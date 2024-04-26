@@ -42,36 +42,29 @@ class ConstantStepSize(StepSizeMethod):
 
 class ArmijoStepSize(StepSizeMethod):
 
-    """ Algorithm 3.1 (Numerical Optimization, Nocedal, Wright)
-    Satisfies armijo condition
+    """ 
+    Applies the Armijo rule to calculate the step size (step_size)
+    
+    The Armijo rule runs a while loop to find the appropriate step_size by starting rom a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`kmax`) the while loop is run.
+        
+    Parameters
+    ----------
+    alpha: float, optional, default=1e6
+        The starting point for the step size iterations 
+    beta: float between 0 and 1, optional, default=0.5
+        The amount the step_size is reduced if the criterion is not met
+    kmax: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
+        The maximum number of iterations to find a suitable step size 
+        
+    Reference
+    ---------
+    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright)
+     https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+    
     """     
     def __init__(self, alpha=1e6, beta=0.5, kmax=None):
         
-        '''Applies the Armijo rule to calculate the step size (step_size)
-
-        https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
-
-        The Armijo rule runs a while loop to find the appropriate step_size by starting
-        from a very large number (alpha). The step_size is found by dividing alpha by 2
-        in an iterative way until a certain criterion is met. To avoid infinite loops, we
-        add a maximum number of times the while loop is run.
-
-        This rule would allow to reach a minimum step_size of 10^-alpha.
-
-        if
-        alpha = numpy.power(10,gamma)
-        delta = 3
-        step_size = numpy.power(10, -delta)
-        with armijo rule we can get to step_size from initial alpha by repeating the while loop k times
-        where
-        alpha / 2^k = step_size
-        10^gamma / 2^k = 10^-delta
-        2^k = 10^(gamma+delta)
-        k = gamma+delta / log10(2) \\approx 3.3 * (gamma+delta)
-
-        if we would take by default delta = gamma
-        kmax = numpy.ceil ( 2 * gamma / numpy.log10(2) )
-        kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
+        '''Initialises the step size rule 
 
         '''
         self.alpha_orig=alpha
@@ -84,6 +77,7 @@ class ArmijoStepSize(StepSizeMethod):
     def __call__(self, algorithm): 
 
         """
+        Applies the Armijo rule to calculate the step size (step_size)
         """
         k = 0
         self.alpha=self.alpha_orig
@@ -106,6 +100,6 @@ class ArmijoStepSize(StepSizeMethod):
             self.alpha *= self.beta
 
         if k == self.kmax:
-            raise ValueError('Could not find a proper step_size in {} loops. Consider increasing alpha.'.format(self.kmax))
+            raise ValueError('Could not find a proper step_size in {} loops. Consider increasing alpha or kmax.'.format(self.kmax))
         return self.alpha
      

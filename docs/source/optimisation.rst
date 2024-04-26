@@ -588,6 +588,46 @@ In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by
    Output:
     15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
 
+
+Step size methods 
+------------------
+A step size method is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD` and is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.ste
+   :members:
+
+We also have a number of example classes:
+
+
+
+
+Preconditioners
+----------------
+A preconditioner is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD` and is called after the calculation of the gradient before the gradient descent step is taken. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Preconditioner
+   :members:
+
+We also have a number of already provided pre-conditioners
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Sensitivity
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.AdaptiveSensitivity
+   :members:
+
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.AdaGrad
+   :members:
+
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Adam
+   :members:
+
 Block Framework
 ***************
 

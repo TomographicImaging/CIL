@@ -50,7 +50,9 @@ class Preconditioner(ABC):
 class Sensitivity(Preconditioner):
     
     """
-    Sensitivity preconditioner class. TODO: need a reference for this! 
+    Sensitivity preconditioner class. 
+    
+    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` 1/(A^T \mathbf{1})` where :math:`A` is an operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.  
 
     Parameters
     ----------
@@ -80,7 +82,7 @@ class Sensitivity(Preconditioner):
     def compute_preconditioner_matrix(self):
         
         """
-        Perform safe division by the sensitivity.
+        Perform safe division by the sensitivity. #TODO: see if this can be done without numpy 
         """
         self.compute_sensitivity()
         sensitivity_np = self.sensitivity.as_array()
@@ -110,18 +112,26 @@ class Sensitivity(Preconditioner):
 class AdaptiveSensitivity(Sensitivity):
 
     """
-    Adaptive Sensitivity preconditioner class. TODO: need a reference for this 
+    Adaptive Sensitivity preconditioner class. 
+    
+    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` (x+\delta)/(A^T \mathbf{1})` where :math:`A` is an operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones. 
+    The point :math:`x` is the current iteration and :math:`delta` is a small positive float. 
+    
 
     Parameters
     ----------
     operator : object
         The operator used for sensitivity computation.
     delta : float, optional
-        The delta value for the __call__.
+        The delta value for the preconditioner.
     iterations : int, optional
-        The maximum number of iterations.
-    array : numpy.ndarray, optional
-        The preconditioner array.
+        The maximum number of iterations before the preconditoner is frozen and no-longer updates.
+    reference : object, optional
+        The reference data.
+
+    Reference
+    ---------
+    Twyman R, Arridge S, Kereta Z, Jin B, Brusaferri L, Ahn S, Stearns CW, Hutton BF, Burger IA, Kotasidis F, Thielemans K. An Investigation of Stochastic Variance Reduction Algorithms for Relative Difference Penalized 3D PET Image Reconstruction. IEEE Trans Med Imaging. 2023 Jan;42(1):29-41. doi: 10.1109/TMI.2022.3203237. Epub 2022 Dec 29. PMID: 36044488.
 
     """
     
@@ -147,8 +157,6 @@ class AdaGrad(Preconditioner):
 
     """
     This Adaptive Gradient method multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epislon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)``. 
-    
-   
     
     Reference
     ---------
@@ -209,7 +217,7 @@ class Adam(Preconditioner):
 
     def __call__(self, algorithm):
         """
-        Method to __call__ the preconditioner. #TODO:
+        Method to __call__ the preconditioner, updating `self.x_update` with the preconditioned gradient.
 
         Parameters
         ----------

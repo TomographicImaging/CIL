@@ -66,8 +66,7 @@ initialise_tests()
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
-
-class TestAlgorithms(CCPiTestClass):
+class TestGD(CCPiTestClass):
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
         initial = ig.allocate()
@@ -92,6 +91,9 @@ class TestAlgorithms(CCPiTestClass):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        self.assertAlmostEqual(alg.get_last_objective(), 0)
+        self.assertNotAlmostEqual(alg.loss[0], alg.loss[1])
 
     def test_update_interval_0(self):
         '''
@@ -161,6 +163,7 @@ class TestAlgorithms(CCPiTestClass):
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
+class TestAlgorithms(CCPiTestClass):
 
     def test_CGLS(self):
         ig = ImageGeometry(10,2)
@@ -523,9 +526,9 @@ class TestAlgorithms(CCPiTestClass):
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_g=0.5)
         pdhg.run(1, verbose=0)
-        self.assertAlmostEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_g * tau))
-        self.assertAlmostEquals(pdhg.tau, tau * pdhg.theta)
-        self.assertAlmostEquals(pdhg.sigma, sigma / pdhg.theta)
+        self.assertAlmostEqual(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_g * tau))
+        self.assertAlmostEqual(pdhg.tau, tau * pdhg.theta)
+        self.assertAlmostEqual(pdhg.sigma, sigma / pdhg.theta)
         pdhg.run(4, verbose=0)
         self.assertNotEqual(pdhg.sigma, sigma)
         self.assertNotEqual(pdhg.tau, tau)
@@ -557,9 +560,9 @@ class TestAlgorithms(CCPiTestClass):
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_fconj=0.5)
         pdhg.run(1, verbose=0)
-        self.assertEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_fconj * sigma))
-        self.assertEquals(pdhg.tau, tau / pdhg.theta)
-        self.assertEquals(pdhg.sigma, sigma * pdhg.theta)
+        self.assertEqual(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_fconj * sigma))
+        self.assertEqual(pdhg.tau, tau / pdhg.theta)
+        self.assertEqual(pdhg.sigma, sigma * pdhg.theta)
         pdhg.run(4, verbose=0)
         self.assertNotEqual(pdhg.sigma, sigma)
         self.assertNotEqual(pdhg.tau, tau)

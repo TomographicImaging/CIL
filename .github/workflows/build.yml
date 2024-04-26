@@ -40,8 +40,8 @@ jobs:
     runs-on: [self-hosted, python, cuda]
     strategy:
       matrix:
-        python-version: [3.9]
-        numpy-version: [1.22]
+        python-version: [3.11]
+        numpy-version: [1.25]
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
@@ -50,7 +50,7 @@ jobs:
       run: |
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
-        sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python=/d' -e 's/(.* numpy=).*/\1${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+        sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -80,15 +80,15 @@ jobs:
     strategy:
       matrix:
         include:
-        - python-version: 3.8
-          numpy-version: 1.21
         - python-version: '3.10'
-          numpy-version: 1.24
+          numpy-version: 1.23
+        - python-version: 3.12
+          numpy-version: 1.26
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
     - name: set requirements
-      run: sed -ri -e '/ python=/d' -e 's/(.* numpy=).*/\1${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -105,11 +105,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
-        numpy-version: [1.22]
+        python-version: [3.11]
+        numpy-version: [1.25]
     steps:
     - uses: actions/checkout@v4
-      with: {fetch-depth: 0, submodules: recursive}
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -130,9 +133,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with: {fetch-depth: 0, submodules: recursive}
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
-      with: {python-version: '3.10'}
+      with: {python-version: 3.11}
     - name: install dependencies
       run: |
         cd docs

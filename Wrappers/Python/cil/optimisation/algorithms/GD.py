@@ -71,7 +71,6 @@ class GD(Algorithm):
             self.step_size = step_size
             self.update_step_size = False
 
-        self.update_objective()
 
         self.x_update = initial.copy()
 

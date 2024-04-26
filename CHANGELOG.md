@@ -1,3 +1,6 @@
+*XX.X.X
+  - Bug fix in gradient descent `update_objective` called twice on the initial point. 
+
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
   - CIL plugin support for TIGRE version v2.6

@@ -284,7 +284,19 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(TypeError):
             reconstructor.set_filter_inplace('unsupported_value')
 
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_plot_filter(self):
+        """The test will not show any screen output
+        Add custom filter to setup"""
+        fdk = GenericFilteredBackProjection(self.ad3D)
+        #for x in reconstructor.preset_filters:
 
+        FBP_filter ='custom'#'hann'#'hamming'#'cosine'#'shepp-logan'#'ram-lak'## 'ram-lak'
+        cutoff = 0.4
+        fdk.set_filter(FBP_filter, cutoff)
+        plot = fdk.plot_filter()
+        
+        
 
 class Test_FDK(unittest.TestCase):
 

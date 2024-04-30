@@ -20,7 +20,10 @@ from abc import ABC, abstractmethod
 import numpy 
 
 
-class StepSizeMethod(ABC):
+class StepSizeRule(ABC):
+    """
+    Abstract base class for a step size rule. The abstract method, `__call__` takes in an algorithm and thus can access all parts of the algorithm (e.g. current iterate, current gradient, objective functions etc) and from this  should return an  a float as a step size. 
+    """
     
     def __init__(self):
         pass
@@ -29,21 +32,29 @@ class StepSizeMethod(ABC):
     def __call__(self, algorithm):
         pass
 
-class ConstantStepSize(StepSizeMethod):
+class ConstantStepSize(StepSizeRule):
+    """
+    Step-size rule that always returns a constant step-size. 
+    
+    Parameters
+    ----------
+    step_size: float
+        The step-size to be returned with each call. 
+    """
     
     def __init__(self, step_size):
         self.step_size=step_size
         
 
-    def __call__(self, algo):
+    def __call__(self, algorithm):
 
         return self.step_size 
 
 
-class ArmijoStepSize(StepSizeMethod):
+class ArmijoStepSize(StepSizeRule):
 
     """ 
-    Applies the Armijo rule to calculate the step size (step_size)
+    Applies the Armijo rule to calculate the step size (step_size).
     
     The Armijo rule runs a while loop to find the appropriate step_size by starting rom a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`kmax`) the while loop is run.
         

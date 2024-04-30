@@ -595,12 +595,16 @@ A step size method is a class which acts on an algorithm and can be passed to  `
 
 Currently in CIL we have a base class:
 
-.. autoclass:: cil.optimisation.utilities.ste
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.StepSizeRule
    :members:
 
 We also have a number of example classes:
 
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ConstantStepSize
+   :members:
 
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSize
+   :members:
 
 
 Preconditioners

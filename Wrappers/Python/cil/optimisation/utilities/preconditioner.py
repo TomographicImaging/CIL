@@ -52,14 +52,14 @@ class Sensitivity(Preconditioner):
     """
     Sensitivity preconditioner class. 
     
-    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` 1/(A^T \mathbf{1})` where :math:`A` is an operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.  
+    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
 
     Parameters
     ----------
-    operator : object
+    operator : CIL Operator 
         The operator used for sensitivity computation.
-    reference : object, optional
-        The reference data.
+    reference : DataContainer e.g. ImageData, optional
+        The reference data, an object in the domain of the operator
     """
             
 
@@ -71,21 +71,15 @@ class Sensitivity(Preconditioner):
             
         self.compute_preconditioner_matrix()
         
-    def compute_sensitivity(self):
-        
-        """
-        Compute the sensitivity. :math:` A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones. 
-        """        
-        
-        self.sensitivity = self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
  
     def compute_preconditioner_matrix(self):
         
         """
-        Perform safe division by the sensitivity. #TODO: see if this can be done without numpy 
+        Compute the sensitivity. :math:`A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.        
+        Then perform safe division by the sensitivity to store the preconditioner array :math:` y/(A^T \mathbf{1})`
         """
-        self.compute_sensitivity()
-        sensitivity_np = self.sensitivity.as_array()
+        
+        sensitivity_np = self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0)).as_array()
         pos_ind = sensitivity_np>0
         array_np = np.zeros(self.operator.domain_geometry().allocate().shape)
 
@@ -114,20 +108,20 @@ class AdaptiveSensitivity(Sensitivity):
     """
     Adaptive Sensitivity preconditioner class. 
     
-    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` (x+\delta)/(A^T \mathbf{1})` where :math:`A` is an operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones. 
+    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
     The point :math:`x` is the current iteration and :math:`delta` is a small positive float. 
     
 
     Parameters
     ----------
-    operator : object
+    operator : CIL object
         The operator used for sensitivity computation.
     delta : float, optional
         The delta value for the preconditioner.
     iterations : int, optional
         The maximum number of iterations before the preconditoner is frozen and no-longer updates.
-    reference : object, optional
-        The reference data.
+    reference : DataContainer e.g. ImageData, optional
+        The reference data, an object in the domain of the operator
 
     Reference
     ---------

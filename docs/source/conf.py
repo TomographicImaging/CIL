@@ -29,7 +29,7 @@ except ImportError:
 # Project information
 project = 'CIL'
 copyright = '2017-2024'
-author = 'CCPi developers'
+author = 'CIL developers'
 version = version.version
 release = version
 _baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")

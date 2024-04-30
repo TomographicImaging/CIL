@@ -81,7 +81,7 @@ Contacts
 
 Please refer to the main `CCPi website`_ for up-to-date information.
 
-The CCPi developers may be contacted:
+The CIL developers may be contacted:
 
 * by joining the `devel mailing list`_
 * on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL or

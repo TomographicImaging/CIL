@@ -62,7 +62,7 @@ defaults:
     show_meta: false
     # sidebar:    		# left, right (default undefined means none)
     comments: false
-    author: CCPi Developers
+    author: CIL developers
 
 #google_site_verification: ''
 #bing_webmastertools_id: ''

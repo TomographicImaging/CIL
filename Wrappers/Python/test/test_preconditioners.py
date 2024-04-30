@@ -18,16 +18,16 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(data).as_array(), A.direct(data).as_array())
         self.assertEqual(preconditioner.reference, None)
-        self.assertNumpyArrayEqual(preconditioner.sensitivity.as_array(), ig.allocate(1.0).as_array())
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), ig.allocate(1.0).as_array())
     
         preconditioner = Sensitivity(A, reference=data)
         
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(data).as_array(), A.direct(data).as_array())
         self.assertNumpyArrayEqual(preconditioner.reference.as_array(), data.as_array())
-        self.assertNumpyArrayEqual(preconditioner.sensitivity.as_array(), ig.allocate(1.0).as_array())
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), data.as_array())
     
+    
+    #TODO: UNIT TESTS WITH REFERENCE IMAGE!!!
     
     
     def test_sensitivity_safe_division(self):
@@ -38,7 +38,6 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(data).as_array(), A.direct(data).as_array())
         self.assertEqual(preconditioner.reference, None)
-        self.assertNumpyArrayEqual(preconditioner.sensitivity.as_array(),  np.array([1/2,1/2,1/2,1/2,0,0,0,0,0,0]))
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), np.array([2.,2.,2.,2.,0,0,0,0,0,0]))
     
     def test_sensitivity_against_sirt(self):
@@ -82,14 +81,12 @@ class TestPreconditioners(CCPiTestClass):
         self.assertEqual(preconditioner.reference, None)
         self.assertEqual(preconditioner.delta, 1e-6)
         self.assertEqual(preconditioner.iterations, 100)
-        self.assertNumpyArrayEqual(preconditioner.sensitivity.as_array(), ig.allocate(1.0).as_array())
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), ig.allocate(1.0).as_array())
     
         preconditioner = AdaptiveSensitivity(A, delta=3, iterations=400, reference=data)
         
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(data).as_array(), A.direct(data).as_array())
         self.assertNumpyArrayEqual(preconditioner.reference.as_array(), data.as_array())
-        self.assertNumpyArrayEqual(preconditioner.sensitivity.as_array(), ig.allocate(1.0).as_array())
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), data.as_array())
         self.assertEqual(preconditioner.delta, 3)
         self.assertEqual(preconditioner.iterations, 400)

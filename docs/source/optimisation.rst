@@ -177,9 +177,9 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
 +----------------+-------+------------+----------------+
-| SAGFunction\*  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
+| SAGFunction\  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
 +----------------+-------+------------+----------------+
-| SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
+| SAGAFunction\ | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
 +----------------+-------+------------+----------------+
 | SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
 +----------------+-------+------------+----------------+

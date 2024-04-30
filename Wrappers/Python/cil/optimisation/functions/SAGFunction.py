@@ -29,8 +29,7 @@ import numpy as np
 class SAGFunction(ApproximateGradientSumFunction):
 
     r"""
-    Stochastic average gradient (SAG) function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_0,...,f_{n-1}}` a `SumFunction`, :math:`f_0+...+f_{n-1}` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
-    and the gradient function returns the approximate gradient. This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method.  
+    Stochastic average gradient (SAG) function
     By incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. See the reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
 
     Parameters:
@@ -78,7 +77,8 @@ class SAGFunction(ApproximateGradientSumFunction):
             self._list_stored_gradients = [
                 0*x for fi in self.functions]
             self._full_gradient_at_iterate = 0*x
-            
+            self._sampled_grad = x.copy()
+            self._stochastic_grad_difference = x.copy()
         
         if self.function_num >= self.num_functions or self.function_num<0 : #check the sampler and raise an error if needed
             raise IndexError(
@@ -86,15 +86,15 @@ class SAGFunction(ApproximateGradientSumFunction):
 
             
         #Calculate the gradient of the sampled function at the current iterate 
-        self._sampled_grad = self.functions[function_num].gradient(x)
+        self.functions[function_num].gradient(x, out=self._sampled_grad)
 
         
         #Calculate the difference between the new gradient of the sampled function and the stored one
-        self._stochastic_grad_difference = self._sampled_grad.sapyb(
-            1., self._list_stored_gradients[function_num], -1.)
+        self._sampled_grad.sapyb(
+            1., self._list_stored_gradients[function_num], -1., out=self._stochastic_grad_difference)
 
         #Calculate the  approximate gradient
-        out =self._update_approx_gradient(out)
+        out = self._update_approx_gradient(out)
 
         #Update the stored gradients 
         self._list_stored_gradients[function_num].fill(
@@ -133,7 +133,9 @@ class SAGFunction(ApproximateGradientSumFunction):
 
     @property
     def data_passes_indices(self): 
-        """ The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.   """
+        """ The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  
+        This is overwritten from the base class to first check to see if the approximate gradient was warm started and, if it was, ensure that the first element of `data_passes_indices` contains each index used to warm start and the index used in the first call to `gradient`. Thus the length of `data_passes_indices` is always equal to the number of calls to `gradient`. 
+        """
         ret = self._data_passes_indices[:]  
         if len(ret[0]) == self.num_functions:  
             a = ret.pop(1)  
@@ -143,8 +145,7 @@ class SAGFunction(ApproximateGradientSumFunction):
 class SAGAFunction(SAGFunction):
 
     """
-    An accelerated version of the stochastic average gradient (SAG) function, a child class of `ApproximateGradientSumFunction`, which defines from a list of functions, :math:`{f_1,...,f_n}` a `SumFunction`, :math:`f_1+...+f_n` where each time the `gradient` is called, the `sampler` provides an index, :math:`i \in {1,...,n}` 
-   and the gradient function returns the approximate gradient.  This can be used with the `cil.optimisation.algorithms` algorithm GD to give a stochastic optimisation method. 
+    An accelerated version of the stochastic average gradient (SAG) function
    SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates. See reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
    
 

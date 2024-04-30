@@ -130,6 +130,8 @@ class SAGFunction(ApproximateGradientSumFunction):
             fi.gradient(initial) for fi in self.functions]
         self._full_gradient_at_iterate = np.sum(self._list_stored_gradients)
         self._update_data_passes_indices(list(range(self.num_functions)))
+        self._sampled_grad = initial.copy()
+        self._stochastic_grad_difference = initial.copy()
 
     @property
     def data_passes_indices(self): 

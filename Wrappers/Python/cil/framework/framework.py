@@ -196,7 +196,7 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        out.geometry = blk_geo
+        # out.geometry = blk_geo
         axis = self.dimension_labels.index('angle')
 
         for i in range(num_batches):

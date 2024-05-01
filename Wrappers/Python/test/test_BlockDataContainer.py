@@ -994,3 +994,19 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
 
         assert cp0.pnorm(2) == np.sqrt(0**2 + 1**2)
+
+    def test_equals(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+
+        data0 = ig0.allocate(0)
+        data2 = ig0.allocate(1)
+
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = BlockDataContainer(data0,data2)
+
+        assert cp0.geometry == cp1.geometry
+
+        cp1 = BlockDataContainer(data2,data2,data2)
+
+        assert cp0 != cp1

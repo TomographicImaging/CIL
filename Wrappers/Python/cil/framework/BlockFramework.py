@@ -108,7 +108,10 @@ class BlockGeometry(object):
             raise StopIteration
     
     def __eq__(self, value: object) -> bool:
-        return functools.reduce(lambda x,y: x and y, [self.geometries[i] == value.geometries[i] for i in range(len(self.geometries))], True)
+        if len(self.geometries) != len(value.geometries):
+            return False
+        return functools.reduce(lambda x,y: x and y, [self.geometries[i] == value.geometries[i] \
+                                                      for i in range(len(self.geometries))], True)
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
@@ -155,7 +158,6 @@ class BlockDataContainer(object):
         ''''''
         self.containers = args
         self.index = 0
-        self.geometry = None
         #if len(set([i.shape for i in self.containers])):
         #    self.geometry = self.containers[0].geometry
 
@@ -738,6 +740,6 @@ class BlockDataContainer(object):
     @property
     def geometry(self):
         try:
-            return BlockGeometry(*[el.copy() for el in self.containers.geometry])
+            return BlockGeometry(*[el.geometry.copy() for el in self.containers])
         except AttributeError:
             return None

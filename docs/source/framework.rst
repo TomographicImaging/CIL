@@ -82,7 +82,7 @@ in :code:`AcquisitionGeometry`, with the z-direction aligned with the rotation a
 BlockGeometry
 =============
 
-.. autoclass:: cil.framework.BlockFramework
+.. autoclass:: cil.framework.BlockFramework.BlockGeometry
    :members:
    :inherited-members:
 
@@ -170,7 +170,7 @@ represents a column vector of :code:`DataContainer` s.
 
 This provide a base class that will behave as normal :code:`DataContainer`.
 
-.. autoclass:: cil.framework.BlockDataContainer
+.. autoclass:: cil.framework.BlockFramework.BlockDataContainer
    :members:
    :inherited-members:
 

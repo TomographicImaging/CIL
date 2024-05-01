@@ -983,7 +983,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         cp0 = BlockDataContainer(data0,data2)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'pnorm: Incompatible shapes'):
             cp0.pnorm(2)
 
         cp0 = BlockDataContainer(data2,data2)
@@ -998,7 +998,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         cp0 = BlockDataContainer(data0,data2)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'pnorm: Incompatible shapes'):
             cp0.pnorm(1)
 
         cp0 = BlockDataContainer(data2,data2)

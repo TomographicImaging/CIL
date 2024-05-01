@@ -52,7 +52,7 @@ class Sensitivity(Preconditioner):
     """
     Sensitivity preconditioner class. 
     
-    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
+    In each call to the preconditioner the `algorithm.gradient_update` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
 
     Parameters
     ----------
@@ -101,14 +101,14 @@ class Sensitivity(Preconditioner):
             The algorithm object.
         """
         
-        algorithm.x_update.multiply(self.array, out=algorithm.x_update)
+        algorithm.gradient_update.multiply(self.array, out=algorithm.gradient_update)
 
 class AdaptiveSensitivity(Sensitivity):
 
     """
     Adaptive Sensitivity preconditioner class. 
     
-    In each call to the preconditioner the `algorithm.x_update` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
+    In each call to the preconditioner the `algorithm.gradient_update` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
     The point :math:`x` is the current iteration and :math:`delta` is a small positive float. 
     
 
@@ -141,9 +141,9 @@ class AdaptiveSensitivity(Sensitivity):
     
         if algorithm.iteration<=self.iterations:
             self.array.multiply(algorithm.x + self.delta, out=self.freezing_point)
-            algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)            
+            algorithm.gradient_update.multiply(self.freezing_point, out=algorithm.gradient_update)            
         else:  
-            algorithm.x_update.multiply(self.freezing_point, out=algorithm.x_update)
+            algorithm.gradient_update.multiply(self.freezing_point, out=algorithm.gradient_update)
 
         
         
@@ -173,14 +173,14 @@ class AdaGrad(Preconditioner):
         """    
               
         if self.gradient_accumulator is None:
-            self.gradient_accumulator = algorithm.x_update.multiply(algorithm.x_update)
+            self.gradient_accumulator = algorithm.gradient_update.multiply(algorithm.gradient_update)
             
         
         else: 
-            self.gradient_accumulator.add(  algorithm.x_update.multiply(algorithm.x_update), out=self.gradient_accumulator)
+            self.gradient_accumulator.add(  algorithm.gradient_update.multiply(algorithm.gradient_update), out=self.gradient_accumulator)
             
 
-        algorithm.x_update.divide(( self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
+        algorithm.gradient_update.divide(( self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.gradient_update)
 
         
 class Adam(Preconditioner):
@@ -211,7 +211,7 @@ class Adam(Preconditioner):
 
     def __call__(self, algorithm):
         """
-        Method to __call__ the preconditioner, updating `self.x_update` with the preconditioned gradient.
+        Method to __call__ the preconditioner, updating `self.gradient_update` with the preconditioned gradient.
 
         Parameters
         ----------
@@ -220,13 +220,13 @@ class Adam(Preconditioner):
         """    
         
         if self.gradient_accumulator is None:
-            self.gradient_accumulator = algorithm.x_update.copy()
-            self.scaling_factor_accumulator=  algorithm.x_update.multiply(algorithm.x_update)
+            self.gradient_accumulator = algorithm.gradient_update.copy()
+            self.scaling_factor_accumulator=  algorithm.gradient_update.multiply(algorithm.gradient_update)
         
         else: 
-            self.gradient_accumulator.sapyb(self.gamma, algorithm.x_update, (1-self.gamma), out=self.gradient_accumulator)
-            self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.x_update.multiply(algorithm.x_update), (1-self.beta), out=self.scaling_factor_accumulator)
+            self.gradient_accumulator.sapyb(self.gamma, algorithm.gradient_update, (1-self.gamma), out=self.gradient_accumulator)
+            self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.gradient_update.multiply(algorithm.gradient_update), (1-self.beta), out=self.scaling_factor_accumulator)
         
-        self.gradient_accumulator.divide(( self.scaling_factor_accumulator+self.epsilon).sqrt(), out=algorithm.x_update)
+        self.gradient_accumulator.divide(( self.scaling_factor_accumulator+self.epsilon).sqrt(), out=algorithm.gradient_update)
         
         

@@ -94,17 +94,17 @@ class ArmijoStepSize(StepSizeRule):
         self.alpha=self.alpha_orig
         f_x = algorithm.objective_function(algorithm.x)
         
-        self.x_update = algorithm.x_update
+        self.gradient_update = algorithm.gradient_update
         
         self.x_armijo = algorithm.x.copy()
 
         while k < self.kmax:
-            # self.x - alpha * self.x_update
-            self.x_update.multiply(self.alpha, out=self.x_armijo)
+            # self.x - alpha * self.gradient_update
+            self.gradient_update.multiply(self.alpha, out=self.x_armijo)
             algorithm.x.subtract(self.x_armijo, out=self.x_armijo)
 
             f_x_a = algorithm.objective_function(self.x_armijo)
-            sqnorm = self.x_update.squared_norm()
+            sqnorm = self.gradient_update.squared_norm()
             if f_x_a - f_x <= - ( self.alpha/2. ) * sqnorm:
                 break
             k += 1.

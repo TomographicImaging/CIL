@@ -106,6 +106,9 @@ class BlockGeometry(object):
         else:
             self.index = 0
             raise StopIteration
+    
+    def __eq__(self, value: object) -> bool:
+        return functools.reduce(lambda x,y: x and y, [self.geometries[i] == value.geometries[i] for i in range(len(self.geometries))], True)
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector

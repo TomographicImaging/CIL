@@ -1020,3 +1020,18 @@ class TestBlockDataContainerGeometry(BDCUnittest):
         cp1 = BlockDataContainer(data2,data2,data2)
 
         assert cp0 != cp1
+
+    def test_geometry_None(self):
+        ig0 = ImageGeometry(2,3,4)
+        
+        data0 = ig0.allocate(0)
+        
+        from cil.framework import DataContainer
+        X, Y, Z = 1, 12, 5
+        
+        a = numpy.ones((X, Y, Z), dtype='float32')
+        ds = DataContainer(a, False, ['X', 'Y', 'Z'])
+
+        cp0 = BlockDataContainer(data0,ds)
+
+        assert cp0.geometry is None

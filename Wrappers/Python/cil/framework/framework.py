@@ -42,7 +42,7 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
-from cil.framework.BlockFramework import BlockGeometry
+from cil.framework import BlockGeometry
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +196,6 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        # out.geometry = blk_geo
         axis = self.dimension_labels.index('angle')
 
         for i in range(num_batches):

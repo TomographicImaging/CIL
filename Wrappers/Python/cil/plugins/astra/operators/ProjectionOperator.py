@@ -18,7 +18,7 @@
 
 from cil.framework import DataOrder
 from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
-from cil.framework.BlockGeometry import BlockGeometry
+from cil.framework.BlockFramework import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.plugins.astra.operators import AstraProjector3D
 from cil.plugins.astra.operators import AstraProjector2D

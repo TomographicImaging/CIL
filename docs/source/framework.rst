@@ -82,7 +82,7 @@ in :code:`AcquisitionGeometry`, with the z-direction aligned with the rotation a
 BlockGeometry
 =============
 
-.. autoclass:: cil.framework.BlockGeometry
+.. autoclass:: cil.framework.BlockFramework
    :members:
    :inherited-members:
 

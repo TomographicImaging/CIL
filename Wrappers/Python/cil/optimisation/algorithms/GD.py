@@ -18,8 +18,10 @@
 
 import numpy
 from cil.optimisation.algorithms import Algorithm
-import warnings
 import logging
+
+log = logging.getLogger(__name__)
+
 
 class GD(Algorithm):
     """Gradient Descent algorithm"""
@@ -54,7 +56,7 @@ class GD(Algorithm):
         :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size'''
-        logging.info("%s setting up", self.__class__.__name__)
+        log.info("%s setting up", self.__class__.__name__)
 
         self.x = initial.copy()
         self.objective_function = objective_function
@@ -69,12 +71,11 @@ class GD(Algorithm):
             self.step_size = step_size
             self.update_step_size = False
 
-        self.update_objective()
 
         self.x_update = initial.copy()
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
+        log.info("%s configured", self.__class__.__name__)
 
     def update(self):
         '''Single iteration'''

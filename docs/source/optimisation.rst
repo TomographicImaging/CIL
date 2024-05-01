@@ -221,7 +221,7 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
 
    #define the sampler and the stochastic gradient function 
-   sampler = Sampler.staggered(len(list_of_functions))
+   sampler = Sampler.staggered(len(list_of_functions), stride=2)
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 
@@ -320,7 +320,12 @@ GradientOperator
    :members:
 
 
+WaveletOperator
+---------------
+We utilise PyWavelets (https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
 
+.. autoclass:: cil.optimisation.operators.WaveletOperator
+   :members:
 
 
 
@@ -447,6 +452,14 @@ Least Squares
 .. autoclass:: cil.optimisation.functions.LeastSquares
    :members:
    :inherited-members:
+
+
+L1 Sparsity
+----------
+.. autoclass:: cil.optimisation.functions.L1Sparsity
+   :members:
+   :inherited-members:
+
 
 Mixed L21 norm
 --------------

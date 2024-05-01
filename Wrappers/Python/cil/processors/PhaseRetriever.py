@@ -115,6 +115,15 @@ class PaganinPhaseRetriever(PhaseRetriever):
     def check_input(self, data):
         geometry = data.geometry
 
+        # if magnification is not specified by the user, use the value in geometry, or default = 1
+        if self.magnification_user is None:
+            if geometry.magnification == None:
+                self.magnification = 1
+            else:
+                self.magnification = geometry.magnification
+        else:
+            self.magnification = self.magnification_user
+
         # if propagation_distance is not specified by the user, use the value in geometry
         if self.propagation_distance_user is None: 
             if data.geometry.dist_center_detector is None:
@@ -127,15 +136,7 @@ class PaganinPhaseRetriever(PhaseRetriever):
                 self.propagation_distance = (propagation_distance)*self.geometry_unit_multiplier
         else:
             self.propagation_distance = self.propagation_distance_user
-        
-        # if magnification is not specified by the user, use the value in geometry, or default = 1
-        if self.magnification_user is None:
-            if geometry.magnification == None:
-                self.magnification = 1
-            else:
-                self.magnification = geometry.magnification
-        else:
-            self.magnification = self.magnification_user
+        self.propagation_distance = self.propagation_distance/self.magnification
 
         if self.pixel_size_user is None:
             if (geometry.pixel_size_h - geometry.pixel_size_v ) / \
@@ -147,6 +148,7 @@ class PaganinPhaseRetriever(PhaseRetriever):
                     )
         else:
             self.pixel_size = self.pixel_size_user
+        self.pixel_size = self.pixel_size/self.magnification
         
         return True
         

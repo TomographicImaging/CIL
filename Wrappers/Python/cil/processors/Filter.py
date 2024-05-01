@@ -51,7 +51,7 @@ class Filter(Processor):
             The optical magnification at the detector. If not specified, either the value in data.geometry.magnification will be used or a default of 1
 
         pixel_size: float (optional)
-            The detector pixel size. If not specified, either values in data.geometry.pixel_size_h and pixel_size_v will be used or a default of 1e-6
+            The detector pixel size. If not specified, either values in data.geometry.pixel_size_h and pixel_size_v will be used or a default of 10e-6
 
         geometry_unit_multiplier: float (optional)
             Multiplier to convert units stored in geometry to metres, conversion applies to pixel size or propagation distance (only if the geometry value is used not 
@@ -92,6 +92,15 @@ class PaganinFilter(Filter):
         if not isinstance(self.delta_beta, (int, float)):
             raise TypeError('delta_beta must be a real number, got type '.format(type(self.delta_beta)))
         
+        # if magnification is not specified by the user, use the value in geometry, or default = 1
+        if self.magnification_user is None:
+            if data.geometry.magnification == None:
+                self.magnification = 1
+            else:
+                self.magnification = data.geometry.magnification
+        else:
+            self.magnification = self.magnification_user
+
         # if propagation_distance is not specified by the user, use the value in geometry, or default = 1
         if self.propagation_distance_user is None: 
             if data.geometry.dist_center_detector is None:
@@ -103,21 +112,12 @@ class PaganinFilter(Filter):
         else:
             if not isinstance(self.propagation_distance_user, (int, float)):
                 raise TypeError('propagation_distance must be a real number, got type '.format(type(self.propagation_distance_user)))
-            self.propagation_distance = self.propagation_distance_user
+            self.propagation_distance = self.propagation_distance_user        
 
-        # if magnification is not specified by the user, use the value in geometry, or default = 1
-        if self.magnification_user is None:
-            if data.geometry.magnification == None:
-                self.magnification = 1
-            else:
-                self.magnification = data.geometry.magnification
-        else:
-            self.magnification = self.magnification_user
-
-        # if pixel_size is not specified by the user, use the value in geometry, or default = 1e-6
+        # if pixel_size is not specified by the user, use the value in geometry, or default = 10e-6
         if self.pixel_size_user is None:
             if (data.geometry.pixel_size_h == None) | (data.geometry.pixel_size_v == None):
-                self.pixel_size = 1e-6
+                self.pixel_size = 10e-6
             else:
                 if (data.geometry.pixel_size_h - data.geometry.pixel_size_v ) / \
                     (data.geometry.pixel_size_h + data.geometry.pixel_size_v ) < 1e-5:

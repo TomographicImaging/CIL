@@ -110,8 +110,8 @@ class BlockGeometry(object):
     def __eq__(self, value: object) -> bool:
         if len(self.geometries) != len(value.geometries):
             return False
-        return functools.reduce(lambda x,y: x and y, [self.geometries[i] == value.geometries[i] \
-                                                      for i in range(len(self.geometries))], True)
+        return functools.reduce(lambda x,y: x and y, \
+                                [sel == vel for sel,vel in zip(self.geometries, value.geometries)], True)
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
@@ -556,7 +556,7 @@ class BlockDataContainer(object):
         return numpy.sqrt(self.squared_norm())
 
     def pnorm(self, p=2):
-
+        # See https://github.com/TomographicImaging/CIL/issues/1525#issuecomment-1757413803
         if p==1:
             return sum(self.abs())
         elif p==2:

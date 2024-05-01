@@ -1,8 +1,9 @@
 
 * XX.X.X
   - Added wavelet operator, wrapping PyWavelets operator as a CIL operator
-  - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, A
-  - Bug fix in gradient descent `update_objective` called twice on the initial point. 
+  - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, A
+  - Bug fix in gradient descent `update_objective` called twice on the initial point.
+  - ProjectionMap operator bug fix in adjoint and added documentation #1743
 
 
 * 24.0.0

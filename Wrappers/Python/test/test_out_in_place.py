@@ -23,9 +23,12 @@ import numpy as np
 
 from cil.utilities.errors import InPlaceError
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
-from cil.optimisation.operators import IdentityOperator
-from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, BlockFunction
-from cil.optimisation.operators import LinearOperator, MatrixOperator
+
+
+from cil.optimisation.operators import IdentityOperator, WaveletOperator
+from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
+from cil.optimisation.operators import LinearOperator, MatrixOperator  
+
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator,  DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
@@ -108,7 +111,8 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),
             (MixedL11Norm(), bg),
-            (BlockFunction(L1Norm(),L2NormSquared()), bg)
+            (BlockFunction(L1Norm(),L2NormSquared()), bg),
+            (L1Sparsity(WaveletOperator(ig)), ig)
 
         ]
 
@@ -233,6 +237,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             (BlurringOperator(PSF,ig), ig),
             (FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann') , ig),
             (FiniteDifferenceOperator(ig, direction = 0) , ig)]
+            
 
 
         self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]

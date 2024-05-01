@@ -3136,6 +3136,63 @@ Y : gm_range ( Default: Y = X )</p>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.operators.ProjectionMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></span><span class="sig-name descname"><span class="pre">ProjectionMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ProjectionMap/#ProjectionMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ProjectionMap" title="Permalink to this definition">#</a></dt>
+<dd><p>Projection Map or Canonical Projection (<a class="reference external" href="https://en.wikipedia.org/wiki/Projection_(mathematics">https://en.wikipedia.org/wiki/Projection_(mathematics</a>))</p>
+<p>Takes an element <span class="math notranslate nohighlight">\(x = (x_{0},\dots,x_{i},\dots,x_{n})\)</span> from a Cartesian product space <span class="math notranslate nohighlight">\(X_{1}\times\cdots\times X_{n}\rightarrow X_{i}\)</span>
+and projects it to element <span class="math notranslate nohighlight">\(x_{i}\)</span> specified by the index <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\pi_{i}: X_{1}\times\cdots\times X_{n}\rightarrow X_{i}\]</div>
+<div class="math notranslate nohighlight">
+\[\pi_{i}(x_{0},\dots,x_{i},\dots,x_{n}) = x_{i}\]</div>
+<p>The adjoint operation, is defined as</p>
+<div class="math notranslate nohighlight">
+\[\pi_{i}^{*}(x_{i}) = (0, \cdots, x_{i}, \cdots, 0)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_geometry</strong> (<cite>BlockGeometry</cite>) – The domain of the <cite>ProjectionMap</cite>. A <cite>BlockGeometry</cite> is expected.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – Index to project to the corresponding <cite>ImageGeometry</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.ProjectionMap.direct">
+<span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ProjectionMap/#ProjectionMap.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ProjectionMap.direct" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the ith (<cite>index</cite>) element of the Block data container, <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>BlockDataContainer</cite>) – </p></li>
+<li><p><strong>out</strong> (<cite>DataContainer</cite>, default <cite>None</cite>) – If <cite>out</cite> is not <cite>None</cite> the output of the <cite>ProjectionMap</cite> will be filled in <cite>out</cite>, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>DataContainer</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.ProjectionMap.adjoint">
+<span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ProjectionMap/#ProjectionMap.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ProjectionMap.adjoint" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a <cite>BlockDataContainer</cite> of zeros with the ith (<cite>index</cite>) filled with the <cite>DataContainer</cite>, <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<cite>DataContainer</cite>) – </p></li>
+<li><p><strong>out</strong> (<cite>BlockDataContainer</cite>, default <cite>None</cite>) – If <cite>out</cite> is not <cite>None</cite> the output of the adjoint of the <cite>ProjectionMap</cite> will be filled in <cite>out</cite>, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>BlockDataContainer</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="gradientoperator">
 <h3>GradientOperator<a class="headerlink" href="#gradientoperator" title="Permalink to this headline">#</a></h3>

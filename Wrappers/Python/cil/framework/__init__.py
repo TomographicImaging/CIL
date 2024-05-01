@@ -29,7 +29,7 @@ from .framework import VectorData, VectorGeometry
 from .framework import find_key, message
 from .framework import DataProcessor, Processor
 from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
-from .BlockDataContainer import BlockDataContainer
-from .BlockGeometry import BlockGeometry
+from .BlockFramework import BlockDataContainer
+from .BlockFramework import BlockGeometry
 from .framework import DataOrder
 from .framework import Partitioner

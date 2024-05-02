@@ -42,7 +42,7 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
-from cil.framework.BlockFramework import BlockGeometry
+from .BlockFramework import BlockGeometry
 
 log = logging.getLogger(__name__)
 

@@ -8,7 +8,7 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.
-    - ProjectionMap operator bug fix in adjoint and added documentation #1743
+    - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
 
 
 * 24.0.0

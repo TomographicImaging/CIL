@@ -558,7 +558,7 @@ class BlockDataContainer(object):
     def pnorm(self, p=2):
         # See https://github.com/TomographicImaging/CIL/issues/1525#issuecomment-1757413803
         if not functools.reduce(lambda x,y: x and y, [el.shape == self.containers[0].shape for el in self.containers], True):
-            raise ValueError('pnorm: Incompatible shapes')
+            raise ValueError('pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm')
         if p==1:
             return sum(self.abs())
         elif p==2:

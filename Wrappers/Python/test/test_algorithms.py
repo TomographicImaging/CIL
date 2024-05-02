@@ -31,6 +31,7 @@ from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 from cil.framework import BlockGeometry
 
+from cil.optimisation.utilities import ArmijoStepSize, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
@@ -39,11 +40,14 @@ from cil.optimisation.functions import LeastSquares, ZeroFunction, \
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler
 from cil.optimisation.functions import IndicatorBox
 
+from scipy.optimize import minimize, rosen
+
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.algorithms import GD
 from cil.optimisation.algorithms import CGLS
 from cil.optimisation.algorithms import SIRT
 from cil.optimisation.algorithms import FISTA
+from cil.optimisation.algorithms import ISTA
 from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
@@ -65,8 +69,29 @@ initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
+    
+from utils import has_cvxpy
 
+if has_cvxpy:
+    import cvxpy
+    
 class TestGD(CCPiTestClass):
+    def setUp(self):
+
+        x0_1 = 1.1
+        x0_2 = 1.1
+        # x0_1 = 0.5
+        # x0_2 = 0.5
+        self.x0 = np.array([x0_1, x0_2])
+
+        self.initial = VectorData(np.array(self.x0))
+        method = 'Nelder-Mead'# or "BFGS"
+        # self.scipy_opt_low = minimize(rosen, self.x0, method=method, tol=1e-3, options={"maxiter":50})
+        self.scipy_opt_high = minimize(rosen, self.x0, method=method, tol=1e-2) # (1., 1.)
+        self.f =  Rosenbrock(alpha=1, beta=100) #fixed (alpha=1, beta=100) same to Scipy, min at (alpha,alpha^2)
+                
+                
+                
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
         initial = ig.allocate()
@@ -118,34 +143,103 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
 
+    def test_gd_step_size_init(self):
+        gd = GD(initial = self.initial, objective_function = self.f, step_size = 0.002)
+        self.assertEqual(gd.step_size_rule.step_size, 0.002)
+        self.assertEqual(gd.step_size, 0.002)
+        
+        gd = GD(initial = self.initial, objective_function = self.f)
+        self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
+        self.assertEqual(gd.step_size_rule.beta, 0.5)
+        self.assertEqual(gd.step_size_rule.kmax, np.ceil (2 * np.log10(1e6) / np.log10(2)))
+        with self.assertRaises(TypeError):
+            gd.step_size
+        
+        
+        gd = GD(initial = self.initial, objective_function = self.f, alpha=1e2, beta=0.25)
+        self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
+        self.assertEqual(gd.step_size_rule.beta, 0.25)
+        self.assertEqual(gd.step_size_rule.kmax, np.ceil (2 * np.log10(1e2) / np.log10(2)))
+       
+        with self.assertRaises(TypeError):
+            gd = GD(initial = self.initial,objective_function = self.f, step_size=0.1, step_size_rule=ConstantStepSize(0.5))
+        
+        
+    def test_gd_constant_step_size_init(self):
+        rule=ConstantStepSize(0.4)
+        self.assertEqual(rule.step_size, 0.4)
+        gd = GD(initial = self.initial, objective_function = self.f, step_size_rule=rule)
+        self.assertEqual(gd.step_size_rule.step_size, 0.4)
+        self.assertEqual(gd.step_size, 0.4)
+        
+    def test_gd_fixed_step_size_rosen(self):
 
+        gd = GD(initial = self.initial, objective_function = self.f, step_size = 0.002,
+                    max_iteration = 3000, 
+                    update_objective_interval =  500)
+        gd.run(verbose=0)    
+        np.testing.assert_allclose(gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
+        np.testing.assert_allclose(gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
+        
+    def test_armijo_step_size_init(self):
 
+        rule=ArmijoStepSize()
+        self.assertEqual(rule.alpha_orig, 1e6)
+        self.assertEqual(rule.beta, 0.5)
+        self.assertEqual(rule.kmax, np.ceil (2 * np.log10(1e6) / np.log10(2)))
+       
+        gd = GD(initial = self.initial, objective_function = self.f, step_size_rule=rule)
+        self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
+        self.assertEqual(gd.step_size_rule.beta, 0.5)
+        self.assertEqual(gd.step_size_rule.kmax, np.ceil (2 * np.log10(1e6) / np.log10(2)))
+       
+        rule=ArmijoStepSize(5e5,0.2,5)
+        self.assertEqual(rule.alpha_orig, 5e5)
+        self.assertEqual(rule.beta, 0.2)
+        self.assertEqual(rule.kmax, 5)
+       
+        gd = GD(initial = self.initial, objective_function = self.f, step_size_rule=rule)
+        self.assertEqual(gd.step_size_rule.alpha_orig, 5e5)
+        self.assertEqual(gd.step_size_rule.beta, 0.2)
+        self.assertEqual(gd.step_size_rule.kmax, 5)
+        
+        with self.assertRaises(TypeError):
+            gd.step_size
 
-
-class TestAlgorithms(CCPiTestClass):
-
-    def test_CGLS(self):
-        ig = ImageGeometry(10,2)
-        np.random.seed(2)
-        initial = ig.allocate(1.)
+    def test_GDArmijo(self):
+        ig = ImageGeometry(12,13,14)
+        initial = ig.allocate()
+        # b = initial.copy()
+        # fill with random numbers
+        # b.fill(np.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
 
-        alg = CGLS(initial=initial, operator=identity, data=b)
+        norm2sq = LeastSquares(identity, b)
 
-        np.testing.assert_array_equal(initial.as_array(), alg.solution.as_array())
-
-        alg.max_iteration = 200
-        alg.run(20, verbose=0)
+        alg = GD(initial=initial, objective_function=norm2sq)
+        alg.max_iteration = 100
+        alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
-        alg = CGLS(initial=initial, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
-        self.assertTrue(alg.max_iteration == 200)
+        alg = GD(initial=initial, objective_function=norm2sq,
+                 max_iteration=20, update_objective_interval=2)
+        #alg.max_iteration = 20
+        self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+    def test_gd_armijo_rosen(self):        
+        armj = ArmijoStepSize(alpha=50, kmax=150)
+        gd = GD(initial = self.initial, objective_function = self.f, step_size_rule = armj,
+                    max_iteration = 2500, 
+                    update_objective_interval =  500)
+        gd.run(verbose=0)  
+        np.testing.assert_allclose(gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
+        np.testing.assert_allclose(gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2) 
 
 
+class TestFISTA(CCPiTestClass):                   
     def test_FISTA(self):
         ig = ImageGeometry(127,139,149)
         initial = ig.allocate()
@@ -289,7 +383,204 @@ class TestAlgorithms(CCPiTestClass):
         opt = {'tol': 1e-4, 'memopt':False}
         log.info("initial objective %s", norm2sq(initial))
         with self.assertRaises(ValueError):
-            alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
+            alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())                
+
+    def test_FISTA_Denoising(self):
+        # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
+        data = dataexample.SHAPES.get()
+        ig = data.geometry
+        ag = ig
+        N=300
+        # Create Noisy data with Poisson noise
+        scale = 5
+        noisy_data = applynoise.poisson(data/scale,seed=10) * scale
+
+        # Regularisation Parameter
+        alpha = 10
+
+        # Setup and run the FISTA algorithm
+        operator = GradientOperator(ig)
+        fid = KullbackLeibler(b=noisy_data)
+        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
+
+        initial = ig.allocate()
+        fista = FISTA(initial=initial , f=reg, g=fid)
+        fista.max_iteration = 3000
+        fista.update_objective_interval = 500
+        fista.run(verbose=0)
+        rmse = (fista.get_output() - data).norm() / data.as_array().size
+        log.info("RMSE %f", rmse)
+        self.assertLess(rmse, 4.2e-4)
+        
+ 
+        
+class testISTA(CCPiTestClass):
+
+    def setUp(self):
+
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0,1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+        self.h = L1Norm()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+
+    def tearDown(self):
+        pass
+
+    def test_signature(self):
+
+        # check required arguments (initial, f, g)
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(f = self.f, g = self.g)
+
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(initial = self.initial, f = self.f)
+
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(initial = self.initial, g = self.g)
+
+        # ista no step-size
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g)
+        np.testing.assert_equal(ista.step_size, 0.99*2./self.f.L)
+
+        # ista step-size
+        tmp_step_size = 10.
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, step_size=tmp_step_size)
+        np.testing.assert_equal(ista.step_size, tmp_step_size)
+
+        # check initialisation
+        self.assertTrue( id(ista.x)!=id(ista.initial) )
+        self.assertTrue( id(ista.x_old)!=id(ista.initial))
+
+    def test_update(self):
+
+        # ista run 10 iteration
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=1)
+        ista.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):
+            x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+            x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue( res1==res2)
+
+    def test_update_g_none(self):
+
+        # ista run 10 iteration
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = self.f, g = None,  max_iteration=1)
+        ista.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+
+        x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+        x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue( res1==res2)
+
+    def test_update_f_none(self):
+
+        # ista run 1 iteration
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = None, g = self.h,  max_iteration=1)
+        ista.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):
+            x = ista.g.proximal(x_old,ista.step_size)
+            x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.h(x)
+        self.assertTrue( res1==res2)
+
+    def test_f_and_g_none(self):
+        tmp_initial = self.ig.allocate()
+        with self.assertRaises(ValueError):
+            ista = ISTA(initial = tmp_initial, f = None, g = None,  max_iteration=1)
+
+
+
+    def test_provable_condition(self):
+
+        tmp_initial = self.ig.allocate()
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10)
+        self.assertTrue(ista1.is_provably_convergent())
+
+        ista1 = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10, step_size=30.0)
+        self.assertFalse(ista1.is_provably_convergent())
+
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
+    def test_with_cvxpy(self):
+
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=2000)
+        ista.run(verbose=0)
+
+        u_cvxpy = cvxpy.Variable(self.ig.shape[0])
+        objective = cvxpy.Minimize(0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4)
+
+        np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(u_cvxpy.value, ista.solution.array, atol=1e-3)
+
+class TestCGLS(CCPiTestClass):
+    def test_CGLS(self):
+        ig = ImageGeometry(10,2)
+        np.random.seed(2)
+        initial = ig.allocate(1.)
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+
+        alg = CGLS(initial=initial, operator=identity, data=b)
+
+        np.testing.assert_array_equal(initial.as_array(), alg.solution.as_array())
+
+        alg.max_iteration = 200
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = CGLS(initial=initial, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 200)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+class TestPDHG(CCPiTestClass):
+
 
 
     def test_PDHG_Denoising(self):
@@ -556,32 +847,7 @@ class TestAlgorithms(CCPiTestClass):
         except ValueError as err:
             log.info(str(err))
 
-    def test_FISTA_Denoising(self):
-        # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        data = dataexample.SHAPES.get()
-        ig = data.geometry
-        ag = ig
-        N=300
-        # Create Noisy data with Poisson noise
-        scale = 5
-        noisy_data = applynoise.poisson(data/scale,seed=10) * scale
-
-        # Regularisation Parameter
-        alpha = 10
-
-        # Setup and run the FISTA algorithm
-        operator = GradientOperator(ig)
-        fid = KullbackLeibler(b=noisy_data)
-        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
-
-        initial = ig.allocate()
-        fista = FISTA(initial=initial , f=reg, g=fid)
-        fista.max_iteration = 3000
-        fista.update_objective_interval = 500
-        fista.run(verbose=0)
-        rmse = (fista.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 4.2e-4)
+  
 
 
 

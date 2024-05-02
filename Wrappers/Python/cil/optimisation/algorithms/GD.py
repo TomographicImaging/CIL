@@ -124,3 +124,11 @@ class GD(Algorithm):
         return super().should_stop() or \
             numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
                 atol=self.atol, equal_nan=False)
+            
+    @property
+    def step_size(self):
+        if isinstance(self.step_size_rule, ConstantStepSize):
+            return self.step_size_rule.step_size
+        else:
+            raise TypeError("There is not a constant step size, it is set by a step-size rule")
+

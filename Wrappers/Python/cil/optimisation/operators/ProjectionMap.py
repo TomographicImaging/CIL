@@ -25,8 +25,8 @@ class ProjectionMap(LinearOperator):
 
     r""" Projection Map or Canonical Projection (https://en.wikipedia.org/wiki/Projection_(mathematics))
 
-    Takes an element x = (x_{0},\dots,x_{i},\dots,x_{n}}) from a Cartesian product space X_{1}\times\cdots\times X_{n}\rightarrow X_{i}
-    and projects it to element x_{i} specified by the index i.
+    Takes an element :math:`x = (x_{0},\dots,x_{i},\dots,x_{n})` from a Cartesian product space :math:`X_{1}\times\cdots\times X_{n}\rightarrow X_{i}`
+    and projects it to element :math:`x_{i}` specified by the index :math:`i`.
 
     .. math:: \pi_{i}: X_{1}\times\cdots\times X_{n}\rightarrow X_{i}
 
@@ -36,12 +36,16 @@ class ProjectionMap(LinearOperator):
 
     .. math:: \pi_{i}^{*}(x_{i}) = (0, \cdots, x_{i}, \cdots, 0)
 
-    :param domain_geometry: The domain of the Projection Map. A BlockGeometry is expected.
-    :type domain_geometry: `BlockGeometry`
-    :param index: Index to project to the corresponding ImageGeometry X_{index}.
-    :type index: int
-    :return: returns a DataContainer
-    :rtype: DataContainer
+    Parameters
+    ----------
+    
+    domain_geometry:`BlockGeometry`
+        The domain of the `ProjectionMap`. A `BlockGeometry` is expected.
+
+    index: int
+        Index to project to the corresponding `ImageGeometry`
+    
+    
 
     """
 
@@ -63,7 +67,24 @@ class ProjectionMap(LinearOperator):
                                             range_geometry=range_geometry)
 
     def direct(self,x,out=None):
-
+        r"""
+        Returns the ith (`index`) element of the Block data container, :math:`x`
+        
+        Parameters
+        ----------
+        x: `BlockDataContainer`
+        
+        out: `DataContainer`, default `None`
+            If `out` is not `None` the output of the `ProjectionMap` will be filled in `out`, otherwise a new object is instantiated and returned.
+        
+        Returns
+        --------
+        `DataContainer`
+        
+        """
+        
+    
+    
         if out is None:
             return x[self.index].copy()
         else:
@@ -71,12 +92,28 @@ class ProjectionMap(LinearOperator):
             return out
     
     def adjoint(self,x, out=None):
-
+        r"""
+        Returns a `BlockDataContainer` of zeros with the ith (`index`) filled with the `DataContainer`, :math:`x`
+        
+        Parameters
+        ----------
+        x: `DataContainer`
+        
+        out: `BlockDataContainer`, default `None`
+            If `out` is not `None` the output of the adjoint of the `ProjectionMap` will be filled in `out`, otherwise a new object is instantiated and returned.
+        
+        Returns
+        --------
+        `BlockDataContainer`
+        
+        """
+        
         if out is None:
             tmp = self.domain_geometry().allocate(0)
             tmp[self.index].fill(x)
             return tmp
         else:
+            out*=0
             out[self.index].fill(x)
             return out 
 

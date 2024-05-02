@@ -512,12 +512,16 @@ class TestOperator(CCPiTestClass):
 
         res1 = bg.allocate(0)
         proj_map.adjoint(x, out=res1)
+        
+        res2=bg.allocate('random')
+        proj_map.adjoint(x, out=res2)
 
         # check if all indices return arrays filled with 0, except the input index
 
         for i in range(len(bg.geometries)):
             if i!=index:
                 numpy.testing.assert_array_almost_equal(res1[i].as_array(), bg.geometries[i].allocate().as_array())
+                numpy.testing.assert_array_almost_equal(res2[i].as_array(), bg.geometries[i].allocate().as_array())
 
         # Check error messages
         # Check if index is correct wrt length of Cartesian Product

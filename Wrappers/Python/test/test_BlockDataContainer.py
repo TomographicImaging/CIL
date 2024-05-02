@@ -961,6 +961,10 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         assert wrong == 0
 
 class TestBlockDataContainerGeometry(BDCUnittest):
+
+    def setUp(self):
+        self.pnorm_error_msg = 'pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm'
+
     def test_allocate(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
@@ -975,8 +979,8 @@ class TestBlockDataContainerGeometry(BDCUnittest):
         data1=ig1.allocate(0)
         cp1 = BlockDataContainer(data0, data1)
         bg = BlockGeometry(ig0, ig1)
-        assert bg.allocate(0) == cp1
-        assert cp1.geometry.allocate(0) == cp1 
+        self.assertBlockDataContainerAlmostEqual(bg.allocate(0), cp1)
+        self.assertBlockDataContainerAlmostEqual(cp1.geometry.allocate(0), cp1)
         
     def test_pnorm2(self):
         ig0 = ImageGeometry(2,3,4)
@@ -987,7 +991,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         cp0 = BlockDataContainer(data0,data2)
 
-        with self.assertRaisesRegex(ValueError, 'pnorm: Incompatible shapes'):
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
             cp0.pnorm(2)
 
         cp0 = BlockDataContainer(data2,data2)
@@ -1002,7 +1006,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         cp0 = BlockDataContainer(data0,data2)
 
-        with self.assertRaisesRegex(ValueError, 'pnorm: Incompatible shapes'):
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
             cp0.pnorm(1)
 
         cp0 = BlockDataContainer(data2,data2)
@@ -1011,8 +1015,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
     def test_equals(self):
         ig0 = ImageGeometry(2,3,4)
-        ig1 = ImageGeometry(2,3,5)
-
+        
         data0 = ig0.allocate(0)
         data2 = ig0.allocate(1)
 

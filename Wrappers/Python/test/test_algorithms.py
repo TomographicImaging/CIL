@@ -66,8 +66,7 @@ initialise_tests()
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
-
-class TestAlgorithms(CCPiTestClass):
+class TestGD(CCPiTestClass):
     def test_GD(self):
         ig = ImageGeometry(12,13,14)
         initial = ig.allocate()
@@ -92,6 +91,9 @@ class TestAlgorithms(CCPiTestClass):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        self.assertAlmostEqual(alg.get_last_objective(), 0)
+        self.assertNotAlmostEqual(alg.loss[0], alg.loss[1])
 
     def test_update_interval_0(self):
         '''
@@ -161,6 +163,7 @@ class TestAlgorithms(CCPiTestClass):
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
         # np.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
+class TestAlgorithms(CCPiTestClass):
 
     def test_CGLS(self):
         ig = ImageGeometry(10,2)

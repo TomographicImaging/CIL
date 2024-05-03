@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>CIL Plugins &#8212; CIL 24.0.0 documentation</title>
   
@@ -15,42 +14,43 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=89421ced"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'plugins';</script>
     <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
     <link rel="search" title="Search" href="../search/" />
@@ -65,19 +65,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -100,15 +104,17 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../">
@@ -116,109 +122,104 @@
   
   
   
+  
     
     
       
     
     
-    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL 24.0.0 documentation - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL 24.0.0 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item pst-header-nav-item current active">
                       <a class="nav-link nav-internal" href="#">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -230,12 +231,13 @@
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -249,10 +251,13 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -263,91 +268,86 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item pst-header-nav-item current active">
                       <a class="nav-link nav-internal" href="#">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -359,12 +359,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -395,12 +396,21 @@ document.write(`
 <script>
 document.write(`
   <div class="version-switcher__container dropdown">
-    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
-      24.0.0  <!-- this text may get changed later by javascript -->
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
       <span class="caret"></span>
     </button>
-    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
-    <!-- dropdown will be populated by javascript on page load -->
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
 `);
@@ -423,7 +433,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#other-regularisation-functions">Other regularisation functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#tomophantom">TomoPhantom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tomophantom">TomoPhantom</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cil.plugins.TomoPhantom.get_ImageData"><code class="docutils literal notranslate"><span class="pre">get_ImageData()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#tigre">TIGRE</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fbp">FBP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#projection-operator">Projection Operator</a></li>
@@ -441,6 +454,7 @@ document.write(`
 </ul>
 </div>
         <div class="sidebar-primary-item">
+
   
   <div class="tocsection editthispage">
     <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/plugins.rst">
@@ -465,7 +479,7 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
@@ -480,8 +494,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../" class="nav-link" aria-label="Home">
@@ -503,29 +517,29 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="cil-plugins">
-<h1>CIL Plugins<a class="headerlink" href="#cil-plugins" title="Permalink to this headline">#</a></h1>
+<h1>CIL Plugins<a class="headerlink" href="#cil-plugins" title="Link to this heading">#</a></h1>
 <section id="ccpi-regularisation">
-<h2>CCPi Regularisation<a class="headerlink" href="#ccpi-regularisation" title="Permalink to this headline">#</a></h2>
+<h2>CCPi Regularisation<a class="headerlink" href="#ccpi-regularisation" title="Link to this heading">#</a></h2>
 <p>This plugin allows the use of regularisation functions from the <a class="reference external" href="https://github.com/vais-ral/CCPi-Regularisation-Toolkit">CCPi Regularisation toolkit</a>
 (<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S2352711018301912">10.1016/j.softx.2019.04.003</a>,
 a set of CPU/GPU optimised regularisation modules for iterative image reconstruction and
 other image processing tasks.</p>
 <section id="total-variation">
-<h3>Total variation<a class="headerlink" href="#total-variation" title="Permalink to this headline">#</a></h3>
+<h3>Total variation<a class="headerlink" href="#total-variation" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_TV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_TV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_TV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_TV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_TV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="Link to this definition">#</a></dt>
 <dd><p>Fast Gradient Projection Total Variation (FGP_TV)</p>
 <p>The <a class="reference internal" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="cil.plugins.ccpi_regularisation.functions.FGP_TV"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGP_TV</span></code></a> computes the proximal operator of the Total variation regulariser</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
-applied to the _dual <a href="#id8"><span class="problematic" id="id9">problem_</span></a> of the above problem, see <span id="id1">[<a class="reference internal" href="../optimisation/#id49" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id2">[<a class="reference internal" href="../optimisation/#id48" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+applied to the _dual <a href="#id8"><span class="problematic" id="id9">problem_</span></a> of the above problem, see <span id="id1">[<a class="reference internal" href="../optimisation/#id54" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id2">[<a class="reference internal" href="../optimisation/#id53" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Number</span></code> (positive), default = 1.0 .) – Total variation regularisation parameter.</p></li>
 <li><p><strong>max_iteration</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>. Default = 100 .) – Maximum number of iterations for the Fast Gradient Projection algorithm.</p></li>
@@ -554,7 +568,7 @@ Now the <code class="code docutils literal notranslate"><span class="pre">TotalV
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
 \[\underset{u\qeq0}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha TV(u)\]</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">FGP_TV</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">FGP_TV</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sol</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -562,7 +576,7 @@ Now the <code class="code docutils literal notranslate"><span class="pre">TotalV
 <p class="admonition-title">Note</p>
 <p>The <a class="reference internal" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="cil.plugins.ccpi_regularisation.functions.FGP_TV"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGP_TV</span></code></a> regularisation does not incorparate information on the <code class="xref py py-class docutils literal notranslate"><span class="pre">ImageGeometry</span></code>, i.e., pixel/voxel size.
 Therefore a rescaled parameter should be used to match the same solution computed using <a class="reference internal" href="../optimisation/#cil.optimisation.functions.TotalVariation" title="cil.optimisation.functions.TotalVariation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TotalVariation</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G1</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span><span class="o">/</span><span class="n">ig</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">FGP_TV</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G1</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span><span class="o">/</span><span class="n">ig</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">FGP_TV</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">G2</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -575,16 +589,16 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 </section>
 <section id="other-regularisation-functions">
-<h3>Other regularisation functions<a class="headerlink" href="#other-regularisation-functions" title="Permalink to this headline">#</a></h3>
+<h3>Other regularisation functions<a class="headerlink" href="#other-regularisation-functions" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TGV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">TGV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">TGV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TGV.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Creator of Total Generalised Variation Function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
 <li><p><strong>gamma</strong> (<em>number</em><em>, </em><em>default 1</em><em>, </em><em>can range between 1 and 2</em>) – ratio of TGV terms</p></li>
@@ -598,21 +612,21 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TGV.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate">
-<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate" title="Link to this definition">#</a></dt>
 <dd><p>Evaluation of the function F* at x, where F* is the convex conjugate of function F,</p>
 <div class="math notranslate nohighlight">
 \[F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of the convex conjugate of the function at x.</p>
 </dd>
 </dl>
@@ -620,7 +634,7 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TGV.__rmul__">
-<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TGV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__" title="Link to this definition">#</a></dt>
 <dd><p>Define the multiplication with a scalar</p>
 <p>this changes the regularisation parameter in the plugin</p>
 </dd></dl>
@@ -629,10 +643,10 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_dTV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_dTV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_dTV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV" title="Link to this definition">#</a></dt>
 <dd><p>Creator of FGP_dTV Function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>reference</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – reference image</p></li>
 <li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
@@ -647,26 +661,26 @@ Therefore a rescaled parameter should be used to match the same solution compute
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate">
-<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate" title="Link to this definition">#</a></dt>
 <dd><p>Evaluation of the function F* at x, where F* is the convex conjugate of function F,</p>
 <div class="math notranslate nohighlight">
 \[F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of the convex conjugate of the function at x.</p>
 </dd>
 </dl>
@@ -674,7 +688,7 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__">
-<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_dTV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__" title="Link to this definition">#</a></dt>
 <dd><p>Define the multiplication with a scalar</p>
 <p>this changes the regularisation parameter in the plugin</p>
 </dd></dl>
@@ -683,13 +697,13 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">TNV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">TNV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Creator of TNV Function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
 <li><p><strong>max_iteration</strong> (<em>integer</em><em>, </em><em>default 100</em>) – max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</p></li>
@@ -701,21 +715,21 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate">
-<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate" title="Link to this definition">#</a></dt>
 <dd><p>Evaluation of the function F* at x, where F* is the convex conjugate of function F,</p>
 <div class="math notranslate nohighlight">
 \[F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of the convex conjugate of the function at x.</p>
 </dd>
 </dl>
@@ -723,14 +737,14 @@ Therefore a rescaled parameter should be used to match the same solution compute
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV.__rmul__">
-<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__" title="Link to this definition">#</a></dt>
 <dd><p>Define the multiplication with a scalar</p>
 <p>this changes the regularisation parameter in the plugin</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.TNV.check_input">
-<span class="sig-name descname"><span class="pre">check_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.check_input" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#TNV.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.check_input" title="Link to this definition">#</a></dt>
 <dd><p>TNV requires 2D+channel data with the first dimension as the channel dimension</p>
 </dd></dl>
 
@@ -739,17 +753,17 @@ Therefore a rescaled parameter should be used to match the same solution compute
 </section>
 </section>
 <section id="tomophantom">
-<h2>TomoPhantom<a class="headerlink" href="#tomophantom" title="Permalink to this headline">#</a></h2>
+<h2>TomoPhantom<a class="headerlink" href="#tomophantom" title="Link to this heading">#</a></h2>
 <p>This plugin allows the use of part of <a class="reference external" href="https://github.com/dkazanc/TomoPhantom">TomoPhantom</a>
 (<a class="reference external" href="https://doi.org/10.1016/j.softx.2018.05.003">10.1016/j.softx.2018.05.003</a>,
 a toolbox written in C language to generate customisable 2D-4D phantoms (with a
 temporal capability).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cil.plugins.TomoPhantom.get_ImageData">
-<span class="sig-prename descclassname"><span class="pre">cil.plugins.TomoPhantom.</span></span><span class="sig-name descname"><span class="pre">get_ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/TomoPhantom/#get_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.TomoPhantom.get_ImageData" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">cil.plugins.TomoPhantom.</span></span><span class="sig-name descname"><span class="pre">get_ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/TomoPhantom/#get_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.TomoPhantom.get_ImageData" title="Link to this definition">#</a></dt>
 <dd><p>Returns an ImageData relative to geometry with the model num_model from tomophantom</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_model</strong> (<em>int</em>) – model number</p></li>
 <li><p><strong>geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – geometrical info that describes the phantom</p></li>
@@ -757,7 +771,7 @@ temporal capability).</p>
 </dd>
 </dl>
 <p>Example usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ndim</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">ndim</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">N</span><span class="o">=</span><span class="mi">128</span>
 <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.4</span>
@@ -784,16 +798,16 @@ temporal capability).</p>
 
 </section>
 <section id="tigre">
-<h2>TIGRE<a class="headerlink" href="#tigre" title="Permalink to this headline">#</a></h2>
+<h2>TIGRE<a class="headerlink" href="#tigre" title="Link to this heading">#</a></h2>
 <p>This plugin allows the use of <a class="reference external" href="https://github.com/CERN/TIGRE">TIGRE</a>
 (<a class="reference external" href="http://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010">10.1088/2057-1976/2/5/055010</a>
 for forward and back projections and filter back projection reconstruction.</p>
 <section id="fbp">
-<h3>FBP<a class="headerlink" href="#fbp" title="Permalink to this headline">#</a></h3>
+<h3>FBP<a class="headerlink" href="#fbp" title="Link to this heading">#</a></h3>
 <p>This reconstructs with FBP for parallel-beam data, and with FDK weights for cone-beam data</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.tigre.FBP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></span><span class="sig-name descname"><span class="pre">FBP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/tigre/FBP/#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.FBP" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></span><span class="sig-name descname"><span class="pre">FBP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/tigre/FBP/#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.FBP" title="Link to this definition">#</a></dt>
 <dd><p>FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
 It is able to back-project circular trajectories with 2 PI angular range and equally spaced angular steps.</p>
 <p>This uses the ram-lak filter
@@ -805,7 +819,7 @@ This is provided for simple and offset parallel-beam geometries only</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">FBP</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">FBP</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reconstruction</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
@@ -813,16 +827,16 @@ This is provided for simple and offset parallel-beam geometries only</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.tigre.FBP.get_output">
-<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.get_output" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Runs the configured processor and returns the processed data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
@@ -830,10 +844,10 @@ This is provided for simple and offset parallel-beam geometries only</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.tigre.FBP.set_input">
-<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.set_input" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.plugins.tigre.FBP.set_input" title="Link to this definition">#</a></dt>
 <dd><p>Set the input data to the processor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
@@ -843,16 +857,16 @@ This is provided for simple and offset parallel-beam geometries only</p>
 
 </section>
 <section id="projection-operator">
-<h3>Projection Operator<a class="headerlink" href="#projection-operator" title="Permalink to this headline">#</a></h3>
+<h3>Projection Operator<a class="headerlink" href="#projection-operator" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.tigre.ProjectionOperator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></span><span class="sig-name descname"><span class="pre">ProjectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/tigre/ProjectionOperator/#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></span><span class="sig-name descname"><span class="pre">ProjectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/tigre/ProjectionOperator/#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator" title="Link to this definition">#</a></dt>
 <dd><p>ProjectionOperator configures and calls TIGRE Projectors for your dataset.</p>
 <p>Please refer to the TIGRE documentation for further descriptions
 <a class="github reference external" href="https://github.com/CERN/TIGRE">CERN/TIGRE</a>
 <a class="reference external" href="https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010">https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010</a></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>image_geometry</strong> (<cite>ImageGeometry</cite>, default used if None) – A description of the area/volume to reconstruct</p></li>
 <li><p><strong>acquisition_geometry</strong> (<cite>AcquisitionGeometry</cite>, <cite>BlockGeometry</cite>) – A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</p></li>
@@ -862,7 +876,7 @@ This is provided for simple and offset parallel-beam geometries only</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PO</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">forward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">backward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -873,20 +887,20 @@ This is provided for simple and offset parallel-beam geometries only</p>
 </section>
 </section>
 <section id="astra">
-<h2>ASTRA<a class="headerlink" href="#astra" title="Permalink to this headline">#</a></h2>
+<h2>ASTRA<a class="headerlink" href="#astra" title="Link to this heading">#</a></h2>
 <p>This plugin allows the use of <a class="reference external" href="https://github.com/astra-toolbox/astra-toolbox">ASTRA-toolbox</a>
 (<a class="reference external" href="http://dx.doi.org/10.1364/OE.24.025129">10.1364/OE.24.025129</a>)
 for forward and back projections and filter back projection reconstruction.</p>
 <section id="id6">
-<h3>FBP<a class="headerlink" href="#id6" title="Permalink to this headline">#</a></h3>
+<h3>FBP<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <p>This reconstructs with FBP for parallel-beam data, and with FDK weights for cone-beam data</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.astra.FBP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></span><span class="sig-name descname"><span class="pre">FBP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></span><span class="sig-name descname"><span class="pre">FBP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP" title="Link to this definition">#</a></dt>
 <dd><p>FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.</p>
 <p>The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small angular steps.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
 <li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the acquisition data</p></li>
@@ -896,7 +910,7 @@ for forward and back projections and filter back projection reconstruction.</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">FBP</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">FBP</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reconstruction</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
@@ -907,10 +921,10 @@ for forward and back projections and filter back projection reconstruction.</p>
 <p>This uses the ram-lak filter only.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.astra.FBP.set_input">
-<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.set_input" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.set_input" title="Link to this definition">#</a></dt>
 <dd><p>Set the input data to the processor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
@@ -918,16 +932,16 @@ for forward and back projections and filter back projection reconstruction.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.plugins.astra.FBP.get_output">
-<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.get_output" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/processors/FBP/#FBP.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.FBP.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Runs the configured processor and returns the processed data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
@@ -937,13 +951,13 @@ for forward and back projections and filter back projection reconstruction.</p>
 
 </section>
 <section id="id7">
-<h3>Projection Operator<a class="headerlink" href="#id7" title="Permalink to this headline">#</a></h3>
+<h3>Projection Operator<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.astra.ProjectionOperator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></span><span class="sig-name descname"><span class="pre">ProjectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/operators/ProjectionOperator/#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.astra.</span></span><span class="sig-name descname"><span class="pre">ProjectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/astra/operators/ProjectionOperator/#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.ProjectionOperator" title="Link to this definition">#</a></dt>
 <dd><p>ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>image_geometry</strong> (<code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code>, default used if None) – A description of the area/volume to reconstruct</p></li>
 <li><p><strong>acquisition_geometry</strong> (<code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="docutils literal notranslate"><span class="pre">BlockGeometry</span></code>) – A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.</p></li>
@@ -952,7 +966,7 @@ for forward and back projections and filter back projection reconstruction.</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.plugins.astra</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PO</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">forward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">backward_projection</span> <span class="o">=</span> <span class="n">PO</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -972,11 +986,10 @@ for forward and back projections and filter back projection reconstruction.</p>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="../utilities/"
@@ -996,10 +1009,7 @@ for forward and back projections and filter back projection reconstruction.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -1017,8 +1027,8 @@ for forward and back projections and filter back projection reconstruction.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1026,6 +1036,7 @@ for forward and back projections and filter back projection reconstruction.</p>
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2017-2024.
@@ -1035,6 +1046,7 @@ for forward and back projections and filter back projection reconstruction.</p>
 </div>
       
     </div>
+  
   
   
 </div>

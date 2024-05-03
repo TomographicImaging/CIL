@@ -1,9 +1,8 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../../../../" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,40 +13,41 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
 
   
-  <link href="../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
-    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
 
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/clipboard.min.js"></script>
-    <script src="../../../../_static/copybutton.js"></script>
+    <script src="../../../../_static/documentation_options.js?v=89421ced"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/framework';</script>
     <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../search/" />
@@ -60,19 +60,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -95,15 +99,17 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../../../../">
@@ -111,109 +117,104 @@
   
   
   
+  
     
     
       
     
     
-    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL 24.0.0 documentation - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL 24.0.0 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../plugins/">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -225,12 +226,13 @@
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -244,10 +246,15 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -258,91 +265,86 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../plugins/">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -354,12 +356,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -390,12 +393,21 @@ document.write(`
 <script>
 document.write(`
   <div class="version-switcher__container dropdown">
-    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
-      24.0.0  <!-- this text may get changed later by javascript -->
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
       <span class="caret"></span>
     </button>
-    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
-    <!-- dropdown will be populated by javascript on page load -->
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
 `);
@@ -428,7 +440,7 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
@@ -443,8 +455,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../../" class="nav-link" aria-label="Home">
@@ -454,7 +466,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../../../" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">cil.framework.framework</li>
+    <li class="breadcrumb-item active" aria-current="page">cil.framewor...</li>
   </ul>
 </nav>
 </div>
@@ -469,7 +481,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <h1>Source code for cil.framework.framework</h1><div class="highlight"><pre>
 <span></span><span class="c1">#  Copyright 2018 United Kingdom Research and Innovation</span>
@@ -717,7 +729,9 @@ document.write(`
 
     <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="ImageGeometry"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry">[docs]</a><span class="k">class</span> <span class="nc">ImageGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageGeometry">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry">[docs]</a>
+<span class="k">class</span> <span class="nc">ImageGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">RANDOM</span> <span class="o">=</span> <span class="s1">&#39;random&#39;</span>
     <span class="n">RANDOM_INT</span> <span class="o">=</span> <span class="s1">&#39;random_int&#39;</span>
     <span class="n">CHANNEL</span> <span class="o">=</span> <span class="s1">&#39;channel&#39;</span>
@@ -863,7 +877,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ImageGeometry.get_slice"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageGeometry.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.get_slice">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a new ImageGeometry of a single slice of in the requested direction.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -886,6 +902,7 @@ document.write(`
             <span class="n">geometry_new</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">return</span> <span class="n">geometry_new</span></div>
+
 
     <span class="k">def</span> <span class="nf">get_order_by_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">,</span> <span class="n">default_dimension_labels</span><span class="p">):</span>
         <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
@@ -920,13 +937,19 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="ImageGeometry.clone"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageGeometry.clone">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.clone">[docs]</a>
+    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a copy of the ImageGeometry&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ImageGeometry.copy"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImageGeometry.copy">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
+
 
     <span class="k">def</span> <span class="fm">__str__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -943,7 +966,9 @@ document.write(`
             <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;center : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_y</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">repres</span>
-<div class="viewcode-block" id="ImageGeometry.allocate"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.allocate">[docs]</a>    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageGeometry.allocate">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.allocate">[docs]</a>
+    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;allocates an ImageData according to the size expressed in the instance</span>
 
 <span class="sd">        :param value: accepts numbers to allocate an uniform array, or a string as &#39;random&#39; or &#39;random_int&#39; to create a random array or None.</span>
@@ -989,7 +1014,9 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Value </span><span class="si">{}</span><span class="s1"> unknown&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+</div>
+
 
 <span class="k">class</span> <span class="nc">ComponentDescription</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This class enables the creation of vectors and unit vectors used to describe the components of a tomography system</span>
@@ -2536,7 +2563,9 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="AcquisitionGeometry"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionGeometry">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry">[docs]</a>
+<span class="k">class</span> <span class="nc">AcquisitionGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class holds the AcquisitionGeometry of the system.</span>
 
 <span class="sd">    Please initialise the AcquisitionGeometry using the using the static methods:</span>
@@ -2868,7 +2897,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="n">offset_x_y0</span><span class="p">,</span> <span class="s1">&#39;pixels&#39;</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="s1">&#39;radian&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AcquisitionGeometry.set_angles"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_angles">[docs]</a>    <span class="k">def</span> <span class="nf">set_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionGeometry.set_angles">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_angles">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the angular information of an AcquisitionGeometry object.</span>
 
 <span class="sd">        :param angles: The angular positions of the acquisition data</span>
@@ -2883,7 +2914,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">Angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="p">,</span> <span class="n">angle_unit</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.set_panel"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_panel">[docs]</a>    <span class="k">def</span> <span class="nf">set_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.set_panel">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_panel">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the panel information of an AcquisitionGeometry object.</span>
 
@@ -2899,7 +2933,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">_dimension</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.set_channels"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_channels">[docs]</a>    <span class="k">def</span> <span class="nf">set_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">channel_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.set_channels">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_channels">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">channel_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the channel information of an AcquisitionGeometry object.</span>
 
 <span class="sd">        :param num_channels: The number of channels of data</span>
@@ -2912,7 +2949,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">Channels</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">channel_labels</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.set_labels"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_labels">[docs]</a>    <span class="k">def</span> <span class="nf">set_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.set_labels">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.set_labels">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the dimension labels of an AcquisitionGeometry object.</span>
 
 <span class="sd">        :param labels:  The order of the dimensions describing the data.\</span>
@@ -2925,7 +2965,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">labels</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.create_Parallel2D"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel2D">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.create_Parallel2D">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel2D">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">create_Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a parallel beam 2D tomographic system</span>
 
@@ -2947,7 +2990,10 @@ document.write(`
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.create_Cone2D"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone2D">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.create_Cone2D">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone2D">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a cone beam 2D tomographic system</span>
 
@@ -2969,7 +3015,10 @@ document.write(`
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.create_Parallel3D"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel3D">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.create_Parallel3D">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel3D">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">create_Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a parallel beam 3D tomographic system</span>
 
@@ -2995,7 +3044,10 @@ document.write(`
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.create_Cone3D"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone3D">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.create_Cone3D">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone3D">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a cone beam 3D tomographic system</span>
 
@@ -3020,6 +3072,7 @@ document.write(`
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span></div>
+
 
     <span class="k">def</span> <span class="nf">get_order_by_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">,</span> <span class="n">default_dimension_labels</span><span class="p">):</span>
         <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
@@ -3056,7 +3109,9 @@ document.write(`
         <span class="n">AG_2D</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">AG_2D</span>
 
-<div class="viewcode-block" id="AcquisitionGeometry.get_ImageGeometry"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_ImageGeometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_ImageGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionGeometry.get_ImageGeometry">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_ImageGeometry">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ImageGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a default configured ImageGeometry object based on the AcquisitionGeomerty&#39;&#39;&#39;</span>
 
         <span class="n">num_voxel_xy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">resolution</span><span class="p">))</span>
@@ -3071,11 +3126,14 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">num_voxel_xy</span><span class="p">,</span> <span class="n">num_voxel_xy</span><span class="p">,</span> <span class="n">num_voxel_z</span><span class="p">,</span> <span class="n">voxel_size_xy</span><span class="p">,</span> <span class="n">voxel_size_xy</span><span class="p">,</span> <span class="n">voxel_size_z</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="fm">__str__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AcquisitionGeometry.get_slice"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionGeometry.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_slice">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -3100,7 +3158,10 @@ document.write(`
 
         <span class="k">return</span> <span class="n">geometry_new</span></div>
 
-<div class="viewcode-block" id="AcquisitionGeometry.allocate"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.allocate">[docs]</a>    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AcquisitionGeometry.allocate">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.allocate">[docs]</a>
+    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;allocates an AcquisitionData according to the size expressed in the instance</span>
 
 <span class="sd">        :param value: accepts numbers to allocate an uniform array, or a string as &#39;random&#39; or &#39;random_int&#39; to create a random array or None.</span>
@@ -3145,9 +3206,13 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Value </span><span class="si">{}</span><span class="s1"> unknown&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+</div>
 
-<div class="viewcode-block" id="DataContainer"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer">[docs]</a><span class="k">class</span> <span class="nc">DataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer">[docs]</a>
+<span class="k">class</span> <span class="nc">DataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Generic class to hold data</span>
 
 <span class="sd">    Data is currently held in a numpy arrays&#39;&#39;&#39;</span>
@@ -3245,7 +3310,9 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown dimension </span><span class="si">{0}</span><span class="s1">. Should be one of </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dimension_label</span><span class="p">,</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
 
-<div class="viewcode-block" id="DataContainer.get_dimension_axis"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_dimension_axis">[docs]</a>    <span class="k">def</span> <span class="nf">get_dimension_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_label</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.get_dimension_axis">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_dimension_axis">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_dimension_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension_label</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the axis index of the DataContainer array if the specified dimension_label(s) match</span>
 <span class="sd">        any dimension_labels of the DataContainer or their indices</span>
@@ -3272,13 +3339,19 @@ document.write(`
                             <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="DataContainer.as_array"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.as_array">[docs]</a>    <span class="k">def</span> <span class="nf">as_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.as_array">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.as_array">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the pointer to the array.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span></div>
 
 
-<div class="viewcode-block" id="DataContainer.get_slice"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_slice">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a new DataContainer containing a single slice in the requested direction. \</span>
 <span class="sd">        Pass keyword arguments &lt;dimension label&gt;=index</span>
@@ -3306,7 +3379,10 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">VectorData</span><span class="p">(</span><span class="n">new_array</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="n">dimension_labels_list</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.reorder"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.reorder">[docs]</a>    <span class="k">def</span> <span class="nf">reorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.reorder">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.reorder">[docs]</a>
+    <span class="k">def</span> <span class="nf">reorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        reorders the data in memory as requested.</span>
 
@@ -3343,7 +3419,10 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">dimension_labels_new</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.fill"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.fill">[docs]</a>    <span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="o">**</span><span class="n">dimension</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.fill">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.fill">[docs]</a>
+    <span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="o">**</span><span class="n">dimension</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;fills the internal data array with the DataContainer, numpy array or number provided</span>
 
 <span class="sd">        :param array: number, numpy array or DataContainer to copy into the DataContainer</span>
@@ -3413,6 +3492,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Can fill only with number, numpy array or DataContainer and subclasses. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
             <span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
+
 
 
     <span class="k">def</span> <span class="nf">check_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -3500,7 +3580,9 @@ document.write(`
             <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Representation: </span><span class="se">\n</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">repres</span>
 
-<div class="viewcode-block" id="DataContainer.get_data_axes_order"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_data_axes_order">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_axes_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">new_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.get_data_axes_order">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.get_data_axes_order">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_data_axes_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">new_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the axes label of self as a list</span>
 
 <span class="sd">        If new_order is None returns the labels of the axes as a sorted-by-key list.</span>
@@ -3524,13 +3606,20 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expecting </span><span class="si">{0}</span><span class="s1"> axes, got </span><span class="si">{2}</span><span class="s1">&#39;</span>\
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="DataContainer.clone"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.clone">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.clone">[docs]</a>
+    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a copy of DataContainer&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.copy"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.copy">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
+
 
     <span class="c1">## binary operations</span>
 
@@ -3625,7 +3714,9 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_binary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">x2</span><span class="o">=</span><span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="DataContainer.sapyb"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.sapyb">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.sapyb">[docs]</a>
+    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;performs a*self + b * y. Can be done in-place</span>
 
 <span class="sd">        Parameters</span>
@@ -3677,6 +3768,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span></div>
+
 
     <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;performs axpby with cilacc C library, can be done in-place.</span>
@@ -3815,27 +3907,41 @@ document.write(`
     <span class="k">def</span> <span class="nf">conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">conjugate</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DataContainer.exp"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.exp">[docs]</a>    <span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.exp">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.exp">[docs]</a>
+    <span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Applies exp pixel-wise to the DataContainer&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.log"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.log">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.log">[docs]</a>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Applies log pixel-wise to the DataContainer&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+
     <span class="c1">## reductions</span>
-<div class="viewcode-block" id="DataContainer.squared_norm"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.squared_norm">[docs]</a>    <span class="k">def</span> <span class="nf">squared_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.squared_norm">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.squared_norm">[docs]</a>
+    <span class="k">def</span> <span class="nf">squared_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;return the squared euclidean norm of the DataContainer viewed as a vector&#39;&#39;&#39;</span>
         <span class="c1">#shape = self.shape</span>
         <span class="c1">#size = reduce(lambda x,y:x*y, shape, 1)</span>
         <span class="c1">#y = numpy.reshape(self.as_array(), (size, ))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
         <span class="c1">#return self.dot(self)</span>
-<div class="viewcode-block" id="DataContainer.norm"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.norm">[docs]</a>    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.norm">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.norm">[docs]</a>
+    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;return the euclidean norm of the DataContainer viewed as a vector&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DataContainer.dot"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.dot">[docs]</a>    <span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.dot">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.dot">[docs]</a>
+    <span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the inner product of 2 DataContainers viewed as vectors. Suitable for real and complex data.</span>
 <span class="sd">          For complex data,  the dot method returns a.dot(b.conjugate())</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -3858,6 +3964,7 @@ document.write(`
                 <span class="k">return</span> <span class="n">sf</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shapes are not aligned: </span><span class="si">{}</span><span class="s1"> != </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
+
 
     <span class="k">def</span> <span class="nf">_directional_reduction_unary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reduction_function</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3901,7 +4008,9 @@ document.write(`
 
             <span class="n">reduction_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out</span><span class="o">=</span><span class="n">out_arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>  <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DataContainer.sum"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataContainer.sum">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.sum">[docs]</a>
+    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sum of values in the DataContainer</span>
 
@@ -3933,7 +4042,10 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.min"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.min">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.min">[docs]</a>
+    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the minimum pixel value in the DataContainer</span>
 
@@ -3956,7 +4068,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.max"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.max">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.max">[docs]</a>
+    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the maximum pixel value in the DataContainer</span>
 
@@ -3979,7 +4094,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataContainer.mean"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataContainer.mean">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataContainer.mean">[docs]</a>
+    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the mean pixel value of the DataContainer</span>
 
@@ -4011,6 +4129,7 @@ document.write(`
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directional_reduction_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 
     <span class="c1"># Logic operators between DataContainers and floats</span>
     <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -4049,7 +4168,10 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">!=</span><span class="n">other</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">!=</span><span class="n">other</span></div>
 
-<div class="viewcode-block" id="ImageData"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData">[docs]</a><span class="k">class</span> <span class="nc">ImageData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImageData">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData">[docs]</a>
+<span class="k">class</span> <span class="nc">ImageData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;DataContainer for holding 2D or 3D DataContainer&#39;&#39;&#39;</span>
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -4105,7 +4227,9 @@ document.write(`
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ImageData.get_slice"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageData.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.get_slice">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a new ImageData of a single slice of in the requested direction.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -4138,7 +4262,10 @@ document.write(`
             <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ImageData.apply_circular_mask"><a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.apply_circular_mask">[docs]</a>    <span class="k">def</span> <span class="nf">apply_circular_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImageData.apply_circular_mask">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.apply_circular_mask">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_circular_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.</span>
@@ -4217,10 +4344,14 @@ document.write(`
             <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">image_data_out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">image_data_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
             <span class="n">image_data_out</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">labels_orig</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">image_data_out</span></div></div>
+            <span class="k">return</span> <span class="n">image_data_out</span></div>
+</div>
 
 
-<div class="viewcode-block" id="AcquisitionData"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">Partitioner</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AcquisitionData">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData">[docs]</a>
+<span class="k">class</span> <span class="nc">AcquisitionData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">Partitioner</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;DataContainer for holding 2D or 3D sinogram&#39;&#39;&#39;</span>
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -4271,7 +4402,9 @@ document.write(`
         <span class="nb">super</span><span class="p">(</span><span class="n">AcquisitionData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AcquisitionData.get_slice"><a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData.get_slice">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionData.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData.get_slice">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a new dataset of a single slice of in the requested direction. \</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -4302,9 +4435,13 @@ document.write(`
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">geometry_new</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+            <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="Processor"><a class="viewcode-back" href="../../../../framework/#cil.framework.Processor">[docs]</a><span class="k">class</span> <span class="nc">Processor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Processor">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Processor">[docs]</a>
+<span class="k">class</span> <span class="nc">Processor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Defines a generic DataContainer processor</span>
 
@@ -4343,7 +4480,9 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Attribute </span><span class="si">{0}</span><span class="s1"> not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Processor.set_input"><a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.set_input">[docs]</a>    <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="Processor.set_input">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.set_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the input data to the processor</span>
 
@@ -4364,7 +4503,10 @@ document.write(`
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="Processor.check_input"><a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Processor.check_input">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.check_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Checks parameters of the input DataContainer</span>
 
 <span class="sd">        Should raise an Error if the DataContainer does not match expectation, e.g.</span>
@@ -4372,7 +4514,10 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implement basic checks for input DataContainer&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Processor.get_output"><a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Processor.get_output">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_output">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs the configured processor and returns the processed data</span>
 
@@ -4401,6 +4546,7 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 
+
     <span class="k">def</span> <span class="nf">set_input_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
@@ -4408,7 +4554,9 @@ document.write(`
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Processor.get_input"><a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Processor.get_input">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the input DataContainer</span>
 
 <span class="sd">        It is useful in the case the user has provided a DataProcessor as</span>
@@ -4421,6 +4569,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">dsi</span></div>
+
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;process must be implemented&#39;</span><span class="p">)</span>
@@ -4437,9 +4586,13 @@ document.write(`
         <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="DataProcessor"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataProcessor">[docs]</a><span class="k">class</span> <span class="nc">DataProcessor</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataProcessor">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">DataProcessor</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Basically an alias of Processor Class&#39;&#39;&#39;</span>
     <span class="k">pass</span></div>
+
 
 <span class="k">class</span> <span class="nc">DataProcessor23D</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Regularizers DataProcessor</span>
@@ -4565,7 +4718,9 @@ document.write(`
         <span class="k">return</span> <span class="n">y</span>
 
 
-<div class="viewcode-block" id="VectorData"><a class="viewcode-back" href="../../../../framework/#cil.framework.VectorData">[docs]</a><span class="k">class</span> <span class="nc">VectorData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+<div class="viewcode-block" id="VectorData">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.VectorData">[docs]</a>
+<span class="k">class</span> <span class="nc">VectorData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;DataContainer to contain 1D array&#39;&#39;&#39;</span>
 
     <span class="nd">@property</span>
@@ -4617,6 +4772,7 @@ document.write(`
         <span class="n">deep_copy</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># need to pass the geometry, othewise None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">VectorData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span> <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span></div>
+
 
 
 <span class="k">class</span> <span class="nc">VectorGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -4709,7 +4865,9 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Value </span><span class="si">{}</span><span class="s1"> unknown&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="DataOrder"><a class="viewcode-back" href="../../../../framework/#cil.framework.DataOrder">[docs]</a><span class="k">class</span> <span class="nc">DataOrder</span><span class="p">():</span>
+<div class="viewcode-block" id="DataOrder">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.DataOrder">[docs]</a>
+<span class="k">class</span> <span class="nc">DataOrder</span><span class="p">():</span>
 
     <span class="n">ENGINES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">]</span>
 
@@ -4757,22 +4915,19 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected dimension_label order </span><span class="si">{0}</span><span class="s2">, got </span><span class="si">{1}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">Try using `data.reorder(&#39;</span><span class="si">{2}</span><span class="s2">&#39;)` to permute for </span><span class="si">{2}</span><span class="s2">&quot;</span>
                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">order_requested</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">),</span> <span class="n">engine</span><span class="p">))</span></div>
+
 </pre></div>
 
                 </article>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -4790,8 +4945,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -4799,6 +4954,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2017-2024.
@@ -4808,6 +4964,7 @@ document.write(`
 </div>
       
     </div>
+  
   
   
 </div>

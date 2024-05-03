@@ -1,9 +1,8 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../../../../" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,40 +13,41 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
 
   
-  <link href="../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
-    <link rel="icon" sizes="32x32" type="image/png" href="https://ccpi.ac.uk/wp-content/uploads/2022/11/cropped-CCPi_Logo_Icon_Only-32x32.png" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
 
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/clipboard.min.js"></script>
-    <script src="../../../../_static/copybutton.js"></script>
+    <script src="../../../../_static/documentation_options.js?v=89421ced"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/BlockDataContainer';</script>
     <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../search/" />
@@ -60,19 +60,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -95,15 +99,17 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../../../../">
@@ -111,109 +117,104 @@
   
   
   
+  
     
     
       
     
     
-    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL 24.0.0 documentation - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL 24.0.0 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../plugins/">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -225,12 +226,13 @@
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -244,10 +246,15 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -258,91 +265,86 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../introduction/">
                         Introduction
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../framework/">
                         Framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../io/">
                         Read/ write AcquisitionData and ImageData
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../optimisation/">
                         Optimisation framework
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../processors/">
                         Processors
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../recon/">
                         Recon
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../utilities/">
                         Utilities
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../plugins/">
                         CIL Plugins
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item pst-header-nav-item ">
                       <a class="nav-link nav-internal" href="../../../../developer_guide/">
                         Developers’ Guide
                       </a>
                     </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
                     More
                 </button>
-                <div class="dropdown-menu">
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../demos/">
+                    <li class="nav-item  ">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </div>
-            </div>
+                </ul>
+            </li>
             
   </ul>
 </nav></div>
@@ -354,12 +356,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -390,12 +393,21 @@ document.write(`
 <script>
 document.write(`
   <div class="version-switcher__container dropdown">
-    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
-      24.0.0  <!-- this text may get changed later by javascript -->
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
       <span class="caret"></span>
     </button>
-    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
-    <!-- dropdown will be populated by javascript on page load -->
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
 `);
@@ -428,7 +440,7 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
@@ -443,8 +455,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../../" class="nav-link" aria-label="Home">
@@ -454,7 +466,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../../../" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">cil.framework.BlockDataContainer</li>
+    <li class="breadcrumb-item active" aria-current="page">cil.framewor...</li>
   </ul>
 </nav>
 </div>
@@ -469,7 +481,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <h1>Source code for cil.framework.BlockDataContainer</h1><div class="highlight"><pre>
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
@@ -495,7 +507,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 
-<div class="viewcode-block" id="BlockDataContainer"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer">[docs]</a><span class="k">class</span> <span class="nc">BlockDataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer">[docs]</a>
+<span class="k">class</span> <span class="nc">BlockDataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold DataContainers as column vector</span>
 
 <span class="sd">    Provides basic algebra between BlockDataContainer&#39;s, DataContainer&#39;s and</span>
@@ -557,13 +571,19 @@ document.write(`
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
 
 
-<div class="viewcode-block" id="BlockDataContainer.__iter__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__iter__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iter__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockDataContainer is Iterable&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span>
         <span class="k">return</span> <span class="bp">self</span></div>
-<div class="viewcode-block" id="BlockDataContainer.next"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.next">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.next">[docs]</a>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;python2 backwards compatibility&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
@@ -572,7 +592,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">+=</span><span class="mi">1</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="BlockDataContainer.is_compatible"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.is_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.is_compatible">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.is_compatible">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;basic check if the size of the 2 objects fit&#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -598,6 +620,7 @@ document.write(`
             <span class="k">return</span> <span class="n">ret</span></div>
 
 
+
     <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -606,7 +629,9 @@ document.write(`
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BlockDataContainer.add"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.add">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.add">[docs]</a>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
@@ -617,7 +642,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.subtract"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.subtract">[docs]</a>    <span class="k">def</span> <span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.subtract">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.subtract">[docs]</a>
+    <span class="k">def</span> <span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
@@ -628,7 +656,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SUBTRACT</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SUBTRACT</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.multiply"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.multiply">[docs]</a>    <span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.multiply">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.multiply">[docs]</a>
+    <span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
@@ -639,7 +670,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MULTIPLY</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MULTIPLY</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.divide"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.divide">[docs]</a>    <span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.divide">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.divide">[docs]</a>
+    <span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
@@ -650,7 +684,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">DIVIDE</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">DIVIDE</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.power"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.power">[docs]</a>    <span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.power">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.power">[docs]</a>
+    <span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
@@ -661,7 +698,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">POWER</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">POWER</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.maximum"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.maximum">[docs]</a>    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.maximum">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.maximum">[docs]</a>
+    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
@@ -672,7 +712,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MAXIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MAXIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-<div class="viewcode-block" id="BlockDataContainer.minimum"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.minimum">[docs]</a>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.minimum">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.minimum">[docs]</a>
+    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
@@ -684,7 +727,10 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlockDataContainer.sapyb"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.sapyb">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.sapyb">[docs]</a>
+    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
 
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
@@ -713,13 +759,19 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BlockDataContainer.axpby"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.axpby">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.axpby">[docs]</a>
+    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Deprecated method. Alias of sapyb&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">out</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="BlockDataContainer.binary_operations"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.binary_operations">[docs]</a>    <span class="k">def</span> <span class="nf">binary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.binary_operations">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.binary_operations">[docs]</a>
+    <span class="k">def</span> <span class="nf">binary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Provides commutativity with DataContainer and subclasses, i.e. this</span>
@@ -870,9 +922,12 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
 
+
     <span class="c1">## unary operations</span>
 
-<div class="viewcode-block" id="BlockDataContainer.unary_operations"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.unary_operations">[docs]</a>    <span class="k">def</span> <span class="nf">unary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.unary_operations">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.unary_operations">[docs]</a>
+    <span class="k">def</span> <span class="nf">unary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Unary operation on BlockDataContainer:</span>
 
 <span class="sd">        generic method of unary operation with BlockDataContainer: abs, sign, sqrt and conjugate</span>
@@ -907,6 +962,7 @@ document.write(`
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">conjugate</span>
                 <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">elout</span>
                 <span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ABS</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -948,9 +1004,12 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BlockDataContainer.copy"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.copy">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -983,7 +1042,9 @@ document.write(`
     <span class="k">def</span> <span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="c1"># reverse operand</span>
-<div class="viewcode-block" id="BlockDataContainer.__radd__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__radd__">[docs]</a>    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__radd__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__radd__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse addition</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -991,9 +1052,12 @@ document.write(`
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">other</span></div>
+
     <span class="c1"># __radd__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__rsub__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rsub__">[docs]</a>    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__rsub__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rsub__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse subtraction</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -1001,9 +1065,12 @@ document.write(`
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">other</span></div>
+
     <span class="c1"># __rsub__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__rmul__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__rmul__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rmul__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse multiplication</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -1011,9 +1078,12 @@ document.write(`
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">other</span></div>
+
     <span class="c1"># __rmul__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__rdiv__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rdiv__">[docs]</a>    <span class="k">def</span> <span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__rdiv__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rdiv__">[docs]</a>
+    <span class="k">def</span> <span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse division</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -1021,8 +1091,11 @@ document.write(`
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
     <span class="c1"># __rdiv__</span>
-<div class="viewcode-block" id="BlockDataContainer.__rtruediv__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rtruediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__rtruediv__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rtruediv__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse truedivision</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -1031,7 +1104,10 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rdiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlockDataContainer.__rpow__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rpow__">[docs]</a>    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.__rpow__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rpow__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse power</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
@@ -1040,7 +1116,10 @@ document.write(`
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlockDataContainer.__iadd__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iadd__">[docs]</a>    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.__iadd__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iadd__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline addition&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
@@ -1054,9 +1133,12 @@ document.write(`
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">+=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
+
     <span class="c1"># __iadd__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__isub__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__isub__">[docs]</a>    <span class="k">def</span> <span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__isub__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__isub__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline subtraction&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
@@ -1070,9 +1152,12 @@ document.write(`
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">-=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
+
     <span class="c1"># __isub__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__imul__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__imul__">[docs]</a>    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__imul__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__imul__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline multiplication&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
@@ -1086,9 +1171,12 @@ document.write(`
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">*=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
+
     <span class="c1"># __imul__</span>
 
-<div class="viewcode-block" id="BlockDataContainer.__idiv__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__idiv__">[docs]</a>    <span class="k">def</span> <span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__idiv__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__idiv__">[docs]</a>
+    <span class="k">def</span> <span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline division&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
@@ -1102,14 +1190,21 @@ document.write(`
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">/=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
+
     <span class="c1"># __rdiv__</span>
-<div class="viewcode-block" id="BlockDataContainer.__itruediv__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__itruediv__">[docs]</a>    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.__itruediv__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__itruediv__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline truedivision&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlockDataContainer.__neg__"><a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__neg__">[docs]</a>    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockDataContainer.__neg__">
+<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__neg__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Return - self &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span></div>
+
 
     <span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="c1">#</span>
@@ -1119,22 +1214,19 @@ document.write(`
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
 </pre></div>
 
                 </article>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -1152,8 +1244,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1161,6 +1253,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2017-2024.
@@ -1170,6 +1263,7 @@ document.write(`
 </div>
       
     </div>
+  
   
   
 </div>

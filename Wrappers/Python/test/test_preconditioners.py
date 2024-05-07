@@ -55,7 +55,7 @@ class TestPreconditioners(CCPiTestClass):
     
    
     
-    def test_sensitivity_safe_division(self):
+    def test_sensitivity_calculation(self):
         ig = VectorGeometry(10)
         data = ig.allocate('random')
         data.fill(np.array([1.,2.,3.,4.,5.,6.,7.,8.,9.,10.]))
@@ -68,14 +68,10 @@ class TestPreconditioners(CCPiTestClass):
         f=LeastSquares(A, data)
         alg = GD(initial=ig.allocate(0), objective_function=f, 
                max_iteration=100, update_objective_interval=1, step_size = 1.)  
-        alg.gradient_update=ig.allocate(1)
+        alg.gradient_update=ig.allocate(2)
         preconditioner(alg)
-        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([2e-6,2e-6,2e-6,2e-6,0,0,0,0,0,0]))
-        alg.gradient_update=ig.allocate(1)
-        alg.x=ig.allocate(1)
-        preconditioner(alg)
-        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([2*(1+1e-6),2*(1+1e-6),2*(1+1e-6),2*(1+1e-6),0,0,0,0,0,0]))
-       
+        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([4.,4.,4.,4.,0,0,0,0,0,0]))
+
        
         
 
@@ -194,6 +190,8 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(data).as_array(), A.direct(data).as_array())
         self.assertEqual(preconditioner.reference, None)
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), np.array([2.,2.,2.,2.,0,0,0,0,0,0]))
+        
+        
         f=LeastSquares(A, data)
         alg = GD(initial=ig.allocate(0), objective_function=f, 
                max_iteration=100, update_objective_interval=1, step_size = 1.)  
@@ -273,6 +271,29 @@ class TestPreconditioners(CCPiTestClass):
         self.assertEqual(preconditioner.gradient_accumulator, None)
         self.assertEqual(preconditioner.scaling_factor_accumulator, None)
         
+    def test_Adam_calculations(self):
+        preconditioner = Adam(gamma=.5, beta=.5, epsilon =1 )
+        ig = VectorGeometry(10)
+        data = ig.allocate('random')
+        data.fill(np.array([1.,2.,3.,4.,5.,6.,7.,8.,9.,10.]))
+        A= MatrixOperator( np.diag([1/2,1/2,1/2,1/2,0.,0.,0.,0.,0.,0.]))
+        
+        f=LeastSquares(A, data)
+        alg = GD(initial=ig.allocate(0), objective_function=f, 
+               max_iteration=100, update_objective_interval=1, step_size = 1.)  
+        alg.gradient_update=ig.allocate(1)
+        preconditioner(alg)
+        self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(), np.array([1,1,1,1,1,1,1,1,1,1]))
+        self.assertNumpyArrayAlmostEqual(preconditioner.scaling_factor_accumulator.as_array(), np.array([1,1,1,1,1,1,1,1,1,1]))
+        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.sqrt(np.array([1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2])))
+        
+        alg.gradient_update=ig.allocate(2)
+        preconditioner(alg)
+        self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(), np.array([1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5]))
+        self.assertNumpyArrayAlmostEqual(preconditioner.scaling_factor_accumulator.as_array(), np.array([2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5]))
+        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(),  1.5*np.sqrt(np.array([2/7,2/7,2/7,2/7,2/7,2/7,2/7,2/7,2/7,2/7])))
+       
+       
         
     def test_Adam_converges(self):
         ig = ImageGeometry(7,8,4)
@@ -300,6 +321,27 @@ class TestPreconditioners(CCPiTestClass):
         self.assertEqual(preconditioner.epsilon, 1e-4)
         self.assertEqual(preconditioner.gradient_accumulator, None)
         
+    def test_AdaGrad_calculations(self):
+        preconditioner = AdaGrad( epsilon =1 )
+        ig = VectorGeometry(10)
+        data = ig.allocate('random')
+        data.fill(np.array([1.,2.,3.,4.,5.,6.,7.,8.,9.,10.]))
+        A= MatrixOperator( np.diag([1/2,1/2,1/2,1/2,0.,0.,0.,0.,0.,0.]))
+        
+        f=LeastSquares(A, data)
+        alg = GD(initial=ig.allocate(0), objective_function=f, 
+               max_iteration=100, update_objective_interval=1, step_size = 1.)  
+        alg.gradient_update=ig.allocate(1)
+        preconditioner(alg)
+        self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(), np.array([1,1,1,1,1,1,1,1,1,1]))
+        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.sqrt(np.array([1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2,1/2])))
+        
+        alg.gradient_update=ig.allocate(2)
+        preconditioner(alg)
+        self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(), np.array([5,5,5,5,5,5,5,5,5,5]))
+        self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(),  2*np.sqrt(np.array([1/6,1/6,1/6,1/6,1/6,1/6,1/6,1/6,1/6,1/6])))
+       
+       
       
     def test_AdaGrad_converges(self):
             ig = ImageGeometry(7,8,4)

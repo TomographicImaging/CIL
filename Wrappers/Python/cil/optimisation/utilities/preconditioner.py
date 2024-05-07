@@ -43,7 +43,7 @@ class Preconditioner(ABC):
         Parameters
         ----------
         algorithm : Algorithm
-            The algorithmrithm object.
+            The algorithm object.
         """    
         pass
 
@@ -78,17 +78,12 @@ class Sensitivity(Preconditioner):
         Compute the sensitivity. :math:`A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.        
         Then perform safe division by the sensitivity to store the preconditioner array :math:` y/(A^T \mathbf{1})`
         """
-        
-        sensitivity_np = self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0)).as_array()
-        pos_ind = sensitivity_np>0
-        array_np = np.zeros(self.operator.domain_geometry().allocate().shape)
+        self.array=self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
         if self.reference is not None:
-            array_np[pos_ind ] = self.reference.as_array()[pos_ind ]/sensitivity_np[pos_ind ]
+            self.reference.divide(self.array, where=self.array.as_array()>0 , out=self.array )
         else:            
-            array_np[pos_ind ] = (1./sensitivity_np[pos_ind])
-        self.array = self.operator.domain_geometry().allocate(0)
-        self.array.fill(array_np) 
+            self.operator.range_geometry().allocate(value=1.0).divide(self.array, where=self.array.as_array()>0 , out=self.array )
                                         
     def __call__(self, algorithm): 
         
@@ -150,7 +145,7 @@ class AdaptiveSensitivity(Sensitivity):
 class AdaGrad(Preconditioner):
 
     """
-    This Adaptive Gradient method multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epislon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)``. 
+    This Adaptive Gradient method multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epsilon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)``. 
     
     Reference
     ---------

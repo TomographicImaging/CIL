@@ -123,7 +123,11 @@ class SAGFunction(ApproximateGradientSumFunction):
         Parameters
         ----------
         initial: DataContainer,
-            The initial point to warmstart the calculation 
+            The initial point to warmstart the calculation
+            
+        Note
+        ----
+        When using SAG or SAGA with a deterministic algorithm, you should warm start the SAG-SAGA Function with the same initial point that you initialise the algorithm
         
         """
         self._list_stored_gradients = [

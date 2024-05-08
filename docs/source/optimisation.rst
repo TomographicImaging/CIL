@@ -624,7 +624,7 @@ We also have a number of example classes:
 
 Preconditioners
 ----------------
-A preconditioner is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD` and is called after the calculation of the gradient before the gradient descent step is taken. 
+A preconditioner is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD` or `cil.optimisation.algorithm.FISTA` and is called after the calculation of the gradient before the gradient descent step is taken. It modifies the `gradient_update`  in the algorithm. 
 
 Currently in CIL we have a base class:
 
@@ -639,10 +639,8 @@ We also have a number of already provided pre-conditioners
 .. autoclass:: cil.optimisation.utilities.preconditioner.AdaptiveSensitivity
    :members:
 
-
 .. autoclass:: cil.optimisation.utilities.preconditioner.AdaGrad
    :members:
-
 
 .. autoclass:: cil.optimisation.utilities.preconditioner.Adam
    :members:

@@ -65,7 +65,7 @@ class ISTA(Algorithm):
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
         This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the Gradient descent algorithm
+    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the `update` call
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
         
     
@@ -255,7 +255,7 @@ class FISTA(ISTA):
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
         This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the Gradient descent algorithm
+    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the `update` method
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
         
     kwargs: Keyword arguments

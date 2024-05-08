@@ -63,11 +63,11 @@ class ISTA(Algorithm):
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
-    step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-        This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the `update` call
+   step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
+            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
+        preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
-        
+ 
     
     
     kwargs: Keyword arguments
@@ -189,9 +189,9 @@ class ISTA(Algorithm):
         # gradient step
         self.f.gradient(self.x_old, out=self.gradient_update)
         if self.preconditioner is not None:
-            self.preconditioner(self)
+            self.preconditioner.apply(self, self.gradient_update, out=self.gradient_update) 
 
-        step_size = self.step_size_rule(self)
+        step_size = self.step_size_rule.get_step_size(self)
         
         self.x_old.sapyb(1., self.gradient_update, -step_size, out=self.x_old)
 
@@ -253,11 +253,11 @@ class FISTA(ISTA):
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of FISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
-    step_size_rule: class with a `__call__` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-        This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
-    preconditioner: class with a `__call__` method or a function that takes an initialised CIL function as an argument and modifies `self.gradient_update` in the `update` method
+    step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
+            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
+    preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
-        
+
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
@@ -338,9 +338,9 @@ class FISTA(ISTA):
         self.f.gradient(self.y, out=self.gradient_update)
         
         if self.preconditioner is not None:
-            self.preconditioner(self)
+            self.preconditioner.apply(self, self.gradient_update, out=self.gradient_update)
 
-        step_size = self.step_size_rule(self)
+        step_size = self.step_size_rule.get_step_size(self)
         
         self.y.sapyb(1., self.gradient_update, -step_size, out=self.y)
 

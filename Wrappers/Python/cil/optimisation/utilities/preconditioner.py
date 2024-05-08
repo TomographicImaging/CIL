@@ -24,12 +24,12 @@ import numpy as np
 class Preconditioner(ABC):
 
     r"""
-    Abstract base class for Preconditioner objects. The `__call__` method of this class takes an initialised CIL function as an argument and modifies `self.gradient_update` in the `update` method of an algorithm. 
+    Abstract base class for Preconditioner objects. The `apply` method of this class takes an initialised CIL function as an argument and modifies a provided  `gradient`.
    
     
     Methods
     -------
-    __call__(x)
+    apply(x)
         Abstract method to call the preconditioner.
     """
 
@@ -39,14 +39,20 @@ class Preconditioner(ABC):
         pass
 
     @abstractmethod
-    def __call__(self, algorithm):
+    def apply(self, algorithm, gradient, out=None):
         r"""
-        Abstract method to __call__ the preconditioner.
+        Abstract method to apply the preconditioner.
 
         Parameters
         ----------
         algorithm : Algorithm
             The algorithm object.
+    
+        gradient : DataContainer
+            The calculated gradient to modify
+        out : DataContainer, optional, default is None 
+            The modified gradient to return 
+            
         """
         pass
 
@@ -56,7 +62,7 @@ class Sensitivity(Preconditioner):
     r"""
     Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `algorithm.gradient_update` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
+    In each call to the preconditioner the `gradient` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
 
     Parameters
     ----------
@@ -89,7 +95,7 @@ class Sensitivity(Preconditioner):
             self.operator.range_geometry().allocate(value=1.0).divide(
                 self.array, where=self.array.as_array() > 0, out=self.array)
 
-    def __call__(self, algorithm):
+    def apply(self, algorithm, gradient, out=None):
         r"""
         Update the preconditioner.
 
@@ -97,10 +103,16 @@ class Sensitivity(Preconditioner):
         ----------
         algorithm : object
             The algorithm object.
+        gradient : DataContainer
+            The calculated gradient to modify
+        out : DataContainer, optional, default is None 
+            The modified gradient to return 
         """
-
-        algorithm.gradient_update.multiply(
-            self.array, out=algorithm.gradient_update)
+        if out is None:
+            out = gradient.copy()
+        gradient.multiply(
+            self.array, out=out)
+        return out
 
 
 class AdaptiveSensitivity(Sensitivity):
@@ -108,7 +120,7 @@ class AdaptiveSensitivity(Sensitivity):
     r"""
     Adaptive Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `algorithm.gradient_update` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
+    In each call to the preconditioner the `gradient` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
     The point :math:`x` is the current iteration and :math:`delta` is a small positive float. 
 
 
@@ -138,16 +150,32 @@ class AdaptiveSensitivity(Sensitivity):
         super(AdaptiveSensitivity, self).__init__(
             operator=operator, reference=reference)
 
-    def __call__(self, algorithm):
+    def apply(self, algorithm, gradient, out=None):
+        r"""
+        Update the preconditioner.
 
+        Parameters
+        ----------
+        algorithm : object
+            The algorithm object.
+        gradient : DataContainer
+            The calculated gradient to modify
+        out : DataContainer, optional, default is None 
+            The modified gradient to return 
+        """
+        if out is None:
+            out = gradient.copy()
+            
         if algorithm.iteration <= self.iterations:
             self.array.multiply(algorithm.x + self.delta,
                                 out=self.freezing_point)
-            algorithm.gradient_update.multiply(
-                self.freezing_point, out=algorithm.gradient_update)
+            gradient.multiply(
+                self.freezing_point, out=out)
         else:
-            algorithm.gradient_update.multiply(
-                self.freezing_point, out=algorithm.gradient_update)
+            gradient.multiply(
+                self.freezing_point, out=out)
+        
+        return out
 
 
 class AdaGrad(Preconditioner):
@@ -164,26 +192,34 @@ class AdaGrad(Preconditioner):
         self.epsilon = epsilon
         self.gradient_accumulator = None
 
-    def __call__(self, algorithm):
+    def apply(self, algorithm, gradient, out=None):
         r"""
-        Method to __call__ the preconditioner. This multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epsilon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)`. 
+        Method to apply the preconditioner. This multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epsilon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)`. 
 
         Parameters
         ----------
-        algorithm : Algorithm
+        algorithm : object
             The algorithm object.
+        gradient : DataContainer
+            The calculated gradient to modify
+        out : DataContainer, optional, default is None 
+            The modified gradient to return 
         """
+        if out is None:
+            out = gradient.copy()
 
         if self.gradient_accumulator is None:
-            self.gradient_accumulator = algorithm.gradient_update.multiply(
-                algorithm.gradient_update)
+            self.gradient_accumulator = gradient.multiply(
+                gradient)
 
         else:
-            self.gradient_accumulator.add(algorithm.gradient_update.multiply(
-                algorithm.gradient_update), out=self.gradient_accumulator)
+            self.gradient_accumulator.add(gradient.multiply(
+                gradient), out=self.gradient_accumulator)
 
-        algorithm.gradient_update.divide(
-            (self.gradient_accumulator+self.epsilon).sqrt(), out=algorithm.gradient_update)
+        gradient.divide(
+            (self.gradient_accumulator+self.epsilon).sqrt(), out=out)
+        
+        return out
 
 
 class Adam(Preconditioner):
@@ -211,26 +247,35 @@ class Adam(Preconditioner):
         self.scaling_factor_accumulator = None
         self.epsilon = epsilon
 
-    def __call__(self, algorithm):
+    def apply(self, algorithm, gradient, out=None):
         r"""
-        Method to __call__ the preconditioner, updating `self.gradient_update` with the preconditioned gradient.
+        Method to apply the preconditioner, updating `self.gradient_update` with the preconditioned gradient.
 
         Parameters
         ----------
-        algorithm : Algorithm
+        algorithm : object
             The algorithm object.
+        gradient : DataContainer
+            The calculated gradient to modify
+        out : DataContainer, optional, default is None 
+            The modified gradient to return 
         """
+        if out is None:
+            out = gradient.copy()
+
 
         if self.gradient_accumulator is None:
-            self.gradient_accumulator = algorithm.gradient_update.copy()
-            self.scaling_factor_accumulator = algorithm.gradient_update.multiply(
-                algorithm.gradient_update)
+            self.gradient_accumulator = gradient.copy()
+            self.scaling_factor_accumulator = gradient.multiply(
+                gradient)
 
         else:
             self.gradient_accumulator.sapyb(
-                self.gamma, algorithm.gradient_update, (1-self.gamma), out=self.gradient_accumulator)
-            self.scaling_factor_accumulator.sapyb(self.beta,  algorithm.gradient_update.multiply(
-                algorithm.gradient_update), (1-self.beta), out=self.scaling_factor_accumulator)
+                self.gamma, gradient, (1-self.gamma), out=self.gradient_accumulator)
+            self.scaling_factor_accumulator.sapyb(self.beta,  gradient.multiply(
+                gradient), (1-self.beta), out=self.scaling_factor_accumulator)
 
         self.gradient_accumulator.divide(
-            (self.scaling_factor_accumulator+self.epsilon).sqrt(), out=algorithm.gradient_update)
+            (self.scaling_factor_accumulator+self.epsilon).sqrt(), out=out)
+
+        return out 

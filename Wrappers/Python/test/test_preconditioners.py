@@ -23,19 +23,19 @@ class TestPreconditioners(CCPiTestClass):
         alg = GD(initial=ig.allocate('random', seed=10), objective_function=f, preconditioner=test_precon,
                  max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
-        self.assertEqual(len(test_precon.mock_calls), 5)
-
-        test_precon = MagicMock(None)
+        self.assertEqual(len(test_precon.apply.mock_calls), 5)
+        test_precon=Sensitivity(A)
+        test_precon.apply = MagicMock(None)
         alg = ISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
                    max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
-        self.assertEqual(len(test_precon.mock_calls), 5)
+        self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
         test_precon = MagicMock(None)
         alg = FISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
                     max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
-        self.assertEqual(len(test_precon.mock_calls), 5)
+        self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
     def test_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
@@ -74,7 +74,7 @@ class TestPreconditioners(CCPiTestClass):
         alg = GD(initial=ig.allocate(0), objective_function=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(2)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([
                                          4., 4., 4., 4., 0, 0, 0, 0, 0, 0]))
 
@@ -204,14 +204,14 @@ class TestPreconditioners(CCPiTestClass):
         alg = GD(initial=ig.allocate(0), objective_function=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(1)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.freezing_point.as_array(
         ), np.array([2e-6, 2e-6, 2e-6, 2e-6, 0, 0, 0, 0, 0, 0]))
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([
                                          2e-6, 2e-6, 2e-6, 2e-6, 0, 0, 0, 0, 0, 0]))
         alg.gradient_update = ig.allocate(1)
         alg.x = ig.allocate(1)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.freezing_point.as_array(
         ), np.array([2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 0, 0, 0, 0, 0, 0]))
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array(
@@ -220,7 +220,7 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = AdaptiveSensitivity(A, iterations=0)
         alg.gradient_update = ig.allocate(1)
         alg.x = ig.allocate(1)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.freezing_point.as_array(
         ), np.array([2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 0, 0, 0, 0, 0, 0]))
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array(
@@ -291,7 +291,7 @@ class TestPreconditioners(CCPiTestClass):
         alg = GD(initial=ig.allocate(0), objective_function=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(1)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(
         ), np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertNumpyArrayAlmostEqual(preconditioner.scaling_factor_accumulator.as_array(
@@ -300,7 +300,7 @@ class TestPreconditioners(CCPiTestClass):
             np.array([1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2])))
 
         alg.gradient_update = ig.allocate(2)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(
         ), np.array([1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]))
         self.assertNumpyArrayAlmostEqual(preconditioner.scaling_factor_accumulator.as_array(
@@ -345,14 +345,14 @@ class TestPreconditioners(CCPiTestClass):
         alg = GD(initial=ig.allocate(0), objective_function=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(1)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(
         ), np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.sqrt(
             np.array([1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2])))
 
         alg.gradient_update = ig.allocate(2)
-        preconditioner(alg)
+        preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.gradient_accumulator.as_array(
         ), np.array([5, 5, 5, 5, 5, 5, 5, 5, 5, 5]))
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(

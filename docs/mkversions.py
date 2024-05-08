@@ -25,4 +25,5 @@ except ValueError:
 else:
     versions += [{"name": "stable", "version": stable["version"], "url": stable["url"], "preferred": True}]
 
+versions.sort(key=lambda v: (version.parse(v["version"]), v["name"]), reverse=True)
 (build / "versions.json").write_text(json.dumps(versions))

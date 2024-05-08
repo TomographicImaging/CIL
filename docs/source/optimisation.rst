@@ -159,8 +159,9 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
 
    .. math::
       x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
-:math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorith. 
-=======
+:math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
+
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
 In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
@@ -231,8 +232,8 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
 Note
 ----
  We ensure that all the approximate gradients written in CIL are of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
- The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. 
-This means that for example, a suitable step size for GD with a SGFunction could be  :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of by :math:`n` reflects this multiplication by the :math:`n` for the approximate gradient. 
+ The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. This means that for example, a suitable step size for GD with a SGFunction could be 
+  :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
 
   
 Operators

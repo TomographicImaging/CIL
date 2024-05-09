@@ -205,7 +205,12 @@ class BlockOperator(Operator):
                         prod += self.get_item(row,
                                               col).direct(x_b.get_item(col))
                 res.append(prod)
-            return BlockDataContainer(*res, shape=shape)
+            if self.shape[1]==1: 
+                # the output is a single DataContainer, so we can take it out 
+                return res[0] 
+            else: 
+                return BlockDataContainer(*res, shape=shape) 
+ 
         else:
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):

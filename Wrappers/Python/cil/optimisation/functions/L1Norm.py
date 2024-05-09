@@ -55,15 +55,11 @@ def soft_shrinkage(x, tau, out=None):
                 \end{cases}.
                 
     """
-    should_return = False       
-    
     if np.min(tau) < 0:
         warnings.warn(
                 "tau should be non-negative!", UserWarning)
     if np.linalg.norm(np.imag(tau))>0:
         raise ValueError("tau should be real!")
-        
-
 
     # get the sign of the input
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
@@ -76,7 +72,6 @@ def soft_shrinkage(x, tau, out=None):
             out.fill(outarr)
         else:
             out = x.abs()
-        should_return = True
     else:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             outarr = out.as_array()
@@ -88,8 +83,8 @@ def soft_shrinkage(x, tau, out=None):
     out -= tau
     out.maximum(0, out = out)
     out *= dsign
-    if should_return:
-        return out
+    return out
+
 
 class L1Norm(Function):
     r"""L1Norm function
@@ -245,18 +240,12 @@ class _L1Norm(Function):
 
 
     def proximal(self, x, tau, out=None):
-        if out is None:
-            if self.b is not None:
-                return self.b + soft_shrinkage(x - self.b, tau)
-            else:
-                return soft_shrinkage(x, tau)
+        if self.b is not None:
+            ret = soft_shrinkage(x - self.b, tau, out=out)
+            ret += self.b
         else:
-
-            if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
-                out += self.b
-            else:
-                soft_shrinkage(x, tau, out = out)
+            ret = soft_shrinkage(x, tau, out=out)
+        return ret
 
 
 class _WeightedL1Norm(Function):

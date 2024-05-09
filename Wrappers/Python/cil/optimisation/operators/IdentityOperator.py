@@ -48,6 +48,7 @@ class IdentityOperator(LinearOperator):
             return x.copy()
         else:
             out.fill(x)
+            return out
 
     def adjoint(self,x, out=None):
 
@@ -58,6 +59,7 @@ class IdentityOperator(LinearOperator):
             return x.copy()
         else:
             out.fill(x)
+            return out
 
     def calculate_norm(self, **kwargs):
 

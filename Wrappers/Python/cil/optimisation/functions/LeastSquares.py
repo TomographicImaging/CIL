@@ -93,10 +93,7 @@ class LeastSquares(Function):
         where :math:`W=\text{diag}(weight)`.
 
         """
-        should_return = True
-        if out is not None:
-            should_return = False
-        else:
+        if out is None:
             out = x * 0.0
 
         tmp = self.A.direct(x)
@@ -105,9 +102,7 @@ class LeastSquares(Function):
             tmp.multiply(self.weight, out=tmp)
         self.A.adjoint(tmp, out = out)
         out.multiply(self.c * 2.0, out=out)
-
-        if should_return:
-            return out
+        return out
 
     @property
     def L(self):

@@ -6,9 +6,11 @@
   - Enhancements:
     - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
+    - Operators and functions now also return when out is specified #1742
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
+
 
 
 * 24.0.0

@@ -20,11 +20,10 @@
 #%%
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
-import warnings
 import numpy
-from scipy import interpolate
 from cil.utilities.display import show2D
 import numpy as np
+import time
 
 class BadPixelCorrector(DataProcessor):
     r'''
@@ -33,12 +32,14 @@ class BadPixelCorrector(DataProcessor):
 
     def __init__(self, mask):
         
-        r'''Processor to correct bad pixels in an image, by replacing with the mean value of unmasked nearest neighbours.
+        r'''Processor to correct bad pixels in an image, by replacing with the weighted mean value of unmasked nearest 
+        neighbours (including diagonals) in the projection
 
         Parameters
         ----------
         mask : DataContainer, numpy.ndarray
-            A boolean array with the same dimensions as the size of a projection in the input data, where 'False' represents masked values.
+            A boolean array with the same dimensions as the size of a projection in the input data (i.e. 1D or 2D), 
+            where 'False' represents masked values.
             Mask can be generated using 'MaskGenerator' processor.
         '''
 
@@ -69,33 +70,6 @@ class BadPixelCorrector(DataProcessor):
         return True
 
     def process(self, out=None):
-
-        # Main question: can I allow only AcquisitionData?
-        # Can I allow only 1D or 2D mask - don't think we would have 3D?
-
-        # Cases:
-        # 1D data, 1D mask -> apply mean in all (i.e. 1) direction
-        # 2D data: i.e. 1D plus multiple angles, 1D mask -> apply mean in just 1 (not angles) direction
-        # 2D data: i.e. single projection, with horizontal and vertical dimensions, 2D mask -> apply mean in both directions
-        # 3D data: i.e. multiple projections, with horizontal and vertical dimensions, 2D mask -> apply mean in 2 directions
-
-        # But we won't be passing in the mask, we will be passing in coordinates.
-        # So we need to know which coordinates correspond to which dimensions.
-        # We can do this by looking at the dimension labels of the data.
-        # We can then use this to work out which dimensions to apply the mean in.
-
-
-        # Could there be a case where the coords dict and data dimension labels are mismatched? e.g. run mask generator on a different dataset to the one we are correcting?
-        # How do we avoid this?
-        # We could save the info in the dict somehow
-
-        # So if we have the coords and the dimension labels
-        # We can work out which dimensions to apply the mean in
-        # We can then apply the mean in those dimensions
-        # Look for horizontal and vertical dimensions
-        # Do we need to accommodate any others? Expect acquisitiondata.
-
-        # Maybe we only ever take 2D mask which has horiz and vert?
         
         data = self.get_input()
         
@@ -103,8 +77,6 @@ class BadPixelCorrector(DataProcessor):
         if out is None:
             out = data.copy()
             return_arr = True
-
-        #assumes mask has 'as_array' method, i.e. is a DataContainer or is a numpy array
         try:
             mask_arr = self.mask.as_array()
         except:
@@ -113,14 +85,9 @@ class BadPixelCorrector(DataProcessor):
         mask_arr = numpy.array(mask_arr, dtype=bool)
         mask_invert = ~mask_arr
 
-        # Replace masked pixels with mean of unmasked neighbours, starting
-        # with masked pixels with unmasked neighbours and iterating.
-
         # Coordinates of all masked pixels:
         masked_pixels = numpy.transpose((mask_invert).nonzero())
 
-
-        # loop over angles:
 
         try:
             angles = data.geometry.angles
@@ -128,8 +95,6 @@ class BadPixelCorrector(DataProcessor):
             angles = [0]
 
         channels = data.geometry.channels
-
-
         
         # need to check order of input array
 
@@ -162,11 +127,12 @@ class BadPixelCorrector(DataProcessor):
                             # Get all neighbours
                             neighbours = []
                             diag_neighbours = []
+                            weights = []
                             if len(list(coords))== 1:
                                 if list(coords)[0] > 0:
-                                    neighbours.append([coords[0]-1])
+                                    neighbours.append(coords[0]-1)
                                 if list(coords)[0] < mask_arr.shape[0]-1:
-                                    neighbours.append([coords[0]+1])
+                                    neighbours.append(coords[0]+1)
                             else:
                                 if coords[0]>0 and coords[1]>0:
                                     diag_neighbours.append(tuple([coords[0]-1, coords[1]-1]))
@@ -188,44 +154,78 @@ class BadPixelCorrector(DataProcessor):
                             # Save coords of unmasked neighbours, should include neighbours and diag_neighbours:
                             neighbour_values = []
                             weights = []
-                            for neighbour in neighbours:
+                            projection_array = projection_out.as_array()
+                            diag_weight = 1/np.sqrt(2)
+                            for neighbour in neighbours + diag_neighbours:
                                 if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
                                     continue
-                                neighbour_values.append(projection_out.as_array()[neighbour])
-                                weights.append(1)
-                            
-                            for neighbour in diag_neighbours:
-                                if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
-                                    continue
-                                neighbour_values.append(projection_out.as_array()[neighbour])
-                                weights.append(1/np.sqrt(2))
-
-                            print("neighbs: ", neighbour_values)
-                            print("weights: ", weights)
+                                neighbour_values.append(projection_array[neighbour])
+                                weights.append(1 if neighbour in neighbours else diag_weight)
 
                             if len(neighbour_values) > 0:
                                 projection_out.array[coords] = numpy.average(neighbour_values, weights=weights)
                                 masked_pixels_status[coords] = True # later remove from masked pixels array
-                            print(projection_out.array)
                     # If data is a single projection, this will be the entire output:
                     try:
                         channel_out[i] = projection_out.array
                     except:
                         channel_out = projection_out.array
 
-                    print("Channel out: ", channel_out)
-                
-                print("Out: ", out)
                 try:
                     out.array[j] = channel_out
                 except:
                     out.array = channel_out
-                print("Out: ", out)
 
         if return_arr is True:
             return out
         
 
+# THE FOLLOWING ARE FOR QUICK TESTING ONLY - WILL LATER BE MOVED TO UNIT TESTS
+#%%
+# 1D data
+        
+start_time = time.time()
+
+a = np.array([6.0,0.0,4.0])
+mask = np.array([True, False, True])
+
+ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0])
+ad = AcquisitionData(array=a, geometry=ag)
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+
+end_time = time.time()
+# Check the result
+print("Input:")
+print(ad.as_array())
+print("Result: ")
+print(corrected_data.array)
+# Calculate the time taken
+time_taken = end_time - start_time
+
+# Print the time taken
+print(f"Time taken: {time_taken} seconds")
+
+#%% 1D data with channels
+
+a = np.array([[6.0,0.0,4.0], [5.0,0,3]])
+mask = np.array([True, False, True])
+
+ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0]).set_channels(2)
+ad = AcquisitionData(array=a, geometry=ag)
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Input:")
+print(ad.as_array())
+print("Result: ")
+print(corrected_data.array)
 
 
 #%%
@@ -241,6 +241,8 @@ bad_pixel_corrector = BadPixelCorrector(mask)
 # Apply the processor to the data
 corrected_data = bad_pixel_corrector(ad)
 # Check the result
+print("Input:")
+print(ad.as_array())
 print("Result: ")
 print(corrected_data.array)
 
@@ -290,6 +292,8 @@ bad_pixel_corrector = BadPixelCorrector(mask)
 # Apply the processor to the data
 corrected_data = bad_pixel_corrector(ad)
 # Check the result
+print("Input:")
+print(ad.as_array())
 print("Result: ")
 print(corrected_data.array)
 
@@ -308,6 +312,12 @@ corrected_data = bad_pixel_corrector(ad)
 print("Result: ")
 print(corrected_data.array)
 
+
+# Check the result
+print("Input:")
+print(ad.as_array())
+print("Result: ")
+print(corrected_data.array)
 #%%
 a = np.array([[1.,1.,1], [0,0,0], [3,3,3]])
 expected_a = np.array([[1,1,1], [2,2,2], [3,3,3]])
@@ -345,6 +355,8 @@ bad_pixel_corrector = BadPixelCorrector(mask)
 # Apply the processor to the data
 corrected_data = bad_pixel_corrector(ad)
 # Check the result
+print("Input:")
+print(ad.as_array())
 print("Result: ")
 print(corrected_data.array)
 

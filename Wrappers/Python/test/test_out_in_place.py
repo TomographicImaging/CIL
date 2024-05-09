@@ -24,7 +24,6 @@ import numpy as np
 from cil.utilities.errors import InPlaceError
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
 
-
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
 from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
 from cil.optimisation.operators import LinearOperator, MatrixOperator  

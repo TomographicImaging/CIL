@@ -93,7 +93,6 @@ class LeastSquares(Function):
         where :math:`W=\text{diag}(weight)`.
 
         """
-
         if out is None:
             out = x * 0.0
 
@@ -103,7 +102,6 @@ class LeastSquares(Function):
             tmp.multiply(self.weight, out=tmp)
         self.A.adjoint(tmp, out = out)
         out.multiply(self.c * 2.0, out=out)
-        
         return out
 
     @property

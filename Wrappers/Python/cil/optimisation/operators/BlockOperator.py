@@ -206,9 +206,7 @@ class BlockOperator(Operator):
                                               col).direct(x_b.get_item(col))
                 res.append(prod)
             return BlockDataContainer(*res, shape=shape)
-
         else:
-
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
@@ -262,7 +260,6 @@ class BlockOperator(Operator):
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
-
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):
                     if row == 0:

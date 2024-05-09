@@ -210,9 +210,11 @@ class LinearOperator(Operator):
             Element in the domain of the Operator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
+
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None.
+        DataContainer or BlockDataContainer containing the result.
+
         Note
         ----
         Only available to linear operators'''
@@ -486,11 +488,8 @@ class ScaledOperator(Operator):
       sop.norm() = operator.norm()
       sop.range_geometry() = operator.range_geometry()
       sop.domain_geometry() = operator.domain_geometry()
-
     '''
-
     def __init__(self, operator, scalar, **kwargs):
-
         super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(),
                                              range_geometry=operator.range_geometry())
         if not isinstance(scalar, Number):
@@ -500,22 +499,17 @@ class ScaledOperator(Operator):
 
     def direct(self, x, out=None):
         '''direct method'''
-        
-        tmp = self.operator.direct(x, out = out)
+        tmp = self.operator.direct(x, out=out)
         tmp *= self.scalar
         return tmp
 
-
     def adjoint(self, x, out=None):
         '''adjoint method'''
-        if self.operator.is_linear():
-            
-            tmp = self.operator.adjoint(x, out = out)
-            tmp *= self.scalar
-            return tmp
-            
-        else:
+        if not self.operator.is_linear():
             raise TypeError('Operator is not linear')
+        tmp = self.operator.adjoint(x, out=out)
+        tmp *= self.scalar
+        return tmp
 
     def norm(self, **kwargs):
         '''norm of the operator'''
@@ -571,12 +565,11 @@ class SumOperator(Operator):
             Element in the domain of the SumOperator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+
         Returns
         -------
         DataContainer or BlockDataContainer containing the result.
-
         """
-
         ret = self.operator1.direct(x, out=out)
         ret.add(self.operator2.direct(x), out=ret)
         return ret
@@ -594,14 +587,11 @@ class SumOperator(Operator):
         -------
         DataContainer or BlockDataContainer containing the result.
         """
-
-        if self.linear_flag:
-            
-            ret = self.operator1.adjoint(x, out=out)
-            ret.add(self.operator2.adjoint(x), out=ret)
-            return ret
-        else:
+        if not self.linear_flag:
             raise ValueError('No adjoint operation with non-linear operators')
+        ret = self.operator1.adjoint(x, out=out)
+        ret.add(self.operator2.adjoint(x), out=ret)
+        return ret
 
     def is_linear(self):
         return self.linear_flag
@@ -659,7 +649,7 @@ class CompositionOperator(Operator):
             If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result
+        DataContainer or BlockDataContainer containing the result.
 
         """
         if out is None:
@@ -720,7 +710,7 @@ class CompositionOperator(Operator):
 
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result
+        DataContainer or BlockDataContainer containing the result.
         """
 
         if self.linear_flag:

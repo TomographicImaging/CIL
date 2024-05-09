@@ -263,10 +263,7 @@ class TotalVariation(Function):
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
             x /= strongly_convex_factor
             tau /= strongly_convex_factor
-
-        
-        solution = self._fista_on_dual_rof(x, tau , out = out)
-        
+        solution = self._fista_on_dual_rof(x, tau, out=out)
 
         if self.strong_convexity_constant > 0:
             x *= strongly_convex_factor
@@ -352,7 +349,6 @@ class TotalVariation(Function):
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):
             tau_reg_neg.divide(-self.regularisation_parameter, out=tau)
-
 
         return out
 

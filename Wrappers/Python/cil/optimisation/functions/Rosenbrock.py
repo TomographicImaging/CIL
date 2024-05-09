@@ -64,7 +64,7 @@ class Rosenbrock(Function):
         res[1] = 2 * self.beta * b
 
         if out is not None:
-            out.fill (res)
+            out.fill(res)
             return out
         else:
             return VectorData(res)

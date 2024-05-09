@@ -42,42 +42,28 @@ class DiagonalOperator(LinearOperator):
         Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly. default=None .
 
     """
-
-
     def __init__(self, diagonal, domain_geometry=None):
-
         if domain_geometry is None:
             domain_geometry = diagonal.geometry.copy()
-
         super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry,
                                     range_geometry=domain_geometry)
         self.diagonal = diagonal
 
-
     def direct(self,x,out=None):
-
         "Returns :math:`D\circ x` "
-
         if out is None:
             return self.diagonal * x
         else:
             self.diagonal.multiply(x,out=out)
         return out
-    
 
     def adjoint(self,x, out=None):
-
         "Returns :math:`D^*\circ x` "
-
         return self.diagonal.conjugate().multiply(x,out=out)
 
-
     def calculate_norm(self, **kwargs):
-
         r""" Returns the operator norm of DiagonalOperator which is the :math:`\infty` norm of `diagonal`
 
         .. math:: \|D\|_{\infty} = \max_{i}\{|D_{i}|\}
-
         """
-
         return self.diagonal.abs().max()

@@ -138,7 +138,6 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer
         :param: out (optional): provides a placehold for the resul.
         '''
-        
         return self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
     def subtract(self, other, *args, **kwargs):
         '''Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer
@@ -146,7 +145,6 @@ class BlockDataContainer(object):
         :param: other (number, DataContainer or subclasses or BlockDataContainer
         :param: out (optional): provides a placeholder for the result.
         '''
-        
         return self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
     def multiply(self, other, *args, **kwargs):
         '''Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer

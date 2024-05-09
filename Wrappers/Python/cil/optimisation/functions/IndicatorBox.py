@@ -162,7 +162,6 @@ class IndicatorBox(Function):
 
             ``tau`` is ignored but it is in the signature of the generic Function class
         '''
-
         if out is None:
             out = x.copy()
         else:
@@ -173,7 +172,6 @@ class IndicatorBox(Function):
         self._proximal(outarr)
 
         out.fill(outarr)
-
         return out
 
     def gradient(self, x, out=None):

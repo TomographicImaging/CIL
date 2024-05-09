@@ -170,24 +170,18 @@ class MixedL21Norm(Function):
         else:
             res = _proximal_step_numpy(tmp, tau)
 
-        
         return x.multiply(res, out=out)
-        
 
 
 class SmoothMixedL21Norm(Function):
-
     """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`
 
         where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
 
         Conjugate, proximal and proximal conjugate methods no closed-form solution
-
-
     """
 
     def __init__(self, epsilon):
-
         r'''
         :param epsilon: smoothing parameter making MixedL21Norm differentiable
         '''
@@ -199,30 +193,18 @@ class SmoothMixedL21Norm(Function):
             raise ValueError('We need epsilon>0. Otherwise, call "MixedL21Norm" ')
 
     def __call__(self, x):
-
-        r"""Returns the value of the SmoothMixedL21Norm function at x.
-        """
+        """Returns the value of the SmoothMixedL21Norm function at x."""
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))
-
-
         return (x.pnorm(2).power(2) + self.epsilon**2).sqrt().sum()
 
 
     def gradient(self, x, out=None):
-
         r"""Returns the value of the gradient of the SmoothMixedL21Norm function at x.
 
         \frac{x}{|x|}
-
-
         """
-
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))
-
         denom = (x.pnorm(2).power(2) + self.epsilon**2).sqrt()
-
-        
-        return x.divide(denom, out=out) 
-             
+        return x.divide(denom, out=out)

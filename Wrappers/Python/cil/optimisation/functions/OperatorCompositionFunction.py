@@ -75,7 +75,5 @@ class OperatorCompositionFunction(Function):
         tmp = self.operator.range_geometry().allocate()
         self.operator.direct(x, out=tmp)
         self.function.gradient(tmp, out=tmp)
-        
-        return self.operator.adjoint(tmp, out = out)
-        
+        return self.operator.adjoint(tmp, out=out)
 

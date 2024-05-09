@@ -55,18 +55,14 @@ def soft_shrinkage(x, tau, out=None):
                 \end{cases}.
                 
     """
-   
-    
     if np.min(tau) < 0:
         warnings.warn(
                 "tau should be non-negative!", UserWarning)
     if np.linalg.norm(np.imag(tau))>0:
         raise ValueError("tau should be real!")
-        
 
     # get the sign of the input
     dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
-
 
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
@@ -86,7 +82,6 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
-
     out *= dsign
     return out
 
@@ -245,13 +240,11 @@ class _L1Norm(Function):
 
 
     def proximal(self, x, tau, out=None):
-
-
         if self.b is not None:
-            ret = soft_shrinkage(x - self.b, tau, out = out)
+            ret = soft_shrinkage(x - self.b, tau, out=out)
             ret += self.b
         else:
-            ret = soft_shrinkage(x, tau, out = out)   
+            ret = soft_shrinkage(x, tau, out=out)
         return ret
 
 

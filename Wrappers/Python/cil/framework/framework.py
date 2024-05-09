@@ -3175,11 +3175,9 @@ class DataContainer(object):
         >>> y = ig.allocate(2)
         >>> out = x.sapyb(a,y,b)
         '''
-        
 
         if out is None:
             out = self * 0.
-            
 
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
@@ -3198,7 +3196,6 @@ class DataContainer(object):
         ax = self * a
         y.multiply(b, out=out)
         out.add(ax, out=out)
-
         return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):

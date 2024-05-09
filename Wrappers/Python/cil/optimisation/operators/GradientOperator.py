@@ -227,8 +227,6 @@ class Gradient_numpy(LinearOperator):
             self.voxel_size_order = list(domain_geometry.spacing)
         except:
             self.voxel_size_order = [1]*len(domain_geometry.shape)
-
-
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry,
                                              range_geometry = range_geometry)
 
@@ -262,7 +260,7 @@ class Gradient_numpy(LinearOperator):
                 else:
                     out += tmp
             return out 
-        else:            
+        else:
             tmp = self.domain_geometry().allocate()
             for i, axis_index in enumerate(self.ind):
                 self.FD.direction = axis_index
@@ -392,11 +390,9 @@ class Gradient_C(LinearOperator):
 
         ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
-        
 
         if out is None:
             out = self.range_geometry().allocate(None)
-
 
         if self.split is False:
             ndout = [el.as_array() for el in out.containers]
@@ -429,15 +425,11 @@ class Gradient_C(LinearOperator):
                     out.get_item(1).get_item(j).fill(ndout[i])
                     j +=1
 
-
         return out
 
     def adjoint(self, x, out=None):
-        
-
         if out is None:
             out = self.domain_geometry().allocate(None)
-
 
         ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
@@ -464,7 +456,6 @@ class Gradient_C(LinearOperator):
         for i, el in enumerate(self.voxel_size_order):
             if el != 1:
                 ndx[i]*= el
-                
 
-        return out        
+        return out
 

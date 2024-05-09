@@ -62,7 +62,7 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x.`  
+        DataContainer, the value of the gradient of the function at x.
 
         """
         raise NotImplementedError
@@ -134,9 +134,7 @@ class Function(object):
         except TypeError:
             tmp = x.divide(tau, dtype=np.float32)
 
-        
         val = self.proximal(tmp, 1.0/tau, out=out)
-        
 
         if id(tmp) == id(x):
             x.multiply(tau, out=x)
@@ -336,18 +334,16 @@ class SumFunction(Function):
         DataContainer, the value of the sum of the gradients evaluated at point :math:`x`.
 
         """
-
         if out is not None and id(x)==id(out):
             raise InPlaceError
 
-        
         for i, f in enumerate(self.functions):
             if i == 0:
                 ret = f.gradient(x, out=out)
             else:
                 ret += f.gradient(x)
         return ret
-        
+
     def __add__(self, other):
         """ Addition for the SumFunction.
 
@@ -499,7 +495,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`. 
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`.
 
         """
 
@@ -530,9 +526,7 @@ class ScaledFunction(Function):
         except TypeError:
             tmp = x.divide(tau, dtype=np.float32)
 
-        
         val = self.function.proximal(tmp, self.scalar/tau, out=out)
-            
 
         if id(tmp) == id(x):
             x.multiply(tau, out=x)
@@ -640,7 +634,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x`. 
+        A DataContainer of zeros, the same size as :math:`x`.
 
         """
         if out is None:
@@ -694,7 +688,7 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x`. 
+        DataContainer, equal to :math:`x`.
 
         """
         if out is None:
@@ -815,7 +809,6 @@ class TranslateFunction(Function):
         except TypeError:
             tmp = x.subtract(self.center, dtype=np.float32)
 
-        
         val = self.function.gradient(tmp, out=out)
 
         if id(tmp) == id(x):
@@ -839,7 +832,6 @@ class TranslateFunction(Function):
         Returns
         -------
         DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau`.
-
         """
 
         if id(x)==id(out):
@@ -851,7 +843,6 @@ class TranslateFunction(Function):
         except TypeError:
             tmp = x.subtract(self.center, dtype=np.float32)
 
-        
         val = self.function.proximal(tmp, tau, out=out)
         val.add(self.center, out=val)
 

@@ -72,15 +72,11 @@ class L2NormSquared(Function):
 
             a) :math:`F'(x) = 2x`
             b) :math:`F'(x) = 2(x-b)`
-
         """
-
         if self.b is None:
-            ret = x.multiply(2, out=out)
+            return x.multiply(2, out=out)
         else:
-            ret = x.sapyb(2, self.b, -2, out=out)
-
-        return ret
+            return x.sapyb(2, self.b, -2, out=out)
 
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
@@ -112,11 +108,9 @@ class L2NormSquared(Function):
         mult = 1/(1+2*tau)
 
         if self.b is None:
-            ret = x.multiply(mult, out=out)
+            return x.multiply(mult, out=out)
         else:
-            ret = x.sapyb(mult, self.b, (1-mult), out=out)
-
-        return ret
+            return x.sapyb(mult, self.b, (1-mult), out=out)
 
 
 class WeightedL2NormSquared(Function):
@@ -171,16 +165,13 @@ class WeightedL2NormSquared(Function):
         """
 
         if out is not None:
-
             out.fill(x)
             if self.b is not None:
                 out -= self.b
             self.operator_weight.direct(out, out=out)
             out *= 2
             return out
-
         else:
-
             y = x
             if self.b is not None:
                 y = x - self.b
@@ -196,13 +187,10 @@ class WeightedL2NormSquared(Function):
 
     def proximal(self, x, tau, out=None):
         r"""Returns the value of the proximal operator of the WeightedL2NormSquared function at x."""
-
-
         if self.b is not None:
             ret = x.subtract(self.b, out=out)
-            ret/= (1+2*tau*self.weight)
+            ret /= (1+2*tau*self.weight)
             ret += self.b
         else:
             ret = x.divide((1+2*tau*self.weight), out=out)
-        
         return ret

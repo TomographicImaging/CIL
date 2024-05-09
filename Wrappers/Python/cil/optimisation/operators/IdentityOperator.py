@@ -49,7 +49,7 @@ class IdentityOperator(LinearOperator):
         else:
             out.fill(x)
             return out
-    
+
     def adjoint(self,x, out=None):
 
         '''Returns Id(x)'''
@@ -60,7 +60,7 @@ class IdentityOperator(LinearOperator):
         else:
             out.fill(x)
             return out
-        
+
     def calculate_norm(self, **kwargs):
 
         '''Evaluates operator norm of IdentityOperator'''

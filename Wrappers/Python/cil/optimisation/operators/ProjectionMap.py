@@ -80,37 +80,31 @@ class ProjectionMap(LinearOperator):
         Returns
         --------
         `DataContainer`
-        
         """
-        
-    
-    
         if out is None:
             return x[self.index].copy()
-        else:
-            out.fill(x[self.index])
+        out.fill(x[self.index])
+        return out
 
     def adjoint(self,x, out=None):
         r"""
         Returns a `BlockDataContainer` of zeros with the ith (`index`) filled with the `DataContainer`, :math:`x`
-        
+
         Parameters
         ----------
         x: `DataContainer`
         
         out: `BlockDataContainer`, default `None`
             If `out` is not `None` the output of the adjoint of the `ProjectionMap` will be filled in `out`, otherwise a new object is instantiated and returned.
-        
+
         Returns
         --------
         `BlockDataContainer`
-        
         """
-        
         if out is None:
-            tmp = self.domain_geometry().allocate(0)
-            tmp[self.index].fill(x)
-            return tmp
+            out = self.domain_geometry().allocate(0)
         else:
-            out*=0
-            out[self.index].fill(x)
+            out *= 0
+        out[self.index].fill(x)
+        return out
+

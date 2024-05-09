@@ -3740,19 +3740,15 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; y = ig.allocate(2)</span>
 <span class="sd">        &gt;&gt;&gt; out = x.sapyb(a,y,b)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mf">0.</span>
-            <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span> <span class="p">]:</span>
             <span class="c1"># handle with C-lib _axpby</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">out</span>
-                <span class="k">return</span>
+                <span class="k">return</span> <span class="n">out</span>
             <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">rte</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sapyb defaulting to Python due to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rte</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
@@ -3765,9 +3761,7 @@ document.write(`
         <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">a</span>
         <span class="n">y</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 
     <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>

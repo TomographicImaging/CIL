@@ -541,7 +541,8 @@ document.write(`
             <span class="c1"># Below use of out is not working, see</span>
             <span class="c1"># https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html</span>
             <span class="c1"># numpy.dot(self.A, x.as_array(), out = out.as_array())</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="MatrixOperator.adjoint">
@@ -552,7 +553,8 @@ document.write(`
             <span class="n">tmp</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
             <span class="k">return</span> <span class="n">tmp</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="n">out</span></div>
 
 
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

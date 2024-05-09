@@ -717,9 +717,7 @@ document.write(`
                                               <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-
         <span class="k">else</span><span class="p">:</span>
-
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
@@ -732,8 +730,8 @@ document.write(`
                         <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
                                                       <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
                                                       <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                        <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
-
+                        <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.adjoint">
@@ -776,7 +774,6 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -800,7 +797,8 @@ document.write(`
                             <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># out_col_operator points to the column in out that we are updating</span>
                             <span class="n">temp_out_col</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
                                                         <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                                        <span class="p">)</span></div>
+                                                        <span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.is_linear">

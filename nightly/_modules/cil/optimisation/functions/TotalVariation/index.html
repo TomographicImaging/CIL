@@ -753,18 +753,13 @@ document.write(`
             <span class="n">strongly_convex_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
             <span class="n">tau</span> <span class="o">/=</span> <span class="n">strongly_convex_factor</span>
-
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fista_on_dual_rof</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
             <span class="n">tau</span> <span class="o">*=</span> <span class="n">strongly_convex_factor</span>
 
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">solution</span></div>
+        <span class="k">return</span> <span class="n">solution</span></div>
 
 
     <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -800,9 +795,7 @@ document.write(`
             <span class="n">tau_reg_neg</span> <span class="o">=</span> <span class="n">tau</span>
             <span class="n">tau</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tau_reg_neg</span><span class="p">)</span>
 
-        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
@@ -848,8 +841,7 @@ document.write(`
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau_reg_neg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">tau</span><span class="p">):</span>
             <span class="n">tau_reg_neg</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="TotalVariation.convex_conjugate">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.TotalVariation.convex_conjugate">[docs]</a>

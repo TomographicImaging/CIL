@@ -570,7 +570,7 @@ document.write(`
 <span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
@@ -730,9 +730,11 @@ document.write(`
 <span class="sd">            Element in the domain of the Operator</span>
 <span class="sd">        out:  DataContainer or BlockDataContainer, default None</span>
 <span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        Only available to linear operators&#39;&#39;&#39;</span>
@@ -1019,11 +1021,8 @@ document.write(`
 <span class="sd">      sop.norm() = operator.norm()</span>
 <span class="sd">      sop.range_geometry() = operator.range_geometry()</span>
 <span class="sd">      sop.domain_geometry() = operator.domain_geometry()</span>
-
 <span class="sd">    &#39;&#39;&#39;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
         <span class="nb">super</span><span class="p">(</span><span class="n">ScaledOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span>
                                              <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -1035,29 +1034,20 @@ document.write(`
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ScaledOperator.direct">[docs]</a>
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;direct method&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
-            <span class="k">return</span> <span class="n">tmp</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span></div>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
+        <span class="k">return</span> <span class="n">tmp</span></div>
 
 
 <div class="viewcode-block" id="ScaledOperator.adjoint">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ScaledOperator.adjoint">[docs]</a>
     <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;adjoint method&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                <span class="n">tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
-                <span class="k">return</span> <span class="n">tmp</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-                <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Operator is not linear&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Operator is not linear&#39;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
+        <span class="k">return</span> <span class="n">tmp</span></div>
 
 
 <div class="viewcode-block" id="ScaledOperator.norm">
@@ -1125,16 +1115,14 @@ document.write(`
 <span class="sd">            Element in the domain of the SumOperator</span>
 <span class="sd">        out:  DataContainer or BlockDataContainer, default None</span>
 <span class="sd">            If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
-
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
 
 
 <div class="viewcode-block" id="SumOperator.adjoint">
@@ -1150,17 +1138,13 @@ document.write(`
 <span class="sd">            If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No adjoint operation with non-linear operators&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator1</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator2</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
 
 
 <div class="viewcode-block" id="SumOperator.is_linear">
@@ -1227,7 +1211,7 @@ document.write(`
 <span class="sd">            If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1273,7 +1257,8 @@ document.write(`
                         <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span></div>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="CompositionOperator.adjoint">
@@ -1290,7 +1275,7 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.</span>
+<span class="sd">        DataContainer or BlockDataContainer containing the result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_flag</span><span class="p">:</span>
@@ -1318,7 +1303,7 @@ document.write(`
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">step</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-
+                <span class="k">return</span> <span class="n">out</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preallocate</span><span class="p">:</span>
                     <span class="k">pass</span>

@@ -632,7 +632,7 @@ document.write(`
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">ind</span><span class="p">],</span> <span class="n">tmp_sum</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.</span>
 
@@ -641,23 +641,12 @@ document.write(`
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        To avoid inf values, we :math:`x+\eta&gt;0` is required.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">should_return</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span>
-            <span class="n">should_return</span><span class="o">=</span><span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="n">arr</span><span class="p">[</span><span class="n">arr</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">arr</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">arr</span><span class="p">[</span><span class="n">arr</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
 
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 
@@ -696,6 +685,7 @@ document.write(`
             <span class="n">out</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">*=</span> <span class="mf">0.5</span>
+            <span class="k">return</span> <span class="n">out</span>
 
 
     <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -721,6 +711,7 @@ document.write(`
             <span class="n">tmp</span> <span class="o">+=</span> <span class="mi">2</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">tmp</span>
             <span class="n">out</span> <span class="o">*=</span> <span class="mf">0.5</span>
+            <span class="k">return</span> <span class="n">out</span>
 
 <span class="c1">####################################</span>
 <span class="c1">## KullbackLeibler numba routines ##</span>
@@ -938,10 +929,8 @@ document.write(`
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">0</span>
-            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
@@ -950,9 +939,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>        
 
     <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
@@ -961,11 +948,8 @@ document.write(`
 <span class="sd">        :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">0</span>
-            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
@@ -983,10 +967,8 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
                     <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
-
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 
     <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -995,12 +977,8 @@ document.write(`
 
 <span class="sd">        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">should_return</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">0</span>
-            <span class="n">should_return</span> <span class="o">=</span> <span class="kc">True</span>
-
         <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
@@ -1017,10 +995,8 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
                     <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">)</span>
-
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">should_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
 </pre></div>
 
                 </article>

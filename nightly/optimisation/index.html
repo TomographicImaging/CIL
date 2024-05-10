@@ -115,9 +115,9 @@
     
       <div class="navbar-item">
 
-  
+   
 
-<a class="navbar-brand logo" href="../">
+<a class="navbar-brand logo" href="/">
   
   
   
@@ -128,8 +128,8 @@
       
     
     
-    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL 24.0.0 documentation - Home"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL 24.0.0 documentation - Home"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
   
   
 </a></div>
@@ -417,7 +417,6 @@ document.write(`
 </script></div>
         <div class="sidebar-primary-item">
 <h3><a href="../">Table of Contents</a></h3>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
@@ -1006,7 +1005,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SIRT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Link to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id56" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">7</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id56" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1189,7 +1188,7 @@ is the <code class="code docutils literal notranslate"><span class="pre">step_si
 is guaranteed if</p>
 <div class="math notranslate nohighlight">
 \[\alpha\in(0, \frac{2}{L}),\]</div>
-<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[]</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id58" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1528,8 +1527,8 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id48" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">8</a>]</span> algorithm 2.2.9).</p>
-<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id47" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">5</a>]</span> sec 2).</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id48" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id47" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1827,7 +1826,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">PDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_fconj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/PDHG/#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Link to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id49" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id50" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">4</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id49" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id50" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1853,7 +1852,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id52" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">6</a>]</span>, <span id="id12">[<a class="reference internal" href="#id51" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">9</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id52" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id51" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -2757,7 +2756,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id58"><span class="problematic" id="id59">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id59"><span class="problematic" id="id60">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -4524,7 +4523,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id62"><span class="problematic" id="id63">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id63"><span class="problematic" id="id64">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -5783,7 +5782,7 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 <dt class="sig sig-object py" id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/MixedL21Norm/#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Link to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id60"><span class="problematic" id="id61">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id61"><span class="problematic" id="id62">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py property">
@@ -6004,7 +6003,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id64"><span class="problematic" id="id65">problem_</span></a> of the above problem, see <span id="id20">[<a class="reference internal" href="#id54" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id21">[<a class="reference internal" href="#id53" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id22">[<a class="reference internal" href="#id57" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">11</a>]</span>.</p>
+applied to the _dual <a href="#id65"><span class="problematic" id="id66">problem_</span></a> of the above problem, see <span id="id20">[<a class="reference internal" href="#id54" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id21">[<a class="reference internal" href="#id53" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id22">[<a class="reference internal" href="#id57" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -6052,7 +6051,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id23">[<a class="reference internal" href="#id55" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">10</a>]</span>, <span id="id24">[<a class="reference internal" href="#id49" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id23">[<a class="reference internal" href="#id55" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id24">[<a class="reference internal" href="#id49" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -7251,7 +7250,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </section>
 <section id="callbacks">
 <h3>Callbacks<a class="headerlink" href="#callbacks" title="Link to this heading">#</a></h3>
-<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id66"><span class="problematic" id="id67">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
+<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id67"><span class="problematic" id="id68">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.utilities.callbacks</span> <span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
 <span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
@@ -8056,36 +8055,40 @@ Otherwise it is a BlockGeometry.</p>
 <span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id24">2</a>)</span>
 <p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </div>
+<div class="citation" id="id58" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. <em>Multiscale Modeling &amp; Simulation</em>, 4(4):1168–1200, 2005. URL: <a class="reference external" href="https://doi.org/10.1137/050626090">https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/050626090">arXiv:https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://doi.org/10.1137/050626090">doi:10.1137/050626090</a>.</p>
+</div>
 <div class="citation" id="id50" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">4</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">5</a><span class="fn-bracket">]</span></span>
 <p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </div>
 <div class="citation" id="id47" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">5</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">6</a><span class="fn-bracket">]</span></span>
 <p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
 </div>
 <div class="citation" id="id52" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">6</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">7</a><span class="fn-bracket">]</span></span>
 <p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </div>
 <div class="citation" id="id56" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">7</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">8</a><span class="fn-bracket">]</span></span>
 <p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </div>
 <div class="citation" id="id48" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">8</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">9</a><span class="fn-bracket">]</span></span>
 <p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
 </div>
 <div class="citation" id="id51" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">9</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">10</a><span class="fn-bracket">]</span></span>
 <p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </div>
 <div class="citation" id="id55" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id23">10</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id23">11</a><span class="fn-bracket">]</span></span>
 <p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </div>
 <div class="citation" id="id57" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id22">11</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id22">12</a><span class="fn-bracket">]</span></span>
 <p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </div>
 </div>

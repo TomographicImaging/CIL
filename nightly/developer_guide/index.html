@@ -113,9 +113,9 @@
     
       <div class="navbar-item">
 
-  
+   
 
-<a class="navbar-brand logo" href="../">
+<a class="navbar-brand logo" href="/">
   
   
   
@@ -126,8 +126,8 @@
       
     
     
-    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL 24.0.0 documentation - Home"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL 24.0.0 documentation - Home"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
   
   
 </a></div>
@@ -415,7 +415,6 @@ document.write(`
 </script></div>
         <div class="sidebar-primary-item">
 <h3><a href="../">Table of Contents</a></h3>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
@@ -690,7 +689,8 @@ for docstring formatting and this rendered <a class="reference external" href="h
 </section>
 <section id="building-documentation-locally">
 <h3>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Link to this heading">#</a></h3>
-<p>The easiest way to test changes to documentation is to build the docs locally. To do this, you will need a working <code class="docutils literal notranslate"><span class="pre">cil</span></code> installation.
+<p>The easiest way to test documentation changes is to open a pull request and <a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">download the rendered documentation from the CI</a>.</p>
+<p>Alternatively, to build the docs locally, you will need a working <code class="docutils literal notranslate"><span class="pre">cil</span></code> installation.
 For development of the documentation embedded within the source code itself (e.g. docstrings), you should build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source.</p>
 <p>The following steps can be used to create an environment that is suitable for building <code class="docutils literal notranslate"><span class="pre">cil</span></code> and its documentation, and to start
 a HTTP server to view the documentation.</p>
@@ -699,13 +699,14 @@ a HTTP server to view the documentation.</p>
 <li><p>Update conda with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">update</span> <span class="pre">-n</span> <span class="pre">base</span> <span class="pre">-c</span> <span class="pre">defaults</span> <span class="pre">conda</span></code></p></li>
 <li><p>Follow the instructions <a class="reference external" href="https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code">here</a> to create a conda environment and build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source</p></li>
 <li><p>Go to <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder</p></li>
-<li><p>Install packages from <code class="docutils literal notranslate"><span class="pre">docs/docs_environment.yml</span></code> (with ‘name’ changed to ENVIRONMENT_NAME) using <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">update</span> <span class="pre">-f</span> <span class="pre">docs_environment.yml</span></code></p></li>
-<li><p>Download the notebooks for rendering in the documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">mkdemos.py</span></code></p></li>
-<li><p>Build the documentation <code class="docutils literal notranslate"><span class="pre">sphinx-build</span> <span class="pre">-b</span> <span class="pre">dirhtml</span> <span class="pre">source</span> <span class="pre">build</span></code></p></li>
-<li><p>Start a HTTP server to serve documentation with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">http.server</span> <span class="pre">--directory</span> <span class="pre">build</span></code></p></li>
+<li><p>Install packages from <code class="docutils literal notranslate"><span class="pre">docs_environment.yml</span></code></p></li>
+<li><p>[Install Ruby version 3.2](<a class="reference external" href="https://www.ruby-lang.org/en/documentation/installation/#installers">https://www.ruby-lang.org/en/documentation/installation/#installers</a>)</p></li>
+<li><p>Install the web dependencies with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">web-deps</span></code></p></li>
+<li><p>Build the documentation with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dirhtml</span> <span class="pre">web</span></code></p></li>
+<li><p>Start an HTTP server with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">serve</span></code> to access the docs via <a class="reference external" href="http://localhost:8000">localhost:8000</a>.</p></li>
 </ol>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+<div class="highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>git clone --recurse-submodule git@github.com:TomographicImaging/CIL
 cd CIL
 sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
 conda activate ENVIRONMENT_NAME
@@ -714,15 +715,14 @@ cmake --build ./build --target install
 cd docs
 conda update -n base -c defaults conda
 conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-python mkdemos.py
-sphinx-build -b dirhtml source build
-python -m http.server -d build
+make web-deps  # install dependencies (requires ruby 3.2)
+make dirhtml web serve
 </pre></div>
 </div>
 </section>
 <section id="notebooks-gallery">
 <h3>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Link to this heading">#</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script (called by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dirhtml</span></code>):</p>
 <ul class="simple">
 <li><p>downloads notebooks from external URLs to <code class="docutils literal notranslate"><span class="pre">source/demos/*.ipynb</span></code></p></li>
 <li><p>uses the <code class="docutils literal notranslate"><span class="pre">demos-template.rst</span></code> file to generate the gallery in <code class="docutils literal notranslate"><span class="pre">source/demos.rst</span></code></p></li>
@@ -733,25 +733,21 @@ python -m http.server -d build
 <section id="contributions-guidelines">
 <h2>Contributions guidelines<a class="headerlink" href="#contributions-guidelines" title="Link to this heading">#</a></h2>
 <p>Make sure that each contributed file contains the following text enclosed in the appropriate comment syntax for the file format. Please replace <cite>[yyyy]</cite> and <cite>[name of copyright owner]</cite> with your own identifying information. Optionally you may add author name and email.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="o">..</span><span class="n">Copyright</span> <span class="mi">2022</span> <span class="n">United</span> <span class="n">Kingdom</span> <span class="n">Research</span> <span class="ow">and</span> <span class="n">Innovation</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">Copyright</span> <span class="p">[</span><span class="n">yyyy</span><span class="p">]</span> <span class="n">United</span> <span class="n">Kingdom</span> <span class="n">Research</span> <span class="ow">and</span> <span class="n">Innovation</span>
+<span class="n">Copyright</span> <span class="p">[</span><span class="n">yyyy</span><span class="p">]</span> <span class="n">The</span> <span class="n">University</span> <span class="n">of</span> <span class="n">Manchester</span>
+<span class="n">Copyright</span> <span class="p">[</span><span class="n">yyyy</span><span class="p">]</span> <span class="p">[</span><span class="n">name</span> <span class="n">of</span> <span class="n">copyright</span> <span class="n">owner</span><span class="p">]</span>
+<span class="n">Author</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="p">[</span><span class="n">Author</span> <span class="n">name</span><span class="p">,</span> <span class="n">Author</span> <span class="n">email</span> <span class="p">(</span><span class="n">optional</span><span class="p">)]</span>
+<span class="n">Licensed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">Apache</span> <span class="n">License</span><span class="p">,</span> <span class="n">Version</span> <span class="mf">2.0</span> <span class="p">(</span><span class="n">the</span> <span class="s2">&quot;License&quot;</span><span class="p">);</span>
+<span class="n">you</span> <span class="n">may</span> <span class="ow">not</span> <span class="n">use</span> <span class="n">this</span> <span class="n">file</span> <span class="k">except</span> <span class="ow">in</span> <span class="n">compliance</span> <span class="k">with</span> <span class="n">the</span> <span class="n">License</span><span class="o">.</span>
+<span class="n">You</span> <span class="n">may</span> <span class="n">obtain</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">License</span> <span class="n">at</span>
+    <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">licenses</span><span class="o">/</span><span class="n">LICENSE</span><span class="o">-</span><span class="mf">2.0</span>
+<span class="n">Unless</span> <span class="n">required</span> <span class="n">by</span> <span class="n">applicable</span> <span class="n">law</span> <span class="ow">or</span> <span class="n">agreed</span> <span class="n">to</span> <span class="ow">in</span> <span class="n">writing</span><span class="p">,</span> <span class="n">software</span>
+<span class="n">distributed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span> <span class="ow">is</span> <span class="n">distributed</span> <span class="n">on</span> <span class="n">an</span> <span class="s2">&quot;AS IS&quot;</span> <span class="n">BASIS</span><span class="p">,</span>
+<span class="n">WITHOUT</span> <span class="n">WARRANTIES</span> <span class="n">OR</span> <span class="n">CONDITIONS</span> <span class="n">OF</span> <span class="n">ANY</span> <span class="n">KIND</span><span class="p">,</span> <span class="n">either</span> <span class="n">express</span> <span class="ow">or</span> <span class="n">implied</span><span class="o">.</span>
+<span class="n">See</span> <span class="n">the</span> <span class="n">License</span> <span class="k">for</span> <span class="n">the</span> <span class="n">specific</span> <span class="n">language</span> <span class="n">governing</span> <span class="n">permissions</span> <span class="ow">and</span>
+<span class="n">limitations</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span><span class="o">.</span>
 </pre></div>
 </div>
-<blockquote>
-<div><p>Copyright 2022 The University of Manchester
-Copyright [yyyy] [name of copyright owner]</p>
-<p>Author(s): [Author name, Author email (optional)]</p>
-<p>Licensed under the Apache License, Version 2.0 (the “License”);
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at</p>
-<blockquote>
-<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
-</div></blockquote>
-<p>Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an “AS IS” BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.</p>
-</div></blockquote>
 </section>
 </section>
 

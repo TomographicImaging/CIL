@@ -121,7 +121,7 @@ class SymmetrisedGradientOperator(LinearOperator):
                     ind+=1
             out1 = BlockDataContainer(*[out[i] for i in self.order_ind])
             out.fill( 0.5 * (out + out1) )
-
+            return out
 
     def adjoint(self, x, out=None):
         r'''Returns the adjoint of the symmetrised gradient operator
@@ -161,3 +161,5 @@ class SymmetrisedGradientOperator(LinearOperator):
                     i+=1
                     tmp1+=tmp[j]
                 out[k].fill(tmp1)
+            return out
+

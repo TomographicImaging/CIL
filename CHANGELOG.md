@@ -4,6 +4,7 @@
   - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, A
   - Bug fix in gradient descent `update_objective` called twice on the initial point.
   - ProjectionMap operator bug fix in adjoint and added documentation #1743
+  - Our operators and functions now also return when out is specified #1742
 
 
 * 24.0.0

@@ -25,12 +25,13 @@ from cil.optimisation.operators import IdentityOperator
 from cil.framework import ImageGeometry, ImageData
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
+from testclass import CCPiTestClass
 
 log = logging.getLogger(__name__)
 initialise_tests()
 
 
-class TestBlockOperator(unittest.TestCase):
+class TestBlockOperator(CCPiTestClass):
     def test_norms(self):
         numpy.random.seed(1)
         N, M = 200, 300
@@ -92,7 +93,7 @@ class TestBlockOperator(unittest.TestCase):
         K = BlockOperator(*ops)
         X = BlockDataContainer(x[0])
         Y = K.direct(X)
-        self.assertTrue(Y.shape == K.shape)
+        self.assertNumpyArrayEqual(Y.shape ,K.shape)
 
         numpy.testing.assert_array_equal(Y.get_item(0).as_array(),X.get_item(0).as_array())
         numpy.testing.assert_array_equal(Y.get_item(1).as_array(),X.get_item(0).as_array())

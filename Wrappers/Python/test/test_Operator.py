@@ -790,6 +790,20 @@ class TestBlockOperator(CCPiTestClass):
         B1.direct(U, out = RES1)
 
         self.assertBlockDataContainerEqual(Z1,RES1)
+        
+    def test_block_operator_1_1(self):
+        M, N ,W = 100, 512, 512
+        ig = ImageGeometry(M, N, W)
+        operator0=IdentityOperator(ig)
+        operator1=-IdentityOperator(ig)
+        K = BlockOperator(operator0, operator1, shape = (1,2))
+        bg=BlockGeometry(ig, ig)
+        data=bg.allocate(1)
+        ans = K.direct(data)
+        #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
+        self.assertNumpyArrayEqual( ans.as_array(), ig.allocate(0).as_array())
+        self.assertFalse(isinstance(ans, BlockDataContainer))
+        
 
     @unittest.skipIf(True, 'Skipping time tests')
     def test_timedifference(self):

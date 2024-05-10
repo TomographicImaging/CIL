@@ -191,11 +191,10 @@ class BlockOperator(Operator):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape)
-        res = []
+        shape = self.get_output_shape(x_b.shape)        
 
         if out is None:
-
+            res = []
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
                     if col == 0:
@@ -205,12 +204,13 @@ class BlockOperator(Operator):
                         prod += self.get_item(row,
                                               col).direct(x_b.get_item(col))
                 res.append(prod)
-            if self.shape[1]==1: 
+            if shape[1]==1 and shape[0]==1: 
                 # the output is a single DataContainer, so we can take it out 
                 return res[0] 
             else: 
                 return BlockDataContainer(*res, shape=shape) 
- 
+            
+
         else:
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):

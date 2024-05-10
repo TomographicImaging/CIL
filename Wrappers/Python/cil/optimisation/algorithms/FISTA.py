@@ -101,6 +101,9 @@ class ISTA(Algorithm):
     """
 
     def _provable_convergence_condition(self):
+        if self.preconditioner is not None:
+            raise NotImplementedError("Can't check convergence criterion if a preconditioner is used ")
+
         if isinstance(self.step_size_rule, ConstantStepSize): 
             return self.step_size_rule.step_size <= 0.99*2.0/self.f.L
         else:
@@ -308,6 +311,9 @@ class FISTA(ISTA):
     
         
     def _provable_convergence_condition(self):
+        if self.preconditioner is not None:
+            raise NotImplementedError("Can't check convergence criterion if a preconditioner is used ")
+
         if isinstance(self.step_size_rule, ConstantStepSize): 
             return self.step_size_rule.step_size <= 1./self.f.L
         else:

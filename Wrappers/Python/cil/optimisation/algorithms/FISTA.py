@@ -115,7 +115,7 @@ class ISTA(Algorithm):
 
 
     # Set default step size
-    def _calculates_default_step_size(self, step_size):
+    def _calculate_default_step_size(self, step_size):
         """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
 

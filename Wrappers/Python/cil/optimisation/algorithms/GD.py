@@ -20,6 +20,7 @@ import numpy
 from cil.optimisation.algorithms import Algorithm
 import logging
 from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSizeRule
+from warnings import warn
 
 log = logging.getLogger(__name__)
 
@@ -50,13 +51,16 @@ class GD(Algorithm):
     def __init__(self, initial=None, objective_function=None, step_size=None, rtol=1e-5, atol=1e-8, step_size_rule=None, preconditioner=None, **kwargs):
         '''GD algorithm creator
         '''
-        super().__init__(**kwargs)
-         
-        self.alpha = kwargs.get('alpha',None)
-        self.beta = kwargs.get('beta', None)
-        if self.alpha is not None or self.beta is not None:
-            raise DeprecationWarning('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ')
+                 
+        self.alpha = kwargs.pop('alpha',None)
+        self.beta = kwargs.pop('beta', None)
         
+        super().__init__(**kwargs)
+        
+        
+        if self.alpha is not None or self.beta is not None:
+            warn('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ', DeprecationWarning, stacklevel=2)
+          
         self.rtol = rtol
         self.atol = atol
         if initial is not None and objective_function is not None:

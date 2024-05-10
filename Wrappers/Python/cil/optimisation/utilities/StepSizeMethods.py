@@ -101,7 +101,7 @@ class ArmijoStepSizeRule(StepSizeRule):
             
         self.kmax = kmax
         if self.kmax is None:
-            self.kmax = numpy.ceil(2 * numpy.log10(alpha) / numpy.log10(2))
+            self.kmax = numpy.ceil(2 * numpy.log10(self.alpha_orig) / numpy.log10(2))
 
     def get_step_size(self, algorithm):
         """

@@ -3,7 +3,7 @@ from cil.optimisation.functions import LeastSquares, IndicatorBox
 from cil.framework import ImageGeometry, VectorGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Adam, AdaGrad, Preconditioner, ConstantStepSize, ArmijoStepSize
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -46,19 +46,19 @@ class TestPreconditioners(CCPiTestClass):
         self.assertEqual(test_stepsize.step_size, 0.3)
 
     def test_armijo_init(self):
-        test_stepsize = ArmijoStepSize(alpha=1e3, beta=0.4, kmax=40)
+        test_stepsize = ArmijoStepSizeRule(alpha=1e3, beta=0.4, kmax=40)
         self.assertEqual(test_stepsize.alpha_orig, 1e3)
         self.assertEqual(test_stepsize.beta, 0.4)
         self.assertEqual(test_stepsize.kmax, 40)
 
-        test_stepsize = ArmijoStepSize()
+        test_stepsize = ArmijoStepSizeRule()
         self.assertEqual(test_stepsize.alpha_orig, 1e6)
         self.assertEqual(test_stepsize.beta, 0.5)
         self.assertEqual(test_stepsize.kmax, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
 
     def test_armijo_calculation(self):
-        test_stepsize = ArmijoStepSize(alpha=8, beta=0.5, kmax=100)
+        test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, kmax=100)
         ig = VectorGeometry(2)
         data = ig.allocate('random')
         data.fill(np.array([3.5, 3.5]))

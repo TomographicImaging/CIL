@@ -64,7 +64,7 @@ class ConstantStepSize(StepSizeRule):
         return self.step_size
 
 
-class ArmijoStepSize(StepSizeRule):
+class ArmijoStepSizeRule(StepSizeRule):
 
     """ 
     Applies the Armijo rule to calculate the step size (step_size).
@@ -82,17 +82,23 @@ class ArmijoStepSize(StepSizeRule):
 
     Reference
     ---------
-    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright)
+    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright) (https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
      https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
 
     """
 
-    def __init__(self, alpha=1e6, beta=0.5, kmax=None):
+    def __init__(self, alpha=None, beta=None, kmax=None):
         '''Initialises the step size rule 
         '''
+        
         self.alpha_orig = alpha
+        if self.alpha_orig is None: # Can be set as defaults in the init after alpha and beta are deprecated in GD
+            self.alpha_orig = 1e6 
 
-        self.beta = beta
+        self.beta = beta 
+        if self.beta is None:  # Can be set as defaults in the init after alpha and beta are deprecated in GD
+            self.beta = 0.5
+            
         self.kmax = kmax
         if self.kmax is None:
             self.kmax = numpy.ceil(2 * numpy.log10(alpha) / numpy.log10(2))
@@ -100,22 +106,22 @@ class ArmijoStepSize(StepSizeRule):
     def get_step_size(self, algorithm):
         """
         Applies the Armijo rule to calculate the step size (`step_size`)
-        
+
         Returns
         --------
         float: the calculated step size 
-        
+
         """
         k = 0
         self.alpha = self.alpha_orig
-        f_x = algorithm.objective_function(algorithm.x)
+        f_x = algorithm.objective_function(algorithm.get_output())
 
-        self.x_armijo = algorithm.x.copy()
+        self.x_armijo = algorithm.get_output().copy()
 
         while k < self.kmax:
 
             algorithm.gradient_update.multiply(self.alpha, out=self.x_armijo)
-            algorithm.x.subtract(self.x_armijo, out=self.x_armijo)
+            algorithm.get_output().subtract(self.x_armijo, out=self.x_armijo)
 
             f_x_a = algorithm.objective_function(self.x_armijo)
             sqnorm = algorithm.gradient_update.squared_norm()

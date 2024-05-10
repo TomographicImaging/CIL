@@ -32,7 +32,7 @@ from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 from cil.framework import BlockGeometry
 
-from cil.optimisation.utilities import ArmijoStepSize, ConstantStepSize
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
@@ -188,7 +188,7 @@ class TestGD(CCPiTestClass):
 
     def test_armijo_step_size_init(self):
 
-        rule = ArmijoStepSize()
+        rule = ArmijoStepSizeRule()
         self.assertEqual(rule.alpha_orig, 1e6)
         self.assertEqual(rule.beta, 0.5)
         self.assertEqual(rule.kmax, np.ceil(2 * np.log10(1e6) / np.log10(2)))
@@ -200,7 +200,7 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.kmax, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
 
-        rule = ArmijoStepSize(5e5, 0.2, 5)
+        rule = ArmijoStepSizeRule(5e5, 0.2, 5)
         self.assertEqual(rule.alpha_orig, 5e5)
         self.assertEqual(rule.beta, 0.2)
         self.assertEqual(rule.kmax, 5)
@@ -238,7 +238,7 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSize(alpha=50, kmax=150)
+        armj = ArmijoStepSizeRule(alpha=50, kmax=150)
         gd = GD(initial=self.initial, objective_function=self.f, step_size_rule=armj,
                 max_iteration=2500,
                 update_objective_interval=500)

@@ -64,7 +64,7 @@ class ISTA(Algorithm):
                 Step size for the gradient step of ISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
    step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
+            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use a`ConstantStepSize` 
         preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
  
@@ -115,8 +115,8 @@ class ISTA(Algorithm):
 
 
     # Set default step size
-    def get_constant_step_size(self, step_size):
-        """ Set default step size.
+    def _calculates_default_step_size(self, step_size):
+        """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
 
         if step_size is None:
@@ -165,7 +165,7 @@ class ISTA(Algorithm):
         # set step_size
         if step_size_rule is None: 
 
-                step_size_rule=ConstantStepSize(self.get_constant_step_size(step_size=step_size))
+                step_size_rule=ConstantStepSize(self._calculate_default_step_size(step_size=step_size))
         else:
             if step_size is not None:
                 raise TypeError('You have passed both a `step_size` and a `step_size_rule`, please pass one or the other')
@@ -254,7 +254,7 @@ class FISTA(ISTA):
                 Step size for the gradient step of FISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
     step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSize` depending on if a `step_size` is provided. 
+            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use a `ConstantStepSize`
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
@@ -286,9 +286,9 @@ class FISTA(ISTA):
 
     """
 
-    def get_constant_step_size(self, step_size):
+    def _calculate_default_step_size(self, step_size):
 
-        """Set the default step size
+        """Calculate the default step size if a step size rule or step size is not provided 
         """
 
         if step_size is None:

@@ -167,7 +167,7 @@ class AdaptiveSensitivity(Sensitivity):
             out = gradient.copy()
             
         if algorithm.iteration <= self.iterations:
-            self.array.multiply(algorithm.x + self.delta,
+            self.array.multiply(algorithm.get_output() + self.delta,
                                 out=self.freezing_point)
             gradient.multiply(
                 self.freezing_point, out=out)
@@ -177,105 +177,3 @@ class AdaptiveSensitivity(Sensitivity):
         
         return out
 
-
-class AdaGrad(Preconditioner):
-
-    r"""
-    This Adaptive Gradient method multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epsilon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)``.  
-
-    Reference
-    ---------
-    Duchi, J., Hazan, E. and Singer, Y., 2011. Adaptive subgradient methods for online learning and stochastic optimization. Journal of machine learning research, 12(7).
-    """
-
-    def __init__(self, epsilon=1e-8):
-        self.epsilon = epsilon
-        self.gradient_accumulator = None
-
-    def apply(self, algorithm, gradient, out=None):
-        r"""
-        Method to apply the preconditioner. This multiplies the gradient, :math`\nabla f(x_k)`, by :math:`1/\sqrt{ s_k^2 +\epsilon}`. Where :math:`s_k^2=s^2_{k-1}+diag((\nabla f(x_k))(\nabla f(x_k))^T)`. 
-
-        Parameters
-        ----------
-        algorithm : object
-            The algorithm object.
-        gradient : DataContainer
-            The calculated gradient to modify
-        out : DataContainer, optional, default is None 
-            The modified gradient to return 
-        """
-        if out is None:
-            out = gradient.copy()
-
-        if self.gradient_accumulator is None:
-            self.gradient_accumulator = gradient.multiply(
-                gradient)
-
-        else:
-            self.gradient_accumulator.add(gradient.multiply(
-                gradient), out=self.gradient_accumulator)
-
-        gradient.divide(
-            (self.gradient_accumulator+self.epsilon).sqrt(), out=out)
-        
-        return out
-
-
-class Adam(Preconditioner):
-
-    r"""
-    This ADAM method combines the adaptive learning rate of AdaGrad with the idea of moomentum. 
-
-    ADAM keeps track of the momentum :math:`g_k=\gamma g_{k-1} +(1-\gamma)\nabla f(x_k).
-
-    It also updates the scaling factors  :math:`s_k^2=\beta s^2_{k-1}+(1-\beta) diag((\nabla f(x_k))(\nabla x_k)^T)`. 
-
-    The returned `new` gradient is :math:`g_k/\sqrt(s_k^2+\epsilon)`
-
-
-    Reference
-    ---------
-    Kingma, D.P. and Ba, J., 2014. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
-
-    """
-
-    def __init__(self, gamma=0.9, beta=0.999, epsilon=1e-8):
-        self.gamma = gamma
-        self.beta = beta
-        self.gradient_accumulator = None
-        self.scaling_factor_accumulator = None
-        self.epsilon = epsilon
-
-    def apply(self, algorithm, gradient, out=None):
-        r"""
-        Method to apply the preconditioner, updating `self.gradient_update` with the preconditioned gradient.
-
-        Parameters
-        ----------
-        algorithm : object
-            The algorithm object.
-        gradient : DataContainer
-            The calculated gradient to modify
-        out : DataContainer, optional, default is None 
-            The modified gradient to return 
-        """
-        if out is None:
-            out = gradient.copy()
-
-
-        if self.gradient_accumulator is None:
-            self.gradient_accumulator = gradient.copy()
-            self.scaling_factor_accumulator = gradient.multiply(
-                gradient)
-
-        else:
-            self.gradient_accumulator.sapyb(
-                self.gamma, gradient, (1-self.gamma), out=self.gradient_accumulator)
-            self.scaling_factor_accumulator.sapyb(self.beta,  gradient.multiply(
-                gradient), (1-self.beta), out=self.scaling_factor_accumulator)
-
-        self.gradient_accumulator.divide(
-            (self.scaling_factor_accumulator+self.epsilon).sqrt(), out=out)
-
-        return out 

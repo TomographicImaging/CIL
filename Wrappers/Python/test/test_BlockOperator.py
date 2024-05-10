@@ -102,14 +102,14 @@ class TestBlockOperator(CCPiTestClass):
         X = BlockDataContainer(*x) + 1
         Y = K.T.direct(X)
         # K.T (1,3) X (3,1) => output shape (1,1)
-        self.assertTrue(Y.shape == (1,1))
+        self.assertFalse(isinstance(Y, BlockDataContainer))
         zero = numpy.zeros(X.get_item(0).shape)
-        numpy.testing.assert_array_equal(Y.get_item(0).as_array(),len(x)+zero)
+        numpy.testing.assert_array_equal(Y.as_array(),len(x)+zero)
 
         K2 = BlockOperator(*(ops+ops), shape=(3,2))
         Y = K2.T.direct(X)
         # K.T (2,3) X (3,1) => output shape (2,1)
-        self.assertTrue(Y.shape == (2,1))
+        self.assertNumpyArrayEqual(Y.shape , (2,1))
 
         try:
             # this should fail as the domain is not compatible
@@ -168,10 +168,10 @@ class TestBlockOperator(CCPiTestClass):
         X = BlockDataContainer(*x) + val
 
         Y = K.T.direct(X)
-        self.assertTrue(Y.shape == (1,1))
+        self.assertFalse(isinstance(Y, BlockDataContainer))
         zero = numpy.zeros(X.get_item(0).shape)
         xx = numpy.asarray([val for _ in x])
-        numpy.testing.assert_array_equal(Y.get_item(0).as_array(),((scalar*xx).sum()+zero))
+        numpy.testing.assert_array_equal(Y.as_array(),((scalar*xx).sum()+zero))
 
         scalar = 0.5
         k = BlockOperator(*ops)
@@ -179,16 +179,16 @@ class TestBlockOperator(CCPiTestClass):
         X = BlockDataContainer(*x) + 1
 
         Y = K.T.direct(X)
-        self.assertTrue(Y.shape == (1,1))
+        self.assertFalse(isinstance(Y, BlockDataContainer))
         zero = numpy.zeros(X.get_item(0).shape)
-        numpy.testing.assert_array_equal(Y.get_item(0).as_array(),scalar*(len(x)+zero))
+        numpy.testing.assert_array_equal(Y.as_array(),scalar*(len(x)+zero))
 
 
     def test_ScaledBlockOperatorScalarList(self):
         ig = [ ImageGeometry(2,3) , \
                #ImageGeometry(10,20,30) , \
                ImageGeometry(2,3    ) ]
-        x = [ g.allocate() for g in ig ]
+        x = [ g.allocate(0) for g in ig ]
         ops = [ IdentityOperator(g) for g in ig ]
 
 
@@ -200,10 +200,10 @@ class TestBlockOperator(CCPiTestClass):
         X = BlockDataContainer(*x) + val
 
         Y = K.T.direct(X)
-        self.assertTrue(Y.shape == (1,1))
-        zero = numpy.zeros(X.get_item(0).shape)
+        self.assertFalse(isinstance(Y, BlockDataContainer))
+        zero = numpy.zeros(ig[0].shape)
         xx = numpy.asarray([val for _ in x])
-        numpy.testing.assert_array_equal(Y.get_item(0).as_array(),(scalar*xx).sum()+zero)
+        numpy.testing.assert_array_equal(Y.as_array(),(scalar*xx).sum()+zero)
 
         scalar = numpy.asarray([i+1 for i,el in enumerate(x)])
         #scalar = numpy.asarray([6,0])
@@ -211,12 +211,12 @@ class TestBlockOperator(CCPiTestClass):
         K = scalar * k
         X = BlockDataContainer(*x) + val
         Y = K.T.direct(X)
-        self.assertTrue(Y.shape == (1,1))
-        zero = numpy.zeros(X.get_item(0).shape)
+        self.assertFalse(isinstance(Y, BlockDataContainer))
+        zero = numpy.zeros(ig[0].shape)
         xx = numpy.asarray([val for _ in x])
 
 
-        numpy.testing.assert_array_equal(Y.get_item(0).as_array(),
+        numpy.testing.assert_array_equal(Y.as_array(),
           (scalar*xx).sum()+zero)
 
 
@@ -224,7 +224,7 @@ class TestBlockOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         log.info("%r %r", img.shape, ig.shape)
-        self.assertTrue(img.shape == (30,20,10))
+        self.assertNumpyArrayEqual(img.shape , (30,20,10))
         self.assertEqual(img.sum(), 0)
         Id = IdentityOperator(ig)
         y = Id.direct(img)

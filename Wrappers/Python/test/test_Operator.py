@@ -232,7 +232,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         # img.fill(numpy.ones((30,20,10)))
-        self.assertTrue(img.shape == (30,20,10))
+        self.assertNumpyArrayEqual(img.shape , (30,20,10))
         #self.assertEqual(img.sum(), 2*float(10*20*30))
         self.assertEqual(img.sum(), 0.)
         Id = IdentityOperator(ig)
@@ -792,17 +792,28 @@ class TestBlockOperator(CCPiTestClass):
         self.assertBlockDataContainerEqual(Z1,RES1)
         
     def test_block_operator_1_1(self):
-        M, N ,W = 100, 512, 512
+        M, N ,W = 3, 4, 5
         ig = ImageGeometry(M, N, W)
         operator0=IdentityOperator(ig)
         operator1=-IdentityOperator(ig)
         K = BlockOperator(operator0, operator1, shape = (1,2))
         bg=BlockGeometry(ig, ig)
-        data=bg.allocate(1)
+        data=bg.allocate('random', seed=2)
         ans = K.direct(data)
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.as_array(), ig.allocate(0).as_array())
         self.assertFalse(isinstance(ans, BlockDataContainer))
+        
+        ans2 = K.adjoint(ans)
+        self.assertTrue(isinstance(ans2, BlockDataContainer))
+        self.assertNumpyArrayEqual(ans2.shape, (2,1))
+        
+        range_data=ans.geometry.allocate('random', seed=2)
+        ans3=K.adjoint(range_data)
+        self.assertNumpyArrayEqual(ans3.shape, (2,1))
+        self.assertNumpyArrayEqual(ans3.get_item(0).as_array(), range_data.as_array())
+        self.assertNumpyArrayEqual(ans3.get_item(1).as_array(), -range_data.as_array())
+        
         
 
     @unittest.skipIf(True, 'Skipping time tests')

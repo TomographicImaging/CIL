@@ -204,7 +204,7 @@ class BlockOperator(Operator):
                         prod += self.get_item(row,
                                               col).direct(x_b.get_item(col))
                 res.append(prod)
-            if shape[1]==1 and shape[0]==1: 
+            if 1 == shape[0] == shape[1]:
                 # the output is a single DataContainer, so we can take it out 
                 return res[0] 
             else: 

@@ -1,8 +1,9 @@
 
 * XX.X.X
+
   -New Features:
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator
-    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, A
+    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, `A`
   - Enhancements:
     - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
@@ -10,6 +11,8 @@
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
+    - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter 
+
 
 
 

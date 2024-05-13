@@ -1,0 +1,42 @@
+# https://github.com/Phlow/feeling-responsive/blob/gh-pages/_data/navigation.yml
+- title: Home
+  url: "/"
+  side: left
+- title: About
+  url: "/about/"
+  side: left
+- title: Documentation
+  url: "/nightly/"
+  side: left
+  dropdown:
+  - title: Documentation
+    url: "/nightly/"
+  - title: Changelog
+    url: "https://github.com/TomographicImaging/CIL/releases"
+  - title: Developer Guide
+    url: "/nightly/developer_guide/"
+- title: Launch Demos
+  url: "https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb"
+  side: left
+- title: GitHub
+  url: "https://github.com/TomographicImaging"
+  side: right
+  dropdown:
+  - title: CIL
+    url: "https://github.com/TomographicImaging/CIL"
+  - title: CIL-Demos
+    url: "https://github.com/TomographicImaging/CIL-Demos"
+- title: Contact
+  url: "/nightly/#contacts"
+  side: right
+  dropdown:
+  - title: Discord
+    url: "https://discord.gg/9NTWu9MEGq"
+  - title: Member Mailing List
+    url: "https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-MEMBERS"
+  - title: Developer Mailing List
+    url: "https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL"
+  - title: Zenodo Community
+    url: "https://zenodo.org/communities/ccpi/about"
+  - title: LinkedIn
+    url: "https://www.linkedin.com/groups/9090791/"

@@ -527,7 +527,7 @@ document.write(`
 
 <span class="n">cilacc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">dll</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework.BlockGeometry</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="kn">from</span> <span class="nn">.block</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -681,7 +681,6 @@ document.write(`
 
         <span class="c1"># copy data</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">blk_geo</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">blk_geo</span>
         <span class="n">axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>

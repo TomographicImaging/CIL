@@ -5,6 +5,8 @@
   - Bug fix in gradient descent `update_objective` called twice on the initial point.
   - ProjectionMap operator bug fix in adjoint and added documentation #1743
   - Our operators and functions now also return when out is specified #1742
+  Bugfix:
+  - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter 
 
 
 * 24.0.0

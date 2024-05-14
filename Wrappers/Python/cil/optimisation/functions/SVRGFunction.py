@@ -167,7 +167,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
                 self._full_gradient_at_snapshot = sum(self._list_stored_gradients, start=0*x)
             else:
                 for i, fi in enumerate(self.functions):
-                    self._list_stored_gradients[i].fill( fi.gradient(x))
+                    fi.gradient(x, out=self._list_stored_gradients[i])
                 self._full_gradient_at_snapshot.fill( sum(self._list_stored_gradients, start=0*x))
            
         else:

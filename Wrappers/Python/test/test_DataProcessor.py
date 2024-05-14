@@ -2820,6 +2820,10 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             for parameter in parameter_list:
                 processor.update_parameters({parameter:10})
                 self.assertEqual(getattr(processor, parameter), 10, msg=self.error_message(processor, parameter))
+            # test setting multiple together
+            processor.update_parameters({'propagation_distance':0.1, 'magnification':5})
+            self.assertEqual(processor.propagation_distance,0.1)
+            self.assertEqual(processor.magnification,5)
 
     def test_PaganinProcessor_create_filter(self):
         processor =  PaganinProcessor()

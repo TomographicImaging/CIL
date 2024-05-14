@@ -26,9 +26,6 @@ from scipy.fft import ifftshift
 from scipy import constants
 
 from tqdm import tqdm
-import logging
-from multiprocessing.pool import ThreadPool
-
 import warnings
 
 class PaganinProcessor(Processor):
@@ -70,7 +67,7 @@ class PaganinProcessor(Processor):
                 
     Example
     -------
-    >>> processor = PaganinProcessor()(data)
+    >>> processor = PaganinProcessor(delta=5, beta=0.05, energy=18000)
     >>> processor.set_input(data)
     >>> thickness = processor.get_output()
 
@@ -148,6 +145,23 @@ class PaganinProcessor(Processor):
         return True
 
     def update_parameters(self, parameters):
+        """
+        Update the parameters to use in the PaganinProcessor 
+        'propagation_distance','pixel_size','magnification', 'delta', 'beta'
+        
+        Parameters
+        ----------
+        parameters: dict
+            The parameters to update, {'parameter':value}, where parameter is 'propagation_distance','pixel_size','magnification', 'delta' or 'beta'
+            and value is the parameter value in units of m (or unitless).
+
+            Example
+        -------
+        >>> processor = PaganinProcessor()
+        >>> processor.set_input(data)
+        >>> parameters = {'pixel_size':1e-6, 'magnification':1}
+        >>> processor.update_parameters(parameters)
+        """
         parameter_list = ['propagation_distance','pixel_size','magnification', 'delta', 'beta']
         for key in parameters.keys():
             if key not in parameter_list:

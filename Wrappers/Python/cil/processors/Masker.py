@@ -179,7 +179,6 @@ class Masker(DataProcessor):
         else:
             out.fill(data.as_array())
             arr = out.as_array()
-        
 
         #assumes mask has 'as_array' method, i.e. is a DataContainer or is a numpy array
         try:

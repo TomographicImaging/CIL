@@ -435,7 +435,6 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         for geom in self.geometry_test_list:
             for data_array in self.data_arrays:
                 processor = CentreOfRotationCorrector()
-                out = processor.get_output()
     #             result=self.get_result(processor, data)
     #             # self.out_test(result, processor, data)
     #             self.in_place_test(result, processor, data)

@@ -109,12 +109,10 @@ class BlockFunction(Function):
 
                 x : BlockDataContainer and must have as many rows as self.length
         """
-
         if self.length != x.shape[0]:
             raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
 
         if out is None:
-
             out = [None]*self.length
             if isinstance(tau, Number):
                 for i in range(self.length):
@@ -124,7 +122,6 @@ class BlockFunction(Function):
                     out[i] = self.functions[i].proximal(x.get_item(i), tau.get_item(i))
 
             return BlockDataContainer(*out)
-
         else:
             if isinstance(tau, Number):
                 for i in range(self.length):
@@ -132,11 +129,9 @@ class BlockFunction(Function):
             else:
                 for i in range(self.length):
                     self.functions[i].proximal(x.get_item(i), tau.get_item(i), out[i])
-
-
+            return out
 
     def gradient(self, x, out=None):
-
         r"""Returns the value of the gradient of the BlockFunction function at x.
 
         .. math:: F'(x) = [f_{1}'(x_{1}), ... , f_{m}'(x_{m})]
@@ -157,7 +152,6 @@ class BlockFunction(Function):
         return  BlockDataContainer(*out)
 
     def proximal_conjugate(self, x, tau, out = None):
-
         r"""Proximal operator of the convex conjugate of BlockFunction at x:
 
             .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}
@@ -166,7 +160,6 @@ class BlockFunction(Function):
 
                 x : BlockDataContainer and must have as many rows as self.length
         """
-
         if self.length != x.shape[0]:
             raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
 
@@ -177,9 +170,8 @@ class BlockFunction(Function):
             else:
                 for i in range(self.length):
                     self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
-
+            return out
         else:
-
             out = [None]*self.length
             if isinstance(tau, Number):
                 for i in range(self.length):

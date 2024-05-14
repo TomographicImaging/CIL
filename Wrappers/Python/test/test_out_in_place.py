@@ -25,7 +25,7 @@ from cil.utilities.errors import InPlaceError
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
-from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity
+from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
 from cil.optimisation.operators import LinearOperator, MatrixOperator  
 
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
@@ -110,6 +110,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),
             (MixedL11Norm(), bg),
+            (BlockFunction(L1Norm(),L2NormSquared()), bg),
             (L1Sparsity(WaveletOperator(ig)), ig)
 
         ]
@@ -151,14 +152,15 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
         out2=0*(x.copy())
         try:
             if method == 'proximal':
-                function.proximal(input, *args, out=out2)
+                ret = function.proximal(input, *args, out=out2)
             elif method == 'proximal_conjugate':
-                function.proximal_conjugate(input, *args, out=out2)
+                ret = function.proximal_conjugate(input, *args, out=out2)
             elif method == 'gradient':
-                function.gradient(input, *args, out=out2)
+                ret = function.gradient(input, *args, out=out2)
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in func."+method+'(x, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case func."+method+'(data, *args, out=out) where func is  ' + function.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-
+            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed returning with `out` in ret = func.{method}(x, *args, out=data) where func is {function.__class__.__name__}")
+          
         except (InPlaceError, NotImplementedError):
             pass
 
@@ -210,7 +212,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
 
         # Parameters for point spread function PSF (size and std)
-        ks          = 10;
+        ks          = 10
         ksigma      = 5.0
 
         # Create 1D PSF and 2D as outer product, then normalise.
@@ -272,18 +274,19 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 pass
 
 
-    def out_test(self, desired_result, operator, method,  x, *args, ):
+    def out_test(self, desired_result, operator, method,  x, *args):
         input = x.copy()
         out2=0*(x.copy())
         try:
             if method == 'direct':
-                operator.direct(input, *args, out=out2)
+                ret = operator.direct(input, *args, out=out2)
             elif method == 'adjoint':
-                operator.adjoint(input, *args, out=out2)
+                ret = operator.adjoint(input, *args, out=out2)
 
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
-
+            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed using return and `out` in ret = operator.{method}(x, *args, out=data) where func is {operator.__class__.__name__}")
+            
         except (InPlaceError, NotImplementedError):
             pass
 

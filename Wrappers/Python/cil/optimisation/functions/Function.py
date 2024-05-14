@@ -357,6 +357,7 @@ class SumFunction(Function):
                     f.gradient(x, out=out)
                 else:
                     out += f.gradient(x)
+            return out 
 
     def __add__(self, other):
         """ Addition for the SumFunction.

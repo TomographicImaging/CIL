@@ -314,8 +314,7 @@ class TestSVRG(CCPiTestClass):
 
         objective = SVRGFunction(
             self.f_subsets, self.sampler, store_gradients=True)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        self.assertEqual(objective._list_stored_gradients, None)
         objective.gradient(self.initial)
         self.assertNumpyArrayAlmostEqual(
             objective._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
@@ -489,8 +488,7 @@ class TestLSVRG(CCPiTestClass):
 
         objective = LSVRGFunction(
             self.f_subsets, self.sampler, store_gradients=True)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        self.assertEqual(objective._list_stored_gradients, None)
         objective.gradient(self.initial)
         self.assertNumpyArrayAlmostEqual(
             objective._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)

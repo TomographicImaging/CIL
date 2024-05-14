@@ -34,8 +34,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. For this approximation, every `update_frequency` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by calculating the gradient of one of the :math:`f_i`s at the current iterate and at the snapshot giving iterations:
     
         .. math ::
-            x_{k+1} = x_k - \gamma [\nabla f_i(x_k) - \nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})],
-    where :math:`\tilde{x}` is the latest "snapshot" point . 
+            x_{k+1} = x_k - \gamma [n*\nabla f_i(x_k) - n*\nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})],    where :math:`\tilde{x}` is the latest "snapshot" point . Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient. 
     
     Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
     
@@ -49,7 +48,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     update_frequency : int or None, optional
         The frequency of updating the full gradient (taking a snapshot). The default is 2*len(functions) so a "snapshot" is taken every 2*len(functions) iterations. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and it's gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
 
     
     """
@@ -65,6 +64,12 @@ class SVRGFunction(ApproximateGradientSumFunction):
         self.store_gradients = store_gradients
 
         self._svrg_iter_number = 0
+        
+        self._full_gradient_at_snapshot = None
+        if self.store_gradients:
+            self._list_stored_gradients = None
+        
+        self.snapshot = None 
 
     def gradient(self, x, out=None):
         """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update frequency
@@ -100,9 +105,11 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
 
     def approximate_gradient(self, x, function_num, out=None):
-        """ Calculates the gradient of the selected function, indexed by `function_number` in {0,...,len(functions)-1}, at the point :math:`x` and at the stored snapshot :math:`\tilde{x}` before returning the stochastic gradient
+        """ Calculates the stochastic gradient at the point :math:`x` by using the gradient of the selected function, indexed by `function_number` in {0,...,len(functions)-1}, and the full gradient at the snapshot :math:`\tilde{x}`
             .. math ::
-                \nabla f_i(x_k) - \nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
+                n*\nabla f_i(x_k) - n*\nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
+        
+        Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
         
         Parameters
         ----------
@@ -130,11 +137,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         self._update_data_passes_indices([function_num])
 
-        if out is None:
-            out = self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_snapshot, 1.)
-        else:
-            self._stochastic_grad_difference.sapyb(
+        out = self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_snapshot, 1., out=out)
 
         return out
@@ -145,7 +148,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
         Parameters
         ----------
-        x : DataContainer (e.g. ImageData)
+        Takes a "snapshot" at the point :math:`x`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is stored, otherwise only  the sum of the gradients and the snapshot point :math:` \tilde{x}=x` are stored.
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
@@ -157,15 +160,24 @@ class SVRGFunction(ApproximateGradientSumFunction):
         self._svrg_iter_number += 1 
 
         if self.store_gradients is True:
-            #Save the gradient of each individual f_i and the gradient of the full sum at the point x. 
-            self._list_stored_gradients = [
-                fi.gradient(x) for fi in self.functions]
-            self._full_gradient_at_snapshot = sum(
-                self._list_stored_gradients, start=0*x)
+            if self._list_stored_gradients is None: 
+                #Save the gradient of each individual f_i and the gradient of the full sum at the point x. 
+                self._list_stored_gradients = [
+                    fi.gradient(x) for fi in self.functions]
+                self._full_gradient_at_snapshot = sum(self._list_stored_gradients, start=0*x)
+            else:
+                for i, fi in enumerate(self.functions):
+                    self._list_stored_gradients[i].fill( fi.gradient(x))
+                self._full_gradient_at_snapshot.fill( sum(self._list_stored_gradients, start=0*x))
+           
         else:
             #Save the snapshot point and the gradient of the full sum at the point x. 
-            self._full_gradient_at_snapshot = self.full_gradient(x)
+            self._full_gradient_at_snapshot = self.full_gradient(x, out=self._full_gradient_at_snapshot) 
+            
+        if self.snapshot is None: 
             self.snapshot = x.copy()
+
+        self.snapshot.fill(x) 
 
         #In this iteration all functions in the sum were used to update the gradient 
         self._update_data_passes_indices(list(range(self.num_functions))) 

@@ -71,13 +71,14 @@ class PaganinProcessor(Processor):
     Example
     -------
     >>> processor = PaganinProcessor()(data)
-    >>> processor.get_output()
+    >>> processor.set_input(data)
+    >>> thickness = processor.get_output()
 
     Example
     -------
     >>> processor = PaganinProcessor(delta=1,beta=10e2)
     >>> processor.set_input(data)
-    >>> processor.get_output()
+    >>> filtered_image = processor.get_output(full_retrieval=False)
 
     """
    

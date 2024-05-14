@@ -26,5 +26,5 @@ from .AbsorptionTransmissionConverter import AbsorptionTransmissionConverter
 from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter
 from .Masker import Masker
 from .Padder import Padder
-from .PhaseRetriever import PhaseRetriever
+from .PaganinProcessor import PaganinProcessor
 from .Filter import Filter

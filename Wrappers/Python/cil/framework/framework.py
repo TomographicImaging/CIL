@@ -968,7 +968,10 @@ class Parallel2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -1117,7 +1120,10 @@ class Parallel3D(SystemConfiguration):
         return False
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice

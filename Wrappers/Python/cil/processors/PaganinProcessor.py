@@ -101,11 +101,11 @@ class PaganinProcessor(Processor):
         geometry = data.geometry
 
         if geometry.magnification is None:
-            warnings.warn('Magnification not found, please update data.geometry.dist_center_detector or over-ride with processor.update_magnification()')
+            warnings.warn("Magnification not found, please update data.geometry.magnification or over-ride with processor.update_parameters({'magnification':value})")
             self.magnification = 1.0
             print('Magnification = ' + str(self.magnification) + ' (default value)')
         elif geometry.magnification == 0:
-            warnings.warn('Found magnification = 0, please update data.geometry.dist_center_detector with processor.update_magnification()')
+            warnings.warn("Found magnification = 0, please update data.geometry.magnification or over-ride with processor.update_parameters({'magnification':value})")
             self.magnification = 1.0
             print('Magnification = ' + str(self.magnification)+ ' (default value)')
         else:
@@ -113,11 +113,11 @@ class PaganinProcessor(Processor):
         print('Magnification = ' + str(self.magnification))
 
         if geometry.dist_center_detector is None:
-            warnings.warn('Propagation distance not found, please update data.geometry.dist_center_detectoror over-ride with processor.update_propagation_distance()')
+            warnings.warn("Propagation distance not found, please update data.geometry.dist_center_detectoror over-ride with processor.update_parameters({'propagation_distance':value})")
             self.propagation_distance = 0.1
             print('Propagation distance = ' + str(self.propagation_distance) + 'm (default value)')
         elif geometry.dist_center_detector == 0:
-            warnings.warn('Found propagation distance = 0, please update the data.geometry.dist_center_detector or over-ride with processor.update_propagation_distance()')
+            warnings.warn("Found propagation distance = 0, please update the data.geometry.dist_center_detector or over-ride with z")
             self.propagation_distance = 0.1
             print('Propagation distance = ' + str(self.propagation_distance) + 'm (default value)')
         else:
@@ -125,10 +125,10 @@ class PaganinProcessor(Processor):
             print('Propagation distance = ' + str(self.propagation_distance) + ' m')
 
         if (geometry.pixel_size_h is None) | (geometry.pixel_size_v is None):
-            warnings.warn('Pixel size not found, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride with processor.update_pixel_size()')
+            warnings.warn("Pixel size not found, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride with processor.update_parameters({'pixel_size':value})")
             
         elif (geometry.pixel_size_h == 0) | (geometry.pixel_size_v == 0):
-            warnings.warn('Found pixel size = 0, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride the pixel size with processor.update_pixel_size()')
+            warnings.warn("Found pixel size = 0, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride the pixel size with processor.update_parameters({'pixel_size':value})")
             self.pixel_size = 10e-6
             print('Pixel size = ' + str(self.propagation_distance) + ' m (default value)')
         elif (geometry.pixel_size_h - geometry.pixel_size_v ) / \
@@ -146,7 +146,6 @@ class PaganinProcessor(Processor):
     def update_parameters(self, parameters):
         """
         Update the parameters to use in the PaganinProcessor 
-        'propagation_distance','pixel_size','magnification', 'delta', 'beta'
         
         Parameters
         ----------

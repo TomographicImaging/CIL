@@ -129,7 +129,7 @@ jobs:
         name: cil-package
         path: recipe/linux-64/cil*
   docs:
-    defaults: {run: {shell: 'bash -el {0}'}}
+    defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -139,14 +139,19 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with: {python-version: 3.11}
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+        cache-version: 0
     - name: install dependencies
       run: |
-        cd docs
         conda install -c conda-forge -yq conda-merge
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list
     - name: build cil
+      working-directory: .
       run: |
         cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
         cmake --build ./build --target install
@@ -155,23 +160,23 @@ jobs:
       with:
         path: docs/build
         ref: gh-pages
-    - name: update docs
+    - id: pages
+      uses: actions/configure-pages@v5
+    - name: update web pages (jekyll)
+      run: make JEKYLLOPTS="--baseurl ${{ steps.pages.outputs.base_path }}" web-deps web
+      env: {JEKYLL_ENV: production}
+    - name: update docs pages (sphinx)
       run: |
-        cd docs
         docs_dir="${{ github.ref_name }}"
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
-        rm -rf "build/$docs_dir"
-        ./mkdemos.py
-        sphinx-build -b dirhtml source "build/$docs_dir"
-        sed 's#DESTINATION#nightly#g' .redirect-template.html > build/index.html
-        ./mkversions.py
+        make BUILDSUBDIR="$docs_dir" dirhtml
     - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML
         path: docs/build
     - name: Push changes
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
       uses: casperdcl/push-dir@v1
       with:
         message: Update documentation

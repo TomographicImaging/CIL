@@ -20,7 +20,7 @@ channels:
 dependencies:
   # in addition to CIL deps (see ../scripts/requirements-test.yml)
   - jinja2
-  - pydata-sphinx-theme
+  # - pydata-sphinx-theme
   - recommonmark
   - sphinx
   - sphinx_rtd_theme
@@ -33,3 +33,7 @@ dependencies:
   - sphinx-gallery
   - sphinx-copybutton
   - notebook
+  # TODO: remove after https://github.com/pydata/pydata-sphinx-theme/pull/1795 is released
+  - pip
+  - pip:
+    - git+https://github.com/TomographicImaging/pydata-sphinx-theme@fix-version-switcher-dirhtml#egg=pydata-sphinx-theme

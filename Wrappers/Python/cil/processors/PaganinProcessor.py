@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2024 United Kingdom Research and Innovation
 #  Copyright 2024 The University of Manchester
 #

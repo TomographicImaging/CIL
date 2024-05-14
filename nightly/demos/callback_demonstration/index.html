@@ -1,0 +1,1473 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CIL Callback demonstration &#8212; CIL 24.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
+
+    <script src="../../_static/documentation_options.js?v=89421ced"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/callback_demonstration';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
+        </script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="prev" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+   
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item  current active">
+                      <a class="nav-link dropdown-item nav-internal" href="../">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../introduction/">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../framework/">
+                        Framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../io/">
+                        Read/ write AcquisitionData and ImageData
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../optimisation/">
+                        Optimisation framework
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../processors/">
+                        Processors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../recon/">
+                        Recon
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../utilities/">
+                        Utilities
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../plugins/">
+                        CIL Plugins
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../developer_guide/">
+                        Developers’ Guide
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown pst-header-nav-item">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item  current active">
+                      <a class="nav-link dropdown-item nav-internal" href="../">
+                        Tutorials
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../00_CIL_geometry/">A detailed look at CIL geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CIL Callback demonstration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Load-Data">Load Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Default-behaviour">Default behaviour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Other-provided-CIL-callbacks">Other provided CIL callbacks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Early-stopping-(a-custom-callback-example)">Early stopping (a custom callback example)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Calculating-data-discrepancy-at-each-iteration-(A-custom-callback-example)">Calculating data discrepancy at each iteration (A custom callback example)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Calculating-a-noise-approximation-for-each-iteration-(A-custom-callback-example)">Calculating a noise approximation for each iteration (A custom callback example)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#More-complex-example,-image-metric-callbacks">More complex example, image metric callbacks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/callback_demonstration.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">CIL...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2024 -  United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2024 -  The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:    CIL contributors</span>
+</pre></div>
+</div>
+</div>
+<section id="CIL-Callback-demonstration">
+<h1>CIL Callback demonstration<a class="headerlink" href="#CIL-Callback-demonstration" title="Link to this heading">#</a></h1>
+<p>This notebook runs on CIL Master (built on 14/03/2024) and demonstrates the new callback functionality</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show2D</span>
+<span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FDK</span>
+<span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="n">Slicer</span>
+<span class="kn">from</span> <span class="nn">cil.utilities.quality_measures</span> <span class="kn">import</span> <span class="n">psnr</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">FISTA</span><span class="p">,</span> <span class="n">Algorithm</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">ZeroFunction</span><span class="p">,</span> <span class="n">TotalVariation</span><span class="p">,</span> <span class="n">WaveletNorm</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">GradientOperator</span><span class="p">,</span> <span class="n">WaveletOperator</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.utilities</span> <span class="kn">import</span> <span class="n">callbacks</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
+
+<span class="kn">from</span> <span class="nn">cil.utilities.quality_measures</span> <span class="kn">import</span> <span class="n">mse</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span>
+
+<span class="c1"># set up default colour map for visualisation</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+
+<span class="c1"># set the backend for FBP and the ProjectionOperator</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<section id="Load-Data">
+<h2>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1">#%% Load data</span>
+<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_CONE_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">twoD</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">if</span> <span class="n">twoD</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+    <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+
+<span class="n">absorption</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">()(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">absorption</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)})(</span><span class="n">absorption</span><span class="p">)</span>
+
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">geometry</span>
+
+<span class="c1">#%%</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">absorption</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="c1">#%%</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># %%</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 60
+        horizontal: 128
+
+Reconstruction Volume:
+        horizontal_y: 128
+        horizontal_x: 128
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 8
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_4_1.png" src="../../_images/demos_callback_demonstration_4_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f276c347550&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Default-behaviour">
+<h2>Default behaviour<a class="headerlink" href="#Default-behaviour" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">image_geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">,</span>
+                       <span class="n">acquisition_geometry</span><span class="o">=</span><span class="n">absorption</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">absorption</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3e8f8d5164384061b4df021a726c2b23", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_6_1.png" src="../../_images/demos_callback_demonstration_6_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f264d94a380&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Other-provided-CIL-callbacks">
+<h2>Other provided CIL callbacks<a class="headerlink" href="#Other-provided-CIL-callbacks" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">(),</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">()])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5846e6494dc947e59b1341de25283b23", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/500        ?it/s
+    10/500    33.51it/s, objective=+8.586e+01
+    20/500    32.56it/s, objective=+9.047e+00
+    30/500    31.92it/s, objective=+2.640e+00
+    40/500    29.97it/s, objective=+1.188e+00
+    50/500    27.51it/s, objective=+6.928e-01
+    60/500    26.41it/s, objective=+4.585e-01
+    70/500    25.72it/s, objective=+3.451e-01
+    80/500    25.24it/s, objective=+2.741e-01
+    90/500    25.09it/s, objective=+2.337e-01
+   100/500    24.89it/s, objective=+2.062e-01
+   110/500    25.64it/s, objective=+1.870e-01
+   120/500    27.31it/s, objective=+1.729e-01
+   130/500    28.33it/s, objective=+1.623e-01
+   140/500    29.20it/s, objective=+1.541e-01
+   150/500    29.81it/s, objective=+1.476e-01
+   160/500    30.34it/s, objective=+1.421e-01
+   170/500    30.73it/s, objective=+1.375e-01
+   180/500    31.01it/s, objective=+1.336e-01
+   190/500    31.14it/s, objective=+1.303e-01
+   200/500    31.26it/s, objective=+1.275e-01
+   210/500    31.23it/s, objective=+1.250e-01
+   220/500    31.37it/s, objective=+1.228e-01
+   230/500    31.48it/s, objective=+1.208e-01
+   240/500    31.38it/s, objective=+1.190e-01
+   250/500    31.44it/s, objective=+1.173e-01
+   260/500    31.39it/s, objective=+1.159e-01
+   270/500    31.57it/s, objective=+1.145e-01
+   280/500    31.59it/s, objective=+1.134e-01
+   290/500    31.54it/s, objective=+1.123e-01
+   300/500    31.75it/s, objective=+1.113e-01
+   310/500    31.73it/s, objective=+1.104e-01
+   320/500    31.59it/s, objective=+1.096e-01
+   330/500    30.41it/s, objective=+1.088e-01
+   340/500    30.60it/s, objective=+1.081e-01
+   350/500    30.22it/s, objective=+1.075e-01
+   360/500    30.70it/s, objective=+1.068e-01
+   370/500    30.78it/s, objective=+1.063e-01
+   380/500    31.07it/s, objective=+1.057e-01
+   390/500    30.91it/s, objective=+1.052e-01
+   400/500    30.90it/s, objective=+1.048e-01
+   410/500    30.95it/s, objective=+1.043e-01
+   420/500    30.99it/s, objective=+1.039e-01
+   430/500    29.62it/s, objective=+1.035e-01
+   440/500    29.70it/s, objective=+1.031e-01
+   450/500    29.44it/s, objective=+1.028e-01
+   460/500    29.83it/s, objective=+1.025e-01
+   470/500    30.37it/s, objective=+1.022e-01
+   480/500    30.29it/s, objective=+1.019e-01
+   490/500    30.56it/s, objective=+1.016e-01
+   500/500    30.71it/s, objective=+1.013e-01
+   500/500    29.92it/s
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_8_2.png" src="../../_images/demos_callback_demonstration_8_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f2624118d60&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">(),</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">()])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "70751c8a7e8941a98e9088fb6bf31723", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+   501/600        ?it/s
+   511/600    31.03it/s, objective=+1.011e-01
+   521/600    31.07it/s, objective=+1.008e-01
+   531/600    30.85it/s, objective=+1.006e-01
+   541/600    31.13it/s, objective=+1.004e-01
+   551/600    31.50it/s, objective=+1.002e-01
+   561/600    31.66it/s, objective=+1.000e-01
+   571/600    31.30it/s, objective=+9.986e-02
+   581/600    31.29it/s, objective=+9.969e-02
+   591/600    31.24it/s, objective=+9.953e-02
+   600/600    31.19it/s, objective=+9.938e-02
+
+</pre></div></div>
+</div>
+</section>
+<section id="Early-stopping-(a-custom-callback-example)">
+<h2>Early stopping (a custom callback example)<a class="headerlink" href="#Early-stopping-(a-custom-callback-example)" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+         <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+               <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">objective</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">2e-1</span><span class="p">:</span>  <span class="c1"># arbitrary stopping criterion</span>
+                  <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+<span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(),</span> <span class="n">EarlyStopping</span><span class="p">()])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/500        ?it/s
+    10/500    27.22it/s, objective=+8.586e+01
+    20/500    26.72it/s, objective=+9.047e+00
+    30/500    29.01it/s, objective=+2.640e+00
+    40/500    30.17it/s, objective=+1.188e+00
+    50/500    30.84it/s, objective=+6.928e-01
+    60/500    31.17it/s, objective=+4.585e-01
+    70/500    31.51it/s, objective=+3.451e-01
+    80/500    31.75it/s, objective=+2.741e-01
+    90/500    31.92it/s, objective=+2.337e-01
+   100/500    32.09it/s, objective=+2.062e-01
+   110/500    32.11it/s, objective=+1.870e-01
+   110/500    31.05it/s
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_11_1.png" src="../../_images/demos_callback_demonstration_11_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f262417a4a0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+         <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">-</span><span class="n">ground_truth</span><span class="o">.</span><span class="n">array</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">3e-8</span><span class="p">:</span>  <span class="c1"># arbitrary stopping criterion</span>
+                  <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+<span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(),</span> <span class="n">EarlyStopping</span><span class="p">()])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/500        ?it/s
+    10/500    31.39it/s, objective=+8.586e+01
+    20/500    31.84it/s, objective=+9.047e+00
+    23/500    31.75it/s
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_12_1.png" src="../../_images/demos_callback_demonstration_12_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f2624118d90&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Calculating-data-discrepancy-at-each-iteration-(A-custom-callback-example)">
+<h2>Calculating data discrepancy at each iteration (A custom callback example)<a class="headerlink" href="#Calculating-data-discrepancy-at-each-iteration-(A-custom-callback-example)" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="k">class</span> <span class="nc">DataDiscrepancyCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()))</span>
+
+<span class="n">mycallback_FISTA_lower_bound</span><span class="o">=</span> <span class="n">DataDiscrepancyCallback</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">absorption</span><span class="p">)</span>
+<span class="n">algo1</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo1</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_lower_bound</span><span class="p">])</span>
+
+
+<span class="n">mycallback_FISTA_no_lower_bound</span><span class="o">=</span> <span class="n">DataDiscrepancyCallback</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">absorption</span><span class="p">)</span>
+<span class="n">algo2</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_no_lower_bound</span><span class="p">])</span>
+
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_lower_bound&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_no_lower_bound&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_lower_bound&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_no_lower_bound&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV with lower bound &#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_no_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV without lower bound &#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Data discrepancy $\|Ax-y\|_2^2$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_14_0.png" src="../../_images/demos_callback_demonstration_14_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_14_1.png" src="../../_images/demos_callback_demonstration_14_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f2614863910&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_14_3.png" src="../../_images/demos_callback_demonstration_14_3.png" />
+</div>
+</div>
+<p>We see that the without the lower bound, the reconstruction overfits to the noisy absorption data</p>
+</section>
+<section id="Calculating-a-noise-approximation-for-each-iteration-(A-custom-callback-example)">
+<h2>Calculating a noise approximation for each iteration (A custom callback example)<a class="headerlink" href="#Calculating-a-noise-approximation-for-each-iteration-(A-custom-callback-example)" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="kn">import</span> <span class="nn">skimage</span>
+
+<span class="k">class</span> <span class="nc">SigmaEstimateCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skimage</span><span class="o">.</span><span class="n">restoration</span><span class="o">.</span><span class="n">estimate_sigma</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+
+<span class="n">mycallback_FISTA_TV_alpha_01</span><span class="o">=</span> <span class="n">SigmaEstimateCallback</span><span class="p">()</span>
+<span class="n">algo1</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo1</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_TV_alpha_01</span><span class="p">])</span>
+
+
+<span class="n">mycallback_FISTA_TV_alpha_1</span><span class="o">=</span> <span class="n">SigmaEstimateCallback</span><span class="p">()</span>
+<span class="n">algo2</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_TV_alpha_1</span><span class="p">])</span>
+
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV_alpha_01&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV_alpha_1&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_TV_alpha_01&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_TV_alpha_1&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_01</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV alpha=0.1 &#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_1</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV alpha=1.0 &#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Noise Estimate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/bih17925/miniconda3/envs/cil_testing2/lib/python3.10/site-packages/numpy/core/fromnumeric.py:3432: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/bih17925/miniconda3/envs/cil_testing2/lib/python3.10/site-packages/numpy/core/_methods.py:190: RuntimeWarning: invalid value encountered in divide
+  ret = ret.dtype.type(ret / rcount)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_17_1.png" src="../../_images/demos_callback_demonstration_17_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_17_2.png" src="../../_images/demos_callback_demonstration_17_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f260d8df6a0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_17_4.png" src="../../_images/demos_callback_demonstration_17_4.png" />
+</div>
+</div>
+<p>We see with a larger regularisation parameter, the resulting image is less noisy.</p>
+</section>
+<section id="More-complex-example,-image-metric-callbacks">
+<h2>More complex example, image metric callbacks<a class="headerlink" href="#More-complex-example,-image-metric-callbacks" title="Link to this heading">#</a></h2>
+<p>Warning - this is a complex example! But the code may be useful to adapt and reuse</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="k">class</span> <span class="nc">ImageQualityCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    reference_image: CIL or STIR ImageData</span>
+<span class="sd">      containing the reference image used to calculate the metrics</span>
+
+<span class="sd">    roi_mask_dict : dictionary of ImageData objects</span>
+<span class="sd">      list containing one binary ImageData object for every ROI to be</span>
+<span class="sd">      evaluated. Voxels with values 1 are considered part of the ROI</span>
+<span class="sd">      and voxels with value 0 are not.</span>
+<span class="sd">      Dimension of the ROI mask images must be the same as the dimension of</span>
+<span class="sd">      the reference image.</span>
+
+<span class="sd">    metrics_dict : dictionary of lambda functions f(x,y) mapping</span>
+<span class="sd">      two 1-dimensional numpy arrays x and y to a scalar value or a</span>
+<span class="sd">      numpy.ndarray.</span>
+<span class="sd">      x and y can be the voxel values of the whole images or the values of</span>
+<span class="sd">      voxels in a ROI such that the metric can be computed on the whole</span>
+<span class="sd">      images and optionally in the ROIs separately.</span>
+
+<span class="sd">      E.g. f(x,y) could be MSE(x,y), PSNR(x,y), MAE(x,y)</span>
+
+<span class="sd">    statistics_dict : dictionary of lambda functions f(x) mapping a</span>
+<span class="sd">      1-dimensional numpy array x to a scalar value or a numpy.ndarray.</span>
+<span class="sd">      E.g. mean(x), std_deviation(x) that calculate global and / or</span>
+<span class="sd">      ROI mean and standard deviations.</span>
+
+<span class="sd">      E.g. f(x) could be x.mean()</span>
+
+
+
+
+<span class="sd">      &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span>
+                       <span class="n">roi_mask_dict</span>   <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">metrics_dict</span>    <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">statistics_dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="p">):</span>
+
+        <span class="c1"># the reference image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span> <span class="o">=</span> <span class="n">reference_image</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_indices_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_store</span><span class="o">=</span><span class="p">[]</span>
+
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask_dict</span><span class="o">=</span><span class="n">roi_mask_dict</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">metrics_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">roi_mask_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                  <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span> <span class="o">=</span> <span class="n">statistics_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="n">roi_mask_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                  <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">ans</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+
+
+                    <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                      <span class="n">ans</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+
+
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">statistic_name</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">ans</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">_NoValue</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+
+
+                    <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">ans</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">dc1</span><span class="p">,</span> <span class="n">dc2</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Calculates the mean squared error of two images</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dc1: `DataContainer`</span>
+<span class="sd">        One image to be compared</span>
+<span class="sd">    dc2: `DataContainer`</span>
+<span class="sd">        Second image to be compared</span>
+<span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
+<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A number, the mean squared error of the two images</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dc1</span> <span class="o">=</span> <span class="n">dc1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">dc2</span> <span class="o">=</span> <span class="n">dc2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+        <span class="n">dc1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc1</span><span class="p">)</span>
+        <span class="n">dc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(((</span><span class="n">dc1</span> <span class="o">-</span> <span class="n">dc2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">mae</span><span class="p">(</span><span class="n">dc1</span><span class="p">,</span> <span class="n">dc2</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Calculates the Mean Absolute error of two images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dc1: `DataContainer`</span>
+<span class="sd">        One image to be compared</span>
+<span class="sd">    dc2: `DataContainer`</span>
+<span class="sd">        Second image to be compared</span>
+<span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
+<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A number with the mean absolute error between the two images.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dc1</span> <span class="o">=</span> <span class="n">dc1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">dc2</span> <span class="o">=</span> <span class="n">dc2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+        <span class="n">dc1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc1</span><span class="p">)</span>
+        <span class="n">dc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dc2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">dc1</span><span class="o">-</span><span class="n">dc2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">psnr</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Calculates the Peak signal to noise ratio (PSNR) between the two images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ground_truth: `DataContainer`</span>
+<span class="sd">        The reference image</span>
+<span class="sd">    corrupted: `DataContainer`</span>
+<span class="sd">        The image to be evaluated</span>
+<span class="sd">    data_range: scalar value, default=None</span>
+<span class="sd">        PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.</span>
+<span class="sd">    mask: array or `DataContainer` with the same dimensions as the `dc1` and `dc2`</span>
+<span class="sd">        The pixelwise operation only considers values where the mask is True or NonZero..</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A number, the peak signal to noise ration between the two images.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+    <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_range</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ground_truth</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
+                                <span class="n">where</span><span class="o">=</span><span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">),</span> <span class="n">initial</span><span class="o">=-</span><span class="mf">1e-8</span><span class="p">)</span>
+
+
+    <span class="n">tmp_mse</span> <span class="o">=</span> <span class="n">mse</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="n">data_range</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">tmp_mse</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1">#%% create masks</span>
+<span class="n">top</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">bottom</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">top</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ground_truth</span><span class="o">.</span><span class="n">array</span> <span class="o">&gt;</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+               <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="n">bottom</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">ground_truth</span><span class="o">.</span><span class="n">array</span> <span class="o">&lt;</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span>
+               <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+
+<span class="n">roi_image_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;top&#39;</span> <span class="p">:</span> <span class="n">top</span><span class="p">,</span>
+    <span class="s1">&#39;bottom&#39;</span> <span class="p">:</span> <span class="n">bottom</span>
+<span class="p">}</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_22_0.png" src="../../_images/demos_callback_demonstration_22_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f2614860970&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">img_qual_callback</span> <span class="o">=</span> <span class="n">ImageQualityCallback</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span>
+                                              <span class="n">roi_mask_dict</span> <span class="o">=</span> <span class="n">roi_image_dict</span><span class="p">,</span>
+                                              <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MSE&#39;</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span>
+                                                              <span class="s1">&#39;MAE&#39;</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span>
+                                                              <span class="s1">&#39;PSNR&#39;</span><span class="p">:</span><span class="n">psnr</span><span class="p">},</span>
+                                              <span class="n">statistics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MEAN&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
+                                                                 <span class="s1">&#39;STDDEV&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
+                                                                 <span class="s1">&#39;MAX&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">0</span><span class="p">))},</span>
+                                              <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">img_qual_callback</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_24_0.png" src="../../_images/demos_callback_demonstration_24_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f261c4389a0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_MSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7f260d52d570&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_25_1.png" src="../../_images/demos_callback_demonstration_25_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;top_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Top&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Global&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;bottom_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Bottom&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f260d557a30&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_callback_demonstration_26_1.png" src="../../_images/demos_callback_demonstration_26_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../deriv2_cgls/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1D inverse problem demo using deriv2 from regtools</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

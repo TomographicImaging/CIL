@@ -4,3 +4,4 @@ Tutorials
 .. nbgallery::
     demos/00_CIL_geometry
     demos/deriv2_cgls
+    demos/callback_demonstration

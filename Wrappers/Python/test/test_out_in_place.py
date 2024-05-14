@@ -38,6 +38,8 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
      IndicatorBox, TotalVariation,  SumFunction, SumScalarFunction, \
     WeightedL2NormSquared, MixedL11Norm, ZeroFunction
 
+from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
+RingRemover, Slicer, TransmissionAbsorptionConverter
 
 import numpy
 
@@ -313,3 +315,95 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 result=self.get_result(operator, 'adjoint', data)
                 self.out_test(result, operator, 'adjoint',  data)
                 self.in_place_test(result,operator,  'adjoint',  data)
+
+class TestProcessorOutandInPlace(CCPiTestClass):
+    def setUp(self):
+        
+        self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),  np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)), np.random.uniform(0,1,(10,20)).astype(np.float32)]
+
+        # processors that don't change the shape of the data
+        self.processor_test_list = [
+            TransmissionAbsorptionConverter(min_intensity=0.01),
+            AbsorptionTransmissionConverter(),
+            RingRemover()
+        ]
+        
+        # Processors that require data as an input when the processor is created
+            # Normaliser(),# Masker() 
+            # Normaliser(),
+        # Masker need to create the correct size mask
+        # mask = MaskGenerator.median(threshold_factor=3, window=7)(self.data_arrays[0])
+        # Masker.interpolate(mask=mask)
+        # Normaliser needs flat and dark arrays
+
+        # processors that don't necessarily return the same out
+        # [CentreOfRotationCorrector().xcorrelation(ang_tol=20),
+        #  Slicer(), Binner(), Padder(pad_width=1)]
+
+        ag_parallel_2D = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+        ag_parallel_2D.set_angles(angles)
+        ag_parallel_2D.set_panel(20)
+
+        ag_parallel_3D = AcquisitionGeometry.create_Parallel3D()
+        ag_parallel_3D.set_angles(angles)
+        ag_parallel_3D.set_panel([20,2])
+
+        ag_cone_2D = AcquisitionGeometry.create_Cone2D(source_position=[0,-10],detector_position=[0,10])
+        ag_cone_2D.set_angles(angles)
+        ag_cone_2D.set_panel(20)
+
+        ag_cone_3D = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0],detector_position=[0,10,0])
+        ag_cone_3D.set_angles(angles)
+        ag_cone_3D.set_panel([20,2])
+        
+        self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
+
+    def get_result(self, processor, data, *args):
+        input=data.copy() #To check that it isn't changed after function calls
+        try:
+            processor.set_input(data)
+            out = processor.get_output()
+            self.assertDataArraysInContainerAllClose(input, data, rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output() where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation.")
+            return out
+        except NotImplementedError:
+            print("get_result test not implemented for  " + processor.__class__.__name__)
+            return None
+
+    def in_place_test(self, desired_result, processor, data, *args, ):
+            out = data.copy()
+            try:
+                processor.set_input(data)
+                processor.get_output(out=out)
+                self.assertDataArraysInContainerAllClose(desired_result, out, rtol=1e-5, msg= "In place calculation failed for processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ "." )
+
+            except (InPlaceError, NotImplementedError):
+                print("in_place_test test not implemented for  " + processor.__class__.__name__)
+                pass
+
+    def out_test(self, desired_result, processor, data, *args, ):
+        input = data.copy()
+        out=0*(data.copy())
+        try:
+            processor.set_input(input, *args)
+            processor.get_output(out=out)
+            
+            self.assertDataArraysInContainerAllClose(desired_result, out, rtol=1e-5, msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
+            self.assertDataArraysInContainerAllClose(input, data,  rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+
+        except (InPlaceError, NotImplementedError):
+            print("in_place_test test not implemented for  " + processor.__class__.__name__)
+            pass
+
+    def test_out(self):
+        for processor in self.processor_test_list:
+            for geom in self.geometry_test_list:
+                for data_array in self.data_arrays:
+                    data=geom.allocate(None)
+                    try:
+                        data.fill(data_array)
+                    except:
+                        data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
+                    result=self.get_result(processor, data)
+                    self.out_test(result, processor, data)
+                    self.in_place_test(result, processor, data)

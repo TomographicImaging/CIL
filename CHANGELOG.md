@@ -4,6 +4,7 @@
   - New Features:
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, `A` (#1618)
+    - Added PaganinProcessor processor, to perform phase retrieval from phase contrast images (#1737)
   - Enhancements:
     - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)

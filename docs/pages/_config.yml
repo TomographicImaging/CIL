@@ -1,0 +1,97 @@
+# jekyll config
+remote_theme: TomographicImaging/feeling-responsive # TODO: revert after https://github.com/Phlow/feeling-responsive/pull/276
+title: CIL
+slogan: The Core Imaging Library
+description: |
+  CIL is a versatile python framework for tomographic imaging.
+  <br/>
+  CCPi is funded by the EPSRC grant <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/T026677/1">EP/T026677/1</a>.
+  <br/>
+  CCPi acknowledges previous funding support by the EPSRC grants <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/J010456/1">EP/J010456/1</a>
+  and <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/M022498/1">EP/M022498/1</a>.
+  <br/>
+  The CCPi Flagship "A Reconstruction Toolkit for Multichannel CT" was funded by the
+  EPSRC grant <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/P02226X/1">EP/P02226X/1</a>.
+  <br/>
+author: ccpi-devs
+url: '' # https://tomographicimaging.github.io
+baseurl: '' # /CIL
+improve_content: https://github.com/TomographicImaging/CIL/edit/master/docs
+urlimg: ''
+logo: "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg"  # ideally 600x80 pixels
+language: en-GB
+plugins:
+- jekyll-remote-theme
+
+# Theme works best with Kramdown (using the table of contents function)
+#markdown: kramdown
+permalink: pretty
+highlight: rouge
+excerpt_separator: "<!--more-->"
+#include: ['.htaccess']
+exclude:
+- .sass-cache
+- Gemfile
+- Gemfile.lock
+- LICENSE
+- README.md
+- INSTALL.md
+- vendor
+# sphinx
+- docs_environment.yml
+- make.bat
+- Makefile
+- mkversions.py
+- .redirect-template.html
+- source
+
+# http://jch.penibelst.de
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  profile: false
+  ignore:
+    envs: [development]
+
+defaults:
+- scope:
+    path: '' # all files
+    type: pages
+  values:
+    show_meta: false
+    # sidebar:    		# left, right (default undefined means none)
+    comments: false
+    author: CIL developers
+
+#google_site_verification: ''
+#bing_webmastertools_id: ''
+#yandex_site_verification: ''
+#alexa_verify_id: ''
+
+# http://j.mp/fb_optimize
+og_image: 'https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg'
+og_locale: en_EN
+og_type: website
+#disqus_shortname:
+
+# http://sass-lang.com/
+# http://jekyllrb.com/docs/assets/#sassscss
+sass:
+  sass_dir: _sass
+  style: :compressed
+
+#google_analytics_tracking_id:
+
+# https://www.tawk.to/knowledgebase/
+#tawkto_embed_uri:
+
+# https://github.com/asciidoctor/jekyll-asciidoc
+# https://github.com/asciidoctor
+#asciidoctor-enabled: false
+#asciidoctor:
+#  description:
+#  attributes:
+#    source-highlighter: coderay
+#    coderay-css: style
+#    icons: font

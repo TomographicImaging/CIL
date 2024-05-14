@@ -29,7 +29,7 @@ except ImportError:
 # Project information
 project = 'CIL'
 copyright = '2017-2024'
-author = 'CCPi developers'
+author = 'CIL developers'
 version = version.version
 release = version
 _baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
@@ -71,6 +71,8 @@ html_theme_options = {
     "logo": {
         "image_light": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg",
         "image_dark": "https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg",
+        "link": "/",
+        "alt_text": "CIL - Home",
     },
     "show_version_warning_banner": True,
     "header_links_before_dropdown": 9,
@@ -93,7 +95,7 @@ html_context = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['docsstatic']
+#html_static_path = ['docsstatic']
 htmlhelp_basename = 'CILdoc'
 
 # LaTeX config

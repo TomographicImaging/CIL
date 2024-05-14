@@ -22,7 +22,7 @@ import unittest
 import numpy as np
 
 from cil.utilities.errors import InPlaceError
-from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry, DataContainer
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
 from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
@@ -319,26 +319,9 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 class TestProcessorOutandInPlace(CCPiTestClass):
     def setUp(self):
         
-        self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),  np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)), np.random.uniform(0,1,(10,20)).astype(np.float32)]
-
-        # processors that don't change the shape of the data
-        self.processor_test_list = [
-            TransmissionAbsorptionConverter(min_intensity=0.01),
-            AbsorptionTransmissionConverter(),
-            RingRemover()
-        ]
-        
-        # Processors that require data as an input when the processor is created
-            # Normaliser(),# Masker() 
-            # Normaliser(),
-        # Masker need to create the correct size mask
-        # mask = MaskGenerator.median(threshold_factor=3, window=7)(self.data_arrays[0])
-        # Masker.interpolate(mask=mask)
-        # Normaliser needs flat and dark arrays
-
-        # processors that don't necessarily return the same out
-        # [CentreOfRotationCorrector().xcorrelation(ang_tol=20),
-        #  Slicer(), Binner(), Padder(pad_width=1)]
+        self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),  
+                          np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)),
+                          np.random.uniform(0,1,(10,20)).astype(np.float32)]
 
         ag_parallel_2D = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
@@ -358,6 +341,23 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         ag_cone_3D.set_panel([20,2])
         
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
+        self.data_test_list= [geom.allocate(None) for geom in self.geometry_test_list]
+        
+        flat_field = self.data_test_list[0]*1
+        dark_field = self.data_test_list[0]*1e-5
+
+        # processors that don't change the shape of the data
+        self.processor_list = [
+            TransmissionAbsorptionConverter(min_intensity=0.01),
+            AbsorptionTransmissionConverter(),
+            RingRemover()
+        ]
+
+        # processors that change the shape of the data
+        self.processor_list_diff_size = [Slicer(), 
+                                         Binner(), 
+                                         Padder(pad_width=1)]
+        
 
     def get_result(self, processor, data, *args):
         input=data.copy() #To check that it isn't changed after function calls
@@ -370,7 +370,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             print("get_result test not implemented for  " + processor.__class__.__name__)
             return None
 
-    def in_place_test(self, desired_result, processor, data, *args, ):
+    def in_place_test(self, desired_result, processor, data ):
             out = data.copy()
             try:
                 processor.set_input(data)
@@ -381,11 +381,11 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 print("in_place_test test not implemented for  " + processor.__class__.__name__)
                 pass
 
-    def out_test(self, desired_result, processor, data, *args, ):
+    def out_test(self, desired_result, processor, data, output_size=None ):
         input = data.copy()
         out=0*(data.copy())
         try:
-            processor.set_input(input, *args)
+            processor.set_input(input)
             processor.get_output(out=out)
             
             self.assertDataArraysInContainerAllClose(desired_result, out, rtol=1e-5, msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
@@ -396,14 +396,48 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             pass
 
     def test_out(self):
-        for processor in self.processor_test_list:
-            for geom in self.geometry_test_list:
-                for data_array in self.data_arrays:
-                    data=geom.allocate(None)
-                    try:
-                        data.fill(data_array)
-                    except:
-                        data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
+        
+        for geom in self.geometry_test_list:
+            for data_array in self.data_arrays:
+                data=geom.allocate(None)
+                try:
+                    data.fill(data_array)
+                except:
+                    data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
+                
+                for processor in self.processor_list:
                     result=self.get_result(processor, data)
                     self.out_test(result, processor, data)
                     self.in_place_test(result, processor, data)
+                
+                # Test the processors that need data size as an input
+                processor = Normaliser(flat_field=data.get_slice(angle=0).as_array()*1, dark_field=data.get_slice(angle=0).as_array()*1e-5)
+                result=self.get_result(processor, data)
+                self.out_test(result, processor, data)
+                self.in_place_test(result, processor, data)
+
+                processor = MaskGenerator.median(threshold_factor=3, window=7)
+                mask=self.get_result(processor, data)
+                self.out_test(mask, processor, data)
+                self.in_place_test(mask, processor, data)
+
+                processor = Masker.median(mask=mask)
+                result=self.get_result(processor, data)
+                self.out_test(result, processor, data)
+                self.in_place_test(result, processor, data)
+
+                # processor = CentreOfRotationCorrector()
+                # result=self.get_result(processor, data)
+                # self.out_test(result, processor, data)
+                # self.in_place_test(result, processor, data)
+        
+    def test_centre_of_rotation_out(self):
+        for geom in self.geometry_test_list:
+            for data_array in self.data_arrays:
+                processor = CentreOfRotationCorrector()
+                out = processor.get_output()
+    #             result=self.get_result(processor, data)
+    #             # self.out_test(result, processor, data)
+    #             self.in_place_test(result, processor, data)
+
+                # Test the processors that don't return the same size output

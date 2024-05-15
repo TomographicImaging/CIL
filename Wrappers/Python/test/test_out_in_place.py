@@ -397,10 +397,11 @@ class TestProcessorOutandInPlace(CCPiTestClass):
 
         try:
             processor.set_input(input)
-            processor.get_output(out=out)
+            output = processor.get_output(out=out)
             
             self.assertDataArraysInContainerAllClose(desired_result, out, rtol=1e-5, msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
             self.assertDataArraysInContainerAllClose(input, data,  rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+            self.assertDataArraysInContainerAllClose(desired_result, output,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor supresses the output. ")
 
         except (InPlaceError, NotImplementedError):
             print("out_test test not implemented for  " + processor.__class__.__name__)
@@ -456,10 +457,11 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 out=0*(data.copy())
                 try:
                     processor.set_input(input)
-                    processor.get_output(out=out)
+                    output = processor.get_output(out=out)
                     
                     numpy.testing.assert_array_equal(result.geometry.config.system.rotation_axis.position, out.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
                     numpy.testing.assert_array_equal(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+                    self.assertDataArraysInContainerAllClose(out, output,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor incorrectly supresses the output. ")
 
                 except (InPlaceError, NotImplementedError):
                     print("out_test_for_geometry test not implemented for  " + processor.__class__.__name__)

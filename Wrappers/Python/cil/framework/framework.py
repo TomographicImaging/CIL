@@ -3898,12 +3898,12 @@ class Processor(object):
         Parameters
         ----------
         out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced DataContainer with the processed data
 
         Returns
         -------
         DataContainer
-            The processed data. Suppressed if `out` is passed
+            The processed data
         """
         if self.output is None or self.shouldRun:
             if out is None:

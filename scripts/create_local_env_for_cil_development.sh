@@ -64,6 +64,7 @@ conda_args=(create --name="$name"
   scikit-image
   scipy
   tqdm
+  zenodo_get
 )
 if test -n "$cil_ver"; then
   echo "CIL version $cil_ver"

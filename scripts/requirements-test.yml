@@ -46,3 +46,4 @@ dependencies:
   - pywavelets
   - numba
   - tqdm
+  - zenodo_get

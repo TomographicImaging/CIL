@@ -40,6 +40,7 @@ test:
     - packaging
     - ccpi-regulariser=22.0.0 # [ not osx ]
     - astra-toolbox>=1.9.9.dev5,<2.1
+    - zenodo_get
 
   source_files:
     - ./Wrappers/Python/test # [win]

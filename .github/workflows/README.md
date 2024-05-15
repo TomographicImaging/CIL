@@ -1,6 +1,6 @@
 # GitHub Actions
 
-There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml)
+There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [build](./build.yml)
 
 The jobs are:
 
@@ -23,13 +23,13 @@ Details on some of these jobs are given below.
 
 ## conda
 
-When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.9` and `numpy=1.22`.
+When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.11` and `numpy=1.25`.
 
 > [!NOTE]
 > The action does not publish to conda, instead this is done by jenkins. We will eventually move from jenkins to conda-forge instead.
 > When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
 
-It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
+It looks for conda-build dependencies in the channels listed [here](./build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
 
 > [!TIP]
 > The `conda` job builds the `*.tar.bz2` package and uploads it as an artifact called `cil-package`.
@@ -38,18 +38,29 @@ It looks for conda-build dependencies in the channels listed [here](https://gith
 
 ## docs
 
-This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). To do this it uses a forked version of the [build-sphinx-action](https://github.com/lauramurgatroyd/build-sphinx-action).
+This github action builds and optionally publishes the documentation located in [docs/source](../../docs/source).
 
-The [docs](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml#L124) job:
+The [docs](./build.yml#L124) job:
 
-- creates a `miniconda` environment from [requirements-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml) and [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/docs/docs_environment.yml)
+- creates a `miniconda` environment from [requirements-test.yml](../../scripts/requirements-test.yml) and [docs_environment.yml](../../docs/docs_environment.yml)
 - `cmake` builds & installs CIL into the `miniconda` environment
-- builds the HTML documentation with `sphinx`
+  + builds the HTML documentation with `sphinx`
+- installs ruby dependencies from [`Gemfile`](../../docs/Gemfile)
+  + builds the HTML landing page with `jekyll`
 - uploads a `DocumentationHTML` artifact (which can be downloaded to view locally for debugging)
-- pushes the HTML documentation to the `gh-pages` branch
-  + only if pushing to `master` or tagging (skipped if pushing to a branch or a PR)
+  + pushes the HTML documentation to the `gh-pages` branch
+    * only if pushing to `master` or tagging (skipped if pushing to a branch or a PR)
 
 > [!TIP]
 > The `docs` job builds the documentation and uploads it as an artifact called `DocumentationHTML`.
 > It can be found by going to the "Actions" tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the "Summary" for the run of the action, there is an "Artifact" section at the bottom of the page.
-> Clicking on `DocumentationHTML` allows you to download a zip folder containing the built HTML files. This allows you to preview the documentation site before it is published.
+> Click on `DocumentationHTML` to download a zip archive of the built HTML files.
+> It must be extracted into a `CIL` subfolder to properly render locally:
+>
+> ```sh
+> mkdir CIL
+> unzip -d CIL DocumentationHTML.zip
+> python -m http.server
+> ```
+>
+> Then open a browser and navigate to <http://localhost:8000/CIL/> to view the documentation.

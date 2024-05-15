@@ -18,7 +18,7 @@
 
 from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
 from cil.framework import DataOrder
-from cil.framework.BlockGeometry import BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry

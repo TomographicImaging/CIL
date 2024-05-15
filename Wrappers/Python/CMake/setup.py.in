@@ -50,10 +50,9 @@ setup(
 
 
     # metadata for upload to PyPI
-    author="CCPi developers",
-    maintainer="Edoardo Pasca",
+    maintainer="CIL developers",
     maintainer_email="edoardo.pasca@stfc.ac.uk",
-    description='CCPi Core Imaging Library',
+    description='Core Imaging Library',
     license="Apache v2.0",
     keywords="Python Framework",
     url="http://www.ccpi.ac.uk/cil",

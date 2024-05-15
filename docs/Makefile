@@ -1,35 +1,36 @@
-##  Copyright 2019 United Kingdom Research and Innovation
-##  Copyright 2019 The University of Manchester
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##      http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-## Authors:
-## CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-# Minimal makefile for Sphinx documentation
-#
-
 # You can set these variables from the command line.
+JEKYLLOPTS    =
+JEKYLLBUILD   = bundle exec jekyll build
+JEKYLLSRCDIR  = pages
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
-
-# Put it first so that "make" without argument is like "make help".
+BUILDSUBDIR   = $(shell git rev-parse --abbrev-ref HEAD)
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@echo extra options
+	@echo '  web-deps    to install website dependencies'
+	@echo '  web         to build website'
+	@echo '  dirhtml     to build docs'
+	@echo '  serve       to serve website & docs'
+.PHONY: help Makefile serve web-deps web dirhtml
 
-.PHONY: help Makefile
+serve:
+	@python -m http.server -d "$(BUILDDIR)"
+web-deps:
+	@gem install bundler
+	@bundle install
+web:
+	@$(JEKYLLBUILD) -s "$(JEKYLLSRCDIR)" $(JEKYLLOPTS)
+	@ls "$(JEKYLLSRCDIR)"/*.md | xargs -II basename I .md | xargs -II rm -rf "$(BUILDDIR)/I"
+	@rm -rf "$(BUILDDIR)/assets"
+	@mv _site/* "$(BUILDDIR)/"
+dirhtml:
+	@rm -rf "$(BUILDDIR)/$(BUILDSUBDIR)"
+	@./mkdemos.py
+	@$(SPHINXBUILD) -b dirhtml $(SPHINXOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/$(BUILDSUBDIR)"
+	@./mkversions.py
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

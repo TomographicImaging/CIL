@@ -165,14 +165,15 @@ class TestRemoteData(unittest.TestCase):
         with ZipFile(os.path.join(args[0][4], args[0][2]), mode='w') as zip_file:
             zip_file.write(shapes_path, arcname=dataexample.TestData.SHAPES)
 
-
+            
     @patch('cil.utilities.dataexample.input', return_value='y')
     @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)
-    def test_unzip_remote_data(self, mock_zenodo_get, input):
+    def test_download_data_input_y(self, mock_zenodo_get, input):
         '''
-        Test the download_data function correctly extracts files from a zip file
+        Test the download_data function, when the user input is 'y' to 'are you sure you want to download data'
         The user input to confirm the download is mocked as 'y'
         The zip file download is mocked by creating a zip file locally
+        Test the download_data function correctly extracts files from the zip file
         '''        
         # create a temporary folder in the CIL data directory
         tmp_dir = os.path.join(dataexample.CILDATA.data_dir, str(uuid.uuid4()))

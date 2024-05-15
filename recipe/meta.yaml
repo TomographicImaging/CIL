@@ -36,11 +36,10 @@ test:
     - cvxpy                   # [ linux ]
     - scikit-image
     - tomophantom=2.0.0       # [ linux ]
-    - tigre=2.4               # [ not osx ]
+    - tigre=2.6
     - packaging
-    - ccpi-regulariser=22.0.0 # [ not osx ]
-    - astra-toolbox>=1.9.9.dev5,<2.1
-    - zenodo_get
+    - ccpi-regulariser=24.0.0 # [ not osx ]
+    - astra-toolbox=2.1=cuda* # [ not osx ]
 
   source_files:
     - ./Wrappers/Python/test # [win]
@@ -88,14 +87,15 @@ requirements:
     - ipp >=2021.10
     - tqdm
     - numba
+    - zenodo_get >1.5.1
 
   #optional packages with version dependancies
   run_constrained:
     - tomophantom=2.0.0
-    - astra-toolbox>=1.9.9.dev5,<2.1
-    - tigre=2.4
-    - ccpi-regulariser=22.0.0
-    - ipywidgets <8
+    - astra-toolbox>=1.9.9.dev5,<=2.1
+    - tigre>=2.4,<=2.6
+    - ccpi-regulariser=24.0.0
+    - ipywidgets
 
 about:
   home: http://www.ccpi.ac.uk/cil

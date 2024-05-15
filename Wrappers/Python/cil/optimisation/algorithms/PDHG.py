@@ -23,6 +23,7 @@ import numpy as np
 from numbers import Number
 import logging
 
+log = logging.getLogger(__name__)
 
 
 class PDHG(Algorithm):
@@ -308,8 +309,7 @@ class PDHG(Algorithm):
             Initial point for the PDHG algorithm.
         theta : Relaxation parameter, Number, default 1.0
         """
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
+        log.info("%s setting up", self.__class__.__name__)
         # Triplet (f, g, K)
         self.f = f
         self.g = g
@@ -340,7 +340,7 @@ class PDHG(Algorithm):
             warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
+        log.info("%s configured", self.__class__.__name__)
 
     def _update_previous_solution(self):
         """

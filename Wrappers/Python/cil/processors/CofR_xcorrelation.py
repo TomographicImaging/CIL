@@ -21,7 +21,7 @@ import numpy as np
 
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class CofR_xcorrelation(Processor):
 
@@ -38,10 +38,10 @@ class CofR_xcorrelation(Processor):
         Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)
     ang_tol: float, optional
         The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)
-    
+
     Returns
     -------
-    AcquisitionData 
+    AcquisitionData
         object with an AcquisitionGeometry with updated centre of rotation
 
     '''
@@ -78,8 +78,8 @@ class CofR_xcorrelation(Processor):
 
             if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
-              
-        # check if projection_index is either a tuple or list of length 2       
+
+        # check if projection_index is either a tuple or list of length 2
         try:
             len_check = ( len(self.projection_index) == 2 )
             index = list(self.projection_index)
@@ -87,28 +87,28 @@ class CofR_xcorrelation(Processor):
         except:
             len_check = True
             index = [self.projection_index]
-        
+
         if not len_check:
             raise ValueError('Expected projection_index to be an int or list/tuple of 2 ints, got {0}'.format(self.projection_index))
-        
+
         for angle in index:
             # check if all the indices are int
             if not isinstance(angle, int):
                 raise ValueError('Expected projection_index to be an int, got {0}'.format(type(angle)))
-            
+
             # check if all the indices are in range 0 to the number of angles
             if angle< 0  or angle>=data.geometry.config.angles.num_positions:
                 raise ValueError('projection_index is out of range. Must be between 0 and {0}. Got {1}'.format(data.geometry.config.angles.num_positions-1, self.projection_index))
 
         angles_deg = data.geometry.config.angles.angle_data.copy()
         if data.geometry.config.angles.angle_unit == "radian":
-                angles_deg *= 180/np.pi 
+                angles_deg *= 180/np.pi
 
-        # if there is only 1 index specified, find the angle in the list closest to 180 degrees away from the index 
+        # if there is only 1 index specified, find the angle in the list closest to 180 degrees away from the index
         if len(index) == 1:
             new_index = CofR_xcorrelation._return_180_index(angles_deg, self.projection_index)
             index.append(new_index)
-        
+
         # check the two angles are 180 degrees apart within the specified tolerance
         ang_diff = (angles_deg[index[0]] - angles_deg[index[1]]) % 360
         if abs(ang_diff-180) > self.ang_tol:
@@ -118,7 +118,7 @@ class CofR_xcorrelation(Processor):
             else:
                 raise ValueError('Method requires projections 180+/-{0} degrees apart, for chosen projection angle {1} found closest angle {2}.\
                             \nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, data.geometry.angles[index[0]], data.geometry.angles[index[1]]))
-        
+
         self._indices = index
 
         return True
@@ -131,7 +131,7 @@ class CofR_xcorrelation(Processor):
         '''
         # set the target projection to 0
         angles_deg -= angles_deg[initial_index]
-        
+
         #keep angles in range 0 to 360
         angles_deg = angles_deg % 360
 
@@ -148,7 +148,7 @@ class CofR_xcorrelation(Processor):
             data = data_full
 
         geometry = data.geometry
-        
+
         #cross correlate single slice with the 180deg one reversed
         data1 = data.get_slice(angle=self._indices[0]).as_array()
         data2 = np.flip(data.get_slice(angle=self._indices[1]).as_array())
@@ -171,11 +171,11 @@ class CofR_xcorrelation(Processor):
         #set up new geometry
         new_geometry.config.system.rotation_axis.position[0] = shift * geometry.config.panel.pixel_size[0]
 
-        logger.info("Centre of rotation correction found using cross-correlation")
-        logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Centre of rotation shift = %f pixels", shift)
-        logger.info("Centre of rotation shift = %f units at the object", shift * geometry.config.panel.pixel_size[0])
-        logger.info("Return new dataset with centred geometry")
+        log.info("Centre of rotation correction found using cross-correlation")
+        log.info("Calculated from slice: %s", str(self.slice_index))
+        log.info("Centre of rotation shift = %f pixels", shift)
+        log.info("Centre of rotation shift = %f units at the object", shift * geometry.config.panel.pixel_size[0])
+        log.info("Return new dataset with centred geometry")
 
         if out is None:
             return AcquisitionData(array = data_full, deep_copy = True, geometry = new_geometry, supress_warning=True)

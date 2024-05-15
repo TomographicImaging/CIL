@@ -17,9 +17,13 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from numbers import Number
+from textwrap import dedent
 import numpy
 import functools
 import logging
+import warnings
+
+log = logging.getLogger(__name__)
 
 
 class Operator(object):
@@ -49,6 +53,15 @@ class Operator(object):
         `Bool`
         '''
         return False
+    
+    def is_orthogonal(self):
+        '''Returns if the operator is orthogonal
+        Returns
+        -------
+        `Bool`
+        '''
+        return False
+    
 
     def direct(self, x, out=None):
         r"""Calls the operator
@@ -61,7 +74,7 @@ class Operator(object):
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
 
         """
         raise NotImplementedError
@@ -76,8 +89,9 @@ class Operator(object):
         '''
 
         if len(kwargs) != 0:
-            logging.warning('norm: the norm method does not use any parameters.\n\
-                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it')
+            warnings.warn(dedent("""\
+                norm: the norm method does not use any parameters.
+                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it"""), DeprecationWarning, stacklevel=2)
 
         if self._norm is None:
             self._norm = self.calculate_norm()
@@ -196,9 +210,11 @@ class LinearOperator(Operator):
             Element in the domain of the Operator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.
+
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
+
         Note
         ----
         Only available to linear operators'''
@@ -322,8 +338,8 @@ class LinearOperator(Operator):
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm = x0.norm()
             if x0_norm < tolerance:
-                logging.warning(
-                    'The operator has at least one zero eigenvector and is likely to be nilpotent')
+                log.warning(
+                    "The operator has at least one zero eigenvector and is likely to be nilpotent")
                 eig_new = 0.
                 break
             x0 /= x0_norm
@@ -472,11 +488,8 @@ class ScaledOperator(Operator):
       sop.norm() = operator.norm()
       sop.range_geometry() = operator.range_geometry()
       sop.domain_geometry() = operator.domain_geometry()
-
     '''
-
     def __init__(self, operator, scalar, **kwargs):
-
         super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(),
                                              range_geometry=operator.range_geometry())
         if not isinstance(scalar, Number):
@@ -486,26 +499,17 @@ class ScaledOperator(Operator):
 
     def direct(self, x, out=None):
         '''direct method'''
-        if out is None:
-            tmp = self.operator.direct(x)
-            tmp *= self.scalar
-            return tmp
-        else:
-            self.operator.direct(x, out=out)
-            out *= self.scalar
+        tmp = self.operator.direct(x, out=out)
+        tmp *= self.scalar
+        return tmp
 
     def adjoint(self, x, out=None):
         '''adjoint method'''
-        if self.operator.is_linear():
-            if out is None:
-                tmp = self.operator.adjoint(x)
-                tmp *= self.scalar
-                return tmp
-            else:
-                self.operator.adjoint(x, out=out)
-                out *= self.scalar
-        else:
+        if not self.operator.is_linear():
             raise TypeError('Operator is not linear')
+        tmp = self.operator.adjoint(x, out=out)
+        tmp *= self.scalar
+        return tmp
 
     def norm(self, **kwargs):
         '''norm of the operator'''
@@ -561,16 +565,14 @@ class SumOperator(Operator):
             Element in the domain of the SumOperator
         out:  DataContainer or BlockDataContainer, default None
             If out is not None the output of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
+
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
-
+        DataContainer or BlockDataContainer containing the result.
         """
-        if out is None:
-            return self.operator1.direct(x) + self.operator2.direct(x)
-        else:
-            self.operator1.direct(x, out=out)
-            out.add(self.operator2.direct(x), out=out)
+        ret = self.operator1.direct(x, out=out)
+        ret.add(self.operator2.direct(x), out=ret)
+        return ret
 
     def adjoint(self, x, out=None):
         r"""Calls the adjoint of the sum operator, evaluated at the point :math:`x`.
@@ -583,17 +585,13 @@ class SumOperator(Operator):
             If out is not None the output of the adjoint of the SumOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
         """
-
-        if self.linear_flag:
-            if out is None:
-                return self.operator1.adjoint(x) + self.operator2.adjoint(x)
-            else:
-                self.operator1.adjoint(x, out=out)
-                out.add(self.operator2.adjoint(x), out=out)
-        else:
+        if not self.linear_flag:
             raise ValueError('No adjoint operation with non-linear operators')
+        ret = self.operator1.adjoint(x, out=out)
+        ret.add(self.operator2.adjoint(x), out=ret)
+        return ret
 
     def is_linear(self):
         return self.linear_flag
@@ -651,7 +649,7 @@ class CompositionOperator(Operator):
             If out is not None the output of the CompositionOperator will be filled in out, otherwise a new object is instantiated and returned.
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
 
         """
         if out is None:
@@ -698,6 +696,7 @@ class CompositionOperator(Operator):
                     else:
                         step = operator.direct(step)
                 out.fill(step)
+            return out
 
     def adjoint(self, x, out=None):
         """Calls the adjoint of the composition operator at the point :math:`x`.
@@ -711,7 +710,7 @@ class CompositionOperator(Operator):
 
         Returns
         -------
-        DataContainer or BlockDataContainer containing the result, or `None` if `out` is passed.
+        DataContainer or BlockDataContainer containing the result.
         """
 
         if self.linear_flag:
@@ -739,7 +738,7 @@ class CompositionOperator(Operator):
                         else:
                             step = operator.adjoint(step)
                     out.fill(step)
-
+                return out
             else:
                 if self.preallocate:
                     pass

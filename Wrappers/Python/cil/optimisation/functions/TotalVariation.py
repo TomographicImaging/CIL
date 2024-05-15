@@ -26,6 +26,9 @@ import warnings
 import logging
 from cil.utilities.errors import InPlaceError
 
+log = logging.getLogger(__name__)
+
+
 class TotalVariation(Function):
 
     r""" Total variation Function
@@ -84,10 +87,6 @@ class TotalVariation(Function):
 
     split : :obj:`boolean`, default = False
         Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
-
-    info : :obj:`boolean`, default = False
-        Information is printed for the stopping criterion of the FGP algorithm used to solve the dual problem
-        of the Total Variation Denoising problem (ROF).
 
     strong_convexity_constant : :obj:`float`, default = 0
         A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.
@@ -163,7 +162,6 @@ class TotalVariation(Function):
                  upper=None,
                  isotropic=True,
                  split=False,
-                 info=False,
                  strong_convexity_constant=0,
                  warm_start=True):
 
@@ -195,10 +193,6 @@ class TotalVariation(Function):
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__
         self._gradient = None
         self._domain = None
-
-        self.info = info
-        if self.info:
-            warnings.warn(" `info` is deprecate. Please use logging instead.")
 
         # splitting Gradient
         self.split = split
@@ -269,18 +263,13 @@ class TotalVariation(Function):
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
             x /= strongly_convex_factor
             tau /= strongly_convex_factor
-
-        if out is None:
-            solution = self._fista_on_dual_rof(x, tau)
-        else:
-            self._fista_on_dual_rof(x, tau, out=out)
+        solution = self._fista_on_dual_rof(x, tau, out=out)
 
         if self.strong_convexity_constant > 0:
             x *= strongly_convex_factor
             tau *= strongly_convex_factor
 
-        if out is None:
-            return solution
+        return solution
 
     def _fista_on_dual_rof(self, x, tau, out=None):
         r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem
@@ -315,9 +304,7 @@ class TotalVariation(Function):
             tau_reg_neg = tau
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
-        should_return = False
         if out is None:
-            should_return = True
             out = self.gradient_operator.domain_geometry().allocate(0)
 
         for k in range(self.iterations):
@@ -354,19 +341,16 @@ class TotalVariation(Function):
         if self.warm_start:
             self._p2 = p2
 
-        if self.info:
-            if self.tolerance is not None:
-                logging.info(
-                    "Stop at {} iterations with tolerance {} .".format(k, error))
-            else:
-                logging.info("Stop at {} iterations.".format(k))
+        if self.tolerance is not None:
+            log.info("Stop at %d iterations with tolerance %r", k, error)
+        else:
+            log.info("Stop at %d iterations.", k)
 
         # return tau to its original state if it was modified
         if id(tau_reg_neg) == id(tau):
             tau_reg_neg.divide(-self.regularisation_parameter, out=tau)
 
-        if should_return:
-            return out
+        return out
 
     def convex_conjugate(self, x):
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""

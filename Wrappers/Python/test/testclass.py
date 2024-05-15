@@ -62,7 +62,7 @@ class CCPiTestClass(unittest.TestCase):
 
 
     def assertDataArraysInContainerAllClose(self, container1, container2, rtol=1e-07, msg=None):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        self.assertTrue(issubclass(container1.__class__, container2.__class__), msg=msg)
         if isinstance(container1, BlockDataContainer):
             for col in range(container1.shape[0]):
                 if issubclass(container1.get_item(col).__class__, DataContainer):

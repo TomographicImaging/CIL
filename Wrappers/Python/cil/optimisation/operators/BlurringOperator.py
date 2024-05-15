@@ -45,9 +45,7 @@ class BlurringOperator(LinearOperator):
                 isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
             raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
-
     def direct(self,x,out=None):
-
         '''Returns D(x). The forward mapping consists of convolution of the
         image with the specified PSF. Here reflective boundary conditions
         are selected.'''
@@ -60,6 +58,7 @@ class BlurringOperator(LinearOperator):
             outarr = out.as_array()
             convolve(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
+            return out
 
     def adjoint(self,x, out=None):
 
@@ -75,3 +74,4 @@ class BlurringOperator(LinearOperator):
             outarr = out.as_array()
             correlate(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
+            return out

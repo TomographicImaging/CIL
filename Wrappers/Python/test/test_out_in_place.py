@@ -346,7 +346,6 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         flat_field = self.data_test_list[0]*1
         dark_field = self.data_test_list[0]*1e-5
 
-        # processors that don't change the shape of the data
         self.processor_list = [
             TransmissionAbsorptionConverter(min_intensity=0.01),
             AbsorptionTransmissionConverter(),

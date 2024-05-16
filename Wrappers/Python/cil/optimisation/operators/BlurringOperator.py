@@ -19,6 +19,7 @@
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 import cil
+import warnings
 
 from scipy.ndimage import convolve, correlate
 
@@ -41,9 +42,15 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        #if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
-        #        isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
-        #    raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
+        expected = [geometry,cil.framework.framework.ImageGeometry, geometry,cil.framework.framework.AcquisitionGeometry]
+        try:
+            from sirf.SIRF import DataContainer, ImageData 
+            expected += [DataContainer, ImageData]
+        except:
+            pass
+            
+        if not isinstance(geometry, tuple(expected)):
+            warnings.warn('unknown geometry type')
 
     def direct(self,x,out=None):
         '''Returns D(x). The forward mapping consists of convolution of the

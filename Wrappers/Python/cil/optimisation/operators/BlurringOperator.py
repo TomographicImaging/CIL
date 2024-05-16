@@ -19,7 +19,6 @@
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 import cil
-import warnings
 
 from scipy.ndimage import convolve, correlate
 

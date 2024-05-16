@@ -17,12 +17,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
 
   
-  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
-  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b89f6043bd7c2867a472"></script>
 
     <script src="../../../../_static/documentation_options.js?v=89421ced"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
@@ -44,7 +44,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/processors/Slicer';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3rc1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
@@ -60,7 +60,7 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -99,7 +99,7 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -265,7 +265,9 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
@@ -331,23 +333,16 @@ document.write(`
                       </a>
                     </li>
                 
-            <li class="nav-item dropdown pst-header-nav-item">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                    <li class="nav-item  ">
-                      <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+
+                    <li class="nav-item pst-header-nav-item ">
+                      <a class="nav-link nav-internal" href="../../../../demos/">
                         Tutorials
                       </a>
                     </li>
                 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -445,7 +440,7 @@ document.write(`
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -454,7 +449,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -934,7 +929,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -955,8 +950,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
+  <script src="../../../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

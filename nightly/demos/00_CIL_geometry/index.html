@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b21ebcc891e24f8e9a69" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -34,9 +34,9 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b21ebcc891e24f8e9a69"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b89f6043bd7c2867a472"></script>
 
     <script src="../../_static/documentation_options.js?v=89421ced"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -48,7 +48,7 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/00_CIL_geometry';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.3dev0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.3rc1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
@@ -66,7 +66,7 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link"><a href="#main-content">Skip to main content</a></div>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -105,7 +105,7 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -269,7 +269,9 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
@@ -335,23 +337,16 @@ document.write(`
                       </a>
                     </li>
                 
-            <li class="nav-item dropdown pst-header-nav-item">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                    <li class="nav-item  current active">
-                      <a class="nav-link dropdown-item nav-internal" href="../">
+
+                    <li class="nav-item pst-header-nav-item current active">
+                      <a class="nav-link nav-internal" href="../">
                         Tutorials
                       </a>
                     </li>
                 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -478,7 +473,7 @@ document.write(`
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -487,7 +482,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -670,7 +665,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc877dd3ec0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd1134fbda0&gt;
 </pre></div></div>
 </div>
 </section>
@@ -711,7 +706,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc877cb5c40&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd112c9cb00&gt;
 </pre></div></div>
 </div>
 </section>
@@ -752,7 +747,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc86f2b77d0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd112c9f410&gt;
 </pre></div></div>
 </div>
 </section>
@@ -789,7 +784,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc86c994680&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd1130fb0e0&gt;
 </pre></div></div>
 </div>
 </section>
@@ -824,7 +819,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc86cd068d0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd112e59c10&gt;
 </pre></div></div>
 </div>
 <p>You can set <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code>, <code class="docutils literal notranslate"><span class="pre">detector_direction_x</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_direction_y</span></code> by specifying a 3D directional vector <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code>.</p>
@@ -856,7 +851,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc86cd506e0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd112e2c6e0&gt;
 </pre></div></div>
 </div>
 <p>In 3D datasets we can tilt the rotation axis to describe laminograpy geometry by changing <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code></p>
@@ -885,7 +880,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc877ca8c20&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd113a34b00&gt;
 </pre></div></div>
 </div>
 </section>
@@ -1046,7 +1041,7 @@ ImageGeometry - Offset RoI
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fc86fbedca0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7fd1137023c0&gt;
 </pre></div></div>
 </div>
 <p>We can also create an <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> directly.</p>
@@ -1071,7 +1066,7 @@ ImageGeometry - Offset RoI
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1110,8 +1105,8 @@ ImageGeometry - Offset RoI
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=b21ebcc891e24f8e9a69"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=b21ebcc891e24f8e9a69"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

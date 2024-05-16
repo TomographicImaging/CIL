@@ -42,16 +42,7 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        expected = [cil.framework.framework.ImageGeometry,
-        cil.framework.framework.AcquisitionGeometry]
-        try:
-            from sirf.SIRF import DataContainer, ImageData 
-            expected += [DataContainer, ImageData]
-        except:
-            pass
-            
-        if not isinstance(geometry, tuple(expected)):
-            warnings.warn('unknown geometry type')
+ 
 
     def direct(self,x,out=None):
         '''Returns D(x). The forward mapping consists of convolution of the
@@ -59,7 +50,7 @@ class BlurringOperator(LinearOperator):
         are selected.'''
 
         if out is None:
-            result = self.range_geometry().allocate()
+            result = self.range_geometry().allocate(0)
             result.fill(convolve(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
@@ -75,7 +66,7 @@ class BlurringOperator(LinearOperator):
         itself.'''
 
         if out is None:
-            result = self.domain_geometry().allocate()
+            result = self.domain_geometry().allocate(0)
             result.fill(correlate(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:

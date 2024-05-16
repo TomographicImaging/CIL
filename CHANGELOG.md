@@ -12,6 +12,7 @@
     - gradient descent `update_objective` called twice on the initial point.
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
     - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
+    - BlurringOperator: remove check for geometry class (old SIRF integration bug)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
 

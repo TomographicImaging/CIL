@@ -25,31 +25,27 @@ from cil.optimisation.utilities.callbacks import Callback, LogfileCallback, _Old
 
 
 class Algorithm:
-    '''Base class for iterative algorithms
+    r"""Base class for iterative algorithms that provides the minimal infrastructure.
 
-      provides the minimal infrastructure.
+    Algorithms are iterables so can be easily run in a for loop. They will
+    stop as soon as the stop criterion is met.
+    The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
+    and :code:`update_objective` methods
 
-      Algorithms are iterables so can be easily run in a for loop. They will
-      stop as soon as the stop criterion is met.
-      The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
-      and :code:`update_objective` methods
-
-      A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
-      a :code:`callbacks` list of callables, each of which receive the current Algorithm object
-      (which in turn contains the iteration number and the actual objective value)
-      and can be used to trigger print to screens and other user interactions. The :code:`run`
-      method will stop when the stopping criterion is met or `StopIteration` is raised.
-   '''
+    A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
+    a :code:`callbacks` list of callables, each of which receive the current Algorithm object
+    (which in turn contains the iteration number and the actual objective value)
+    and can be used to trigger print to screens and other user interactions. The :code:`run`
+    method will stop when the stopping criterion is met or `StopIteration` is raised.
+    
+    Parameters
+    ----------
+    update_objective_interval: int, optional, default 1
+        the interval every which we would save the current objective. 1 means every iteration, 2 every 2 iteration and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.
+    """
 
     def __init__(self, update_objective_interval=1, max_iteration=None, log_file=None):
-        '''Set the minimal number of parameters:
 
-        :param update_objective_interval: the interval every which we would save the current\
-                                       objective. 1 means every iteration, 2 every 2 iteration\
-                                       and so forth. This is by default 1 and should be increased\
-                                       when evaluating the objective is computationally expensive.
-        :type update_objective_interval: int, optional, default 1
-        '''
         self.iteration = -1
         self.__max_iteration = 1
         if max_iteration is not None:
@@ -150,10 +146,7 @@ class Algorithm:
         return self.get_output()
 
     def get_last_loss(self, return_all=False):
-        '''Returns the last stored value of the loss function
-
-        if update_objective_interval is 1 it is the value of the objective at the current
-        iteration. If update_objective_interval > 1 it is the last stored value.
+        '''Returns the last stored value of the loss function if `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
         '''
         try:
             objective = self.__loss[-1]
@@ -177,8 +170,7 @@ class Algorithm:
     def loss(self):
         '''returns the list of the values of the objective during the iteration
 
-        The length of this list may be shorter than the number of iterations run when
-        the update_objective_interval > 1
+        The length of this list may be shorter than the number of iterations run when the update_objective_interval > 1
         '''
         return self.__loss
 
@@ -206,14 +198,20 @@ class Algorithm:
         self.__update_objective_interval = value
 
     def run(self, iterations=None, callbacks: Optional[List[Callback]]=None, verbose=1, **kwargs):
-        '''run upto :code:`iterations` with callbacks/logging.
+        r"""run upto :code:`iterations` with callbacks/logging.
+        
+        For a demonstration of callbacks see https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb
 
-        :param iterations: number of iterations to run. If not set the algorithm will
-          run until :code:`should_stop()` is reached
-        :param verbose: 0=quiet, 1=info, 2=debug
-        :param callbacks: list of callables which are passed the current Algorithm
-          object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
-        '''
+        Parameters
+        -----------
+        iterations: int, default is None
+            Number of iterations to run. If not set the algorithm will run until :code:`should_stop()` is reached
+        callbacks: list of callables, default is Defaults to :code:`[ProgressCallback(verbose)]`
+            List of callables which are passed the current Algorithm object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
+        verbose: 0=quiet, 1=info, 2=debug
+            Passed to the default callback to determine the verbosity of the printed output. 
+        """
+        
         if 'print_interval' in kwargs:
             warn("use `TextProgressCallback(miniters)` instead of `run(print_interval)`",
                  DeprecationWarning, stacklevel=2)

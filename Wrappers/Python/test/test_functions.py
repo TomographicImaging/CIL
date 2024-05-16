@@ -97,7 +97,15 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
+        #negative function 
+        g = - L2NormSquared(b=noisy_data)
 
+        # Compare call of g
+        a2 = -1* (d - noisy_data).power(2).sum()
+
+        self.assertAlmostEqual(a2, g(d))
+        h = -g
+        self.assertAlmostEqual(-a2, h(d))
 
 
     def test_L2NormSquared(self):

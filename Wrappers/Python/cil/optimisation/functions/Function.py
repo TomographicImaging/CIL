@@ -176,6 +176,11 @@ class Function(object):
 
     def __mul__(self, scalar):
         return self.__rmul__(scalar)
+    
+    def __neg__(self):
+        """ Return the negative of the function """
+        return -1 * self
+    
 
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.

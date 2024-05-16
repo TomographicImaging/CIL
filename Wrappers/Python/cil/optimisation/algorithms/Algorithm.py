@@ -27,16 +27,10 @@ from cil.optimisation.utilities.callbacks import Callback, LogfileCallback, _Old
 class Algorithm:
     r"""Base class for iterative algorithms that provides the minimal infrastructure.
 
-    Algorithms are iterables so can be easily run in a for loop. They will
-    stop as soon as the stop criterion is met.
-    The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
-    and :code:`update_objective` methods
+    Algorithms are iterables so can be easily run in a for loop. They will stop as soon as the stop criterion is met.
+    The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective` methods.
 
-    A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
-    a :code:`callbacks` list of callables, each of which receive the current Algorithm object
-    (which in turn contains the iteration number and the actual objective value)
-    and can be used to trigger print to screens and other user interactions. The :code:`run`
-    method will stop when the stopping criterion is met or `StopIteration` is raised.
+    The method :code:`run` is available to run :code:`n` iterations. The method accepts a :code:`callbacks` list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.
     
     Parameters
     ----------
@@ -77,9 +71,11 @@ class Algorithm:
         return self.iteration > self.max_iteration
 
     def __set_up_logger(self, *_, **__):
+        """Do not use: this is being deprecated"""
         warn("use `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
 
     def max_iteration_stop_criterion(self):
+        """Do not use: this is being deprecated"""
         warn("use `should_stop()` instead of `max_iteration_stop_criterion()`", DeprecationWarning, stacklevel=2)
         return self.iteration > self.max_iteration
 
@@ -116,8 +112,7 @@ class Algorithm:
     def _update_previous_solution(self):
         """ Update the previous solution with the current one
 
-        The concrete algorithm calls update_previous_solution. Normally this would
-        entail the swapping of pointers:
+        The concrete algorithm calls update_previous_solution. Normally this would entail the swapping of pointers:
 
         .. highlight:: python
         .. code-block:: python
@@ -134,19 +129,37 @@ class Algorithm:
         return self.x
 
     def _provable_convergence_condition(self):
+        """ Checks if the algorithm meets a mathematical convergence criterion.
+        
+        Returns
+        -------
+        bool: Outcome of the convergence check  
+        """
         raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
 
     def is_provably_convergent(self):
         """ Check if the algorithm is convergent based on the provable convergence criterion.
+        
+        Returns
+        -------
+        Boolean
+            Outcome of the convergence check  
+        
         """
         return self._provable_convergence_condition()
 
     @property
     def solution(self):
+        " Returns the current solution. "
         return self.get_output()
 
     def get_last_loss(self, return_all=False):
-        '''Returns the last stored value of the loss function if `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
+        '''Returns the last stored value of the loss function. If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
+        Returns
+        -------
+        Float
+            Last stored value of the loss function 
+        
         '''
         try:
             objective = self.__loss[-1]
@@ -166,6 +179,7 @@ class Algorithm:
     def iterations(self):
         '''returns the iterations at which the objective has been evaluated'''
         return self._iteration
+    
     @property
     def loss(self):
         '''returns the list of the values of the objective during the iteration
@@ -189,10 +203,12 @@ class Algorithm:
 
     @property
     def update_objective_interval(self):
+        '''gets the update_objective_interval'''
         return self.__update_objective_interval
 
     @update_objective_interval.setter
     def update_objective_interval(self, value):
+        '''sets the update_objective_interval'''
         if not isinstance(value, Integral) or value < 0:
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
@@ -243,6 +259,7 @@ class Algorithm:
                 break
 
     def objective_to_dict(self, verbose=False):
+        """Internal function to save and print objective functions"""
         obj = self.get_last_objective(return_all=verbose)
         if isinstance(obj, list) and len(obj) == 3:
             if not np.isnan(obj[1:]).all():
@@ -251,11 +268,14 @@ class Algorithm:
         return {'objective': obj}
 
     def objective_to_string(self, verbose=False):
+        """Do not use: this is being deprecated"""
         warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
         return str(self.objective_to_dict(verbose=verbose))
 
     def verbose_output(self, *_, **__):
+        """Do not use: this is being deprecated"""
         warn("use `run(callbacks=[ProgressCallback()])` instead", DeprecationWarning, stacklevel=2)
 
     def verbose_header(self, *_, **__):
+        """Do not use: this is being deprecated"""
         warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)

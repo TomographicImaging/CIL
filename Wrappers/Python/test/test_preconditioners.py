@@ -44,18 +44,10 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
-        self.assertEqual(preconditioner.reference, None)
         self.assertNumpyArrayEqual(
             preconditioner.array.as_array(), ig.allocate(1.0).as_array())
 
-        preconditioner = Sensitivity(A, reference=data)
 
-        self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
-            data).as_array(), A.direct(data).as_array())
-        self.assertNumpyArrayEqual(
-            preconditioner.reference.as_array(), data.as_array())
-        self.assertNumpyArrayEqual(
-            preconditioner.array.as_array(), data.as_array())
 
     def test_sensitivity_calculation(self):
         ig = VectorGeometry(10)
@@ -66,7 +58,7 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
-        self.assertEqual(preconditioner.reference, None)
+
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), np.array([
                                    2., 2., 2., 2., 0, 0, 0, 0, 0, 0]))
 
@@ -144,23 +136,7 @@ class TestPreconditioners(CCPiTestClass):
         np.testing.assert_allclose(sirt.get_last_loss(
         ), correct_update_objective(precond_pwls), atol=1e-4)
 
-    def test_sensitivity_reference_ista_converges(self):
-        ig = ImageGeometry(7, 8, 4)
-        data = ig.allocate(0.5)
-        A = IdentityOperator(ig)
-        initial = ig.allocate('random', seed=2)
 
-        f = LeastSquares(A=A, b=data, c=0.5)
-        g = IndicatorBox(lower=0, upper=1)
-        step_size = 1.
-        preconditioner = Sensitivity(A, reference=ig.allocate(0.45))
-
-        precond_pwls = ISTA(initial=initial, f=f, g=g,   preconditioner=preconditioner,
-                            update_objective_interval=1, step_size=step_size)
-
-        precond_pwls.run(30)
-        self.assertNumpyArrayAlmostEqual(
-            data.array, precond_pwls.solution.array, 4)
 
     def test_adaptive_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
@@ -169,11 +145,20 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = AdaptiveSensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
-        self.assertEqual(preconditioner.reference, None)
         self.assertEqual(preconditioner.delta, 1e-6)
         self.assertEqual(preconditioner.iterations, 100)
         self.assertNumpyArrayEqual(
             preconditioner.array.as_array(), ig.allocate(1.0).as_array())
+        
+        preconditioner = AdaptiveSensitivity(A, iterations=300)
+        self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
+            data).as_array(), A.direct(data).as_array())
+        self.assertEqual(preconditioner.delta, 1e-6)
+        self.assertEqual(preconditioner.iterations, 300)
+        self.assertNumpyArrayEqual(
+            preconditioner.array.as_array(), ig.allocate(1.0).as_array())
+        
+        
 
         preconditioner = AdaptiveSensitivity(
             A, delta=3, iterations=400, reference=data)
@@ -181,11 +166,11 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
         self.assertNumpyArrayEqual(
-            preconditioner.reference.as_array(), data.as_array())
+            preconditioner.array.as_array(), np.ones(preconditioner.array.shape))
         self.assertNumpyArrayEqual(
-            preconditioner.array.as_array(), data.as_array())
+            preconditioner.freezing_point.as_array(), data.as_array()+3)
         self.assertEqual(preconditioner.delta, 3)
-        self.assertEqual(preconditioner.iterations, 400)
+        self.assertEqual(preconditioner.iterations, -1)
 
     def test_adaptive_sensitivity_calculations(self):
         ig = VectorGeometry(10)
@@ -196,7 +181,6 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = AdaptiveSensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
-        self.assertEqual(preconditioner.reference, None)
         self.assertNumpyArrayEqual(preconditioner.array.as_array(), np.array([
                                    2., 2., 2., 2., 0, 0, 0, 0, 0, 0]))
 
@@ -229,6 +213,25 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(preconditioner.freezing_point.as_array(
         ), np.array([2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 0, 0, 0, 0, 0, 0]))
 
+    def test_adaptive_sensitivity_reference_ista_converges(self):
+        ig = ImageGeometry(7, 8, 4)
+        data = ig.allocate(0.5)
+        A = IdentityOperator(ig)
+        initial = ig.allocate('random', seed=2)
+
+        f = LeastSquares(A=A, b=data, c=0.5)
+        g = IndicatorBox(lower=0, upper=1)
+        step_size = 1.
+        preconditioner = AdaptiveSensitivity(A, reference=ig.allocate(0.45))
+
+        precond_pwls = ISTA(initial=initial, f=f, g=g,   preconditioner=preconditioner,
+                            update_objective_interval=1, step_size=step_size)
+
+        precond_pwls.run(30)
+        self.assertNumpyArrayAlmostEqual(
+            data.array, precond_pwls.solution.array, 4)
+        
+        
     def test_adaptive_sensitivity_gd_converges(self):
         ig = ImageGeometry(7, 8, 4)
         data = ig.allocate('random', seed=2)

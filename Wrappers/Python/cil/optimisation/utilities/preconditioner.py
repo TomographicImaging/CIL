@@ -39,7 +39,7 @@ class Preconditioner(ABC):
         pass
 
     @abstractmethod
-    def apply(self, algorithm, gradient, out=None):
+    def apply(self, algorithm, gradient, out):
         r"""
         Abstract method to apply the preconditioner.
 
@@ -50,8 +50,13 @@ class Preconditioner(ABC):
     
         gradient : DataContainer
             The calculated gradient to modify
-        out : DataContainer, optional, default is None 
-            The modified gradient to return 
+        out : DataContainer, 
+            Container to fill with the modified gradient 
+        
+        Returns
+        -------
+        DataContainer
+            The modified gradient
             
         """
         pass
@@ -62,7 +67,7 @@ class Sensitivity(Preconditioner):
     r"""
     Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `gradient` is multiplied by :math:` y/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
+    In each call to the preconditioner the `gradient` is multiplied by :math:` 1/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
 
     Parameters
     ----------
@@ -72,28 +77,24 @@ class Sensitivity(Preconditioner):
         The reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. 
     """
 
-    def __init__(self, operator, reference=None):
+    def __init__(self, operator):
 
         super(Sensitivity, self).__init__()
         self.operator = operator
-        self.reference = reference
+
 
         self.compute_preconditioner_matrix()
 
     def compute_preconditioner_matrix(self):
         r"""
         Compute the sensitivity. :math:`A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.        
-        Then perform safe division by the sensitivity to store the preconditioner array :math:` y/(A^T \mathbf{1})`
+        Then perform safe division by the sensitivity to store the preconditioner array :math:` 1/(A^T \mathbf{1})`
         """
         self.array = self.operator.adjoint(
             self.operator.range_geometry().allocate(value=1.0))
-
-        if self.reference is not None:
-            self.reference.divide(
-                self.array, where=self.array.as_array() > 0, out=self.array)
-        else:
-            self.operator.range_geometry().allocate(value=1.0).divide(
-                self.array, where=self.array.as_array() > 0, out=self.array)
+        
+        self.operator.range_geometry().allocate(value=1.0).divide(
+                self.array, where=np.abs(self.array.as_array()) > 0, out=self.array)
 
     def apply(self, algorithm, gradient, out=None):
         r"""
@@ -105,8 +106,14 @@ class Sensitivity(Preconditioner):
             The algorithm object.
         gradient : DataContainer
             The calculated gradient to modify
-        out : DataContainer, optional, default is None 
-            The modified gradient to return 
+        out : DataContainer, 
+            Container to fill with the modified gradient 
+            
+        Returns
+        -------
+        DataContainer
+            The modified gradient
+            
         """
         if out is None:
             out = gradient.copy()
@@ -120,8 +127,8 @@ class AdaptiveSensitivity(Sensitivity):
     r"""
     Adaptive Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `gradient` is multiplied by :math:` (x+\delta) \odot y /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones and :math:`y` is an optional reference image.  
-    The point :math:`x` is the current iteration and :math:`delta` is a small positive float. 
+    In each call to the preconditioner the `gradient` is multiplied by :math:` (x+\delta) /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
+    The point :math:`x` is the current iteration, or a reference image,  and :math:`delta` is a small positive float. 
 
 
     Parameters
@@ -130,11 +137,11 @@ class AdaptiveSensitivity(Sensitivity):
         The operator used for sensitivity computation.
     delta : float, optional
         The delta value for the preconditioner.
-    iterations : int, optional
-        The maximum number of iterations before the preconditoner is frozen and no-longer updates. Freezing iterations saves computational effort. 
-    reference : DataContainer e.g. ImageData, optional
-        The reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. 
-
+    reference : DataContainer e.g. ImageData, default is None
+        Reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. If reference data is passed the preconditioner does not update with each iteration.  
+    iterations : int,  default = 100
+        The maximum number of iterations before the preconditoner is frozen and no-longer updates. Note that if reference data is passed the preconditioner is always frozen and `iterations` is set to -1. 
+    
     Reference
     ---------
     Twyman R, Arridge S, Kereta Z, Jin B, Brusaferri L, Ahn S, Stearns CW, Hutton BF, Burger IA, Kotasidis F, Thielemans K. An Investigation of Stochastic Variance Reduction Algorithms for Relative Difference Penalized 3D PET Image Reconstruction. IEEE Trans Med Imaging. 2023 Jan;42(1):29-41. doi: 10.1109/TMI.2022.3203237. Epub 2022 Dec 29. PMID: 36044488.
@@ -145,10 +152,19 @@ class AdaptiveSensitivity(Sensitivity):
 
         self.iterations = iterations
         self.delta = delta
-        self.freezing_point = operator.domain_geometry().allocate(0)
-
+        
         super(AdaptiveSensitivity, self).__init__(
-            operator=operator, reference=reference)
+            operator=operator)
+        
+        
+        self.freezing_point = operator.domain_geometry().allocate(0)
+        if reference is not None:
+              self.array.multiply(reference+self.delta, out=self.freezing_point)
+              self.iterations = -1
+        
+            
+
+        
 
     def apply(self, algorithm, gradient, out=None):
         r"""
@@ -160,8 +176,13 @@ class AdaptiveSensitivity(Sensitivity):
             The algorithm object.
         gradient : DataContainer
             The calculated gradient to modify
-        out : DataContainer, optional, default is None 
-            The modified gradient to return 
+        out : DataContainer, 
+            Container to fill with the modified gradient 
+            
+        Returns
+        -------
+        DataContainer
+            The modified gradient
         """
         if out is None:
             out = gradient.copy()

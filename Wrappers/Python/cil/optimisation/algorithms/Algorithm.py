@@ -110,7 +110,7 @@ class Algorithm:
         return self.iteration
 
     def _update_previous_solution(self):
-        """ Update the previous solution with the current one
+        r""" Update the previous solution with the current one
 
         The concrete algorithm calls update_previous_solution. Normally this would entail the swapping of pointers:
 
@@ -125,11 +125,18 @@ class Algorithm:
         pass
 
     def get_output(self):
-        " Returns the current solution. "
+        r""" Returns the current solution. 
+        
+        Returns
+        -------
+        DataContainer
+            The current solution 
+             
+        """
         return self.x
 
     def _provable_convergence_condition(self):
-        """ Checks if the algorithm meets a mathematical convergence criterion.
+        r""" Checks if the algorithm meets a mathematical convergence criterion.
         
         Returns
         -------
@@ -138,7 +145,7 @@ class Algorithm:
         raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
 
     def is_provably_convergent(self):
-        """ Check if the algorithm is convergent based on the provable convergence criterion.
+        r""" Check if the algorithm is convergent based on the provable convergence criterion.
         
         Returns
         -------
@@ -154,7 +161,13 @@ class Algorithm:
         return self.get_output()
 
     def get_last_loss(self, return_all=False):
-        '''Returns the last stored value of the loss function. If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
+        r'''Returns the last stored value of the loss function. If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
+        
+        Parameters
+        ----------
+        return_all: Boolean, default is False
+            If True, returns all the stored loss functions 
+        
         Returns
         -------
         Float
@@ -184,7 +197,7 @@ class Algorithm:
     def loss(self):
         '''returns the list of the values of the objective during the iteration
 
-        The length of this list may be shorter than the number of iterations run when the update_objective_interval > 1
+        The length of this list may be shorter than the number of iterations run when the `update_objective_interval` > 1
         '''
         return self.__loss
 

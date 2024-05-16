@@ -1,26 +1,16 @@
-..    Copyright 2019 United Kingdom Research and Innovation
-      Copyright 2019 The University of Manchester
-
-      Licensed under the Apache License, Version 2.0 (the "License");
-      you may not use this file except in compliance with the License.
-      You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-      Unless required by applicable law or agreed to in writing, software
-      distributed under the License is distributed on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      See the License for the specific language governing permissions and
-      limitations under the License.
-
-     Authors:
-     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-
-.. CCPi-Framework documentation master file, created by
-   sphinx-quickstart on Tue Mar 19 15:12:44 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Copyright 2019 United Kingdom Research and Innovation
+   Copyright 2019 The University of Manchester
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   Authors:
+   CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 Welcome to CIL's documentation!
 ###############################
@@ -48,6 +38,11 @@ A number of demos can be found in the `CIL-Demos`_ repository.
 For detailed information refer to our articles and the repositories
 with the code to reproduce the article's results.
 
+Cite this work
+==============
+
+If you use this software please consider citing one or both of the articles below.
+
 1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging
 https://doi.org/10.1098/rsta.2020.0192 . Phil. Trans. R. Soc. A 20200192.
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
@@ -56,18 +51,11 @@ The code to reproduce the article results. https://github.com/TomographicImaging
 tomography https://doi.org/10.1098/rsta.2020.0193 Phil. Trans. R. Soc. A 20200193.
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II
 
-
-Cite this work
-==============
-
-If you use this software please consider citing one or both of the articles above.
-
-Software documentation Index
-****************************
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
    :name: mastertoc
 
    introduction
@@ -93,10 +81,10 @@ Contacts
 
 Please refer to the main `CCPi website`_ for up-to-date information.
 
-The CCPi developers may be contacted:
+The CIL developers may be contacted:
 
 * by joining the `devel mailing list`_
-* on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL.git or
+* on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL or
 * on the CIL Discord channel https://discord.gg/9NTWu9MEGq
 
 .. _devel mailing list: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL

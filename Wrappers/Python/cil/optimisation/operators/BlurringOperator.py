@@ -41,9 +41,9 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
-                isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
-            raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
+        #if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
+        #        isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
+        #    raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
     def direct(self,x,out=None):
         '''Returns D(x). The forward mapping consists of convolution of the

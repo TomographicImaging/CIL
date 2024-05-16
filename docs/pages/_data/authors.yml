@@ -1,0 +1,6 @@
+# https://github.com/Phlow/feeling-responsive/blob/gh-pages/_data/authors.yml
+# http://blog.sorryapp.com/blogging-with-jekyll/2014/02/06/adding-authors-to-your-jekyll-site.html
+ccpi-devs:
+  name: CIL developers
+  siterole: "webmaster, developer, copywriter, designer"
+  uri: https://github.com/TomographicImaging/CIL/graphs/contributors

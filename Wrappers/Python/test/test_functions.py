@@ -483,7 +483,7 @@ class TestFunction(CCPiTestClass):
 
         # alternative
         tmp1 = x.copy()
-        tmp1.containers += (epsilon, )
+        tmp1.containers += (ig.allocate(epsilon), )
         res3 = tmp1.pnorm(2).sum()
 
         np.testing.assert_almost_equal(res1, res2, decimal=5)

@@ -42,7 +42,8 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        expected = [geometry,cil.framework.framework.ImageGeometry, geometry,cil.framework.framework.AcquisitionGeometry]
+        expected = [cil.framework.framework.ImageGeometry,
+        cil.framework.framework.AcquisitionGeometry]
         try:
             from sirf.SIRF import DataContainer, ImageData 
             expected += [DataContainer, ImageData]

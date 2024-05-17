@@ -22,6 +22,7 @@ from cil.optimisation.utilities import ConstantStepSize
 import numpy
 import logging
 from numbers import Number
+import warnings 
 
 log = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ class ISTA(Algorithm):
    step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
             This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use a`ConstantStepSize` 
         preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
-            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
  
     
     
@@ -114,7 +115,8 @@ class ISTA(Algorithm):
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            raise TypeError("There is not a constant step size, it is set by a step-size rule")
+            warnings.warn("Note the step-size is set by a step-size rule and could change wit each iteration")
+            return self.step_size_rule.get_step_size()
 
 
     # Set default step size
@@ -171,7 +173,7 @@ class ISTA(Algorithm):
                 step_size_rule=ConstantStepSize(self._calculate_default_step_size(step_size=step_size))
         else:
             if step_size is not None:
-                raise TypeError('You have passed both a `step_size` and a `step_size_rule`, please pass one or the other')
+                raise TypeError('You have passed both a `step_size` and a `step_size_rule`, please pass only a `step_size_rule`')
 
         self.step_size_rule=step_size_rule
         

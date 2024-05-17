@@ -73,8 +73,7 @@ class Sensitivity(Preconditioner):
     ----------
     operator : CIL Operator 
         The operator used for sensitivity computation.
-    reference : DataContainer e.g. ImageData, optional
-        The reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. 
+
     """
 
     def __init__(self, operator):

@@ -343,9 +343,6 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
         self.data_test_list= [geom.allocate(None) for geom in self.geometry_test_list]
         
-        flat_field = self.data_test_list[0]*1
-        dark_field = self.data_test_list[0]*1e-5
-
         self.processor_list = [
             TransmissionAbsorptionConverter(min_intensity=0.01),
             AbsorptionTransmissionConverter(),

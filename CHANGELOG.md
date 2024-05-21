@@ -2,6 +2,7 @@
 * XX.X.X
 
   - New Features:
+    - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, `A` (#1618)
   - Enhancements:

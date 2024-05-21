@@ -22,6 +22,9 @@ import numpy as np
 import weakref
 import logging
 
+log = logging.getLogger(__name__)
+
+
 # Note to developers: Binner and Slicer share a lot of common code
 # so Binner has been implemented as a child of Slicer.  This makes use
 # of commonality and redefines only the methods that differ. These methods
@@ -224,14 +227,17 @@ class Slicer(DataProcessor):
                 stop += shape_in[offset + i]
 
             if stop > shape_in[offset+i]:
-                logging.warning("ROI for axis {0} has 'stop' out of bounds. Using axis length as stop value. Got stop index: {1}, using {2}".format(dimension_labels[i],stop, shape_in[offset+i]))
+                log.warning(f"ROI for axis {dimension_labels[i]} has 'stop' out of bounds. Using axis length as stop value."
+                            f" Got stop index: {stop}, using {shape_in[offset+i]}")
                 stop = shape_in[offset+i]
 
             if start > shape_in[offset+i]:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1} for axis length {2}".format(dimension_labels[i]),start, shape_in[offset+i])
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start} for axis length {shape_in[offset+i]}")
 
             if start >= stop:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1}, stop index {2}".format(dimension_labels[i]),start, stop)
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start}, stop index {stop}")
 
             # set values
             range_list[offset+ i] = range(int(start), int(stop), int(step))
@@ -288,7 +294,7 @@ class Slicer(DataProcessor):
                         position = self._get_slice_position(roi)
                         geometry_new = geometry_new.get_slice(vertical = position)
                     except ValueError:
-                        logging.warn("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
+                        log.warning("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
                         return None
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step

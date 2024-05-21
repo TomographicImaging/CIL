@@ -259,15 +259,10 @@ class GenericFilteredBackProjection(Reconstructor):
     
     def plot_filter(self):
         filter_array=self.get_filter_array()
-        a =  filter_array
         filter_length = 2**self.fft_order
         freq = fftfreq(filter_length)
         freq*=2
         ind_sorted = np.argsort(freq)
-        print('filter is'+str(a))
-        print('filter is'+str(a.dtype))
-        print('filter is'+str(a.shape))
-        print('fftorder'+str(2**self.fft_order))
         plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
         plt.xlabel('Frequency (rads/pixel)')
         plt.ylabel('Magnitude')

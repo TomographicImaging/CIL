@@ -28,6 +28,10 @@ from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 
+import os
+import matplotlib.testing.compare as compare
+from scipy.fft import fftfreq
+
 initialise_tests()
 
 if has_tigre:
@@ -69,7 +73,6 @@ class Test_Reconstructor(unittest.TestCase):
 
         self.ad3D = self.ag3D.allocate('random')
         self.ig3D = self.ag3D.get_ImageGeometry()
-
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_defaults(self):
@@ -284,19 +287,40 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(TypeError):
             reconstructor.set_filter_inplace('unsupported_value')
 
+    def create_custom_filter_example(self, cutoff):
+        filter_length = 256
+        freq = fftfreq(filter_length)
+        freq*=2
+        ramp = abs(freq)
+        ramp[ramp>cutoff]=0
+        FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
+        return FBP_filter
+
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_plot_filter(self):
         """The test will not show any screen output
+        Tests the filter for two different values of cutoffs.
         Add custom filter to setup"""
         fdk = GenericFilteredBackProjection(self.ad3D)
         #for x in reconstructor.preset_filters:
-
-        FBP_filter ='custom'#'hann'#'hamming'#'cosine'#'shepp-logan'#'ram-lak'## 'ram-lak'
-        cutoff = 0.4
-        fdk.set_filter(FBP_filter, cutoff)
-        plot = fdk.plot_filter()
-        
-        
+        filter_list = fdk.preset_filters
+        filter_list.append('custom')
+        filter_plots_folder = r"../test_plots/filters"
+        test_plot_path = os.path.join(filter_plots_folder, 'test_plot_filter.png')
+        for cutoff in [0.5,1]:
+            for filter_name in filter_list:
+                if filter_name == 'custom':
+                    FBP_filter = self.create_custom_filter_example(cutoff)
+                else:
+                    FBP_filter =filter_name
+                fdk.set_filter(FBP_filter, cutoff)
+                plot = fdk.plot_filter()
+                base_plot_path =os.path.join(filter_plots_folder, filter_name+'_'+str(round(cutoff))+'.png')
+                plot.savefig(test_plot_path)
+                err = compare.compare_images(base_plot_path,  test_plot_path, tol=0)
+                self.assertIsNone(err, f"Filter plots are not the same: {err}")
+                os.remove(test_plot_path)
+                plot.close()
 
 class Test_FDK(unittest.TestCase):
 

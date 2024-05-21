@@ -288,6 +288,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
             reconstructor.set_filter_inplace('unsupported_value')
 
     def create_custom_filter_example(self, cutoff):
+        """Returns a custom filter array."""
         filter_length = 256
         freq = fftfreq(filter_length)
         freq*=2
@@ -298,11 +299,13 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_plot_filter(self):
-        """The test will not show any screen output
-        Tests the filter for two different values of cutoffs.
-        Add custom filter to setup"""
+        """
+        Tests that the filters are plotted correctly for two different 
+        values of cutoff, all preset filters and the custom filter.
+        The plots are compared to stored png files.
+        The test will not show any screen output.
+        """
         fdk = GenericFilteredBackProjection(self.ad3D)
-        #for x in reconstructor.preset_filters:
         filter_list = fdk.preset_filters
         filter_list.append('custom')
         filter_plots_folder = r"../test_plots/filters"

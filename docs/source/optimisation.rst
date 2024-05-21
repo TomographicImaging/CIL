@@ -232,7 +232,9 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
 Note
 ----
  We ensure that all the approximate gradients written in CIL are of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
- The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets. This means that for example, a suitable step size for GD with a SGFunction could be 
+ The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets.
+ The multiplication also ensures that you have an unbiased estimator of the full gradient ie :math:`\mathbb{E}\left[\tilde\nabla f(x)\right] =\nabla f(x)``.
+  This has an implication when choosing step sized. For example, a suitable step size for GD with a SGFunction could be 
   :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
 
   

@@ -42,7 +42,7 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
-from cil.framework.BlockGeometry import BlockGeometry
+from .block import BlockGeometry
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +196,6 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        out.geometry = blk_geo
         axis = self.dimension_labels.index('angle')
 
         for i in range(num_batches):
@@ -3175,19 +3174,15 @@ class DataContainer(object):
         >>> y = ig.allocate(2)
         >>> out = x.sapyb(a,y,b)
         '''
-        ret_out = False
 
         if out is None:
             out = self * 0.
-            ret_out = True
 
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
                 self._axpby(a, b, y, out, out.dtype, num_threads)
-                if ret_out:
-                    return out
-                return
+                return out
             except RuntimeError as rte:
                 warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
             except TypeError as te:
@@ -3200,9 +3195,7 @@ class DataContainer(object):
         ax = self * a
         y.multiply(b, out=out)
         out.add(ax, out=out)
-
-        if ret_out:
-            return out
+        return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.

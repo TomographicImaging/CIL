@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor
+from cil.processors import Padder, Slicer
 import numpy as np
 
 from scipy.fft import fft2
@@ -30,8 +31,8 @@ import warnings
 class PaganinProcessor(Processor):
 
     """
-    Processor to retrieve quantitative information from phase contrast images using the Paganin phase retrieval algorithm described in 
-    https://doi.org/10.1046/j.1365-2818.2002.01010.x 
+    Processor to retrieve quantitative information from phase contrast images using the Paganin phase retrieval algorithm described in [1] 
+     
     The phase retrieval is valid under the following assumptions
         - it's used with paraxial propagation induced phase contrast images on single-material samples
         - using intensity data which has been flat field corrected
@@ -44,11 +45,11 @@ class PaganinProcessor(Processor):
     ----------
     delta: float (optional)
         Real part of the deviation of the material refractive index from 1, where refractive index n = (1 - delta) + i beta 
-        energy-dependent refractive index information for x-ray wavelengths can be found at https://henke.lbl.gov/optical_constants/getdb2.html , default is 1
+        energy-dependent refractive index information for x-ray wavelengths can be found at [2], default is 1
     
     beta: float (optional)
         Complex part of the material refractive index, where refractive index n = (1 - delta) + i beta
-        energy-dependent refractive index information for x-ray wavelengths can be found at https://henke.lbl.gov/optical_constants/getdb2.html , default is 1e-2
+        energy-dependent refractive index information for x-ray wavelengths can be found at [2], default is 1e-2
     
     energy: float (optional)
         Energy of the incident photon in eV, default is 40000
@@ -57,12 +58,19 @@ class PaganinProcessor(Processor):
         Multiplier to convert units stored in geometry to metres, conversion applies to pixel size or propagation distance, default is 1
 
     filter_type: string (optional)
-        The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
+        The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in [3] 
+
+    pad: int (optional)
+        Number of pixels to pad the image in Fourier space to reduce aliasing, default is 0 
+    
+    [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x 
+    [2] https://henke.lbl.gov/optical_constants/getdb2.html 
+    [3] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
     
     Returns
     -------
     Processor
-        Paganin phase retrieval processor
+        AcquisitionData corrected for phase effects, retrieved sample thickness in m or (if get_output(full_retrieval=False)) filtered data 
                 
     Example
     -------
@@ -78,7 +86,7 @@ class PaganinProcessor(Processor):
 
     """
    
-    def __init__(self, delta = 1, beta = 1e-2, energy = 40000, geometry_unit_multiplier = 1,  filter_type='paganin_method'):
+    def __init__(self, delta = 1, beta = 1e-2, energy = 40000, geometry_unit_multiplier = 1,  filter_type='paganin_method', pad = False):
         kwargs = {
             'energy' : energy,
             'wavelength' : self.energy_to_wavelength(energy),
@@ -93,6 +101,7 @@ class PaganinProcessor(Processor):
             'magnification' : None,
             'filter' : None,
             'full_retrieval' : True,
+            'pad' : pad,
             }
         
         super(PaganinProcessor, self).__init__(**kwargs)
@@ -126,20 +135,21 @@ class PaganinProcessor(Processor):
 
         if (geometry.pixel_size_h is None) | (geometry.pixel_size_v is None):
             warnings.warn("Pixel size not found, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride with processor.update_parameters({'pixel_size':value})")
-            
+            self.pixel_size = 10e-6
+            print('Pixel size = ' + str(self.pixel_size) + ' m (default value)')
         elif (geometry.pixel_size_h == 0) | (geometry.pixel_size_v == 0):
             warnings.warn("Found pixel size = 0, please update data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride the pixel size with processor.update_parameters({'pixel_size':value})")
             self.pixel_size = 10e-6
-            print('Pixel size = ' + str(self.propagation_distance) + ' m (default value)')
+            print('Pixel size = ' + str(self.pixel_size) + ' m (default value)')
         elif (geometry.pixel_size_h - geometry.pixel_size_v ) / \
             (geometry.pixel_size_h + geometry.pixel_size_v ) >= 1e-5:
             warnings.warn('Panel pixel size is not homogeneous up to 1e-5: got {} {}, please update geometry using data.geometry.pixel_size_h or data.geometry.pixel_size_v or over-ride with processor.update_pixel_size()'\
                     .format( geometry.pixel_size_h, geometry.pixel_size_v ))
             self.pixel_size = 10e-6
-            print('Pixel size = ' + str(self.propagation_distance) + ' m (default value)')
+            print('Pixel size = ' + str(self.pixel_size) + ' m (default value)')
         else:
             self.pixel_size = geometry.pixel_size_h*self.geometry_unit_multiplier
-            print('Pixel size = ' + str(self.propagation_distance) + ' m')
+            print('Pixel size = ' + str(self.pixel_size) + ' m')
         
         return True
 
@@ -173,8 +183,10 @@ class PaganinProcessor(Processor):
         
     def create_filter(self, Nx, Ny):
         '''
-        Function to create the Paganin filter, either using the paganin or generalised paganin method
+        Function to create the Paganin filter, either using the paganin [1] or generalised paganin [2] method
         The filter is created on a mesh in Fourier space kx, ky
+        [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x
+        [2] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9 
         '''
         
         self.__calculate_mu()
@@ -199,10 +211,16 @@ class PaganinProcessor(Processor):
 
         data  = self.get_input()
 
-        must_return = False        
         if out is None:
             out = data.geometry.allocate(None)
-            must_return = True
+
+        if self.pad>0:
+            try:
+                Padder.edge(pad_width={'horizontal': self.pad, 'vertical':self.pad})(data)
+                Padder.edge(pad_width={'horizontal': self.pad, 'vertical':self.pad})(out)
+            except:
+                Padder.edge(pad_width={'horizontal': self.pad})(data)
+                Padder.edge(pad_width={'horizontal': self.pad})(out)
 
         filter_shape = np.shape(data.get_slice(angle=0).as_array())
         if data.geometry.dimension == '2D':
@@ -222,12 +240,16 @@ class PaganinProcessor(Processor):
                 processed_projection = scaling_factor*np.log(iffI)
             else:
                 fI = fft2(projection)
-                processed_projection = ifft2(fI*self.filter)
-                
+                processed_projection = ifft2(fI*self.filter)   
             out.fill(np.squeeze(processed_projection), angle = i)
+        
+        if self.pad>0:
+            try:
+                Slicer(roi={'horizontal': (self.pad,out.get_dimension_size('horizontal')-self.pad), 'vertical':(self.pad,out.get_dimension_size('vertical')-self.pad)})(out)
+            except:
+                Slicer(roi={'horizontal': (self.pad,out.get_dimension_size('horizontal')-self.pad)})(out)
 
-        if must_return:
-            return out
+        return out
         
     def get_output(self, out=None, full_retrieval=True):
         self.full_retrieval = full_retrieval
@@ -261,4 +283,3 @@ class PaganinProcessor(Processor):
 
         """
         return (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
-    

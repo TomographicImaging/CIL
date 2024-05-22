@@ -2890,7 +2890,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
         thickness = -(1/mu)*numpy.log(data_slice)
 
-        processor = PaganinProcessor()
+        processor = PaganinProcessor(pad=10)
         processor.set_input(data_slice)
         output = processor.get_output()
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)

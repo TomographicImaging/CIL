@@ -71,7 +71,7 @@ class Sensitivity(Preconditioner):
     r"""
     Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `gradient` is multiplied by :math:` 1/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
+    In each call to the preconditioner the `gradient` is multiplied by :math:`1/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ class Sensitivity(Preconditioner):
     def compute_preconditioner_matrix(self):
         r"""
         Compute the sensitivity. :math:`A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.        
-        Then perform safe division by the sensitivity to store the preconditioner array :math:` 1/(A^T \mathbf{1})`
+        Then perform safe division by the sensitivity to store the preconditioner array :math:`1/(A^T \mathbf{1})`
         """
         self.array = self.operator.adjoint(
             self.operator.range_geometry().allocate(value=1.0))
@@ -136,8 +136,8 @@ class AdaptiveSensitivity(Sensitivity):
     r"""
     Adaptive Sensitivity preconditioner class. 
 
-    In each call to the preconditioner the `gradient` is multiplied by :math:` (x+\delta) /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
-    The point :math:`x` is the current iteration, or a reference image,  and :math:`delta` is a small positive float. 
+    In each call to the preconditioner the `gradient` is multiplied by :math:`(x+\delta) /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones.
+    The point :math:`x` is the current iteration, or a reference image,  and :math:`\delta` is a small positive float. 
 
 
     Parameters
@@ -151,9 +151,9 @@ class AdaptiveSensitivity(Sensitivity):
     max_iterations : int,  default = 100
         The maximum number of iterations before the preconditoner is frozen and no-longer updates. Note that if reference data is passed the preconditioner is always frozen and `iterations` is set to -1. 
 
-    Reference
-    ---------
-    Twyman R, Arridge S, Kereta Z, Jin B, Brusaferri L, Ahn S, Stearns CW, Hutton BF, Burger IA, Kotasidis F, Thielemans K. An Investigation of Stochastic Variance Reduction Algorithms for Relative Difference Penalized 3D PET Image Reconstruction. IEEE Trans Med Imaging. 2023 Jan;42(1):29-41. doi: 10.1109/TMI.2022.3203237. Epub 2022 Dec 29. PMID: 36044488.
+    Note
+    ----
+    A reference for the freezing of the preconditioner can be found: Twyman R., Arridge S., Kereta Z., Jin B., Brusaferri L., Ahn S., Stearns CW., Hutton B.F., Burger I.A., Kotasidis F., Thielemans K.. An Investigation of Stochastic Variance Reduction Algorithms for Relative Difference Penalized 3D PET Image Reconstruction. IEEE Trans Med Imaging. 2023 Jan;42(1):29-41. doi: 10.1109/TMI.2022.3203237. Epub 2022 Dec 29. PMID: 36044488.
 
     """
 

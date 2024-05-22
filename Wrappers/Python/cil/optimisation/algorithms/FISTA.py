@@ -170,7 +170,6 @@ class ISTA(Algorithm):
         elif isinstance(step_size, StepSizeRule):
             self.step_size_rule = step_size
         else:
-
             raise TypeError(
                 '`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 

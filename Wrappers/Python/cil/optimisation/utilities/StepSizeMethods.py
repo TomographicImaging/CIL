@@ -35,7 +35,7 @@ class StepSizeRule(ABC):
         """
         Returns
         --------
-        float: the calculated step size 
+        the calculated step size:float 
         """
         pass
 
@@ -63,7 +63,7 @@ class ConstantStepSize(StepSizeRule):
         """
         Returns
         --------
-        float: the calculated step size 
+        the calculated step size:float
         """
         return self.step_size
 
@@ -113,7 +113,7 @@ class ArmijoStepSizeRule(StepSizeRule):
 
         Returns
         --------
-        float: the calculated step size 
+        the calculated step size:float
 
         """
         k = 0

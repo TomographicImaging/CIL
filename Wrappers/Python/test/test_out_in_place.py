@@ -343,6 +343,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
         self.data_test_list= [geom.allocate(None) for geom in self.geometry_test_list]
         
+        # Add new Processors here:
         self.processor_list = [
             TransmissionAbsorptionConverter(min_intensity=0.01),
             AbsorptionTransmissionConverter(),
@@ -350,6 +351,8 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             Slicer(roi={'horizontal':(None,None,2),'angle':(None,None,2)}), 
             Binner(roi={'horizontal':(None,None,2),'angle':(None,None,2)}), 
             Padder(pad_width=1)]
+        
+        # Specify whether new Processors should return the same size output here:
         self.processor_out_same_size = [
             True,
             True,

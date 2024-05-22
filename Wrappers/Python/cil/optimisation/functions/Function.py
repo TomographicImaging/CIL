@@ -618,7 +618,7 @@ class ConstantFunction(Function):
 
     def __init__(self, constant=0):
         self.constant = constant
-        super(ConstantFunction, self).__init__(L=0)
+        super(ConstantFunction, self).__init__(L=1)
 
     def __call__(self, x):
         """ Returns the value of the function, :math:`F(x) = constant`"""

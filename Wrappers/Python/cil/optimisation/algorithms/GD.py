@@ -19,8 +19,9 @@
 import numpy
 from cil.optimisation.algorithms import Algorithm
 import logging
-from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSizeRule
+from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSizeRule, StepSizeRule
 from warnings import warn
+from numbers import Real
 
 log = logging.getLogger(__name__)
 
@@ -32,12 +33,10 @@ class GD(Algorithm):
     ----------
     initial: DataContainer (e.g. ImageData)
         The initial point for the optimisation 
-    objective_function: CIL function with a defined gradient 
+    objective_function: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
         The function to be minimised. 
-    step_size: float, default = None 
-        Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. 
-    step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-        This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijioStepSizeRule` depending on if a `step_size` is provided. 
+    step_size: float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
+        If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. Alternatively, this could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`.
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
@@ -48,7 +47,7 @@ class GD(Algorithm):
 
     """
 
-    def __init__(self, initial=None, objective_function=None, step_size=None, rtol=1e-5, atol=1e-8, step_size_rule=None, preconditioner=None, **kwargs):
+    def __init__(self, initial=None, objective_function=None, step_size=None, rtol=1e-5, atol=1e-8,  preconditioner=None, **kwargs):
         '''GD algorithm creator
         '''
                  
@@ -65,9 +64,9 @@ class GD(Algorithm):
         self.atol = atol
         if initial is not None and objective_function is not None:
             self.set_up(initial=initial, objective_function=objective_function,
-                        step_size=step_size, step_size_rule=step_size_rule, preconditioner=preconditioner)
+                        step_size=step_size,  preconditioner=preconditioner)
 
-    def set_up(self, initial, objective_function, step_size, step_size_rule, preconditioner):
+    def set_up(self, initial, objective_function, step_size, preconditioner):
         '''initialisation of the algorithm
 
         Parameters
@@ -76,10 +75,9 @@ class GD(Algorithm):
             The initial point for the optimisation 
         objective_function: CIL function with a defined gradient 
             The function to be minimised. 
-        step_size: float, default = None 
-            Step size for gradient descent iteration if you want to use a constant step size. If left as None and do not pass a step_size_rule then the Armijo rule will be used to perform backtracking to choose a step size at each iteration. 
-        step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use either `ConstantStepSize` or `ArmijoStepSizeRule` depending on if a `step_size` is provided. 
+        step_size: float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
+            If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. Alternatively, this could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`.
+   
         preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
@@ -92,17 +90,15 @@ class GD(Algorithm):
 
         
         
-        if step_size_rule is None:
-            if step_size is None:
-                step_size_rule = ArmijoStepSizeRule(
+        if step_size is None:
+            step_size_rule = ArmijoStepSizeRule(
                     alpha=self.alpha, beta=self.beta)
-            else:
+        elif isinstance(step_size, Real): 
                 step_size_rule = ConstantStepSize(step_size)
-        else:
-            if step_size is not None:
-                raise TypeError(
-                    'You have passed both a `step_size` and a `step_size_rule`, please pass one or the other')
-
+        elif  isinstance(step_size,StepSizeRule ):
+                step_size_rule=step_size
+        else: 
+            raise TypeError('`step_size` must be `None`, a Real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
         self.gradient_update = initial.copy()
 
         self.configured = True
@@ -118,14 +114,14 @@ class GD(Algorithm):
         self.objective_function.gradient(self.x, out=self.gradient_update)
 
         if self.preconditioner is not None:
-            self.preconditioner.apply(self, self.gradient_update, out=self.gradient_update) #TODO:  Think about another name? 
+            self.preconditioner.apply(self, self.gradient_update, out=self.gradient_update) 
 
         step_size = self.step_size_rule.get_step_size(self) 
 
         self.x.sapyb(1.0, self.gradient_update, -step_size, out=self.x)
 
     def update_objective(self):
-        self.loss.append(self.objective_function(self.x))
+        self.loss.append(self.objective_function(self.solution))
 
     def should_stop(self):
         '''Stopping criterion for the gradient descent algorithm '''

@@ -146,22 +146,22 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
         self.assertEqual(preconditioner.delta, 1e-6)
-        self.assertEqual(preconditioner.iterations, 100)
+        self.assertEqual(preconditioner.max_iterations, 100)
         self.assertNumpyArrayEqual(
             preconditioner.array.as_array(), ig.allocate(1.0).as_array())
         
-        preconditioner = AdaptiveSensitivity(A, iterations=300)
+        preconditioner = AdaptiveSensitivity(A, max_iterations=300)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
         self.assertEqual(preconditioner.delta, 1e-6)
-        self.assertEqual(preconditioner.iterations, 300)
+        self.assertEqual(preconditioner.max_iterations, 300)
         self.assertNumpyArrayEqual(
             preconditioner.array.as_array(), ig.allocate(1.0).as_array())
         
         
 
         preconditioner = AdaptiveSensitivity(
-            A, delta=3, iterations=400, reference=data)
+            A, delta=3, max_iterations=400, reference=data)
 
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
             data).as_array(), A.direct(data).as_array())
@@ -170,7 +170,7 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayEqual(
             preconditioner.freezing_point.as_array(), data.as_array()+3)
         self.assertEqual(preconditioner.delta, 3)
-        self.assertEqual(preconditioner.iterations, -1)
+        self.assertEqual(preconditioner.max_iterations, -1)
 
     def test_adaptive_sensitivity_calculations(self):
         ig = VectorGeometry(10)
@@ -201,7 +201,7 @@ class TestPreconditioners(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array(
             [2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 2*(1+1e-6), 0, 0, 0, 0, 0, 0]))
 
-        preconditioner = AdaptiveSensitivity(A, iterations=0)
+        preconditioner = AdaptiveSensitivity(A, max_iterations=0)
         alg.gradient_update = ig.allocate(1)
         alg.x = ig.allocate(1)
         preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
@@ -240,7 +240,7 @@ class TestPreconditioners(CCPiTestClass):
 
         f = LeastSquares(A=A, b=data, c=0.5)
         step_size = 1.
-        preconditioner = AdaptiveSensitivity(A, iterations=3000, delta=1e-8)
+        preconditioner = AdaptiveSensitivity(A, max_iterations=3000, delta=1e-8)
 
         precond_pwls = GD(initial=initial, objective_function=f,
                           preconditioner=preconditioner, update_objective_interval=1, step_size=step_size)
@@ -258,7 +258,7 @@ class TestPreconditioners(CCPiTestClass):
         f = LeastSquares(A=A, b=data, c=0.5)
         g = IndicatorBox(lower=0, upper=1)
         step_size = 1.
-        preconditioner = AdaptiveSensitivity(A, iterations=3000, delta=1e-8)
+        preconditioner = AdaptiveSensitivity(A, max_iterations=3000, delta=1e-8)
 
         precond_pwls = FISTA(initial=initial, f=f, g=g,   preconditioner=preconditioner,
                              update_objective_interval=1, step_size=step_size)

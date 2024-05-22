@@ -51,7 +51,11 @@ class ConstantStepSize(StepSizeRule):
     """
 
     def __init__(self, step_size):
-        '''Initialises the step size rule 
+        '''Initialises the constant step size rule
+        
+         Parameters:
+         -------------
+         step_size : float, the constant step size 
         '''
         self.step_size = step_size
 
@@ -69,7 +73,7 @@ class ArmijoStepSizeRule(StepSizeRule):
     """ 
     Applies the Armijo rule to calculate the step size (step_size).
 
-    The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`kmax`) the while loop is run.
+    The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.
 
     Parameters
     ----------
@@ -77,7 +81,7 @@ class ArmijoStepSizeRule(StepSizeRule):
         The starting point for the step size iterations 
     beta: float between 0 and 1, optional, default=0.5
         The amount the step_size is reduced if the criterion is not met
-    kmax: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
+    max_iterations: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
         The maximum number of iterations to find a suitable step size 
 
     Reference
@@ -87,21 +91,21 @@ class ArmijoStepSizeRule(StepSizeRule):
 
     """
 
-    def __init__(self, alpha=None, beta=None, kmax=None):
+    def __init__(self, alpha=1e6, beta=0.5, max_iterations=None):
         '''Initialises the step size rule 
         '''
         
         self.alpha_orig = alpha
-        if self.alpha_orig is None: # Can be set as defaults in the init after alpha and beta are deprecated in GD
+        if self.alpha_orig is None: # Can be removed when alpha and beta are deprecated in GD
             self.alpha_orig = 1e6 
 
         self.beta = beta 
-        if self.beta is None:  # Can be set as defaults in the init after alpha and beta are deprecated in GD
+        if self.beta is None:  # Can be removed when alpha and beta are deprecated in GD
             self.beta = 0.5
             
-        self.kmax = kmax
-        if self.kmax is None:
-            self.kmax = numpy.ceil(2 * numpy.log10(self.alpha_orig) / numpy.log10(2))
+        self.max_iterations = max_iterations
+        if self.max_iterations is None:
+            self.max_iterations = numpy.ceil(2 * numpy.log10(self.alpha_orig) / numpy.log10(2))
 
     def get_step_size(self, algorithm):
         """
@@ -114,14 +118,14 @@ class ArmijoStepSizeRule(StepSizeRule):
         """
         k = 0
         self.alpha = self.alpha_orig
-        f_x = algorithm.objective_function(algorithm.get_output())
+        f_x = algorithm.objective_function(algorithm.solution)
 
-        self.x_armijo = algorithm.get_output().copy()
+        self.x_armijo = algorithm.solution.copy()
 
-        while k < self.kmax:
+        while k < self.max_iterations:
 
             algorithm.gradient_update.multiply(self.alpha, out=self.x_armijo)
-            algorithm.get_output().subtract(self.x_armijo, out=self.x_armijo)
+            algorithm.solution.subtract(self.x_armijo, out=self.x_armijo)
 
             f_x_a = algorithm.objective_function(self.x_armijo)
             sqnorm = algorithm.gradient_update.squared_norm()
@@ -130,7 +134,7 @@ class ArmijoStepSizeRule(StepSizeRule):
             k += 1.
             self.alpha *= self.beta
 
-        if k == self.kmax:
+        if k == self.max_iterations:
             raise ValueError(
-                'Could not find a proper step_size in {} loops. Consider increasing alpha or kmax.'.format(self.kmax))
+                'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
         return self.alpha

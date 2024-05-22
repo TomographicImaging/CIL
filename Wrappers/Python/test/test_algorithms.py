@@ -151,7 +151,7 @@ class TestGD(CCPiTestClass):
         gd = GD(initial=self.initial, objective_function=self.f)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
-        self.assertEqual(gd.step_size_rule.kmax, np.ceil(
+        self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
         with self.assertRaises(TypeError):
             gd.step_size
@@ -160,7 +160,7 @@ class TestGD(CCPiTestClass):
                 objective_function=self.f, alpha=1e2, beta=0.25)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
         self.assertEqual(gd.step_size_rule.beta, 0.25)
-        self.assertEqual(gd.step_size_rule.kmax, np.ceil(
+        self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e2) / np.log10(2)))
 
         with self.assertRaises(TypeError):
@@ -171,7 +171,7 @@ class TestGD(CCPiTestClass):
         rule = ConstantStepSize(0.4)
         self.assertEqual(rule.step_size, 0.4)
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size_rule=rule)
+                objective_function=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.step_size, 0.4)
         self.assertEqual(gd.step_size, 0.4)
 
@@ -191,25 +191,25 @@ class TestGD(CCPiTestClass):
         rule = ArmijoStepSizeRule()
         self.assertEqual(rule.alpha_orig, 1e6)
         self.assertEqual(rule.beta, 0.5)
-        self.assertEqual(rule.kmax, np.ceil(2 * np.log10(1e6) / np.log10(2)))
+        self.assertEqual(rule.max_iterations, np.ceil(2 * np.log10(1e6) / np.log10(2)))
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size_rule=rule)
+                objective_function=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
-        self.assertEqual(gd.step_size_rule.kmax, np.ceil(
+        self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
 
         rule = ArmijoStepSizeRule(5e5, 0.2, 5)
         self.assertEqual(rule.alpha_orig, 5e5)
         self.assertEqual(rule.beta, 0.2)
-        self.assertEqual(rule.kmax, 5)
+        self.assertEqual(rule.max_iterations, 5)
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size_rule=rule)
+                objective_function=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 5e5)
         self.assertEqual(gd.step_size_rule.beta, 0.2)
-        self.assertEqual(gd.step_size_rule.kmax, 5)
+        self.assertEqual(gd.step_size_rule.max_iterations, 5)
 
         with self.assertRaises(TypeError):
             gd.step_size
@@ -238,8 +238,8 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSizeRule(alpha=50, kmax=150)
-        gd = GD(initial=self.initial, objective_function=self.f, step_size_rule=armj,
+        armj = ArmijoStepSizeRule(alpha=50, max_iterations=150)
+        gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
                 max_iteration=2500,
                 update_objective_interval=500)
         gd.run(verbose=0)

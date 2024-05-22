@@ -47,11 +47,15 @@ class Preconditioner(ABC):
         ----------
         algorithm : Algorithm
             The algorithm object.
-    
         gradient : DataContainer
             The calculated gradient to modify
         out : DataContainer, 
-            Container to fill with the modified gradient 
+            Container to fill with the modified gradient. 
+            
+        Note
+        -----
+        
+        In CIL algorithms, the preconditioners are used in-place. Make sure any custom pre-conditioners are safe to use in place. 
         
         Returns
         -------
@@ -92,8 +96,15 @@ class Sensitivity(Preconditioner):
         self.array = self.operator.adjoint(
             self.operator.range_geometry().allocate(value=1.0))
         
-        self.operator.range_geometry().allocate(value=1.0).divide(
+        try:
+            self.operator.range_geometry().allocate(value=1.0).divide(
                 self.array, where=np.abs(self.array.as_array()) > 0, out=self.array)
+        except:
+            sensitivity_np = self.array.as_array()
+            self.pos_ind = np.abs(sensitivity_np)>0
+            array_np = np.ones(self.operator.range_geometry().allocate().shape)
+            array_np[self.pos_ind ] = (1./sensitivity_np[self.pos_ind])
+            self.array.fill(array_np) 
 
     def apply(self, algorithm, gradient, out=None):
         r"""
@@ -137,8 +148,8 @@ class AdaptiveSensitivity(Sensitivity):
     delta : float, optional
         The delta value for the preconditioner.
     reference : DataContainer e.g. ImageData, default is None
-        Reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. If reference data is passed the preconditioner does not update with each iteration.  
-    iterations : int,  default = 100
+        Reference data, an object in the domain of the operator. Recommended to be a best guess reconstruction. If reference data is passed the preconditioner is always fixed.   
+    max_iterations : int,  default = 100
         The maximum number of iterations before the preconditoner is frozen and no-longer updates. Note that if reference data is passed the preconditioner is always frozen and `iterations` is set to -1. 
     
     Reference
@@ -147,9 +158,9 @@ class AdaptiveSensitivity(Sensitivity):
 
     """
 
-    def __init__(self, operator, delta=1e-6, iterations=100, reference=None):
+    def __init__(self, operator, delta=1e-6, max_iterations=100, reference=None):
 
-        self.iterations = iterations
+        self.max_iterations = max_iterations
         self.delta = delta
         
         super(AdaptiveSensitivity, self).__init__(
@@ -158,8 +169,10 @@ class AdaptiveSensitivity(Sensitivity):
         
         self.freezing_point = operator.domain_geometry().allocate(0)
         if reference is not None:
-              self.array.multiply(reference+self.delta, out=self.freezing_point)
-              self.iterations = -1
+              reference += self.delta
+              self.array.multiply(reference, out=self.freezing_point)
+              reference -= self.delta
+              self.max_iterations = -1
         
             
 
@@ -186,8 +199,10 @@ class AdaptiveSensitivity(Sensitivity):
         if out is None:
             out = gradient.copy()
             
-        if algorithm.iteration <= self.iterations:
-            self.array.multiply(algorithm.get_output() + self.delta,
+        if algorithm.iteration <= self.max_iterations:
+            self.freezing_point.fill(algorithm.solution)
+            self.freezing_point.add(self.delta, out=self.freezing_point)
+            self.array.multiply(self.freezing_point, 
                                 out=self.freezing_point)
             gradient.multiply(
                 self.freezing_point, out=out)

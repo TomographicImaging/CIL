@@ -18,10 +18,10 @@
 
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
-from cil.optimisation.utilities import ConstantStepSize
+from cil.optimisation.utilities import ConstantStepSize, StepSizeRule
 import numpy
 import logging
-from numbers import Number
+from numbers import Real, Number
 import warnings 
 
 log = logging.getLogger(__name__)
@@ -61,15 +61,12 @@ class ISTA(Algorithm):
         Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
-    step_size : positive :obj:`float`, default = None
-                Step size for the gradient step of ISTA.
-                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
-   step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use a`ConstantStepSize` 
-        preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
-            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
- 
-    
+    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
+                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size, if a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+                The default :code:`step_size` is a constant :math:`\frac{0.99*2}{L}` or 1 if `f=None`.
+     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
+
     
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
@@ -120,24 +117,21 @@ class ISTA(Algorithm):
 
 
     # Set default step size
-    def _calculate_default_step_size(self, step_size):
+    def _calculate_default_step_size(self):
         """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
 
-        if step_size is None:
-            if isinstance(self.f, ZeroFunction):
-                ret= 1
+        if isinstance(self.f, ZeroFunction):
+            ret= 1
 
-            elif isinstance(self.f.L, Number):
-                ret = 0.99*2.0/self.f.L
-
-            else:
-                raise ValueError("Function f is not differentiable")
+        elif isinstance(self.f.L, Real):
+            ret = 0.99*2.0/self.f.L
 
         else:
-            ret = step_size
+            raise ValueError("Function f is not differentiable")
+        return ret       
             
-        return ret
+        
 
     def __init__(self, initial, f, g, step_size = None, step_size_rule=None, preconditioner=None,**kwargs):
 
@@ -168,12 +162,15 @@ class ISTA(Algorithm):
             raise ValueError('You set both f and g to be the ZeroFunction and thus the iterative method will not update and will remain fixed at the initial value.')
 
         # set step_size
-        if step_size_rule is None: 
-
-                step_size_rule=ConstantStepSize(self._calculate_default_step_size(step_size=step_size))
+        if step_size is None:
+                step_size_rule=ConstantStepSize(self._calculate_default_step_size())
+        elif isinstance(step_size, Real):
+                step_size_rule=ConstantStepSize(step_size)
+        elif isinstance(step_size, StepSizeRule):
+            step_size_rule=step_size
         else:
-            if step_size is not None:
-                raise TypeError('You have passed both a `step_size` and a `step_size_rule`, please pass only a `step_size_rule`')
+            
+            raise TypeError('`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 
         self.step_size_rule=step_size_rule
         
@@ -255,11 +252,9 @@ class FISTA(ISTA):
         Differentiable function.  If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
-    step_size : positive :obj:`float`, default = None
-                Step size for the gradient step of FISTA.
-                The default :code:`step_size` is :math:`\frac{1}{L}` or 1 if `f=None`.
-    step_size_rule: class with a `get_step_size` method or a function that takes an initialised CIL function as an argument and outputs a step size, default is None
-            This could be a custom `step_size_rule` or one provided in :meth:`~cil.optimisation.utilities.StepSizeMethods`. If None is passed  then the algorithm will use a `ConstantStepSize`
+    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
+                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size, if a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+                The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
@@ -291,25 +286,21 @@ class FISTA(ISTA):
 
     """
 
-    def _calculate_default_step_size(self, step_size):
+    def _calculate_default_step_size(self):
 
         """Calculate the default step size if a step size rule or step size is not provided 
         """
 
-        if step_size is None:
+        if isinstance(self.f, ZeroFunction):
+            ret = 1
 
-            if isinstance(self.f, ZeroFunction):
-                ret = 1
-
-            elif isinstance(self.f.L, Number):
-                ret = 1./self.f.L
-
-            else:
-                raise ValueError("Function f is not differentiable")
+        elif isinstance(self.f.L, Number):
+            ret = 1./self.f.L
 
         else:
-            ret = step_size
+            raise ValueError("Function f is not differentiable")
         return ret
+
     
         
     def _provable_convergence_condition(self):

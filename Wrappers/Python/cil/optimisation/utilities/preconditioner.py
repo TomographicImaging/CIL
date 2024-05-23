@@ -98,10 +98,10 @@ class Sensitivity(Preconditioner):
         try:
             self.operator.range_geometry().allocate(value=1.0).divide(
                 self.array, where=np.abs(self.array.as_array()) > 0, out=self.array)
-        except:  # Due to CIL/SIRF compatibility and SIRF not divide not taking kwargs
+        except:  # Due to CIL/SIRF compatibility and SIRF divide not taking kwargs
             sensitivity_np = self.array.as_array()
             self.pos_ind = np.abs(sensitivity_np) > 0
-            array_np = np.ones(self.operator.range_geometry().allocate().shape)
+            array_np = np.zeros(self.operator.range_geometry().allocate().shape)
             array_np[self.pos_ind] = (1./sensitivity_np[self.pos_ind])
             self.array.fill(array_np)
 

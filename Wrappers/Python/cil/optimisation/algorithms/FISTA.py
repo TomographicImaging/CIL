@@ -124,12 +124,10 @@ class ISTA(Algorithm):
         """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
 
-        if isinstance(self.f.L, Real):
-            ret = 0.99*2.0/self.f.L
+        
+        return 0.99*2.0/self.f.L
 
-        else:
-            raise ValueError("Function f is not differentiable")
-        return ret
+        
 
     def __init__(self, initial, f, g, step_size=None, preconditioner=None, **kwargs):
 
@@ -169,10 +167,7 @@ class ISTA(Algorithm):
             self.step_size_rule = ConstantStepSize(step_size)
         elif isinstance(step_size, StepSizeRule):
             self.step_size_rule = step_size
-        else:
-            raise TypeError(
-                '`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
-
+        
         self.preconditioner = preconditioner
 
         self.configured = True
@@ -191,7 +186,10 @@ class ISTA(Algorithm):
             self.preconditioner.apply(
                 self, self.gradient_update, out=self.gradient_update)
 
-        step_size = self.step_size_rule.get_step_size(self)
+        try:
+            step_size = self.step_size_rule.get_step_size(self)
+        except NameError:
+            raise NameError(msg='`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 
         self.x_old.sapyb(1., self.gradient_update, -step_size, out=self.x_old)
 
@@ -287,16 +285,9 @@ class FISTA(ISTA):
     def _calculate_default_step_size(self):
         """Calculate the default step size if a step size rule or step size is not provided 
         """
+        return 1./self.f.L
 
-        if isinstance(self.f, ZeroFunction):
-            ret = 1
 
-        elif isinstance(self.f.L, Number):
-            ret = 1./self.f.L
-
-        else:
-            raise ValueError("Function f is not differentiable")
-        return ret
 
     def _provable_convergence_condition(self):
         if self.preconditioner is not None:

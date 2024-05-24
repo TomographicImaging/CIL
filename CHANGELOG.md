@@ -3,7 +3,10 @@
 
   - New Features:
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
-    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and it's proximal, in the case of orthogonal operators, `A` (#1618)
+    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
+    - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`
+    - an implementation of the Armijo Rule as a child class of  `cil.optimisation.utilities.StepSizeRule`
+    - Sensitivity preconditioners added as child classes of `cil.optimisation.utilities.Preconditioner`
   - Enhancements:
     - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
@@ -13,6 +16,7 @@
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
     - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
     - BlurringOperator: remove check for geometry class (old SIRF integration bug)
+    - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. 
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
 

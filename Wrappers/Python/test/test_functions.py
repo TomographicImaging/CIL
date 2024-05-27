@@ -891,10 +891,10 @@ class TestFunction(CCPiTestClass):
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = func1 + 3
-        assert f3.L == 0
+        assert f3.L == 1
         f3.L = 2
         assert f3.L == 2
-        assert func1.L == 0
+        assert func1.L == 1
         with self.assertRaises(AttributeError):
             func1.L = 2
 

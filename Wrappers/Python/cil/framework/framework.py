@@ -1714,6 +1714,9 @@ class Cone3D_SOUV(SystemConfiguration):
             
             raise ValueError("Make sure all the sets have the same number of parameters");
 
+        # Number of projections
+        self.num_positions = len(source_position_set);
+
         #source
         self.source.position_set = source_position_set;
 
@@ -2439,10 +2442,19 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
-                     AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
-                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],
-                     AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
+        # We are using angles, not per-projection geometry
+        if self.config.system.geometry != "cone_souv":
+            shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
+                        AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
+                        AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],
+                        AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
+        # We are using per-projection geometry, not angles
+        else:
+            shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
+                        AcquisitionGeometry.ANGLE: self.config.system.num_positions,
+                        AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],
+                        AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
+
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -2453,11 +2465,20 @@ class AcquisitionGeometry(object):
     def dimension_labels(self):
         labels_default = DataOrder.CIL_AG_LABELS
 
-        shape_default = [self.config.channels.num_channels,
-                            self.config.angles.num_positions,
-                            self.config.panel.num_pixels[1],
-                            self.config.panel.num_pixels[0]
-                            ]
+        # We are using angles, not per-projection geometry
+        if self.config.system.geometry != "cone_souv":
+            shape_default = [self.config.channels.num_channels,
+                                self.config.angles.num_positions,
+                                self.config.panel.num_pixels[1],
+                                self.config.panel.num_pixels[0]
+                                ]
+        # We are using per-projection geometry, not angles
+        else:
+            shape_default = [self.config.channels.num_channels,
+                                self.config.system.num_positions,
+                                self.config.panel.num_pixels[1],
+                                self.config.panel.num_pixels[0]
+                                ]
 
         try:
             labels = list(self._dimension_labels)

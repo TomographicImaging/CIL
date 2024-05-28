@@ -1728,6 +1728,7 @@ class Cone3D_SOUV(SystemConfiguration):
         #reconstructed volume centre
         self.volume_centre_position = numpy.array(volume_centre_position);
 
+
     # def align_z(self):
     #     r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
     #     '''
@@ -1842,24 +1843,30 @@ class Cone3D_SOUV(SystemConfiguration):
 
         return False
 
-    # def calculate_magnification(self):
+    def calculate_magnification(self, projection_ID:int=0):
 
-    #     ab = (self.rotation_axis.position - self.source.position)
-    #     dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+        if projection_ID < self.num_positions:
+            idx = projection_ID;
+        else:
+            raise IndexError("The requested projection index is greater than or equal to the total number of projections in the SOUV geometry.");
 
-    #     ab_unit = ab / numpy.sqrt(ab.dot(ab))
+        ab = (self.volume_centre_position - self.source.position_set[idx])
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
 
-    #     n = self.detector.normal
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
 
-    #     #perpendicular distance between source and detector centre
-    #     sd = float((self.detector.position - self.source.position).dot(n))
-    #     ratio = float(ab_unit.dot(n))
+        # Compute the normal vector of the detector
+        n = numpy.cross(self.detector.direction_x_set[idx], self.detector.direction_y_set[idx])
 
-    #     source_to_detector = sd / ratio
-    #     dist_center_detector = source_to_detector - dist_source_center
-    #     magnification = (dist_center_detector + dist_source_center) / dist_source_center
+        #perpendicular distance between source and detector centre
+        sd = float((self.detector.position_set[idx] - self.source.position_set[idx]).dot(n))
+        ratio = float(ab_unit.dot(n))
 
-    #     return [dist_source_center, dist_center_detector, magnification]
+        source_to_detector = sd / ratio
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
 
     # def rotation_axis_on_detector(self):
     #     """

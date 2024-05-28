@@ -1827,21 +1827,20 @@ class Cone3D_SOUV(SystemConfiguration):
         repres += "\tCentre position: {0}\n".format(csv(self.volume_centre_position))
         return repres
 
-    # def __eq__(self, other):
+    def __eq__(self, other):
 
-    #     if not isinstance(other, self.__class__):
-    #         return False
+        if not isinstance(other, self.__class__):
+            return False
 
-    #     if numpy.allclose(self.source.position, other.source.position) \
-    #     and numpy.allclose(self.detector.position, other.detector.position)\
-    #     and numpy.allclose(self.detector.direction_x, other.detector.direction_x)\
-    #     and numpy.allclose(self.detector.direction_y, other.detector.direction_y)\
-    #     and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
-    #     and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
+        if numpy.allclose(self.source.position_set, other.source.position_set) \
+        and numpy.allclose(self.detector.position_set, other.detector.position_set)\
+        and numpy.allclose(self.detector.direction_x_set, other.detector.direction_x_set)\
+        and numpy.allclose(self.detector.direction_y_set, other.detector.direction_y_set)\
+        and numpy.allclose(self.volume_centre_position, other.volume_centre_position):
 
-    #         return True
+            return True
 
-    #     return False
+        return False
 
     # def calculate_magnification(self):
 

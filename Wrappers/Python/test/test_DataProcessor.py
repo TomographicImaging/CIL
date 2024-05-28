@@ -2764,20 +2764,20 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
 
-class TestPaganinPhaseRetriver(unittest.TestCase):       
+class TestPaganinPhaseRetriver(unittest.TestCase):
 
-    def setUp(self):      
+    def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
 
-    def test_PaganinProcessor_init(self):        
+    def test_PaganinProcessor_init(self):
         # test default values are initialised
         processor = PaganinProcessor()
-        test_parameter = ['energy', 'wavelength', 'delta', 'beta','geometry_unit_multiplier', 'filter_type']
-        test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, 1,'paganin_method']
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'filter_type']
+        test_value = [40000, (constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2,'paganin_method']
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
@@ -2788,59 +2788,104 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
-
     def test_PaganinProcessor_check_input(self):
-        # check the propagation distance, magnification and pixel size can be found from the geometry with unit multiplier
-        processor = PaganinProcessor(geometry_unit_multiplier=1e-6)
-        processor.check_input(self.data_cone)
-        self.assertEqual(processor.propagation_distance, 1e-6*self.data_cone.geometry.dist_center_detector, 
-                         msg=self.error_message(processor, 'propagation_distance'))
-        self.assertEqual(processor.magnification, self.data_cone.geometry.magnification, 
-                         msg=self.error_message(processor, 'magnification'))
-        self.assertEqual(processor.pixel_size, 1e-6*self.data_cone.geometry.pixel_size_h, 
-                         msg=self.error_message(processor, 'pixel_size'))
-        
-        # check there is a warning when the data geometry does not have dist_center_detector, and uses default value
-        with self.assertWarns(Warning):
-            processor.check_input(self.data_parallel)
-        self.assertEqual(processor.propagation_distance, 0.1, 
-                         msg=self.error_message(processor, 'propagation_distance'))
-        self.assertEqual(processor.magnification, self.data_parallel.geometry.magnification, 
-                         msg=self.error_message(processor, 'magnification'))
-        self.assertEqual(processor.pixel_size, 1e-6*self.data_parallel.geometry.pixel_size_h, 
-                         msg=self.error_message(processor, 'pixel_size'))
-
-    def test_PaganinProcessor_update_parameters(self):
-        parameter_list = ['propagation_distance','pixel_size','magnification', 'delta', 'beta']
         processor = PaganinProcessor()
-
-        data_array = [self.data_cone, self.data_parallel]
-        for data in data_array:
+        for data in [self.data_cone, self.data_parallel]:
             processor.set_input(data)
-            for parameter in parameter_list:
-                processor.update_parameters({parameter:10})
-                self.assertEqual(getattr(processor, parameter), 10, msg=self.error_message(processor, parameter))
-            # test setting multiple together
-            processor.update_parameters({'propagation_distance':0.1, 'magnification':5})
-            self.assertEqual(processor.propagation_distance,0.1)
-            self.assertEqual(processor.magnification,5)
+            data2 = processor.get_input()
+            numpy.testing.assert_allclose(data2.as_array(), data.as_array())
+
+            # check there is an error when the wrong data type is input
+            with self.assertRaises(TypeError):
+                processor.set_input(data.geometry)
+
+            with self.assertRaises(TypeError):
+                processor.set_input(data.as_array())
+
+            dc = DataContainer(data.as_array())
+            with self.assertRaises(TypeError):
+                processor.set_input(dc)
+
+
+    def test_PaganinProcessor_set_geometry(self):
+        processor = PaganinProcessor()
+        data = self.data_cone
+        # check there is an error when the data geometry does not have units
+        processor.set_input(data)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(data.geometry, None)
+        
+        # check there is no error when the geometry unit is provided
+        data.geometry.config.units = 'um'
+        processor._set_geometry(data.geometry, None)
+        
+        # check the processor finds the correct geometry values, scaled by the units
+        self.assertEqual(processor.propagation_distance, data.geometry.dist_center_detector*1e-6, 
+                         msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, data.geometry.magnification, 
+                         msg=self.error_message(processor, 'magnification'))
+        self.assertEqual(processor.pixel_size, data.geometry.pixel_size_h*1e-6, 
+                         msg=self.error_message(processor, 'pixel_size'))
+                
+        # check there is an error when the data geometry does not have propagation distance, and it is not provided in override geometry
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, None)
+        
+        # check override_geometry
+        for data in [self.data_parallel, self.data_cone]:
+            processor.set_input(data)
+            processor._set_geometry(self.data_cone.geometry, override_geometry={'propagation_distance':1,'magnification':2, 'pixel_size':3})
+            
+            self.assertEqual(processor.propagation_distance, 1, 
+                            msg=self.error_message(processor, 'propagation_distance'))
+            self.assertEqual(processor.magnification, 2, 
+                            msg=self.error_message(processor, 'magnification'))
+            self.assertEqual(processor.pixel_size, 3, 
+                            msg=self.error_message(processor, 'pixel_size'))
+        
+        # check the processor goes back to values from geometry if the geometry over-ride is not passed
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        self.assertEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector*1e-6, 
+                        msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, self.data_cone.geometry.magnification, 
+                        msg=self.error_message(processor, 'magnification'))
+        self.assertEqual(processor.pixel_size, self.data_cone.geometry.pixel_size_h*1e-6, 
+                        msg=self.error_message(processor, 'pixel_size'))
+        
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry)
+
+        # check there is an error when the pixel_size_h and pixel_size_v are different
+        self.data_parallel.geometry.pixel_size_h = 9
+        self.data_parallel.geometry.pixel_size_h = 10
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, override_geometry={'propagation_distance':1})
 
     def test_PaganinProcessor_create_filter(self):
-        processor =  PaganinProcessor()
-
-        # check alpha and mu are calculated correctly
-        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength)
-        data_array = [self.data_cone, self.data_parallel]
-        for data in data_array:
-            processor.set_input(data)
-            processor.process()
-            alpha = processor.propagation_distance*1/mu
-            self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
-            self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
-        
         image = self.data_cone.get_slice(angle=0).as_array()
         Nx, Ny = image.shape
+        
+        delta = 1
+        beta = 2
+        energy = 3
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy)
+
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+
+        self.data_cone.geometry.config.units='m'
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor._create_filter(Nx, Ny)
+        
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        
         kx,ky = numpy.meshgrid( 
             numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
             numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
@@ -2849,25 +2894,60 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
             )
         
         # check default filter is created with paganin_method
-        processor.set_input(self.data_cone)
-        processor.create_filter(Nx, Ny)
-        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)*self.data_cone.geometry.magnification))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
         numpy.testing.assert_allclose(processor.filter, filter)
 
-        # # check generalised_paganin_method
-        processor = PaganinProcessor(filter_type='generalised_paganin_method')
+        # check generalised_paganin_method
+        processor = PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='generalised_paganin_method')
         processor.set_input(self.data_cone)
-        processor.create_filter(Nx, Ny)
-        expected_filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)/self.data_cone.geometry.magnification))
-        numpy.testing.assert_allclose(processor.filter, expected_filter)
+        processor._set_geometry(self.data_cone.geometry)
+        processor._create_filter(Nx, Ny)
+        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
 
-        # # check unknown method raises error
-        processor =  PaganinProcessor(filter_type='unknown_method')
+        # check unknown method raises error
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='unknown_method')
         processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
         with self.assertRaises(ValueError):
-            processor.create_filter(Nx, Ny)
+            processor._create_filter(Nx, Ny)
 
-    def test_PaganinProcessor(self): 
+        # check parameter override 
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy)
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        delta = 100
+        beta=200
+        processor._create_filter(Nx, Ny, override_filter={'delta':delta, 'beta':beta})
+        
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+        
+        # test specifying alpha, delta and beta
+        delta = 12
+        beta = 13
+        alpha = 14
+        with self.assertLogs(level='WARN') as log:
+            processor._create_filter(Nx, Ny, override_filter = {'delta':delta, 'beta':beta, 'alpha':alpha})
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+    def test_PaganinProcessor(self):
 
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
@@ -2877,14 +2957,21 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
         data_array = [self.data_cone, self.data_parallel]
         for data in data_array:
-            processor.set_input(data) 
-            output = processor.get_output()
-            thickness = -(1/mu)*numpy.log(data)
-            self.assertLessEqual(quality_measures.mse(output, thickness), 1e-5)
-            output = processor.get_output(full_retrieval=False)
-            self.assertLessEqual(quality_measures.mse(output, data), 1e-5)
+            data.geometry.config.units = 'm'
+            data_abs = -(1/mu)*numpy.log(data)
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            filtered_image = processor.get_output(full_retrieval=False, override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+            # test in-line
+            thickness_inline = PaganinProcessor()(data, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
+            filtered_image_inline = PaganinProcessor()(data, full_retrieval=False, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
 
     def test_PaganinProcessor_2D(self):
+        self.data_parallel.geometry.config.units = 'm'
         data_slice = self.data_parallel.get_slice(vertical=10)
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
@@ -2892,7 +2979,7 @@ class TestPaganinPhaseRetriver(unittest.TestCase):
 
         processor = PaganinProcessor(pad=10)
         processor.set_input(data_slice)
-        output = processor.get_output()
+        output = processor.get_output(override_geometry={'propagation_distance':1})
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
         
 if __name__ == "__main__":

@@ -1245,6 +1245,9 @@ class Cone3D_SOUV(SystemConfiguration):
             
             raise ValueError("Make sure all the sets have the same number of parameters");
 
+        # Number of projections
+        self.num_positions = len(source_position_set);
+
         #source
         self.source.position_set = source_position_set;
 
@@ -2035,11 +2038,20 @@ class AcquisitionGeometry(object):
     def dimension_labels(self):
         labels_default = AcquisitionDimension.get_order_for_engine("cil")
 
-        shape_default = [self.config.channels.num_channels,
-                            self.config.angles.num_positions,
-                            self.config.panel.num_pixels[1],
-                            self.config.panel.num_pixels[0]
-                            ]
+        # We are using angles, not per-projection geometry
+        if self.config.system.geometry != "cone_souv":
+            shape_default = [self.config.channels.num_channels,
+                                self.config.angles.num_positions,
+                                self.config.panel.num_pixels[1],
+                                self.config.panel.num_pixels[0]
+                                ]
+        # We are using per-projection geometry, not angles
+        else:
+            shape_default = [self.config.channels.num_channels,
+                                self.config.system.num_positions,
+                                self.config.panel.num_pixels[1],
+                                self.config.panel.num_pixels[0]
+                                ]
 
         try:
             labels = self._dimension_labels

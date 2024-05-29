@@ -52,7 +52,10 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
-        
+    
+    # Translation vector that will modify the centre of the reconstructed volume
+    # (by defalut, no translation)
+    translation = [0.0, 0.0, 0.0];
 
     if sinogram_geometry.dimension == '2D':
         #create a 3D astra geom from 2D CIL geometry
@@ -86,29 +89,41 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             src[1] = system.source.position[1]
             projector = 'cone_vec'
 
+    # Only needed when using the traditional geometry set with rotation angles 
+    elif sinogram_geometry.geom_type != 'cone_souv':
+
+        volume_geometry_temp = volume_geometry.copy()
+
+        row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
+        col = panel.pixel_size[1] * system.detector.direction_y.reshape(3,1)
+        det = system.detector.position.reshape(3, 1)
+
+        if 'right' in panel.origin:
+            row *= -1
+        if 'top' in panel.origin:
+            col *= -1
+
+        if sinogram_geometry.geom_type == 'parallel':
+            src = system.ray.direction.reshape(3,1)
+            projector = 'parallel3d_vec'
+        elif sinogram_geometry.geom_type != 'cone_souv':
+            src = system.source.position.reshape(3,1)
+            projector = 'cone_vec'
+    # Use the per-projection geometry
     else:
         volume_geometry_temp = volume_geometry.copy()
 
-        # Only needed when using the traditional geometry set with rotation angles 
-        if sinogram_geometry.geom_type != 'cone_souv':
-            row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
-            col = panel.pixel_size[1] * system.detector.direction_y.reshape(3,1)
-            det = system.detector.position.reshape(3, 1)
+        # Compute the current centre
+        current_centre = np.array([
+            volume_geometry_temp.get_min_x() + (volume_geometry_temp.get_max_x() - volume_geometry_temp.get_min_x()) / 2.0,
+            volume_geometry_temp.get_min_y() + (volume_geometry_temp.get_max_y() - volume_geometry_temp.get_min_y()) / 2.0,
+            volume_geometry_temp.get_min_z() + (volume_geometry_temp.get_max_z() - volume_geometry_temp.get_min_z()) / 2.0
+        ]);
 
-            if 'right' in panel.origin:
-                row *= -1
-            if 'top' in panel.origin:
-                col *= -1
+        # Compute a translation vector that will modify the centre of the reconstructed volume
+        translation = np.array(system.volume_centre_position) - current_centre;
 
-            if sinogram_geometry.geom_type == 'parallel':
-                src = system.ray.direction.reshape(3,1)
-                projector = 'parallel3d_vec'
-            elif sinogram_geometry.geom_type != 'cone_souv':
-                src = system.source.position.reshape(3,1)
-                projector = 'cone_vec'
-        # Use the per-projection geometry
-        else:
-            projector = 'cone_vec'
+        projector = 'cone_vec'
 
     #Build for astra 3D only
     # Use the traditional geometry set with rotation angles
@@ -137,15 +152,15 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
-    vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
-                                    volume_geometry_temp.voxel_num_x,
+    vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_x,
+                                    volume_geometry_temp.voxel_num_y,
                                     volume_geometry_temp.voxel_num_z,
-                                    volume_geometry_temp.get_min_x(),
-                                    volume_geometry_temp.get_max_x(),
-                                    volume_geometry_temp.get_min_y(),
-                                    volume_geometry_temp.get_max_y(),
-                                    volume_geometry_temp.get_min_z(),
-                                    volume_geometry_temp.get_max_z()
+                                    volume_geometry_temp.get_min_x() + translation[0],
+                                    volume_geometry_temp.get_max_x() + translation[0],
+                                    volume_geometry_temp.get_min_y() + translation[1],
+                                    volume_geometry_temp.get_max_y() + translation[1],
+                                    volume_geometry_temp.get_min_z() + translation[2],
+                                    volume_geometry_temp.get_max_z() + translation[2]
                                     )
 
 

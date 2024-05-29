@@ -35,7 +35,7 @@ class PaganinProcessor(Processor):
     r"""
     Processor to retrieve quantitative information from phase contrast images using the Paganin phase retrieval algorithm described in [1]
     
-    .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 + \alpha\left ( k_x^2 + k_y^2 \right )/M}  \right )\right ),
+    .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 + \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),
     
     where
 
@@ -49,7 +49,7 @@ class PaganinProcessor(Processor):
     
     A generalised form of the Paganin phase retrieval method can be called using :code:`filter_type='generalised_paganin_method'`, which uses the form of the algorithm described in [2]
     
-    .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2\alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )/M}  \right )\right )
+    .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2\alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )}  \right )\right )
     
     The phase retrieval is valid under the following assumptions
 
@@ -57,7 +57,7 @@ class PaganinProcessor(Processor):
         - using intensity data which has been flat field corrected
         - and under the assumption that the Fresnel number :math:`F_N = W^2/(\lambda\Delta) >> 1`
     
-    To apply a filter to images using the Paganin method, call :code:`get_output(full_retrieval=False)`. In this case the pre-scaling and conversion to absorption is not applied so 
+    To apply a filter to images using the Paganin method, call :code:`full_retrieval=False`. In this case the pre-scaling and conversion to absorption is not applied so 
     the requirement to supply flat field corrected intensity data is relaxed,
     
     .. math:: I_{filt} = \mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( I(x, y,z = \Delta) \right )}{1 - \alpha\left ( k_x^2 + k_y^2 \right )}  \right )
@@ -75,16 +75,22 @@ class PaganinProcessor(Processor):
     energy: float (optional)
         Energy of the incident photon in eV, default is 40000
 
+    full_retrieval : bool, optional
+        If True, perform the full phase retrieval and return the thickness. If False, return a filtered image, default is True
+
     filter_type: string (optional)
         The form of the Paganin filter to use, either 'paganin_method' (default) or 'generalised_paganin_method' as described in [2] 
 
     pad: int (optional)
         Number of pixels to pad the image in Fourier space to reduce aliasing, default is 0 
 
+    return_units: string (optional)
+        The distance units to return the sample thickness in, must be one of 'm', 'cm', 'mm' or 'um' (defults is 'cm') 
+
     Returns
     -------
     AcquisitionData
-        AcquisitionData corrected for phase effects, retrieved sample thickness in m or (if :code:`get_output(full_retrieval=False)`) filtered data 
+        AcquisitionData corrected for phase effects, retrieved sample thickness or (if :code:`full_retrieval=False`) filtered data 
                 
     Example
     -------
@@ -94,9 +100,9 @@ class PaganinProcessor(Processor):
 
     Example
     -------
-    >>> processor = PaganinProcessor(delta=1,beta=10e2)
+    >>> processor = PaganinProcessor(delta=1,beta=10e2, full_retrieval=False)
     >>> processor.set_input(data)
-    >>> filtered_image = processor.get_output(full_retrieval=False)
+    >>> filtered_image = processor.get_output()
 
     Example
     -------
@@ -113,12 +119,20 @@ class PaganinProcessor(Processor):
     With thanks to Rajmund Mokso for help with the initial implementation of the phase retrieval algorithm
 
     """
+
+    UNIT_LIST = ['m','cm','mm','um']
+    UNIT_MULTIPLIERS = [1, 1e-2, 1e-3, 1e-6]
    
-    def __init__(self, delta = 1, beta = 1e-2, energy = 40000,  filter_type='paganin_method', pad = 0):
+    def __init__(self, delta = 1, beta = 1e-2, energy = 40000,  full_retrieval=True, filter_type='paganin_method', pad = 0, return_units='cm'):
+
+        if return_units not in self.UNIT_LIST:
+            raise ValueError("Return units {} not recognised, expected one of {}, please update data.geometry.config.units".format(str(return_units),str(self.UNIT_LIST)))
+        else:
+            return_multiplier = 1/(self.UNIT_MULTIPLIERS[self.UNIT_LIST.index(return_units)])
         
         kwargs = {
             'energy' : energy,
-            'wavelength' : self._energy_to_wavelength(energy),
+            'wavelength' : self._energy_to_wavelength(energy, return_multiplier),
             'delta': delta,
             'beta': beta,
             '_delta_user' : delta,
@@ -130,10 +144,11 @@ class PaganinProcessor(Processor):
             'propagation_distance' : None,
             'magnification' : None,
             'filter' : None,
-            'full_retrieval' : True,
+            'full_retrieval' : full_retrieval,
             'pad' : pad,
             'override_geometry' : None,
-            'override_filter' : None
+            'override_filter' : None,
+            'return_multiplier' : return_multiplier
             }
         
         super(PaganinProcessor, self).__init__(**kwargs)
@@ -200,7 +215,7 @@ class PaganinProcessor(Processor):
         """
         return super().set_input(dataset)
         
-    def get_output(self, out=None, full_retrieval=True, override_geometry=None, override_filter=None):
+    def get_output(self, out=None, override_geometry=None, override_filter=None):
         r'''
         Function to get output from the PaganinProcessor
         
@@ -209,12 +224,9 @@ class PaganinProcessor(Processor):
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data
 
-        full_retrieval : bool, optional
-            If True, perform the full phase retrieval and return the thickness. If False, return a filtered image, default is True
-
         override_geometry: dict, optional
-            Geometry parameters to use in the phase retrieval if you want to over-ride values found in `data.geometry`. Specify parameters as :code:`{'parameter':value}`\
-            where parameter is :code:`'magnification', 'propagation_distance'` or :code:`'pixel_size'` and value is the new value to use. Specify distance parameters in units of m.
+            Geometry parameters to use in the phase retrieval if you want to over-ride values found in `data.geometry`. Specify parameters as a dictionary :code:`{'parameter':value}`\
+            where parameter is :code:`'magnification', 'propagation_distance'` or :code:`'pixel_size'` and value is the new value to use. Specify distance parameters in the same units as :code:`return_units` (default is cm).
 
         override_filter: dict, optional
             Over-ride the filter parameters to use in the phase retrieval. Specify parameters as :code:`{'parameter':value}` where parameter is :code:`'delta', 'beta'` or :code:`'alpha'` and value is the new value to use. \
@@ -225,7 +237,7 @@ class PaganinProcessor(Processor):
         Returns
         -------
         AcquisitionData
-            AcquisitionData corrected for phase effects, retrieved sample thickness in m or (if :code:`get_output(full_retrieval=False)`) filtered data 
+            AcquisitionData corrected for phase effects, retrieved sample thickness or (if :code:`full_retrieval=False`) filtered data 
                     
         Example
         -------
@@ -235,9 +247,9 @@ class PaganinProcessor(Processor):
 
         Example
         -------
-        >>> processor = PaganinProcessor(delta=1,beta=10e2)
+        >>> processor = PaganinProcessor(delta=1,beta=10e2, full_retrieval=False)
         >>> processor.set_input(data)
-        >>> filtered_image = processor.get_output(full_retrieval=False)
+        >>> filtered_image = processor.get_output()
 
         Example
         -------
@@ -249,33 +261,35 @@ class PaganinProcessor(Processor):
         '''
         self.override_geometry = override_geometry
         self.override_filter = override_filter
-        self.full_retrieval = full_retrieval
         
         return super().get_output(out)
     
-    def __call__(self, x, out=None, full_retrieval=True, override_geometry=None, override_filter=None):
+    def __call__(self, x, out=None, override_geometry=None, override_filter=None):
         self.set_input(x)
 
         if out is None:
-            out = self.get_output(full_retrieval=full_retrieval, override_geometry=override_geometry, override_filter=override_filter)
+            out = self.get_output(override_geometry=override_geometry, override_filter=override_filter)
         else:
-            self.get_output(out=out, full_retrieval=full_retrieval, override_geometry=override_geometry, override_filter=override_filter)
+            self.get_output(out=out, override_geometry=override_geometry, override_filter=override_filter)
 
         return out
 
     def _set_geometry(self, geometry, override_geometry=None):
         '''
-        Function to set the geometry parameters for the processor, from the data geometry unless the geometry is overridden with an override_geometry dictionary.
+        Function to set the geometry parameters for the processor. Values are from the data geometry unless the geometry is overridden with an override_geometry dictionary.
         '''
-
-        unit_list = ['m','cm','mm','um']
-        unit_multipliers = [1, 1e-2, 1e-3, 1e-6]
-        if geometry.config.units in unit_list:
-            unit_multiplier = unit_multipliers[unit_list.index(geometry.config.units)]
+        
+        if geometry.config.units in self.UNIT_LIST:
+            input_multiplier = self.UNIT_MULTIPLIERS[self.UNIT_LIST.index(geometry.config.units)]
+            unit_multiplier = input_multiplier*self.return_multiplier
         else:
             unit_multiplier = None
         
         parameters = ['magnification', 'propagation_distance', 'pixel_size']
+        # specify parameter names as defined in geometry
+        geometry_parameters = ['magnification', 'dist_center_detector', ('pixel_size_h', 'pixel_size_v')]
+        # specify if parameter requires unit conversion
+        convert_units = [False, True, True]
         
         if override_geometry is None:
             override_geometry = {}
@@ -290,10 +304,6 @@ class PaganinProcessor(Processor):
             else:
                 self.__setattr__(parameter, override_geometry[parameter])
 
-        # specify parameter names as defined in geometry
-        geometry_parameters = ['magnification', 'dist_center_detector', ('pixel_size_h', 'pixel_size_v')]
-        # specify if parameter requires unit conversion
-        convert_units = [False, True, True]
 
         # get and check parameters from geometry if they are not in the over-ride geometry dictionary
         for i, parameter in enumerate(parameters):
@@ -314,7 +324,7 @@ class PaganinProcessor(Processor):
                 else:
                     if convert_units[i]:
                         if unit_multiplier is None:
-                            raise ValueError("Geometry units {} not recognised, expected one of {}, please update data.geometry.config.units".format(str(geometry.config.units),str(unit_list)))
+                            raise ValueError("Geometry units {} not recognised, expected one of {}, please update data.geometry.config.units".format(str(geometry.config.units),str(self.UNIT_LIST)))
                         else:
                             self.__setattr__(parameter, param1*unit_multiplier)
                     else:
@@ -377,9 +387,9 @@ class PaganinProcessor(Processor):
         '''
         self.alpha = self.propagation_distance*self.delta/self.mu
     
-    def _energy_to_wavelength(self, energy):
+    def _energy_to_wavelength(self, energy, return_multiplier):
         '''
-        Function to convert photon energy in eV to wavelength in m
+        Function to convert photon energy in eV to wavelength in return_units
         
         Parameters
         ----------
@@ -389,6 +399,7 @@ class PaganinProcessor(Processor):
         Returns
         -------
         float
-            Photon wavelength in m
+            Photon wavelength in return_units
         '''
-        return (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+
+        return return_multiplier*(constants.h*constants.speed_of_light)/(energy*constants.electron_volt)

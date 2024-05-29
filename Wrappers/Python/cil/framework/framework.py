@@ -2112,7 +2112,7 @@ class AcquisitionGeometry(object):
 
     @pixel_num_v.setter
     def pixel_num_v(self, val):
-        if self.units == 'pixels' & val!=1:
+        if (self.units == 'pixels') & (val!=1):
             raise ValueError("`units` is specified as `pixels` therefore `pixel_size` must be 1. Got {}".format(val))
         self.config.panel.num_pixels[1] = val
 

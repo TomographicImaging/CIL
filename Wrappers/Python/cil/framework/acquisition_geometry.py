@@ -1254,7 +1254,65 @@ class Cone3D_SOUV(SystemConfiguration):
         self.detector.direction_y_set = detector_direction_y_set;
 
         #reconstructed volume centre
-        self.volume_centre_position = numpy.array(volume_centre_position);
+        if volume_centre_position is not None:
+            self.volume_centre_position = numpy.array(volume_centre_position);
+        # Estimate the position
+        else:
+            def clamp(n, smallest, largest):
+                return max(smallest, min(n, largest))
+
+            # The function below has been adapted from:
+            # https://zalo.github.io/blog/closest-point-between-segments/
+            def lineSegClosestPoints(a, u, b, v):
+                r = b - a
+
+                ru = numpy.dot(r, u)
+                rv = numpy.dot(r, v)
+                uu = numpy.dot(u, u)
+                uv = numpy.dot(u, v)
+                vv = numpy.dot(v, v)
+
+                det = uu*vv - uv*uv
+
+                # if det is too close to 0, then they're parallel
+                # you can work out a way to handle this case
+
+                # compute optimal values for s and t
+                s = (ru*vv - rv*uv)/det
+                t = (ru*uv - rv*uu)/det
+
+                # constrain values s and t so that they describe points on the segments
+                s = clamp(s, 0, 1)
+                t = clamp(t, 0, 1)
+
+                # convert value s for segA into the corresponding closest value t for segB
+                # and vice versa
+                S = (t*uv + ru)/uu
+                T = (s*uv - rv)/vv
+
+                # constrain
+                S = clamp(S, 0, 1)
+                T = clamp(T, 0, 1)
+
+                return a + S*u, b + T*v
+
+            points = numpy.zeros(((len(source_position_set) - 1) * 2, 3));
+
+            for i in range(len(source_position_set) - 1):
+                a = source_position_set[i + 0]
+                b = source_position_set[i + 1]
+
+                u = detector_position_set[i + 0] - source_position_set[i + 0]
+                v = detector_position_set[i + 1] - source_position_set[i + 1]
+                
+                A, B = lineSegClosestPoints(a, u, b, v)
+                
+                points[i * 2 + 0] = A
+                points[i * 2 + 1] = B
+
+            self.volume_centre_position = numpy.array([points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]);
+
+
 
 
     # def align_z(self):
@@ -2352,7 +2410,7 @@ class AcquisitionGeometry(object):
         :type detector_direction_x_set: list, tuple, ndarray
         :param detector_direction_y_set: N 3D vectors describing the direction of the detector_y (x,y,z)
         :type detector_direction_y_set: list, tuple, ndarray
-        :param volume_centre_position: A 3D vector describing the position of the centre of the reconstructed volume (x,y,z)
+        :param volume_centre_position: A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). If no position givenm it will be computed automatically.
         :type volume_centre_position: list, tuple, ndarray, optional
         :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
         :type units: string

@@ -1345,7 +1345,6 @@ class Cone3D_SOUV(SystemConfiguration):
         def csv(val):
             return numpy.array2string(val, separator=', ')
 
-        print(self.volume_centre_position)
         repres = "Per-projection 3D Cone-beam tomography\n"
         repres += "System configuration:\n"
         repres += "\tSource positions 0-9: {0}\n".format(numpy.array2string(self.source.position_set[0:10], separator=', '))
@@ -1899,7 +1898,12 @@ class AcquisitionGeometry(object):
 
     @property
     def num_projections(self):
-        return len(self.angles)
+        # Using the traditional geometry set with rotation angles
+        if self.geom_type != "cone_souv":
+            return len(self.angles);
+        # Using the per-projection SOUV geometry
+        else:
+            return self.config.system.num_positions;
 
     @property
     def pixel_num_h(self):

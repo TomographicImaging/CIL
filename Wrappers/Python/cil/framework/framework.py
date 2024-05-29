@@ -2112,6 +2112,8 @@ class AcquisitionGeometry(object):
 
     @pixel_num_v.setter
     def pixel_num_v(self, val):
+        if self.units == 'pixels' & val!=1:
+            raise ValueError("`units` is specified as `pixels` therefore `pixel_size` must be 1. Got {}".format(val))
         self.config.panel.num_pixels[1] = val
 
     @property
@@ -2120,6 +2122,8 @@ class AcquisitionGeometry(object):
 
     @pixel_size_h.setter
     def pixel_size_h(self, val):
+        if self.units == 'pixels' & val!=1:
+            raise ValueError("`units` is specified as `pixels` therefore `pixel_size` must be 1. Got {}".format(val))
         self.config.panel.pixel_size[0] = val
 
     @property
@@ -2225,6 +2229,17 @@ class AcquisitionGeometry(object):
     def dtype(self, val):
         self._dtype = val
 
+    @property
+    def units(self):
+        return self.config.units
+    
+    @units.setter
+    def units(self, val):
+        units_list = ['m','cm','mm','um','units distance', 'pixels']
+        if val in units_list:
+            self.config.units = val
+        else:
+            raise ValueError("`units` not recognised. Must be one of {}. Got {}".format(str(units_list), str(val)))
 
     def __init__(self):
         self._dtype = numpy.float32

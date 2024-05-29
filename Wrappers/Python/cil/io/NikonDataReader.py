@@ -143,6 +143,7 @@ class NikonDataReader(object):
         object_roll_deg = None
         centre_of_rotation_top = 0
         centre_of_rotation_bottom = 0
+        units = 'units distance'
 
         for line in content:
             # filename of TIFF files
@@ -199,6 +200,8 @@ class NikonDataReader(object):
                 centre_of_rotation_top = float(line.split('=')[1])
             elif line.startswith("CentreOfRotationBottom"):
                 centre_of_rotation_bottom = float(line.split('=')[1])
+            elif line.startswith("Units"):
+                units = str(line.split('=')[1])
 
             # directory where data is stored
             elif line.startswith("InputFolderName"):
@@ -303,7 +306,8 @@ class NikonDataReader(object):
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
             self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_origin],
                                                      rotation_axis_position=[-object_offset_x, 0],
-                                                     detector_position=[-det_pos_h, source_to_det-source_to_origin])
+                                                     detector_position=[-det_pos_h, source_to_det-source_to_origin], 
+                                                     units=units)
             self._ag.set_angles(angles,
                                 angle_unit='degree')
 
@@ -314,7 +318,8 @@ class NikonDataReader(object):
             self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_origin, 0],
                                                          rotation_axis_position=[-object_offset_x, 0, 0],
                                                          rotation_axis_direction=rotation_axis_direction,
-                                                         detector_position=[-det_pos_h, source_to_det-source_to_origin, det_pos_v])
+                                                         detector_position=[-det_pos_h, source_to_det-source_to_origin, det_pos_v], 
+                                                         units=units)
             self._ag.set_angles(angles,
                                 angle_unit='degree')
 

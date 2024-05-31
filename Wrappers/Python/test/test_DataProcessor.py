@@ -2764,7 +2764,7 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
 
-class TestPaganinPhaseRetriver(unittest.TestCase):
+class TestPaganinProcessor(unittest.TestCase):
 
     def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()

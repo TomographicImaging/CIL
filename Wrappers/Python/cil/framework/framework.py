@@ -967,6 +967,18 @@ class Parallel2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
         ab = (self.rotation_axis.position - self.detector.position)
         dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
 
@@ -1119,6 +1131,18 @@ class Parallel3D(SystemConfiguration):
         return False
 
     def calculate_magnification(self):
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
         ab = (self.rotation_axis.position - self.detector.position)
         dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
 

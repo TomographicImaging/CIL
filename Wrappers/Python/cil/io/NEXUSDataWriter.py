@@ -195,6 +195,7 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['num_pixels_h'] = self.data.geometry.config.panel.num_pixels[0]
                 ds_data.attrs['pixel_size_h'] = self.data.geometry.config.panel.pixel_size[0]
                 ds_data.attrs['panel_origin'] = self.data.geometry.config.panel.origin
+                ds_data.attrs['distance_units'] = self.data.geometry.units
 
                 if self.data.geometry.config.system.dimension == '3D':
                     f.create_dataset('entry1/tomo_entry/config/detector/direction_y',

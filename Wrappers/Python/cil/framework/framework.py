@@ -696,7 +696,7 @@ class SystemConfiguration(object):
         else:
             self._geometry = val
 
-    def __init__(self, dof, geometry, units='units'):
+    def __init__(self, dof, geometry, units='custom units'):
         """Initialises the system component attributes for the acquisition type
         """
         self.dimension = dof
@@ -830,7 +830,7 @@ class Parallel2D(SystemConfiguration):
     :type units: string
     '''
 
-    def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
+    def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='custom units'):
         """Constructor method
         """
         super(Parallel2D, self).__init__(dof=2, geometry = 'parallel', units=units)
@@ -945,8 +945,8 @@ class Parallel2D(SystemConfiguration):
         repres = "2D Parallel-beam tomography\n"
         repres += "System configuration:\n"
         repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
-        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
-        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tRotation axis position in {0}: {1}\n".format(self.units, csv(self.rotation_axis.position))
+        repres += "\tDetector position in {0}: {1}\n".format(self.units, csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
         return repres
 
@@ -988,7 +988,7 @@ class Parallel3D(SystemConfiguration):
     :type units: string
     '''
 
-    def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
+    def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='custom units'):
         """Constructor method
         """
         super(Parallel3D, self).__init__(dof=3, geometry = 'parallel', units=units)
@@ -1092,9 +1092,9 @@ class Parallel3D(SystemConfiguration):
         repres = "3D Parallel-beam tomography\n"
         repres += "System configuration:\n"
         repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
-        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tRotation axis position in {0}: {1}\n".format(self.units, csv(self.rotation_axis.position))
         repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
-        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector position in {0}: {1}\n".format(self.units, csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
         repres += "\tDetector direction y: {0}\n".format(csv(self.detector.direction_y))
         return repres
@@ -1258,7 +1258,7 @@ class Cone2D(SystemConfiguration):
     :type units: string
     '''
 
-    def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
+    def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='custom units'):
         """Constructor method
         """
         super(Cone2D, self).__init__(dof=2, geometry = 'cone', units=units)
@@ -1323,9 +1323,9 @@ class Cone2D(SystemConfiguration):
 
         repres = "2D Cone-beam tomography\n"
         repres += "System configuration:\n"
-        repres += "\tSource position: {0}\n".format(csv(self.source.position))
-        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
-        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tSource position in {0}: {1}\n".format(self.units, csv(self.source.position))
+        repres += "\tRotation axis position in {0}: {1}\n".format(self.units, csv(self.rotation_axis.position))
+        repres += "\tDetector position in {0}: {1}\n".format(self.units, csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
         return repres
 
@@ -1436,7 +1436,7 @@ class Cone3D(SystemConfiguration):
     :type units: string
     '''
 
-    def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
+    def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='custom units'):
         """Constructor method
         """
         super(Cone3D, self).__init__(dof=3, geometry = 'cone', units=units)
@@ -1542,10 +1542,10 @@ class Cone3D(SystemConfiguration):
 
         repres = "3D Cone-beam tomography\n"
         repres += "System configuration:\n"
-        repres += "\tSource position: {0}\n".format(csv(self.source.position))
-        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tSource position in {0}: {1}\n".format(self.units, csv(self.source.position))
+        repres += "\tRotation axis position in {0}: {1}\n".format(self.units, csv(self.rotation_axis.position))
         repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
-        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector position in {0}: {1}\n".format(self.units, csv(self.detector.position))
         repres += "\tDetector direction x: {0}\n".format(csv(self.detector.direction_x))
         repres += "\tDetector direction y: {0}\n".format(csv(self.detector.direction_y))
         return repres
@@ -1967,7 +1967,7 @@ class Configuration(object):
     r'''This class holds the description of the system components.
      '''
 
-    def __init__(self, units_distance='units distance'):
+    def __init__(self, units_distance='custom units'):
         self.system = None #has distances
         self.angles = None #has angles
         self.panel = None #has distances
@@ -2235,7 +2235,7 @@ class AcquisitionGeometry(object):
     
     @units.setter
     def units(self, val):
-        units_list = ['m','cm','mm','um','units distance', 'pixels']
+        units_list = ['m','cm','mm','um','custom units', 'pixels']
         if val in units_list:
             self.config.units = val
         else:
@@ -2466,7 +2466,7 @@ class AcquisitionGeometry(object):
         return self
 
     @staticmethod
-    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='units distance'):
+    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='custom units'):
         r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
 
         :param ray_direction: A 2D vector describing the x-ray direction (x,y)
@@ -2488,7 +2488,7 @@ class AcquisitionGeometry(object):
         return AG
 
     @staticmethod
-    def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='units distance'):
+    def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='custom units'):
         r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system
 
         :param source_position: A 2D vector describing the position of the source (x,y)
@@ -2510,7 +2510,7 @@ class AcquisitionGeometry(object):
         return AG
 
     @staticmethod
-    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
+    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='custom units'):
         r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
 
         :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)
@@ -2536,7 +2536,7 @@ class AcquisitionGeometry(object):
         return AG
 
     @staticmethod
-    def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
+    def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='custom units'):
         r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
 
         :param source_position: A 3D vector describing the position of the source (x,y,z)

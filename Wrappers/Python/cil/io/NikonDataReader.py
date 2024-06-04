@@ -143,7 +143,7 @@ class NikonDataReader(object):
         object_roll_deg = None
         centre_of_rotation_top = 0
         centre_of_rotation_bottom = 0
-        units = 'units distance'
+        units = 'custom units'
 
         for line in content:
             # filename of TIFF files

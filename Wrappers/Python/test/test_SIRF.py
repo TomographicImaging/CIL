@@ -24,8 +24,9 @@ import os
 import shutil
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
-from cil.optimisation.algorithms import FISTA
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler, IndicatorBox
+from cil.optimisation.algorithms import FISTA, ISTA
+from cil.optimisation.utilities import AdaptiveSensitivity
 
 import os
 from cil.utilities.display import show2D
@@ -264,10 +265,6 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
         np.testing.assert_array_almost_equal(fista.solution.as_array(), res2.as_array(), decimal=3)
 
 
-
-
-
-
 class TestSIRFCILIntegration(CCPiTestClass):
 
     def setUp(self):
@@ -485,3 +482,64 @@ class TestMRRegularisation(unittest.TestCase, CCPiRegularisationWithSIRFTests):
         recon.process()
         self.image1 = recon.get_output()
         self.image2 = self.image1 * 0.5
+
+
+class TestCILSIRFPrecond(unittest.TestCase):
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def setUp(self):
+        data_path = os.path.join(examples_data_path('PET'), 'thorax_single_slice')
+        self.image = pet.ImageData(os.path.join(data_path, 'emission.hv'))
+        attn_image = pet.ImageData(os.path.join(data_path, 'attenuation.hv'))
+        template = pet.AcquisitionData(os.path.join(data_path, 'template_sinogram.hs'))
+        self.cmax = self.image.max()*.6
+        # create attenuation
+        acq_model_for_attn = pet.AcquisitionModelUsingRayTracingMatrix()
+        asm_attn = pet.AcquisitionSensitivityModel(attn_image, acq_model_for_attn)
+        asm_attn.set_up(template)
+        attn_factors = asm_attn.forward(template.get_uniform_copy(1))
+        asm_attn = pet.AcquisitionSensitivityModel(attn_factors)
+
+        # create acquisition model
+        self.acq_model = pet.AcquisitionModelUsingRayTracingMatrix()
+        self.acq_model.set_num_tangential_LORs(5)
+        self.acq_model.set_acquisition_sensitivity(asm_attn)
+        self.acq_model.set_up(template,self.image)    
+
+        # simulate data
+        acquired_data = self.acq_model.forward(self.image)
+
+        background_term = acquired_data.get_uniform_copy(acquired_data.max()/10)
+        self.acq_model.set_background_term(background_term)
+        self.acquired_data = self.acq_model.forward(self.image)
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_SIRF_CIL_MLEM(self):     
+
+        obj_fun = pet.make_Poisson_loglikelihood(self.acquired_data)
+        obj_fun.set_acquisition_model(self.acq_model)
+        recon = pet.OSMAPOSLReconstructor()
+        recon.set_objective_function(obj_fun)
+        recon.set_num_subsets(1)
+        recon.set_num_subiterations(10)
+
+        initial_image=self.image.get_uniform_copy(self.cmax / 4)
+        trunc = pet.TruncateToCylinderProcessor()
+        trunc.apply(initial_image)
+
+        recon.set_current_estimate(initial_image)
+        recon.set_up(initial_image)
+        recon.process()
+        reconstructed_image=recon.get_output()    
+
+        sens = AdaptiveSensitivity(self.acq_model, delta = 0., iterations = 200)
+
+        trunc = pet.TruncateToCylinderProcessor()
+        trunc.apply(initial_image)
+
+        ista = ISTA(initial = initial_image, f = obj_fun, g = IndicatorBox(lower=0.),  step_size = -1.0, 
+                    preconditioner=sens,update_objective_interval=1, max_iteration=10)
+        ista.run(verbose=0)      
+
+        print("adad")
+        np.testing.assert_allclose(ista.solution.as_array()[0], reconstructed_image.as_array()[0], rtol=1e-3)         

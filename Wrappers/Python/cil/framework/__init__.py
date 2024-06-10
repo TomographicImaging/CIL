@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -30,7 +29,7 @@ from .framework import VectorData, VectorGeometry
 from .framework import find_key, message
 from .framework import DataProcessor, Processor
 from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
-from .BlockDataContainer import BlockDataContainer
-from .BlockGeometry import BlockGeometry
+from .block import BlockDataContainer
+from .block import BlockGeometry
 from .framework import DataOrder
 from .framework import Partitioner

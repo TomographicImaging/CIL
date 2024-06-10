@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -33,21 +32,21 @@ class L2NormSquared(Function):
 
     Parameters
     ----------
-    
+
     b:`DataContainer`, optional
         Translation of the function
-                
-        
+
+
     Note
     -----
-    
+
     For case b) we can use :code:`F = L2NormSquared().centered_at(b)`, see *TranslateFunction*.
 
     Example
     -------
 
         >>> F = L2NormSquared()
-        >>> F = L2NormSquared(b=b) 
+        >>> F = L2NormSquared(b=b)
         >>> F = L2NormSquared().centered_at(b)
 
     """
@@ -73,23 +72,18 @@ class L2NormSquared(Function):
 
             a) :math:`F'(x) = 2x`
             b) :math:`F'(x) = 2(x-b)`
-
         """
-
         if self.b is None:
-            ret = x.multiply(2, out=out)
+            return x.multiply(2, out=out)
         else:
-            ret = x.sapyb(2, self.b, -2, out=out)
-
-        if out is None:
-            return ret
+            return x.sapyb(2, self.b, -2, out=out)
 
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
 
         Consider the following cases:
 
-                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} 
+                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2}
                 b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + \langle x^{*}, b\rangle
 
         """
@@ -107,19 +101,16 @@ class L2NormSquared(Function):
         Consider the following cases:
 
                 a) .. math:: \text{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
-                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
+                b) .. math:: \text{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b
 
         """
 
         mult = 1/(1+2*tau)
 
         if self.b is None:
-            ret = x.multiply(mult, out=out)
+            return x.multiply(mult, out=out)
         else:
-            ret = x.sapyb(mult, self.b, (1-mult), out=out)
-
-        if out is None:
-            return ret
+            return x.sapyb(mult, self.b, (1-mult), out=out)
 
 
 class WeightedL2NormSquared(Function):
@@ -174,15 +165,13 @@ class WeightedL2NormSquared(Function):
         """
 
         if out is not None:
-
             out.fill(x)
             if self.b is not None:
                 out -= self.b
             self.operator_weight.direct(out, out=out)
             out *= 2
-
+            return out
         else:
-
             y = x
             if self.b is not None:
                 y = x - self.b
@@ -198,21 +187,10 @@ class WeightedL2NormSquared(Function):
 
     def proximal(self, x, tau, out=None):
         r"""Returns the value of the proximal operator of the WeightedL2NormSquared function at x."""
-        if out is None:
-
-            if self.b is None:
-                return x/(1+2*tau*self.weight)
-            else:
-                tmp = x.subtract(self.b)
-                tmp /= (1+2*tau*self.weight)
-                tmp += self.b
-                return tmp
-
+        if self.b is not None:
+            ret = x.subtract(self.b, out=out)
+            ret /= (1+2*tau*self.weight)
+            ret += self.b
         else:
-
-            if self.b is not None:
-                x.subtract(self.b, out=out)
-                out /= (1+2*tau*self.weight)
-                out += self.b
-            else:
-                x.divide((1+2*tau*self.weight), out=out)
+            ret = x.divide((1+2*tau*self.weight), out=out)
+        return ret

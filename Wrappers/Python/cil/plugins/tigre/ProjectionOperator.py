@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -19,12 +18,15 @@
 
 from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
 from cil.framework import DataOrder
-from cil.framework.BlockGeometry import BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
 import logging
+import warnings
+
+log = logging.getLogger(__name__)
 
 try:
     from _Atb import _Atb_ext as Atb
@@ -46,10 +48,10 @@ class ProjectionOperator(LinearOperator):
     """
         ProjectionOperator configures and calls TIGRE Projectors for your dataset.
 
-        Please refer to the TIGRE documentation for futher descriptions
+        Please refer to the TIGRE documentation for further descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
-                        
+
 
         Parameters
         ----------
@@ -77,7 +79,7 @@ class ProjectionOperator(LinearOperator):
     def __new__(cls, image_geometry=None, acquisition_geometry=None, \
         direct_method='interpolated',adjoint_weights='matched', **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
-            logging.info("BlockOperator is returned.")
+            log.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
@@ -87,7 +89,7 @@ class ProjectionOperator(LinearOperator):
                 )
             return BlockOperator(*K)
         else:
-            logging.info("Standard Operator is returned.")
+            log.info("Standard Operator is returned.")
             return super(ProjectionOperator,
                          cls).__new__(ProjectionOperator_ag)
 
@@ -104,10 +106,10 @@ class ProjectionOperator_ag(ProjectionOperator):
         """
         ProjectionOperator configures and calls TIGRE Projectors for your dataset.
 
-        Please refer to the TIGRE documentation for futher descriptions
+        Please refer to the TIGRE documentation for further descriptions
         https://github.com/CERN/TIGRE
         https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010
-                        
+
 
         Parameters
         ----------
@@ -133,18 +135,8 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         """
 
-        acquisition_geometry_old = kwargs.get('aquisition_geometry', None)
-
-        if acquisition_geometry_old is not None:
-            acquisition_geometry = acquisition_geometry_old
-            logging.warning(
-                "aquisition_geometry has been deprecated. Please use acquisition_geometry instead."
-            )
-
         if acquisition_geometry is None:
-            raise TypeError(
-                "Please specify an acquisition_geometry to configure this operator"
-            )
+            raise TypeError("Please specify an acquisition_geometry to configure this operator")
 
         if image_geometry == None:
             image_geometry = acquisition_geometry.get_ImageGeometry()

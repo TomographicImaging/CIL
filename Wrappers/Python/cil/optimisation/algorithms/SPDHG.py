@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -21,17 +20,20 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.operators import BlockOperator
 import numpy as np
-import warnings
 import logging
 from cil.optimisation.utilities import Sampler
 from numbers import Number
 import numpy as np
 
 
+log = logging.getLogger(__name__)
+
+
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
 
     Problem: 
+
 
     .. math::
 
@@ -43,8 +45,8 @@ class SPDHG(Algorithm):
         Each must be a convex function with a "simple" proximal method of its conjugate
     g : Function
         A convex function with a "simple" proximal
-    operator : BlockOperator   
-        BlockOperator must contain Linear Operators    
+    operator : BlockOperator
+        BlockOperator must contain Linear Operators
     tau : positive float, optional, default=None
         Step size parameter for Primal problem
     sigma : list of positive float, optional, default=None
@@ -90,6 +92,7 @@ class SPDHG(Algorithm):
     >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.sequential(len(A)),
                       initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
     >>> spdhg.run(100)
+
 
     Example
     -------
@@ -157,6 +160,7 @@ class SPDHG(Algorithm):
 
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
+
         '''set-up of the algorithm
 
         Parameters
@@ -165,8 +169,8 @@ class SPDHG(Algorithm):
             Each must be a convex function with a "simple" proximal method of its conjugate
         g : Function
             A convex function with a "simple" proximal
-        operator : BlockOperator   
-            BlockOperator must contain Linear Operators    
+        operator : BlockOperator
+            BlockOperator must contain Linear Operators
         tau : positive float, optional, default=None
             Step size parameter for Primal problem
         sigma : list of positive float, optional, default=None
@@ -181,8 +185,8 @@ class SPDHG(Algorithm):
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 
         '''
-        logging.info("{} setting up".format(self.__class__.__name__, ))
-
+        log.info("%s setting up", self.__class__.__name__)
+    
         # algorithmic parameters
         self.f = f
         self.g = g
@@ -220,6 +224,7 @@ class SPDHG(Algorithm):
             self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = initial.copy()
+
 
         self._x_tmp = self.operator.domain_geometry().allocate(0)
 

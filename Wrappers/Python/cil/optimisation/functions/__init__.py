@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -35,3 +34,7 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
+from .L1Sparsity import L1Sparsity
+from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
+from .SGFunction import SGFunction
+

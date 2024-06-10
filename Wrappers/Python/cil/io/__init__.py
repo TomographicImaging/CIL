@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2018 United Kingdom Research and Innovation
 #  Copyright 2018 The University of Manchester
 #
@@ -24,5 +23,4 @@ from .TIFF import TIFFWriter
 from .TIFF import TIFFStackReader
 # from .TIFFStackReader import TIFFStackReader
 from .ZEISSDataReader import ZEISSDataReader
-from .ZEISSDataReader import TXRMDataReader
 from .RAWFileWriter import RAWFileWriter

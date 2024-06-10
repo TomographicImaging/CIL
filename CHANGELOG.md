@@ -1,5 +1,39 @@
 
-* x.x.x
+* XX.X.X
+
+  - New Features:
+    - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
+    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
+    - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)
+    - an implementation of the Armijo Rule as a child class of  `cil.optimisation.utilities.StepSizeRule` (#1768)
+    - Sensitivity preconditioners added as child classes of `cil.optimisation.utilities.Preconditioner`(#1768)
+  - Enhancements:
+    - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
+    - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
+    - Operators and functions now also return when out is specified (#1742)
+    - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
+  - Bug fixes:
+    - gradient descent `update_objective` called twice on the initial point.(#1789)
+    - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
+    - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
+    - BlurringOperator: remove check for geometry class (old SIRF integration bug) (#1807)
+    - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
+  - Changes that break backwards compatibility:
+    - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
+
+
+
+* 24.0.0
+  - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
+  - CIL plugin support for TIGRE version v2.6
+  - CIL plugin support for ASTRA-TOOLBOX version v2.1
+  - Dropped support for python 3.8 and 3.9
+  - Added support for python 3.11 and 3.12
+  - Dropped support for numpy 1.21 and 1.22
+  - Added support for numpy 1.25 and 1.26
+  - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
   - Allow reduction methods on the DataContainer class to accept axis argument as string which matches values in dimension_labels
@@ -13,18 +47,39 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility 
-  - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
-  - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None
   - Bug fix in the adjoint of the Diagonal Operator for complex values
   - Update conda build action to v2 for 2.5x quicker builds
-  - Add docker image & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
+  - Add docker image, test & push to [`ghcr.io/tomographicimaging/cil`](https://github.com/TomographicImaging/CIL/pkgs/container/cil)
   - Quality metrics have added mask option
   - Bug fix for norm of CompositionOperator
-
+  - Functions updated to use sapyb
+  - Fix KullbackLeibler numba gradient ignoring mask
+  - show1D slice_list parameter can now be of type tuple
+  - Deprecated `Algorithm`'s `max_iteration`, `log_file`, `**kwargs`, `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output`, `verbose_header`, `run(print_interval)`
+  - Added `optimisation.utilities.callbacks`
+    - Added `Callback` (abstract base class), `ProgressCallback`, `TextProgressCallback`, `LogfileCallback`
+    - Deprecated `Algorithm.run(callback: Callable)`
+    - Added `Algorithm.run(callbacks: list[Callback])`
+  - Allow `CentreOfRotationCorrector.xcorrelation` to accept a list of two values in `projection_index` to use for the correlation
+  - Bug fix in `CentreOfRotationCorrector.xcorrelation` finding correlation angles for limited angle data
+  - New unit tests have been implemented for operators and functions to check for in place errors and the behaviour of `out`.
+  - Bug fix for missing factor of 1/2 in SIRT update objective and catch in place errors in the SIRT constraint
+  - Bug fix to allow safe in place calculation for the soft shrinkage algorithm
+  - Allow Masker to take integer arrays in addition to boolean
+  - Add remote data class to example data to enable download of relevant datasets from remote repositories 
+  - Improved import error/warning messages
+  - New adjoint operator
+  - Bug fix for complex matrix adjoint
+  - Removed the following code which was deprecated since v22.0.0:
+    - `info` parameter in `cil.optimisation.functions.TotalVariation`
+    - `sinogram_geometry` and `volume_geometry` parameters in `cil.plugins.astra.processors.FBP` and in `cil.plugins.tigre.processors.FBP`
+    - `aquisition_geometry` (misspelled) parameter in `cil.plugins.tigre.processors.ProjectionOperator`
+    - `FBP` kwarg (and thus all kwargs) in `cil.processors.CentreOfRotationCorrector` and `cil.processors.CofR_image_sharpness`
+    - `TXRMDataReader`
+  - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
@@ -140,7 +195,7 @@
   - Recon.FBP allows 'astra' backend
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
-  - Geometry alignmentment fix for 2D datasets
+  - Geometry alignment fix for 2D datasets
   - CGLS update for sapyb to enable complex data, bugfix in use of initial
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
@@ -183,7 +238,7 @@
   - Fixed bug in Zeiss reader geometry direction of rotation
 
 * 21.0.0
-  - Show2D now takes 4D datasets and slice infomation as input
+  - Show2D now takes 4D datasets and slice information as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
   - Datacontainers have get_slice method which returns a dataset with a single slice of the data
   - Datacontainers have reorder method which reorders the data in memory as requested, or for use with 'astra' or 'tigre'

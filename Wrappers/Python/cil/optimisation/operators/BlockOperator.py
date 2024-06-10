@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -36,10 +35,10 @@ class BlockOperator(Operator):
 
     Parameters
     ----------
-    *args : Operator  
-        Operators in the block.  
-    **kwargs : dict  
-        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  
+    *args : Operator
+        Operators in the block.
+    **kwargs : dict
+        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.
 
 
     Note
@@ -52,9 +51,9 @@ class BlockOperator(Operator):
       \min Regulariser + Fidelity
 
 
-    BlockOperators have a generic shape M x N, and when applied on an 
+    BlockOperators have a generic shape M x N, and when applied on an
     Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
-  
+
     Note
     -----
     BlockDatacontainer are only allowed to have the shape of N x 1, with
@@ -140,9 +139,9 @@ class BlockOperator(Operator):
         Parameters
         ----------
         row: `int`
-            The row index required. 
+            The row index required.
         col: `int`
-            The column index required. 
+            The column index required.
         '''
         if row > self.shape[0]:
             raise ValueError(
@@ -164,12 +163,12 @@ class BlockOperator(Operator):
         return [op.norm() for op in self.operators]
 
     def set_norms(self, norms):
-        '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
+        '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values.
 
-        Parameters  
-        ------------  
-        norms: list  
-            A list of positive real values the same length as the number of operators in the BlockOperator.  
+        Parameters
+        ------------
+        norms: list
+            A list of positive real values the same length as the number of operators in the BlockOperator.
 
         '''
         if len(norms) != self.size:
@@ -192,11 +191,10 @@ class BlockOperator(Operator):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape)
-        res = []
+        shape = self.get_output_shape(x_b.shape)        
 
         if out is None:
-
+            res = []
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
                     if col == 0:
@@ -206,24 +204,28 @@ class BlockOperator(Operator):
                         prod += self.get_item(row,
                                               col).direct(x_b.get_item(col))
                 res.append(prod)
-            return BlockDataContainer(*res, shape=shape)
+            if 1 == shape[0] == shape[1]:
+                # the output is a single DataContainer, so we can take it out 
+                return res[0] 
+            else: 
+                return BlockDataContainer(*res, shape=shape) 
+            
 
         else:
-
             tmp = self.range_geometry().allocate()
             for row in range(self.shape[0]):
-                for col in range(self.shape[1]):  
-                    if col == 0:       
+                for col in range(self.shape[1]):
+                    if col == 0:
                         self.get_item(row,col).direct(
                                                       x_b.get_item(col),
-                                                      out=out.get_item(row))                        
+                                                      out=out.get_item(row))
                     else:
-                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to  
+                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to
                         self.get_item(row,col).direct(
-                                                      x_b.get_item(col), 
+                                                      x_b.get_item(col),
                                                       out=tmp.get_item(row))
                         temp_out_row += tmp.get_item(row)
-                
+            return out
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -263,7 +265,6 @@ class BlockOperator(Operator):
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
-
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):
                     if row == 0:
@@ -284,10 +285,11 @@ class BlockOperator(Operator):
                                 x_b.get_item(row))
                         else:
 
-                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating 
+                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating
                             temp_out_col += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row),
                                                         )
+            return out
 
     def is_linear(self):
         '''Returns whether all the elements of the BlockOperator are linear'''
@@ -304,7 +306,7 @@ class BlockOperator(Operator):
         Examples
         --------
         A(N,M) direct u(M,1) -> N,1
-        
+
         A(N,M)^T adjoint u(N,1) -> M,1
         '''
         rows, cols = self.shape
@@ -372,6 +374,8 @@ class BlockOperator(Operator):
             tmp = []
             for i in range(self.shape[1]):
                 tmp.append(self.get_item(0, i).domain_geometry())
+            if self.shape[1] == 1:
+                return tmp[0]
             return BlockGeometry(*tmp)
 
             # shape = (self.shape[0], 1)
@@ -384,6 +388,8 @@ class BlockOperator(Operator):
         tmp = []
         for i in range(self.shape[0]):
             tmp.append(self.get_item(i, 0).range_geometry())
+        if self.shape[0] == 1:
+            return tmp[0]
         return BlockGeometry(*tmp)
 
     def sum_abs_row(self):

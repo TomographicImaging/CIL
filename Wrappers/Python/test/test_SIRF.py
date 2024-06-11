@@ -532,7 +532,7 @@ class TestCILSIRFPrecond(unittest.TestCase):
         recon.process()
         reconstructed_image=recon.get_output()    
 
-        sens = AdaptiveSensitivity(self.acq_model, delta = 0., iterations = 200)
+        sens = AdaptiveSensitivity(self.acq_model, delta = 0., max_iterations = 200)
 
         trunc = pet.TruncateToCylinderProcessor()
         trunc.apply(initial_image)

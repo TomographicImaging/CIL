@@ -125,8 +125,9 @@ class Function(object):
         DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`.
 
         """
-        if id(x)==id(out):
-            raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
+        if id(x) == id(out):
+            raise InPlaceError(
+                message="The proximal_conjugate of a CIL function cannot be used in place")
 
         try:
             tmp = x
@@ -176,6 +177,11 @@ class Function(object):
 
     def __mul__(self, scalar):
         return self.__rmul__(scalar)
+    
+    def __neg__(self):
+        """ Return the negative of the function """
+        return -1 * self
+    
 
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.
@@ -334,7 +340,7 @@ class SumFunction(Function):
         DataContainer, the value of the sum of the gradients evaluated at point :math:`x`.
 
         """
-        if out is not None and id(x)==id(out):
+        if out is not None and id(x) == id(out):
             raise InPlaceError
 
         for i, f in enumerate(self.functions):
@@ -366,6 +372,7 @@ class SumFunction(Function):
     @property
     def num_functions(self):
         return len(self.functions)
+
 
 class ScaledFunction(Function):
 
@@ -517,7 +524,7 @@ class ScaledFunction(Function):
         DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau`.
 
         """
-        if out is not None and id(x)==id(out):
+        if out is not None and id(x) == id(out):
             raise InPlaceError
 
         try:
@@ -618,7 +625,7 @@ class ConstantFunction(Function):
 
     def __init__(self, constant=0):
         self.constant = constant
-        super(ConstantFunction, self).__init__(L=0)
+        super(ConstantFunction, self).__init__(L=1)
 
     def __call__(self, x):
         """ Returns the value of the function, :math:`F(x) = constant`"""
@@ -709,7 +716,7 @@ class ConstantFunction(Function):
 
     @property
     def L(self):
-        return 0.
+        return 1.
 
     def __rmul__(self, other):
         '''defines the right multiplication with a number'''
@@ -800,7 +807,7 @@ class TranslateFunction(Function):
         DataContainer, the gradient of the translated function evaluated at :math:`x`.
         """
 
-        if id(x)==id(out):
+        if id(x) == id(out):
             raise InPlaceError
 
         try:
@@ -834,7 +841,7 @@ class TranslateFunction(Function):
         DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau`.
         """
 
-        if id(x)==id(out):
+        if id(x) == id(out):
             raise InPlaceError
 
         try:

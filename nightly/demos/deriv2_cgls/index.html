@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=b89f6043bd7c2867a472" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -34,9 +34,9 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=b89f6043bd7c2867a472"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f7af4ec81fd330a28c6b"></script>
 
     <script src="../../_static/documentation_options.js?v=89421ced"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -48,7 +48,7 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/deriv2_cgls';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.3rc1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.0.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
@@ -104,6 +104,11 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
     <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
@@ -116,7 +121,9 @@
     
       <div class="navbar-item">
 
-   
+  
+     
+  
 
 <a class="navbar-brand logo" href="/">
   
@@ -142,83 +149,83 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../introduction/">
-                        Introduction
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../framework/">
-                        Framework
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../io/">
-                        Read/ write AcquisitionData and ImageData
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../optimisation/">
-                        Optimisation framework
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../processors/">
-                        Processors
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../recon/">
-                        Recon
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../utilities/">
-                        Utilities
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../plugins/">
-                        CIL Plugins
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../developer_guide/">
-                        Developers’ Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
             <li class="nav-item dropdown pst-header-nav-item">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item  current active">
-                      <a class="nav-link dropdown-item nav-internal" href="../">
-                        Tutorials
-                      </a>
-                    </li>
-                
+<li class="nav-item  current active">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -272,78 +279,78 @@ document.write(`
           
           
             <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../introduction/">
-                        Introduction
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../framework/">
-                        Framework
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../io/">
-                        Read/ write AcquisitionData and ImageData
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../optimisation/">
-                        Optimisation framework
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../processors/">
-                        Processors
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../recon/">
-                        Recon
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../utilities/">
-                        Utilities
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../plugins/">
-                        CIL Plugins
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item pst-header-nav-item ">
-                      <a class="nav-link nav-internal" href="../../developer_guide/">
-                        Developers’ Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
 
-                    <li class="nav-item pst-header-nav-item current active">
-                      <a class="nav-link nav-internal" href="../">
-                        Tutorials
-                      </a>
-                    </li>
-                
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
   </ul>
 </nav></div>
           
@@ -505,10 +512,10 @@ document.write(`
                 <article class="bd-article">
                   
   <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
 <span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -535,10 +542,10 @@ for tomographic imaging.” Philosophical Transactions of the Royal Society A 37
 <p>This notebook was developed as part of the CCPi CIL Hackathon <a class="reference external" href="https://ccpi.ac.uk/events/byod-cil-hackathon/">https://ccpi.ac.uk/events/byod-cil-hackathon/</a> in March 2023 in Cambridge as part of the Rich Nonlinear Tomography programme at the Isaac Newton Institute for Mathematical Sciences <a class="reference external" href="https://www.newton.ac.uk/event/rnt/">https://www.newton.ac.uk/event/rnt/</a>. The CIL is supported by the CCPi EPSRC grant EP/T026677/1 and the Isaac NewtonInstitute by EP/R014604/1 The author would like to thank the Isaac Newton Institute for support and hospitality.(c) W.R.B. Lionheart 2023.
 Apache License</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">CGLS</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">MatrixOperator</span>
@@ -551,10 +558,10 @@ Apache License</p>
 <section id="CIL-version-23.0.1">
 <h2>CIL version 23.0.1<a class="headerlink" href="#CIL-version-23.0.1" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="kn">import</span> <span class="nn">cil</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cil</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -580,10 +587,10 @@ Apache License</p>
 \[b(s) = (s^3 - s)/6          , \ \  x(t) = t\]</div>
 <p>where the integral is disretised using the Galerkin method with orthonormal box functions, with interval size <span class="math notranslate nohighlight">\(1/n\)</span>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1"># Test of one dimensional inverse problems using deriv2 from reg tools</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># Test of one dimensional inverse problems using deriv2 from reg tools</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">x</span> <span class="o">=</span> <span class="n">deriv2</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <br/><br/></pre></div>
@@ -591,10 +598,10 @@ Apache License</p>
 </div>
 <p>The functions <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(x\)</span> can be plotted:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">x</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">b</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -612,15 +619,15 @@ Apache License</p>
 </div>
 <p>This has made a A, x, and b where Ax=b. We can check check this is the case up to floating point error:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="nd">@x</span><span class="o">-</span><span class="n">b</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="nd">@x</span><span class="o">-</span><span class="n">b</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -630,10 +637,10 @@ Apache License</p>
 </div>
 <p>Now make a version of b with noise</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">bn</span><span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="mf">0.001</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bn</span><span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="mf">0.001</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">b</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Noise free b&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">bn</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Noisy b&#39;</span><span class="p">)</span>
@@ -651,10 +658,10 @@ Apache License</p>
 </div>
 <p><span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are stored as Numpy arrays. Just as in Matlab we can look at the singular value decomposition (SVD). On a log scale we see the singular values decay as a negative power as expected for an operator that approximates the inverse of two derivatives.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;The singular values of the forward operator A&#39;</span><span class="p">)</span>
@@ -682,10 +689,10 @@ Apache License</p>
 </div>
 <p>Solving the least squares problem <span class="math notranslate nohighlight">\(\min_x\|Ax-b\|_2^2\)</span> demonstrates the ill-posedness of the problem:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">xlq</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">bn</span><span class="p">,</span><span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xlq</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">bn</span><span class="p">,</span><span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">xlq</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Least squares solution&#39;</span><span class="p">)</span>
@@ -696,7 +703,7 @@ Apache License</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -721,15 +728,15 @@ Apache License</p>
 </div>
 <p>We see the solution matches the observed data well:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="nd">@xlq</span><span class="o">-</span><span class="n">bn</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="nd">@xlq</span><span class="o">-</span><span class="n">bn</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -739,10 +746,10 @@ Apache License</p>
 </div>
 <p>However this is not a desired solution to our inverse problem. Now, instead, solve using Tikonov regularization:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">reg_param</span><span class="o">=</span> <span class="mf">0.005</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reg_param</span><span class="o">=</span> <span class="mf">0.005</span>
 
 <span class="n">Atik</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">A</span><span class="p">,</span><span class="n">reg_param</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
 
@@ -758,7 +765,7 @@ Apache License</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -784,10 +791,10 @@ Apache License</p>
 <p>This solution is an improvement, although we still have this odd behaviour at the end of the interval.</p>
 <p>Now convert the matrix and operators to CIL types so we can use inbuilt optimisation routines and regularisers in CIL:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">Aop</span> <span class="o">=</span> <span class="n">MatrixOperator</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Aop</span> <span class="o">=</span> <span class="n">MatrixOperator</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="n">bop</span><span class="o">=</span> <span class="n">VectorData</span><span class="p">(</span><span class="n">bn</span><span class="p">)</span>
 <br/></pre></div>
 </div>
@@ -797,10 +804,10 @@ Apache License</p>
 \[\min_x \|Ax-b\|_2^2.\]</div>
 <p>We choose a small number of iterations to implicitly regularise via early stopping:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="c1">#bop = VectorData(np.reshape(b,[-1]))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#bop = VectorData(np.reshape(b,[-1]))</span>
 <span class="n">op</span> <span class="o">=</span> <span class="n">VectorData</span><span class="p">(</span><span class="n">bn</span><span class="p">)</span>
 <span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">Aop</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bop</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -836,10 +843,10 @@ Stop criterion has been reached.
 </div>
 <p>We can also do Tikhonov regularisation using the CIL framework. For example, in the block framework below:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
 <span class="n">operator_block</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">Aop</span><span class="p">,</span> <span class="n">reg_param</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
 
@@ -875,10 +882,10 @@ Stop criterion has been reached.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span> <span class="n">cglsb</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Tikhonov regularised solution- CIL&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">x</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ground truth solution&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -895,10 +902,10 @@ Stop criterion has been reached.
 </div>
 <p>We can compare the results of Tikhonov regularisation implemented by numpy and CIL:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre data-tabindex="0"><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre data-tabindex="0"><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span>  <span class="n">cglsb</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Tikhonov regularised solution- CIL&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">xtik</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Tikhonov regularised solution- numpy&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">),</span><span class="n">x</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ground truth solution&#39;</span><span class="p">)</span>
@@ -965,8 +972,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=b89f6043bd7c2867a472"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=b89f6043bd7c2867a472"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

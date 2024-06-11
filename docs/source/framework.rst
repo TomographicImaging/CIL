@@ -174,6 +174,44 @@ This provide a base class that will behave as normal :code:`DataContainer`.
    :members:
    :inherited-members:
 
+Partitioner
+===========
+
+This class allows a user to partition an instance of :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
+
+For example: 
+
+.. code-block :: python
+
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
+
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
+
+   # partition the data and build the projectors
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
+   A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
+
+
+Users can call :code:`YourAcquisitionData.partition(num_batches, mode, seed=None)` using the method
+
+.. autoclass:: cil.framework.Partitioner.partition
+   :members:
+   
+This comes from the parent class: 
+
+.. autoclass:: cil.framework.Partitioner
+   :members:
+   :inherited-members:
+
 DataOrder
 =========
 .. autoclass:: cil.framework.DataOrder

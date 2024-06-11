@@ -201,16 +201,11 @@ For example:
    A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
 
 
-Users can call :code:`YourAcquisitionData.partition(num_batches, mode, seed=None)` using the method
-
-.. autoclass:: cil.framework.Partitioner.partition
-   :members:
-   
-This comes from the parent class: 
+Users can call :code:`YourAcquisitionData.partition(num_batches, mode, seed=None)` using the method :code:`cil.framework.Partitioner.partition` from 
 
 .. autoclass:: cil.framework.Partitioner
    :members:
-   :inherited-members:
+   
 
 DataOrder
 =========

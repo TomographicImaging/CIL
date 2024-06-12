@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -33,9 +33,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f7af4ec81fd330a28c6b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=c7a720198ac4ae000e18" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=c7a720198ac4ae000e18" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=c7a720198ac4ae000e18"></script>
 
     <script src="../_static/documentation_options.js?v=89421ced"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
@@ -532,13 +532,17 @@ other image processing tasks.</p>
 <h3>Total variation<a class="headerlink" href="#total-variation" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.plugins.ccpi_regularisation.functions.FGP_TV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_TV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_TV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></span><span class="sig-name descname"><span class="pre">FGP_TV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_convexity_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/plugins/ccpi_regularisation/functions/regularisers/#FGP_TV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="Link to this definition">#</a></dt>
 <dd><p>Fast Gradient Projection Total Variation (FGP_TV)</p>
 <p>The <a class="reference internal" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="cil.plugins.ccpi_regularisation.functions.FGP_TV"><code class="xref py py-class docutils literal notranslate"><span class="pre">FGP_TV</span></code></a> computes the proximal operator of the Total variation regulariser</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
 applied to the _dual <a href="#id8"><span class="problematic" id="id9">problem_</span></a> of the above problem, see <span id="id1">[<a class="reference internal" href="../optimisation/#id55" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id2">[<a class="reference internal" href="../optimisation/#id54" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -550,7 +554,7 @@ applied to the _dual <a href="#id8"><span class="problematic" id="id9">problem_<
 <div class="math notranslate nohighlight">
 \[|x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})\]</div>
 </p></li>
-<li><p><strong>nonnegativity</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>. Default = True .) – Non-negativity constraint for the solution of the FGP algorithm.</p></li>
+<li><p><strong>nonnegativity</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>. Default = False .) – Non-negativity constraint for the solution of the FGP algorithm.</p></li>
 <li><p><strong>tolerance</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, Default = 0 .) – <p>Stopping criterion for the FGP algorithm.</p>
 <div class="math notranslate nohighlight">
 \[\|x^{k+1} - x^{k}\|_{2} &lt; \mathrm{tolerance}\]</div>
@@ -1028,8 +1032,8 @@ for forward and back projections and filter back projection reconstruction.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=c7a720198ac4ae000e18"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=c7a720198ac4ae000e18"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

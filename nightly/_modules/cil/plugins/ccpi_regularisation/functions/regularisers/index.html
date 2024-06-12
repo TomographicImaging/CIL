@@ -17,12 +17,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../../_static/styles/theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
-<link href="../../../../../../_static/styles/bootstrap.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
-<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+  <link href="../../../../../../_static/styles/theme.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
+<link href="../../../../../../_static/styles/bootstrap.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
+<link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
 
   
-  <link href="../../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f7af4ec81fd330a28c6b" rel="stylesheet" />
+  <link href="../../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=c7a720198ac4ae000e18" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sg_gallery.css?v=61a4c737" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b" />
-<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b" />
-  <script src="../../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f7af4ec81fd330a28c6b"></script>
+  <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=c7a720198ac4ae000e18" />
+<link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=c7a720198ac4ae000e18" />
+  <script src="../../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=c7a720198ac4ae000e18"></script>
 
     <script src="../../../../../../_static/documentation_options.js?v=89421ced"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
@@ -627,6 +627,9 @@ document.write(`
 <span class="sd">        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm</span>
 <span class="sd">        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
 
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -644,7 +647,7 @@ document.write(`
 
 <span class="sd">                    .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})</span>
 
-<span class="sd">        nonnegativity : :obj:`boolean`. Default = True .</span>
+<span class="sd">        nonnegativity : :obj:`boolean`. Default = False .</span>
 <span class="sd">                        Non-negativity constraint for the solution of the FGP algorithm.</span>
 
 <span class="sd">        tolerance : :obj:`float`, Default = 0 .</span>
@@ -691,13 +694,16 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">isotropic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">methodTV</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">methodTV</span> <span class="o">=</span> <span class="mi">1</span>
 
+        <span class="k">if</span> <span class="n">nonnegativity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Deprecate this warning in future versions and allow nonnegativity to be default False in the init. </span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Note that the default behaviour now sets the nonnegativity constraint to False &#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">False</span> 
         <span class="k">if</span> <span class="n">nonnegativity</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nonnegativity</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1064,8 +1070,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../../../_static/scripts/bootstrap.js?digest=f7af4ec81fd330a28c6b"></script>
-<script src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f7af4ec81fd330a28c6b"></script>
+  <script src="../../../../../../_static/scripts/bootstrap.js?digest=c7a720198ac4ae000e18"></script>
+<script src="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=c7a720198ac4ae000e18"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -28,7 +28,7 @@ from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 
-import os
+import os, sys
 import matplotlib.testing.compare as compare
 from scipy.fft import fftfreq
 
@@ -308,7 +308,8 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         fdk = GenericFilteredBackProjection(self.ad3D)
         filter_list = fdk.preset_filters
         filter_list.append('custom')
-        filter_plots_folder = os.path.join(os.path.dirname(__file__),"test_plots","filters")
+        #filter_plots_folder = os.path.join(os.path.dirname(__file__),"test_plots","filters")
+        filter_plots_folder = os.path.abspath(os.path.join(sys.prefix,"test_plots","filters"))
         test_plot_path = os.path.join(filter_plots_folder, 'test_plot_filter.png')
         for cutoff in [0.5,1]:
             for filter_name in filter_list:

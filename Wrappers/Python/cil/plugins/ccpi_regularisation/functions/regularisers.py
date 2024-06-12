@@ -138,6 +138,9 @@ class FGP_TV(TV_Base):
         The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
         applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
+        Note
+        -----
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default. 
 
         Parameters
         ----------

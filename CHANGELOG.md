@@ -12,6 +12,7 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
     - Operators and functions now also return when out is specified (#1742)
     - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes 
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
@@ -20,7 +21,7 @@
     - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
-
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively
 
 
 
@@ -46,7 +47,6 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None

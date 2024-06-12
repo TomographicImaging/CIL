@@ -308,7 +308,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         fdk = GenericFilteredBackProjection(self.ad3D)
         filter_list = fdk.preset_filters
         filter_list.append('custom')
-        filter_plots_folder = r"../test_plots/filters"
+        filter_plots_folder = os.path.join(os.path.dirname(__file__),"test_plots","filters")
         test_plot_path = os.path.join(filter_plots_folder, 'test_plot_filter.png')
         for cutoff in [0.5,1]:
             for filter_name in filter_list:

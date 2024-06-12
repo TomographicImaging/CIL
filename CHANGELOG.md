@@ -12,6 +12,7 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
     - Operators and functions now also return when out is specified (#1742)
     - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Added documentation for the Partitioner (#1828) to `framework.rst`
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)

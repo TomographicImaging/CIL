@@ -31,6 +31,7 @@ from cil.recon import FDK, FBP
 import os, sys
 import matplotlib.testing.compare as compare
 from scipy.fft import fftfreq
+import tempfile
 
 initialise_tests()
 
@@ -301,15 +302,17 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
     def test_plot_filter(self):
         """
         Tests that the filters are plotted correctly for two different 
-        values of cutoff, all preset filters and the custom filter.
+        values of cutoff. This is done for all preset filters and the custom filter.
         The plots are compared to stored png files.
         The test will not show any screen output.
+        The temporary directory and files are removed.
         """
         fdk = GenericFilteredBackProjection(self.ad3D)
         filter_list = fdk.preset_filters
         filter_list.append('custom')
         filter_plots_folder = os.path.join(os.path.dirname(__file__),"test_plots","filters")
-        test_plot_path = os.path.join(filter_plots_folder, 'test_plot_filter.png')
+        test_plot_folder = tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
+        test_plot_path = os.path.join(test_plot_folder, 'test_plot_filter.png')
         for cutoff in [0.5,1]:
             for filter_name in filter_list:
                 if filter_name == 'custom':
@@ -324,6 +327,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                 self.assertIsNone(err, f"Filter plots are not the same: {err}")
                 os.remove(test_plot_path)
                 plot.close()
+        os.removedirs(test_plot_folder)
 
 class Test_FDK(unittest.TestCase):
 

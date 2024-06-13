@@ -37,6 +37,69 @@ class PaganinProcessor(Processor):
     Processor to retrieve quantitative information from phase contrast images 
     using the Paganin phase retrieval algorithm described in [1]
     
+    Parameters
+    ----------
+    delta: float (optional)
+        Real part of the deviation of the material refractive index from 1, 
+        where refractive index :math:`n = (1 - \delta) + i \beta` energy-
+        dependent refractive index information for x-ray wavelengths can be 
+        found at [2], default is 1
+    
+    beta: float (optional)
+        Complex part of the material refractive index, where refractive index 
+        :math:`n = (1 - \delta) + i \beta` energy-dependent refractive index 
+        information for x-ray wavelengths can be found at [2], default is 1e-2
+    
+    energy: float (optional)
+        Energy of the incident photon in eV, default is 40000
+
+    full_retrieval : bool, optional
+        If True, perform the full phase retrieval and return the thickness. If 
+        False, return a filtered image, default is True
+
+    filter_type: string (optional)
+        The form of the Paganin filter to use, either 'paganin_method' 
+        (default) or 'generalised_paganin_method' as described in [3] 
+
+    pad: int (optional)
+        Number of pixels to pad the image in Fourier space to reduce aliasing, 
+        default is 0 
+
+    return_units: string (optional)
+        The distance units to return the sample thickness in, must be one of 
+        'm', 'cm', 'mm' or 'um'. Only applies if full_retrieval=True (defult 
+        is 'cm') 
+
+    Returns
+    -------
+    AcquisitionData
+        AcquisitionData corrected for phase effects, retrieved sample thickness 
+        or (if :code:`full_retrieval=False`) filtered data 
+                
+    Example
+    -------
+    >>> processor = PaganinProcessor(delta=5, beta=0.05, energy=18000)
+    >>> processor.set_input(data)
+    >>> thickness = processor.get_output()
+
+    Example
+    -------
+    >>> processor = PaganinProcessor(delta=1,beta=10e2, full_retrieval=False)
+    >>> processor.set_input(data)
+    >>> filtered_image = processor.get_output()
+
+    Example
+    -------
+    >>> processor = PaganinProcessor()
+    >>> processor.set_input(data)
+    >>> thickness = processor.get_output(override_filter={'alpha':10})
+    >>> phase_retrieved_image = thickness*processor.mu
+
+    Notes
+    -----
+    This processor uses the phase retrieval algorithm described by Paganin et 
+    al. [1] to retrieve the sample thickness
+    
     .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left 
         (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 + 
           \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),
@@ -86,69 +149,12 @@ class PaganinProcessor(Processor):
     .. math:: I_{filt} = \mathcal{F}^{-1}\left (\frac{\mathcal{F}\left ( 
         I(x, y,z = \Delta) \right )}
         {1 - \alpha\left ( k_x^2 + k_y^2 \right )}  \right )
-    
-    Parameters
-    ----------
-    delta: float (optional)
-        Real part of the deviation of the material refractive index from 1, 
-        where refractive index :math:`n = (1 - \delta) + i \beta` energy-
-        dependent refractive index information for x-ray wavelengths can be 
-        found at [3], default is 1
-    
-    beta: float (optional)
-        Complex part of the material refractive index, where refractive index 
-        :math:`n = (1 - \delta) + i \beta` energy-dependent refractive index 
-        information for x-ray wavelengths can be found at [3], default is 1e-2
-    
-    energy: float (optional)
-        Energy of the incident photon in eV, default is 40000
-
-    full_retrieval : bool, optional
-        If True, perform the full phase retrieval and return the thickness. If 
-        False, return a filtered image, default is True
-
-    filter_type: string (optional)
-        The form of the Paganin filter to use, either 'paganin_method' 
-        (default) or 'generalised_paganin_method' as described in [2] 
-
-    pad: int (optional)
-        Number of pixels to pad the image in Fourier space to reduce aliasing, 
-        default is 0 
-
-    return_units: string (optional)
-        The distance units to return the sample thickness in, must be one of 
-        'm', 'cm', 'mm' or 'um' (defult is 'cm') 
-
-    Returns
-    -------
-    AcquisitionData
-        AcquisitionData corrected for phase effects, retrieved sample thickness 
-        or (if :code:`full_retrieval=False`) filtered data 
-                
-    Example
-    -------
-    >>> processor = PaganinProcessor(delta=5, beta=0.05, energy=18000)
-    >>> processor.set_input(data)
-    >>> thickness = processor.get_output()
-
-    Example
-    -------
-    >>> processor = PaganinProcessor(delta=1,beta=10e2, full_retrieval=False)
-    >>> processor.set_input(data)
-    >>> filtered_image = processor.get_output()
-
-    Example
-    -------
-    >>> processor = PaganinProcessor()
-    >>> processor.set_input(data)
-    >>> thickness = processor.get_output(override_filter={'alpha':10})
-    >>> phase_retrieved_image = thickness*processor.mu
 
     References
     ---------
     - [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x 
-    - [2] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
-    - [3] https://henke.lbl.gov/optical_constants/getdb2.html
+    - [2] https://henke.lbl.gov/optical_constants/getdb2.html
+    - [3] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
     With thanks to Rajmund Mokso (DTU) for help with the initial implementation 
     of the phase retrieval algorithm
 
@@ -301,14 +307,7 @@ class PaganinProcessor(Processor):
             Over-ride the filter parameters to use in the phase retrieval. 
             Specify parameters as :code:`{'parameter':value}` where parameter 
             is :code:`'delta', 'beta'` or :code:`'alpha'` and value is the new 
-            value to use.If :code:`'alpha'` is specified the new value will be 
-            used, delta will be ignored but beta will still be used to 
-            calculate :math:`\mu = \frac{4\pi\beta}{\lambda}` which is used for 
-            scaling the thickness, therefore it is only recommended to specify 
-            alpha when also using `get_output(full_retrieval=False)`, or 
-            re-scaling the result by :math:`\mu` e.g. 
-            :code:`thickness*processor.mu` If :code:`alpha` is not specified, 
-            it will be calculated :math:`\frac{\Delta\delta\lambda}{4\pi\beta}`
+            value to use.
 
         Returns
         -------
@@ -335,6 +334,17 @@ class PaganinProcessor(Processor):
         >>> processor.set_input(data)
         >>> thickness = processor.get_output(override_filter={'alpha':10})
         >>> phase_retrieved_image = thickness*processor.mu
+
+        Notes
+        -----
+        If :code:`'alpha'` is specified in override_filter the new value will 
+        be used and delta will be ignored but beta will still be used to 
+        calculate :math:`\mu = \frac{4\pi\beta}{\lambda}` which is used for 
+        scaling the thickness, therefore it is only recommended to specify 
+        alpha when also using :code:`get_output(full_retrieval=False)`, or 
+        re-scaling the result by :math:`\mu` e.g. 
+        :code:`thickness*processor.mu` If :code:`alpha` is not specified, 
+        it will be calculated :math:`\frac{\Delta\delta\lambda}{4\pi\beta}`
 
         '''
         self.override_geometry = override_geometry

@@ -269,7 +269,7 @@ class GenericFilteredBackProjection(Reconstructor):
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order
         freq = fftfreq(filter_length)
-        freq*=2
+        freq *= 2
         ind_sorted = np.argsort(freq)
         plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
         plt.xlabel('Frequency (rads/pixel)')

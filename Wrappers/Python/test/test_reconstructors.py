@@ -294,7 +294,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         freq = fftfreq(filter_length)
         freq *= 2
         ramp = abs(freq)
-        ramp[ramp>cutoff]=0
+        ramp[ramp>cutoff] = 0
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 

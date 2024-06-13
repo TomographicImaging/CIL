@@ -266,7 +266,7 @@ class GenericFilteredBackProjection(Reconstructor):
         matplotlib.pyplot
             A plot of the filter
         """
-        filter_array=self.get_filter_array()
+        filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order
         freq = fftfreq(filter_length)
         freq*=2

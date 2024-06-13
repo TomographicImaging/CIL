@@ -292,7 +292,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         """Returns a custom filter array."""
         filter_length = 256
         freq = fftfreq(filter_length)
-        freq*=2
+        freq *= 2
         ramp = abs(freq)
         ramp[ramp>cutoff]=0
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2

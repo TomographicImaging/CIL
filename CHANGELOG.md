@@ -2,6 +2,7 @@
 * XX.X.X
 
   - New Features:
+    - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
     - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)
@@ -12,6 +13,7 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
     - Operators and functions now also return when out is specified (#1742)
     - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
@@ -20,6 +22,7 @@
     - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
+    - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826). 
 
 
 

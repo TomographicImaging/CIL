@@ -3944,14 +3944,7 @@ class Processor(object):
     def __call__(self, x, out=None):
 
         self.set_input(x)
-
-        if out is None:
-            out = self.get_output()
-        else:
-            self.get_output(out=out)
-
-        return out
-
+        return self.get_output(out=out)
 
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''

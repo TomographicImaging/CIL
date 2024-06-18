@@ -366,9 +366,10 @@ class MaskGenerator(DataProcessor):
         if out is None:
             mask = numpy.asarray(mask, dtype=bool)
             out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
-            return out
         else:
             out.fill(mask)
+        
+        return out
 
     def _parse_threshold_value(self, arr, quantile=False):
 

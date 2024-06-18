@@ -3906,10 +3906,7 @@ class Processor(object):
             The processed data
         """
         if self.output is None or self.shouldRun:
-            if out is None:
-                out = self.process()
-            else:
-                self.process(out=out)
+            out = self.process(out=out)
 
             if self.store_output:
                 self.output = out.copy()
@@ -4006,12 +4003,12 @@ class AX(DataProcessor):
         dsi = self.get_input()
         a = self.scalar
         if out is None:
-            y = DataContainer( a * dsi.as_array() , True,
+            out = DataContainer( a * dsi.as_array() , True,
                         dimension_labels=dsi.dimension_labels )
             #self.setParameter(output_dataset=y)
-            return y
         else:
             out.fill(a * dsi.as_array())
+        return out
 
 
 ###### Example of DataProcessors

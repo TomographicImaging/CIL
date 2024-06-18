@@ -430,5 +430,5 @@ class Slicer(DataProcessor):
 
         self._process_data(data, data_out)
 
-        if out is None:
-            return data_out
+
+        return data_out

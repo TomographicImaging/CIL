@@ -19,14 +19,14 @@
 option (BUILD_PYTHON_WRAPPER "Build Python Wrapper" ON)
 
 if (BUILD_PYTHON_WRAPPER)
-  find_package(PythonInterp REQUIRED)
+  find_package(Python COMPONENTS Interpreter REQUIRED)
 
   #set(PYTHON_DEST_DIR "" CACHE PATH "Directory of the Python wrappers")
   if (PYTHON_DEST_DIR)
     set(PYTHON_DEST "${PYTHON_DEST_DIR}")
   else()
     message(STATUS "python version ${PYTHON_DEST}")
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/sp_dir.py
+    execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/sp_dir.py
       OUTPUT_VARIABLE SP_DIR)
     # remove trailing newline
     string(REGEX REPLACE "\n$" "" PYTHON_DEST ${SP_DIR})
@@ -46,18 +46,18 @@ if (BUILD_PYTHON_WRAPPER)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
   endif()
 
-  find_package(PythonLibs)
-  if (PYTHONINTERP_FOUND)
-    message(STATUS "Found PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
-    message(STATUS "Python version ${PYTHON_VERSION_STRING}")
+  find_package(Python COMPONENTS Development.Module)
+  if (Python_Interpreter_FOUND)
+    message(STATUS "Found Python_EXECUTABLE=${Python_EXECUTABLE}")
+    message(STATUS "Python version ${Python_VERSION}")
   endif()
-  if (PYTHONLIBS_FOUND)
-    message(STATUS "Found PYTHON_INCLUDE_DIRS=${PYTHON_INCLUDE_DIRS}")
-    message(STATUS "Found PYTHON_LIBRARIES=${PYTHON_LIBRARIES}")
+  if (Python_Development.Module_FOUND)
+    message(STATUS "Found Python_INCLUDE_DIRS=${Python_INCLUDE_DIRS}")
+    message(STATUS "Found Python_LIBRARIES=${Python_LIBRARIES}")
   endif()
 
-  if (PYTHONINTERP_FOUND)
-      message("Python found " ${PYTHON_EXECUTABLE})
+  if (Python_Interpreter_FOUND)
+      message("Python found " ${Python_EXECUTABLE})
       set(SETUP_PY    "${CMAKE_CURRENT_SOURCE_DIR}/setup.py")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/timestamp")
       file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/cil/*.py )
@@ -80,7 +80,7 @@ if (BUILD_PYTHON_WRAPPER)
       file( REMOVE ${OUTPUT} )
 
       add_custom_target(pythonsetup ALL
-          COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install . -t ${PYTHON_DEST} --upgrade
+          COMMAND ${CMAKE_COMMAND} -E env ${Python_EXECUTABLE} -m pip install . -t ${PYTHON_DEST} --upgrade
           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
           COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
           DEPENDS cilacc)

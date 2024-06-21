@@ -1,19 +1,20 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
 from cil.optimisation.algorithms import Algorithm
@@ -24,20 +25,30 @@ class PD3O(Algorithm):
     
 
     r"""Primal Dual Three Operator Splitting (PD3O) algorithm, see "A New Primal–Dual Algorithm for Minimizing the Sum
-        of Three Functions with a Linear Operator"
+        of Three Functions with a Linear Operator".  This is a primal dual algorithm for minimising :math:`f(x)+g(x)+h(Ax)` where all functions are proper, lower semi-continuous and convex
+        :math:`f` should be differentiable with a Lipschitz continuous gradient and :math:`A` is a bounded linear operator. 
     
         Parameters
         ----------
 
-        initial : DataContainer
-                  Initial point for the ProxSkip algorithm. 
+        
         f : Function
             A smooth function with Lipschitz continuous gradient.
         g : Function
-            A proximable convex function.
+            A convex function with a computationally computable proximal.
         h : Function
-            A composite convex function.            
+            A composite convex function.
+        operator: Operator
+            Bounded linear operator
+        delta: TODO:
+        gamma: TODO:
+        initial : DataContainer, default TODO:
+            Initial point for the ProxSkip algorithm.             
 
+
+        Reference
+        ---------
+        Yan, M. A New Primal–Dual Algorithm for Minimizing the Sum of Three Functions with a Linear Operator. J Sci Comput 76, 1698–1717 (2018). https://doi.org/10.1007/s10915-018-0680-3
      """    
 
 
@@ -45,22 +56,24 @@ class PD3O(Algorithm):
 
         super(PD3O, self).__init__(**kwargs)
 
+              
+        self.set_up(f=f, g=g, h=h,  operator=operator, delta=delta, gamma=gamma, initial=initial, **kwargs)
+ 
+                  
+    def set_up(self, f, g, h, operator, delta=None, gamma=None, initial=None,**kwargs):
+        #TODO: do we need a seperate set_up and init function? Probably not? 
+        logging.info("{} setting up".format(self.__class__.__name__, ))
+        
         self.f = f # smooth function
         if isinstance(self.f, ZeroFunction):
-            logging.warning(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwhise, select a relatively small parameter gamma")                        
+            logging.warning(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma TODO: what does this mean? ")                        
         
         self.g = g # proximable
         self.h = h # composite
         self.operator = operator
         
         self.delta = delta
-        self.gamma = gamma         
-        self.set_up(f=f, g=g, operator=operator, delta=delta, gamma=gamma, initial=initial, **kwargs)
- 
-                  
-    def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
+        self.gamma = gamma   
         
         if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
@@ -82,10 +95,10 @@ class PD3O(Algorithm):
     def update(self):
         r""" Performs a single iteration of the PD3O algorithm        
         """
-        
+        #TODO: Margaret to check this 
         # following equations 4 in https://link.springer.com/article/10.1007/s10915-018-0680-3
         # in this case order of proximal steps we recover the (primal) PDHG, when f=0
-        # #TODO if we change the order of proximal steps we recover the PDDY algorithm (dual) PDHG, when f=0
+        # #TODO: if we change the order of proximal steps we recover the PDDY algorithm (dual) PDHG, when f=0
         
         # proximal conjugate step
         self.operator.direct(self.x_bar, out=self.s)

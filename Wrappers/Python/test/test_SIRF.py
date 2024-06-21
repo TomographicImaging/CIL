@@ -26,7 +26,7 @@ from cil.framework import BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler, IndicatorBox
 from cil.optimisation.algorithms import FISTA, ISTA
-from cil.optimisation.utilities import AdaptiveSensitivity
+from cil.optimisation.utilities.preconditioner import AdaptiveSensitivity
 
 import os
 from cil.utilities.display import show2D

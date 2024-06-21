@@ -1543,7 +1543,7 @@ class TestTotalVariation(unittest.TestCase):
         a=np.sum(np.linalg.norm(test))
         print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
-                np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal", decimal=4)
+                np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
         np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
 
 

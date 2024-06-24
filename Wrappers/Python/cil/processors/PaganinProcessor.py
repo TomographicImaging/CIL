@@ -18,14 +18,13 @@
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.processors import Padder, Slicer
-import numpy as np
+from cil.utilities.units import DistanceUnits, EnergyUnits
 
+import numpy as np
 from scipy.fft import fft2
 from scipy.fft import ifft2
 from scipy.fft import ifftshift
 from scipy import constants
-
 from tqdm import tqdm
 import logging
 
@@ -51,8 +50,11 @@ class PaganinProcessor(Processor):
         information for x-ray wavelengths can be found at [2], default is 1e-2
     
     energy: float (optional)
-        Energy of the incident photon in eV, default is 40000
+        Energy of the incident photon, default is 40000
 
+    energy_units: str or cil.utilities.EnergyUnits (optional)
+        Energy units, default is EnergyUnits.eV
+    
     full_retrieval : bool, optional
         If True, perform the full phase retrieval and return the thickness. If 
         False, return a filtered image, default is True
@@ -65,10 +67,10 @@ class PaganinProcessor(Processor):
         Number of pixels to pad the image in Fourier space to reduce aliasing, 
         default is 0 
 
-    return_units: string (optional)
+    return_units: string or cil.utilities.DisranceUnits (optional)
         The distance units to return the sample thickness in, must be one of 
-        'm', 'cm', 'mm' or 'um'. Only applies if full_retrieval=True (defult 
-        is 'cm') 
+        'm', 'cm', 'mm' or 'um'. Only applies if full_retrieval=True (default 
+        is DistanceUnits.cm)
 
     Returns
     -------
@@ -159,29 +161,22 @@ class PaganinProcessor(Processor):
     of the phase retrieval algorithm
 
     """
-
-    UNIT_LIST = ['m','cm','mm','um']
-    UNIT_MULTIPLIERS = [1.0, 1e-2, 1e-3, 1e-6]
    
-    def __init__(self, delta=1, beta=1e-2, energy=40000,  full_retrieval=True, 
-                 filter_type='paganin_method', pad=0, return_units='cm'):
-
-        if return_units not in self.UNIT_LIST:
-            raise ValueError("Return units {} not recognised, expected one of \
-                             {}, please update data.geometry.config.units"
-                             .format(str(return_units),str(self.UNIT_LIST)))
-        else:
-            return_multiplier = 1/(self.UNIT_MULTIPLIERS[self.UNIT_LIST.index
-                                                         (return_units)])
+    def __init__(self, delta=1, beta=1e-2, energy=40000,
+                 energy_units=EnergyUnits.eV,  full_retrieval=True, 
+                 filter_type='paganin_method', pad=0, 
+                 return_units=DistanceUnits.cm):
         
         kwargs = {
             'energy' : energy,
-            'wavelength' : self._energy_to_wavelength(energy, 
-                                                      return_multiplier),
+            'wavelength' : self._energy_to_wavelength(energy, energy_units,
+                                                      return_units),
             'delta': delta,
             'beta': beta,
             '_delta_user' : delta,
             '_beta_user' : beta,
+            'filter_Nx' : None,
+            'filter_Ny' : None,
             'filter_type' : filter_type,
             'mu' : None,
             'alpha' : None,
@@ -193,7 +188,7 @@ class PaganinProcessor(Processor):
             'pad' : pad,
             'override_geometry' : None,
             'override_filter' : None,
-            'return_multiplier' : return_multiplier
+            'return_units' : return_units
             }
         
         super(PaganinProcessor, self).__init__(**kwargs)
@@ -215,61 +210,68 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
 
-        if self.pad>0:
-            try:
-                # pad the data
-                Padder.edge(pad_width={'horizontal': self.pad, 
-                                       'vertical':self.pad})(data)
-                Padder.edge(pad_width={'horizontal': self.pad, 
-                                       'vertical':self.pad})(out)
-            except:
-                # pad just in horizontal if the data is 2D
-                Padder.edge(pad_width={'horizontal': self.pad})(data)
-                Padder.edge(pad_width={'horizontal': self.pad})(out)
-
-        # create an empty axis if the data is 2D
-        if data.geometry.dimension == '2D':
-            data = np.expand_dims(data.as_array(),2)
-        else:
-            data = data.as_array()
-
-        # create a filter based on the shape of the data
-        filter_shape = np.shape(data.take(indices = 0, axis = 
-                                          out.get_dimension_axis('angle')))
-        self._create_filter(filter_shape[0], filter_shape[1], 
-                            self.override_filter)
-        
-        # pre-calculate the scaling factor
-        scaling_factor = -(1/self.mu)
-
-        # loop over the projections
-        for i in tqdm(range(len(out.geometry.angles))):
-            projection = data.take(indices = i, 
-                                   axis = out.get_dimension_axis('angle'))
-            if self.full_retrieval==True:
-                # apply the filter in fourier space, and scale by magnification
-                fI = fft2(self.magnification**2*projection)
-                iffI = ifft2(fI*self.filter)
-                # apply scaling factor
-                processed_projection = scaling_factor*np.log(iffI)
+        for j in range(data.geometry.channels):
+            if data.geometry.channels>1:
+                data_channel = data.get_slice(channel=j)
             else:
-                # apply the filter in fourier space
-                fI = fft2(projection)
-                processed_projection = ifft2(fI*self.filter)
-            out.fill(np.squeeze(processed_projection), angle = i)
-        
-        # crop the data if it was previously padded
-        if self.pad>0:
-            try:
-                Slicer(roi={'horizontal': (self.pad, 
-                                           out.get_dimension_size('horizontal')
-                                           -self.pad), 
-                            'vertical':(self.pad,out.get_dimension_size(
-                                            'vertical')-self.pad)})(out)
-            except:
-                Slicer(roi={'horizontal': (self.pad,
-                                           out.get_dimension_size('horizontal')
-                                           -self.pad)})(out)
+                data_channel = data
+
+            angle_axis = data_channel.get_dimension_axis('angle')
+
+            # create an empty axis if the data is 2D
+            if len(data_channel.shape) == 2:
+                data_channel = np.expand_dims(data_channel.as_array(),2)
+            elif len(data_channel.shape) == 3:
+                data_channel = data_channel.as_array()
+            else:
+                raise(ValueError('Data must be 2D or 3D per channel'))
+
+            # make slice indices to get the projection
+            slice_proj = [slice(None)]*len(data_channel.shape)
+            slice_proj[angle_axis] = 0
+
+            # create a filter based on the shape of the data
+            filter_shape = np.shape(data_channel[tuple(slice_proj)])
+            self.filter_Nx = filter_shape[0]+self.pad*2
+            self.filter_Ny = filter_shape[1]+self.pad*2
+            self._create_filter(self.override_filter)
+            
+            # pre-calculate the scaling factor
+            scaling_factor = -(1/self.mu)
+ 
+            # allocate padded buffer
+            padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_channel[(
+                tuple(slice_proj))].shape))
+            
+            # make slice indices to unpad the data
+            if self.pad>0:
+                slice_pad = tuple([slice(self.pad,-self.pad)]
+                                  *len(padded_buffer.shape))
+            else:
+                slice_pad = tuple([slice(None)]*len(padded_buffer.shape))
+                
+            # loop over the projections
+            for i in tqdm(range(len(out.geometry.angles))):
+                
+                slice_proj[angle_axis] = i
+                padded_buffer[slice_pad] = data_channel[(tuple(slice_proj))]
+                
+                if self.full_retrieval==True:
+                    # apply the filter in fourier space, apply log and scale 
+                    # by magnification
+                    fI = fft2(self.magnification**2*padded_buffer)
+                    iffI = ifft2(fI*self.filter)
+                    # apply scaling factor
+                    padded_buffer = scaling_factor*np.log(iffI)
+                else:
+                    # apply the filter in fourier space
+                    fI = fft2(padded_buffer)
+                    padded_buffer = ifft2(fI*self.filter)
+                if data.geometry.channels>1:
+                    out.fill(np.squeeze(padded_buffer[slice_pad]), angle = i, 
+                             channel=j)
+                else:
+                    out.fill(np.squeeze(padded_buffer[slice_pad]), angle = i)
 
         return out
     
@@ -372,13 +374,6 @@ class PaganinProcessor(Processor):
         override_geometry dictionary.
         '''
         
-        if geometry.config.units in self.UNIT_LIST:
-            input_multiplier = self.UNIT_MULTIPLIERS[
-                self.UNIT_LIST.index(geometry.config.units)]
-            unit_multiplier = input_multiplier*self.return_multiplier
-        else:
-            unit_multiplier = None
-        
         parameters = ['magnification', 'propagation_distance', 'pixel_size']
         # specify parameter names as defined in geometry
         geometry_parameters = ['magnification', 'dist_center_detector', 
@@ -438,18 +433,13 @@ class PaganinProcessor(Processor):
                                              parameter))
                 else:
                     if convert_units[i]:
-                        if unit_multiplier is None:
-                            raise ValueError("Geometry units {} not recognised\
-                                             , expected one of {}, please \
-                                             update data.geometry.config.units"
-                                             .format(str(geometry.config.units)
-                                                     , str(self.UNIT_LIST)))
-                        else:
-                            self.__setattr__(parameter, param1*unit_multiplier)
-                    else:
-                        self.__setattr__(parameter, param1)
+                        param1 = DistanceUnits.convert(param1, 
+                                                       geometry.config.units, 
+                                                       self.return_units)
+                    self.__setattr__(parameter, param1)
+
         
-    def _create_filter(self, Nx, Ny, override_filter=None):
+    def _create_filter(self, override_filter=None):
         '''
         Function to create the Paganin filter, either using the paganin [1] or 
         generalised paganin [2] method
@@ -484,10 +474,10 @@ class PaganinProcessor(Processor):
             
         # create the Fourier mesh
         kx,ky = np.meshgrid( 
-            np.arange(-Nx/2, Nx/2, 1, dtype=np.float64) 
-            * (2*np.pi)/(Nx*self.pixel_size),
-            np.arange(-Ny/2, Ny/2, 1, dtype=np.float64) 
-            * (2*np.pi)/(Ny*self.pixel_size),
+            np.arange(-self.filter_Nx/2, self.filter_Nx/2, 1, dtype=np.float64) 
+            * (2*np.pi)/(self.filter_Nx*self.pixel_size),
+            np.arange(-self.filter_Ny/2, self.filter_Ny/2, 1, dtype=np.float64) 
+            * (2*np.pi)/(self.filter_Ny*self.pixel_size),
             sparse=False, 
             indexing='ij'
             )
@@ -518,20 +508,28 @@ class PaganinProcessor(Processor):
         '''
         self.alpha = self.propagation_distance*self.delta/self.mu
     
-    def _energy_to_wavelength(self, energy, return_multiplier):
+    def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''
         Function to convert photon energy in eV to wavelength in return_units
         
         Parameters
         ----------
         energy: float
-            Photon energy in eV
+            Photon energy
+        
+        energy_units
+            Energy units
+
+        return_units
+            Distance units in which to return the wavelength
         
         Returns
         -------
         float
             Photon wavelength in return_units
         '''
+        top = DistanceUnits.convert(constants.h*constants.speed_of_light, 
+                                    'm', return_units)
+        bottom = EnergyUnits.convert(energy, energy_units, 'J')
 
-        return return_multiplier*(constants.h*constants.speed_of_light)\
-            /(energy*constants.electron_volt)
+        return top/bottom

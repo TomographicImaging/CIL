@@ -23,6 +23,7 @@ from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
 from cil.utilities import quality_measures
+from cil.utilities.units import DistanceUnits, EnergyUnits, AngleUnits
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
@@ -2769,6 +2770,12 @@ class TestPaganinProcessor(unittest.TestCase):
     def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel2D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel(128,0.1)\
+            .set_channels(4)
+
+        self.data_multichannel = ag.allocate('random')
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -2776,24 +2783,32 @@ class TestPaganinProcessor(unittest.TestCase):
     def test_PaganinProcessor_init(self):
         # test default values are initialised
         processor = PaganinProcessor()
-        test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'full_retrieval', 'filter_type', 'pad', 'return_multiplier']
-        test_value = [40000, 1e2*(constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 1, 1e-2, True, 'paganin_method', 0, 1e2]
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'full_retrieval', 
+                          'filter_type', 'pad', 'return_units']
+        test_value = [40000, 1e2*(constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 
+                      1, 1e-2, True, 'paganin_method', 0, DistanceUnits.cm]
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = PaganinProcessor(1, 2, 3, False, 'string', 19, 'mm')
-        test_value = [3, 1e3*(constants.h*constants.speed_of_light)/(3*constants.electron_volt), 1, 2, False, 'string', 19, 1e3]
+        processor = PaganinProcessor(1, 2, 3, 'keV', False, 'string', 19, 'mm')
+        test_value = [3, 1e3*(constants.h*constants.speed_of_light)/(3000*constants.electron_volt), 1, 2, False, 'string', 19, 'mm']
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         with self.assertRaises(ValueError):
             processor = PaganinProcessor(return_units='string')
 
+    def test_PaganinProcessor_energy_to_wavelength(self):
+        processor = PaganinProcessor()
+        wavelength = processor._energy_to_wavelength(10, 'meV', 'mm')
+        self.assertAlmostEqual(wavelength, 0.12398419)
+
+
     def test_PaganinProcessor_check_input(self):
         processor = PaganinProcessor()
-        for data in [self.data_cone, self.data_parallel]:
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel]:
             processor.set_input(data)
             data2 = processor.get_input()
             numpy.testing.assert_allclose(data2.as_array(), data.as_array())
@@ -2837,7 +2852,7 @@ class TestPaganinProcessor(unittest.TestCase):
             processor._set_geometry(self.data_parallel.geometry, None)
         
         # check override_geometry
-        for data in [self.data_parallel, self.data_cone]:
+        for data in [self.data_parallel, self.data_cone, self.data_multichannel]:
             processor.set_input(data)
             processor._set_geometry(self.data_cone.geometry, override_geometry={'propagation_distance':1,'magnification':2, 'pixel_size':3})
             
@@ -2885,7 +2900,9 @@ class TestPaganinProcessor(unittest.TestCase):
         self.data_cone.geometry.config.units='m'
         processor.set_input(self.data_cone)
         processor._set_geometry(self.data_cone.geometry)
-        processor._create_filter(Nx, Ny)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
         
         self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
         self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
@@ -2905,7 +2922,9 @@ class TestPaganinProcessor(unittest.TestCase):
         processor = PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='generalised_paganin_method', return_units='m')
         processor.set_input(self.data_cone)
         processor._set_geometry(self.data_cone.geometry)
-        processor._create_filter(Nx, Ny)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
         filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
         numpy.testing.assert_allclose(processor.filter, filter)
 
@@ -2913,8 +2932,10 @@ class TestPaganinProcessor(unittest.TestCase):
         processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='unknown_method', return_units='m')
         processor.set_input(self.data_cone)
         processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
         with self.assertRaises(ValueError):
-            processor._create_filter(Nx, Ny)
+            processor._create_filter()
 
         # check parameter override 
         processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, return_units='m')
@@ -2922,7 +2943,9 @@ class TestPaganinProcessor(unittest.TestCase):
         processor._set_geometry(self.data_cone.geometry)
         delta = 100
         beta=200
-        processor._create_filter(Nx, Ny, override_filter={'delta':delta, 'beta':beta})
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter(override_filter={'delta':delta, 'beta':beta})
         
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
@@ -2939,8 +2962,10 @@ class TestPaganinProcessor(unittest.TestCase):
         delta = 12
         beta = 13
         alpha = 14
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
         with self.assertLogs(level='WARN') as log:
-            processor._create_filter(Nx, Ny, override_filter = {'delta':delta, 'beta':beta, 'alpha':alpha})
+            processor._create_filter(override_filter = {'delta':delta, 'beta':beta, 'alpha':alpha})
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
         
@@ -2956,7 +2981,7 @@ class TestPaganinProcessor(unittest.TestCase):
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength)        
 
-        data_array = [self.data_cone, self.data_parallel]
+        data_array = [self.data_cone, self.data_parallel, ]
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
@@ -2968,10 +2993,31 @@ class TestPaganinProcessor(unittest.TestCase):
             processor.set_input(data)
             filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with GPM
+            processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, filter_type='generalised_paganin_method')
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with padding
+            processor = PaganinProcessor(full_retrieval=True, pad=10)
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, pad=10)
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
             # test in-line
-            thickness_inline = PaganinProcessor(full_retrieval=True)(data, override_geometry={'propagation_distance':1})
+            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
-            filtered_image_inline = PaganinProcessor(full_retrieval=False)(data, override_geometry={'propagation_distance':1})
+            filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
 
     def test_PaganinProcessor_2D(self):
@@ -2985,6 +3031,19 @@ class TestPaganinProcessor(unittest.TestCase):
         processor.set_input(data_slice)
         output = processor.get_output(override_geometry={'propagation_distance':1})
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+        # check with different data order
+        data_slice.reorder(('horizontal','angle'))
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data_slice)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data_slice)
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+        # 'horizontal, vertical, angles
         
 if __name__ == "__main__":
 

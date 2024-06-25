@@ -67,7 +67,7 @@ class PaganinProcessor(Processor):
         Number of pixels to pad the image in Fourier space to reduce aliasing, 
         default is 0 
 
-    return_units: string or cil.utilities.DisranceUnits (optional)
+    return_units: string or cil.utilities.DistanceUnits (optional)
         The distance units to return the sample thickness in, must be one of 
         'm', 'cm', 'mm' or 'um'. Only applies if full_retrieval=True (default 
         is DistanceUnits.cm)

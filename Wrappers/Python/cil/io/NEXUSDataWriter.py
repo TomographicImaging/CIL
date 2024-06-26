@@ -123,7 +123,7 @@ class NEXUSDataWriter(object):
             f.attrs['file_name'] = self.file_name
             f.attrs['cil_version'] = version
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
-            f.attrs['creator'] = np.string_('NEXUSDataWriter.py')
+            f.attrs['creator'] = np.bytes_('NEXUSDataWriter.py')
             f.attrs['NeXus_version'] = '4.3.0'
             f.attrs['HDF5_Version'] = h5py.version.hdf5_version
             f.attrs['h5py_version'] = h5py.version.version

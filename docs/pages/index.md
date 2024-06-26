@@ -4,8 +4,8 @@ layout: frontpage
 header:
   image_fullwidth: https://ccpi.ac.uk/wp-content/uploads/2022/08/front-page-1125x800.png # ideally 600x80 pixels
   title: '<img loading="lazy" src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" alt="CIL - Core Imaging Library">'
-widget1:
-  title: Examples
+widgets:
+- title: Examples
   url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
   text: >
@@ -13,15 +13,13 @@ widget1:
     <br/>
     Some examples <em>without any local installation</em> are provided in <a href="https://mybinder.org">Binder</a>.
     Please click the button below to try them immediately in your browser.
-widget2:
-  title: CIL Documentation
+- title: CIL Documentation
   url: '/nightly/'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
   text: >
     CIL has a live documentation which gets updated regularly and built nightly.
     We suggest to download and read the open access articles below, which provide very detailed information about CIL structure and usage.
-widget3:
-  title: Papers
+- title: Papers
   url: 'https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
   text: >

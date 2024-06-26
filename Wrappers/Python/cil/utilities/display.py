@@ -1062,7 +1062,7 @@ class show_geometry(show_base):
 
 
 
-class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
+class show_SOUV_geometry_vectors(show_base):
     '''
     Displays four plots to show i) the source position, 
     ii) the imager centre, iii) the imager x-direction, and 
@@ -1085,10 +1085,10 @@ class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
     '''
 
 
-    def __init__(self, acquisition_geometry:cil.framework.framework.AcquisitionGeometry, figsize=(10,10), fontsize=10):
+    def __init__(self, acquisition_geometry:AcquisitionGeometry, figsize=(10,10), fontsize=10):
 
         # Only applicable for AcquisitionGeometry
-        if not isinstance(acquisition_geometry, cil.framework.framework.AcquisitionGeometry):
+        if not isinstance(acquisition_geometry, AcquisitionGeometry):
             raise ValueError("The data type of `acquisition_geometry` must be \"<class 'cil.framework.framework.AcquisitionGeometry'>\". It is \"%s\", which is not currently supported by this function." % type(acquisition_geometry))
 
         # Only applicable for cone_souv geometry type
@@ -1107,9 +1107,9 @@ class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
         i = 0; j = 0;
         x = 0; y = 1; z = 2;
         self.axs[j,i].set_title("Source position");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,0], label="X axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,1], label="Y axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,2], label="Z axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.source.position_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.source.position_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.source.position_set[:,2], label="Z axis");
         self.axs[j,i].legend(fontsize=fontsize);
         # self.axs[j,i].set_xlabel("Projection #");
         self.axs[j,i].set_ylabel("Position");
@@ -1117,9 +1117,9 @@ class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
         i = 1; j = 0;
         x += 3; y += 3; z += 3;
         self.axs[j,i].set_title("Imager Center");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,0], label="X axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,1], label="Y axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,2], label="Z axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.position_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.position_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.position_set[:,2], label="Z axis");
         self.axs[j,i].legend(fontsize=fontsize);
         # axs[j,i].set_xlabel("Projection #");
         # axs[j,i].set_ylabel("Position in (cm)");
@@ -1127,9 +1127,9 @@ class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
         i = 0; j = 1;
         x += 3; y += 3; z += 3;
         self.axs[j,i].set_title("Imager X-direction");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,0], label="X axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,1], label="Y axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,2], label="Z axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_x_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_x_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_x_set[:,2], label="Z axis");
         self.axs[j,i].legend(fontsize=fontsize);
         self.axs[j,i].set_xlabel("Projection #");
         self.axs[j,i].set_ylabel("Position");
@@ -1137,9 +1137,9 @@ class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
         i = 1; j = 1;
         x += 3; y += 3; z += 3;
         self.axs[j,i].set_title("Imager Y-direction");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,0], label="X axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,1], label="Y axis");
-        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,2], label="Z axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_y_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_y_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, acquisition_geometry.config.system.detector.direction_y_set[:,2], label="Z axis");
         self.axs[j,i].legend(fontsize=fontsize);
         self.axs[j,i].set_xlabel("Projection #");
         # axs[j,i].set_ylabel("Position in (mm)");

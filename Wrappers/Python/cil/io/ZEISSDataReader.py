@@ -228,8 +228,8 @@ class ZEISSDataReader(object):
         '''
         if self._metadata['beam geometry'] == 'cone':
             self._geometry = AcquisitionGeometry.create_Cone3D(
-                [0,-self._metadata['dist_source_center'],0],[0,self._metadata['dist_center_detector'],0] \
-                ) \
+                [0,-self._metadata['dist_source_center'],0],[0,self._metadata['dist_center_detector'],0], \
+                units='mm') \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
                     .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)

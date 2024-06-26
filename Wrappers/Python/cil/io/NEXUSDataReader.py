@@ -141,7 +141,11 @@ class NEXUSDataReader(object):
                     dim = 3
                 else:
                     dim = 2
-
+                
+                if ds_data.attrs.__contains__('distance_units'):
+                    units = ds_data.attrs.get('distance_units')
+                else:
+                    units = 'custom units'
 
                 if self.is_old_file_version():
                     num_pixels_h = ds_data.attrs.get('pixel_num_h', 1)
@@ -150,14 +154,15 @@ class NEXUSDataReader(object):
 
                     if geom_type == 'cone' and dim == 3:
                         self._geometry = AcquisitionGeometry.create_Cone3D(source_position=[0, -ds_data.attrs['dist_source_center'], 0],
-                                                                               detector_position=[0, ds_data.attrs['dist_center_detector'],0])
+                                                                               detector_position=[0, ds_data.attrs['dist_center_detector'],0],
+                                                                               units=units)
                     elif geom_type == 'cone' and dim == 2:
                         self._geometry = AcquisitionGeometry.create_Cone2D(source_position=[0, -ds_data.attrs['dist_source_center']],
-                                                        detector_position=[0, ds_data.attrs['dist_center_detector']])
+                                                        detector_position=[0, ds_data.attrs['dist_center_detector']], units=units)
                     elif geom_type == 'parallel' and dim == 3:
-                        self._geometry = AcquisitionGeometry.create_Parallel3D()
+                        self._geometry = AcquisitionGeometry.create_Parallel3D(units=units)
                     elif geom_type == 'parallel' and dim == 2:
-                        self._geometry = AcquisitionGeometry.create_Parallel2D()
+                        self._geometry = AcquisitionGeometry.create_Parallel2D(units=units)
 
 
                 else:
@@ -187,20 +192,23 @@ class NEXUSDataReader(object):
                         source_position = list(dfile['entry1/tomo_entry/config/source/position'])
 
                         if dim == 2:
-                            self._geometry = AcquisitionGeometry.create_Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
+                            self._geometry = AcquisitionGeometry.create_Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position,
+                                                                               units=units)
                         else:
                             self._geometry = AcquisitionGeometry.create_Cone3D(source_position,\
                                                 detector_position, detector_direction_x, detector_direction_y,\
-                                                rotation_axis_position, rotation_axis_direction)
+                                                rotation_axis_position, rotation_axis_direction,
+                                                units=units)
                     else:
                         ray_direction = list(dfile['entry1/tomo_entry/config/ray/direction'])
 
                         if dim == 2:
-                            self._geometry = AcquisitionGeometry.create_Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position)
+                            self._geometry = AcquisitionGeometry.create_Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position,
+                                                                                   units=units)
                         else:
                             self._geometry = AcquisitionGeometry.create_Parallel3D(ray_direction,\
                                                 detector_position, detector_direction_x, detector_direction_y,\
-                                                rotation_axis_position, rotation_axis_direction)
+                                                rotation_axis_position, rotation_axis_direction, units=units)
 
                 # for all Aquisition data
                 #set angles

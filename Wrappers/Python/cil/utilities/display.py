@@ -1059,3 +1059,97 @@ class show_geometry(show_base):
 
         self.display = _ShowGeometry(acquisition_geometry, image_geometry)
         self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
+
+
+
+class show_SOUV_geometry_vectors(cil.utilities.display.show_base):
+    '''
+    Displays four plots to show i) the source position, 
+    ii) the imager centre, iii) the imager x-direction, and 
+    iv) the imager y-direction for each projection.
+
+
+    Parameters
+    ----------
+    acquisition_geometry: AcquisitionGeometry
+        CIL acquisition geometry
+    figsize: tuple (x, y)
+        Set figure size (inches), default (10,10)
+    fontsize: int
+        Set fontsize, default 10
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        returns a matplotlib.pyplot figure object
+    '''
+
+
+    def __init__(self, acquisition_geometry:cil.framework.framework.AcquisitionGeometry, figsize=(10,10), fontsize=10):
+
+        # Only applicable for AcquisitionGeometry
+        if not isinstance(acquisition_geometry, cil.framework.framework.AcquisitionGeometry):
+            raise ValueError("The data type of `acquisition_geometry` must be \"<class 'cil.framework.framework.AcquisitionGeometry'>\". It is \"%s\", which is not currently supported by this function." % type(acquisition_geometry))
+
+        # Only applicable for cone_souv geometry type
+        if acquisition_geometry.geom_type != "cone_souv":
+            raise ValueError("The geometry type of `acquisition_geometry` must be \"cone_souv\". It is \"%s\", which is not currently supported by this function." % acquisition_geometry.geom_type)
+
+        self.figure = self._draw(acquisition_geometry, figsize, fontsize);
+
+        
+    def _draw(self, acquisition_geometry, figsize, fontsize):
+                
+        # Plot the data
+        self.fig, self.axs = plt.subplots(2, 2, figsize=figsize);
+
+        x_axis_values = np.arange(acquisition_geometry.num_projections);
+        i = 0; j = 0;
+        x = 0; y = 1; z = 2;
+        self.axs[j,i].set_title("Source position");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.source.position_set[:,2], label="Z axis");
+        self.axs[j,i].legend(fontsize=fontsize);
+        # self.axs[j,i].set_xlabel("Projection #");
+        self.axs[j,i].set_ylabel("Position");
+
+        i = 1; j = 0;
+        x += 3; y += 3; z += 3;
+        self.axs[j,i].set_title("Imager Center");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.position_set[:,2], label="Z axis");
+        self.axs[j,i].legend(fontsize=fontsize);
+        # axs[j,i].set_xlabel("Projection #");
+        # axs[j,i].set_ylabel("Position in (cm)");
+
+        i = 0; j = 1;
+        x += 3; y += 3; z += 3;
+        self.axs[j,i].set_title("Imager X-direction");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_x_set[:,2], label="Z axis");
+        self.axs[j,i].legend(fontsize=fontsize);
+        self.axs[j,i].set_xlabel("Projection #");
+        self.axs[j,i].set_ylabel("Position");
+
+        i = 1; j = 1;
+        x += 3; y += 3; z += 3;
+        self.axs[j,i].set_title("Imager Y-direction");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,0], label="X axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,1], label="Y axis");
+        self.axs[j,i].plot(x_axis_values, geometry.config.system.detector.direction_y_set[:,2], label="Z axis");
+        self.axs[j,i].legend(fontsize=fontsize);
+        self.axs[j,i].set_xlabel("Projection #");
+        # axs[j,i].set_ylabel("Position in (mm)");
+
+        # Resize the text
+        for ax in self.axs.flatten():
+            for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels()):
+                item.set_fontsize(fontsize)
+        
+        plt.tight_layout()
+        fig2 = plt.gcf()
+        return fig2
+    

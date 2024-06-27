@@ -18,7 +18,6 @@
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.utilities.units import DistanceUnits, EnergyUnits
 
 import numpy as np
 from scipy.fft import fft2
@@ -52,8 +51,8 @@ class PaganinProcessor(Processor):
     energy: float (optional)
         Energy of the incident photon, default is 40000
 
-    energy_units: str or cil.utilities.EnergyUnits (optional)
-        Energy units, default is EnergyUnits.eV
+    energy_units: string (optional)
+        Energy units, default is 'eV'
     
     full_retrieval : bool, optional
         If True, perform the full phase retrieval and return the thickness. If 
@@ -67,10 +66,10 @@ class PaganinProcessor(Processor):
         Number of pixels to pad the image in Fourier space to reduce aliasing, 
         default is 0 
 
-    return_units: string or cil.utilities.DisranceUnits (optional)
+    return_units: string (optional)
         The distance units to return the sample thickness in, must be one of 
         'm', 'cm', 'mm' or 'um'. Only applies if full_retrieval=True (default 
-        is DistanceUnits.cm)
+        is'cm')
 
     Returns
     -------
@@ -163,9 +162,9 @@ class PaganinProcessor(Processor):
     """
    
     def __init__(self, delta=1, beta=1e-2, energy=40000,
-                 energy_units=EnergyUnits.eV,  full_retrieval=True, 
+                 energy_units='eV',  full_retrieval=True, 
                  filter_type='paganin_method', pad=0, 
-                 return_units=DistanceUnits.cm):
+                 return_units='cm'):
         
         kwargs = {
             'energy' : energy,
@@ -433,7 +432,7 @@ class PaganinProcessor(Processor):
                                              parameter))
                 else:
                     if convert_units[i]:
-                        param1 = DistanceUnits.convert(param1, 
+                        param1 = self._convert_units(param1, 'distance',
                                                        geometry.config.units, 
                                                        self.return_units)
                     self.__setattr__(parameter, param1)
@@ -528,8 +527,32 @@ class PaganinProcessor(Processor):
         float
             Photon wavelength in return_units
         '''
-        top = DistanceUnits.convert(constants.h*constants.speed_of_light, 
-                                    'm', return_units)
-        bottom = EnergyUnits.convert(energy, energy_units, 'J')
+        top = self._convert_units(constants.h*constants.speed_of_light, 
+                                    'distance', 'm', return_units)
+        bottom = self._convert_units(energy, 'energy', energy_units, 'J')
 
         return top/bottom
+    
+    def _convert_units(self, value, unit_type, input_unit, output_unit):
+        unit_types = ['distance','energy','angle']
+
+        if unit_type == unit_types[0]:
+            unit_list = ['m','cm','mm','um']
+            unit_multipliers = [1.0, 1e-2, 1e-3, 1e-6]
+        elif unit_type == unit_types[1]:
+            unit_list = ['meV', 'eV', 'keV', 'MeV', 'J']
+            unit_multipliers = [1e-3, 1, 1e3, 1e6, 1/constants.eV]
+        elif unit_type == unit_types[2]:
+            unit_list = ['deg', 'rad']
+            unit_multipliers = [1, np.rad2deg(1)]
+        else:
+            raise ValueError("Unit type '{}' not recognised, must be one of {}"
+                            .format(unit_type, unit_types))
+
+        for x in [input_unit, output_unit]:
+            if x not in unit_list:
+                raise ValueError("Unit {} not recognised, must be one of {}"
+                                .format(x, unit_list))
+            
+        return value*unit_multipliers[unit_list.index(input_unit)]\
+            /unit_multipliers[unit_list.index(output_unit)]

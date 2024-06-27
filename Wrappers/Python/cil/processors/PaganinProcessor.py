@@ -551,8 +551,9 @@ class PaganinProcessor(Processor):
 
         for x in [input_unit, output_unit]:
             if x not in unit_list:
-                raise ValueError("Unit {} not recognised, must be one of {}"
-                                .format(x, unit_list))
+                raise ValueError("Unit '{}' not recognised, must be one of {}.\
+                                 \nGeometry units can be updated using geometry.config.units"
+                                 .format(x, unit_list))
             
         return value*unit_multipliers[unit_list.index(input_unit)]\
             /unit_multipliers[unit_list.index(output_unit)]

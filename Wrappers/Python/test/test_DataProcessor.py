@@ -23,7 +23,6 @@ from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
 from cil.framework import ImageData, AcquisitionData
 from cil.utilities import dataexample
 from cil.utilities import quality_measures
-from cil.utilities.units import DistanceUnits, EnergyUnits, AngleUnits
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
@@ -2786,7 +2785,7 @@ class TestPaganinProcessor(unittest.TestCase):
         test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'full_retrieval', 
                           'filter_type', 'pad', 'return_units']
         test_value = [40000, 1e2*(constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 
-                      1, 1e-2, True, 'paganin_method', 0, DistanceUnits.cm]
+                      1, 1e-2, True, 'paganin_method', 0, 'cm']
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))

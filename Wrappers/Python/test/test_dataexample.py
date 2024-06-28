@@ -191,8 +191,8 @@ class TestRemoteData(unittest.TestCase):
         shutil.rmtree(tmp_dir)
 
 
-    @patch('cil.utilities.dataexample.input', return_value='n')    
-    @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)
+    @patch('cil.utilities.dataexample.input', return_value='n')
+    @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)   
     def test_download_data_input_n(self, mock_zenodo_get, input):
         '''
         Test the download_data function, when the user input is 'n' to 'are you sure you want to download data'

@@ -28,8 +28,7 @@ from urllib.request import urlopen
 from io import BytesIO
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
-import requests
-import hashlib
+import scipy
 from zenodo_get import zenodo_get
 
 class DATA(object):
@@ -299,6 +298,29 @@ class SANDSTONE(REMOTEDATA):
     FOLDER = 'sandstone'
     ZENODO_RECORD = '4912435'
     ZIP_FILE = 'small.zip'
+
+    def get(cls, data_dir, filename):
+        '''
+        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+        This function can be used to return selected projections or slices of the reconstruction
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)
+
+        file: str
+            The slices or projections to return, specify the path to the file within the data_dir
+
+        Returns
+        -------
+        ImageData
+            The selected sandstone dataset
+        '''
+        extension = os.path.splitext(filename)[1]
+        if extension == '.mat':
+            return scipy.io.loadmat(os.path.join(data_dir,filename))
+        
 
 class TestData(object):
     '''Class to return test data

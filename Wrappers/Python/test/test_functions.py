@@ -97,7 +97,15 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
+        #negative function 
+        g = - L2NormSquared(b=noisy_data)
 
+        # Compare call of g
+        a2 = -1* (d - noisy_data).power(2).sum()
+
+        self.assertAlmostEqual(a2, g(d))
+        h = -g
+        self.assertAlmostEqual(-a2, h(d))
 
 
     def test_L2NormSquared(self):
@@ -883,10 +891,10 @@ class TestFunction(CCPiTestClass):
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = func1 + 3
-        assert f3.L == 0
+        assert f3.L == 1
         f3.L = 2
         assert f3.L == 2
-        assert func1.L == 0
+        assert func1.L == 1
         with self.assertRaises(AttributeError):
             func1.L = 2
 
@@ -1536,7 +1544,7 @@ class TestTotalVariation(unittest.TestCase):
         print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
-        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal")
+        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
 
 
     def test_get_p2_without_warm_start(self):

@@ -192,7 +192,7 @@ class Algorithm:
     @max_iteration.setter
     def max_iteration(self, value):
         '''sets the maximum number of iterations'''
-        assert isinstance(value, Integral)
+        assert isinstance(value, Integral) or np.isposinf(value)
         self.__max_iteration = value
 
     @property

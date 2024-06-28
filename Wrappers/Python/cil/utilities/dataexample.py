@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageGeometry
 import numpy
 import numpy as np
 from PIL import Image
@@ -24,11 +24,8 @@ import os
 import os.path
 import sys
 from zipfile import ZipFile
-from urllib.request import urlopen
-from io import BytesIO
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
-import scipy
 from zenodo_get import zenodo_get
 
 class DATA(object):
@@ -319,7 +316,7 @@ class SANDSTONE(REMOTEDATA):
         '''
         extension = os.path.splitext(filename)[1]
         if extension == '.mat':
-            return scipy.io.loadmat(os.path.join(data_dir,filename))
+            return loadmat(os.path.join(data_dir,filename))
         
 
 class TestData(object):

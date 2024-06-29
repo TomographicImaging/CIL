@@ -500,6 +500,7 @@ document.write(`
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">count</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
@@ -747,7 +748,9 @@ document.write(`
 
         <span class="c1"># call `__next__` upto `iterations` times or until `StopIteration` is raised</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="n">iterations</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="n">iterations</span><span class="p">),</span> <span class="bp">self</span><span class="p">):</span>
+        <span class="n">iters</span> <span class="o">=</span> <span class="p">(</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isposinf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span><span class="p">)</span>
+                 <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
                     <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>

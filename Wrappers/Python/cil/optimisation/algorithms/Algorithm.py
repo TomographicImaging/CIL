@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+from itertools import count
 from numbers import Integral
 from typing import List, Optional
 from warnings import warn
@@ -237,7 +238,9 @@ class Algorithm:
 
         # call `__next__` upto `iterations` times or until `StopIteration` is raised
         self.max_iteration = self.iteration + iterations
-        for _ in zip(range(self.iteration, self.iteration + iterations), self):
+        iters = (count(self.iteration) if np.isposinf(self.max_iteration)
+                 else range(self.iteration, self.max_iteration))
+        for _ in zip(iters, self):
             try:
                 for callback in callbacks:
                     callback(self)

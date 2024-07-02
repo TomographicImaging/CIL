@@ -20,7 +20,7 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
 import logging
-
+import warnings
 class PD3O(Algorithm):
     
 
@@ -30,8 +30,6 @@ class PD3O(Algorithm):
     
         Parameters
         ----------
-
-        
         f : Function
             A smooth function with Lipschitz continuous gradient.
         g : Function
@@ -40,9 +38,11 @@ class PD3O(Algorithm):
             A composite convex function.
         operator: Operator
             Bounded linear operator
-        delta: TODO:
-        gamma: TODO:
-        initial : DataContainer, default TODO:
+        delta: Float, optional, default is  `1./(gamma*operator.norm()**2)`
+            The dual step-size 
+        gamma: Float, optional, default is `2.0/f.L`
+            The primal step size 
+        initial : DataContainer, optional default is a container of zeros, in the domain of the operator 
             Initial point for the ProxSkip algorithm.             
 
 
@@ -61,20 +61,26 @@ class PD3O(Algorithm):
  
                   
     def set_up(self, f, g, h, operator, delta=None, gamma=None, initial=None,**kwargs):
-        #TODO: do we need a seperate set_up and init function? Probably not? 
+        
         logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.f = f # smooth function
         if isinstance(self.f, ZeroFunction):
-            logging.warning(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma TODO: what does this mean? ")                        
+            warnings.warn(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)                        
         
         self.g = g # proximable
         self.h = h # composite
         self.operator = operator
         
-        self.delta = delta
-        self.gamma = gamma   
+        if gamma is None:
+            gamma = 0.99*2.0/self.f.L
         
+        if delta is None :
+            delta = 1./(gamma*self.operator.norm()**2)
+        
+        self.gamma = gamma
+        self.delta = delta  
+
         if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
         else:

@@ -18,18 +18,16 @@
 
 import unittest
 from utils import initialise_tests
-from cil.optimisation.functions import L2NormSquared, MixedL21Norm, TotalVariation, ZeroFunction
+from cil.optimisation.functions import L2NormSquared, MixedL21Norm, TotalVariation, ZeroFunction, IndicatorBox
 from cil.optimisation.operators import GradientOperator
-from cil.optimisation.algorithms import PDHG, PD3O
+from cil.optimisation.algorithms import PDHG, PD3O, FISTA
 from cil.utilities import dataexample
 import numpy as np
 import scipy.sparse as sp
-from utils import has_cvxpy
 
 initialise_tests()
 
-if has_cvxpy:
-    import cvxpy #TODO: is this used 
+
 
 class Test_PD3O(unittest.TestCase):
 
@@ -38,9 +36,48 @@ class Test_PD3O(unittest.TestCase):
         # default test data
         self.data = dataexample.CAMERA.get(size=(32, 32))
         
-    #TODO: some tests checking the init of PD30, defaults etc. Need to also check the objective calculation? Check the error message when ZeroOperator is passed 
+   
+    def test_init_and_set_up(self):
+        F1= 0.5 * L2NormSquared(b=self.data)
+        H1 = 0.1*  MixedL21Norm()
+        operator =  GradientOperator(self.data.geometry)
+        G1= IndicatorBox(lower=0)
 
+        algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator)
+        self.assertEqual(algo_pd3o.gamma,0.99*2.0/F1.L )
+        self.assertEqual(algo_pd3o.delta,F1.L/(0.99*2.0*operator.norm()**2) )
+        np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate(0).array)
+        self.assertTrue(algo_pd3o.configured)
+        
+        algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator, gamma=3, delta=43.1, initial=self.data.geometry.allocate('random', seed=3))
+        self.assertEqual(algo_pd3o.gamma,3 )
+        self.assertEqual(algo_pd3o.delta,43.1 )
+        np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate('random', seed=3).array)
+        self.assertTrue(algo_pd3o.configured)
+        
+        with self.assertWarnsRegex(UserWarning,"Please use PDHG instead." ):
+            algo_pd3o=PD3O(f=ZeroFunction(), g=G1, h=H1, operator=operator, gamma=3, delta=43.1)
+        
+       
+    def test_pd3o_vs_fista(self):
+        alpha = 0.1  
+        G = alpha * TotalVariation(max_iteration=5, lower=0)
 
+        F= 0.5 * L2NormSquared(b=self.data)
+        algo=FISTA(f=F, g=G,initial=0*self.data)
+        algo.run(200)
+
+        F1= 0.5 * L2NormSquared(b=self.data)
+        H1 = alpha *  MixedL21Norm()
+        operator =  GradientOperator(self.data.geometry)
+        G1= IndicatorBox(lower=0)
+
+        algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator, initial=0*self.data)
+        algo_pd3o.run(500)
+
+        np.testing.assert_allclose(algo.solution.as_array(), algo_pd3o.solution.as_array(), atol=1e-2)
+        np.testing.assert_allclose(algo.objective[-1], algo_pd3o.objective[-1], atol=1e-2)
+        
     def test_PD3O_PDHG_denoising(self):
 
         # compare the TV denoising problem using
@@ -78,7 +115,7 @@ class Test_PD3O(unittest.TestCase):
         H = alpha * MixedL21Norm()
         G = 0.25 * L2NormSquared(b=self.data)
         F = 0.25 * L2NormSquared(b=self.data)
-        gamma = 2./F.L
+        gamma = 0.99*2./F.L
         delta = 1./(gamma*norm_op**2)
 
         pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,

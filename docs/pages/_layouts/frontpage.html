@@ -1,0 +1,105 @@
+---
+layout: default
+format: frontpage
+---
+<!-- from https://github.com/Phlow/feeling-responsive/raw/gh-pages/_layouts/frontpage.html -->
+<div id="header-home">
+    <div class="row">
+        <div class="small-12 columns">
+        </div><!-- /.medium-4.columns -->
+    </div><!-- /.row -->
+</div><!-- /#header-home -->
+
+
+{% comment %}
+*
+* Main page content
+*
+{% endcomment %}
+<div class="row">
+    {{ content }}
+</div><!-- /.row -->
+
+
+{% comment %}
+*
+* Widgets (multi-column cards)
+*
+{% endcomment %}
+<div class="row t60">
+    {% if page.widgets %}
+    {% for widget in page.widgets %}
+        {% include _frontpage-widget.html widget=widget %}
+    {% endfor %}
+	{% endif %}
+</div><!-- /.row -->
+
+
+
+{% comment %}
+*
+* First check, if there is a call for action-button
+*
+{% endcomment %}
+{% if page.callforaction.url contains 'http' %}
+{% assign url = '' %}
+{% else %}
+{% capture url %}{{ site.url }}{{ site.baseurl }}{% endcapture %}
+{% endif %}
+{% if page.callforaction %}
+    <div class="row t60 b60">
+        <div class="small-12 text-center columns">
+            <a class="button large radius {{ page.callforaction.style }}" href="{{ url }}{{ page.callforaction.url }}"{% if page.callforaction.url contains 'http' %} target="_blank" {% endif %}>{{ page.callforaction.text }}</a>
+        </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+{% endif %}
+
+
+
+{% comment %}
+*
+* First check, if there are any posts at all
+*
+{% endcomment %}
+
+{% unless site.posts == empty %}
+    <div class="row t30 b20 homepage">
+        <div class="small-12 columns">
+            {% for post in site.posts limit:1 %}
+            {% if post.image.homepage %}
+            <p>
+                <a href="{{ site.url }}{{ site.baseurl }}{{ post.url }}" title="{{ post.title | escape_once }}"><img width="970" src="{{ site.urlimg }}{{ post.image.homepage }}" alt="{{ page.title | escape_once }}"></a>
+            </p>
+
+            {% if post.image.caption_url and post.image.caption %}
+            <p class="text-right caption">
+                <a href="{{ post.image.caption_url }}">{{ post.image.caption }}</a>
+            </p>
+            {% endif %}
+            {% else post.image.homepage == NULL %}
+            <h2>{{ site.data.language.new_blog_entries }}</h2>
+            {% endif %}
+            {% endfor %}
+        </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+
+    <div class="row">
+        <div class="medium-6 columns">
+            {% for post in site.posts limit:1 %}
+            {% if post.subheadline %}<p class="subheadline">{{ post.subheadline }}</p>{% endif %}
+            <h2><a href="{{ site.url }}{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h2>
+            <p>
+                {% if post.meta_description %}{{ post.meta_description | strip_html | escape }}{% else post.teaser %}{{ post.teaser | strip_html | escape }}{% endif %}
+                <a href="{{ site.url }}{{ site.baseurl }}{{ post.url }}" title="Read {{ post.title | escape_once }}"><strong>{{ site.data.language.read_more }}</strong></a>
+            </p>
+            {% endfor %}
+        </div><!-- /.medium-5.columns -->
+
+
+        <div class="medium-6 columns">
+            <p><strong>{{ site.data.language.more_articles }}</strong></p>
+            {% include list-posts entries='3' offset='1' %}
+        </div><!-- /.medium-7.columns -->
+    </div><!-- /.row -->
+{% endunless %}

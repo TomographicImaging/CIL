@@ -201,7 +201,7 @@ For example:
    A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
 
 
-The `partition` method is defined as part of:
+The :code:`partition` method is defined as part of:
 
 .. autoclass:: cil.framework.Partitioner
    :members:

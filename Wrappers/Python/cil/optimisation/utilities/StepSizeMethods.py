@@ -138,3 +138,61 @@ class ArmijoStepSizeRule(StepSizeRule):
             raise ValueError(
                 'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
         return self.alpha
+
+
+class BarzilaiBorweinStepSizeRule(StepSizeRule):
+
+    """ 
+    Applies the Barzilai- Borwein rule to calculate the step size (step_size).
+
+    #TODO: Write a short explanation here 
+    Parameters
+    ----------
+    mode: Choose one of 'long', 'short' or 'alternate'
+    
+
+    Reference
+    ---------
+    Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148
+    https://en.wikipedia.org/wiki/Barzilai-Borwein_method
+    
+    
+
+    """
+
+    def __init__(self, function, mode='alternate'):
+        '''Initialises the step size rule 
+        '''
+        self.function=function
+        self.mode=mode
+        self.store_grad=None 
+        self.store_x=None
+        pass
+    
+
+    def get_step_size(self, algorithm):
+        """
+        Applies the B-B rule to calculate the step size (`step_size`)
+
+        Returns
+        --------
+        the calculated step size:float
+
+        """
+        if self.store_x is None:
+            self.store_x=algorithm.x.copy()
+            self.store_grad=algorithm.gradient_update.copy()
+            return 1./self.function.L
+        
+        else:
+            if self.mode=='long' or (self.mode =='alternate' and algorithm.iteration%2 ==0):
+                ret = (( algorithm.x-self.store_x).dot(algorithm.x-self.store_x))/ (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))
+            elif self.mode=='short' or (self.mode =='alternate' and algorithm.iteration%2 ==1):
+                ret = (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))/ (( algorithm.gradient_update-self.store_grad).dot(algorithm.gradient_update-self.store_grad))
+            else:
+                raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+        self.store_x.fill(algorithm.x)
+        self.store_grad.fill(algorithm.gradient_update)
+        
+        print(ret)
+        return ret

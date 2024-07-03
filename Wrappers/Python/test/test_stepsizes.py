@@ -1,9 +1,9 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA
 from cil.optimisation.functions import LeastSquares, IndicatorBox
-from cil.framework import ImageGeometry, VectorGeometry
+from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -77,3 +77,48 @@ class TestStepSizes(CCPiTestClass):
         alg.gradient_update = ig.allocate(-2)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 2)
+
+    def test_bb_init(self):
+        pass #TODO:
+    
+    def test_bb_converge(self):
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        ig=Aop.domain
+        initial = ig.allocate()
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        
+        ss_rule=ArmijoStepSizeRule(max_iterations=40)
+        alg_true = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg_true .run(200, verbose=0)
+        
+        
+        
+        
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(f, 'short')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(200, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        
+
+        ss_rule=BarzilaiBorweinStepSizeRule(f, 'long')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(200, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        
+
+        ss_rule=BarzilaiBorweinStepSizeRule(f, 'alternate')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+
+        alg.run(200, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        
+        

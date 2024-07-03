@@ -123,13 +123,13 @@ class Test_PD3O(unittest.TestCase):
                     max_iteration = 2000)
         pd3O_with_f.run(verbose=1)        
 
-        # pd30 vs fista
+        # PD3O vs fista
         np.testing.assert_allclose(tv_cil.array, pd3O.solution.array,atol=1e-2) 
 
-        # pd30 vs pdhg
+        # PD3O vs pdhg
         np.testing.assert_allclose(pdhg.solution.array, pd3O.solution.array,atol=1e-2) 
 
-        # pd30_with_f vs pdhg
+        # PD3O_with_f vs pdhg
         np.testing.assert_allclose(pdhg.solution.array, pd3O_with_f.solution.array,atol=1e-2)               
 
         # objective values

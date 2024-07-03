@@ -2,6 +2,7 @@
 * XX.X.X
 
   - New Features:
+    - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
     - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)

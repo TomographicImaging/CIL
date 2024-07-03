@@ -100,7 +100,7 @@ class NEXUSDataReader(object):
 
         with h5py.File(self.file_name,'r') as dfile:
 
-            if np.string_(dfile.attrs['creator']) != np.string_('NEXUSDataWriter.py'):
+            if np.bytes_(dfile.attrs['creator']) != np.bytes_('NEXUSDataWriter.py'):
                 raise Exception('We can parse only files created by NEXUSDataWriter.py')
 
             ds_data = dfile['entry1/tomo_entry/data/data']
@@ -349,7 +349,7 @@ class NEXUSDataReader(object):
         #return ds_data.attrs.__contains__('geom_type')
         with h5py.File(self.file_name,'r') as dfile:
 
-            if np.string_(dfile.attrs['creator']) != np.string_('NEXUSDataWriter.py'):
+            if np.bytes_(dfile.attrs['creator']) != np.bytes_('NEXUSDataWriter.py'):
                 raise Exception('We can parse only files created by NEXUSDataWriter.py')
 
             ds_data = dfile['entry1/tomo_entry/data/data']

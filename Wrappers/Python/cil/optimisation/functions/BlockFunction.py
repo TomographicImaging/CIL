@@ -147,9 +147,9 @@ class BlockFunction(Function):
         if out is None:
             out = x.geometry.allocate(0)
         for i in range(self.length):
-            out[i].fill(self.functions[i].gradient(x.get_item(i)))
+            self.functions[i].gradient(x.get_item(i), out=out.get_item(i))
 
-        return  BlockDataContainer(*out)
+        return  out
 
     def proximal_conjugate(self, x, tau, out = None):
         r"""Proximal operator of the convex conjugate of BlockFunction at x:

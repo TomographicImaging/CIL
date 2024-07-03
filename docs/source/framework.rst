@@ -196,12 +196,12 @@ For example:
    ig = ag.get_ImageGeometry()
 
    # partition the data and build the projectors
-   n_subsets = 10 
-   partitioned_data = data.partition(n_subsets, 'sequential')
+   n_batches = 10 
+   partitioned_data = data.partition(num_batches=n_batches, mode='sequential') # Choose mode from `sequential`, `staggered` or `random_permutation` 
    A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
 
 
-Users can call :code:`YourAcquisitionData.partition(num_batches, mode, seed=None)` using the method :code:`cil.framework.Partitioner.partition` from 
+The `partition` method is defined as part of:
 
 .. autoclass:: cil.framework.Partitioner
    :members:

@@ -177,7 +177,7 @@ This provide a base class that will behave as normal :code:`DataContainer`.
 Partitioner
 ===========
 
-This class allows a user to partition an instance of :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
+This class allows a user to partition an instance of :code:`AcquisitionData` into a number of subsets. For example, to use with a stochastic optimisation method. 
 
 For example: 
 

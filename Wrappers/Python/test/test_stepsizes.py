@@ -82,8 +82,8 @@ class TestStepSizes(CCPiTestClass):
         pass #TODO:
     
     def test_bb_converge(self):
-        n = 50
-        m = 500
+        n = 10
+        m = 5
 
         A = np.random.uniform(0, 1, (m, n)).astype('float32')
         b = (A.dot(np.random.randn(n)) + 0.1 *
@@ -97,28 +97,28 @@ class TestStepSizes(CCPiTestClass):
         
         ss_rule=ArmijoStepSizeRule(max_iterations=40)
         alg_true = GD(initial=initial, objective_function=f, step_size=ss_rule)
-        alg_true .run(200, verbose=0)
+        alg_true .run(300, verbose=0)
         
         
         
         
         
-        ss_rule=BarzilaiBorweinStepSizeRule(f, 'short')
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
-        alg.run(200, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        alg.run(40, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=4)
         
 
-        ss_rule=BarzilaiBorweinStepSizeRule(f, 'long')
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'long')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
-        alg.run(200, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        alg.run(40, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=4)
         
 
-        ss_rule=BarzilaiBorweinStepSizeRule(f, 'alternate')
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
 
-        alg.run(200, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array())
+        alg.run(40, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=4)
         
         

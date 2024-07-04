@@ -149,6 +149,9 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     Parameters
     ----------
     mode: Choose one of 'long', 'short' or 'alternate'
+        TODO:
+    stabilisation_param: float
+        TODO:
     
 
     Reference
@@ -156,17 +159,20 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148
     https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     
-    
+    Burdakov, O., Dai, Y.H. and Huang, N., 2019. Stabilized barzilai-borwein method. arXiv preprint arXiv:1907.06409.
 
     """
 
-    def __init__(self, function, mode='alternate'):
+    def __init__(self, initial, mode='alternate', stabilisation_param=2):
         '''Initialises the step size rule 
         '''
-        self.function=function
+ 
         self.mode=mode
         self.store_grad=None 
         self.store_x=None
+        self.initial=initial
+        self.stabilisation_param=stabilisation_param
+        
         pass
     
 
@@ -182,17 +188,22 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         if self.store_x is None:
             self.store_x=algorithm.x.copy()
             self.store_grad=algorithm.gradient_update.copy()
-            return 1./self.function.L
+            return self.initial
         
+        if algorithm.gradient_update.norm()<1e-6:
+            raise StopIteration
+
+        if self.mode=='long' or (self.mode =='alternate' and algorithm.iteration%2 ==0):
+            ret = (( algorithm.x-self.store_x).dot(algorithm.x-self.store_x))/ (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))
+        elif self.mode=='short' or (self.mode =='alternate' and algorithm.iteration%2 ==1):
+            ret = (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))/ (( algorithm.gradient_update-self.store_grad).dot(algorithm.gradient_update-self.store_grad))
         else:
-            if self.mode=='long' or (self.mode =='alternate' and algorithm.iteration%2 ==0):
-                ret = (( algorithm.x-self.store_x).dot(algorithm.x-self.store_x))/ (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))
-            elif self.mode=='short' or (self.mode =='alternate' and algorithm.iteration%2 ==1):
-                ret = (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))/ (( algorithm.gradient_update-self.store_grad).dot(algorithm.gradient_update-self.store_grad))
-            else:
-                raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+            raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+        
+        ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/algorithm.gradient_update.norm()]))
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
         
-        print(ret)
+
+   
         return ret

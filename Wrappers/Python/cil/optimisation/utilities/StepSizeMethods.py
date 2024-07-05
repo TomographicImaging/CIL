@@ -18,7 +18,7 @@
 
 from abc import ABC, abstractmethod
 import numpy
-
+from numbers import Number
 
 class StepSizeRule(ABC):
     """
@@ -145,25 +145,34 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     """ 
     Applies the Barzilai- Borwein rule to calculate the step size (step_size).
 
-    #TODO: Write a short explanation here 
+    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha _kg_k` where the step size :math:`\alpha _k` is either
+
+    - :math:`\alpha _k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
+
+    - :math:`\alpha _k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
+    
     Parameters
     ----------
+    initial: float,
+        The step-size for the first iteration
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
-        TODO:
-    stabilisation_param: float
-        TODO:
+        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
+    stabilisation_param: float or None, default is None 
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` were :math:`\Delta` is either a given positive constant, or determined to be the minimium of :math`:\Delta x: from the first 3 iterations. To "turn off" the stabilisation use `np.inf`.
+        
     
 
     Reference
     ---------
-    Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148
+    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148
     https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     
-    Burdakov, O., Dai, Y.H. and Huang, N., 2019. Stabilized barzilai-borwein method. arXiv preprint arXiv:1907.06409.
+    - Burdakov, O., Dai, Y.H. and Huang, N., 2019. Stabilized barzilai-borwein method. arXiv preprint arXiv:1907.06409.
 
+    - https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     """
 
-    def __init__(self, initial, mode='short', stabilisation_param=2):
+    def __init__(self, initial, mode='short', stabilisation_param=None):
         '''Initialises the step size rule 
         '''
  
@@ -171,9 +180,15 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad=None 
         self.store_x=None
         self.initial=initial
+        if stabilisation_param is None:
+            self.adaptive = True
+            stabilisation_param =numpy.inf
+        else:
+            self.adaptive = False 
+            if not ( isinstance(stabilisation_param, Number) and stabilisation_param >=0):
+                raise TypeError(" The stabilisation_param should be None, a positive number or np.inf")
         self.stabilisation_param=stabilisation_param
         
-        pass
     
 
     def get_step_size(self, algorithm):
@@ -200,10 +215,11 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         else:
             raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
         
+        if (self.adaptive and algorithm.iteration <=3):
+            self.stabilisation_param = min(self.stabilisation_param,(algorithm.x-self.store_x).norm() )
+        
         ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/algorithm.gradient_update.norm()]))
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
-        
-
-   
+           
         return ret

@@ -138,6 +138,9 @@ class FGP_TV(TV_Base):
         The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
         applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
+        Note
+        -----
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default. 
 
         Parameters
         ----------
@@ -155,7 +158,7 @@ class FGP_TV(TV_Base):
 
                     .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
 
-        nonnegativity : :obj:`boolean`. Default = True .
+        nonnegativity : :obj:`boolean`. Default = False .
                         Non-negativity constraint for the solution of the FGP algorithm.
 
         tolerance : :obj:`float`, Default = 0 .
@@ -202,13 +205,16 @@ class FGP_TV(TV_Base):
         """
 
 
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=None, device='cpu', strong_convexity_constant=0):
 
         if isotropic == True:
             self.methodTV = 0
         else:
             self.methodTV = 1
 
+        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init. 
+            warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
+            nonnegativity=False 
         if nonnegativity == True:
             self.nonnegativity = 1
         else:

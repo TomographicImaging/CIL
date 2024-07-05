@@ -46,6 +46,8 @@ class SIRT(Algorithm):
     :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
     and :math:`\omega` is the relaxation parameter.
 
+    Note that SIRT is equivalent to gradient descent on a weighted least squares objective (weighted by :math:`M`) preconditioned by the sensitivity matrix (:math:`D`).
+    Thus the objective calculation for SIRT is the weighted least squares objective :math:`\frac{1}{2}\|A x - b\|^{2}_{M}`.
     Parameters
     ----------
 
@@ -106,6 +108,7 @@ class SIRT(Algorithm):
         self.data = data
 
         self.r = data.copy()
+    
 
         self.constraint = constraint
         if constraint is None:
@@ -201,10 +204,13 @@ class SIRT(Algorithm):
                 self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
-        r"""Returns the objective
+        r"""Returns the weighted least squares objective
 
-        .. math:: \frac{1}{2}\|A x - b\|^{2}
+        .. math:: \frac{1}{2}\|A x - b\|^{2}_{M}
 
         """
-        self.loss.append(0.5*(self.operator.direct(self.x)-self.data).squared_norm())
+        y = self.operator.direct(self.x)
+        y.subtract(self.data, out = y)
+        wy=self.M.multiply(y)
+        self.objective.append(0.5* y.dot(wy))
 

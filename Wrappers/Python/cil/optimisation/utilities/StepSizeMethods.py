@@ -148,7 +148,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     #TODO: Write a short explanation here 
     Parameters
     ----------
-    mode: Choose one of 'long', 'short' or 'alternate'
+    mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         TODO:
     stabilisation_param: float
         TODO:
@@ -163,7 +163,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
     """
 
-    def __init__(self, initial, mode='alternate', stabilisation_param=2):
+    def __init__(self, initial, mode='short', stabilisation_param=2):
         '''Initialises the step size rule 
         '''
  

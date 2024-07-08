@@ -188,7 +188,7 @@ class TestStepSizes(CCPiTestClass):
     def test_bb_converge(self):
         n = 10
         m = 5
-
+        np.random.seed(4)
         A = np.random.uniform(0, 1, (m, n)).astype('float32')
         b = (A.dot(np.random.randn(n)) + 0.1 *
              np.random.randn(m)).astype('float32')

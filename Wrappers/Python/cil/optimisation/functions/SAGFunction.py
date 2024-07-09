@@ -1,26 +1,26 @@
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-# Authors:
-# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# - Daniel Deidda (National Physical Laboratory, UK)
-# - Claire Delplancke (Electricite de France, Research and Development)
-# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
-# - Zeljko Kereta (Department of Computer Science, University College London, UK)
-# - Evgueni Ovtchinnikov (STFC - UKRI)
-# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
+#   Copyright 2024 United Kingdom Research and Innovation
+#   Copyright 2024 The University of Manchester
+# 
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+# 
+#       http://www.apache.org/licenses/LICENSE-2.0
+# 
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+# 
+#  Authors:
+#  - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+#  - Daniel Deidda (National Physical Laboratory, UK)
+#  - Claire Delplancke (Electricite de France, Research and Development)
+#  - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+#  - Zeljko Kereta (Department of Computer Science, University College London, UK)
+#  - Evgueni Ovtchinnikov (STFC - UKRI)
+#  - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 import numpy as np
@@ -35,7 +35,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     Parameters:
     -----------
     functions : `list`  of functions
-        A list of functions: :math:`[f_{0}, f_{2}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list) must be strictly greater than 1. 
+        A list of functions: :math:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list `n`) must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in :math:`{0,...,n-1}`.
         This sampler is called each time `gradient` is called and sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     
@@ -73,34 +73,33 @@ class SAGFunction(ApproximateGradientSumFunction):
         """
         
         
-        if self._list_stored_gradients is None: # Initialise the stored gradients on the first call of gradient unless using warm start.  
+        if self._list_stored_gradients is None: #  Initialise the stored gradients on the first call of gradient unless using warm start.  
             self._list_stored_gradients = [
                 0*x for fi in self.functions]
             self._full_gradient_at_iterate = 0*x
             self._sampled_grad = x.copy()
             self._stochastic_grad_difference = x.copy()
         
-        if self.function_num >= self.num_functions or self.function_num<0 : #check the sampler and raise an error if needed
-            raise IndexError(
-                'The sampler has outputted an index larger than the number of functions to sample from. Please ensure your sampler samples from {0,1,...,len(functions)-1} only.')
+        if self.function_num >= self.num_functions or self.function_num<0 : # check the sampler and raise an error if needed
+            raise IndexError("The sampler has produced an index that exceeds  the number of available functions to sample from. Please ensure your sampler only selects from {0,1,...,len(functions)-1} ")
 
             
-        #Calculate the gradient of the sampled function at the current iterate 
+        # Calculate the gradient of the sampled function at the current iterate 
         self.functions[function_num].gradient(x, out=self._sampled_grad)
 
         
-        #Calculate the difference between the new gradient of the sampled function and the stored one
+        # Calculate the difference between the new gradient of the sampled function and the stored one
         self._sampled_grad.sapyb(
             1., self._list_stored_gradients[function_num], -1., out=self._stochastic_grad_difference)
 
-        #Calculate the  approximate gradient
+        # Calculate the  approximate gradient
         out = self._update_approx_gradient(out)
 
-        #Update the stored gradients 
+        # Update the stored gradients 
         self._list_stored_gradients[function_num].fill(
             self._sampled_grad)
         
-        #Calculate the stored full gradient
+        # Calculate the stored full gradient
         self._full_gradient_at_iterate.sapyb(
             1., self._stochastic_grad_difference, 1., out=self._full_gradient_at_iterate)
 
@@ -176,11 +175,11 @@ class SAGAFunction(SAGFunction):
     def _update_approx_gradient(self, out):
         """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: """
         if out is None:
-            # due to the convention that we follow: without the 1/n factor
+            #  due to the convention that we follow: without the 1/n factor
             out= self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_iterate, 1.)
         else:
-            # due to the convention that we follow: without the 1/n factor
+            #  due to the convention that we follow: without the 1/n factor
             self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_iterate, 1., out=out)
 

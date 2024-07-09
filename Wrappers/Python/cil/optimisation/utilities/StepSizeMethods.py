@@ -145,29 +145,29 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     """ 
     Applies the Barzilai- Borwein rule to calculate the step size (step_size).
 
-    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha _kg_k` where the step size :math:`\alpha _k` is either
+    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k`th iterate (current solution after iteration :math:`k`) and :math:`g_k` is the gradient calculation in the :math:`k`th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha _kg_k` where the step size :math:`\alpha _k` is either
 
     - :math:`\alpha _k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
 
     - :math:`\alpha _k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
-    
+    Where the operator :math:`\cdot` is the standard inner product between two vectors. 
     Parameters
     ----------
-    initial: float,
-        The step-size for the first iteration
+    initial: float, greater than zero 
+        The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
     stabilisation_param: float or None, default is None 
-        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` were :math:`\Delta` is either a given positive constant, or determined to be the minimium of :math`:\Delta x: from the first 3 iterations. To "turn off" the stabilisation use `np.inf`.
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` were by default, if `stabilisation_param` is None` this  is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or to "turn off" the stabilisation use `np.inf`.
         
     
 
     Reference
     ---------
-    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148
+    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141
     https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     
-    - Burdakov, O., Dai, Y.H. and Huang, N., 2019. Stabilized barzilai-borwein method. arXiv preprint arXiv:1907.06409.
+    - Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). https://doi.org/10.4208/jcm.1911-m2019-0171
 
     - https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     """
@@ -200,12 +200,14 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         the calculated step size:float
 
         """
+        #For the first iteration we use an initial step size because the BB step size requires a previous iterate. 
         if self.store_x is None:
-            self.store_x=algorithm.x.copy()
-            self.store_grad=algorithm.gradient_update.copy()
+            self.store_x=algorithm.x.copy() # We store the last iterate in order to calculate the BB step size 
+            self.store_grad=algorithm.gradient_update.copy()# We store the last gradient in order to calculate the BB step size 
             return self.initial
         
-        if algorithm.gradient_update.norm()<1e-6:
+        #If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations. 
+        if algorithm.gradient_update.norm()<1e-8:
             raise StopIteration
 
         if self.mode=='long' or (self.mode =='alternate' and algorithm.iteration%2 ==0):
@@ -215,10 +217,14 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         else:
             raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
         
-        if (self.adaptive and algorithm.iteration <=3):
+        #This computes the default stabilisation parameter, using the first three iterations
+        if (algorithm.iteration <=3 and self.adaptive):
             self.stabilisation_param = min(self.stabilisation_param,(algorithm.x-self.store_x).norm() )
         
+        # Computes the step size as the minimum of the ret, above, and :math:`\Delta/\|g_k\|` ignoring any NaN values. 
         ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/algorithm.gradient_update.norm()]))
+        
+        # We store the last iterate and gradient in order to calculate the BB step size 
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
            

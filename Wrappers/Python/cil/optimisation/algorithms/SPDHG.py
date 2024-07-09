@@ -24,6 +24,7 @@ import logging
 from cil.optimisation.utilities import Sampler
 from numbers import Number
 import numpy as np
+import warnings
 
 
 log = logging.getLogger(__name__)
@@ -147,13 +148,9 @@ class SPDHG(Algorithm):
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
                  initial=None, sampler=None, prob_weights=None,   **kwargs):
 
-        max_iteration = kwargs.pop('max_iteration', 0)
 
-        print_interval = kwargs.pop('print_interval', None)
-        log_file = kwargs.pop('log_file', None)
         update_objective_interval = kwargs.pop('update_objective_interval', 1)
-        super(SPDHG, self).__init__(max_iteration=max_iteration,
-                                    update_objective_interval=update_objective_interval, log_file=log_file, print_interval=print_interval)
+        super(SPDHG, self).__init__(update_objective_interval=update_objective_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                     initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
@@ -297,7 +294,7 @@ class SPDHG(Algorithm):
         The step sizes `sigma` and `tau` are set using the equations:
         .. math:: 
             \sigma_i=\gamma\rho / (\|K_i\|**2)\\
-            \tau = (\rho/\gamma)\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+            \tau = \min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
         """
         if isinstance(gamma, Number):
@@ -318,10 +315,9 @@ class SPDHG(Algorithm):
                 "We currently only support scalar values of gamma")
 
         self._sigma = [gamma * rho / ni for ni in self._norms]
-        values = [pi / (si * ni**2) for pi, ni,
+        values = [rho*pi / (si * ni**2) for pi, ni,
                   si in zip(self._prob_weights, self._norms, self._sigma)]
         self._tau = min([value for value in values if value > 1e-8])
-        self._tau *= (rho / gamma)
 
     def set_step_sizes(self, sigma=None, tau=None):
         r""" Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.
@@ -376,16 +372,16 @@ class SPDHG(Algorithm):
             self._sigma = sigma
 
         elif tau is None:
-            self._sigma = [gamma * rho / ni for ni in self._norms]
+            self._sigma = [rho / ni for ni in self._norms]
         else:
             self._sigma = [
-                gamma * rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
+                rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
 
         if tau is None:
-            values = [pi / (si * ni**2) for pi, ni,
+            values = [rho*pi / (si * ni**2) for pi, ni,
                       si in zip(self._prob_weights, self._norms, self._sigma)]
             self._tau = min([value for value in values if value > 1e-8])
-            self._tau *= (rho / gamma)
+            
         else:
             if isinstance(tau, Number) and tau > 0:
                 pass

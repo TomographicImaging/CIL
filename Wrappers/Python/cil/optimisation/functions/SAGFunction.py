@@ -65,8 +65,8 @@ class SAGFunction(ApproximateGradientSumFunction):
 
         Parameters
         ----------
-        x: element in the domain of the `functions`
-
+        x : DataContainer (e.g. ImageData object)
+            Element in the domain of the `functions`
         function_num: `int` 
             Between 0 and the number of functions in the list  
 

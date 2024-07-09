@@ -36,4 +36,4 @@ dependencies:
   # TODO: remove after https://github.com/pydata/pydata-sphinx-theme/pull/1795 is released
   - pip
   - pip:
-    - git+https://github.com/TomographicImaging/pydata-sphinx-theme@fix-version-switcher-dirhtml#egg=pydata-sphinx-theme
+    - git+https://github.com/pydata/pydata-sphinx-theme

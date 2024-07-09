@@ -1,26 +1,26 @@
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-# Authors:
-# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# - Daniel Deidda (National Physical Laboratory, UK)
-# - Claire Delplancke (Electricite de France, Research and Development)
-# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
-# - Zeljko Kereta (Department of Computer Science, University College London, UK)
-# - Evgueni Ovtchinnikov (STFC - UKRI)
-# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
+#   Copyright 2024 United Kingdom Research and Innovation
+#   Copyright 2024 The University of Manchester
+# 
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+# 
+#       http://www.apache.org/licenses/LICENSE-2.0
+# 
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+# 
+#  Authors:
+#  - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+#  - Daniel Deidda (National Physical Laboratory, UK)
+#  - Claire Delplancke (Electricite de France, Research and Development)
+#  - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+#  - Zeljko Kereta (Department of Computer Science, University College London, UK)
+#  - Evgueni Ovtchinnikov (STFC - UKRI)
+#  - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
@@ -36,14 +36,14 @@ class SVRGFunction(ApproximateGradientSumFunction):
         .. math ::
             x_{k+1} = x_k - \gamma [n*\nabla f_i(x_k) - n*\nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})],    where :math:`\tilde{x}` is the latest "snapshot" point . Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient. 
     
-    Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.
+    Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.https://proceedings.neurips.cc/paper_files/paper/2013/file/ac1dd209cbcc5e5d1c6e28598e8cbbe8-Paper.pdf
     
 
     Parameters
     ----------
      functions : `list`  of functions
         A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
-    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0, 1, ..., n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     update_frequency : int or None, optional
         The frequency of updating the full gradient (taking a snapshot). The default is 2*len(functions) so a "snapshot" is taken every 2*len(functions) iterations. 
@@ -56,7 +56,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     def __init__(self, functions, sampler=None, update_frequency=None, store_gradients=False):
         super(SVRGFunction, self).__init__(functions, sampler)
 
-        # update_frequency for SVRG
+        #  update_frequency for SVRG
         self.update_frequency = update_frequency
     
         if self.update_frequency is None:
@@ -87,7 +87,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 
     
-        # For SVRG, every `update_frequency` a full gradient step is calculated, else an approximate gradient is taken. 
+        #  For SVRG, every `update_frequency` a full gradient step is calculated, else an approximate gradient is taken. 
         if (np.isinf(self.update_frequency) == False and (self._svrg_iter_number % (self.update_frequency)) == 0):
 
             return self._update_full_gradient_and_return(x, out=out)
@@ -113,13 +113,13 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
         Parameters
         ----------
-        x : DataContainer ( e.g. ImageData)
+        x : DataContainer (e.g. ImageData object)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
         function_num: `int` 
-            Between 0 and the number of functions in the list  
+            Between 0 and n-1, where n is the number of functions in the list  
         Returns
         --------
-        DataContainer (e.g. ImageData)
+        DataContainer (e.g. ImageData object)
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
     
@@ -153,7 +153,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         Returns
         --------
-        DataContainer (e.g. ImageData)
+        DataContainer (e.g. ImageData object)
             the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1}
         """
 
@@ -161,7 +161,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         if self.store_gradients is True:
             if self._list_stored_gradients is None: 
-                #Save the gradient of each individual f_i and the gradient of the full sum at the point x. 
+                # Save the gradient of each individual f_i and the gradient of the full sum at the point x. 
                 self._list_stored_gradients = [
                     fi.gradient(x) for fi in self.functions]
                 self._full_gradient_at_snapshot = sum(self._list_stored_gradients, start=0*x)
@@ -171,7 +171,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
                 self._full_gradient_at_snapshot.fill( sum(self._list_stored_gradients, start=0*x))
            
         else:
-            #Save the snapshot point and the gradient of the full sum at the point x. 
+            # Save the snapshot point and the gradient of the full sum at the point x. 
             self._full_gradient_at_snapshot = self.full_gradient(x, out=self._full_gradient_at_snapshot) 
             
         if self.snapshot is None: 
@@ -179,10 +179,10 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         self.snapshot.fill(x) 
 
-        #In this iteration all functions in the sum were used to update the gradient 
+        # In this iteration all functions in the sum were used to update the gradient 
         self._update_data_passes_indices(list(range(self.num_functions))) 
 
-        #Return the gradient of the full sum at the snapshot. 
+        # Return the gradient of the full sum at the snapshot. 
         if out is None:
             out = self._full_gradient_at_snapshot
         else:
@@ -193,15 +193,17 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 class LSVRGFunction(SVRGFunction):
     """""
-    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a "snapshot"  is calculated at random  intervals rather than at fixed numbers of iterations. 
+    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a "snapshot"  is calculated at random intervals rather than at fixed numbers of iterations. 
     
     
-    Reference: D. Kovalev et al., “Don’t jump through hoops and remove those loops: SVRG and Katyusha are better without the outer loop,” in Algo Learn Theo, PMLR, 2020.
+    Reference: Kovalev, D., Horváth, S. &amp; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.
+
+
 
     Parameters
     ----------
      functions : `list`  of functions
-        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
+        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions `n` must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     update_prob: positive float, default: 1/n
@@ -219,26 +221,26 @@ class LSVRGFunction(SVRGFunction):
         super(LSVRGFunction, self).__init__(
             functions, sampler=sampler, store_gradients=store_gradients)
 
-        # update frequency based on probability
+        # Update frequency based on probability.
         self.update_prob = update_prob
-        # default update_prob for Loopless SVRG
+        #  Default update_prob for Loopless SVRG
         if self.update_prob is None:
             self.update_prob = 1./self.num_functions
 
-        # the random generator used to decide if the gradient calculation is a full gradient or an approximate gradient 
+        #  The random generator used to decide if the gradient calculation is a full gradient or an approximate gradient 
         self.generator = np.random.default_rng(seed=seed)
 
     def gradient(self, x, out=None):
-        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update probability 
+        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update probability.
 
         Parameters
         ----------
-        x : DataContainer ( e.g. ImageData)
+        x : DataContainer (e.g. ImageData objects)
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
         --------
-        DataContainer ( e.g. ImageData)
+        DataContainer (e.g. ImageData object)
             the value of the approximate gradient of the sum function at :code:`x`
         """
 

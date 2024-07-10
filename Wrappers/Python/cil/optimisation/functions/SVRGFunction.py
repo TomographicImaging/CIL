@@ -31,17 +31,21 @@ import numbers
 class SVRGFunction(ApproximateGradientSumFunction):
 
     r"""
-    A class representing a function for Stochastic Variance Reduced Gradient (SVRG) approximation. For this approximation, every `update_frequency` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by calculating the gradient of one of the :math:`f_i`s at the current iterate and at the snapshot giving iterations:
+    The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `update_frequency` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`s at the current iterate and the snapshot, updating the approximate gradient to be:
     
         .. math ::
-            x_{k+1} = x_k - \gamma [n*\nabla f_i(x_k) - n*\nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})],    where :math:`\tilde{x}` is the latest "snapshot" point . Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient. 
+            n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),
+            
+    where :math:`\tilde{x}` is the latest "snapshot" point and :math:`x_k` is the value at the current iteration. 
+    
+    Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient. 
     
     Reference: Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.https://proceedings.neurips.cc/paper_files/paper/2013/file/ac1dd209cbcc5e5d1c6e28598e8cbbe8-Paper.pdf
     
 
     Parameters
     ----------
-     functions : `list`  of functions
+    functions : `list`  of functions
         A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0, 1, ..., n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
@@ -105,9 +109,9 @@ class SVRGFunction(ApproximateGradientSumFunction):
         
 
     def approximate_gradient(self, x, function_num, out=None):
-        """ Calculates the stochastic gradient at the point :math:`x` by using the gradient of the selected function, indexed by `function_number` in {0,...,len(functions)-1}, and the full gradient at the snapshot :math:`\tilde{x}`
+        """ Calculates the stochastic gradient at the point :math:`x` by using the gradient of the selected function, indexed by :math:`i_k`, the `function_number` in {0,...,len(functions)-1}, and the full gradient at the snapshot :math:`\tilde{x}`
             .. math ::
-                n*\nabla f_i(x_k) - n*\nabla f_i(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
+                n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
         
         Note that compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
         

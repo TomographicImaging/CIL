@@ -32,7 +32,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
     
     .. math ::
-                \sum_{i=1}^{n-1} g_i^k \qquad \text{where} \\qquad g_i^k= \begin{cases}
+                \sum_{i=1}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}
                                                                             \nabla f_i(x_k), \text{ if } i=i_k\\
                                                                             g_i^{k-1},\text{ otherwise }
                                                                             \end{cases}
@@ -55,7 +55,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     Note
     ------
     
-    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. 
+    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. 
 
 
     
@@ -130,7 +130,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         return out 
     
     def warm_start_approximate_gradients(self, initial):
-        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`. 
+        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. 
         
         Parameters
         ----------
@@ -162,13 +162,13 @@ class SAGFunction(ApproximateGradientSumFunction):
     
 class SAGAFunction(SAGFunction):
 
-    """
+    r"""
     An accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
     
     .. math ::
-                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=1}^{n-1} g_i^{k-1} \qquad \text{where} \\qquad g_i^k= \begin{cases}
+                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=1}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}
                                                                             \nabla f_i(x_k), \text{ if } i=i_k\\
-                                                                            g_i^{k-1},\text{ otherwise }
+                                                                            g_i^{k-1},\text{ otherwise}
                                                                             \end{cases}
                                                                         
     Note that compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
@@ -187,7 +187,7 @@ class SAGAFunction(SAGFunction):
     
     Note
     ----
-    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. 
+    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. 
 
   
      """

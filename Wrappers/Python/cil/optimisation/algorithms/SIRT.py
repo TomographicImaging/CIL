@@ -46,8 +46,8 @@ class SIRT(Algorithm):
     :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
     and :math:`\omega` is the relaxation parameter.
 
-    Note that SIRT is equivalent to gradient descent on a weighted least squares objective (weighted by :math:`M`) preconditioned by the sensitivity matrix (:math:`D`).
-    Thus the objective calculation for SIRT is the weighted least squares objective :math:`\frac{1}{2}\|A x - b\|^{2}_{M}`.
+    Note that SIRT is equivalent to preconditioned gradient descent on a weighted least squares objective (weighted by :math:`M`) preconditioned by the sensitivity matrix (:math:`D`).
+    Thus the objective calculation for SIRT is the weighted least squares objective :math:`\frac{1}{2}\|A x - b\|^{2}_{M}` where :math:`\|y\|_M^2:=y^TMy`.
     Parameters
     ----------
 

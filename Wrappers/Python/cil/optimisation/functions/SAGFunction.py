@@ -178,7 +178,7 @@ class SAGAFunction(SAGFunction):
     Reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
    
 
-   Parameters:
+    Parameters:
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 
@@ -190,7 +190,7 @@ class SAGAFunction(SAGFunction):
     The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. 
 
   
-     """
+    """
 
     def __init__(self, functions,  sampler=None):
         super(SAGAFunction, self).__init__(functions, sampler)

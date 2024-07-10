@@ -1,26 +1,26 @@
-#   Copyright 2024 United Kingdom Research and Innovation
-#   Copyright 2024 The University of Manchester
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
 # 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
 # 
-#       http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 # 
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
 # 
-#  Authors:
-#  - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-#  - Daniel Deidda (National Physical Laboratory, UK)
-#  - Claire Delplancke (Electricite de France, Research and Development)
-#  - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
-#  - Zeljko Kereta (Department of Computer Science, University College London, UK)
-#  - Evgueni Ovtchinnikov (STFC - UKRI)
-#  - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
+# Authors:
+# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# - Daniel Deidda (National Physical Laboratory, UK)
+# - Claire Delplancke (Electricite de France, Research and Development)
+# - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
+# - Zeljko Kereta (Department of Computer Science, University College London, UK)
+# - Evgueni Ovtchinnikov (STFC - UKRI)
+# - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 import numpy as np
@@ -29,8 +29,21 @@ import numpy as np
 class SAGFunction(ApproximateGradientSumFunction):
 
     r"""
-    Stochastic average gradient (SAG) function
-    By incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. See the reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
+    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
+    
+    .. math ::
+                \sum_{i=1}^{n-1} g_i^k \qquad \text{where} \\qquad g_i^k= \begin{cases}
+                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\
+                                                                            g_i^{k-1},\text{ otherwise }
+                                                                            \end{cases}
+
+        
+    Note that compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
+        
+    
+    The idea is that by incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. 
+    
+    Reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
 
     Parameters:
     -----------
@@ -42,7 +55,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     Note
     ------
     
-    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point. If this method is not called, the gradients are initialised with zeros. 
+    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. 
 
 
     
@@ -73,7 +86,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         """
         
         
-        if self._list_stored_gradients is None: #  Initialise the stored gradients on the first call of gradient unless using warm start.  
+        if self._list_stored_gradients is None: # Initialise the stored gradients on the first call of gradient unless using warm start.  
             self._list_stored_gradients = [
                 0*x for fi in self.functions]
             self._full_gradient_at_iterate = 0*x
@@ -81,7 +94,7 @@ class SAGFunction(ApproximateGradientSumFunction):
             self._stochastic_grad_difference = x.copy()
         
         if self.function_num >= self.num_functions or self.function_num<0 : # check the sampler and raise an error if needed
-            raise IndexError("The sampler has produced an index that exceeds  the number of available functions to sample from. Please ensure your sampler only selects from {0,1,...,len(functions)-1} ")
+            raise IndexError("The sampler has produced an index that exceeds the number of available functions to sample from. Please ensure your sampler only selects from {0,1,...,len(functions)-1} ")
 
             
         # Calculate the gradient of the sampled function at the current iterate 
@@ -117,7 +130,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         return out 
     
     def warm_start_approximate_gradients(self, initial):
-        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point.
+        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`. 
         
         Parameters
         ----------
@@ -150,8 +163,19 @@ class SAGFunction(ApproximateGradientSumFunction):
 class SAGAFunction(SAGFunction):
 
     """
-    An accelerated version of the stochastic average gradient (SAG) function
-   SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates. See reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
+    An accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
+    
+    .. math ::
+                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=1}^{n-1} g_i^{k-1} \qquad \text{where} \\qquad g_i^k= \begin{cases}
+                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\
+                                                                            g_i^{k-1},\text{ otherwise }
+                                                                            \end{cases}
+                                                                        
+    Note that compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
+     
+    SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates. Compared to SAG it is an unbiased estimator. 
+   
+    Reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
    
 
    Parameters:
@@ -163,7 +187,7 @@ class SAGAFunction(SAGFunction):
     
     Note
     ----
-    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point. If this method is not called, the gradients are initialised with zeros. 
+    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. 
 
   
      """
@@ -175,11 +199,11 @@ class SAGAFunction(SAGFunction):
     def _update_approx_gradient(self, out):
         """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: """
         if out is None:
-            #  due to the convention that we follow: without the 1/n factor
+            # Due to the convention that we follow: without the 1/n factor
             out= self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_iterate, 1.)
         else:
-            #  due to the convention that we follow: without the 1/n factor
+            # Due to the convention that we follow: without the 1/n factor
             self._stochastic_grad_difference.sapyb(
                 self.num_functions, self._full_gradient_at_iterate, 1., out=out)
 

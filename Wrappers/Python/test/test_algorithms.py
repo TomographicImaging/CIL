@@ -52,6 +52,7 @@ from cil.optimisation.algorithms import ISTA
 from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
+from cil.optimisation.algorithms import PD3O
 
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -1388,3 +1389,107 @@ class TestADMM(unittest.TestCase):
         admm.run(500,verbose=0)
         np.testing.assert_almost_equal(
             admm.solution.array, pdhg.solution.array,  decimal=3)
+
+class Test_PD3O(unittest.TestCase):
+
+    def setUp(self):
+
+        # default test data
+        self.data = dataexample.CAMERA.get(size=(32, 32))
+        
+        
+   
+    def test_init_and_set_up(self):
+        F1= 0.5 * L2NormSquared(b=self.data)
+        H1 = 0.1*  MixedL21Norm()
+        operator =  GradientOperator(self.data.geometry)
+        G1= IndicatorBox(lower=0)
+
+        algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator)
+        self.assertEqual(algo_pd3o.gamma,0.99*2.0/F1.L )
+        self.assertEqual(algo_pd3o.delta,F1.L/(0.99*2.0*operator.norm()**2) )
+        np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate(0).array)
+        self.assertTrue(algo_pd3o.configured)
+        
+        algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator, gamma=3, delta=43.1, initial=self.data.geometry.allocate('random', seed=3))
+        self.assertEqual(algo_pd3o.gamma,3 )
+        self.assertEqual(algo_pd3o.delta,43.1 )
+        np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate('random', seed=3).array)
+        self.assertTrue(algo_pd3o.configured)
+        
+        with self.assertWarnsRegex(UserWarning,"Please use PDHG instead." ):
+            algo_pd3o=PD3O(f=ZeroFunction(), g=G1, h=H1, operator=operator, gamma=3, delta=43.1)
+        
+       
+    def test_PD3O_PDHG_denoising_1_iteration(self):
+
+        # compare the TV denoising problem using
+        # PDHG, PD3O for 1 iteration 
+
+        # regularisation parameter
+        alpha = 0.1        
+
+        # setup PDHG denoising      
+        F = alpha * MixedL21Norm()
+        operator = GradientOperator(self.data.geometry)
+        norm_op = operator.norm()
+        G = 0.5 * L2NormSquared(b=self.data)
+        sigma = 1./norm_op
+        tau = 1./norm_op
+        pdhg = PDHG(f=F, g=G, operator=operator, tau=tau, sigma=sigma, update_objective_interval = 100, 
+                    max_iteration = 2000)
+        pdhg.run(1)
+
+        # setup PD3O denoising  (F=ZeroFunction)   
+        H = alpha * MixedL21Norm()
+        
+        F = ZeroFunction()
+        gamma = 1./norm_op
+        delta = 1./norm_op
+
+        pd3O = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
+                    update_objective_interval = 100, 
+                    max_iteration = 2000)
+        pd3O.run(1)      
+               
+        # PD3O vs pdhg
+        np.testing.assert_allclose(pdhg.solution.array, pd3O.solution.array,atol=1e-2) 
+        
+        # objective values
+        np.testing.assert_allclose(pdhg.objective[-1], pd3O.objective[-1],atol=1e-2)  
+        
+    
+    def test_pd3o_convergence(self):
+        
+        # pd30 convergence test using TV denoising
+
+
+        # regularisation parameter
+        alpha = 0.11        
+
+        # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
+        TV = TotalVariation(max_iteration=200)
+        tv_cil = TV.proximal(self.data, tau=alpha)  
+
+   
+        F = alpha * MixedL21Norm()
+        operator = GradientOperator(self.data.geometry)
+        norm_op= operator.norm()
+  
+        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)   
+        H = alpha * MixedL21Norm()
+        G = 0.25 * L2NormSquared(b=self.data)
+        F = 0.25 * L2NormSquared(b=self.data)
+        gamma = 2./F.L
+        delta = 1./(gamma*norm_op**2)
+
+        pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
+                    update_objective_interval = 100)
+        pd3O_with_f.run(1000)        
+
+        # pd30 vs fista
+        np.testing.assert_allclose(tv_cil.array, pd3O_with_f.solution.array,atol=1e-2) 
+
+
+        
+       

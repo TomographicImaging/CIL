@@ -200,7 +200,7 @@ For example:
    ig = ag.get_ImageGeometry()
 
    # partition the data into batches contained in the elements of a BlockDataContainer
-   data_partitioned = data.partition(num_batches=10, mode='sequential') # Choose mode from `sequential`, `staggered` or `random_permutation` 
+   data_partitioned = data.partition(num_batches=10, mode='staggered') # Choose mode from `sequential`, `staggered` or `random_permutation` 
    # From the partitioned data build a BlockOperator container the projectors for each batch 
    A_partitioned = ProjectionOperator(ig, data_partitioned.geometry, device = "cpu")
 

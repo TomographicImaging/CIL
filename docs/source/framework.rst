@@ -177,10 +177,10 @@ This provide a base class that will behave as normal :code:`DataContainer`.
 Partitioner
 ===========
 
-This class allows a user to partition an instance of tomography :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
+This function partitions an instance of tomography :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
 
-The partitioning done by considering batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` called in the method and takes in an `AquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AquisitionData` object with the batch of data and corresponding geometry. 
-
+The partitioning is done by considering batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` called in the method and takes in an `AquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AquisitionData` object with the batch of data and corresponding geometry. 
+We consider a **batch** to be a subset of the :code:`AcquisitionData` and the verb, **to partition**, to be the act of splitting into batches. 
  
 
 For example: 

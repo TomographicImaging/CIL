@@ -23,9 +23,7 @@ import numpy as np
 import logging
 from cil.optimisation.utilities import Sampler
 from numbers import Number
-import numpy as np
 import warnings
-
 
 log = logging.getLogger(__name__)
 
@@ -33,12 +31,8 @@ log = logging.getLogger(__name__)
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
 
-    Problem: 
-
-
-    .. math::
-
-      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+    Problem:
+    .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
     Parameters
     ----------
@@ -54,13 +48,16 @@ class SPDHG(Algorithm):
         List of Step size parameters for Dual problem
     initial : DataContainer, optional, default=None
         Initial point for the SPDHG algorithm
-    gamma : float
-        parameter controlling the trade-off between the primal and dual step sizes
-    sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting an integer from {1,...,len(operator)}. 
-             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling with replacement and each index will have probability = 1/len(operator)
+    gamma : float, optional
+            Parameter controlling the trade-off between the primal and dual step sizes
+    sampler: optional, an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting an integer from {1,...,len(operator)}. 
+            Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling with replacement and each index will have probability = 1/len(operator)
+    prob_weights: optional, list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
+            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 
 
-    **kwargs:
+    **kwargs
+    ---------
     prob : list of floats, optional, default=None
         List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated.
     norms : list of floats
@@ -69,29 +66,22 @@ class SPDHG(Algorithm):
 
     Example
     -------
-    >>> data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
-    >>> subsets = 10
-    >>> ig = data.geometry
-    >>> ig.voxel_size_x = 0.1
-    >>> ig.voxel_size_y = 0.1
-    >>> 
-    >>> detectors = ig.shape[0]
-    >>> angles = np.linspace(0, np.pi, 90)
-    >>> ag = AcquisitionGeometry.create_Parallel2D().set_angles(angles, angle_unit='radian').set_panel(detectors, 0.1)
-    >>> 
-    >>> Aop = ProjectionOperator(ig, ag, 'cpu')
-    >>> 
-    >>> sin = Aop.direct(data)
-    >>> partitioned_data = sin.partition(subsets, 'sequential')
-    >>> A = BlockOperator(*[ProjectionOperator(ig. partitioned_data[i].geometry, 'cpu') for i in range(subsets)])
-    >>> 
-    >>> F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-                            for i in range(subsets)])
+    >>> data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+    >>> data.reorder('astra')
+    >>> data = data.get_slice(vertical='centre')
+    >>> ig = ag.get_ImageGeometry()
+
+    >>> data_partitioned = data.partition(num_batches=10, mode='staggered')
+    >>> A_partitioned = ProjectionOperator(ig, data_partitioned.geometry, device = "cpu")
+
+
+    >>> F = BlockFunction(*[L2NormSquared(b=data_partitioned[i])
+                            for i in range(10)])
 
     >>> alpha = 0.025
     >>> G = alpha * TotalVariation()
-    >>> spdhg = SPDHG(f=F, g=G, operator=A, sampler=Sampler.sequential(len(A)),
-                      initial=A.domain_geometry().allocate(1), max_iteration=1000, update_objective_interval=10)
+    >>> spdhg = SPDHG(f=F, g=G, operator=A_partitioned, sampler=Sampler.sequential(len(A)),
+                      initial=A.domain_geometry().allocate(1), update_objective_interval=10)
     >>> spdhg.run(100)
 
 
@@ -105,20 +95,17 @@ class SPDHG(Algorithm):
 
     - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
 
-        .. math:: 
-          \sigma_i=0.99 / (\|K_i\|**2)
+    .. math:: \sigma_i=0.99 / (\|K_i\|**2)
 
-        and `tau` is set as per case 2
+    and `tau` is set as per case 2
 
     - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
-        .. math:: 
-        \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+    .. math:: \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
 
     - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
-        .. math:: 
-        \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+    .. math:: \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
 
     - Case 4: Both `sigma` and `tau` are provided.
 
@@ -128,9 +115,7 @@ class SPDHG(Algorithm):
 
     Convergence is guaranteed provided that [2, eq. (12)]:
 
-    .. math:: 
-
-    \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
+    .. math:: \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
 
     References
     ----------
@@ -138,11 +123,11 @@ class SPDHG(Algorithm):
     [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary 
     sampling and imaging applications",
     Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
-    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   
+    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   https://doi.org/10.1137/17M1134834 
 
     [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
     Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
-    Physics in Medicine & Biology, Volume 64, Number 22, 2019.
+    Physics in Medicine & Biology, Volume 64, Number 22, 2019. https://doi.org/10.1088/1361-6560/ab3d07
     '''
 
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
@@ -159,7 +144,7 @@ class SPDHG(Algorithm):
                initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
 
         '''set-up of the algorithm
-
+        
         Parameters
         ----------
         f : BlockFunction
@@ -174,11 +159,11 @@ class SPDHG(Algorithm):
             List of Step size parameters for Dual problem
         initial : DataContainer, optional, default=None
             Initial point for the SPDHG algorithm
-        gamma : float
+        gamma : float, optional
             parameter controlling the trade-off between the primal and dual step sizes
-        sampler: an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
+        sampler: optional, an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
              Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
-        prob_weights: list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
+        prob_weights: optional, list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 
         '''
@@ -221,7 +206,6 @@ class SPDHG(Algorithm):
             self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = initial.copy()
-
 
         self._x_tmp = self.operator.domain_geometry().allocate(0)
 
@@ -282,6 +266,12 @@ class SPDHG(Algorithm):
     def set_step_sizes_from_ratio(self, gamma=1.0, rho=0.99):
         r""" Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
 
+        The step sizes `sigma` and `tau` are set using the equations:
+        .. math:: \sigma_i=\gamma\rho / (\|K_i\|**2)\\
+            
+        .. math::  \tau = \rho\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+
+
         Parameters
         ----------
             gamma : Positive float
@@ -289,13 +279,8 @@ class SPDHG(Algorithm):
             rho : Positive float
                  parameter controlling the size of the product :math: \sigma\tau :math:
 
-        Note
-        -----
-        The step sizes `sigma` and `tau` are set using the equations:
-        .. math:: 
-            \sigma_i=\gamma\rho / (\|K_i\|**2)\\
-            \tau = \min_i([p_i / (\sigma_i * \|K_i\|**2) ])
-
+        
+        
         """
         if isinstance(gamma, Number):
             if gamma <= 0:
@@ -322,38 +307,32 @@ class SPDHG(Algorithm):
     def set_step_sizes(self, sigma=None, tau=None):
         r""" Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.
 
+        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
+
+        - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
+
+        .. math:: \sigma_i=0.99 / (\|K_i\|**2)`
+
+
+        and `tau` is set as per case 2
+
+        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
+
+        .. math:: \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+
+        - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
+
+        .. math:: \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+
+        - Case 4: Both `sigma` and `tau` are provided.
+        
+        
         Parameters
         ----------
             sigma : list of positive float, optional, default=None
                 List of Step size parameters for Dual problem
             tau : positive float, optional, default=None
                 Step size parameter for Primal problem
-
-        The user can set these or default values are calculated, either sigma, tau, both or None can be passed. 
-
-        Note
-        -----
-        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
-
-        - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
-
-            .. math:: 
-            \sigma_i=0.99 / (\|K_i\|**2)
-
-
-            and `tau` is set as per case 2
-
-        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
-
-            .. math:: 
-            \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
-
-        - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
-
-            .. math:: 
-            \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
-
-        - Case 4: Both `sigma` and `tau` are provided.
 
         """
         gamma = 1.
@@ -372,7 +351,7 @@ class SPDHG(Algorithm):
             self._sigma = sigma
 
         elif tau is None:
-            self._sigma = [rho / ni for ni in self._norms]
+            self._sigma = [gamma* rho / ni for ni in self._norms]
         else:
             self._sigma = [
                 rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
@@ -435,7 +414,7 @@ class SPDHG(Algorithm):
             y_k = self.operator[i].direct(self.x)
         except IndexError:
             raise IndexError(
-                'The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {1,2,...,len(operator)} only.')
+                'The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {0,1,...,len(operator)-1} only.')
 
         y_k.sapyb(self._sigma[i], self._y_old[i], 1., out=y_k)
 

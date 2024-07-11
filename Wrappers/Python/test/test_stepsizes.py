@@ -119,9 +119,10 @@ class TestStepSizes(CCPiTestClass):
         self.assertEqual(ss_rule.stabilisation_param,3)
         
         #Check infinity can be passed 
-        ss_rule=BarzilaiBorweinStepSizeRule(2, 'short',np.inf )
+        ss_rule=BarzilaiBorweinStepSizeRule(2, 'short',"off" )
         self.assertEqual(ss_rule.mode, 'short')
         self.assertFalse(ss_rule.adaptive)
+        self.assertEqual(ss_rule.stabilisation_param,np.inf)
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
         alg.run(2)
            
@@ -167,7 +168,7 @@ class TestStepSizes(CCPiTestClass):
         self.assertEqual(alg.iteration, 1)
         
         #check adaptive
-        ss_rule=BarzilaiBorweinStepSizeRule(0.001, 'long',None )
+        ss_rule=BarzilaiBorweinStepSizeRule(0.001, 'long',"automatic")
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
         self.assertEqual(ss_rule.stabilisation_param, np.inf)
         alg.run(2)
@@ -175,7 +176,7 @@ class TestStepSizes(CCPiTestClass):
         
         #check stops being adaptive 
         
-        ss_rule=BarzilaiBorweinStepSizeRule(0.0000001, 'long',None )
+        ss_rule=BarzilaiBorweinStepSizeRule(0.0000001, 'long',"automatic" )
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
         self.assertEqual(ss_rule.stabilisation_param, np.inf)
         alg.run(4)

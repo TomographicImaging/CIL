@@ -157,8 +157,8 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
-    stabilisation_param: float or None, default is None 
-        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` were by default, if `stabilisation_param` is None` this  is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or to "turn off" the stabilisation use `np.inf`.
+    stabilisation_param: 'automatic', float or 'off', default is 'automatic'
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or turn  "off" the stabilisation, equivalently passing `np.inf`.
         
     
 
@@ -172,7 +172,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     - https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     """
 
-    def __init__(self, initial, mode='short', stabilisation_param=None):
+    def __init__(self, initial, mode='short', stabilisation_param="automatic"):
         '''Initialises the step size rule 
         '''
  
@@ -180,13 +180,16 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad=None 
         self.store_x=None
         self.initial=initial
-        if stabilisation_param is None:
+        if stabilisation_param == 'automatic':
             self.adaptive = True
-            stabilisation_param =numpy.inf
-        else:
+            stabilisation_param = numpy.inf
+        elif stabilisation_param == "off":
             self.adaptive = False 
-            if not ( isinstance(stabilisation_param, Number) and stabilisation_param >=0):
-                raise TypeError(" The stabilisation_param should be None, a positive number or np.inf")
+            stabilisation_param = numpy.inf
+        elif ( isinstance(stabilisation_param, Number) and stabilisation_param >=0):
+            self.adaptive = False 
+        else:
+            raise TypeError(" The stabilisation_param should be 'automatic', a positive number or 'off'")
         self.stabilisation_param=stabilisation_param
         
     

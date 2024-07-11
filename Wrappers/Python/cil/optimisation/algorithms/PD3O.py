@@ -66,7 +66,9 @@ class PD3O(Algorithm):
         
         self.f = f # smooth function
         if isinstance(self.f, ZeroFunction):
-            warnings.warn(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)                        
+            warnings.warn(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
+            if gamma is None:
+                gamma = 1.0/operator.norm()                      
         
         self.g = g # proximable
         self.h = h # composite
@@ -76,7 +78,7 @@ class PD3O(Algorithm):
             gamma = 0.99*2.0/self.f.L
         
         if delta is None :
-            delta = 1./(gamma*self.operator.norm()**2)
+            delta = 0.99/(gamma*self.operator.norm()**2)
         
         self.gamma = gamma
         self.delta = delta  
@@ -101,10 +103,10 @@ class PD3O(Algorithm):
     def update(self):
         r""" Performs a single iteration of the PD3O algorithm        
         """
-        #TODO: Margaret to check this 
-        # following equations 4 in https://link.springer.com/article/10.1007/s10915-018-0680-3
+
+        # Following equations 4 in https://link.springer.com/article/10.1007/s10915-018-0680-3
         # in this case order of proximal steps we recover the (primal) PDHG, when f=0
-        # #TODO: if we change the order of proximal steps we recover the PDDY algorithm (dual) PDHG, when f=0
+
         
         # proximal conjugate step
         self.operator.direct(self.x_bar, out=self.s)

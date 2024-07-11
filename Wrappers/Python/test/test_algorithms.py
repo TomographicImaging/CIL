@@ -1407,7 +1407,7 @@ class Test_PD3O(unittest.TestCase):
 
         algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator)
         self.assertEqual(algo_pd3o.gamma,0.99*2.0/F1.L )
-        self.assertEqual(algo_pd3o.delta,F1.L/(0.99*2.0*operator.norm()**2) )
+        self.assertEqual(algo_pd3o.delta,F1.L/(2.0*operator.norm()**2) )
         np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate(0).array)
         self.assertTrue(algo_pd3o.configured)
         
@@ -1418,8 +1418,8 @@ class Test_PD3O(unittest.TestCase):
         self.assertTrue(algo_pd3o.configured)
         
         with self.assertWarnsRegex(UserWarning,"Please use PDHG instead." ):
-            algo_pd3o=PD3O(f=ZeroFunction(), g=G1, h=H1, operator=operator, gamma=3, delta=43.1)
-        
+            algo_pd3o=PD3O(f=ZeroFunction(), g=G1, h=H1, operator=operator, delta=43.1)
+            self.assertEqual(algo_pd3o.gamma,1.0/operator.norm()    )
        
     def test_PD3O_PDHG_denoising_1_iteration(self):
 

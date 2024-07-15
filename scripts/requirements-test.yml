@@ -11,7 +11,7 @@
 # limitations under the License.
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-name: cil_dev
+name: cil_dev2
 channels:
   - conda-forge
   - nvidia
@@ -23,7 +23,7 @@ dependencies:
   - numpy >=1.23
   - ccpi::cil-data
   - ccpi::tigre=2.6
-  - ccpi::ccpi-regulariser=24.0.0
+  - ccpi::ccpi-regulariser=24.0.1
   - ccpi::tomophantom=2.0.0
   - astra-toolbox=2.1=cuda*
   - cvxpy

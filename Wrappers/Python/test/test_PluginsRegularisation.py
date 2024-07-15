@@ -46,7 +46,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
         cmpx = np.zeros(data.shape, dtype=np.complex64)
         cmpx.real = datarr[:]
@@ -90,7 +90,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_dTV_rmul(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         f = FGP_dTV(data)
 
         self.rmul_test(f)
@@ -98,7 +98,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_FGP_TV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
 
         tau = 1.
@@ -111,7 +111,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_TGV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
 
         tau = 1.
@@ -125,7 +125,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_FGP_dTV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
         ref = data*0.3
 
@@ -160,7 +160,7 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_TNV_raise_on_2D(self):
         # data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
 
         tau = 1.
@@ -173,7 +173,7 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_TNV_raise_on_3D_nochannel(self):
         # data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,10))
         datarr = data.as_array()
         tau = 1.
 

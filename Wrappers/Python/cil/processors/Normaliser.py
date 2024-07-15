@@ -21,18 +21,46 @@ from cil.framework import Processor, DataContainer, AcquisitionData,\
 import numpy
 
 class Normaliser(Processor):
+
+    @staticmethod
+    def flat_and_dark(flat_field=None, dark_field=None, tolerance=1e-5):
+        return Normaliser_flat_and_dark(flat_field=flat_field, 
+                                        dark_field=dark_field, 
+                                        tolerance=tolerance)
+    
+    @staticmethod
+    def flux(flux, tolerance=1e-5):
+        return Normaliser_flux(flux=flux, 
+                                        tolerance=tolerance)
+    
+    @staticmethod
+    def region_of_interest(roi, tolerance=1e-5):
+        return Normaliser_region_of_interest(roi=roi, tolerance=tolerance)
+    
+class Normaliser_flat_and_dark(Processor):
+
     '''Normalisation based on flat and dark
 
     This processor read in a AcquisitionData and normalises it based on
     the instrument reading with and without incident photons or neutrons.
+    Parameters
+    ----------
+    flat_field: AcquisitionData
+        2D projection with flat field (or stack)
 
-    Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSet
+    dark_field: AcquisitionData
+        2D projection with dark field (or stack)
+
+    tolerance: float
+        Tolerance of the calculation, used when there is a division by zero
+
+    Returns
+    -------
+    AcquisitionData
+        Normalised data
     '''
 
-    def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
+    def __init__(self, flat_field, dark_field, tolerance):
         kwargs = {
                   'flat_field'  : flat_field,
                   'dark_field'  : dark_field,
@@ -41,7 +69,7 @@ class Normaliser(Processor):
                   }
 
         #DataProcessor.__init__(self, **kwargs)
-        super(Normaliser, self).__init__(**kwargs)
+        super(Normaliser_flat_and_dark, self).__init__(**kwargs)
         if not flat_field is None:
             self.set_flat_field(flat_field)
         if not dark_field is None:
@@ -120,3 +148,77 @@ class Normaliser(Processor):
                     dimension_labels=projections.dimension_labels,
                     geometry=projections.geometry)
         return y
+
+class Normaliser_flux(Processor):
+    '''Normalisation based on beam flux
+
+    This processor read in a AcquisitionData and normalises it based on
+    the beam flux measured during the experiment.
+    Parameters
+    ----------
+    flux: float or array of floats
+        The beam flux measured during the experiment, either a single float or
+        an array of floats with size equal to the number of projections
+    tolerance: float
+        Tolerance of the calculation, used when there is a division by zero
+
+    Output: AcquisitionDataSet
+    '''
+
+    def __init__(self, flux, tolerance):
+        
+        kwargs = {
+                  'flux'  : flux,
+                  # very small number. Used when there is a division by zero
+                  'tolerance'   : tolerance
+                  }
+        super(Normaliser_flux, self).__init__(**kwargs)
+        
+        
+    def check_input(self, dataset):
+        flux_size = (numpy.shape(self.flux))
+        if len(flux_size) > 0:
+            data_size = numpy.shape(dataset.geometry.angles)
+            if data_size != flux_size:
+                raise ValueError("Flux must be a scalar or array with length \
+                                 \n = data.geometry.angles, found {} and {}"
+                                 .format(flux_size, data_size))
+            
+        return True
+    
+    def process(self, out=None):
+
+        data = self.get_input()
+
+        if out is None:
+            out = data.copy()
+
+        flux_size = (numpy.shape(self.flux))
+        
+        proj_axis = data.get_dimension_axis('angle')
+        slice_proj = [slice(None)]*len(data.shape)
+        slice_proj[proj_axis] = 0
+        
+        f = self.flux
+        for i in range(len(data.geometry.angles)):
+            if len(flux_size) > 0:
+                f = self.flux[i]
+
+            slice_proj[proj_axis] = i
+            with numpy.errstate(divide='ignore', invalid='ignore'):
+                out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]/f
+                        
+        out.array[ ~ numpy.isfinite( out.array )] = self.tolerance
+
+        return out
+
+            
+class Normaliser_region_of_interest(Processor):
+    def __init__(self, roi, tolerance):
+        kwargs = {
+                  'flux'  : roi,
+                  # very small number. Used when there is a division by zero
+                  'tolerance'   : tolerance
+                  }
+        
+

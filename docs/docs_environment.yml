@@ -14,7 +14,7 @@
 name: cil_dev
 channels:
   - conda-forge
-  - intel
+  - https://software.repos.intel.com/python/conda
   - ccpi
   - defaults
 dependencies:

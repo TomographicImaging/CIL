@@ -165,7 +165,7 @@ class PaganinProcessor(Processor):
     of the phase retrieval algorithm
 
     """
-   
+
     def __init__(self, delta=1, beta=1e-2, energy=40000,
                  energy_units='eV',  full_retrieval=True, 
                  filter_type='paganin_method', pad=0, 

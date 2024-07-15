@@ -157,7 +157,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
-    stabilisation_param: 'automatic', float or 'off', default is 'automatic'
+    stabilisation_param: 'auto', float or 'off', default is 'auto'
         In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or turn  "off" the stabilisation, equivalently passing `np.inf`.
         
     
@@ -172,7 +172,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     - https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     """
 
-    def __init__(self, initial, mode='short', stabilisation_param="automatic"):
+    def __init__(self, initial, mode='short', stabilisation_param="auto"):
         '''Initialises the step size rule 
         '''
  
@@ -180,7 +180,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad=None 
         self.store_x=None
         self.initial=initial
-        if stabilisation_param == 'automatic':
+        if stabilisation_param == 'auto':
             self.adaptive = True
             stabilisation_param = numpy.inf
         elif stabilisation_param == "off":
@@ -189,7 +189,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         elif ( isinstance(stabilisation_param, Number) and stabilisation_param >=0):
             self.adaptive = False 
         else:
-            raise TypeError(" The stabilisation_param should be 'automatic', a positive number or 'off'")
+            raise TypeError(" The stabilisation_param should be 'auto', a positive number or 'off'")
         self.stabilisation_param=stabilisation_param
         
     

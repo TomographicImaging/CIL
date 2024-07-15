@@ -17,7 +17,7 @@
 # CIL Developers, listed at: 
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData
+from cil.framework import Processor, AcquisitionData, DataOrder
 
 import numpy as np
 from scipy.fft import fft2
@@ -98,6 +98,11 @@ class PaganinProcessor(Processor):
 
     Notes
     -----
+    This processor will work most efficiently using the cil data order with
+    `data.reorder('cil')`
+    
+    Notes
+    -----
     This processor uses the phase retrieval algorithm described by Paganin et 
     al. [1] to retrieve the sample thickness
     
@@ -156,7 +161,7 @@ class PaganinProcessor(Processor):
     - [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x 
     - [2] https://henke.lbl.gov/optical_constants/getdb2.html
     - [3] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
-    With thanks to Rajmund Mokso (DTU) for help with the initial implementation 
+    With thanks to DTU for help with the initial implementation 
     of the phase retrieval algorithm
 
     """
@@ -201,6 +206,10 @@ class PaganinProcessor(Processor):
     def process(self, out=None):
 
         data  = self.get_input()
+        cil_order = tuple(DataOrder.get_order_for_engine('cil', data.geometry))
+        if data.dimension_labels != cil_order:
+            log.warning(msg="This processor will work most efficiently using\
+                        \nCIL data order, consider using `data.reorder('cil')`")
 
         # set the geometry parameters to use from data.geometry unless the 
         # geometry is overridden with an override_geometry
@@ -209,51 +218,57 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
 
+        # make slice indices to get the projection
+        slice_proj = [slice(None)]*len(data.shape)
+        angle_axis = data.get_dimension_axis('angle')
+        slice_proj[angle_axis] = 0
+        
+        if data.geometry.channels>1:
+            channel_axis = data.get_dimension_axis('channel')
+            slice_proj[channel_axis] = 0
+        else:
+            channel_axis = None
+
+        data_proj = data.as_array()[tuple(slice_proj)]
+
+        # create an empty axis if the data is 2D
+        if len(data_proj.shape) == 1:
+            data.array = np.expand_dims(data.array, len(data.shape))
+            slice_proj.append(slice(None))
+            data_proj = data.as_array()[tuple(slice_proj)]
+            
+        elif len(data_proj.shape) == 2:
+            pass
+        else:
+            raise(ValueError('Data must be 2D or 3D per channel'))
+        
+        # create a filter based on the shape of the data
+        filter_shape = np.shape(data_proj)
+        self.filter_Nx = filter_shape[0]+self.pad*2
+        self.filter_Ny = filter_shape[1]+self.pad*2
+        self._create_filter(self.override_filter)
+        
+        # pre-calculate the scaling factor
+        scaling_factor = -(1/self.mu)
+
+        # allocate padded buffer
+        padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_proj.shape))
+        
+        # make slice indices to unpad the data
+        if self.pad>0:
+            slice_pad = tuple([slice(self.pad,-self.pad)]
+                                *len(padded_buffer.shape))
+        else:
+            slice_pad = tuple([slice(None)]*len(padded_buffer.shape))
+        # loop over the channels
         for j in range(data.geometry.channels):
-            if data.geometry.channels>1:
-                data_channel = data.get_slice(channel=j)
-            else:
-                data_channel = data
-
-            angle_axis = data_channel.get_dimension_axis('angle')
-
-            # create an empty axis if the data is 2D
-            if len(data_channel.shape) == 2:
-                data_channel = np.expand_dims(data_channel.as_array(),2)
-            elif len(data_channel.shape) == 3:
-                data_channel = data_channel.as_array()
-            else:
-                raise(ValueError('Data must be 2D or 3D per channel'))
-
-            # make slice indices to get the projection
-            slice_proj = [slice(None)]*len(data_channel.shape)
-            slice_proj[angle_axis] = 0
-
-            # create a filter based on the shape of the data
-            filter_shape = np.shape(data_channel[tuple(slice_proj)])
-            self.filter_Nx = filter_shape[0]+self.pad*2
-            self.filter_Ny = filter_shape[1]+self.pad*2
-            self._create_filter(self.override_filter)
-            
-            # pre-calculate the scaling factor
-            scaling_factor = -(1/self.mu)
- 
-            # allocate padded buffer
-            padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_channel[(
-                tuple(slice_proj))].shape))
-            
-            # make slice indices to unpad the data
-            if self.pad>0:
-                slice_pad = tuple([slice(self.pad,-self.pad)]
-                                  *len(padded_buffer.shape))
-            else:
-                slice_pad = tuple([slice(None)]*len(padded_buffer.shape))
-                
+            if channel_axis is not None:
+                slice_proj[channel_axis] = j
             # loop over the projections
             for i in tqdm(range(len(out.geometry.angles))):
                 
                 slice_proj[angle_axis] = i
-                padded_buffer[slice_pad] = data_channel[(tuple(slice_proj))]
+                padded_buffer[slice_pad] = data.array[(tuple(slice_proj))]
                 
                 if self.full_retrieval==True:
                     # apply the filter in fourier space, apply log and scale 
@@ -271,7 +286,7 @@ class PaganinProcessor(Processor):
                              channel=j)
                 else:
                     out.fill(np.squeeze(padded_buffer[slice_pad]), angle = i)
-
+        data.array = np.squeeze(data.array)
         return out
     
     def set_input(self, dataset):

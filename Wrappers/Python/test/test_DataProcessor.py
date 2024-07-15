@@ -2769,9 +2769,9 @@ class TestPaganinProcessor(unittest.TestCase):
     def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
-        ag = AcquisitionGeometry.create_Parallel2D()\
+        ag = AcquisitionGeometry.create_Parallel3D()\
             .set_angles(numpy.linspace(0,360,360,endpoint=False))\
-            .set_panel(128,0.1)\
+            .set_panel([128,128],0.1)\
             .set_channels(4)
 
         self.data_multichannel = ag.allocate('random')
@@ -2980,7 +2980,7 @@ class TestPaganinProcessor(unittest.TestCase):
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength)        
 
-        data_array = [self.data_cone, self.data_parallel, ]
+        data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
@@ -3018,6 +3018,35 @@ class TestPaganinProcessor(unittest.TestCase):
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
             filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
+
+            # check with different data order
+            data.reorder('astra')
+            data_abs = -(1/mu)*numpy.log(data)
+            processor = PaganinProcessor(full_retrieval=True, pad=10)
+            processor.set_input(data)
+            with self.assertLogs(level='WARN') as log:
+                thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, pad=10)
+            processor.set_input(data)
+            with self.assertLogs(level='WARN') as log:
+                filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+            
+            # check with different channel data order
+            if data.geometry.channels>1:
+                data.reorder(('vertical','channel','horizontal','angle'))
+                data_abs = -(1/mu)*numpy.log(data)
+                processor = PaganinProcessor(full_retrieval=True, pad=10)
+                processor.set_input(data)
+                with self.assertLogs(level='WARN') as log:
+                    thickness = processor.get_output(override_geometry={'propagation_distance':1})
+                self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+                processor = PaganinProcessor(full_retrieval=False, pad=10)
+                processor.set_input(data)
+                with self.assertLogs(level='WARN') as log:
+                    filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+                self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
     def test_PaganinProcessor_2D(self):
         self.data_parallel.geometry.config.units = 'm'

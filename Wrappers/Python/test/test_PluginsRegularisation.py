@@ -35,7 +35,7 @@ if has_ccpi_regularisation:
 class TestPlugin(unittest.TestCase):
     def setUp(self):
         #Default test image
-        self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,64))
+        self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,10))
         self.alpha = 2.0
         self.iterations = 1000
 

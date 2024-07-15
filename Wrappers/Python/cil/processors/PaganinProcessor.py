@@ -161,7 +161,7 @@ class PaganinProcessor(Processor):
     - [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x 
     - [2] https://henke.lbl.gov/optical_constants/getdb2.html
     - [3] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
-    With thanks to DTU for help with the initial implementation 
+    With thanks to colleagues at DTU for help with the initial implementation 
     of the phase retrieval algorithm
 
     """

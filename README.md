@@ -23,13 +23,13 @@ We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda
 Install a new environment using:
 
 ```sh
-conda create --name cil -c conda-forge -c intel -c ccpi cil=24.0.0
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.0.0
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c intel -c ccpi cil=24.0.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipywidgets
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.0.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipywidgets
 ```
 
 where:
@@ -44,7 +44,7 @@ where:
 
 CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/1070) `recon` module requires:
 
-1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `intel` [channel](https://anaconda.org/intel/ipp).
+1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `https://software.repos.intel.com/python/conda` channel.
 2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
 
 ### Docker

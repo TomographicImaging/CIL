@@ -43,6 +43,8 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'processors';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
@@ -438,6 +440,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ring-remover">Ring Remover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#paganin-processor">Paganin Processor</a></li>
 </ul>
 </li>
 </ul>
@@ -1649,6 +1652,203 @@ the ring removal, but also increases the computational effort</p></li>
 <dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="paganin-processor">
+<h3>Paganin Processor<a class="headerlink" href="#paganin-processor" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.processors.PaganinProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">PaganinProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eV'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_retrieval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paganin_method'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/PaganinProcessor/#PaganinProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.PaganinProcessor" title="Link to this definition">#</a></dt>
+<dd><p>Processor to retrieve quantitative information from phase contrast images
+using the Paganin phase retrieval algorithm described in [1]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delta</strong> (<em>float</em><em> (</em><em>optional</em><em>)</em>) – Real part of the deviation of the material refractive index from 1,
+where refractive index <span class="math notranslate nohighlight">\(n = (1 - \delta) + i \beta\)</span> energy-
+dependent refractive index information for x-ray wavelengths can be
+found at [2], default is 1</p></li>
+<li><p><strong>beta</strong> (<em>float</em><em> (</em><em>optional</em><em>)</em>) – Complex part of the material refractive index, where refractive index
+<span class="math notranslate nohighlight">\(n = (1 - \delta) + i \beta\)</span> energy-dependent refractive index
+information for x-ray wavelengths can be found at [2], default is 1e-2</p></li>
+<li><p><strong>energy</strong> (<em>float</em><em> (</em><em>optional</em><em>)</em>) – Energy of the incident photon, default is 40000</p></li>
+<li><p><strong>energy_units</strong> (<em>string</em><em> (</em><em>optional</em><em>)</em>) – Energy units, default is ‘eV’</p></li>
+<li><p><strong>full_retrieval</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, perform the full phase retrieval and return the thickness. If
+False, return a filtered image, default is True</p></li>
+<li><p><strong>filter_type</strong> (<em>string</em><em> (</em><em>optional</em><em>)</em>) – The form of the Paganin filter to use, either ‘paganin_method’
+(default) or ‘generalised_paganin_method’ as described in [3]</p></li>
+<li><p><strong>pad</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – Number of pixels to pad the image in Fourier space to reduce aliasing,
+default is 0</p></li>
+<li><p><strong>return_units</strong> (<em>string</em><em> (</em><em>optional</em><em>)</em>) – The distance units to return the sample thickness in, must be one of
+‘m’, ‘cm’, ‘mm’ or ‘um’. Only applies if full_retrieval=True (default
+is’cm’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>AcquisitionData corrected for phase effects, retrieved sample thickness
+or (if <code class="code docutils literal notranslate"><span class="pre">full_retrieval=False</span></code>) filtered data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="mi">18000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thickness</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="mf">10e2</span><span class="p">,</span> <span class="n">full_retrieval</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_image</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thickness</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">override_filter</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase_retrieved_image</span> <span class="o">=</span> <span class="n">thickness</span><span class="o">*</span><span class="n">processor</span><span class="o">.</span><span class="n">mu</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>This processor will work most efficiently using the cil data order with
+<cite>data.reorder(‘cil’)</cite></p>
+<p class="rubric">Notes</p>
+<p>This processor uses the phase retrieval algorithm described by Paganin et
+al. [1] to retrieve the sample thickness</p>
+<div class="math notranslate nohighlight">
+\[T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left
+(\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 +
+  \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),\]</div>
+<p>where</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(T\)</span>, is the sample thickness,</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mu = \frac{4\pi\beta}{\lambda}\)</span> is the material linear</p></li>
+</ul>
+<p>attenuation coefficient where <span class="math notranslate nohighlight">\(\beta\)</span> is the complex part of the
+material refractive index and <span class="math notranslate nohighlight">\(\lambda=\frac{hc}{E}\)</span> is the probe
+wavelength,
+- <span class="math notranslate nohighlight">\(M\)</span> is the magnification at the detector,
+- <span class="math notranslate nohighlight">\(I_{norm}\)</span> is the input image which is expected to be the
+normalised transmission data,
+- <span class="math notranslate nohighlight">\(\Delta\)</span> is the propagation distance,
+- <span class="math notranslate nohighlight">\(\alpha = \frac{\Delta\delta}{\mu}\)</span> is a parameter determining
+the strength of the filter to be applied in Fourier space where
+<span class="math notranslate nohighlight">\(\delta\)</span> is the real part of the deviation of the material
+refractive index from 1
+- <span class="math notranslate nohighlight">\(k_x, k_y = \left ( \frac{2\pi p}{N_xW}, \frac{2\pi q}{N_yW}
+\right )\)</span> where <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span> are co-ordinates in a Fourier
+mesh in the range <span class="math notranslate nohighlight">\(-N_x/2\)</span> to <span class="math notranslate nohighlight">\(N_x/2\)</span> for an image with
+size <span class="math notranslate nohighlight">\(N_x, N_y\)</span> and pixel size <span class="math notranslate nohighlight">\(W\)</span>.</p>
+</div></blockquote>
+<p>A generalised form of the Paganin phase retrieval method can be called
+using <code class="code docutils literal notranslate"><span class="pre">filter_type='generalised_paganin_method'</span></code>, which uses the
+form of the algorithm described in [2]</p>
+<div class="math notranslate nohighlight">
+\[T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{
+\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2
+\alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )}  \right )
+\right )\]</div>
+<p>The phase retrieval is valid under the following assumptions</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>used with paraxial propagation-induced phase contrast images which</p></li>
+</ul>
+<p>can be assumed to be single-material locally
+- using intensity data which has been flat field corrected
+- and under the assumption that the Fresnel number
+<span class="math notranslate nohighlight">\(F_N = W^2/(\lambda\Delta) &gt;&gt; 1\)</span></p>
+</div></blockquote>
+<p>To apply a filter to images using the Paganin method, call
+<code class="code docutils literal notranslate"><span class="pre">full_retrieval=False</span></code>. In this case the pre-scaling and conversion
+to absorption is not applied so the requirement to supply flat field
+corrected intensity data is relaxed,</p>
+<div class="math notranslate nohighlight">
+\[I_{filt} = \mathcal{F}^{-1}\left (\frac{\mathcal{F}\left (
+I(x, y,z = \Delta) \right )}
+{1 - \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\]</div>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>[1] <a class="reference external" href="https://doi.org/10.1046/j.1365-2818.2002.01010.x">https://doi.org/10.1046/j.1365-2818.2002.01010.x</a></p></li>
+<li><p>[2] <a class="reference external" href="https://henke.lbl.gov/optical_constants/getdb2.html">https://henke.lbl.gov/optical_constants/getdb2.html</a></p></li>
+<li><p>[3] <a class="reference external" href="https://iopscience.iop.org/article/10.1088/2040-8986/abbab9">https://iopscience.iop.org/article/10.1088/2040-8986/abbab9</a></p></li>
+</ul>
+<p>With thanks to colleagues at DTU for help with the initial implementation
+of the phase retrieval algorithm</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.PaganinProcessor.set_input">
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/PaganinProcessor/#PaganinProcessor.set_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.PaganinProcessor.set_input" title="Link to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input AcquisitionData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.PaganinProcessor.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/PaganinProcessor/#PaganinProcessor.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.PaganinProcessor.get_output" title="Link to this definition">#</a></dt>
+<dd><p>Function to get output from the PaganinProcessor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data</p></li>
+<li><p><strong>override_geometry</strong> (<em>dict</em><em>, </em><em>optional</em>) – Geometry parameters to use in the phase retrieval if you want to
+over-ride values found in <cite>data.geometry</cite>. Specify parameters as a
+dictionary <code class="code docutils literal notranslate"><span class="pre">{'parameter':value}</span></code> where parameter is
+<code class="code docutils literal notranslate"><span class="pre">'magnification',</span> <span class="pre">'propagation_distance'</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">'pixel_size'</span></code> and value is the new value to use. Specify
+distance parameters in the same units as <code class="code docutils literal notranslate"><span class="pre">return_units</span></code>
+(default is cm).</p></li>
+<li><p><strong>override_filter</strong> (<em>dict</em><em>, </em><em>optional</em>) – Over-ride the filter parameters to use in the phase retrieval.
+Specify parameters as <code class="code docutils literal notranslate"><span class="pre">{'parameter':value}</span></code> where parameter
+is <code class="code docutils literal notranslate"><span class="pre">'delta',</span> <span class="pre">'beta'</span></code> or <code class="code docutils literal notranslate"><span class="pre">'alpha'</span></code> and value is the new
+value to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>AcquisitionData corrected for phase effects, retrieved sample
+thickness or (if <code class="code docutils literal notranslate"><span class="pre">full_retrieval=False</span></code>) filtered data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="mi">18000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thickness</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="mf">10e2</span><span class="p">,</span>
+<span class="go">full_retrieval=False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_image</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thickness</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">override_filter</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase_retrieved_image</span> <span class="o">=</span> <span class="n">thickness</span><span class="o">*</span><span class="n">processor</span><span class="o">.</span><span class="n">mu</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">'alpha'</span></code> is specified in override_filter the new value will
+be used and delta will be ignored but beta will still be used to
+calculate <span class="math notranslate nohighlight">\(\mu = \frac{4\pi\beta}{\lambda}\)</span> which is used for
+scaling the thickness, therefore it is only recommended to specify
+alpha when also using <code class="code docutils literal notranslate"><span class="pre">get_output(full_retrieval=False)</span></code>, or
+re-scaling the result by <span class="math notranslate nohighlight">\(\mu\)</span> e.g.
+<code class="code docutils literal notranslate"><span class="pre">thickness*processor.mu</span></code> If <code class="code docutils literal notranslate"><span class="pre">alpha</span></code> is not specified,
+it will be calculated <span class="math notranslate nohighlight">\(\frac{\Delta\delta\lambda}{4\pi\beta}\)</span></p>
 </dd></dl>
 
 </dd></dl>

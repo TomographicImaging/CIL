@@ -1473,7 +1473,22 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">calculate_magnification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Method to calculate magnification and distance from the sample to </span>
+<span class="sd">        the detector using the detector positions and the rotation axis. </span>
+<span class="sd">        For parallel beam geometry magnification = 1</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list containing the [0] distance from the source to the rotate </span>
+<span class="sd">            axis, [1] distance from the rotate axis to the detector, </span>
+<span class="sd">            [2] magnification of the system</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ab</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">dist_center_detector</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_center_detector</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
 
 <span class="k">class</span> <span class="nc">Parallel3D</span><span class="p">(</span><span class="n">SystemConfiguration</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This class creates the SystemConfiguration of a parallel beam 3D tomographic system</span>
@@ -1622,7 +1637,22 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">calculate_magnification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Method to calculate magnification and distance from the sample to </span>
+<span class="sd">        the detector using the detector positions and the rotation axis. </span>
+<span class="sd">        For parallel beam geometry magnification = 1</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list containing the [0] distance from the source to the rotate </span>
+<span class="sd">            axis, [1] distance from the rotate axis to the detector, </span>
+<span class="sd">            [2] magnification of the system</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ab</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">dist_center_detector</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_center_detector</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">get_centre_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the 2D system configuration corresponding to the centre slice</span>

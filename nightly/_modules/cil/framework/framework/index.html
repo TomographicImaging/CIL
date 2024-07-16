@@ -532,6 +532,8 @@ document.write(`
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="Partitioner">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Partitioner">[docs]</a>
 <span class="k">class</span> <span class="nc">Partitioner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Interface for AcquisitionData to be able to partition itself in a number of batches.</span>
 
@@ -615,6 +617,8 @@ document.write(`
             <span class="n">ags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">ags</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Partitioner.partition">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.Partitioner.partition">[docs]</a>
     <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using the specified ``mode``.</span>
 
@@ -660,7 +664,8 @@ document.write(`
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">RANDOM_PERMUTATION</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_random_permutation</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown partition mode </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown partition mode </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span></div>
+
 
     <span class="k">def</span> <span class="nf">_partition_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches.</span>
@@ -712,7 +717,8 @@ document.write(`
 
         <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span></div>
+
 
 <span class="k">def</span> <span class="nf">find_key</span><span class="p">(</span><span class="n">dic</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;return the key of dictionary dic given the value&quot;&quot;&quot;</span>

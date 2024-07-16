@@ -446,6 +446,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#blockdatacontainer">BlockDataContainer</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#partitioner">Partitioner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cil.framework.Partitioner"><code class="docutils literal notranslate"><span class="pre">Partitioner</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#dataorder">DataOrder</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cil.framework.DataOrder"><code class="docutils literal notranslate"><span class="pre">DataOrder</span></code></a></li>
 </ul>
@@ -2300,6 +2304,96 @@ methods of DataContainer and subclasses.</p>
 </dd></dl>
 
 </section>
+</section>
+<section id="partitioner">
+<h2>Partitioner<a class="headerlink" href="#partitioner" title="Link to this heading">#</a></h2>
+<p>This method partitions an instance of tomography <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> into a number of batches. For example, to use with a stochastic optimisation method.</p>
+<p>The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the <cite>mode</cite> and takes in an <cite>AquisitionData</cite> object and outputs a <cite>BlockDataContainer</cite> where each element in the block is  <cite>AquisitionData</cite> object with the batch of data and corresponding geometry.
+We consider a <strong>batch</strong> to be a subset of the <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and the verb, <strong>to partition</strong>, to be the act of splitting into batches.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+
+<span class="c1"># get the data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+
+<span class="c1"># create the geometries</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+
+<span class="c1"># partition the data into batches contained in the elements of a BlockDataContainer</span>
+<span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;staggered&#39;</span><span class="p">)</span> <span class="c1"># Choose mode from `sequential`, `staggered` or `random_permutation`</span>
+<span class="c1"># From the partitioned data build a BlockOperator container the projectors for each batch</span>
+<span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The total number of angles is &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The first 30 angles are &#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[:</span><span class="mi">30</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In batch zero the number of angles is &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The angles in batch zero are &#39;</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The angles in batch one are &#39;</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-RST notranslate"><div class="highlight"><pre><span></span>The total number of angles is  300
+The first 30 angles are  [ 0.   1.2  2.4  3.6  4.8  6.   7.2  8.4  9.6 10.8 12.  13.2 14.4 15.6
+16.8 18.  19.2 20.4 21.6 22.8 24.  25.2 26.4 27.6 28.8 30.  31.2 32.4
+33.6 34.8]
+In batch zero the number of angles is  30
+The angles in batch zero are  [  0.  12.  24.  36.  48.  60.  72.  84.  96. 108. 120. 132. 144. 156.
+<span class="m">168.</span> 180. 192. 204. 216. 228. 240. 252. 264. 276. 288. 300. 312. 324.
+<span class="m">336.</span> 348.]
+The angles in batch one are  [  1.2  13.2  25.2  37.2  49.2  61.2  73.2  85.2  97.2 109.2 121.2 133.2
+145.2 157.2 169.2 181.2 193.2 205.2 217.2 229.2 241.2 253.2 265.2 277.2
+289.2 301.2 313.2 325.2 337.2 349.2]
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">partition</span></code> method is defined as part of:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.framework.Partitioner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">Partitioner</span></span><a class="reference internal" href="../_modules/cil/framework/framework/#Partitioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Partitioner" title="Link to this definition">#</a></dt>
+<dd><p>Interface for AcquisitionData to be able to partition itself in a number of batches.</p>
+<p>This class, by multiple inheritance with AcquisitionData, allows the user to partition the data,
+by using the method <code class="docutils literal notranslate"><span class="pre">partition</span></code>.
+The partitioning will generate a <code class="docutils literal notranslate"><span class="pre">BlockDataContainer</span></code> with appropriate <code class="docutils literal notranslate"><span class="pre">AcquisitionData</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.framework.Partitioner.partition">
+<span class="sig-name descname"><span class="pre">partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_batches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/framework/#Partitioner.partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Partitioner.partition" title="Link to this definition">#</a></dt>
+<dd><p>Partition the data into <code class="docutils literal notranslate"><span class="pre">num_batches</span></code> batches using the specified <code class="docutils literal notranslate"><span class="pre">mode</span></code>.</p>
+<p>The modes are</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sequential</span></code> - The data will be partitioned into <code class="docutils literal notranslate"><span class="pre">num_batches</span></code> batches of sequential indices.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staggered</span></code> - The data will be partitioned into <code class="docutils literal notranslate"><span class="pre">num_batches</span></code> batches of sequential indices, with stride equal to <code class="docutils literal notranslate"><span class="pre">num_batches</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">random_permutation</span></code> - The data will be partitioned into <code class="docutils literal notranslate"><span class="pre">num_batches</span></code> batches of random indices.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_batches</strong> (<em>int</em>) – The number of batches to partition the data into.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – The mode to use for partitioning. Must be one of <code class="docutils literal notranslate"><span class="pre">sequential</span></code>, <code class="docutils literal notranslate"><span class="pre">staggered</span></code> or <code class="docutils literal notranslate"><span class="pre">random_permutation</span></code>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – The seed to use for the random permutation. If not specified, the random number
+generator will not be seeded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Block of <cite>AcquisitionData</cite> objects containing the data requested in each batch</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer">BlockDataContainer</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:</p>
+<ol class="arabic simple">
+<li><p>[[0, 1, 2], [3, 4], [5, 6], [7, 8]] with <code class="docutils literal notranslate"><span class="pre">sequential</span></code></p></li>
+<li><p>[[0, 4, 8], [1, 5], [2, 6], [3, 7]] with <code class="docutils literal notranslate"><span class="pre">staggered</span></code></p></li>
+<li><p>[[8, 2, 6], [7, 1], [0, 4], [3, 5]] with <code class="docutils literal notranslate"><span class="pre">random_permutation</span></code> and seed 1</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="dataorder">
 <h2>DataOrder<a class="headerlink" href="#dataorder" title="Link to this heading">#</a></h2>

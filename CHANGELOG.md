@@ -1,6 +1,5 @@
 
-* XX.X.X
-
+* 24.1.0
   - New Features:
     - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)

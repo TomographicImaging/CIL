@@ -200,7 +200,7 @@ class PaganinProcessor(Processor):
     def check_input(self, data):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
-      
+    
         return True
         
     def process(self, out=None):

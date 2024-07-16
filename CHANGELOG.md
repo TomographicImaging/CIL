@@ -13,6 +13,7 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
     - Operators and functions now also return when out is specified (#1742)
     - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Added documentation for the Partitioner to `framework.rst` (#1828)
     - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
     - Update to CCPi-Regularisation toolkit v24.0.1 (#1868) 
   - Bug fixes:

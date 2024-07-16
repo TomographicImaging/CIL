@@ -4,6 +4,7 @@
   - New Features:
     - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
     - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
+    - Added PaganinProcessor processor, to perform phase retrieval from phase contrast images (#1737)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
     - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)
     - an implementation of the Armijo Rule as a child class of  `cil.optimisation.utilities.StepSizeRule` (#1768)

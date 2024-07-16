@@ -174,6 +174,64 @@ This provide a base class that will behave as normal :code:`DataContainer`.
    :members:
    :inherited-members:
 
+Partitioner
+===========
+
+This method partitions an instance of tomography :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
+
+The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` and takes in an `AquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AquisitionData` object with the batch of data and corresponding geometry. 
+We consider a **batch** to be a subset of the :code:`AcquisitionData` and the verb, **to partition**, to be the act of splitting into batches. 
+ 
+
+For example: 
+
+.. code-block :: python
+
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
+
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
+
+   # partition the data into batches contained in the elements of a BlockDataContainer
+   data_partitioned = data.partition(num_batches=10, mode='staggered') # Choose mode from `sequential`, `staggered` or `random_permutation` 
+   # From the partitioned data build a BlockOperator container the projectors for each batch 
+   A_partitioned = ProjectionOperator(ig, data_partitioned.geometry, device = "cpu")
+
+   print('The total number of angles is ', len(data.geometry.angles))
+   print('The first 30 angles are ', data.geometry.angles[:30])
+
+   print('In batch zero the number of angles is ', len(data_partitioned[0].geometry.angles))
+   print('The angles in batch zero are ', data_partitioned[0].geometry.angles)
+   print('The angles in batch one are ', data_partitioned[1].geometry.angles)
+
+.. code-block :: RST
+
+   The total number of angles is  300
+   The first 30 angles are  [ 0.   1.2  2.4  3.6  4.8  6.   7.2  8.4  9.6 10.8 12.  13.2 14.4 15.6
+   16.8 18.  19.2 20.4 21.6 22.8 24.  25.2 26.4 27.6 28.8 30.  31.2 32.4
+   33.6 34.8]
+   In batch zero the number of angles is  30
+   The angles in batch zero are  [  0.  12.  24.  36.  48.  60.  72.  84.  96. 108. 120. 132. 144. 156.
+   168. 180. 192. 204. 216. 228. 240. 252. 264. 276. 288. 300. 312. 324.
+   336. 348.]
+   The angles in batch one are  [  1.2  13.2  25.2  37.2  49.2  61.2  73.2  85.2  97.2 109.2 121.2 133.2
+   145.2 157.2 169.2 181.2 193.2 205.2 217.2 229.2 241.2 253.2 265.2 277.2
+   289.2 301.2 313.2 325.2 337.2 349.2]
+
+
+The :code:`partition` method is defined as part of:
+
+.. autoclass:: cil.framework.Partitioner
+   :members:
+   
+
 DataOrder
 =========
 .. autoclass:: cil.framework.DataOrder

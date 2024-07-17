@@ -241,8 +241,8 @@ Note
 Memory requirements
 -------------------
 Note that the approximate gradient methods have different memory requirements:
-- The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
-- `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
++ The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
++ `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
 
 
 Operators

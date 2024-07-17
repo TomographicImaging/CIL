@@ -1,7 +1,7 @@
 
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA
 from cil.optimisation.functions import LeastSquares, IndicatorBox
-from cil.framework import ImageGeometry, VectorGeometry
+from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator
 
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner
@@ -72,9 +72,17 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_sensitivity_gd_against_sirt(self):
 
-        ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random', seed=4)
-        A = IdentityOperator(ig)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+                np.random.randn(m)).astype('float32')
+
+        A = MatrixOperator(A)
+        data = VectorData(b)
+        ig=A.domain
+
 
         sirt = SIRT(ig.allocate(0), A, data,   update_objective_interval=1)
         sirt.run(10)
@@ -91,26 +99,28 @@ class TestPreconditioners(CCPiTestClass):
         precond_pwls = GD(initial=ig.allocate(0), objective_function=f,   preconditioner=preconditioner,
                           max_iteration=100, update_objective_interval=1, step_size=step_size)
 
-        def correct_update_objective(alg):
-            # SIRT computes |Ax_{k} - b|_2^2
-            # GD with weighted LeastSquares computes the objective included the weight, so we remove the weight
-            return 0.5*(alg.objective_function.A.direct(alg.x) - alg.objective_function.b).squared_norm()
-
         precond_pwls.run(10)
         np.testing.assert_allclose(
             sirt.solution.array, precond_pwls.solution.array, atol=1e-4)
-        np.testing.assert_allclose(sirt.get_last_loss(
-        ), correct_update_objective(precond_pwls), atol=1e-4)
+        np.testing.assert_allclose(f(sirt.x), precond_pwls.get_last_loss(), atol=1e-4)
 
+    
     def test_sensitivity_ista_against_sirt(self):
 
-        ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random')
-        A = IdentityOperator(ig)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+                np.random.randn(m)).astype('float32')
+
+        A = MatrixOperator(A)
+        data = VectorData(b)
+        ig=A.domain
 
         sirt = SIRT(ig.allocate(0), A, data, lower=0,
                     update_objective_interval=1)
-        sirt.run(10)
+        sirt.run(15)
 
         M = 1./A.direct(A.domain_geometry().allocate(value=1.0))
         f = LeastSquares(A=A, b=data, c=0.5, weight=M)
@@ -122,19 +132,13 @@ class TestPreconditioners(CCPiTestClass):
                    max_iteration=100, update_objective_interval=1, step_size=step_size)
         self.assertEqual(alg.preconditioner, None)
 
-        precond_pwls = GD(initial=ig.allocate(0), objective_function=f,   preconditioner=preconditioner,
+        precond_pwls = ISTA(initial=ig.allocate(0), f=f, g=g,  preconditioner=preconditioner,
                           max_iteration=100, update_objective_interval=1, step_size=step_size)
-
-        def correct_update_objective(alg):
-            # SIRT computes |Ax_{k} - b|_2^2
-            # GD with weighted LeastSquares computes the objective included the weight, so we remove the weight
-            return 0.5*(alg.objective_function.A.direct(alg.x) - alg.objective_function.b).squared_norm()
-
-        precond_pwls.run(10)
+        
+        precond_pwls.run(15)
         np.testing.assert_allclose(
             sirt.solution.array, precond_pwls.solution.array, atol=1e-4)
-        np.testing.assert_allclose(sirt.get_last_loss(
-        ), correct_update_objective(precond_pwls), atol=1e-4)
+        np.testing.assert_allclose(f(sirt.x), precond_pwls.get_last_loss(), atol=1e-4)
 
 
 

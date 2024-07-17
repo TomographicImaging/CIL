@@ -229,7 +229,12 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
    alg.run(300)
 
-  
+Memory requirements
+-------------------
+Note that the approximate gradient methods have different memory requirements:
+- The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
+- `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at te expensive of stored memory `n+4` times the image size.  
+
 
 Operators
 =========

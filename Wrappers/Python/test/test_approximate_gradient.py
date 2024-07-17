@@ -253,19 +253,19 @@ class TestSVRG(CCPiTestClass):
             SVRGFunction([self.f, self.f], bad_sampler)
 
     def test_SVRG_init(self):
-        self.assertEqual(self.f_stochastic.update_frequency,
+        self.assertEqual(self.f_stochastic.snapshot_update_interval,
                          2*self.f_stochastic.num_functions)
         self.assertListEqual(self.f_stochastic.data_passes, [])
         self.assertListEqual(self.f_stochastic.data_passes_indices, [])
         self.assertEqual(self.f_stochastic.store_gradients, False)
-        f2 = SVRGFunction(self.f_subsets, update_frequency=2,
+        f2 = SVRGFunction(self.f_subsets, snapshot_update_interval=2,
                           store_gradients=True)
-        self.assertEqual(f2.update_frequency, 2)
+        self.assertEqual(f2.snapshot_update_interval, 2)
         self.assertListEqual(f2.data_passes, [])
         self.assertListEqual(f2.data_passes_indices, [])
         self.assertEqual(f2.store_gradients, True)
 
-    def test_SVRG_update_frequency_and_data_passes(self):
+    def test_SVRG_snapshot_update_interval_and_data_passes(self):
         objective = SVRGFunction(self.f_subsets, self.sampler)
         alg_stochastic = GD(initial=self.initial,
                             objective_function=objective, update_objective_interval=500,
@@ -289,7 +289,7 @@ class TestSVRG(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array(
             [1., 6./5, 7./5, 8./5, 9./5, 10./5, 11./5, 12./5, 13./5, 14./5, 19./5, 20./5]))
         objective = SVRGFunction(
-            self.f_subsets, self.sampler, update_frequency=3)
+            self.f_subsets, self.sampler, snapshot_update_interval=3)
         alg_stochastic = GD(initial=self.initial,
                             objective_function=objective, update_objective_interval=500,
                             step_size=5e-8, max_iteration=5000)
@@ -306,11 +306,9 @@ class TestSVRG(CCPiTestClass):
 
     def test_SVRG_store_gradients(self):
         objective = SVRGFunction(self.f_subsets, self.sampler)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        self.assertEqual(objective._list_stored_gradients, None)
         objective.gradient(self.initial)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        self.assertEqual(objective._list_stored_gradients, None)
 
         objective = SVRGFunction(
             self.f_subsets, self.sampler, store_gradients=True)
@@ -447,19 +445,19 @@ class TestLSVRG(CCPiTestClass):
             LSVRGFunction(self.f, self.sampler)
 
     def test_LSVRG_init(self):
-        self.assertEqual(self.f_stochastic.update_prob, 1/self.n_subsets)
+        self.assertEqual(self.f_stochastic.snapshot_update_probability, 1/self.n_subsets)
         self.assertListEqual(self.f_stochastic.data_passes, [])
         self.assertListEqual(self.f_stochastic.data_passes_indices, [])
         self.assertEqual(self.f_stochastic.store_gradients, False)
 
-        f2 = LSVRGFunction(self.f_subsets, update_prob=1 /
+        f2 = LSVRGFunction(self.f_subsets, snapshot_update_probability=1 /
                            2, store_gradients=True, seed=1)
-        self.assertEqual(f2.update_prob, 1/2)
+        self.assertEqual(f2.snapshot_update_probability, 1/2)
         self.assertListEqual(f2.data_passes, [])
         self.assertEqual(f2.store_gradients, True)
 
-    def test_LSVRG_data_passes_and_update_prob_and_seed(self):
-        objective = LSVRGFunction(self.f_subsets, self.sampler, update_prob=1)
+    def test_LSVRG_data_passes_and_snapshot_update_probability_and_seed(self):
+        objective = LSVRGFunction(self.f_subsets, self.sampler, snapshot_update_probability=1)
         alg_stochastic = GD(initial=self.initial,  update_objective_interval=500,
                             objective_function=objective,                               step_size=5e-8, max_iteration=5000)
         alg_stochastic.run(2, verbose=0)
@@ -480,11 +478,10 @@ class TestLSVRG(CCPiTestClass):
 
     def test_LSVRG_store_gradients(self):
         objective = LSVRGFunction(self.f_subsets, self.sampler)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        
+        self.assertEqual(objective._list_stored_gradients, None)
         objective.gradient(self.initial)
-        with self.assertRaises(AttributeError):
-            objective._list_stored_gradients
+        self.assertEqual(objective._list_stored_gradients, None)
 
         objective = LSVRGFunction(
             self.f_subsets, self.sampler, store_gradients=True)

@@ -62,7 +62,10 @@ class SAGFunction(ApproximateGradientSumFunction):
     
     The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. 
 
+    Note:  
+    ------  
 
+    This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.
     
 
     """
@@ -70,8 +73,8 @@ class SAGFunction(ApproximateGradientSumFunction):
     def __init__(self, functions,  sampler=None):
         self._list_stored_gradients = None
         self._full_gradient_at_iterate = None
-        self._warm_start_just_done=False
-        self._sampled_grad=None
+        self._warm_start_just_done = False
+        self._sampled_grad = None
         
         super(SAGFunction, self).__init__(functions, sampler)
 
@@ -99,7 +102,7 @@ class SAGFunction(ApproximateGradientSumFunction):
             self._stochastic_grad_difference = x.copy()
         
         if self.function_num >= self.num_functions or self.function_num<0 : # check the sampler and raise an error if needed
-            raise IndexError("The sampler has produced an index that exceeds the number of available functions to sample from. Please ensure your sampler only selects from {0,1,...,len(functions)-1} ")
+            raise IndexError(f"The sampler has produced the index {self.function_num} which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] ")
 
             
         # Calculate the gradient of the sampled function at the current iterate 
@@ -125,12 +128,8 @@ class SAGFunction(ApproximateGradientSumFunction):
     
     def _update_approx_gradient(self, out):
         """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: """
-        if out is None:
-            out = self._stochastic_grad_difference.sapyb(
-                1., self._full_gradient_at_iterate, 1.)
-        else:
-            self._stochastic_grad_difference.sapyb(
-                1., self._full_gradient_at_iterate, 1., out=out)
+        out = self._stochastic_grad_difference.sapyb(  
+                1., self._full_gradient_at_iterate, 1., out=out)  
 
         return out 
     
@@ -183,7 +182,11 @@ class SAGAFunction(SAGFunction):
     ------
     Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
 
+    Note:  
+    ------  
 
+    This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.
+    
     Reference
     ----------
     Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
@@ -209,13 +212,9 @@ class SAGAFunction(SAGFunction):
 
     def _update_approx_gradient(self, out):
         """Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: """
-        if out is None:
-            # Due to the convention that we follow: without the 1/n factor
-            out= self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_iterate, 1.)
-        else:
-            # Due to the convention that we follow: without the 1/n factor
-            self._stochastic_grad_difference.sapyb(
-                self.num_functions, self._full_gradient_at_iterate, 1., out=out)
+
+        # Due to the convention that we follow: without the 1/n factor
+        out= self._stochastic_grad_difference.sapyb(  
+            self.num_functions, self._full_gradient_at_iterate, 1., out)  
 
         return out 

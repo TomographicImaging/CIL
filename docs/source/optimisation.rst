@@ -238,6 +238,13 @@ Note
   :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
 
   
+Memory requirements
+-------------------
+Note that the approximate gradient methods have different memory requirements:
+- The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
+- `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
+
+
 Operators
 =========
 The two most important methods are :code:`direct` and :code:`adjoint`

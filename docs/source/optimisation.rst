@@ -183,9 +183,9 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
 +----------------+-------+------------+----------------+
-| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
+| SVRGFunction\ | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
 +----------------+-------+------------+----------------+
-| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
+| LSVRGFunction\| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
 +----------------+-------+------------+----------------+
 
 \*In development 
@@ -232,8 +232,8 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
 Memory requirements
 -------------------
 Note that the approximate gradient methods have different memory requirements:
-- The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
-- `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at te expensive of stored memory `n+4` times the image size.  
++ The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
++ `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at the expensive of stored memory `n+4` times the image size.  
 
 
 Operators

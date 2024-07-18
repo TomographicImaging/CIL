@@ -95,8 +95,8 @@ class TestSGD(CCPiTestClass):
             
 
     def test_approximate_gradient_not_equal_full(self):
-        self.assertFalse((self.f_stochastic.full_gradient(
-            self.initial) == self.f_stochastic.gradient(self.initial).array).all())
+        with self.assertRaises(AssertionError):
+            self.assertNumpyArrayEqual(self.f_stochastic.full_gradient(self.initial).as_array(),self.f_stochastic.gradient(self.initial).as_array())
 
     
     def test_sampler(self):
@@ -224,7 +224,8 @@ class TestSAG(CCPiTestClass):
 
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
-        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
+        with self.assertRaises(AssertionError):
+            self.assertNumpyArrayEqual(self.f_stochastic.full_gradient(self.initial).as_array(),self.f_stochastic.gradient(self.initial).as_array())
 
     
     def test_sampler(self):
@@ -378,7 +379,8 @@ class TestSAGA(CCPiTestClass):
         
     
     def test_approximate_gradient(self): #Test when we the approximate gradient is not equal to the full gradient 
-        self.assertFalse((self.f_stochastic.full_gradient(self.initial)==self.f_stochastic.gradient(self.initial).array).all())
+        with self.assertRaises(AssertionError):
+            self.assertNumpyArrayEqual(self.f_stochastic.full_gradient(self.initial).as_array(),self.f_stochastic.gradient(self.initial).as_array())
 
     
     def test_sampler(self):

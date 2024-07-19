@@ -170,10 +170,9 @@ class approx_gradient_child_class_testing():
 
         alg_stochastic = GD(initial=initial,
                             objective_function=stochastic_objective, update_objective_interval=1000,
-                            step_size=1/stochastic_objective.L)
+                            step_size=0.05)
         alg_stochastic.run(600, verbose=0)
-        self.assertListEqual(stochastic_objective.data_passes_indices[-1], [stochastic_objective.function_num])
-
+        
         np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)

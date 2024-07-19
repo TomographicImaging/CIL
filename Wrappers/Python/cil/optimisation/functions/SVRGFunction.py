@@ -70,7 +70,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
         #  snapshot_update_interval for SVRG
         self.snapshot_update_interval = snapshot_update_interval
-
+    
         if snapshot_update_interval is None:
             self.snapshot_update_interval = 2*self.num_functions
         self.store_gradients = store_gradients
@@ -107,7 +107,8 @@ class SVRGFunction(ApproximateGradientSumFunction):
         else:
 
             self.function_num = self.sampler.next()
-
+            if not isinstance(self.function_num, numbers.Number):
+                raise ValueError("Batch gradient is not yet implemented")
             if self.function_num >= self.num_functions or self.function_num < 0:
                 raise IndexError(
                     f"The sampler has produced the index {self.function_num} which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] ")
@@ -276,8 +277,7 @@ class LSVRGFunction(SVRGFunction):
             self.function_num = self.sampler.next()
             if not isinstance(self.function_num, numbers.Number):
                 raise ValueError("Batch gradient is not yet implemented")
-            if self.function_num > self.num_functions:
+            if self.function_num >= self.num_functions or self.function_num < 0:
                 raise IndexError(
                     f"The sampler has produced the index {self.function_num} which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] ")
-
             return self.approximate_gradient(x, self.function_num, out=out)

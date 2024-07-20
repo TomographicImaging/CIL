@@ -31,7 +31,7 @@ dependencies:
   - scikit-image
   - packaging
   - cmake >=3.16
-  - setuptools
+  - setuptools <71
   - ipp-include >=2021.10
   - ipp-devel >=2021.10
   - ipp >=2021.10

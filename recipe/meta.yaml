@@ -55,7 +55,7 @@ requirements:
     - python
     - numpy {{ numpy }}
     - pip
-    - setuptools <71
+    - setuptools
     - cmake         # [not osx]
     - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]

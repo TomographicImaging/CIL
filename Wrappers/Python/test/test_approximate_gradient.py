@@ -532,3 +532,13 @@ class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+        
+    def test_sampler_out_of_range(self):
+        def g(index):
+            return -2
+        bad_sampler = Sampler.from_function(12,g)
+        f = self.stochastic_estimator([self.f]*10, bad_sampler, seed=25)
+        with self.assertRaises(IndexError):
+            f.gradient(self.initial)
+            f.gradient(self.initial)
+            

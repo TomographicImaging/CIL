@@ -127,7 +127,6 @@ class TestSamplers(CCPiTestClass):
         self.assertListEqual(sampler.prob_weights,  [1]+[0]*39)
         self.assertEqual(sampler.num_indices, 40)
         self.assertEqual(sampler._type, 'from_function')
-
     def test_sequential_iterator_and_get_samples(self):
 
         sampler = Sampler.sequential(10)

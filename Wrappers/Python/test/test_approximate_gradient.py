@@ -28,6 +28,7 @@ from cil.framework import VectorData
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction, SAGFunction, SAGAFunction
+from cil.optimisation.functions import SVRGFunction, LSVRGFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData

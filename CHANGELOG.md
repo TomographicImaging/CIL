@@ -1,4 +1,7 @@
-
+* 24.x.x
+  - Enhancements:
+    - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
+    
 * 24.1.0
   - New Features:
     - Added method to plot filter in `GenericFilteredBackProjection` (#1667)

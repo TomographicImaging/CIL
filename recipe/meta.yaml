@@ -38,7 +38,7 @@ test:
     - tomophantom=2.0.0       # [ linux ]
     - tigre=2.6
     - packaging
-    - ccpi-regulariser=24.0.0 # [ not osx ]
+    - ccpi-regulariser=24.0.1 # [ not osx ]
     - astra-toolbox=2.1=cuda* # [ not osx ]
 
   source_files:
@@ -94,7 +94,7 @@ requirements:
     - tomophantom=2.0.0
     - astra-toolbox>=1.9.9.dev5,<=2.1
     - tigre>=2.4,<=2.6
-    - ccpi-regulariser=24.0.0
+    - ccpi-regulariser=24.0.1
     - ipywidgets
 
 about:

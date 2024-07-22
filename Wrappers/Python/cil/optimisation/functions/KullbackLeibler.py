@@ -245,6 +245,9 @@ if has_numba:
                     (4. * tau * bb[i])
                 )
             )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
+
     @njit(parallel=True)
     def kl_proximal_arr(x,b, tau, out, eta):
         tt = tau.ravel()
@@ -262,6 +265,9 @@ if has_numba:
                     (4. * t * bb[i])
                 )
             )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
+
     @njit(parallel=True)
     def kl_proximal_mask(x,b, tau, out, eta, mask):
         xx = x.ravel()
@@ -278,6 +284,9 @@ if has_numba:
                         (4. * tau * bb[i])
                     )
                 )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
+
     @njit(parallel=True)
     def kl_proximal_arr_mask(x,b, tau, out, eta, mask):
         xx = x.ravel()
@@ -297,6 +306,9 @@ if has_numba:
                         (4. * t * bb[i])
                     )
                 )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
+
     # proximal conjugate
     @njit(parallel=True)
     def kl_proximal_conjugate_arr(x, b, eta, tau, out):
@@ -313,6 +325,8 @@ if has_numba:
             oo[i] = 0.5 * (
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * bb[i])
                 )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
@@ -327,6 +341,8 @@ if has_numba:
             oo[i] = 0.5 * (
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * bb[i])
                 )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate_arr_mask(x, b, eta, tau, out, mask):
@@ -345,6 +361,8 @@ if has_numba:
                 oo[i] = 0.5 * (
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * bb[i])
                     )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate_mask(x, b, eta, tau, out, mask):
@@ -361,6 +379,9 @@ if has_numba:
                 oo[i] = 0.5 * (
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * bb[i])
                     )
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
+
     # gradient
     @njit(parallel=True)
     def kl_gradient(x, b, out, eta):
@@ -370,6 +391,8 @@ if has_numba:
         oo = out.ravel()
         for i in prange(x.size):
             oo[i] = 1 - bb[i]/(xx[i] + ee[i])
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
 
     @njit(parallel=True)
     def kl_gradient_mask(x, b, out, eta, mask):
@@ -381,6 +404,8 @@ if has_numba:
         for i in prange(x.size):
             if mm[i] > 0:
                 oo[i] = 1 - bb[i]/(xx[i] + ee[i])
+        if out.ctypes.data != oo.ctypes.data:
+            out[:] = oo
 
     # KL divergence
     @njit(parallel=True)

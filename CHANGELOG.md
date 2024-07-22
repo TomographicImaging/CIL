@@ -1,6 +1,7 @@
 * 24.x.x
   - New Features:
     - Added SAG and SAGA stochastic functions (#1624) 
+    - Added SVRG and LSVRG stochastic functions (#1625)
   
 * 24.1.0
   - New Features:

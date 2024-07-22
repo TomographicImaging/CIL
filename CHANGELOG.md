@@ -4,6 +4,7 @@
     - Allow `SumFunction` with 1 item (#1857)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
+    - Upgrade Python wrapper (#1873, #1875)
 
 * 24.1.0
   - New Features:

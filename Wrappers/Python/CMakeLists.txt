@@ -25,12 +25,9 @@ if (BUILD_PYTHON_WRAPPER)
   if (PYTHON_DEST_DIR)
     set(PYTHON_DEST "${PYTHON_DEST_DIR}")
   else()
-    message(STATUS "python version ${PYTHON_DEST}")
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/sp_dir.py
-      OUTPUT_VARIABLE SP_DIR)
-    # remove trailing newline
-    string(REGEX REPLACE "\n$" "" PYTHON_DEST ${SP_DIR})
-    # append default site-packages
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import os; print(os.path.dirname(os.__file__))"
+      OUTPUT_VARIABLE PYTHON_DEST
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(PYTHON_DEST "${PYTHON_DEST}/site-packages")
   endif()
 
@@ -58,30 +55,16 @@ if (BUILD_PYTHON_WRAPPER)
 
   if (PYTHONINTERP_FOUND)
       message("Python found " ${PYTHON_EXECUTABLE})
-      set(SETUP_PY    "${CMAKE_CURRENT_SOURCE_DIR}/setup.py")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/timestamp")
-      file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/cil/*.py )
+      # TODO: add to add_custom_command DEPENDS the list of python files of the project.
+      # file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/cil/*.py )
 
-      # adds the CIL_VERSION to the setup.py
-      if (EXISTS ${SETUP_PY})
-        file(REMOVE ${SETUP_PY})
-      endif()
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/setup.py.in ${SETUP_PY})
-      # adds the version.py file to the source code with correct version string.
-      if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cil/version.py)
-        file(REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/cil/version.py)
-      endif()
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/version.py.in ${CMAKE_CURRENT_SOURCE_DIR}/cil/version.py)
-
-
-
-      # add to add_custom_command DEPENDS the list of python files of the project.
       # as a hack I remove ${OUTPUT}. This should trigger the new build.
       file( REMOVE ${OUTPUT} )
 
       add_custom_target(pythonsetup ALL
           COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install . -t ${PYTHON_DEST} --upgrade
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
           COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
           DEPENDS cilacc)
 
@@ -89,7 +72,6 @@ if (BUILD_PYTHON_WRAPPER)
       if (NOT CONDA_BUILD)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
       endif()
-
 
       add_custom_target(PythonWrapper ALL DEPENDS pythonsetup)
 

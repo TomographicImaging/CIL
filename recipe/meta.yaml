@@ -97,6 +97,6 @@ requirements:
     - ipywidgets
 
 about:
-  home: http://www.ccpi.ac.uk/cil
+  home: https://ccpi.ac.uk/cil
   license:  Apache 2.0 License
   summary: 'CCPi Core Imaging Library'

@@ -1,4 +1,7 @@
-
+* 24.x.x
+  - New Features:
+    - Added SAG and SAGA stochastic functions (#1624) 
+  
 * 24.1.0
   - New Features:
     - Added method to plot filter in `GenericFilteredBackProjection` (#1667)

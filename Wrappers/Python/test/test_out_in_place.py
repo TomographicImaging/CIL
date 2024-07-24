@@ -43,6 +43,7 @@ from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRota
 RingRemover, Slicer, TransmissionAbsorptionConverter
 
 import numpy
+from utils import has_tigre, has_nvidia
 
 
 from cil.framework import  BlockGeometry
@@ -485,6 +486,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 except (InPlaceError, NotImplementedError):
                     print("in_place_test test not implemented for  " + processor.__class__.__name__)
     
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_centre_of_rotation_image_sharpness_out(self):
         """
         Test the output of the centre of rotation image_sharpness processor 

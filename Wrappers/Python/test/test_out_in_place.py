@@ -40,7 +40,7 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
     WeightedL2NormSquared, MixedL11Norm, ZeroFunction
 
 from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
-RingRemover, Slicer, TransmissionAbsorptionConverter
+RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor
 
 import numpy
 from utils import has_tigre, has_nvidia
@@ -325,22 +325,25 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                           np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)),
                           np.random.uniform(0,1,(10,20)).astype(np.float32)]
 
-        ag_parallel_2D = AcquisitionGeometry.create_Parallel2D()
+        ag_parallel_2D = AcquisitionGeometry.create_Parallel2D(detector_position=[0,1], units='m')
         angles = np.linspace(0, 360, 10, dtype=np.float32)
         ag_parallel_2D.set_angles(angles)
         ag_parallel_2D.set_panel(20)
 
-        ag_parallel_3D = AcquisitionGeometry.create_Parallel3D()
+        ag_parallel_3D = AcquisitionGeometry.create_Parallel3D(detector_position=[0,1,0], units='mm')
+        # ag = AcquisitionGeometry.create_Parallel3D(detector_position=[0, 1, 0], units='mm').set_panel([20,2], pixel_size=0.1).set_angles(angles)
         ag_parallel_3D.set_angles(angles)
-        ag_parallel_3D.set_panel([20,2])
+        ag_parallel_3D.set_panel([20,2], pixel_size=0.1)
 
-        ag_cone_2D = AcquisitionGeometry.create_Cone2D(source_position=[0,-10],detector_position=[0,10])
+        ag_cone_2D = AcquisitionGeometry.create_Cone2D(source_position=[0,-10],detector_position=[0,10], units='mm')
         ag_cone_2D.set_angles(angles)
         ag_cone_2D.set_panel(20)
 
-        ag_cone_3D = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0],detector_position=[0,10,0])
+        ag_cone_3D = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0],detector_position=[0,10,0], units='mm')
         ag_cone_3D.set_angles(angles)
-        ag_cone_3D.set_panel([20,2])
+        ag_cone_3D.set_panel([20,2], pixel_size=0.1)
+
+        ag = AcquisitionGeometry.create_Parallel3D(detector_position=[0, 150, 0], units='mm').set_panel([20,2], pixel_size=0.1).set_angles(angles)
         
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
 
@@ -416,7 +419,6 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     data.fill(data_array)
                 except:
                     data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
-
                 # Add new Processors here 
                 processor_list = [
                     TransmissionAbsorptionConverter(min_intensity=0.01),
@@ -430,8 +432,9 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     Padder(pad_width=1),
                     Normaliser(flat_field=data.get_slice(angle=0).as_array()*1, dark_field=data.get_slice(angle=0).as_array()*1e-5),
                     MaskGenerator.median(threshold_factor=3, window=7),
-                    Masker.median(mask=data.copy())
-                    ]                
+                    Masker.median(mask=data.copy()),
+                    PaganinProcessor()
+                    ]
                 
                 for processor in processor_list:
                     self.get_result_check(processor, data)

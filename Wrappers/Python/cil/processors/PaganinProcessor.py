@@ -216,7 +216,7 @@ class PaganinProcessor(Processor):
         self._set_geometry(data.geometry, self.override_geometry)
 
         if out is None:
-            out = data.geometry.allocate(None)
+            out = data.copy()
 
         # make slice indices to get the projection
         slice_proj = [slice(None)]*len(data.shape)
@@ -232,7 +232,7 @@ class PaganinProcessor(Processor):
         data_proj = data.as_array()[tuple(slice_proj)]
 
         # create an empty axis if the data is 2D
-        if len(data_proj.shape) == 1:
+        if len(data.shape) == 2:
             data.array = np.expand_dims(data.array, len(data.shape))
             slice_proj.append(slice(None))
             data_proj = data.as_array()[tuple(slice_proj)]
@@ -241,6 +241,9 @@ class PaganinProcessor(Processor):
             pass
         else:
             raise(ValueError('Data must be 2D or 3D per channel'))
+        
+        if len(out.shape) == 2:
+            out.array = np.expand_dims(out.array, len(out.shape))
         
         # create a filter based on the shape of the data
         filter_shape = np.shape(data_proj)
@@ -265,7 +268,7 @@ class PaganinProcessor(Processor):
             if channel_axis is not None:
                 slice_proj[channel_axis] = j
             # loop over the projections
-            for i in tqdm(range(len(out.geometry.angles))):
+            for i in tqdm(range(len(data.geometry.angles))):
                 
                 slice_proj[angle_axis] = i
                 padded_buffer[slice_pad] = data.array[(tuple(slice_proj))]
@@ -282,11 +285,14 @@ class PaganinProcessor(Processor):
                     fI = fft2(padded_buffer)
                     padded_buffer = ifft2(fI*self.filter)
                 if data.geometry.channels>1:
-                    out.fill(np.squeeze(padded_buffer[slice_pad]), angle = i, 
+                    out.fill(padded_buffer[slice_pad], angle = i, 
                              channel=j)
                 else:
-                    out.fill(np.squeeze(padded_buffer[slice_pad]), angle = i)
+                    x = padded_buffer[slice_pad]
+                    out.fill(x, angle = i)
+                    
         data.array = np.squeeze(data.array)
+        out.array = np.squeeze(out.array)
         return out
     
     def set_input(self, dataset):

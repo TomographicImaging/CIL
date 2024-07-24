@@ -42,7 +42,10 @@ else:
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
-from cil.framework.BlockGeometry import BlockGeometry
+from .block import BlockGeometry
+
+log = logging.getLogger(__name__)
+
 
 class Partitioner(object):
     '''Interface for AcquisitionData to be able to partition itself in a number of batches.
@@ -193,7 +196,6 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        out.geometry = blk_geo
         axis = self.dimension_labels.index('angle')
 
         for i in range(num_batches):
@@ -965,7 +967,22 @@ class Parallel2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -1114,7 +1131,22 @@ class Parallel3D(SystemConfiguration):
         return False
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
@@ -2375,7 +2407,7 @@ class AcquisitionGeometry(object):
 
         if self.dimension == '2D':
             if offset2 is not None:
-                logging.WARNING("Only offset1 is being used")
+                log.warning("Only offset1 is being used")
             self.set_centre_of_rotation(offset1)
 
         if offset2 is None or offset1 == offset2:
@@ -3172,19 +3204,15 @@ class DataContainer(object):
         >>> y = ig.allocate(2)
         >>> out = x.sapyb(a,y,b)
         '''
-        ret_out = False
 
         if out is None:
             out = self * 0.
-            ret_out = True
 
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
                 self._axpby(a, b, y, out, out.dtype, num_threads)
-                if ret_out:
-                    return out
-                return
+                return out
             except RuntimeError as rte:
                 warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
             except TypeError as te:
@@ -3197,9 +3225,7 @@ class DataContainer(object):
         ax = self * a
         y.multiply(b, out=out)
         out.add(ax, out=out)
-
-        if ret_out:
-            return out
+        return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
@@ -3447,7 +3473,7 @@ class DataContainer(object):
             Default is to accumulate and return data as float64 or complex128
         """
         if kwargs.get('dtype') is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+            log.warning("dtype argument is ignored, using float64 or complex128")
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64
@@ -3526,7 +3552,7 @@ class DataContainer(object):
         """
 
         if kwargs.get('dtype', None) is not None:
-            logging.WARNING("dtype argument is ignored, using float64 or complex128")
+            log.warning("dtype argument is ignored, using float64 or complex128")
 
         if numpy.isrealobj(self.array):
             kwargs['dtype'] = numpy.float64

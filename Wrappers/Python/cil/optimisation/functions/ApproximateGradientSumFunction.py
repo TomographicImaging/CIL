@@ -18,7 +18,7 @@
 # - Daniel Deidda (National Physical Laboratory, UK)
 # - Claire Delplancke (Electricite de France, Research and Development)
 # - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)
-# - Zeljko Kerata (Department of Computer Science, University College London, UK)
+# - Zeljko Kereta (Department of Computer Science, University College London, UK)
 # - Evgueni Ovtchinnikov (STFC - UKRI)
 # - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)
 
@@ -229,7 +229,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     def data_passes(self):
         """ The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
         data_passes = []
-        for el in self._data_passes_indices:
+        for el in self.data_passes_indices:
             try:
                 data_passes.append(data_passes[-1])
             except IndexError:

@@ -1,4 +1,45 @@
-* x.x.x
+* 24.x.x
+  - New Features:
+    - Added SAG and SAGA stochastic functions (#1624) 
+  
+* 24.1.0
+  - New Features:
+    - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
+    - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1615)
+    - Added PaganinProcessor processor, to perform phase retrieval from phase contrast images (#1737)
+    - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
+    - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)
+    - an implementation of the Armijo Rule as a child class of  `cil.optimisation.utilities.StepSizeRule` (#1768)
+    - Sensitivity preconditioners added as child classes of `cil.optimisation.utilities.Preconditioner`(#1768)
+  - Enhancements:
+    - Added `geometry` property to `BlockDataContainer`. Adds `__eq__` to `BlockGeometry` (#1799)
+    - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
+    - Operators and functions now also return when out is specified (#1742)
+    - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Added documentation for the Partitioner to `framework.rst` (#1828)
+    - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
+    - Update to CCPi-Regularisation toolkit v24.0.1 (#1868) 
+  - Bug fixes:
+    - gradient descent `update_objective` called twice on the initial point.(#1789)
+    - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
+    - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
+    - BlurringOperator: remove check for geometry class (old SIRF integration bug) (#1807)
+    - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
+  - Changes that break backwards compatibility:
+    - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
+    - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826). 
+
+
+
+
+* 24.0.0
+  - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.
+  - CIL plugin support for TIGRE version v2.6
+  - CIL plugin support for ASTRA-TOOLBOX version v2.1
+  - Dropped support for python 3.8 and 3.9
+  - Added support for python 3.11 and 3.12
+  - Dropped support for numpy 1.21 and 1.22
+  - Added support for numpy 1.25 and 1.26
   - Set CMake Policy CMP0148 to OLD to avoid warnings in CMake 3.27
   - AcquisitionGeometry prints the first and last 10 angles, or all if there are 30 or less, rather than the first 20
   - Added a weight argument to the L1Norm function
@@ -40,8 +81,13 @@
   - Improved import error/warning messages
   - New adjoint operator
   - Bug fix for complex matrix adjoint
+  - Removed the following code which was deprecated since v22.0.0:
+    - `info` parameter in `cil.optimisation.functions.TotalVariation`
+    - `sinogram_geometry` and `volume_geometry` parameters in `cil.plugins.astra.processors.FBP` and in `cil.plugins.tigre.processors.FBP`
+    - `aquisition_geometry` (misspelled) parameter in `cil.plugins.tigre.processors.ProjectionOperator`
+    - `FBP` kwarg (and thus all kwargs) in `cil.processors.CentreOfRotationCorrector` and `cil.processors.CofR_image_sharpness`
+    - `TXRMDataReader`
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
-
 
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate

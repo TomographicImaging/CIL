@@ -62,7 +62,7 @@ class Function(object):
 
         Returns
         --------
-        DataContainer, the value of the gradient of the function at x or `None` if `out`
+        DataContainer, the value of the gradient of the function at x.
 
         """
         raise NotImplementedError
@@ -82,7 +82,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`. 
 
         """
         raise NotImplementedError
@@ -125,8 +125,9 @@ class Function(object):
         DataContainer, the value of the proximal operator of the convex conjugate at point :math:`x` for scalar :math:`\tau` or None if `out`.
 
         """
-        if id(x)==id(out):
-            raise InPlaceError(message= "The proximal_conjugate of a CIL function cannot be used in place")
+        if id(x) == id(out):
+            raise InPlaceError(
+                message="The proximal_conjugate of a CIL function cannot be used in place")
 
         try:
             tmp = x
@@ -134,19 +135,14 @@ class Function(object):
         except TypeError:
             tmp = x.divide(tau, dtype=np.float32)
 
-        if out is None:
-            val = self.proximal(tmp, 1.0/tau)
-        else:
-            self.proximal(tmp, 1.0/tau, out=out)
-            val = out
+        val = self.proximal(tmp, 1.0/tau, out=out)
 
         if id(tmp) == id(x):
             x.multiply(tau, out=x)
 
         val.sapyb(-tau,  x, 1.0, out=val)
 
-        if out is None:
-            return val
+        return val
 
     # Algebra for Function Class
 
@@ -181,6 +177,11 @@ class Function(object):
 
     def __mul__(self, scalar):
         return self.__rmul__(scalar)
+    
+    def __neg__(self):
+        """ Return the negative of the function """
+        return -1 * self
+    
 
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.
@@ -336,27 +337,18 @@ class SumFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the sum of the gradients evaluated at point :math:`x` or `None` if `out`.
+        DataContainer, the value of the sum of the gradients evaluated at point :math:`x`.
 
         """
-
-        if out is not None and id(x)==id(out):
+        if out is not None and id(x) == id(out):
             raise InPlaceError
 
-        if out is None:
-            for i,f in enumerate(self.functions):
-
-                if i == 0:
-                    ret = f.gradient(x)
-                else:
-                    ret += f.gradient(x)
-            return ret
-        else:
-            for i, f in enumerate(self.functions):
-                if i == 0:
-                    f.gradient(x, out=out)
-                else:
-                    out += f.gradient(x)
+        for i, f in enumerate(self.functions):
+            if i == 0:
+                ret = f.gradient(x, out=out)
+            else:
+                ret += f.gradient(x)
+        return ret
 
     def __add__(self, other):
         """ Addition for the SumFunction.
@@ -380,6 +372,7 @@ class SumFunction(Function):
     @property
     def num_functions(self):
         return len(self.functions)
+
 
 class ScaledFunction(Function):
 
@@ -432,7 +425,7 @@ class ScaledFunction(Function):
             raise TypeError(
                 'Expecting scalar type as a number type. Got {}'.format(type(value)))
 
-    def __call__(self, x, out=None):
+    def __call__(self, x):
         r"""Returns the value of the scaled function evaluated at :math:`x`.
 
         .. math:: G(x) = \alpha F(x)
@@ -441,11 +434,9 @@ class ScaledFunction(Function):
         ----------
         x : DataContainer
 
-        out: return DataContainer, if None a new DataContainer is returned, default None.
-
         Returns
         --------
-        DataContainer, the value of the scaled function or `None` if `out` .
+        DataContainer, the value of the scaled function.
         """
         return self.scalar * self.function(x)
 
@@ -489,14 +480,12 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x` or `None` if `out`.
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x`. 
 
         """
-        if out is None:
-            return self.scalar * self.function.gradient(x)
-        else:
-            self.function.gradient(x, out=out)
-            out *= self.scalar
+        res = self.function.gradient(x, out=out)
+        res *= self.scalar
+        return res
 
     def proximal(self, x, tau, out=None):
         r"""Returns the proximal operator of the scaled function, evaluated at :math:`x`.
@@ -513,7 +502,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal operator of the scaled function evaluated at :math:`x` with scalar :math:`\tau`.
 
         """
 
@@ -532,10 +521,10 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal conjugate operator for the function evaluated at :math:`x` and :math:`\tau`.
 
         """
-        if out is not None and id(x)==id(out):
+        if out is not None and id(x) == id(out):
             raise InPlaceError
 
         try:
@@ -544,19 +533,14 @@ class ScaledFunction(Function):
         except TypeError:
             tmp = x.divide(tau, dtype=np.float32)
 
-        if out is None:
-            val = self.function.proximal(tmp, self.scalar/tau)
-        else:
-            self.function.proximal(tmp, self.scalar/tau, out=out)
-            val = out
+        val = self.function.proximal(tmp, self.scalar/tau, out=out)
 
         if id(tmp) == id(x):
             x.multiply(tau, out=x)
 
         val.sapyb(-tau,  x, 1.0, out=val)
 
-        if out is None:
-            return val
+        return val
 
 
 class SumScalarFunction(SumFunction):
@@ -613,7 +597,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau` or `None` if `out`.
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau`. 
 
         """
         return self.function.proximal(x, tau, out=out)
@@ -641,7 +625,7 @@ class ConstantFunction(Function):
 
     def __init__(self, constant=0):
         self.constant = constant
-        super(ConstantFunction, self).__init__(L=0)
+        super(ConstantFunction, self).__init__(L=1)
 
     def __call__(self, x):
         """ Returns the value of the function, :math:`F(x) = constant`"""
@@ -657,13 +641,14 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        A DataContainer of zeros, the same size as :math:`x` or `None` if `out`
+        A DataContainer of zeros, the same size as :math:`x`.
 
         """
         if out is None:
             return x * 0.
         else:
             out.fill(0)
+            return out
 
     def convex_conjugate(self, x):
         r""" The convex conjugate of constant function :math:`F(x) = c\in\mathbb{R}` is
@@ -710,13 +695,14 @@ class ConstantFunction(Function):
 
         Returns
         -------
-        DataContainer, equal to :math:`x` or `None` if `out`.
+        DataContainer, equal to :math:`x`.
 
         """
         if out is None:
             return x.copy()
         else:
             out.fill(x)
+            return out
 
     @property
     def constant(self):
@@ -730,7 +716,7 @@ class ConstantFunction(Function):
 
     @property
     def L(self):
-        return 0.
+        return 1.
 
     def __rmul__(self, other):
         '''defines the right multiplication with a number'''
@@ -818,10 +804,10 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the gradient of the translated function evaluated at :math:`x` or `None` if `out`.
+        DataContainer, the gradient of the translated function evaluated at :math:`x`.
         """
 
-        if id(x)==id(out):
+        if id(x) == id(out):
             raise InPlaceError
 
         try:
@@ -830,16 +816,12 @@ class TranslateFunction(Function):
         except TypeError:
             tmp = x.subtract(self.center, dtype=np.float32)
 
-        if out is None:
-            val = self.function.gradient(tmp)
-        else:
-            self.function.gradient(tmp, out=out)
+        val = self.function.gradient(tmp, out=out)
 
         if id(tmp) == id(x):
             x.add(self.center, out=x)
 
-        if out is None:
-            return val
+        return val
 
     def proximal(self, x, tau, out=None):
         r"""Returns the proximal operator of the translated function.
@@ -856,10 +838,10 @@ class TranslateFunction(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau` or `None` if `out`.
+        DataContainer, the proximal operator of the translated function at :math:`x` and :math:`\tau`.
         """
 
-        if id(x)==id(out):
+        if id(x) == id(out):
             raise InPlaceError
 
         try:
@@ -868,18 +850,13 @@ class TranslateFunction(Function):
         except TypeError:
             tmp = x.subtract(self.center, dtype=np.float32)
 
-        if out is None:
-            val = self.function.proximal(tmp, tau)
-            val.add(self.center, out=val)
-        else:
-            self.function.proximal(tmp, tau, out=out)
-            out.add(self.center, out=out)
+        val = self.function.proximal(tmp, tau, out=out)
+        val.add(self.center, out=val)
 
         if id(tmp) == id(x):
             x.add(self.center, out=x)
 
-        if out is None:
-            return val
+        return val
 
     def convex_conjugate(self, x):
         r"""Returns the convex conjugate of the translated function.

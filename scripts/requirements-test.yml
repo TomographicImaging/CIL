@@ -14,24 +14,24 @@
 name: cil_dev
 channels:
   - conda-forge
-  - intel
-  - ccpi
+  - nvidia
+  - https://software.repos.intel.com/python/conda
   - defaults
 dependencies:
   # base (vis. recipe/conda_build_config.yaml)
-  - python=3.10
-  - numpy=1.24
-  - cil-data
-  - tigre=2.4
-  - ccpi-regulariser=22.0.0
-  - tomophantom=2.0.0
-  - astra-toolbox >=1.9.9.dev5,<2.1
+  - python >=3.10
+  - numpy >=1.23
+  - ccpi::cil-data
+  - ccpi::tigre=2.6
+  - ccpi::ccpi-regulariser=24.0.1
+  - ccpi::tomophantom=2.0.0
+  - astra-toolbox=2.1=cuda*
   - cvxpy
   - python-wget
   - scikit-image
   - packaging
   - cmake >=3.16
-  - setuptools
+  - setuptools <71
   - ipp-include >=2021.10
   - ipp-devel >=2021.10
   - ipp >=2021.10

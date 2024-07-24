@@ -17,8 +17,10 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.algorithms import Algorithm
-import warnings
 import logging
+
+log = logging.getLogger(__name__)
+
 
 class LADMM(Algorithm):
 
@@ -62,10 +64,8 @@ class LADMM(Algorithm):
         self.set_up(f = f, g = g, operator = operator, tau = tau,\
              sigma = sigma, initial=initial)
 
-    def set_up(self, f, g, operator, tau = None, sigma=1., \
-        initial=None):
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
+    def set_up(self, f, g, operator, tau = None, sigma=1., initial=None):
+        log.info("%s setting up", self.__class__.__name__)
 
         if sigma is None and tau is None:
             raise ValueError('Need tau <= sigma / ||K||^2')
@@ -95,7 +95,7 @@ class LADMM(Algorithm):
 
         self.configured = True
 
-        logging.info("{} configured".format(self.__class__.__name__, ))
+        log.info("%s configured", self.__class__.__name__)
 
     def update(self):
 

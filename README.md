@@ -23,27 +23,28 @@ We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda
 Install a new environment using:
 
 ```sh
-conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.1.0
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c intel -c ccpi cil=23.1.0 astra-toolbox tigre ccpi-regulariser tomophantom "ipywidgets<8"
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.1.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipywidgets
 ```
 
 where:
-
-- `astra-toolbox` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) projectors (GPLv3 license)
+- `astra-toolbox` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) CPU projector (2D Parallel beam only) (GPLv3 license)
+- `astra-toolbox=*=cuda*` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) GPU projectors (GPLv3 license)
 - `tigre` (requires an NVIDIA GPU) enables support for [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license)
-- `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit)
+- `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit)
 - `tomophantom` can generate phantoms to use as test data [Tomophantom](https://github.com/dkazanc/TomoPhantom)
+- `ipywidgets` enables visulisation tools within jupyter noteboooks
 
 ### Dependencies
 
 CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/1070) `recon` module requires:
 
-1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `intel` [channel](https://anaconda.org/intel/ipp).
+1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `https://software.repos.intel.com/python/conda` channel.
 2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
 
 ### Docker
@@ -104,7 +105,7 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 In case of development it is useful to be able to build the software directly. You should clone this repository as
 
 ```sh
-git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+git clone --recurse-submodule git@github.com:TomographicImaging/CIL
 ```
 
 The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as

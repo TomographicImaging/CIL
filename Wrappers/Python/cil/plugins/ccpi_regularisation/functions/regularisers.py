@@ -18,9 +18,9 @@
 
 try:
     from ccpi.filters import regularisers
-    from ccpi.filters.cpu_regularisers import TV_ENERGY
+    from ccpi.filters.TV import TV_ENERGY
 except ImportError as exc:
-    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=20.04"`') from exc
+    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24.0.1"`') from exc
 
 
 from cil.framework import DataOrder
@@ -138,6 +138,9 @@ class FGP_TV(TV_Base):
         The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
         applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
+        Note
+        -----
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default. 
 
         Parameters
         ----------
@@ -155,7 +158,7 @@ class FGP_TV(TV_Base):
 
                     .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
 
-        nonnegativity : :obj:`boolean`. Default = True .
+        nonnegativity : :obj:`boolean`. Default = False .
                         Non-negativity constraint for the solution of the FGP algorithm.
 
         tolerance : :obj:`float`, Default = 0 .
@@ -202,13 +205,16 @@ class FGP_TV(TV_Base):
         """
 
 
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=None, device='cpu', strong_convexity_constant=0):
 
         if isotropic == True:
             self.methodTV = 0
         else:
             self.methodTV = 1
 
+        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init. 
+            warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
+            nonnegativity=False 
         if nonnegativity == True:
             self.nonnegativity = 1
         else:
@@ -229,14 +235,17 @@ class FGP_TV(TV_Base):
 
         """
 
-        res , info = regularisers.FGP_TV(\
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
               self.max_iteration,\
               self.tolerance,\
               self.methodTV,\
               self.nonnegativity,\
-              self.device)
+              infovector = info,
+              device = self.device)
 
         return res, info
 
@@ -315,14 +324,18 @@ class TGV(RegulariserFunction):
         return 1.
 
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.TGV(in_arr,
+
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.TGV(in_arr,
               self.alpha * tau,
               self.alpha1,
               self.alpha2,
               self.max_iteration,
               self.LipshitzConstant,
               self.tolerance,
-              self.device)
+              infovector = info,
+              device = self.device)
 
         # info: return number of iteration and reached tolerance
         # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
@@ -400,7 +413,10 @@ class FGP_dTV(RegulariserFunction):
         return np.nan
 
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.FGP_dTV(\
+        
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
                 self.alpha * tau,\
@@ -409,7 +425,8 @@ class FGP_dTV(RegulariserFunction):
                 self.eta,\
                 self.methodTV,\
                 self.nonnegativity,\
-                self.device)
+                infovector = info,
+                device = self.device)
         return res, info
 
     def convex_conjugate(self, x):
@@ -454,7 +471,7 @@ class TNV(RegulariserFunction):
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
         in_arr = np.squeeze(in_arr)
-
+    
         res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,

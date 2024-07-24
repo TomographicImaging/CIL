@@ -18,11 +18,13 @@
 
 from cil.framework import DataOrder
 from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
-from cil.framework.BlockGeometry import BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.operators import BlockOperator
 from cil.plugins.astra.operators import AstraProjector3D
 from cil.plugins.astra.operators import AstraProjector2D
 import logging
+
+log = logging.getLogger(__name__)
 
 
 class ProjectionOperator(LinearOperator):
@@ -55,7 +57,7 @@ class ProjectionOperator(LinearOperator):
     def __new__(cls, image_geometry=None, acquisition_geometry=None, \
         device='gpu', **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
-            logging.info("BlockOperator is returned.")
+            log.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
@@ -65,7 +67,7 @@ class ProjectionOperator(LinearOperator):
                 )
             return BlockOperator(*K)
         else:
-            logging.info("Standard Operator is returned.")
+            log.info("Standard Operator is returned.")
             return super(ProjectionOperator,
                          cls).__new__(ProjectionOperator_ag)
 

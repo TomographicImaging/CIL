@@ -22,6 +22,7 @@ import unittest
 import numpy as np
 
 from cil.utilities.errors import InPlaceError
+from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry, DataContainer
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
@@ -341,29 +342,48 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         ag_cone_3D.set_panel([20,2])
         
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
-        self.data_test_list= [geom.allocate(None) for geom in self.geometry_test_list]
 
 
-    def out_tests(self, processor, data, *args):
-        input=data.copy() #To check that it isn't changed after function calls
+    def fail(self, error_message):
+        raise NotImplementedError(error_message)
 
+    def get_result_check(self, processor, data, *args):
+        # Check the original data is not modified when the processor is called
+
+        data_original=data.copy() #To check that data isn't changed after function calls
         try:
             processor.set_input(data)
             out1 = processor.get_output()
-            self.assertDataArraysInContainerAllClose(input, data, rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output() where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation.")
+            self.assertDataArraysInContainerAllClose(data_original, data, rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output() where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation.")
         except NotImplementedError:
-            print("get_result test not implemented for  " + processor.__class__.__name__)
-        
+            self.fail("get_result test not implemented for  " + processor.__class__.__name__)
+
+    def out_check(self, processor, data, *args):
+        # Check the processor gives the same result using the out argument
+        # Also check the out argument doesn't change the orginal data
+        # and that the processor still returns correctly with the out argument
+
+        data_original=data.copy() #To check that data isn't changed after function calls
         try:
+            processor.set_input(data)
+            out1 = processor.get_output()
             out2 = 0.*(out1.copy())
             out3 = processor.get_output(out=out2)
             self.assertDataArraysInContainerAllClose(out1, out2, rtol=1e-5, msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
-            self.assertDataArraysInContainerAllClose(input, data,  rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output(out=out) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+            self.assertDataArraysInContainerAllClose(data_original, data,  rtol=1e-5, msg= "In case processor.set_input(data), processor.get_output(out=out) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
             self.assertDataArraysInContainerAllClose(out1, out3,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=out) where processor is  " + processor.__class__.__name__+ " the processor supresses the output. ")
         except NotImplementedError:
-            print("out_test test not implemented for  " + processor.__class__.__name__)
+            self.fail("out_test test not implemented for  " + processor.__class__.__name__)
 
+    def in_place_check(self, processor, data, *args):
+        # Check the processor gives the correct result if the calculation is performed in place
+        # i.e. data is passed to the out argument
+        # if the processor output is a different sized array, the calcualtion
+        # cannot be perfomed in place, so we expect this to raise a ValueError
+         
         try:
+            processor.set_input(data)
+            out1 = processor.get_output()
             if out1.shape != data.shape:
                 with self.assertRaises(ValueError):
                     processor.get_output(out=data)
@@ -371,10 +391,11 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 processor.get_output(out=data)
                 self.assertDataArraysInContainerAllClose(out1, data, rtol=1e-5, msg= "In place calculation failed for processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ "." )
         except (InPlaceError, NotImplementedError):
-            print("in_place_test test not implemented for  " + processor.__class__.__name__)
+            self.fail("in_place_test test not implemented for  " + processor.__class__.__name__)
 
     def test_out(self):
         
+        # perform the tests on different data and geometry types
         for geom in self.geometry_test_list:
             for data_array in self.data_arrays:
                 data=geom.allocate(None)
@@ -384,7 +405,6 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
 
                 # Add new Processors here 
-                # Works when out is same or different size to the data
                 processor_list = [
                     TransmissionAbsorptionConverter(min_intensity=0.01),
                     AbsorptionTransmissionConverter(),
@@ -401,9 +421,15 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     ]                
                 
                 for processor in processor_list:
-                    self.out_tests(processor, data)
+                    self.get_result_check(processor, data)
+                    self.out_check(processor, data)
+                    self.in_place_check(processor, data)
    
-    def test_centre_of_rotation_out(self):
+    def test_centre_of_rotation_xcorrelation_out(self):
+        # Test the centre of rotation processor 
+        # These tests are different because the processor retusrns changes to the geometry rather than the data
+        
+        # First test CentreOfRotationCorrector.xcorrelation() on parallel beam data only
         for geom in self.geometry_test_list[0:2]:
             for data_array in self.data_arrays:
                 data=geom.allocate(None)
@@ -414,7 +440,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 processor = CentreOfRotationCorrector.xcorrelation(ang_tol=180)
                 processor.set_input(data)
                 out1 = processor.get_output()
-                # out_test fails because the processor only updates geometry, I think this is expected behaviour
+                # out_test fails because the processor only updates geometry, this is expected behaviour
                 # self.out_test(result, processor, data)
                 # test geometry instead
                 input = data.copy()
@@ -423,8 +449,8 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     processor.set_input(input)
                     out3 = processor.get_output(out=out2)
                     
-                    numpy.testing.assert_array_equal(out1.geometry.config.system.rotation_axis.position, out2.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
-                    numpy.testing.assert_array_equal(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+                    numpy.testing.assert_allclose(out1.geometry.config.system.rotation_axis.position, out2.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
+                    numpy.testing.assert_allclose(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
                     self.assertDataArraysInContainerAllClose(out2, out3,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor incorrectly supresses the output. ")
 
                     processor.set_input(data)
@@ -444,3 +470,46 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                         self.assertDataArraysInContainerAllClose(out1, data, rtol=1e-5, msg= "In place calculation failed for processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ "." )
                 except (InPlaceError, NotImplementedError):
                     print("in_place_test test not implemented for  " + processor.__class__.__name__)
+    
+    def test_centre_of_rotation_image_sharpness_out(self):
+        # Next test CentreOfRotationCorrector.image_sharpness() on parallel beam data 
+        # - here we need to use an image rather than random data
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        
+        processor = Binner(roi={'horizontal':(0,-1,2),'vertical':(0,-1,2), 'angle':(0,-1,2)})
+        processor.set_input(data)
+        data = processor.get_output()
+
+        processor = CentreOfRotationCorrector.image_sharpness()
+        processor.set_input(data)
+        out1 = processor.get_output()
+        # out_test fails because the processor only updates geometry, this is expected behaviour
+        # self.out_test(result, processor, data)
+        # test geometry instead
+        input = data.copy()
+        out2 = 0*(out1.copy())
+        try:
+            processor.set_input(input)
+            out3 = processor.get_output(out=out2)
+            
+            numpy.testing.assert_allclose(out1.geometry.config.system.rotation_axis.position, out2.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
+            numpy.testing.assert_allclose(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
+            self.assertDataArraysInContainerAllClose(out2, out3,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor incorrectly supresses the output. ")
+
+            processor.set_input(data)
+            processor.get_output(out=data)
+            numpy.testing.assert_array_equal(out1.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=data) where func is  " + processor.__class__.__name__+ ".")
+            
+        except (InPlaceError, NotImplementedError):
+            self.fail("out_test_for_geometry test not implemented for  " + processor.__class__.__name__)
+            pass
+
+        try:
+            if out1.shape != data.shape:
+                with self.assertRaises(ValueError):
+                    processor.get_output(out=data)
+            else:
+                processor.get_output(out=data)
+                self.assertDataArraysInContainerAllClose(out1, data, rtol=1e-5, msg= "In place calculation failed for processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ "." )
+        except (InPlaceError, NotImplementedError):
+            self.fail("in_place_test test not implemented for  " + processor.__class__.__name__)

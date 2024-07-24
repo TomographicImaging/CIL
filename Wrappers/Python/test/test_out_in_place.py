@@ -348,8 +348,9 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         raise NotImplementedError(error_message)
 
     def get_result_check(self, processor, data, *args):
-        # Check the original data is not modified when the processor is called
-
+        """
+        Tests to check the original data is not modified when the processor is called
+        """
         data_original=data.copy() #To check that data isn't changed after function calls
         try:
             processor.set_input(data)
@@ -359,10 +360,11 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             self.fail("get_result test not implemented for  " + processor.__class__.__name__)
 
     def out_check(self, processor, data, *args):
-        # Check the processor gives the same result using the out argument
-        # Also check the out argument doesn't change the orginal data
-        # and that the processor still returns correctly with the out argument
-
+        """
+        Tests to check the processor gives the same result using the out argument
+        Also check the out argument doesn't change the orginal data
+        and that the processor still returns correctly with the out argument
+        """
         data_original=data.copy() #To check that data isn't changed after function calls
         try:
             processor.set_input(data)
@@ -376,11 +378,12 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             self.fail("out_test test not implemented for  " + processor.__class__.__name__)
 
     def in_place_check(self, processor, data, *args):
-        # Check the processor gives the correct result if the calculation is performed in place
-        # i.e. data is passed to the out argument
-        # if the processor output is a different sized array, the calcualtion
-        # cannot be perfomed in place, so we expect this to raise a ValueError
-         
+        """
+        Check the processor gives the correct result if the calculation is performed in place
+        i.e. data is passed to the out argument
+        if the processor output is a different sized array, the calcualtion
+        cannot be perfomed in place, so we expect this to raise a ValueError
+        """
         try:
             processor.set_input(data)
             out1 = processor.get_output()
@@ -394,7 +397,16 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             self.fail("in_place_test test not implemented for  " + processor.__class__.__name__)
 
     def test_out(self):
-        
+        """
+        Tests to check output from Processors, including:
+        - Checks that Processors give the same results when the result is obtained
+        directly or using the out argument, or in place
+        - Checks that the out argument doesn't change the original data
+        - Checks that Processors still return the output even when out is used
+        All the tests are performed on different data types, geometry and Processors
+        Any new Processors should be added to the processor_list
+        """
+
         # perform the tests on different data and geometry types
         for geom in self.geometry_test_list:
             for data_array in self.data_arrays:
@@ -426,10 +438,12 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     self.in_place_check(processor, data)
    
     def test_centre_of_rotation_xcorrelation_out(self):
-        # Test the centre of rotation processor 
-        # These tests are different because the processor retusrns changes to the geometry rather than the data
-        
-        # First test CentreOfRotationCorrector.xcorrelation() on parallel beam data only
+        """
+        Test the output of the centre of rotation xcorrelation processor 
+        These tests are performed separately because the processor returns 
+        changes to the geometry rather than the data
+        """
+        # CentreOfRotationCorrector.xcorrelation() works on parallel beam data only
         for geom in self.geometry_test_list[0:2]:
             for data_array in self.data_arrays:
                 data=geom.allocate(None)
@@ -472,8 +486,12 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     print("in_place_test test not implemented for  " + processor.__class__.__name__)
     
     def test_centre_of_rotation_image_sharpness_out(self):
-        # Next test CentreOfRotationCorrector.image_sharpness() on parallel beam data 
-        # - here we need to use an image rather than random data
+        """
+        Test the output of the centre of rotation image_sharpness processor 
+        These tests are performed separately because the processor returns 
+        changes to the geometry rather than the data
+        """
+        # Here we need to use real data rather than random data otherwise the processor fails
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         
         processor = Binner(roi={'horizontal':(0,-1,2),'vertical':(0,-1,2), 'angle':(0,-1,2)})

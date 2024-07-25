@@ -30,7 +30,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
 
 from scipy import constants
@@ -3072,7 +3072,37 @@ class TestPaganinProcessor(unittest.TestCase):
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
         # 'horizontal, vertical, angles
-        
+
+class TestFluxNormaliser(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel([128,128],0.1)\
+            .set_channels(4)
+
+        self.data_multichannel = ag.allocate('random')
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_init(self):
+        # test default values are initialised
+        processor = FluxNormaliser()
+        test_parameter = ['flux','roi','tolerance']
+        test_value = [None, None, 1e-5]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = FluxNormaliser(1,2,3)
+        test_value = [1, 2, 3]
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
 if __name__ == "__main__":
 
     d = TestDataProcessor()

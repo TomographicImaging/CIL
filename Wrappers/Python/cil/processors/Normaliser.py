@@ -101,7 +101,6 @@ class Normaliser_flat_and_dark(Processor):
         elif issubclass(type(df), DataContainer):
             self.flat_field = self.set_flat_field(df.as_array())
 
-    @staticmethod
     def Normalise_projection(projection, flat, dark, tolerance):
         a = (projection - dark)
         b = (flat-dark)
@@ -110,7 +109,6 @@ class Normaliser_flat_and_dark(Processor):
             c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0
         return c
 
-    @staticmethod
     def estimate_normalised_error(projection, flat, dark, delta_flat, delta_dark):
         '''returns the estimated relative error of the normalised projection
 
@@ -137,12 +135,12 @@ class Normaliser_flat_and_dark(Processor):
 
 
             a = numpy.asarray(
-                    [ Normaliser.Normalise_projection(
+                    [ Normaliser_flat_and_dark.Normalise_projection(
                             projection, flat, dark, self.tolerance) \
                      for projection in projections.as_array() ]
                     )
         elif projections.number_of_dimensions == 2:
-            a = Normaliser.Normalise_projection(projections.as_array(),
+            a = Normaliser_flat_and_dark.Normalise_projection(projections.as_array(),
                                                 flat, dark, self.tolerance)
         y = type(projections)( a , True,
                     dimension_labels=projections.dimension_labels,
@@ -200,7 +198,7 @@ class Normaliser_flux(Processor):
         slice_proj[proj_axis] = 0
         
         f = self.flux
-        for i in range(len(data.geometry.angles)):
+        for i in range(numpy.shape(data)[proj_axis]):
             if len(flux_size) > 0:
                 f = self.flux[i]
 

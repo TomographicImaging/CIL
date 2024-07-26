@@ -3,7 +3,7 @@ remote_theme: TomographicImaging/feeling-responsive # TODO: revert after https:/
 title: CIL
 slogan: The Core Imaging Library
 description: |
-  CIL is a versatile python framework for tomographic imaging.
+  CIL core developers gratefully receive funding from <a href="https://ccpi.ac.uk">CCPi</a>.
   <br/>
   CCPi is funded by the EPSRC grant <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/T026677/1">EP/T026677/1</a>.
   <br/>
@@ -12,6 +12,8 @@ description: |
   <br/>
   The CCPi Flagship "A Reconstruction Toolkit for Multichannel CT" was funded by the
   EPSRC grant <a href="https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/P02226X/1">EP/P02226X/1</a>.
+  <br/>
+  Development of CIL is supported by the <a href="https://adalovelacecentre.ac.uk">Ada Lovelace Centre</a>.
   <br/>
 author: ccpi-devs
 url: '' # https://tomographicimaging.github.io

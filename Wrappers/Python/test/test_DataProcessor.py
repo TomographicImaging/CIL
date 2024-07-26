@@ -3103,6 +3103,12 @@ class TestFluxNormaliser(unittest.TestCase):
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
+    def test_FluxNormaliser(self):
+        processor = FluxNormaliser(flux=10)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array/10)
+
 if __name__ == "__main__":
 
     d = TestDataProcessor()

@@ -216,7 +216,7 @@ class PaganinProcessor(Processor):
         self._set_geometry(data.geometry, self.override_geometry)
 
         if out is None:
-            out = data.copy()
+            out = data.geometry.allocate(None)
 
         # make slice indices to get the projection
         slice_proj = [slice(None)]*len(data.shape)

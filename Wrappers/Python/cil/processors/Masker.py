@@ -84,15 +84,6 @@ class Masker(DataProcessor):
         processor = Masker(mode='interpolate', mask=mask, axis=axis, method=method)
 
         return processor
-    
-    @staticmethod
-    def nearest_neighbours(mask=None):
-        r'''Mean of nearest neighbours which aren't bad pixels
-        '''
-
-        processor = Masker(mode='nearest_neighbours', mask=mask)
-
-        return processor
 
     def __init__(self,
                  mask = None,
@@ -138,7 +129,7 @@ class Masker(DataProcessor):
             raise Exception("Mask and Data must have the same dimension labels." + 
                             "{} != {}".format(self.mask.dimension_labels, data.dimension_labels))
 
-        if self.mode not in ['value', 'mean', 'median', 'interpolate', 'nearest_neighbours']:
+        if self.mode not in ['value', 'mean', 'median', 'interpolate']:
             raise Exception("Wrong mode. One of the following is expected:\n" + 
                             "value, mean, median, interpolate")
     
@@ -254,47 +245,10 @@ class Masker(DataProcessor):
                                             kind=self.method)
                     tmp[mask_invert[idx]] = f(numpy.where(mask_arr[idx] == False)[0])
                     arr[idx] = tmp
-
-        elif self.mode == 'nearest_neighbours':
-            # Replace masked pixels with mean of unmasked neighbours, starting
-            # with masked pixels with unmasked neighbours and iterating.
-
-            # Coordinates of all masked pixels:
-            masked_pixels = numpy.transpose((mask_invert).nonzero())
-
-            # Stores coordinates of all bad pixels and whether they have been corrected:
-            masked_pixels_status = {}
-            for coords in masked_pixels:
-                masked_pixels_status[tuple(coords)] = False
-
-            # Loop through masked pixel coordinates until all have been corrected:
-            while not all (masked_pixels_status.values()):
-                for coords, corrected in masked_pixels_status.items():
-                    if not corrected: 
-                        # Get all neighbours
-                        neighbours = []
-                        for i in range(len(coords)):
-                            if coords[i] > 0:
-                                current_coords = list(coords).copy()
-                                current_coords[i] -= 1
-                                neighbours.append(tuple(current_coords))
-                            if coords[i] < mask_arr.shape[i]-1:
-                                current_coords = list(coords).copy()
-                                current_coords[i] += 1
-                                neighbours.append(tuple(current_coords))
-                        # Save coords of unmasked neighbours:
-                        unmasked_neighbours = []
-                        for neighbour in neighbours:
-                            if not mask_invert[neighbour]:
-                                unmasked_neighbours.append(neighbour)
-                        # Set pixel to mean of unmasked neighbours if there are any:
-                        if len(unmasked_neighbours) > 0:
-                            arr[coords] = numpy.mean([arr[neighbour] for neighbour in unmasked_neighbours])
-                            masked_pixels_status[coords] = True
         
         else:
             raise ValueError('Mode is not recognised. One of the following is expected: ' + 
-                              'value, mean, median, interpolate, nearest_neighbours')
+                              'value, mean, median, interpolate')
         
         out.fill(arr)
 

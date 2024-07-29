@@ -2504,60 +2504,39 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
 class TestMasker(unittest.TestCase):       
 
     def setUp(self):
-        IG_2D = ImageGeometry(voxel_num_x=10,
+        IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
-        IG_3D = ImageGeometry(voxel_num_x=5, 
-                            voxel_num_y=5,
-                            voxel_num_z=5)
         
-        self.data_2D_init = IG_2D.allocate('random')
-        self.data_3D_init = IG_3D.allocate('random')
-
-        self.data_2D = self.data_2D_init.copy()
-        self.data_3D = self.data_3D_init.copy()
-
-        self.mask_coords_2D = [(2,3), (4,5)]
-        self.mask_coords_3D = [(2,3,1), (3,1,2)]
+        self.data_init = IG.allocate('random')
         
-        self.data_2D.as_array()[self.mask_coords_2D[0]] = float('inf')
-        self.data_2D.as_array()[self.mask_coords_2D[1]] = float('nan')
-
-        self.data_3D.as_array()[self.mask_coords_3D[0]] = float('inf')
-        self.data_3D.as_array()[self.mask_coords_3D[1]] = float('nan')
+        self.data = self.data_init.copy()
         
-        mask_2D_manual = numpy.ones((10,10), dtype=bool)
-        mask_2D_manual[self.mask_coords_2D[0]] = 0
-        mask_2D_manual[self.mask_coords_2D[1]] = 0
-
-        mask_3D_manual = numpy.ones((5,5,5), dtype=bool)
-        mask_3D_manual[self.mask_coords_3D[0]] = 0
-        mask_3D_manual[self.mask_coords_3D[1]] = 0
+        self.data.as_array()[2,3] = float('inf')
+        self.data.as_array()[4,5] = float('nan')
         
-        self.mask_2D_manual = DataContainer(mask_2D_manual, dimension_labels=self.data_2D.dimension_labels) 
-        self.mask_2D_generated = MaskGenerator.special_values()(self.data_2D)
-
-        self.mask_3D_manual = DataContainer(mask_3D_manual, dimension_labels=self.data_3D.dimension_labels)
-        self.mask_3D_generated = MaskGenerator.special_values()(self.data_3D)
+        mask_manual = numpy.ones((10,10), dtype=bool)
+        mask_manual[2,3] = 0
+        mask_manual[4,5] = 0
+        
+        self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
+        self.mask_generated = MaskGenerator.special_values()(self.data)
 
     def test_Masker_Manual(self):
-        self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
-        self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
+        self.Masker_check(self.mask_manual, self.data, self.data_init)
 
     def test_Masker_generated(self):
-        self.Masker_check(self.mask_2D_generated, self.data_2D, self.data_2D_init, self.mask_coords_2D)
-        self.Masker_check(self.mask_3D_generated, self.data_3D, self.data_3D_init, self.mask_coords_3D)
+        self.Masker_check(self.mask_generated, self.data, self.data_init)
 
-    def Masker_check(self, mask, data, data_init, mask_coords): 
+    def Masker_check(self, mask, data, data_init): 
 
-        # test value mode
+        # test vaue mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()
         
         data_test = data.copy().as_array()
-
-        for mask_coord in mask_coords:
-            data_test[mask_coord] = 10
+        data_test[2,3] = 10
+        data_test[4,5] = 10
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)     
         
@@ -2567,12 +2546,12 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        tmp = numpy.sum(data_init.as_array())-numpy.sum([data_init.as_array()[i] for i in mask_coords])
-        tmp /= (data_init.size - len(mask_coords))
-        for mask_coord in mask_coords:
-            data_test[mask_coord] = tmp
-
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='mean mode failed')  
+        tmp = numpy.sum(data_init.as_array())-(data_init.as_array()[2,3]+data_init.as_array()[4,5])
+        tmp /= 98
+        data_test[2,3] = tmp
+        data_test[4,5] = tmp
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test median mode
         m = Masker.median(mask=mask)
@@ -2581,11 +2560,10 @@ class TestMasker(unittest.TestCase):
         
         data_test = data.copy().as_array()
         tmp = data.as_array()[numpy.isfinite(data.as_array())]
-        for mask_coord in mask_coords:
-            data_test[mask_coord] = numpy.median(tmp)
+        data_test[2,3] = numpy.median(tmp)
+        data_test[4,5] = numpy.median(tmp)
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='median mode failed')
-
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
         
         # test axis int
         m = Masker.median(mask=mask, axis=0)
@@ -2593,19 +2571,12 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-
-        for mask_coord in mask_coords:
-            # get elements in mask_coord:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                tmp = data.as_array()[x, :][numpy.isfinite(data.as_array()[x, :])]
-            else:
-                x, y, z = mask_coord
-                tmp = data.as_array()[x,:,:][numpy.isfinite(data.as_array()[x,:,:])]
-            
-            data_test[mask_coord] = numpy.median(tmp)
+        tmp1 = data.as_array()[2,:][numpy.isfinite(data.as_array()[2,:])]
+        tmp2 = data.as_array()[4,:][numpy.isfinite(data.as_array()[4,:])]
+        data_test[2,3] = numpy.median(tmp1)
+        data_test[4,5] = numpy.median(tmp2)
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='median along integer axis failed') 
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
         # test axis str
         m = Masker.mean(mask=mask, axis=data.dimension_labels[1])
@@ -2613,17 +2584,12 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        for mask_coord in mask_coords:
-            # get elements in mask_coord:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                tmp = data.as_array()[:,y][numpy.isfinite(data.as_array()[:,y])]
-            else:
-                x, y, z = mask_coord
-                tmp = data.as_array()[:,y,:][numpy.isfinite(data.as_array()[:,y,:])]
-            data_test[mask_coord] = numpy.sum(tmp) / len(tmp)
+        tmp1 = data.as_array()[:,3][numpy.isfinite(data.as_array()[:,3])]
+        tmp2 = data.as_array()[:,5][numpy.isfinite(data.as_array()[:,5])]
+        data_test[2,3] = numpy.sum(tmp1) / 9
+        data_test[4,5] = numpy.sum(tmp2) / 9
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='mean along string axis failed')
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
         
         # test inline
         data = data_init.copy()
@@ -2632,10 +2598,10 @@ class TestMasker(unittest.TestCase):
         m.process(out=data)
         
         data_test = data_init.copy().as_array()
-        for mask_coord in mask_coords:
-            data_test[mask_coord] = 10
+        data_test[2,3] = 10
+        data_test[4,5] = 10
         
-        numpy.testing.assert_allclose(data.as_array(), data_test, rtol=1E-6, err_msg='inline failed') 
+        numpy.testing.assert_allclose(data.as_array(), data_test, rtol=1E-6) 
         
         # test mask numpy 
         data = data_init.copy()
@@ -2644,52 +2610,25 @@ class TestMasker(unittest.TestCase):
         res = m.process()
         
         data_test = data.copy().as_array()
-        for mask_coord in mask_coords:
-            data_test[mask_coord] = 10
+        data_test[2,3] = 10
+        data_test[4,5] = 10
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='failed with numpy mask')  
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test interpolate
         data = data_init.copy()
-        m = Masker.interpolate(mask=mask, method='linear', axis=0)
+        m = Masker.interpolate(mask=mask, method='linear', axis='horizontal_y')
         m.set_input(data)
         res = m.process()
         
         data_test = data.copy().as_array()
-
-        for mask_coord in mask_coords:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                data_test[mask_coord] = (data_test[x-1, y] + data_test[x+1, y]) / 2
-            else:
-                x, y, z = mask_coord
-                data_test[mask_coord] = (data_test[x-1, y, z] + data_test[x+1, y, z]) / 2
-        
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6, err_msg='interpolate along integer axis failed')
-
-        # test nearest neighbours
-
-        m = Masker.nearest_neighbours(mask=mask)
-        m.set_input(data)
-        res = m.process()
-        
-        data_test = data.copy().as_array()
-        for mask_coord in mask_coords:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                print(mask_coord)
-                print(type(mask_coord))
-                print(type(x))
-
-                data_test[mask_coord] = numpy.mean([data_test[x-1, y], data_test[x+1, y], data_test[x, y-1], data_test[x, y+1]])
-            elif len(mask_coord) ==3:
-                x, y, z = mask_coord
-                data_test[mask_coord] = numpy.mean([data_test[x-1, y, z], data_test[x+1, y, z], data_test[x, y-1, z], data_test[x, y+1, z], data_test[x, y, z-1], data_test[x, y, z+1]]) 
-            # data_test[2,3] = numpy.mean([data_test[1,3], data_test[3,3], data_test[2,2], data_test[2,4]])
-            # data_test[4,5] = numpy.mean([data_test[3,5], data_test[5,5], data_test[4,4], data_test[4,6]])
+        data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
+        data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        
 
+        
 if __name__ == "__main__":
     
     d = TestDataProcessor()

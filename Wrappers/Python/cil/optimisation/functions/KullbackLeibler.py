@@ -355,7 +355,7 @@ if has_numba:
             else:
                 # out.flat[i] = numpy.inf
                 return numpy.inf
-        return numpy.sum(accumulator)
+        return sum(accumulator)
     
     @njit(parallel=True)
     def kl_div_mask(x, y, eta, mask):
@@ -373,7 +373,7 @@ if has_numba:
                 else:
                     # out.flat[i] = numpy.inf
                     return numpy.inf
-        return numpy.sum(accumulator)
+        return sum(accumulator)
 
     # convex conjugate
     @njit(parallel=True)
@@ -389,7 +389,7 @@ if has_numba:
                     accumulator[get_thread_id()] += X * numpy.log(Y)
                 # else xlogy is 0 so it doesn't add to the accumulator
                 accumulator[get_thread_id()] += eta.flat[i] * x_f
-        return - (numpy.sum(accumulator))
+        return - sum(accumulator)
     
     @njit(parallel=True)
     def kl_convex_conjugate_mask(x, b, eta, mask):
@@ -405,7 +405,7 @@ if has_numba:
                         accumulator[get_thread_id()] += X * numpy.log(Y)
                     # else xlogy is 0 so it doesn't add to the accumulator
                     accumulator[get_thread_id()] += eta.flat[i] * x_f
-        return - (numpy.sum(accumulator))
+        return -sum(accumulator)
 
 
 class KullbackLeibler_numba(KullbackLeibler):

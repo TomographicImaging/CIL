@@ -232,191 +232,120 @@ if has_numba:
 
     @njit(parallel=True)
     def kl_proximal(x,b, tau, out, eta):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
         for i in prange(x.size):
-            X = xx[i]
-            E = ee[i]
-            oo[i] = 0.5 *  (
+            X = x.flat[i]
+            E = eta.flat[i]
+            out.flat[i] = 0.5 *  (
                 ( X - E - tau ) +\
                 numpy.sqrt( (X + E - tau)**2. + \
-                    (4. * tau * bb[i])
+                    (4. * tau * b.flat[i])
                 )
             )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_arr(x,b, tau, out, eta):
-        tt = tau.ravel()
-        xx = x.ravel()
-        ee = eta.ravel()
-        oo = out.ravel()
-        bb = b.ravel()
         for i in prange(x.size):
-            t = tt.flat[i]
-            X = xx.flat[i]
-            E = ee.flat[i]
-            oo[i] = 0.5 *  (
+            t = tau.flat[i]
+            X = x.flat[i]
+            E = eta.flat[i]
+            out.flat[i] = 0.5 *  (
                 ( X - E - t ) +\
                 numpy.sqrt( (X + E - t)**2. + \
-                    (4. * t * bb[i])
+                    (4. * t * b.flat[i])
                 )
             )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_mask(x,b, tau, out, eta, mask):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
         for i in prange(x.size):
             if mask.flat[i] > 0:
-                X = xx[i]
-                E = ee[i]
-                oo[i] = 0.5 *  (
+                X = x.flat[i]
+                E = eta.flat[i]
+                out.flat[i] = 0.5 *  (
                     ( X - E - tau ) +\
                     numpy.sqrt( (X + E - tau)**2. + \
-                        (4. * tau * bb[i])
+                        (4. * tau * b.flat[i])
                     )
                 )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_arr_mask(x,b, tau, out, eta, mask):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
-        tt = tau.ravel()
-        mm = mask.ravel()
         for i in prange(x.size):
-            if mm[i] > 0:
-                t = tt[i]
-                X = xx[i]
-                E = ee[i]
-                oo[i] = 0.5 *  (
+            if mask.flat[i] > 0:
+                t = tau.flat[i]
+                X = x.flat[i]
+                E = eta.flat[i]
+                out.flat[i] = 0.5 *  (
                     ( X - E - t ) +\
                     numpy.sqrt( (X + E - t)**2. + \
-                        (4. * t * bb[i])
+                        (4. * t * b.flat[i])
                     )
                 )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     # proximal conjugate
     @njit(parallel=True)
     def kl_proximal_conjugate_arr(x, b, eta, tau, out):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
-        tt = tau.ravel()
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         for i in prange(x.size):
-            t = tt[i]
-            z = xx[i] + ( t * ee[i] )
-            oo[i] = 0.5 * (
-                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * bb[i])
+            t = tau.flat[i]
+            z = x.flat[i] + ( t * eta.flat[i] )
+            out.flat[i] = 0.5 * (
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                 )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         for i in prange(x.size):
-            z = xx[i] + ( tau * ee[i] )
-            oo[i] = 0.5 * (
-                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * bb[i])
+            z = x.flat[i] + ( tau * eta.flat[i] )
+            out.flat[i] = 0.5 * (
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                 )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate_arr_mask(x, b, eta, tau, out, mask):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
-        tt = tau.ravel()
-        mm = mask.ravel()
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         for i in prange(x.size):
-            if mm[i] > 0:
-                t = tt[i]
-                z = xx[i] + ( t * ee[i] )
-                oo[i] = 0.5 * (
-                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * bb[i])
+            if mask.flat[i] > 0:
+                t = tau.flat[i]
+                z = x.flat[i] + ( t * eta.flat[i] )
+                out.flat[i] = 0.5 * (
+                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
                     )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     @njit(parallel=True)
     def kl_proximal_conjugate_mask(x, b, eta, tau, out, mask):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
-        mm = mask.ravel()
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         for i in prange(x.size):
-            if mm[i] > 0:
-                z = xx[i] + ( tau * ee[i] )
-                oo[i] = 0.5 * (
-                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * bb[i])
+            if mask.flat[i] > 0:
+                z = x.flat[i] + ( tau * eta.flat[i] )
+                out.flat[i] = 0.5 * (
+                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                     )
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
 
     # gradient
     @njit(parallel=True)
     def kl_gradient(x, b, out, eta):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
         for i in prange(x.size):
-            oo[i] = 1 - bb[i]/(xx[i] + ee[i])
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
-
+            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
+        
     @njit(parallel=True)
     def kl_gradient_mask(x, b, out, eta, mask):
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        oo = out.ravel()
-        mm = mask.ravel()
         for i in prange(x.size):
-            if mm[i] > 0:
-                oo[i] = 1 - bb[i]/(xx[i] + ee[i])
-        if out.ctypes.data != oo.ctypes.data:
-            out[:] = oo
-
+            if mask.flat[i] > 0:
+                out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
+        
     # KL divergence
     @njit(parallel=True)
     def kl_div(x, y, eta):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        xx = x.ravel()
-        ee = eta.ravel()
-        yy = y.ravel()
         for i in prange(x.size):
-            X = xx[i]
-            Y = yy[i] + ee[i]
+            X = x.flat[i]
+            Y = y.flat[i] + eta.flat[i]
             if X > 0 and Y > 0:
                 # out.flat[i] = X * numpy.log(X/Y) - X + Y
                 accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
@@ -431,14 +360,10 @@ if has_numba:
     @njit(parallel=True)
     def kl_div_mask(x, y, eta, mask):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        xx = x.ravel()
-        ee = eta.ravel()
-        yy = y.ravel()
-        mm = mask.ravel()
         for i in prange(x.size):
-            if mm[i] > 0:
-                X = xx[i]
-                Y = yy[i] + ee[i]
+            if mask.flat[i] > 0:
+                X = x.flat[i]
+                Y = y.flat[i] + eta.flat[i]
                 if X > 0 and Y > 0:
                     # out.flat[i] = X * numpy.log(X/Y) - X + Y
                     accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
@@ -454,41 +379,32 @@ if has_numba:
     @njit(parallel=True)
     def kl_convex_conjugate(x, b, eta):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
         for i in prange(x.size):
-            X = bb[i]
-            x_f = xx[i]
+            X = b.flat[i]
+            x_f = x.flat[i]
             Y = 1 - x_f
             if Y > 0:
                 if X > 0:
                     # out.flat[i] = X * numpy.log(X/Y) - X + Y
                     accumulator[get_thread_id()] += X * numpy.log(Y)
                 # else xlogy is 0 so it doesn't add to the accumulator
-                accumulator[get_thread_id()] += ee[i] * x_f
+                accumulator[get_thread_id()] += eta.flat[i] * x_f
         return - (numpy.sum(accumulator))
     
     @njit(parallel=True)
     def kl_convex_conjugate_mask(x, b, eta, mask):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        xx = x.ravel()
-        ee = eta.ravel()
-        bb = b.ravel()
-        mm = mask.ravel()
-        j = 0
         for i in prange(x.size):
-            if mm[i] > 0:
-                j+=1
-                X = bb[i]
-                x_f = xx[i]
+            if mask.flat[i] > 0:
+                X = b.flat[i]
+                x_f = x.flat[i]
                 Y = 1 - x_f
                 if Y > 0:
                     if X > 0:
                         # out.flat[i] = X * numpy.log(X/Y) - X + Y
                         accumulator[get_thread_id()] += X * numpy.log(Y)
                     # else xlogy is 0 so it doesn't add to the accumulator
-                    accumulator[get_thread_id()] += ee[i] * x_f
+                    accumulator[get_thread_id()] += eta.flat[i] * x_f
         return - (numpy.sum(accumulator))
 
 

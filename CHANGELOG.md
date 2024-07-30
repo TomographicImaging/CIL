@@ -1,4 +1,4 @@
-* 24.x.x    
+* 24.x.x
   - New Features:
     - Added SAG and SAGA stochastic functions (#1624) 
   - Enhancements:

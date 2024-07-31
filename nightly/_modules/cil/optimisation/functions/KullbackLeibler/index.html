@@ -17,24 +17,24 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=0e73b54361af21f738ff" rel="stylesheet" />
-<link href="../../../../../_static/styles/bootstrap.css?digest=0e73b54361af21f738ff" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=0e73b54361af21f738ff" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+<link href="../../../../../_static/styles/bootstrap.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
 
   
-  <link href="../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=0e73b54361af21f738ff" rel="stylesheet" />
+  <link href="../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=4cb0e87c476518279630" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=0e73b54361af21f738ff" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=0e73b54361af21f738ff" />
-  <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=0e73b54361af21f738ff"></script>
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630" />
+  <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=4cb0e87c476518279630"></script>
 
     <script src="../../../../../_static/documentation_options.js?v=16008877"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
@@ -78,9 +78,8 @@
           id="pst-secondary-sidebar-checkbox"/>
   <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../../../search/"
       method="get">
@@ -88,7 +87,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -96,8 +94,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -382,7 +380,6 @@ document.write(`
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -508,7 +505,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.errors</span> <span class="kn">import</span> <span class="n">InPlaceError</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+    <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span><span class="p">,</span> <span class="n">get_thread_id</span><span class="p">,</span> <span class="n">get_num_threads</span>
     <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
     <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">False</span>
@@ -729,6 +726,7 @@ document.write(`
                     <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -741,6 +739,7 @@ document.write(`
                     <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_proximal_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -753,6 +752,7 @@ document.write(`
                         <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
+
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_proximal_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -766,6 +766,7 @@ document.write(`
                         <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
+
     <span class="c1"># proximal conjugate</span>
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
@@ -810,56 +811,59 @@ document.write(`
                 <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
                     <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="p">)</span>
+
     <span class="c1"># gradient</span>
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_gradient_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
+        
     <span class="c1"># KL divergence</span>
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_div</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
-                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+                <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
             <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># out.flat[i] = Y</span>
-                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">Y</span>
+                <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">Y</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># out.flat[i] = numpy.inf</span>
                 <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
-        <span class="k">return</span> <span class="n">accumulator</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
+    
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_div_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
-                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+                    <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
                 <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># out.flat[i] = Y</span>
-                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">Y</span>
+                    <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">Y</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># out.flat[i] = numpy.inf</span>
                     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
-        <span class="k">return</span> <span class="n">accumulator</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
 
     <span class="c1"># convex conjugate</span>
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
-        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="n">X</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">x_f</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -867,27 +871,26 @@ document.write(`
             <span class="k">if</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
-                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+                    <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
                 <span class="c1"># else xlogy is 0 so it doesn&#39;t add to the accumulator</span>
-                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
-        <span class="k">return</span> <span class="o">-</span> <span class="n">accumulator</span>
+                <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
+        <span class="k">return</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
+    
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_convex_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span>
                 <span class="n">X</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">x_f</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">Y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x_f</span>
                 <span class="k">if</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
-                        <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+                        <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
                     <span class="c1"># else xlogy is 0 so it doesn&#39;t add to the accumulator</span>
-                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
-        <span class="k">return</span> <span class="o">-</span> <span class="n">accumulator</span>
+                    <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
+        <span class="k">return</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">KullbackLeibler_numba</span><span class="p">(</span><span class="n">KullbackLeibler</span><span class="p">):</span>
@@ -1025,8 +1028,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../../_static/scripts/bootstrap.js?digest=0e73b54361af21f738ff"></script>
-<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=0e73b54361af21f738ff"></script>
+  <script src="../../../../../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630"></script>
+<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

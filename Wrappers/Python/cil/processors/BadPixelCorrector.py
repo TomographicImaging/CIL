@@ -284,6 +284,24 @@ corrected_data = bad_pixel_corrector(ad)
 
 
 
+#%%
+print("This example shows that the method still corrects all of the pixels even if some of the starting masked pixels begin with no unmasked neighbours:")
+print("Input:")
+print(ad.as_array())
+a = np.array([[0,0,1.,1.], [0.,0.,2.,2.], [4.,3.,0.,0.], [4.,3.,0.,0.]])
+mask = np.array([[False,False,True,True], [False, False, True, True], [True, True, False, False], [True, True, False, False]])
+
+ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([4,4]).set_angles([0])
+ad = AcquisitionData(array=a, geometry=ag)
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+
+
+
+
 
 
 
@@ -308,22 +326,6 @@ print("Input:")
 print(ad.as_array())
 # print("Result: ")
 # print(corrected_data.array)
-
-
-#%%
-print("This example shows that the method still corrects all of the pixels even if some of the starting masked pixels begin with no unmasked neighbours:")
-print("Input:")
-print(ad.as_array())
-a = np.array([[0,0,1.,1.], [0.,0.,2.,2.], [4.,3.,0.,0.], [4.,3.,0.,0.]])
-mask = np.array([[False,False,True,True], [False, False, True, True], [True, True, False, False], [True, True, False, False]])
-
-ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([4,4]).set_angles([0])
-ad = AcquisitionData(array=a, geometry=ag)
-
-# Create a BadPixelCorrector processor
-bad_pixel_corrector = BadPixelCorrector(mask)
-# Apply the processor to the data
-corrected_data = bad_pixel_corrector(ad)
 
 
 

@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageGeometry
 import numpy
 import numpy as np
 from PIL import Image
@@ -24,10 +24,9 @@ import os
 import os.path
 import sys
 from zipfile import ZipFile
-from urllib.request import urlopen
-from io import BytesIO
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
+from zenodo_get import zenodo_get
 
 class DATA(object):
     @classmethod
@@ -45,18 +44,12 @@ class CILDATA(DATA):
 class REMOTEDATA(DATA):
     
     FOLDER = ''
-    URL = ''
-    FILE_SIZE = ''
+    ZENODO_RECORD = ''
+    ZIP_FILE = ''
 
     @classmethod
     def get(cls, data_dir):
         return None
-
-    @classmethod
-    def _download_and_extract_from_url(cls, data_dir):
-        with urlopen(cls.URL) as response:
-            with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                zipfile.extractall(path = data_dir) 
 
     @classmethod
     def download_data(cls, data_dir):
@@ -70,14 +63,20 @@ class REMOTEDATA(DATA):
 
         '''
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
-            print("Dataset already exists in " + data_dir)
+            print("Dataset folder already exists in " + data_dir)
         else:
-            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y": 
-                print('Downloading dataset from ' + cls.URL) 
-                cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
-                print('Download complete')
+            # get user confirmation for download
+            if input("Are you sure you want to download {} dataset from Zenodo record {} ? (y/n)").format(cls.ZIP_FILE, cls.ZENODO_RECORD) == "y": 
+                zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
+
+                # unzip file
+                with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
+                    zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
+                os.remove(os.path.join(data_dir, cls.ZIP_FILE))
+
             else:
                 print('Download cancelled')
+                return
 
 class BOAT(CILDATA):
     @classmethod
@@ -196,8 +195,8 @@ class WALNUT(REMOTEDATA):
     A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
     '''
     FOLDER = 'walnut'
-    URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
-    FILE_SIZE = '6.4 GB'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'walnut.zip'
 
     @classmethod
     def get(cls, data_dir):
@@ -228,8 +227,8 @@ class USB(REMOTEDATA):
     A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
     '''
     FOLDER = 'USB' 
-    URL = 'https://zenodo.org/record/4822516/files/usb.zip'
-    FILE_SIZE = '3.2 GB'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'usb.zip'
 
     @classmethod
     def get(cls, data_dir):
@@ -260,8 +259,8 @@ class KORN(REMOTEDATA):
     A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
     '''
     FOLDER = 'korn'
-    URL = 'https://zenodo.org/record/6874123/files/korn.zip'
-    FILE_SIZE = '2.9 GB'
+    ZENODO_RECORD = '6874123'
+    ZIP_FILE = 'korn.zip'
 
     @classmethod
     def get(cls, data_dir):
@@ -294,8 +293,31 @@ class SANDSTONE(REMOTEDATA):
     A small subset of the data containing selected projections and 4 slices of the reconstruction
     '''
     FOLDER = 'sandstone'
-    URL = 'https://zenodo.org/records/4912435/files/small.zip'
-    FILE_SIZE = '227 MB'
+    ZENODO_RECORD = '4912435'
+    ZIP_FILE = 'small.zip'
+
+    def get(cls, data_dir, filename):
+        '''
+        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+        This function can be used to return selected projections or slices of the reconstruction
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)
+
+        file: str
+            The slices or projections to return, specify the path to the file within the data_dir
+
+        Returns
+        -------
+        ImageData
+            The selected sandstone dataset
+        '''
+        extension = os.path.splitext(filename)[1]
+        if extension == '.mat':
+            return loadmat(os.path.join(data_dir,filename))
+        
 
 class TestData(object):
     '''Class to return test data

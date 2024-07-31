@@ -87,6 +87,7 @@ requirements:
     - ipp >=2021.10
     - tqdm
     - numba
+    - zenodo_get >1.5.1
 
   #optional packages with version dependancies
   run_constrained:

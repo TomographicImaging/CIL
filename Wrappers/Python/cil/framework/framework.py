@@ -3935,17 +3935,24 @@ class Processor(object):
         DataContainer
             The processed data
         """
+        self.check_output(out)
         if self.output is None or self.shouldRun:
             out = self.process(out=out)
-
             if self.store_output:
                 self.output = out.copy()
-
             return out
-
         else:
-            return self.output.copy()
-
+            if out is not None:
+                out.fill(self.output)
+                return out
+        return self.output.copy()
+    
+    def check_output(self, out):
+        data = self.get_input()
+        if out is not None:
+            if data.array.dtype != out.array.dtype:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, data.array.dtype))
 
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):

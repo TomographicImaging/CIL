@@ -255,7 +255,7 @@ class PaganinProcessor(Processor):
         scaling_factor = -(1/self.mu)
 
         # allocate padded buffer
-        padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_proj.shape))
+        padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_proj.shape), dtype=data.dtype)
         
         # make slice indices to unpad the data
         if self.pad>0:
@@ -264,6 +264,7 @@ class PaganinProcessor(Processor):
         else:
             slice_pad = tuple([slice(None)]*len(padded_buffer.shape))
         # loop over the channels
+        mag2 = self.magnification**2
         for j in range(data.geometry.channels):
             if channel_axis is not None:
                 slice_proj[channel_axis] = j
@@ -271,25 +272,28 @@ class PaganinProcessor(Processor):
             for i in tqdm(range(len(data.geometry.angles))):
                 
                 slice_proj[angle_axis] = i
+                padded_buffer.fill(0)
                 padded_buffer[slice_pad] = data.array[(tuple(slice_proj))]
                 
                 if self.full_retrieval==True:
                     # apply the filter in fourier space, apply log and scale 
                     # by magnification
-                    fI = fft2(self.magnification**2*padded_buffer)
-                    iffI = ifft2(fI*self.filter)
+                    padded_buffer*=mag2
+                    fI = fft2(padded_buffer)
+                    iffI = ifft2(fI*self.filter).real
+                    np.log(iffI, out=padded_buffer)
                     # apply scaling factor
-                    padded_buffer = scaling_factor*np.log(iffI)
+                    np.multiply(scaling_factor, padded_buffer, out=padded_buffer)
                 else:
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)
-                    padded_buffer = ifft2(fI*self.filter)
+                    padded_buffer[:] = ifft2(fI*self.filter).real
+
                 if data.geometry.channels>1:
                     out.fill(padded_buffer[slice_pad], angle = i, 
                              channel=j)
                 else:
-                    x = padded_buffer[slice_pad]
-                    out.fill(x, angle = i)
+                    out.fill(padded_buffer[slice_pad], angle = i)
                     
         data.array = np.squeeze(data.array)
         out.array = np.squeeze(out.array)

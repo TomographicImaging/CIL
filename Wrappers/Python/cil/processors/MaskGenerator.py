@@ -197,6 +197,13 @@ class MaskGenerator(DataProcessor):
                                 "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
         return True
+    
+    def check_output(self, out):
+        if out is not None:
+            if out.array.dtype != bool:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, bool))
+
 
     def process(self, out=None):
 

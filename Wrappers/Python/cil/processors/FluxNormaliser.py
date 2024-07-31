@@ -18,7 +18,11 @@
 
 from cil.framework import Processor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
+from cil.utilities.display import show2D
 import numpy
+import logging
+
+log = logging.getLogger(__name__)
 
 class FluxNormaliser(Processor):
     '''Flux normalisation based on float or region of interest
@@ -35,13 +39,44 @@ class FluxNormaliser(Processor):
     def __init__(self, flux=None, roi=None, tolerance=1e-5):
             kwargs = {
                     'flux'  : flux,
-                    'roi'  : roi,
+                    'roi' : roi,
+                    'roi_slice' : None,
                     # very small number. Used when there is a division by zero
                     'tolerance'   : tolerance
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
     def check_input(self, dataset):
+        
+        if not issubclass(type(dataset), DataContainer):
+            raise TypeError("Expected DataContainer or subclass, found {}"
+                            .format(type(dataset)))
+        if self.roi is not None:
+            if self.flux is not None:
+                raise ValueError("Please specify either flux or roi, not both")
+            else:
+                if isinstance(self.roi,dict):
+                    slc = [slice(None)]*len(data.shape)
+                    axes=[]
+                    for r in self.roi:
+                        if (r == 'horizontal' or r == 'vertical') and (r in data.dimension_labels):
+                            if not all(isinstance(i, int) for i in self.roi[r]):
+                                raise ValueError("roi values must be int, found {}"
+                                .format(str(type(self.roi[r]))))
+                            else:
+                                ax = data.get_dimension_axis(r)
+                                slc[ax] = slice(self.roi[r][0],self.roi[r][1])
+                                axes.append(ax)
+                        else:
+                            raise ValueError("roi must be 'horizontal' or 'vertical', and in data.dimension_labels, found {}"
+                            .format(str(r)))
+
+                    self.flux = np.mean(data.array[tuple(slc)],axis=tuple(axes))
+
+                else:
+                    raise TypeError("roi must be a dictionary, found {}"
+                    .format(str(type(self.roi))))
+
         flux_size = (numpy.shape(self.flux))
         if len(flux_size) > 0:
             data_size = numpy.shape(dataset.geometry.angles)
@@ -52,8 +87,44 @@ class FluxNormaliser(Processor):
             
         return True
 
-    def process(self, out=None):
+    def show_roi(self, angle='range'):
+        if angle=='range':
+            plot_slice_roi_angle(angle=0, ax=231)
+            plot_slice_roi_angle(angle=len(data.geometry.angles)//2, ax=232)
+            plot_slice_roi_angle(angle=len(data.geometry.angles)-1, ax=233)
 
+            plt.subplot(212)
+            plt.plot(self.flux)
+            plt.xlabel('Angle index')
+            plt.ylabel('Mean intensity in roi')
+
+        else:
+            data = self.get_input()
+            plt.imshow(data.array[1,:,:], cmap='gray')
+            plt.plot([0,120],[0,120],'--k')
+
+    def plot_slice_roi_angle(angle, ax):
+        data_slice = data.get_slice(angle=angle)
+        plt.subplot(ax)
+        plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower')
+
+        h = data_slice.dimension_labels[0]
+        v = data_slice.dimension_labels[1]
+        plt.plot([self.roi[h][0],self.roi[h][0]], [self.roi[v][0],self.roi[v][1]],'--r')
+        plt.plot([self.roi[h][1],self.roi[h][1]], [self.roi[v][0],self.roi[v][1]],'--r')
+
+        plt.plot([self.roi[h][0],self.roi[h][1]], [self.roi[v][0],self.roi[v][0]],'--r')
+        plt.plot([self.roi[h][0],self.roi[h][1]], [self.roi[v][1],self.roi[v][1]],'--r')
+
+        plt.xlabel(h)
+        plt.ylabel(v)
+        plt.title('Angle = ' + str(angle))
+
+        
+
+
+    def process(self, out=None):
+        
         data = self.get_input()
 
         if out is None:

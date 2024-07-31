@@ -1,5 +1,5 @@
-#  Copyright 2019 United Kingdom Research and Innovation
-#  Copyright 2019 The University of Manchester
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,4 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-theme: jekyll-theme-slate
+
+from .sampler import Sampler
+from .sampler import SamplerRandom
+from .StepSizeMethods import ConstantStepSize, ArmijoStepSizeRule, StepSizeRule
+from .preconditioner import  Preconditioner, AdaptiveSensitivity, Sensitivity

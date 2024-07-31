@@ -33,13 +33,13 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy # [ linux ]
+    - cvxpy                   # [ linux ]
     - scikit-image
-    - tomophantom=2.0.0 # [ linux ]
-    - tigre=2.4 # [ not osx ]
+    - tomophantom=2.0.0       # [ linux ]
+    - tigre=2.6
     - packaging
-    - ccpi-regulariser=22.0.0 # [ not osx ]
-    - astra-toolbox>=1.9.9.dev5,<2.1
+    - ccpi-regulariser=24.0.1 # [ not osx ]
+    - astra-toolbox=2.1=cuda* # [ not osx ]
 
   source_files:
     - ./Wrappers/Python/test # [win]
@@ -57,14 +57,13 @@ requirements:
     - pip
     - setuptools
     - cmake         # [not osx]
-    - cmake >=3.16 # [osx]
+    - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]
     - libstdcxx-ng  # [linux]
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
     - cil-data
-    - ripgrep
     - ipp-include >=2021.10
     - ipp-devel >=2021.10
     - ipp >=2021.10
@@ -92,10 +91,10 @@ requirements:
   #optional packages with version dependancies
   run_constrained:
     - tomophantom=2.0.0
-    - astra-toolbox>=1.9.9.dev5,<2.1
-    - tigre=2.4
-    - ccpi-regulariser=22.0.0
-    - ipywidgets <8
+    - astra-toolbox>=1.9.9.dev5,<=2.1
+    - tigre>=2.4,<=2.6
+    - ccpi-regulariser=24.0.1
+    - ipywidgets
 
 about:
   home: http://www.ccpi.ac.uk/cil

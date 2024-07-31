@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -22,16 +21,19 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import DataContainer, ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer
+from cil.utilities.errors import InPlaceError
+from cil.framework import ImageGeometry, \
+    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
-from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
+from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation
+                                         Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity
+
 from cil.optimisation.functions import BlockFunction
 
 import numpy
@@ -50,6 +52,7 @@ import cil.utilities.multiprocessing as cilmp
 
 from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
+from numbers import Number
 
 initialise_tests()
 
@@ -88,11 +91,22 @@ class TestFunction(CCPiTestClass):
         # Compare call of g
         a2 = alpha * (d - noisy_data).power(2).sum()
 
-        self.assertEqual(a2, g(d))
+        self.assertAlmostEqual(a2, g(d))
 
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
+
+        #negative function 
+        g = - L2NormSquared(b=noisy_data)
+
+        # Compare call of g
+        a2 = -1* (d - noisy_data).power(2).sum()
+
+        self.assertAlmostEqual(a2, g(d))
+        h = -g
+        self.assertAlmostEqual(-a2, h(d))
+
 
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
@@ -413,7 +427,7 @@ class TestFunction(CCPiTestClass):
         from cil.framework import ImageGeometry
 
         tau = 1.1
-        
+
         ig = ImageGeometry(2,3,4)
         tmp = ig.allocate(1)
         a = _proximal_step_numpy(tmp, tau)
@@ -426,34 +440,34 @@ class TestFunction(CCPiTestClass):
         from cil.optimisation.functions.MixedL21Norm import _proximal_step_numpy
         from cil.framework import ImageGeometry
 
-        
+
         ig = ImageGeometry(2,3,4)
         tmp = ig.allocate(1)
         tau = ig.allocate(2)
         a = _proximal_step_numpy(tmp, tau)
-        
+
         tau *= -1
         b = _proximal_step_numpy(tmp, tau)
 
         np.testing.assert_allclose(a.as_array(), b.as_array())
-    
+
     def test_MixedL21Norm_proximal_step_numpy_ndarray(self):
         from cil.optimisation.functions.MixedL21Norm import _proximal_step_numpy
         from cil.framework import ImageGeometry
 
-        
+
         ig = ImageGeometry(2,3,4)
         tmp = ig.allocate(1)
         tau = ig.allocate(2)
         tauarr = tau.as_array()
         a = _proximal_step_numpy(tmp, tauarr)
-        
+
         tauarr *= -1
         b = _proximal_step_numpy(tmp, tauarr)
 
         np.testing.assert_allclose(a.as_array(), b.as_array())
-    
-    
+
+
     def test_smoothL21Norm(self):
         ig = ImageGeometry(4, 5)
         bg = BlockGeometry(ig, ig)
@@ -469,7 +483,7 @@ class TestFunction(CCPiTestClass):
 
         # alternative
         tmp1 = x.copy()
-        tmp1.containers += (epsilon, )
+        tmp1.containers += (ig.allocate(epsilon), )
         res3 = tmp1.pnorm(2).sum()
 
         np.testing.assert_almost_equal(res1, res2, decimal=5)
@@ -877,10 +891,10 @@ class TestFunction(CCPiTestClass):
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = func1 + 3
-        assert f3.L == 0
+        assert f3.L == 1
         f3.L = 2
         assert f3.L == 2
-        assert func1.L == 0
+        assert func1.L == 1
         with self.assertRaises(AttributeError):
             func1.L = 2
 
@@ -913,12 +927,14 @@ class TestFunction(CCPiTestClass):
             (KullbackLeibler(b=b, backend='numba'), ag),
             (KullbackLeibler(b=b, backend='numpy'), ag),
             (L1Norm(), ag),
+            (L1Norm(weight=ag.allocate(1)), ag),
             (L2NormSquared(), ag),
+            (WeightedL2NormSquared(), ag),
             (MixedL21Norm(), bg),
             (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
             (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
         ]
-        
+
         for func, geom in func_geom_test_list:
             self.proximal_conjugate_test(func, geom)
 
@@ -941,6 +957,283 @@ class TestFunction(CCPiTestClass):
                                     rtol=1e-5, atol=1e-5)
 
 
+class TestL1Norm (CCPiTestClass):
+    
+    def test_L1Norm_vs_WeightedL1Norm_noweight(self):
+        f1 = L1Norm()
+        f2 = L1Norm(weight=None)
+
+        assert f1.function.__class__.__name__ == '_L1Norm'
+        assert f2.function.__class__.__name__ == '_L1Norm'
+
+    def test_L1Norm_vs_WeightedL1Norm(self):
+        f1 = L1Norm()
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate('random', seed=1)
+
+        weights = geom.allocate(1)
+        f2 = L1Norm(weight=weights)
+
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+        f2 = L1Norm(weight=weights, b=geom.allocate(1))
+        f1 = L1Norm(b=geom.allocate(1))
+
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+        np.random.seed(1)
+        weights= geom.allocate('random').abs()
+        w = weights.abs().sum()
+        x=geom.allocate(1)
+        f1 = L1Norm()
+        f2 = L1Norm(weight=weights)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        np.testing.assert_allclose(f2(x), f1(weights))
+        
+        np.random.seed(1)
+        weights= geom.allocate('random').abs()
+        w = weights.abs().sum()
+        x=geom.allocate(2)
+        b=geom.allocate(1)
+        f1 = L1Norm(b=b)
+        f2 = L1Norm(weight=weights, b=b)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        
+
+        np.random.seed(1)
+        w = 1
+        x=geom.allocate(1+1e-7)
+        f1 = L1Norm()
+        f2 = L1Norm(weight=w)
+
+        np.testing.assert_allclose(f1(x), f2(x))
+        
+    
+        with self.assertRaises(ValueError):
+            a=3+4j
+            f2 = L1Norm(weight=a)
+
+
+        geom = ImageGeometry(N, M, dtype=np.complex64)
+        np.random.seed(1)
+        weights= geom.allocate('random').abs()
+        w = weights.abs().sum()
+        x=geom.allocate(2+3j)
+        b=geom.allocate(1+3j)
+        f1 = L1Norm(b=b)
+        f2 = L1Norm(weight=weights, b=b)
+
+        np.testing.assert_allclose(f1(x), float(N*M))
+        np.testing.assert_allclose(f2(x), w)
+        
+        x=geom.allocate(3j)
+        b=geom.allocate(2j)
+        f1 = L1Norm(b=b)
+        np.testing.assert_allclose(f1(x), M*N)
+        
+        x=geom.allocate(1+1j)
+        b=geom.allocate(1)
+        f1 = L1Norm(b=b)
+        np.testing.assert_allclose(f1(x), M*N)
+        
+        
+    def test_ZeroWeights_L1Norm(self):
+        weight = VectorData(np.array([0., 1.]))
+        tau = 0.2
+
+        x = VectorData(np.array([0., 1.]))
+        y = VectorData(np.array([1., 0.]))
+        f = L1Norm(weight=weight)
+
+        np.testing.assert_almost_equal(f(x), 1.)
+        np.testing.assert_almost_equal(f(y), 0.)
+
+        np.testing.assert_allclose(f.proximal(x, tau=tau).as_array(), 0.8*x.as_array())
+        np.testing.assert_allclose(f.proximal(y, tau=tau).as_array(), y.as_array())
+
+        np.testing.assert_almost_equal(f.convex_conjugate(x), 0.)
+        np.testing.assert_almost_equal(f.convex_conjugate(y), np.inf)
+
+    def test_L1Norm_input(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+
+        weights = geom.allocate('random').abs().as_array()
+        f2 = L1Norm(weight=weights)
+
+        w = np.abs(weights).sum()
+        x = geom.allocate(1)
+        np.testing.assert_allclose(f2(x), w)
+
+        weights = 1.5
+        self.L1Norm_input_test(x, weights)
+
+        weights = 1.5 * np.ones_like(x.as_array())
+        self.L1Norm_input_test(x, weights)
+
+        weights = geom.allocate(1.5)
+        self.L1Norm_input_test(x, weights)
+        weights=geom.allocate(-1)
+        with self.assertRaises(ValueError):
+            f2=L1Norm(weight=weights)
+
+    def L1Norm_input_test(self, x, weights):
+        f2 = L1Norm(weight=weights)
+
+        if isinstance(weights, DataContainer):
+            w = weights.as_array()
+        else:
+            w = weights
+        b = np.sum(w)
+        if isinstance(w, Number):
+            b = w * x.as_array().size
+        np.testing.assert_allclose(f2(x), b)
+        np.testing.assert_allclose(f2.convex_conjugate(x), 0)
+
+        z = f2.proximal(x, 0)
+        np.testing.assert_allclose(f2.proximal(x, 0).as_array(), x.as_array())
+        np.testing.assert_allclose(f2.proximal(x, 1).as_array(), x.geometry.allocate(0).as_array())
+
+    def test_soft_shrinkage(self):
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate(1)
+        self.soft_shrinkage_test(x)
+
+        xc = geom.allocate(1, dtype=np.complex64)
+        self.soft_shrinkage_test(xc)
+        
+
+
+
+    def soft_shrinkage_test(self, x):
+        tau = 1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.
+        with self.assertWarns(UserWarning):
+            ret = soft_shrinkage(-0.5 *x, tau)
+            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        tau = -3j
+        with self.assertRaises(ValueError):
+            ret = soft_shrinkage(-0.5 *x, tau)
+            
+        # tau np.ndarray
+        tau = 1. * np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1.* np.ones_like(x.as_array())
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+
+        # tau DataContainer
+        tau = 1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(x, tau)
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        tau = 1. * x
+        ret = soft_shrinkage(-0.5 * x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = 2. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        tau = -1. * x
+        ret = soft_shrinkage(-0.5 *x, tau)
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+
+        np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
+
+        
+
+    def test_L1_prox_init(self):
+        pass
+
+    def test_L1Sparsity(self):    
+        from cil.optimisation.operators import WaveletOperator
+        f1 = L1Norm()
+        N, M = 2,3
+        geom = ImageGeometry(N, M)
+        x = geom.allocate('random', seed=1)
+        b = geom.allocate('random', seed=2)
+        f3=L1Norm(b=b)
+        weights = geom.allocate(1)
+
+        W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
+        f2 = L1Sparsity(W, weight=weights)
+        self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b, weight=weights)
+        self.L1SparsityTest(f3, f2, x)
+
+        f2 = L1Sparsity(W)
+        self.L1SparsityTest(f1, f2, x)
+        
+        f2 = L1Sparsity(W, b=b)
+        self.L1SparsityTest(f3, f2, x)
+        
+        
+
+    def L1SparsityTest(self, f1, f2, x):
+        np.testing.assert_almost_equal(f1(x), f2(x))
+
+        tau = 1.
+
+        np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
+                                   f2.proximal(x, tau).as_array())
+        
+        np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
+
+
+
+
 class TestTotalVariation(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -954,41 +1247,38 @@ class TestTotalVariation(unittest.TestCase):
         self.alpha_arr = self.ig_real.allocate(0.15)
 
     def test_configure_tv_defaults(self):
-        self.assertEquals(self.tv.warm_start, True)
-        self.assertEquals(self.tv.iterations, 10)
-        self.assertEquals(self.tv.correlation, "Space")
-        self.assertEquals(self.tv.backend, "c")
-        self.assertEquals(self.tv.lower, -np.inf)
-        self.assertEquals(self.tv.upper, np.inf)
-        self.assertEquals(self.tv.isotropic, True)
-        self.assertEquals(self.tv.split, False)
-        self.assertEquals(self.tv.info, False)
-        self.assertEquals(self.tv.strong_convexity_constant, 0)
-        self.assertEquals(self.tv.tolerance, None)
+        self.assertEqual(self.tv.warm_start, True)
+        self.assertEqual(self.tv.iterations, 10)
+        self.assertEqual(self.tv.correlation, "Space")
+        self.assertEqual(self.tv.backend, "c")
+        self.assertEqual(self.tv.lower, -np.inf)
+        self.assertEqual(self.tv.upper, np.inf)
+        self.assertEqual(self.tv.isotropic, True)
+        self.assertEqual(self.tv.split, False)
+        self.assertEqual(self.tv.strong_convexity_constant, 0)
+        self.assertEqual(self.tv.tolerance, None)
 
     def test_configure_tv_not_defaults(self):
-        tv=TotalVariation( max_iteration=100, 
-                 tolerance = 1e-5, 
+        tv=TotalVariation( max_iteration=100,
+                 tolerance = 1e-5,
                  correlation = "SpaceChannels",
                  backend = "numpy",
                  lower = 0.,
                  upper = 1.,
                  isotropic = False,
                  split = True,
-                 info = True, 
                  strong_convexity_constant = 1.,
                  warm_start=False)
-        self.assertEquals(tv.warm_start, False) 
-        self.assertEquals(tv.iterations, 100)
-        self.assertEquals(tv.correlation, "SpaceChannels")
-        self.assertEquals(tv.backend, "numpy")
-        self.assertEquals(tv.lower, 0.)
-        self.assertEquals(tv.upper, 1.)
-        self.assertEquals(tv.isotropic, False)
-        self.assertEquals(tv.split, True)
-        self.assertEquals(tv.info, True)
-        self.assertEquals(tv.strong_convexity_constant, 1.)
-        self.assertEquals(tv.tolerance, 1e-5)
+        self.assertEqual(tv.warm_start, False)
+        self.assertEqual(tv.iterations, 100)
+        self.assertEqual(tv.correlation, "SpaceChannels")
+        self.assertEqual(tv.backend, "numpy")
+        self.assertEqual(tv.lower, 0.)
+        self.assertEqual(tv.upper, 1.)
+        self.assertEqual(tv.isotropic, False)
+        self.assertEqual(tv.split, True)
+        self.assertEqual(tv.strong_convexity_constant, 1.)
+        self.assertEqual(tv.tolerance, 1e-5)
 
 
 
@@ -1106,7 +1396,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(
-            iters, tolerance=None, lower=0, info=True, warm_start=False)
+            iters, tolerance=None, lower=0, warm_start=False)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
@@ -1186,7 +1476,7 @@ class TestTotalVariation(unittest.TestCase):
 
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=False)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=False)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
@@ -1215,9 +1505,9 @@ class TestTotalVariation(unittest.TestCase):
                                    res2.as_array(),
                                    atol=5e-2, err_msg='Comparing the CCPi proximal against the CIL TV proximal, without tolerance without warm_start')
 
-        #with warm start 
+        #with warm start
         iters=10
-        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True, warm_start=True)
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, warm_start=True)
         # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()
         for i in range(4):
@@ -1243,9 +1533,9 @@ class TestTotalVariation(unittest.TestCase):
     def test_get_p2_with_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=True, max_iteration=10)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         test=tv.proximal(data, 1.)
@@ -1254,21 +1544,21 @@ class TestTotalVariation(unittest.TestCase):
         print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
-        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal")
- 
-                
+        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
+
+
     def test_get_p2_without_warm_start(self):
         data = dataexample.SHAPES.get(size=(16, 16))
         tv=TotalVariation(warm_start=False)
-        self.assertEquals(tv._p2, None, msg="tv._p2 not initialised to None")
+        self.assertEqual(tv._p2, None, msg="tv._p2 not initialised to None")
         tv(data)
-        checkp2=tv.gradient.range_geometry().allocate(0)
+        checkp2=tv.gradient_operator.range_geometry().allocate(0)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         tv.proximal(data, 1.)
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not reset to zero after a call to proximal")
- 
+
 
 
 class TestLeastSquares(unittest.TestCase):
@@ -1677,7 +1967,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2 * mask]):
-            # logging.info("test1", val, res)
+            # log.info("test1", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1685,7 +1975,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
-            # logging.info("test1", val, res)
+            # log.info("test1", val, res)
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(

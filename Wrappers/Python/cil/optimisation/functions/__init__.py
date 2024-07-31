@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -24,7 +23,7 @@ from .Function import SumScalarFunction
 from .Function import ConstantFunction
 from .Function import ZeroFunction
 from .Function import TranslateFunction
-from .L1Norm import L1Norm, MixedL11Norm
+from .L1Norm import L1Norm, MixedL11Norm, soft_shrinkage
 from .L2NormSquared import L2NormSquared
 from .L2NormSquared import WeightedL2NormSquared
 from .LeastSquares import LeastSquares
@@ -35,3 +34,8 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
+from .L1Sparsity import L1Sparsity
+from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
+from .SGFunction import SGFunction
+from .SAGFunction import SAGFunction, SAGAFunction
+

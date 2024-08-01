@@ -1,9 +1,14 @@
-
-* XX.X.X
-
+* 24.x.x
+  - New Features:
+    - Added SAG and SAGA stochastic functions (#1624) 
+  - Enhancements:
+    - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
+  
+* 24.1.0
   - New Features:
     - Added method to plot filter in `GenericFilteredBackProjection` (#1667)
-    - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1618)
+    - Added wavelet operator, wrapping PyWavelets operator as a CIL operator (#1615)
+    - Added PaganinProcessor processor, to perform phase retrieval from phase contrast images (#1737)
     - Added L1Sparsity function, allowing calculations of `|Ax-b|_1` and its proximal, in the case of orthogonal operators, `A` (#1618)
     - Options in algorithms GD, ISTA and FISTA to pass a `cil.optimisation.utilities.StepSizeRule` or a `cil.optimisation.utilities.Preconditioner`(#1768)
     - an implementation of the Armijo Rule as a child class of  `cil.optimisation.utilities.StepSizeRule` (#1768)
@@ -13,7 +18,9 @@
     - Raises error in `BlockDataContainer.pnorm` if the shape of the containers is not the same (#1799)
     - Operators and functions now also return when out is specified (#1742)
     - The CIL function class now has a `__neg__` function, so you can write `-YourFunction(x)` rather than `-1*YourFunction(x)` (#1808)
+    - Added documentation for the Partitioner to `framework.rst` (#1828)
     - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
+    - Update to CCPi-Regularisation toolkit v24.0.1 (#1868) 
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)

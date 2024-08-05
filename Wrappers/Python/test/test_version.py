@@ -22,60 +22,28 @@ initialise_tests()
 
 class TestModuleBase(unittest.TestCase):
     def test_version(self):
-        try:
-            from cil import version
-            a = version.version
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-        try:
-            import cil
-            a = cil.__version__
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-
+        from cil import version
+        self.assertTrue(isinstance(version.version, str))
+        import cil
+        self.assertEqual(cil.__version__, version.version)
 
     def test_version_major(self):
-        try:
-            from cil import version
-            a = version.major
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-
+        from cil import version
+        self.assertTrue(isinstance(version.major, int))
 
     def test_version_minor(self):
-        try:
-            from cil import version
-            a = version.minor
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-
+        from cil import version
+        self.assertTrue(isinstance(version.minor, int))
 
     def test_version_patch(self):
-        try:
-            from cil import version
-            a = version.patch
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-
+        from cil import version
+        self.assertTrue(isinstance(version.patch, int))
 
     def test_version_num_commit(self):
-        try:
-            from cil import version
-            a = version.num_commit
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
-
+        from cil import version
+        self.assertTrue(isinstance(version.num_commit, int))
 
     def test_version_commit_hash(self):
-        try:
-            from cil import version
-            a = version.commit_hash
-            self.assertTrue(isinstance(a, str))
-        except ImportError as ie:
-            self.assertFalse(True, str(ie))
+        from cil import version
+        self.assertTrue(isinstance(version.commit_hash, str))
+        self.assertEqual(version.commit_hash[0], 'g')

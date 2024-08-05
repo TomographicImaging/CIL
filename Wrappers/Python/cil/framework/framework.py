@@ -4028,6 +4028,9 @@ class AX(DataProcessor):
     def check_input(self, dataset):
         return True
 
+    def check_output(self, dataset):
+        return True
+
     def process(self, out=None):
 
         dsi = self.get_input()
@@ -4064,6 +4067,9 @@ class CastDataContainer(DataProcessor):
         super(CastDataContainer, self).__init__(**kwargs)
 
     def check_input(self, dataset):
+        return True
+    
+    def check_output(self, dataset):
         return True
 
     def process(self, out=None):

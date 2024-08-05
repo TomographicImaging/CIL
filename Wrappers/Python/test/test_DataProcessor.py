@@ -1651,8 +1651,9 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
-class TestPaddder(unittest.TestCase):
 
+class TestPadder(unittest.TestCase):
+    
     def setUp(self):
 
         self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1]).set_channels(4)

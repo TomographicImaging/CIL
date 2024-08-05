@@ -21,6 +21,8 @@ from cil.framework import Processor, DataContainer, AcquisitionData,\
 from cil.utilities.display import show2D
 import numpy
 import logging
+import matplotlib.pyplot as plt
+from scipy import stats
 
 log = logging.getLogger(__name__)
 
@@ -51,31 +53,58 @@ class FluxNormaliser(Processor):
         if not issubclass(type(dataset), DataContainer):
             raise TypeError("Expected DataContainer or subclass, found {}"
                             .format(type(dataset)))
+
         if self.roi is not None:
             if self.flux is not None:
                 raise ValueError("Please specify either flux or roi, not both")
+
             else:
                 if isinstance(self.roi,dict):
-                    slc = [slice(None)]*len(data.shape)
-                    axes=[]
-                    for r in self.roi:
-                        if (r == 'horizontal' or r == 'vertical') and (r in data.dimension_labels):
-                            if not all(isinstance(i, int) for i in self.roi[r]):
-                                raise ValueError("roi values must be int, found {}"
-                                .format(str(type(self.roi[r]))))
-                            else:
-                                ax = data.get_dimension_axis(r)
-                                slc[ax] = slice(self.roi[r][0],self.roi[r][1])
-                                axes.append(ax)
-                        else:
-                            raise ValueError("roi must be 'horizontal' or 'vertical', and in data.dimension_labels, found {}"
-                            .format(str(r)))
+                    if not all (r in dataset.dimension_labels for r in self.roi):
+                        raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
+                                        .format(str(self.roi)))
 
-                    self.flux = np.mean(data.array[tuple(slc)],axis=tuple(axes))
+                    slc = [slice(None)]*len(dataset.shape)
+                    axes=[]
+                    roi_list = list(dataset.dimension_labels)
+                    
+                    # loop through all dimensions in the dataset apart from angle
+                    roi_list.remove('angle')
+                    for r in roi_list:
+                        # check the dimension is in the user specified roi
+                        if r in self.roi:
+                            # only allow horizontal and vertical roi
+                            if (r == 'horizontal' or r == 'vertical'):
+                                # check indices are ints
+                                if not all(isinstance(i, int) for i in self.roi[r]):
+                                    raise TypeError("roi values must be int, found {} and {}"
+                                    .format(str(type(self.roi[r][0])), str(type(self.roi[r][1]))))
+                                # check indices are in range
+                                elif (self.roi[r][0] >= self.roi[r][1]) or (self.roi[r][0] < 0) or self.roi[r][1] > dataset.get_dimension_size(r):
+                                    raise ValueError("roi values must be start > stop and between 0 and {}, found start={} and stop={} for direction '{}'"
+                                    .format(str(dataset.get_dimension_size(r)), str(self.roi[r][0]), str(self.roi[r][1]), r ))
+                                # create slice
+                                else:
+                                    ax = dataset.get_dimension_axis(r)
+                                    slc[ax] = slice(self.roi[r][0], self.roi[r][1])
+                                    axes.append(ax)
+                            else:
+                                raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
+                                .format(str(r)))
+                        # if the dimension is not in roi, average across the whole dimension
+                        else:
+                            ax = dataset.get_dimension_axis(r)
+                            axes.append(ax)
+                            self.roi.update({r:(0,dataset.get_dimension_size(r))})
+
+                    self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
 
                 else:
                     raise TypeError("roi must be a dictionary, found {}"
                     .format(str(type(self.roi))))
+        else:
+            if self.flux is None:
+                raise ValueError("Please specify flux or roi")
 
         flux_size = (numpy.shape(self.flux))
         if len(flux_size) > 0:
@@ -87,41 +116,46 @@ class FluxNormaliser(Processor):
             
         return True
 
-    def show_roi(self, angle='range'):
-        if angle=='range':
-            plot_slice_roi_angle(angle=0, ax=231)
-            plot_slice_roi_angle(angle=len(data.geometry.angles)//2, ax=232)
-            plot_slice_roi_angle(angle=len(data.geometry.angles)-1, ax=233)
+    def show_roi(self, angle_index='range'):
+        if angle_index=='range':
+            data = self.get_input()
+            max_zscore = numpy.argmax(numpy.abs(stats.zscore(self.flux)))
+            self._plot_slice_roi_angle(angle_index=0, ax=231)
+            self._plot_slice_roi_angle(angle_index=max_zscore, ax=232)
+            self._plot_slice_roi_angle(angle_index=len(data.geometry.angles)-1, ax=233)
 
             plt.subplot(212)
             plt.plot(self.flux)
+            plt.plot(max_zscore, self.flux[max_zscore],'rx')
+        
+            plt.legend(['Mean intensity in roi','Max Z-score'])
             plt.xlabel('Angle index')
             plt.ylabel('Mean intensity in roi')
+            plt.tight_layout()
+
+        elif isinstance(angle_index, int):
+            self._plot_slice_roi_angle(angle_index=angle_index)
 
         else:
-            data = self.get_input()
-            plt.imshow(data.array[1,:,:], cmap='gray')
-            plt.plot([0,120],[0,120],'--k')
+            raise TypeError("angle must be an int or 'range'")
 
-    def plot_slice_roi_angle(angle, ax):
-        data_slice = data.get_slice(angle=angle)
+    def _plot_slice_roi_angle(self, angle_index, ax=111):
+        data = self.get_input()
+        data_slice = data.get_slice(angle=angle_index)
         plt.subplot(ax)
         plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower')
 
         h = data_slice.dimension_labels[0]
         v = data_slice.dimension_labels[1]
-        plt.plot([self.roi[h][0],self.roi[h][0]], [self.roi[v][0],self.roi[v][1]],'--r')
-        plt.plot([self.roi[h][1],self.roi[h][1]], [self.roi[v][0],self.roi[v][1]],'--r')
+        plt.plot([self.roi[v][0],self.roi[v][0]], [self.roi[h][0],self.roi[h][1]],'--r')
+        plt.plot([self.roi[v][1],self.roi[v][1]], [self.roi[h][0],self.roi[h][1]],'--r')
 
-        plt.plot([self.roi[h][0],self.roi[h][1]], [self.roi[v][0],self.roi[v][0]],'--r')
-        plt.plot([self.roi[h][0],self.roi[h][1]], [self.roi[v][1],self.roi[v][1]],'--r')
+        plt.plot([self.roi[v][0],self.roi[v][1]], [self.roi[h][0],self.roi[h][0]],'--r')
+        plt.plot([self.roi[v][0],self.roi[v][1]], [self.roi[h][1],self.roi[h][1]],'--r')
 
-        plt.xlabel(h)
-        plt.ylabel(v)
-        plt.title('Angle = ' + str(angle))
-
-        
-
+        plt.xlabel(v)
+        plt.ylabel(h)
+        plt.title('Angle index = ' + str(angle_index))
 
     def process(self, out=None):
         

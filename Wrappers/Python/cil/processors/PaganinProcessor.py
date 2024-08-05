@@ -200,6 +200,9 @@ class PaganinProcessor(Processor):
     def check_input(self, data):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
+        
+        if data.dtype!=np.float32:
+            raise TypeError('Processor only support dtype=float32')
     
         return True
         

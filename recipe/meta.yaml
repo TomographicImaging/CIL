@@ -55,7 +55,8 @@ requirements:
     - python
     - numpy {{ numpy }}
     - pip
-    - setuptools
+    - setuptools >=64
+    - setuptools_scm >=8
     - cmake         # [not osx]
     - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]
@@ -97,6 +98,6 @@ requirements:
     - ipywidgets
 
 about:
-  home: http://www.ccpi.ac.uk/cil
+  home: https://ccpi.ac.uk/cil
   license:  Apache 2.0 License
   summary: 'CCPi Core Imaging Library'

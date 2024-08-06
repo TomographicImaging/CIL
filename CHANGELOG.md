@@ -5,6 +5,8 @@
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+  - Bug fixes:
+      - `DataContainer` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
 
 * 24.1.0
   - New Features:

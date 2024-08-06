@@ -2772,9 +2772,9 @@ class DataContainer(object):
 
         if type(array) == numpy.ndarray:
             if deep_copy:
-                self.array = array.copy()
+                self.array = numpy.squeeze(array.copy())
             else:
-                self.array = array
+                self.array = numpy.squeeze(array)
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
@@ -3645,7 +3645,7 @@ class ImageData(DataContainer):
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
-        if array.shape != geometry.shape:
+        if numpy.squeeze(array).shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
 
         if array.ndim not in [2,3,4]:
@@ -3814,7 +3814,7 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
-        if array.shape != geometry.shape:
+        if numpy.squeeze(array).shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)

@@ -1024,6 +1024,10 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         assert cp0.geometry == cp1.geometry
 
+        cp1 = BlockDataContainer(data2,data2)
+
+        assert cp0 != cp1
+
         cp1 = BlockDataContainer(data2,data2,data2)
 
         assert cp0 != cp1
@@ -1034,7 +1038,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
         data0 = ig0.allocate(0)
         
         from cil.framework import DataContainer
-        X, Y, Z = 1, 12, 5
+        X, Y, Z = 2, 12, 5
         
         a = numpy.ones((X, Y, Z), dtype='float32')
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])

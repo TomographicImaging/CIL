@@ -2920,7 +2920,7 @@ class DataContainer(object):
             return
         if dimension == {}:
             if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
+                if numpy.squeeze(array).shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting shape {0} got {1}'.format(
                                      self.shape,array.shape))

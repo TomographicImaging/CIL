@@ -76,3 +76,9 @@ class CCPiTestClass(unittest.TestCase):
                     self.assertDataArraysInContainerAllClose(container1.get_item(col),container2.get_item(col), rtol=rtol,  msg=msg)
         else:
             np.testing.assert_allclose(container1.as_array(), container2.as_array(), rtol=rtol, err_msg=msg)
+
+    def assertDataContainerAllClose(self, container1, container2, rtol=1e-07, msg=None, strict=False):
+        np.testing.assert_allclose(container1.as_array(), container2.as_array(), rtol=rtol, err_msg=msg)
+        np.testing.assert_equal(container1.geometry, container2.geometry, err_msg=msg)
+        if strict:
+            np.testing.assert_equal(container1.dtype, container2.dtype, err_msg=msg)

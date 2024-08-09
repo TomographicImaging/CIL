@@ -116,7 +116,12 @@ class Normaliser(Processor):
         elif projections.number_of_dimensions == 2:
             a = Normaliser.Normalise_projection(projections.as_array(),
                                                 flat, dark, self.tolerance)
-        y = type(projections)( a , True,
-                    dimension_labels=projections.dimension_labels,
-                    geometry=projections.geometry)
-        return y
+        
+        if out is None:
+            out = type(projections)( a , True,
+                        dimension_labels=projections.dimension_labels,
+                        geometry=projections.geometry)
+        else:
+            out.fill(a)
+        
+        return out

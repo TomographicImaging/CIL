@@ -666,3 +666,4 @@ class Padder(DataProcessor):
                     raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, new_geometry))
 
             out.array = self._process_data(data)
+            return out

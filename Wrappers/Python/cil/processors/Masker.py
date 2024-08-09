@@ -171,12 +171,11 @@ class Masker(DataProcessor):
 
         data = self.get_input()
 
-        return_arr = False
         if out is None:
             out = data.copy()
             arr = out.as_array()
-            return_arr = True
         else:
+            out.fill(data.as_array())
             arr = out.as_array()
 
         #assumes mask has 'as_array' method, i.e. is a DataContainer or is a numpy array
@@ -283,5 +282,4 @@ class Masker(DataProcessor):
 
         out.fill(arr)
 
-        if return_arr is True:
-            return out
+        return out

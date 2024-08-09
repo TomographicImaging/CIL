@@ -181,3 +181,4 @@ class CofR_xcorrelation(Processor):
             return AcquisitionData(array = data_full, deep_copy = True, geometry = new_geometry, supress_warning=True)
         else:
             out.geometry = new_geometry
+            return out

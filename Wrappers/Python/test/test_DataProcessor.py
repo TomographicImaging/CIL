@@ -30,7 +30,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
 
 from scipy import constants
@@ -179,6 +179,11 @@ class TestBinner(unittest.TestCase):
         horizontal_x = range(0,4,4)
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        
+        # check init non-default values
+        proc = Binner(roi=roi,accelerated=False)
+        self.assertTrue(proc._accelerated==False)
+        
         proc = Binner(roi,accelerated=True)
         proc._set_up_processor(data)
 
@@ -3072,7 +3077,92 @@ class TestPaganinProcessor(unittest.TestCase):
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
         # 'horizontal, vertical, angles
+
+class TestFluxNormaliser(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel([128,128],0.1)\
+            .set_channels(4)
+
+        self.data_multichannel = ag.allocate('random')
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_init(self):
+        # test default values are initialised
+        processor = FluxNormaliser()
+        test_parameter = ['flux','roi','tolerance']
+        test_value = [None, None, 1e-5]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = FluxNormaliser(1,2,3)
+        test_value = [1, 2, 3]
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+    def test_check_input(self):
         
+        # check there is an error if no flux or roi is specified
+        processor = FluxNormaliser()
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_cone)
+
+        # check there is an error if no flux array size is not equal to the number of angles in data
+        processor = FluxNormaliser(flux = [1,2,3])
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_cone)
+        
+        # check there is an error if roi is not specified as a dictionary
+        processor = FluxNormaliser(roi='string')
+        with self.assertRaises(TypeError):
+            processor.check_input(self.data_cone)
+
+        # check there is an error if roi is specified with float values
+        processor = FluxNormaliser(roi={'horizontal':(1.5, 6.5)})
+        with self.assertRaises(TypeError):
+            processor.check_input(self.data_cone)
+
+        # check there is an error if roi stop is greater than start
+        processor = FluxNormaliser(roi={'horizontal':(10, 5)})
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_cone)
+
+        # check there is an error if roi stop is greater than the size of the axis
+        processor = FluxNormaliser(roi={'horizontal':(0, self.data_cone.get_dimension_size('horizontal')+1)})
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_cone)
+
+    def test_FluxNormaliser(self):
+        processor = FluxNormaliser(flux=10)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array/10)
+        
+        processor = FluxNormaliser(flux=10*numpy.ones(self.data_cone.get_dimension_size('angle')))
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array/10)
+
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+
+        roi = {'vertical':(0,2)}
+        processor = FluxNormaliser(roi=roi)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+
 if __name__ == "__main__":
 
     d = TestDataProcessor()

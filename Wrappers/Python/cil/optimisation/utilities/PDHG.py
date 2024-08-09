@@ -1,10 +1,10 @@
 # set up TGV
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L2NormSquared
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L2NormSquared, ScaledFunction
 from cil.optimisation.operators import BlockOperator, IdentityOperator, GradientOperator, \
     SymmetrisedGradientOperator, ZeroOperator
 
 def setup_explicit_TGV(A, data, alpha, delta=1.0, omega=1):
-    '''Function to setup LS + TGV problem with explicit PDHG
+    '''Function to setup LS + TGV problem for use with explicit PDHG
 
     Parameters
     ----------
@@ -31,7 +31,7 @@ def setup_explicit_TGV(A, data, alpha, delta=1.0, omega=1):
     beta = alpha * delta
     f1 = L2NormSquared(b=data)
     if omega != 1:
-        f1 = omega * L2NormSquared(b=data)
+        f1 = omega * f1
     f2 = MixedL21Norm()
     f3 = MixedL21Norm() 
     F = BlockFunction(f1, f2, f3)         
@@ -56,7 +56,7 @@ def setup_explicit_TGV(A, data, alpha, delta=1.0, omega=1):
 
 
 def setup_explicit_TV(A, data, alpha, omega=1):
-    '''Function to setup LS + TV problem with explicit PDHG
+    '''Function to setup LS + TV problem for use with explicit PDHG
 
     Parameters
     ----------
@@ -78,7 +78,7 @@ def setup_explicit_TV(A, data, alpha, omega=1):
 
     f1 = L2NormSquared(b=data)
     if omega != 1:
-        f1 = omega * L2NormSquared(b=data)
+        f1 = omega * f1
     f2 = MixedL21Norm()
     F = BlockFunction(f1, f2)         
 

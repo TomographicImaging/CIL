@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "Wrappers/Python/cil/version.py"
+version_file_template = """
+version = '{version}'
+major = {version_tuple[0]}
+minor = {version_tuple[1]}
+patch = {version_tuple[2]}
+commit_hash = '{scm_version.node}'
+num_commit = {scm_version.distance}
+# work-around for https://github.com/pypa/setuptools_scm/issues/1059
+if (commit_hash, num_commit) == ('None', 0):
+    import re
+    if (_v := re.search(r'\\.dev(\\d+)\\+(\\w+)', version)):
+        num_commit, commit_hash = int(_v.group(1)), _v.group(2)
+"""
+
+[tool.setuptools]
+package-dir = {"" = "Wrappers/Python"}
+
+[tool.setuptools.packages.find]
+where = ["Wrappers/Python"]
+include = ["cil", "cil.*"]
+exclude = ["data", "test"]
+
+[project.urls]
+#homepage = "https://ccpi.ac.uk/cil"
+homepage = "https://tomographicimaging.github.io/CIL"
+documentation = "https://tomographicimaging.github.io/CIL/nightly"
+repository = "https://github.com/TomographicImaging/CIL"
+changelog = "https://github.com/TomographicImaging/CIL/blob/master/CHANGELOG.md"
+
+[project]
+name = "cil"
+dynamic = ["version"]
+description = "Core Imaging Library"
+license = {text = "Apache-2.0"}
+maintainers = [{name="CIL developers", email="tomography+cil@stfc.ac.uk"}]
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = ["tomography", "optimisation"]

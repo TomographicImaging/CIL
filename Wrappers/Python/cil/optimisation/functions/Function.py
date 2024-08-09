@@ -82,7 +82,7 @@ class Function(object):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`. 
+        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`.
 
         """
         raise NotImplementedError
@@ -177,11 +177,11 @@ class Function(object):
 
     def __mul__(self, scalar):
         return self.__rmul__(scalar)
-    
+
     def __neg__(self):
         """ Return the negative of the function """
         return -1 * self
-    
+
 
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.
@@ -257,8 +257,8 @@ class SumFunction(Function):
     def __init__(self, *functions):
 
         super(SumFunction, self).__init__()
-        if len(functions) < 2:
-            raise ValueError('At least 2 functions need to be passed')
+        if not len(functions):
+            raise IndexError('At least 1 function needed')
         self.functions = functions
 
     @property
@@ -480,7 +480,7 @@ class ScaledFunction(Function):
 
         Returns
         -------
-        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x`. 
+        DataContainer, the value of the gradient of the scaled function evaluated at :math:`x`.
 
         """
         res = self.function.gradient(x, out=out)
@@ -597,7 +597,7 @@ class SumScalarFunction(SumFunction):
 
         Returns
         -------
-        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau`. 
+        DataContainer, the evaluation of the proximal operator evaluated at :math:`x` and :math:`\tau`.
 
         """
         return self.function.proximal(x, tau, out=out)

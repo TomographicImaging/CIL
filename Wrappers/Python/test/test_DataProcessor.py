@@ -30,7 +30,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor
 import gc
 
 from scipy import constants

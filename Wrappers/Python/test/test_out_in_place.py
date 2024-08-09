@@ -353,9 +353,10 @@ class TestProcessorOutandInPlace(CCPiTestClass):
     
     def out_check(self, processor, data, data_array_index, *args):
         """
-        Tests to check the processor gives the same result using the out argument
-        Also check the out argument doesn't change the orginal data
-        and that the processor still returns correctly with the out argument
+        - Test to check the processor gives the same result using the out argument
+        - Check the out argument doesn't change the orginal data
+        - Check the processor still returns correctly with the out argument
+        - Check the processor returns an error if the dtype of out is different to expected
         """
         data_copy=data.copy() #To check that data isn't changed after function calls
         try:
@@ -365,10 +366,22 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             out2.fill(0)
             out3 = processor.get_output(out=out2)
 
+            # check the processor gives the same result using the out argument
             self.assertDataContainerAllClose(out1, out2, rtol=1e-10, strict=True)
+            # check the out argument doesn't change the orginal data
             self.assertDataContainerAllClose(data_copy, data, rtol=1e-10, strict=True)
+            # check the processor still returns correctly with the out argument
             self.assertEqual(id(out2), id(out3))
-            
+            # check the processor returns an error if the dtype of out is different to expected
+            out_wrong_type = out1.copy()
+            out_wrong_type.array = numpy.array(out_wrong_type.array, dtype=bool)
+            # if the processor does return a different out type, put an exception here
+            if isinstance(processor, MaskGenerator):
+                processor.get_output(out=out_wrong_type)
+            else:
+                with self.assertRaises(TypeError):
+                    processor.get_output(out=out_wrong_type)
+
         except NotImplementedError:
             self.fail("out_test test not implemented for  " + processor.__class__.__name__)
         except Exception as e:

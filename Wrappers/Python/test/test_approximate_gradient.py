@@ -48,7 +48,6 @@ if has_cvxpy:
     import cvxpy
 
 
-
 class TestApproximateGradientSumFunction(CCPiTestClass):
 
     def setUp(self):

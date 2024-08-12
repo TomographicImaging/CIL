@@ -1,6 +1,5 @@
 * 24.x.x
   - New Features:
-    - Added SAG and SAGA stochastic functions (#1624) 
     - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)

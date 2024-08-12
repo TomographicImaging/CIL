@@ -37,7 +37,7 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
     .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})
 
     where there are :math:`n` functions. This function class has two ways of calling gradient
-
+    
         - `full_gradient` calculates the gradient of the sum :math:`\sum_{i=0}^{n-1} \nabla f_{i}`
         - `gradient` calls an `approximate_gradient` function which may be less computationally expensive to calculate than the full gradient
     

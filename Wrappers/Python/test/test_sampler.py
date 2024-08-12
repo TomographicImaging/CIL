@@ -118,6 +118,7 @@ class TestSamplers(CCPiTestClass):
 
         self.assertEqual(sampler.get_samples(
             550)[519], self.example_function(519))
+
         sampler = Sampler.from_function(50, self.example_function)
         self.assertListEqual(sampler.prob_weights, [1/50] * 50)
         self.assertEqual(sampler.num_indices, 50)

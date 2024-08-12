@@ -71,11 +71,11 @@ if test -n "$cil_ver"; then
 fi
 
 if test $test_deps = 0; then
-  conda_args+=(-c conda-forge -c intel -c defaults --override-channels)
+  conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda -c defaults --override-channels)
 else
   conda_args+=(
-    astra-toolbox'>=1.9.9.dev5,<2.1'
-    ccpi-regulariser=22.0.0
+    astra-toolbox=2.1=cuda*
+    ccpi-regulariser=24.0.1
     cil-data
     cvxpy
     ipywidgets
@@ -83,10 +83,10 @@ else
     python-wget
     setuptools
     scikit-image
-    tigre=2.4
+    tigre=2.6
     tomophantom=2.0.0
     -c conda-forge
-    -c intel
+    -c https://software.repos.intel.com/python/conda
     -c ccpi/label/dev
     -c ccpi
     --override-channels

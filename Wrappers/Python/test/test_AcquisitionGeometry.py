@@ -702,7 +702,8 @@ class Test_Parallel2D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel2D()
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [None, None, 1])
+        detector_position = np.array(AG.config.system.detector.position)
+        self.assertEqual(out, [None, float(np.sqrt(detector_position.dot(detector_position))), 1])
 
     def test_calculate_centre_of_rotation(self):
         AG = AcquisitionGeometry.create_Parallel2D()
@@ -856,7 +857,8 @@ class Test_Parallel3D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel3D()
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [None, None, 1])
+        detector_position = np.array(AG.config.system.detector.position)
+        self.assertEqual(out, [None, float(np.sqrt(detector_position.dot(detector_position))), 1])
 
     def test_calculate_centre_of_rotation(self):
 

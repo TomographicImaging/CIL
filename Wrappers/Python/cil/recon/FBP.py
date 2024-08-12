@@ -24,6 +24,7 @@ from scipy.fft import fftfreq
 import numpy as np
 import ctypes
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -154,6 +155,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def preset_filters(self):
         return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
 
+
     def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
         Set the filter used by the reconstruction.
@@ -252,7 +254,31 @@ class GenericFilteredBackProjection(Reconstructor):
         elif self._filter == 'hann':
             filter_array = ramp * (0.5 + 0.5 * np.cos(freq*np.pi))
 
-        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order)
+        return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order) 
+        
+    
+    def plot_filter(self):
+        """
+        Returns a plot of the filter array.
+        
+        Returns
+        -------
+        matplotlib.pyplot
+            A plot of the filter
+        """
+        filter_array = self.get_filter_array()
+        filter_length = 2**self.fft_order
+        freq = fftfreq(filter_length)
+        freq *= 2
+        ind_sorted = np.argsort(freq)
+        plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
+        plt.xlabel('Frequency (rads/pixel)')
+        plt.ylabel('Magnitude')
+        theta = np.linspace(-1, 1, 9, True)
+        plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/4', 'π'])
+        plt.legend()
+        return plt
+
 
     def _calculate_weights(self):
         return NotImplementedError

@@ -226,7 +226,6 @@ class Gradient_numpy(LinearOperator):
             self.voxel_size_order = list(domain_geometry.spacing)
         except:
             self.voxel_size_order = [1]*len(domain_geometry.shape)
-
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry,
                                              range_geometry = range_geometry)
 
@@ -238,6 +237,7 @@ class Gradient_numpy(LinearOperator):
                  self.FD.direction = axis_index
                  self.FD.voxel_size = self.voxel_size_order[axis_index]
                  self.FD.direct(x, out = out[i])
+             return out
          else:
              tmp = self.range_geometry().allocate()
              for i, axis_index in enumerate(self.ind):
@@ -258,6 +258,7 @@ class Gradient_numpy(LinearOperator):
                     out.fill(tmp)
                 else:
                     out += tmp
+            return out 
         else:
             tmp = self.domain_geometry().allocate()
             for i, axis_index in enumerate(self.ind):
@@ -389,10 +390,8 @@ class Gradient_C(LinearOperator):
         ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
 
-        return_val = False
         if out is None:
             out = self.range_geometry().allocate(None)
-            return_val = True
 
         if self.split is False:
             ndout = [el.as_array() for el in out.containers]
@@ -425,15 +424,11 @@ class Gradient_C(LinearOperator):
                     out.get_item(1).get_item(j).fill(ndout[i])
                     j +=1
 
-        if return_val is True:
-            return out
+        return out
 
     def adjoint(self, x, out=None):
-
-        return_val = False
         if out is None:
             out = self.domain_geometry().allocate(None)
-            return_val = True
 
         ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
@@ -461,5 +456,5 @@ class Gradient_C(LinearOperator):
             if el != 1:
                 ndx[i]*= el
 
-        if return_val is True:
-            return out
+        return out
+

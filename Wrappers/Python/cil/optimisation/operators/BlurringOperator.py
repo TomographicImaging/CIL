@@ -17,8 +17,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy as np
-
-from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.optimisation.operators import LinearOperator
 import cil
 
@@ -43,25 +41,22 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
 
-        if not (isinstance(geometry, ImageGeometry) or \
-                isinstance(geometry, AcquisitionGeometry)):
-            raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
-
+ 
 
     def direct(self,x,out=None):
-
         '''Returns D(x). The forward mapping consists of convolution of the
         image with the specified PSF. Here reflective boundary conditions
         are selected.'''
 
         if out is None:
-            result = self.range_geometry().allocate()
+            result = self.range_geometry().allocate(0)
             result.fill(convolve(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
             outarr = out.as_array()
             convolve(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
+            return out
 
     def adjoint(self,x, out=None):
 
@@ -70,10 +65,11 @@ class BlurringOperator(LinearOperator):
         itself.'''
 
         if out is None:
-            result = self.domain_geometry().allocate()
+            result = self.domain_geometry().allocate(0)
             result.fill(correlate(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
             outarr = out.as_array()
             correlate(x.as_array(),self.PSF, output=outarr, mode='reflect')
             out.fill(outarr)
+            return out

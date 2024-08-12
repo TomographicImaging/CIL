@@ -151,8 +151,6 @@ Each iteration considers just one index of the sum, potentially reducing computa
    :inherited-members: run, update_objective_interval, max_iteration
 
 
-
-
 Approximate gradient methods
 ----------------------------------
 
@@ -161,6 +159,8 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
 
    .. math::
       x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
+:math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
 
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
@@ -178,9 +178,9 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
 +----------------+-------+------------+----------------+
-| SAGFunction\*  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
+| SAGFunction\  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
 +----------------+-------+------------+----------------+
-| SAGAFunction\* | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
+| SAGAFunction\ | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
 +----------------+-------+------------+----------------+
 | SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
 +----------------+-------+------------+----------------+
@@ -221,17 +221,28 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
 
    #define the sampler and the stochastic gradient function 
-   sampler = Sampler.staggered(len(list_of_functions))
+   sampler = Sampler.staggered(len(list_of_functions), stride=2)
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 
    alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
    alg.run(300)
 
+
+Note
+----
+ All the approximate gradients written in CIL are of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
+ The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets.
+ The multiplication ensures that the (SAGA, SGD, and SVRG  and LSVRG) approximate gradients are an unbiased estimator of the full gradient ie :math:`\mathbb{E}\left[\tilde\nabla f(x)\right] =\nabla f(x)``.
+  This has an implication when choosing step sizes. For example, a suitable step size for GD with a SGFunction could be 
+  :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
+
   
-
-
-
+Memory requirements
+-------------------
+Note that the approximate gradient methods have different memory requirements:
++ The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
++ `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
 
 
 Operators
@@ -300,6 +311,8 @@ Trivial operators are the following.
    :members:
 
 
+.. autoclass:: cil.optimisation.operators.ProjectionMap
+   :members:
 
 GradientOperator
 -----------------
@@ -318,7 +331,12 @@ GradientOperator
    :members:
 
 
+WaveletOperator
+---------------
+We utilise PyWavelets (https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
 
+.. autoclass:: cil.optimisation.operators.WaveletOperator
+   :members:
 
 
 
@@ -446,6 +464,14 @@ Least Squares
    :members:
    :inherited-members:
 
+
+L1 Sparsity
+----------
+.. autoclass:: cil.optimisation.functions.L1Sparsity
+   :members:
+   :inherited-members:
+
+
 Mixed L21 norm
 --------------
 
@@ -488,6 +514,21 @@ Stochastic Gradient function
 .. autoclass:: cil.optimisation.functions.SGFunction 
    :members:
    :inherited-members:
+
+SAG function
+-------------
+
+.. autoclass:: cil.optimisation.functions.SAGFunction 
+   :members:
+   :inherited-members:
+
+SAGA function
+--------------
+
+.. autoclass:: cil.optimisation.functions.SAGAFunction 
+   :members:
+   :inherited-members:
+
 
 
 Utilities
@@ -587,6 +628,44 @@ In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by
 
    Output:
     15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
+
+
+Step size methods 
+------------------
+A step size method is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA`  `cil.optimisation.algorithm.FISTA` and it's method `get_step_size` is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.StepSizeRule
+   :members:
+
+We also have a number of example classes:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ConstantStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
+   :members:
+
+
+Preconditioners
+----------------
+A preconditioner is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA` or `cil.optimisation.algorithm.FISTA` and it's method `apply` is called after the calculation of the gradient before the gradient descent step is taken. It modifies and returns a passed `gradient`. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Preconditioner
+   :members:
+
+We also have a number of already provided pre-conditioners
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Sensitivity
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.AdaptiveSensitivity
+   :members:
+
+
 
 Block Framework
 ***************

@@ -953,3 +953,86 @@ class TestAcquisitionDataPartition(unittest.TestCase):
                 k += 1
 
         assert wrong == 0
+
+class TestBlockDataContainerGeometry(BDCUnittest):
+
+    def setUp(self):
+        self.pnorm_error_msg = 'pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm'
+
+    def test_allocate(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+
+        data0 = ig0.allocate(0)
+        data2 = ig0.allocate(1)
+
+        cp0 = BlockDataContainer(data0,data2)
+
+        assert cp0.geometry == BlockGeometry(ig0, ig0)
+        assert cp0.geometry != BlockGeometry(ig0, ig1)
+        data1=ig1.allocate(0)
+        cp1 = BlockDataContainer(data0, data1)
+        bg = BlockGeometry(ig0, ig1)
+        self.assertBlockDataContainerAlmostEqual(bg.allocate(0), cp1)
+        self.assertBlockDataContainerAlmostEqual(cp1.geometry.allocate(0), cp1)
+        
+    def test_pnorm2(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+
+        data0 = ig0.allocate(0)
+        data2 = ig1.allocate(1)
+
+        cp0 = BlockDataContainer(data0,data2)
+
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
+            cp0.pnorm(2)
+
+        cp0 = BlockDataContainer(data2,data2)
+        np.testing.assert_allclose(cp0.pnorm(2).as_array(), np.sqrt(1**2 + 1**2)*data2.as_array())
+
+    def test_pnorm1(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+
+        data0 = ig0.allocate(0)
+        data2 = ig1.allocate(1)
+
+        cp0 = BlockDataContainer(data0,data2)
+
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
+            cp0.pnorm(1)
+
+        cp0 = BlockDataContainer(data2,data2)
+        np.testing.assert_allclose(cp0.pnorm(1).array, np.ones_like(data2.array)*2)
+
+
+    def test_equals(self):
+        ig0 = ImageGeometry(2,3,4)
+        
+        data0 = ig0.allocate(0)
+        data2 = ig0.allocate(1)
+
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = BlockDataContainer(data0,data2)
+
+        assert cp0.geometry == cp1.geometry
+
+        cp1 = BlockDataContainer(data2,data2,data2)
+
+        assert cp0 != cp1
+
+    def test_geometry_None(self):
+        ig0 = ImageGeometry(2,3,4)
+        
+        data0 = ig0.allocate(0)
+        
+        from cil.framework import DataContainer
+        X, Y, Z = 1, 12, 5
+        
+        a = numpy.ones((X, Y, Z), dtype='float32')
+        ds = DataContainer(a, False, ['X', 'Y', 'Z'])
+
+        cp0 = BlockDataContainer(data0,ds)
+
+        assert cp0.geometry is None

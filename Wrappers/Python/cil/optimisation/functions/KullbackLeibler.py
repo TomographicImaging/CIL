@@ -23,7 +23,7 @@ import scipy.special
 import logging
 from cil.utilities.errors import InPlaceError
 try:
-    from numba import njit, prange
+    from numba import njit, prange, get_thread_id, get_num_threads
     has_numba = True
 except ImportError as ie:
     has_numba = False
@@ -143,7 +143,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
         tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])
         return numpy.sum(tmp)
 
-    def gradient(self, x, out = None):
+    def gradient(self, x, out=None):
 
         r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.
 
@@ -152,23 +152,12 @@ class KullbackLeibler_numpy(KullbackLeibler):
         Note
         ----
         To avoid inf values, we :math:`x+\eta>0` is required.
-
         """
-
-        should_return=False
-        if out is None:
-            out = x.add(self.eta)
-            should_return=True
-        else:
-            x.add(self.eta,out=out)
-
-        arr = out.as_array()
+        ret = x.add(self.eta, out=out)
+        arr = ret.as_array()
         arr[arr>0] = 1 - self.b.as_array()[arr>0]/arr[arr>0]
-
-        out.fill(arr)
-
-        if should_return:
-            return out
+        ret.fill(arr)
+        return ret
 
     def convex_conjugate(self, x):
 
@@ -207,6 +196,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
             out.subtract(self.eta, out=out)
             out.add(x, out=out)
             out *= 0.5
+            return out
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -232,6 +222,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
             tmp += 2
             out += tmp
             out *= 0.5
+            return out
 
 ####################################
 ## KullbackLeibler numba routines ##
@@ -250,6 +241,7 @@ if has_numba:
                     (4. * tau * b.flat[i])
                 )
             )
+
     @njit(parallel=True)
     def kl_proximal_arr(x,b, tau, out, eta):
         for i in prange(x.size):
@@ -262,6 +254,7 @@ if has_numba:
                     (4. * t * b.flat[i])
                 )
             )
+
     @njit(parallel=True)
     def kl_proximal_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
@@ -274,6 +267,7 @@ if has_numba:
                         (4. * tau * b.flat[i])
                     )
                 )
+
     @njit(parallel=True)
     def kl_proximal_arr_mask(x,b, tau, out, eta, mask):
         for i in prange(x.size):
@@ -287,6 +281,7 @@ if has_numba:
                         (4. * t * b.flat[i])
                     )
                 )
+
     # proximal conjugate
     @njit(parallel=True)
     def kl_proximal_conjugate_arr(x, b, eta, tau, out):
@@ -331,56 +326,59 @@ if has_numba:
                 out.flat[i] = 0.5 * (
                     (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                     )
+
     # gradient
     @njit(parallel=True)
     def kl_gradient(x, b, out, eta):
         for i in prange(x.size):
             out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
+        
     @njit(parallel=True)
     def kl_gradient_mask(x, b, out, eta, mask):
         for i in prange(x.size):
             if mask.flat[i] > 0:
                 out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
-
+        
     # KL divergence
     @njit(parallel=True)
     def kl_div(x, y, eta):
-        accumulator = 0.
+        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
         for i in prange(x.size):
             X = x.flat[i]
             Y = y.flat[i] + eta.flat[i]
             if X > 0 and Y > 0:
                 # out.flat[i] = X * numpy.log(X/Y) - X + Y
-                accumulator += X * numpy.log(X/Y) - X + Y
+                accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
             elif X == 0 and Y >= 0:
                 # out.flat[i] = Y
-                accumulator += Y
+                accumulator[get_thread_id()] += Y
             else:
                 # out.flat[i] = numpy.inf
                 return numpy.inf
-        return accumulator
+        return sum(accumulator)
+    
     @njit(parallel=True)
     def kl_div_mask(x, y, eta, mask):
-        accumulator = 0.
+        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
         for i in prange(x.size):
             if mask.flat[i] > 0:
                 X = x.flat[i]
                 Y = y.flat[i] + eta.flat[i]
                 if X > 0 and Y > 0:
                     # out.flat[i] = X * numpy.log(X/Y) - X + Y
-                    accumulator += X * numpy.log(X/Y) - X + Y
+                    accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
                 elif X == 0 and Y >= 0:
                     # out.flat[i] = Y
-                    accumulator += Y
+                    accumulator[get_thread_id()] += Y
                 else:
                     # out.flat[i] = numpy.inf
                     return numpy.inf
-        return accumulator
+        return sum(accumulator)
 
     # convex conjugate
     @njit(parallel=True)
     def kl_convex_conjugate(x, b, eta):
-        accumulator = 0.
+        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
         for i in prange(x.size):
             X = b.flat[i]
             x_f = x.flat[i]
@@ -388,27 +386,26 @@ if has_numba:
             if Y > 0:
                 if X > 0:
                     # out.flat[i] = X * numpy.log(X/Y) - X + Y
-                    accumulator += X * numpy.log(Y)
+                    accumulator[get_thread_id()] += X * numpy.log(Y)
                 # else xlogy is 0 so it doesn't add to the accumulator
-                accumulator += eta.flat[i] * x_f
-        return - accumulator
+                accumulator[get_thread_id()] += eta.flat[i] * x_f
+        return - sum(accumulator)
+    
     @njit(parallel=True)
     def kl_convex_conjugate_mask(x, b, eta, mask):
-        accumulator = 0.
-        j = 0
+        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
         for i in prange(x.size):
             if mask.flat[i] > 0:
-                j+=1
                 X = b.flat[i]
                 x_f = x.flat[i]
                 Y = 1 - x_f
                 if Y > 0:
                     if X > 0:
                         # out.flat[i] = X * numpy.log(X/Y) - X + Y
-                        accumulator += X * numpy.log(Y)
+                        accumulator[get_thread_id()] += X * numpy.log(Y)
                     # else xlogy is 0 so it doesn't add to the accumulator
-                    accumulator += eta.flat[i] * x_f
-        return - accumulator
+                    accumulator[get_thread_id()] += eta.flat[i] * x_f
+        return -sum(accumulator)
 
 
 class KullbackLeibler_numba(KullbackLeibler):
@@ -449,10 +446,8 @@ class KullbackLeibler_numba(KullbackLeibler):
 
         """
 
-        should_return = False
         if out is None:
             out = x * 0
-            should_return = True
 
         out_np = out.as_array()
 
@@ -461,9 +456,7 @@ class KullbackLeibler_numba(KullbackLeibler):
         else:
             kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
         out.fill(out_np)
-
-        if should_return:
-            return out
+        return out        
 
     def proximal(self, x, tau, out = None):
 
@@ -472,11 +465,8 @@ class KullbackLeibler_numba(KullbackLeibler):
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
 
         """
-
-        should_return = False
         if out is None:
             out = x * 0
-            should_return = True
 
         out_np = out.as_array()
 
@@ -494,10 +484,8 @@ class KullbackLeibler_numba(KullbackLeibler):
             else:
                 kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), \
                     out_np, self.eta_np)
-
         out.fill(out_np)
-        if should_return:
-            return out
+        return out
 
 
     def proximal_conjugate(self, x, tau, out = None):
@@ -506,12 +494,8 @@ class KullbackLeibler_numba(KullbackLeibler):
 
         :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
         """
-
-        should_return = False
         if out is None:
             out = x * 0
-            should_return = True
-
         out_np = out.as_array()
 
         if isinstance(tau, Number):
@@ -528,7 +512,5 @@ class KullbackLeibler_numba(KullbackLeibler):
             else:
                 kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
                     tau.as_array(), out_np)
-
         out.fill(out_np)
-        if should_return:
-            return out
+        return out

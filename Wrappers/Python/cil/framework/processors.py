@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Joshua DM Hellier (University of Manchester) [refactorer]
-
 import numpy
 import weakref
 
@@ -32,7 +29,7 @@ def find_key(dic, val):
 class Processor(object):
 
     '''Defines a generic DataContainer processor
-                       
+
     accepts a DataContainer as input
     returns a DataContainer
     `__setattr__` allows additional attributes to be defined
@@ -51,7 +48,7 @@ class Processor(object):
 
         for key, value in attributes.items():
             self.__dict__[key] = value
-        
+
     def __setattr__(self, name, value):
         if name == 'input':
             self.set_input(value)
@@ -63,11 +60,11 @@ class Processor(object):
                 pass
             elif name == 'output':
                 self.__dict__['shouldRun'] = False
-            else:            
+            else:
                 self.__dict__['shouldRun'] = True
         else:
             raise KeyError('Attribute {0} not found'.format(name))
-    
+
     def set_input(self, dataset):
         """
         Set the input data to the processor
@@ -87,16 +84,16 @@ class Processor(object):
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}" \
                             .format(type(dataset), DataContainer))
-    
+
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
-        
+
         Should raise an Error if the DataContainer does not match expectation, e.g.
         if the expected input DataContainer is 3D and the Processor expects 2D.
         '''
         raise NotImplementedError('Implement basic checks for input DataContainer')
-        
+
     def get_output(self, out=None):
         """
         Runs the configured processor and returns the processed data
@@ -105,7 +102,7 @@ class Processor(object):
         ----------
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
@@ -117,25 +114,25 @@ class Processor(object):
             else:
                 self.process(out=out)
 
-            if self.store_output: 
+            if self.store_output:
                 self.output = out.copy()
-            
+
             return out
 
         else:
             return self.output.copy()
-            
-    
+
+
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
             self.__dict__['input'] =  weakref.ref(processor)
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataProcessor))
-        
+
     def get_input(self):
         '''returns the input DataContainer
-        
+
         It is useful in the case the user has provided a DataProcessor as
         input
         '''
@@ -146,16 +143,16 @@ class Processor(object):
         else:
             dsi = self.input()
         return dsi
-        
+
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
-    
+
     def __call__(self, x, out=None):
-        
-        self.set_input(x)    
+
+        self.set_input(x)
 
         if out is None:
-            out = self.get_output()      
+            out = self.get_output()
         else:
             self.get_output(out=out)
 
@@ -169,10 +166,10 @@ class DataProcessor(Processor):
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor
     '''
-            
+
     def check_input(self, dataset):
         '''Checks number of dimensions input DataContainer
-        
+
         Expected input is 2D or 3D
         '''
         if dataset.number_of_dimensions == 2 or \
@@ -181,7 +178,7 @@ class DataProcessor23D(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
-    
+
 ###### Example of DataProcessors
 
 class AX(DataProcessor):
@@ -195,20 +192,20 @@ class AX(DataProcessor):
 
     x a DataContainer.
     '''
-    
+
     def __init__(self):
-        kwargs = {'scalar':None, 
-                  'input':None, 
+        kwargs = {'scalar':None,
+                  'input':None,
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(AX, self).__init__(**kwargs)
-    
+
     def check_input(self, dataset):
         return True
-        
+
     def process(self, out=None):
-        
+
         dsi = self.get_input()
         a = self.scalar
         if out is None:
@@ -218,7 +215,7 @@ class AX(DataProcessor):
             return y
         else:
             out.fill(a * dsi.as_array())
-    
+
 
 ###### Example of DataProcessors
 
@@ -233,62 +230,58 @@ class CastDataContainer(DataProcessor):
 
     x a DataContainer.
     '''
-    
+
     def __init__(self, dtype=None):
-        kwargs = {'dtype':dtype, 
-                  'input':None, 
+        kwargs = {'dtype':dtype,
+                  'input':None,
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(CastDataContainer, self).__init__(**kwargs)
-    
+
     def check_input(self, dataset):
         return True
-        
+
     def process(self, out=None):
-        
+
         dsi = self.get_input()
         dtype = self.dtype
         if out is None:
             y = numpy.asarray(dsi.as_array(), dtype=dtype)
-            
+
             return type(dsi)(numpy.asarray(dsi.as_array(), dtype=dtype),
                                 dimension_labels=dsi.dimension_labels )
         else:
             out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
-    
+
 class PixelByPixelDataProcessor(DataProcessor):
     '''Example DataProcessor
-    
+
     This processor applies a python function to each pixel of the DataContainer
-    
+
     f is a python function
 
     x a DataSet.
     '''
-    
+
     def __init__(self):
-        kwargs = {'pyfunc':None, 
-                  'input':None, 
+        kwargs = {'pyfunc':None,
+                  'input':None,
                   }
         #DataProcessor.__init__(self, **kwargs)
         super(PixelByPixelDataProcessor, self).__init__(**kwargs)
-        
+
     def check_input(self, dataset):
         return True
-    
+
     def process(self, out=None):
-        
+
         pyfunc = self.pyfunc
         dsi = self.get_input()
-        
+
         eval_func = numpy.frompyfunc(pyfunc,1,1)
 
-        
+
         y = DataContainer(eval_func(dsi.as_array()), True,
                           dimension_labels=dsi.dimension_labels)
         return y
-
-
-
-        

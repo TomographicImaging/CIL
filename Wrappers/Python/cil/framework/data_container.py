@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Joshua DM Hellier (University of Manchester) [refactorer]
-# Nicholas Whyatt (UKRI-STFC) [refactorer]
 import copy
 import ctypes
 import warnings
@@ -839,19 +836,15 @@ class DataContainer(object):
         >>> y = ig.allocate(2)
         >>> out = x.sapyb(a,y,b)
         '''
-        ret_out = False
 
         if out is None:
             out = self * 0.
-            ret_out = True
 
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
                 self._axpby(a, b, y, out, out.dtype, num_threads)
-                if ret_out:
-                    return out
-                return
+                return out
             except RuntimeError as rte:
                 warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
             except TypeError as te:
@@ -865,8 +858,7 @@ class DataContainer(object):
         y.multiply(b, out=out)
         out.add(ax, out=out)
 
-        if ret_out:
-            return out
+        return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.

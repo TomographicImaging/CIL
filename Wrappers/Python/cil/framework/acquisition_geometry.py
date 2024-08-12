@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Joshua DM Hellier (University of Manchester) [refactorer]
-
 import copy
 import math
 import warnings
@@ -184,7 +181,22 @@ class Parallel2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to
+        the detector using the detector positions and the rotation axis.
+        For parallel beam geometry magnification = 1
+
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate
+            axis, [1] distance from the rotate axis to the detector,
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
 
 class Parallel3D(SystemConfiguration):
@@ -334,7 +346,22 @@ class Parallel3D(SystemConfiguration):
         return False
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to
+        the detector using the detector positions and the rotation axis.
+        For parallel beam geometry magnification = 1
+
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate
+            axis, [1] distance from the rotate axis to the detector,
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice

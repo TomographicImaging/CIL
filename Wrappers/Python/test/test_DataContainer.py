@@ -15,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import unittest
 from utils import initialise_tests
 import sys
 import numpy
@@ -812,11 +810,11 @@ class TestDataContainer(CCPiTestClass):
         self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
                  acquisition_labels["CHANNEL"]  ,
                  acquisition_labels["ANGLE"]], list(ss1.dimension_labels))
-        
+
         ss2 = dc.get_slice(vertical=0, channel=0)
         self.assertListEqual([acquisition_labels["HORIZONTAL"] ,
                  acquisition_labels["ANGLE"]], list(ss2.dimension_labels))
-        
+
         # Check we can get slice still even if force parameter is passed:
         ss3 = dc.get_slice(vertical=0, channel=0, force=True)
         self.assertListEqual([acquisition_labels["HORIZONTAL"] ,

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2024 United Kingdom Research and Innovation
-#  Copyright 2024 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Joshua DM Hellier (University of Manchester)
-
 class BaseAcquisitionGeometry:
     """This class only exists to give get_order_for_engine something to typecheck for. At some point separate interface
     stuff into here or refactor get_order_for_engine to not need it."""

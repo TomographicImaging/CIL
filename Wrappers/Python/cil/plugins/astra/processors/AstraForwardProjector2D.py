@@ -93,7 +93,7 @@ class AstraForwardProjector2D(DataProcessor):
                 raise TypeError("out type mismatch: got {0} expecting {1}"\
                             .format(out.array.dtype, data.array.dtype))
             
-            if self.volume_geometry.shape != out.shape:
+            if self.sinogram_geometry.shape != out.shape:
                 raise ValueError("out size mismatch: got {0} expecting {1}"\
                                     .format(out.shape, self._shape_out))
             

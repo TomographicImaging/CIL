@@ -25,33 +25,41 @@ log = logging.getLogger(__name__)
 
 class CGLS(Algorithm):
 
-    r'''Conjugate Gradient Least Squares algorithm
+    r'''Conjugate Gradient Least Squares (CGLS) algorithm
+    
+    The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.
 
     Problem:
 
     .. math::
 
-      \min || A x - b ||^2_2
+      \min_x || A x - b ||^2_2
+      
+      
+    Note
+    ----
+    By default, this algorithm will terminate if the value of :math:`||A^T(Ax-b)||_2 < tol*||A^T(Ax_0-b)||_2` where 'tol' is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
+    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2>1/{tol}`. 
+    
+    By setting 'tolerance' to be '0' you can prevent the algorithm stopping on either of these criteria. 
 
-    |
+    Parameters
+    ------------
+    operator : Operator
+        Linear operator for the inverse problem
+    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
+        Initial guess 
+    data : Data Container in the range of the operator 
+        Acquired data to reconstruct
+    tolerance: float, default 1e-6 
+        Tolerance/ Stopping Criterion to end CGLS algorithm.  
 
-    Parameters :
-
-      :parameter operator : Linear operator for the inverse problem
-      :parameter initial : Initial guess ( Default initial = 0)
-      :parameter data : Acquired data to reconstruct
-      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
-
-    Reference:
-        https://web.stanford.edu/group/SOL/software/cgls/
+    Reference
+    ---------
+    https://web.stanford.edu/group/SOL/software/cgls/
     '''
     def __init__(self, initial=None, operator=None, data=None, tolerance=1e-6, **kwargs):
         '''initialisation of the algorithm
-
-        :param operator : Linear operator for the inverse problem
-        :param initial : Initial guess ( Default initial = 0)
-        :param data : Acquired data to reconstruct
-        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         super(CGLS, self).__init__(**kwargs)
 
@@ -61,13 +69,19 @@ class CGLS(Algorithm):
             self.set_up(initial=initial, operator=operator, data=data, tolerance=tolerance)
 
     def set_up(self, initial, operator, data, tolerance=1e-6):
-        '''initialisation of the algorithm
-
-        :param operator: Linear operator for the inverse problem
-        :param initial: Initial guess ( Default initial = 0)
-        :param data: Acquired data to reconstruct
-        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+        r'''initialisation of the algorithm
+        Parameters
+        ------------
+        operator : Operator
+            Linear operator for the inverse problem
+        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
+            Initial guess 
+        data : Data Container in the range of the operator 
+            Acquired data to reconstruct
+        tolerance: float, default 1e-6 
+            Tolerance/ Stopping Criterion to end the CGLS algorithm
         '''
+        
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator

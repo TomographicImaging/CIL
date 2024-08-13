@@ -203,6 +203,8 @@ class MaskGenerator(DataProcessor):
             if out.array.dtype != bool:
                 raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(out.array.dtype, bool))
+        
+        return True
 
 
     def process(self, out=None):
@@ -372,7 +374,7 @@ class MaskGenerator(DataProcessor):
 
         if out is None:
             mask = numpy.asarray(mask, dtype=bool)
-            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
+            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry.copy(), suppress_warning=True, dimension_labels=data.dimension_labels)
         else:
             out.fill(mask)
         

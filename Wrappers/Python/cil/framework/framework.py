@@ -2587,7 +2587,9 @@ class AcquisitionGeometry(object):
 
     def __eq__(self, other):
 
-        if isinstance(other, self.__class__) and self.config == other.config :
+        if isinstance(other, self.__class__) \
+            and self.config == other.config \
+            and self.dtype == other.dtype:
             return True
         return False
 
@@ -3872,6 +3874,7 @@ class Processor(object):
         attributes['output'] = None
         attributes['shouldRun'] = True
         attributes['input'] = None
+        attributes['_shape_out'] = None,
 
         for key, value in attributes.items():
             self.__dict__[key] = value
@@ -3891,6 +3894,14 @@ class Processor(object):
                 self.__dict__['shouldRun'] = True
         else:
             raise KeyError('Attribute {0} not found'.format(name))
+        
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        dataset = self.get_input()
+        self._shape_out = dataset.shape
 
     def set_input(self, dataset):
         """
@@ -3901,7 +3912,6 @@ class Processor(object):
         input : DataContainer
             The input DataContainer
         """
-
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = weakref.ref(dataset)
@@ -3911,7 +3921,8 @@ class Processor(object):
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
-
+        
+        self._set_up()
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
@@ -3935,7 +3946,9 @@ class Processor(object):
         DataContainer
             The processed data
         """
-        self.check_output(out)
+        if not self.check_output(out):
+            raise ValueError('Output data not compatible with processor')
+        
         if self.output is None or self.shouldRun:
             out = self.process(out=out)
             if self.store_output:
@@ -3948,11 +3961,18 @@ class Processor(object):
         return self.output.copy()
     
     def check_output(self, out):
-        data = self.get_input()
+        
         if out is not None:
+            data = self.get_input()
             if data.array.dtype != out.array.dtype:
                 raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(out.array.dtype, data.array.dtype))
+            
+            if self._shape_out != out.shape:
+                raise ValueError("out size mismatch: got {0} expecting {1}"\
+                                 .format(out.shape, self._shape_out))
+         
+        return True
 
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):

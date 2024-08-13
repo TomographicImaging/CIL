@@ -374,13 +374,9 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             self.assertEqual(id(out2), id(out3))
             # check the processor returns an error if the dtype of out is different to expected
             out_wrong_type = out1.copy()
-            out_wrong_type.array = numpy.array(out_wrong_type.array, dtype=bool)
-            # if the processor does return a different out type, put an exception here
-            if isinstance(processor, MaskGenerator):
+            out_wrong_type.array = numpy.array(out_wrong_type.array, dtype=np.int64)
+            with self.assertRaises(TypeError):
                 processor.get_output(out=out_wrong_type)
-            else:
-                with self.assertRaises(TypeError):
-                    processor.get_output(out=out_wrong_type)
 
         except NotImplementedError:
             self.fail("out_test test not implemented for  " + processor.__class__.__name__)

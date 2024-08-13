@@ -322,9 +322,9 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         # Functionality is tested in specific implementations
         # this checks the pixel size scaling and return format for each geometry type
 
-        gold1_2D = {'offset':(0.25,'units distance'), 'angle':(0.0,'radian')}
+        gold1_2D = {'offset':(0.25,'custom units'), 'angle':(0.0,'radian')}
         gold2_2D = {'offset':(0.5,'pixels'), 'angle':(0.0,'degree')}
-        gold1_3D = {'offset':(0.25,'units distance'), 'angle':(math.pi/4,'radian')}
+        gold1_3D = {'offset':(0.25,'custom units'), 'angle':(math.pi/4,'radian')}
         gold2_3D = {'offset':(0.5,'pixels'), 'angle':(45,'degree')}
 
         #check outputs for each geometry type
@@ -363,8 +363,8 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         # Functionality is tested in specific implementations
         # this checks the pixel size scaling and return format for each geometry type
 
-        gold_2D = {'offset':(0.25,'units distance'), 'angle':(0.0,'radian')}
-        gold_3D = {'offset':(0.25,'units distance'), 'angle':(math.pi/4,'radian')}
+        gold_2D = {'offset':(0.25,'custom units'), 'angle':(0.0,'radian')}
+        gold_3D = {'offset':(0.25,'custom units'), 'angle':(math.pi/4,'radian')}
 
         #check outputs for each geometry type
         ag = AcquisitionGeometry.create_Parallel2D().set_panel(10,0.5)
@@ -414,8 +414,8 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         # Functionality is tested in specific implementations
         # this checks the pixel size scaling and return format for each geometry type
 
-        gold_2D = {'offset':(0.25,'units distance'), 'angle':(0.0,'radian')}
-        gold_3D = {'offset':(0.25,'units distance'), 'angle':(math.pi/4,'radian')}
+        gold_2D = {'offset':(0.25,'custom units'), 'angle':(0.0,'radian')}
+        gold_3D = {'offset':(0.25,'custom units'), 'angle':(math.pi/4,'radian')}
 
         #check outputs for each geometry type
         ag = AcquisitionGeometry.create_Parallel2D().set_panel(10,0.5)

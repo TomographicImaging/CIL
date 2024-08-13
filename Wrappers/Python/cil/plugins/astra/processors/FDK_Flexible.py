@@ -73,6 +73,9 @@ class FDK_Flexible(DataProcessor):
                  .format(self.sinogram_geometry.geom_type))
 
         return True
+    
+    def check_output(self, out):
+        return True
 
 
     def process(self, out=None):

@@ -86,6 +86,9 @@ class AstraForwardProjector2D(DataProcessor):
             raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
                              .format(dataset.number_of_dimensions))
 
+    def check_output(self, out):
+        return True
+    
     def set_projector(self, proj_id):
         self.proj_id = proj_id
 

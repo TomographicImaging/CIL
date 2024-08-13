@@ -63,6 +63,9 @@ class AstraBackProjector3D(DataProcessor):
             raise ValueError("Dataset not compatible with geometry used to create the projector")
 
         return True
+    
+    def check_output(self, out):
+        return True
 
     def set_ImageGeometry(self, volume_geometry):
 

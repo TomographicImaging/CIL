@@ -82,6 +82,9 @@ class FBP(DataProcessor):
 
         DataOrder.check_order_for_engine('tigre', dataset.geometry)
         return True
+    
+    def check_output(self, out):
+        return True
 
     def process(self, out=None):
 

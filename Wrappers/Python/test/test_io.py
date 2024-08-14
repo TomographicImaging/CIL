@@ -22,7 +22,7 @@ from utils import initialise_tests
 
 import numpy as np
 import os
-from cil.framework import ImageGeometry, acquisition_labels
+from cil.framework import ImageGeometry, UnitsAngles
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
@@ -87,7 +87,7 @@ class TestZeissDataReader(unittest.TestCase):
     def setUp(self):
         if has_file:
             self.reader = ZEISSDataReader()
-            angle_unit = acquisition_labels["RADIAN"]
+            angle_unit = UnitsAngles["RADIAN"]
 
             self.reader.set_up(file_name=filename,
                                angle_unit=angle_unit)

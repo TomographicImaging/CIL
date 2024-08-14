@@ -18,8 +18,7 @@
 
 from .cilacc import cilacc
 from .acquisition_data import AcquisitionData
-from .acquisition_geometry import AcquisitionGeometry
-from .system_configuration import SystemConfiguration
+from .acquisition_geometry import AcquisitionGeometry, SystemConfiguration
 from .data_container import DataContainer
 from .image_data import ImageData
 from .image_geometry import ImageGeometry
@@ -28,4 +27,4 @@ from .vector_geometry import VectorGeometry
 from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer
 from .block import BlockDataContainer, BlockGeometry
 from .partitioner import Partitioner
-from .label import acquisition_labels, image_labels, data_order, get_order_for_engine, check_order_for_engine
+from .label import DimensionLabelsAcquisition, DimensionLabelsImage, FillTypes, UnitsAngles, AcquisitionType, AcquisitionDimension

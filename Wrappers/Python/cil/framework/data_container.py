@@ -23,7 +23,6 @@ from numbers import Number
 
 import numpy
 
-from .label import data_order, get_order_for_engine
 from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
 
@@ -190,12 +189,10 @@ class DataContainer(object):
         '''
         reorders the data in memory as requested.
 
-        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
+        :param order: ordered list of labels from self.dimension_labels
         :type order: list, sting
         '''
 
-        if order in data_order["ENGINES"]:
-            order = get_order_for_engine(order, self.geometry)
 
         try:
             if len(order) != len(self.shape):
@@ -222,6 +219,7 @@ class DataContainer(object):
             self.dimension_labels = dimension_labels_new
         else:
             self.geometry.set_labels(dimension_labels_new)
+
 
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided

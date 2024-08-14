@@ -21,19 +21,19 @@ import warnings
 
 import numpy
 
-from .label import geometry_labels
+from .label import FillTypes
 
 class VectorGeometry:
     '''Geometry describing VectorData to contain 1D array'''
     @property
     def RANDOM(self):
-        warnings.warn("use geometry_labels['RANDOM'] instead", DeprecationWarning, stacklevel=2)
-        return geometry_labels['RANDOM']
+        warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
+        return FillTypes.RANDOM
 
     @property
     def RANDOM_INT(self):
-        warnings.warn("use geometry_labels['RANDOM_INT'] instead", DeprecationWarning, stacklevel=2)
-        return geometry_labels['RANDOM_INT']
+        warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
+        return FillTypes.RANDOM_INT
 
     @property
     def dtype(self):
@@ -97,8 +97,11 @@ class VectorGeometry:
         if isinstance(value, Number):
             if value != 0:
                 out += value
-        else:
-            if value == geometry_labels["RANDOM"]:
+        elif value is not None:
+            FillTypes.validate(value)
+            value = FillTypes.get_enum_member(value)
+
+            if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -106,7 +109,7 @@ class VectorGeometry:
                     out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == geometry_labels["RANDOM_INT"]:
+            elif value == FillTypes.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

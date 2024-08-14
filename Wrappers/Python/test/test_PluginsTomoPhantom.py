@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from cil.framework import AcquisitionGeometry, acquisition_labels
+from cil.framework import AcquisitionGeometry, UnitsAngles
 import numpy as np
 from utils import has_tomophantom, initialise_tests
 
@@ -36,7 +36,7 @@ class TestTomoPhantom2D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Cone2D((offset,-100), (offset,100))
         ag.set_panel(N)
 
-        ag.set_angles(angles, angle_unit=acquisition_labels["DEGREE"])
+        ag.set_angles(angles, angle_unit=UnitsAngles["DEGREE"])
         ig = ag.get_ImageGeometry()
         self.ag = ag
         self.ig = ig
@@ -103,7 +103,7 @@ class TestTomoPhantom3D(unittest.TestCase):
         ag = AcquisitionGeometry.create_Cone3D((offset,-100,0), (offset,100,0))
         ag.set_panel((N,N/2))
 
-        ag.set_angles(angles, angle_unit=acquisition_labels["DEGREE"])
+        ag.set_angles(angles, angle_unit=UnitsAngles["DEGREE"])
         ig = ag.get_ImageGeometry()
         self.ag = ag
         self.ig = ig

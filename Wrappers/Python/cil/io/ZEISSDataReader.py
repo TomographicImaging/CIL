@@ -18,7 +18,7 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, acquisition_labels, data_order
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, UnitsAngles, DimensionLabelsAcquisition, DimensionLabelsImage
 import numpy as np
 import os
 import olefile
@@ -127,10 +127,10 @@ class ZEISSDataReader(object):
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                allowed_labels = data_order["CIL_AG_LABELS"]
+                allowed_labels = [item.value for item in DimensionLabelsAcquisition]
                 zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
             else:
-                allowed_labels = data_order["CIL_IG_LABELS"]
+                allowed_labels = [item.value for item in DimensionLabelsImage]
                 zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
 
             # check roi labels and create tuple for slicing
@@ -232,11 +232,11 @@ class ZEISSDataReader(object):
                 ) \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
-                    .set_angles(self._metadata['thetas'],angle_unit=acquisition_labels["RADIAN"])
+                    .set_angles(self._metadata['thetas'],angle_unit=UnitsAngles.RADIAN)
         else:
             self._geometry = AcquisitionGeometry.create_Parallel3D()\
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']])\
-                    .set_angles(self._metadata['thetas'],angle_unit=acquisition_labels["RADIAN"])
+                    .set_angles(self._metadata['thetas'],angle_unit=UnitsAngles.RADIAN)
         self._geometry.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
     def _setup_image_geometry(self):

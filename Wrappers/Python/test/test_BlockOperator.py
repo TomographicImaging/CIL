@@ -20,7 +20,7 @@ import unittest
 from utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator, GradientOperator
-from cil.framework import BlockDataContainer, BlockGeometry, ImageGeometry, image_labels
+from cil.framework import BlockDataContainer, BlockGeometry, ImageGeometry, FillTypes
 from cil.optimisation.operators import IdentityOperator
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
@@ -58,7 +58,7 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertBlockDataContainerEqual(z1, res)
 
-        z1 = B.range_geometry().allocate(image_labels["RANDOM"])
+        z1 = B.range_geometry().allocate(FillTypes["RANDOM"])
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -159,7 +159,7 @@ class TestBlockOperator(CCPiTestClass):
             )
 
         B1 = BlockOperator(G, Id)
-        U = ig.allocate(image_labels["RANDOM"])
+        U = ig.allocate(FillTypes["RANDOM"])
         #U = BlockDataContainer(u,u)
         RES1 = B1.range_geometry().allocate()
 
@@ -284,7 +284,7 @@ class TestBlockOperator(CCPiTestClass):
         B = BlockOperator(G, Id)
         # Nx1 case
         u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(image_labels["RANDOM"], seed=3)
+        w = B.range_geometry().allocate(FillTypes["RANDOM"], seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
         self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)

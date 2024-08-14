@@ -23,7 +23,7 @@ except ImportError as exc:
     raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24.0.1"`') from exc
 
 
-from cil.framework import check_order_for_engine, DataContainer
+from cil.framework import DataContainer, DimensionLabelsImage
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -494,7 +494,7 @@ class TNV(RegulariserFunction):
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
         if isinstance(input, DataContainer):
-            check_order_for_engine('cil', input.geometry)
+            DimensionLabelsImage.check_order_for_engine('cil', input.geometry)
             if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:

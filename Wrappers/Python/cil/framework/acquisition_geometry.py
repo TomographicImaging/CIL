@@ -22,11 +22,309 @@ from numbers import Number
 
 import numpy
 
-from .label import acquisition_labels, data_order
+from .label import DimensionLabelsAcquisition, UnitsAngles, AcquisitionType, FillTypes, AcquisitionDimension
 from .acquisition_data import AcquisitionData
-from .base import BaseAcquisitionGeometry
 from .image_geometry import ImageGeometry
-from .system_configuration import ComponentDescription, PositionVector, PositionDirectionVector, SystemConfiguration
+
+class ComponentDescription(object):
+    r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
+     '''
+    def __init__ (self, dof):
+        self._dof = dof
+
+    @staticmethod
+    def create_vector(val):
+        try:
+            vec = numpy.array(val, dtype=numpy.float64).reshape(len(val))
+        except:
+            raise ValueError("Can't convert to numpy array")
+
+        return vec
+
+    @staticmethod
+    def create_unit_vector(val):
+        vec = ComponentDescription.create_vector(val)
+        dot_product = vec.dot(vec)
+        if abs(dot_product)>1e-8:
+            vec = (vec/numpy.sqrt(dot_product))
+        else:
+            raise ValueError("Can't return a unit vector of a zero magnitude vector")
+        return vec
+
+    def length_check(self, val):
+        try:
+            val_length = len(val)
+        except:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
+
+        if val_length != self._dof:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self._dof,val))
+
+    @staticmethod
+    def test_perpendicular(vector1, vector2):
+        dor_prod = vector1.dot(vector2)
+        if abs(dor_prod) <1e-10:
+            return True
+        return False
+
+    @staticmethod
+    def test_parallel(vector1, vector2):
+        '''For unit vectors only. Returns true if directions are opposite'''
+        dor_prod = vector1.dot(vector2)
+        if 1- abs(dor_prod) <1e-10:
+            return True
+        return False
+
+
+class PositionVector(ComponentDescription):
+    r'''This class creates a component of a tomography system with a position attribute
+     '''
+    @property
+    def position(self):
+        try:
+            return self._position
+        except:
+            raise AttributeError
+
+    @position.setter
+    def position(self, val):
+        self.length_check(val)
+        self._position = ComponentDescription.create_vector(val)
+
+
+class DirectionVector(ComponentDescription):
+    r'''This class creates a component of a tomography system with a direction attribute
+     '''
+    @property
+    def direction(self):
+        try:
+            return self._direction
+        except:
+            raise AttributeError
+
+    @direction.setter
+    def direction(self, val):
+        self.length_check(val)
+        self._direction = ComponentDescription.create_unit_vector(val)
+
+
+class PositionDirectionVector(PositionVector, DirectionVector):
+    r'''This class creates a component of a tomography system with position and direction attributes
+     '''
+    pass
+
+
+class Detector1D(PositionVector):
+    r'''This class creates a component of a tomography system with position and direction_x attributes used for 1D panels
+     '''
+    @property
+    def direction_x(self):
+        try:
+            return self._direction_x
+        except:
+            raise AttributeError
+
+    @direction_x.setter
+    def direction_x(self, val):
+        self.length_check(val)
+        self._direction_x = ComponentDescription.create_unit_vector(val)
+
+    @property
+    def normal(self):
+        try:
+            return ComponentDescription.create_unit_vector([self._direction_x[1], -self._direction_x[0]])
+        except:
+            raise AttributeError
+
+
+class Detector2D(PositionVector):
+    r'''This class creates a component of a tomography system with position, direction_x and direction_y attributes used for 2D panels
+     '''
+    @property
+    def direction_x(self):
+        try:
+            return self._direction_x
+        except:
+            raise AttributeError
+
+    @property
+    def direction_y(self):
+        try:
+            return self._direction_y
+        except:
+            raise AttributeError
+
+    @property
+    def normal(self):
+        try:
+            return numpy.cross(self._direction_x, self._direction_y)
+        except:
+            raise AttributeError
+
+    def set_direction(self, x, y):
+        self.length_check(x)
+        x = ComponentDescription.create_unit_vector(x)
+
+        self.length_check(y)
+        y = ComponentDescription.create_unit_vector(y)
+
+        dot_product = x.dot(y)
+        if not numpy.isclose(dot_product, 0):
+            raise ValueError("vectors detector.direction_x and detector.direction_y must be orthogonal")
+
+        self._direction_y = y
+        self._direction_x = x
+
+
+class SystemConfiguration(object):
+    r'''This is a generic class to hold the description of a tomography system
+     '''
+
+    SYSTEM_SIMPLE = 'simple'
+    SYSTEM_OFFSET = 'offset'
+    SYSTEM_ADVANCED = 'advanced'
+
+    @property
+    def dimension(self):
+        if self._dimension == 2:
+            return AcquisitionDimension.DIM2.value
+        else:
+            return AcquisitionDimension.DIM3.value
+
+    @dimension.setter
+    def dimension(self,val):
+        if val != 2 and val != 3:
+            raise ValueError('Can set up 2D and 3D systems only. got {0}D'.format(val))
+        else:
+            self._dimension = val
+
+    @property
+    def geometry(self):
+        return self._geometry
+
+    @geometry.setter
+    def geometry(self,val):
+        AcquisitionType.validate(val)
+        self._geometry = AcquisitionType.get_enum_member(val)
+
+    def __init__(self, dof, geometry, units='units'):
+        """Initialises the system component attributes for the acquisition type
+        """
+        self.dimension = dof
+        self.geometry = geometry
+        self.units = units
+
+        if self.geometry == AcquisitionType.PARALLEL:
+            self.ray = DirectionVector(dof)
+        else:
+            self.source = PositionVector(dof)
+
+        if dof == 2:
+            self.detector = Detector1D(dof)
+            self.rotation_axis = PositionVector(dof)
+        else:
+            self.detector = Detector2D(dof)
+            self.rotation_axis = PositionDirectionVector(dof)
+
+    def __str__(self):
+        """Implements the string representation of the system configuration
+        """
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        """Implements the equality check of the system configuration
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def rotation_vec_to_y(vec):
+        ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
+
+        vec = ComponentDescription.create_unit_vector(vec)
+
+        axis_rotation = numpy.eye(len(vec))
+
+        if numpy.allclose(vec[:2],[0,1]):
+            pass
+        elif numpy.allclose(vec[:2],[0,-1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(vec[0],vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        return axis_rotation
+
+    @staticmethod
+    def rotation_vec_to_z(vec):
+        ''' returns a rotation matrix that will align vec with the z-direction [0,0,1]'''
+
+        vec = ComponentDescription.create_unit_vector(vec)
+
+        if len(vec) == 2:
+            return numpy.array([[1, 0],[0, 1]])
+
+        elif len(vec) == 3:
+            axis_rotation = numpy.eye(3)
+
+            if numpy.allclose(vec,[0,0,1]):
+                pass
+            elif numpy.allclose(vec,[0,0,-1]):
+                axis_rotation = numpy.eye(3)
+                axis_rotation[1][1] = -1
+                axis_rotation[2][2] = -1
+            else:
+                vx = numpy.array([[0, 0, -vec[0]], [0, 0, -vec[1]], [vec[0], vec[1], 0]])
+                axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + vec[2])
+
+        else:
+            raise ValueError("Vec must have length 3, got {}".format(len(vec)))
+
+        return axis_rotation
+
+    def update_reference_frame(self):
+        r'''Transforms the system origin to the rotation_axis position
+        '''
+        self.set_origin(self.rotation_axis.position)
+
+
+    def set_origin(self, origin):
+        r'''Transforms the system origin to the input origin
+        '''
+        translation = origin.copy()
+        if hasattr(self,'source'):
+            self.source.position -= translation
+
+        self.detector.position -= translation
+        self.rotation_axis.position -= translation
+
+
+    def get_centre_slice(self):
+        """Returns the 2D system configuration corresponding to the centre slice
+        """
+        raise NotImplementedError
+
+    def calculate_magnification(self):
+        r'''Calculates the magnification of the system using the source to rotate axis,
+        and source to detector distance along the direction.
+
+        :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
+        :rtype: list
+        '''
+        raise NotImplementedError
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''
+        raise NotImplementedError
+
+    def copy(self):
+        '''returns a copy of SystemConfiguration'''
+        return copy.deepcopy(self)
 
 
 class Parallel2D(SystemConfiguration):
@@ -47,7 +345,7 @@ class Parallel2D(SystemConfiguration):
     def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Parallel2D, self).__init__(dof=2, geometry = 'parallel', units=units)
+        super(Parallel2D, self).__init__(dof=2, geometry = AcquisitionType.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -221,7 +519,7 @@ class Parallel3D(SystemConfiguration):
     def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Parallel3D, self).__init__(dof=3, geometry = 'parallel', units=units)
+        super(Parallel3D, self).__init__(dof=3, geometry = AcquisitionType.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -506,7 +804,7 @@ class Cone2D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Cone2D, self).__init__(dof=2, geometry = 'cone', units=units)
+        super(Cone2D, self).__init__(dof=2, geometry = AcquisitionType.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -685,7 +983,7 @@ class Cone3D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Cone3D, self).__init__(dof=3, geometry = 'cone', units=units)
+        super(Cone3D, self).__init__(dof=3, geometry = AcquisitionType.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -1171,10 +1469,8 @@ class Angles(object):
 
     @angle_unit.setter
     def angle_unit(self,val):
-        if val != acquisition_labels["DEGREE"] and val != acquisition_labels["RADIAN"]:
-            raise ValueError('angle_unit = {} not recognised please specify \'degree\' or \'radian\''.format(val))
-        else:
-            self._angle_unit = val
+        UnitsAngles.validate(val)
+        self._angle_unit = UnitsAngles.get_enum_value(val)
 
     def __str__(self):
         repres = "Acquisition description:\n"
@@ -1310,7 +1606,7 @@ class Configuration(object):
         return False
 
 
-class AcquisitionGeometry(BaseAcquisitionGeometry):
+class AcquisitionGeometry(object):
     """This class holds the AcquisitionGeometry of the system.
 
     Please initialise the AcquisitionGeometry using the using the static methods:
@@ -1328,33 +1624,33 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
     #for backwards compatibility
     @property
     def ANGLE(self):
-        warnings.warn("use acquisition_labels['ANGLE'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['ANGLE']
+        warnings.warn("use DimensionLabelsAcquisition.Angle instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsAcquisition.ANGLE
 
     @property
     def CHANNEL(self):
-        warnings.warn("use acquisition_labels['CHANNEL'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['CHANNEL']
+        warnings.warn("use DimensionLabelsAcquisition.Channel instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsAcquisition.CHANNEL
 
     @property
     def DEGREE(self):
-        warnings.warn("use acquisition_labels['DEGREE'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['DEGREE']
+        warnings.warn("use UnitsAngles.DEGREE", DeprecationWarning, stacklevel=2)
+        return UnitsAngles.DEGREE
 
     @property
     def HORIZONTAL(self):
-        warnings.warn("use acquisition_labels['HORIZONTAL'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['HORIZONTAL']
+        warnings.warn("use DimensionLabelsAcquisition.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsAcquisition.HORIZONTAL
 
     @property
     def RADIAN(self):
-        warnings.warn("use acquisition_labels['RADIAN'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['RADIAN']
+        warnings.warn("use UnitsAngles.RADIAN instead", DeprecationWarning, stacklevel=2)
+        return UnitsAngles.RADIAN
 
     @property
     def VERTICAL(self):
-        warnings.warn("use acquisition_labels['VERTICAL'] instead", DeprecationWarning, stacklevel=2)
-        return acquisition_labels['VERTICAL']
+        warnings.warn("use DimensionLabelsAcquisition.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsAcquisition.VERTICAL
 
     @property
     def geom_type(self):
@@ -1426,10 +1722,10 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
     @property
     def shape(self):
 
-        shape_dict = {acquisition_labels["CHANNEL"]: self.config.channels.num_channels,
-                      acquisition_labels["ANGLE"]: self.config.angles.num_positions,
-                      acquisition_labels["VERTICAL"]: self.config.panel.num_pixels[1],
-                      acquisition_labels["HORIZONTAL"]: self.config.panel.num_pixels[0]}
+        shape_dict = {DimensionLabelsAcquisition.CHANNEL.value: self.config.channels.num_channels,
+                      DimensionLabelsAcquisition.ANGLE.value: self.config.angles.num_positions,
+                      DimensionLabelsAcquisition.VERTICAL.value: self.config.panel.num_pixels[1],
+                      DimensionLabelsAcquisition.HORIZONTAL.value: self.config.panel.num_pixels[0]}
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -1438,7 +1734,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
 
     @property
     def dimension_labels(self):
-        labels_default = data_order["CIL_AG_LABELS"]
+        labels_default = DimensionLabelsAcquisition.get_default_order_for_engine("CIL")
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -1465,15 +1761,14 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
     @dimension_labels.setter
     def dimension_labels(self, val):
 
-        labels_default = data_order["CIL_AG_LABELS"]
 
-        #check input and store. This value is not used directly
         if val is not None:
+            label_new=[]
             for x in val:
-                if x not in labels_default:
-                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                if DimensionLabelsAcquisition.validate(x):
+                    label_new.append(DimensionLabelsAcquisition.get_enum_value(x))
 
-            self._dimension_labels = tuple(val)
+            self._dimension_labels = tuple(label_new)
 
     @property
     def ndim(self):
@@ -1544,16 +1839,14 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
         else:
             raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
 
-        if angle_units == 'radian':
-            angle = angle_rad
-            ang_units = 'radian'
-        elif angle_units == 'degree':
-            angle = numpy.degrees(angle_rad)
-            ang_units = 'degree'
-        else:
-            raise ValueError("`angle_units` is not recognised. Must be 'radian' or 'degree'. Got {}".format(angle_units))
+        UnitsAngles.validate(angle_units)
+        angle_units = UnitsAngles.get_enum_member(angle_units)
 
-        return {'offset': (offset, offset_units), 'angle': (angle, ang_units)}
+        angle = angle_rad
+        if angle_units == UnitsAngles.DEGREE:
+            angle = numpy.degrees(angle_rad)
+
+        return {'offset': (offset, offset_units), 'angle': (angle, angle_units.value)}
 
 
     def set_centre_of_rotation(self, offset=0.0, distance_units='default', angle=0.0, angle_units='radian'):
@@ -1590,12 +1883,13 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
             raise NotImplementedError()
 
-        if angle_units == 'radian':
-            angle_rad = angle
-        elif angle_units == 'degree':
+
+        UnitsAngles.validate(angle_units)
+        angle_units = UnitsAngles.get_enum_member(angle_units)
+
+        angle_rad = angle
+        if angle_units == UnitsAngles.DEGREE:
             angle_rad = numpy.radians(angle)
-        else:
-            raise ValueError("`angle_units` is not recognised. Must be 'radian' or 'degree'. Got {}".format(angle_units))
 
         if distance_units =='default':
             offset_distance = offset
@@ -1881,7 +2175,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
 
         if vertical is not None:
-            if geometry_new.geom_type == acquisition_labels["PARALLEL"] or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+            if geometry_new.geom_type == AcquisitionType.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
@@ -1911,8 +2205,11 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        else:
-            if value == acquisition_labels["RANDOM"]:
+        elif value is not None:
+            FillTypes.validate(value)
+            value = FillTypes.get_enum_member(value)
+
+            if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -1921,7 +2218,7 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
                     out.fill(r)
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == acquisition_labels["RANDOM_INT"]:
+            elif value == FillTypes.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -1931,9 +2228,5 @@ class AcquisitionGeometry(BaseAcquisitionGeometry):
                 else:
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=dtype))
-            elif value is None:
-                pass
-            else:
-                raise ValueError('Value {} unknown'.format(value))
 
         return out

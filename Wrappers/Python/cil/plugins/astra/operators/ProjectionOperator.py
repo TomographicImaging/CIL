@@ -18,7 +18,7 @@
 
 import logging
 
-from cil.framework import check_order_for_engine, BlockGeometry
+from cil.framework import BlockGeometry, DimensionLabelsAcquisition, DimensionLabelsImage
 from cil.optimisation.operators import BlockOperator, LinearOperator, ChannelwiseOperator
 from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
 
@@ -115,8 +115,8 @@ class ProjectionOperator_ag(ProjectionOperator):
               self).__init__(domain_geometry=image_geometry,
                              range_geometry=acquisition_geometry)
 
-        check_order_for_engine('astra', image_geometry)
-        check_order_for_engine('astra', acquisition_geometry)
+        DimensionLabelsAcquisition.check_order_for_engine('astra',acquisition_geometry)
+        DimensionLabelsImage.check_order_for_engine('astra',image_geometry)
 
         self.volume_geometry = image_geometry
         self.sinogram_geometry = acquisition_geometry

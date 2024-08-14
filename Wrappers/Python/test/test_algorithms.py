@@ -25,7 +25,7 @@ import numpy as np
 import logging
 
 from cil.framework import (ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry,
-                           BlockDataContainer, BlockGeometry, VectorData, image_labels)
+                           BlockDataContainer, BlockGeometry, VectorData, FillTypes)
 
 from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator
@@ -250,7 +250,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(image_labels["RANDOM"])
+        initial = ig.allocate(FillTypes["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -353,9 +353,9 @@ class TestFISTA(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
-        b = ig.allocate(image_labels["RANDOM"])
+        b = ig.allocate(FillTypes["RANDOM"])
         # fill with random numbers
-        initial = ig.allocate(image_labels["RANDOM"])
+        initial = ig.allocate(FillTypes["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -382,7 +382,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(image_labels["RANDOM"])
+        initial = ig.allocate(FillTypes["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)

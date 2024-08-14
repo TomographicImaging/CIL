@@ -21,7 +21,7 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, image_labels, ImageGeometry, \
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, FillTypes, ImageGeometry, \
     AcquisitionGeometry
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
@@ -79,9 +79,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
+        noisy_data = ag.allocate(FillTypes["RANDOM"], dtype=numpy.float64)
 
-        d = ag.allocate(image_labels["RANDOM"], dtype=numpy.float64)
+        d = ag.allocate(FillTypes["RANDOM"], dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -111,8 +111,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(image_labels["RANDOM"])
-        b = ig.allocate(image_labels["RANDOM"])
+        u = ig.allocate(FillTypes["RANDOM"])
+        b = ig.allocate(FillTypes["RANDOM"])
 
         # check grad/call no data
         f = L2NormSquared()
@@ -222,8 +222,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(image_labels["RANDOM"], seed=1)
-        b = ig.allocate(image_labels["RANDOM"], seed=2)
+        u = ig.allocate(FillTypes["RANDOM"], seed=1)
+        b = ig.allocate(FillTypes["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()

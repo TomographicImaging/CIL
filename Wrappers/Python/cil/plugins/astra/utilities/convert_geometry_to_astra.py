@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework import acquisition_labels
+from cil.framework import UnitsAngles
 
 def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
     """
@@ -49,7 +49,7 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
 
     #get units
 
-    if sinogram_geometry.config.angles.angle_unit == acquisition_labels["DEGREE"]:
+    if UnitsAngles.get_enum_member(sinogram_geometry.config.angles.angle_unit) == UnitsAngles.DEGREE:
         angles_rad = sinogram_geometry.config.angles.angle_data * np.pi / 180.0
     else:
         angles_rad = sinogram_geometry.config.angles.angle_data

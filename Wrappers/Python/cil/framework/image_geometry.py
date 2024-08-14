@@ -22,47 +22,45 @@ from numbers import Number
 import numpy
 
 from .image_data import ImageData
-from .label import data_order, image_labels
+from .label import DimensionLabelsImage, FillTypes
 
 
 class ImageGeometry:
     @property
     def CHANNEL(self):
-        warnings.warn("use image_labels['CHANNEL'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['CHANNEL']
+        warnings.warn("use DimensionLabelsImage.CHANNEL instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsImage.CHANNEL
 
     @property
     def HORIZONTAL_X(self):
-        warnings.warn("use image_labels['HORIZONTAL_X'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['HORIZONTAL_X']
+        warnings.warn("use DimensionLabelsImage.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsImage.HORIZONTAL_X
 
     @property
     def HORIZONTAL_Y(self):
-        warnings.warn("use image_labels['HORIZONTAL_Y'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['HORIZONTAL_Y']
+        warnings.warn("use DimensionLabelsImage.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsImage.HORIZONTAL_Y
 
     @property
     def RANDOM(self):
-        warnings.warn("use image_labels['RANDOM'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['RANDOM']
-
+        warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
+        return FillTypes.RANDOM
     @property
     def RANDOM_INT(self):
-        warnings.warn("use image_labels['RANDOM_INT'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['RANDOM_INT']
+        warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
+        return FillTypes.RANDOM_INT
 
     @property
     def VERTICAL(self):
-        warnings.warn("use image_labels['VERTICAL'] instead", DeprecationWarning, stacklevel=2)
-        return image_labels['VERTICAL']
+        warnings.warn("use DimensionLabelsImage.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return DimensionLabelsImage.VERTICAL
 
     @property
-    def shape(self):
-
-        shape_dict = {image_labels["CHANNEL"]: self.channels,
-                      image_labels["VERTICAL"]: self.voxel_num_z,
-                      image_labels["HORIZONTAL_Y"]: self.voxel_num_y,
-                      image_labels["HORIZONTAL_X"]: self.voxel_num_x}
+    def shape(self):   
+        shape_dict = {DimensionLabelsImage.CHANNEL.value: self.channels,
+                      DimensionLabelsImage.VERTICAL.value: self.voxel_num_z,
+                      DimensionLabelsImage.HORIZONTAL_Y.value: self.voxel_num_y,
+                      DimensionLabelsImage.HORIZONTAL_X.value: self.voxel_num_x}
 
         shape = []
         for label in self.dimension_labels:
@@ -77,10 +75,10 @@ class ImageGeometry:
     @property
     def spacing(self):
 
-        spacing_dict = {image_labels["CHANNEL"]: self.channel_spacing,
-                        image_labels["VERTICAL"]: self.voxel_size_z,
-                        image_labels["HORIZONTAL_Y"]: self.voxel_size_y,
-                        image_labels["HORIZONTAL_X"]: self.voxel_size_x}
+        spacing_dict = {DimensionLabelsImage.CHANNEL.value: self.channel_spacing,
+                        DimensionLabelsImage.VERTICAL.value: self.voxel_size_z,
+                        DimensionLabelsImage.HORIZONTAL_Y.value: self.voxel_size_y,
+                        DimensionLabelsImage.HORIZONTAL_X.value: self.voxel_size_x}
 
         spacing = []
         for label in self.dimension_labels:
@@ -99,7 +97,7 @@ class ImageGeometry:
     @property
     def dimension_labels(self):
 
-        labels_default = data_order["CIL_IG_LABELS"]
+        labels_default = DimensionLabelsImage.get_default_order_for_engine("CIL")
 
         shape_default = [   self.channels,
                             self.voxel_num_z,
@@ -124,16 +122,13 @@ class ImageGeometry:
         self.set_labels(val)
 
     def set_labels(self, labels):
-        labels_default = data_order["CIL_IG_LABELS"]
-
-        #check input and store. This value is not used directly
         if labels is not None:
+            label_new=[]
             for x in labels:
-                if x not in labels_default:
-                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'\
-                        .format(labels_default,labels))
+                if DimensionLabelsImage.validate(x):
+                    label_new.append(DimensionLabelsImage.get_enum_value(x))
 
-            self._dimension_labels = tuple(labels)
+            self._dimension_labels = tuple(label_new)
 
     def __eq__(self, other):
 
@@ -295,8 +290,11 @@ class ImageGeometry:
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        else:
-            if value == image_labels["RANDOM"]:
+        elif value is not None:
+            FillTypes.validate(value)
+            value = FillTypes.get_enum_member(value)
+
+            if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -305,7 +303,8 @@ class ImageGeometry:
                     out.fill(r)
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == image_labels["RANDOM_INT"]:
+
+            elif value == FillTypes.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -314,9 +313,4 @@ class ImageGeometry:
                     out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
                 else:
                     out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
-            elif value is None:
-                pass
-            else:
-                raise ValueError('Value {} unknown'.format(value))
-
         return out

@@ -18,7 +18,7 @@
 import numpy
 
 from .data_container import DataContainer
-
+from .label import DimensionLabelsImage, Backends
 
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -189,3 +189,20 @@ class ImageData(DataContainer):
             image_data_out.reorder(labels_orig)
 
             return image_data_out
+
+
+    def reorder(self, order=None):
+        '''
+        reorders the data in memory as requested.
+
+        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
+        :type order: list, sting
+        '''
+
+        try:
+            Backends.validate(order)            
+            order = DimensionLabelsImage.get_order_for_engine(order, self.geometry) 
+        except ValueError:
+            pass
+
+        super(ImageData, self).reorder(order)

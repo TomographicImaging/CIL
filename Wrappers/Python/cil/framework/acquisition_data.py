@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
 
+from .label import DimensionLabelsAcquisition, Backends
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
@@ -101,3 +102,19 @@ class AcquisitionData(DataContainer, Partitioner):
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+
+    def reorder(self, order=None):
+        '''
+        reorders the data in memory as requested.
+
+        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
+        :type order: list, sting
+        '''
+
+        try:
+            Backends.validate(order)            
+            order = DimensionLabelsAcquisition.get_order_for_engine(order, self.geometry) 
+        except ValueError:
+            pass
+
+        super(AcquisitionData, self).reorder(order)

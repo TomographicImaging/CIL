@@ -19,7 +19,7 @@
 import unittest
 from unittest.mock import Mock
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer, image_labels
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer, FillTypes
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
@@ -249,13 +249,13 @@ class TestOperator(CCPiTestClass):
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
-        res = FD.domain_geometry().allocate(image_labels["RANDOM"])
+        res = FD.domain_geometry().allocate(FillTypes["RANDOM"])
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(image_labels["RANDOM"])
+        res = Id.domain_geometry().allocate(FillTypes["RANDOM"])
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -264,14 +264,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(image_labels["RANDOM"])
+        u = G.range_geometry().allocate(FillTypes["RANDOM"])
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(image_labels["RANDOM"])
+        u = G.domain_geometry().allocate(FillTypes["RANDOM"])
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)

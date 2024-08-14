@@ -25,7 +25,7 @@ import numpy
 from .label import acquisition_labels, data_order
 from .acquisition_data import AcquisitionData
 from .base import BaseAcquisitionGeometry
-from .data_container import ImageGeometry
+from .image_geometry import ImageGeometry
 from .system_configuration import ComponentDescription, PositionVector, PositionDirectionVector, SystemConfiguration
 
 

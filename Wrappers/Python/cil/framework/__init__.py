@@ -20,7 +20,11 @@ from .cilacc import cilacc
 from .acquisition_data import AcquisitionData
 from .acquisition_geometry import AcquisitionGeometry
 from .system_configuration import SystemConfiguration
-from .data_container import message, ImageGeometry, DataContainer, ImageData, VectorData, VectorGeometry
+from .data_container import message, DataContainer
+from .image_data import ImageData
+from .image_geometry import ImageGeometry
+from .vector_data import VectorData
+from .vector_geometry import VectorGeometry
 from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer, find_key
 from .block import BlockDataContainer, BlockGeometry
 from .partitioner import Partitioner

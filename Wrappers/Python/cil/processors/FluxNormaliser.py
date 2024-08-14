@@ -27,15 +27,28 @@ from scipy import stats
 log = logging.getLogger(__name__)
 
 class FluxNormaliser(Processor):
-    '''Flux normalisation based on float or region of interest
+    '''
+    Flux normalisation based on float or region of interest
 
     This processor reads in a AcquisitionData and normalises it based on
     a float or array of float values, or a region of interest.
 
-    Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSet
+    Parameters:
+    -----------
+    flux: float or list of floats (optional)
+        Divide the image by the flux value. If flux is a list it must have length 
+        equal to the number of angles in the dataset.
+    
+    roi: dict (optional)
+        Dictionary describing the region of interest containing the background
+        in the image. The image is divided by the mean value in the roi.
+
+    tolerance: float (optional)
+        Small number to set to when there is a division by zero, default is 1e-5.
+
+    Returns:
+    --------
+    Output: AcquisitionData normalised by flux or mean intensity in roi
     '''
 
     def __init__(self, flux=None, roi=None, tolerance=1e-5):
@@ -43,7 +56,7 @@ class FluxNormaliser(Processor):
                     'flux'  : flux,
                     'roi' : roi,
                     'roi_slice' : None,
-                    # very small number. Used when there is a division by zero
+                    'roi_axes' : None,
                     'tolerance'   : tolerance
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
@@ -98,7 +111,9 @@ class FluxNormaliser(Processor):
                             self.roi.update({r:(0,dataset.get_dimension_size(r))})
 
                     self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
-
+                    self.roi_slice = slc
+                    self.roi_axes = axes
+                    
                 else:
                     raise TypeError("roi must be a dictionary, found {}"
                     .format(str(type(self.roi))))
@@ -116,34 +131,59 @@ class FluxNormaliser(Processor):
             
         return True
 
-    def show_roi(self, angle_index='range'):
-        if angle_index=='range':
-            data = self.get_input()
-            max_zscore = numpy.argmax(numpy.abs(stats.zscore(self.flux)))
-            self._plot_slice_roi_angle(angle_index=0, ax=231)
-            self._plot_slice_roi_angle(angle_index=max_zscore, ax=232)
-            self._plot_slice_roi_angle(angle_index=len(data.geometry.angles)-1, ax=233)
-
-            plt.subplot(212)
-            plt.plot(self.flux)
-            plt.plot(max_zscore, self.flux[max_zscore],'rx')
+    def preview_configuration(self, angle='min_and_max', log=False):
+        '''
+        Preview the FluxNormalisation processor configuration for roi mode.
+        Plots the region of interest on the image and the mean, maximum and 
+        minimum intensity in the roi. the angles with minimum and maximum intensity in the roi, 
         
-            plt.legend(['Mean intensity in roi','Max Z-score'])
-            plt.xlabel('Angle index')
-            plt.ylabel('Mean intensity in roi')
-            plt.tight_layout()
+        Parameters:
+        -----------
+        angle: float or str (optional)
+            Angle to plot, default='min_and_max' displays the data with the minimum
+            and maximum pixel values in the roi, otherwise the angle to display 
+            can be specified as a float (closest angle is displayed).
 
-        elif isinstance(angle_index, int):
-            self._plot_slice_roi_angle(angle_index=angle_index)
-
+        log: bool (optional)
+            If True, plot the image with a log scale, default is False
+        '''
+        if self.roi_slice is None:
+            raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
         else:
-            raise TypeError("angle must be an int or 'range'")
+            data = self.get_input()
+            min = numpy.min(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
+            max = numpy.max(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
+            
+            if angle=='min_and_max':
+                self._plot_slice_roi_angle(angle_index=numpy.argmin(min), log=log, ax=221)
+                self._plot_slice_roi_angle(angle_index=numpy.argmax(max), log=log, ax=222)
 
-    def _plot_slice_roi_angle(self, angle_index, ax=111):
+                plt.subplot(212)
+                
+            else:
+                plt.figure(figsize=(3,6))
+                angle_index = numpy.argmin(numpy.abs(angle-data.geometry.angles))
+                self._plot_slice_roi_angle(angle_index=angle_index, log=log, ax=211)
+
+                plt.subplot(212)
+            
+            plt.plot(data.geometry.angles, self.flux, 'r', label='Mean')
+            plt.plot(data.geometry.angles, min,'--k', label='Minimum')
+            plt.plot(data.geometry.angles, max,'--k', label='Maximum')
+            plt.legend()
+            plt.xlabel('Angle')
+            plt.ylabel('Intensity in roi')
+            plt.grid()
+            plt.tight_layout()
+   
+    def _plot_slice_roi_angle(self, angle_index, log=False, ax=111):
         data = self.get_input()
         data_slice = data.get_slice(angle=angle_index)
         plt.subplot(ax)
-        plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower')
+        if log:
+            plt.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower')
+        else:
+            plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower')
 
         h = data_slice.dimension_labels[0]
         v = data_slice.dimension_labels[1]
@@ -155,7 +195,7 @@ class FluxNormaliser(Processor):
 
         plt.xlabel(v)
         plt.ylabel(h)
-        plt.title('Angle index = ' + str(angle_index))
+        plt.title('Angle = ' + str(data.geometry.angles[angle_index]))
 
     def process(self, out=None):
         

@@ -82,6 +82,11 @@ class DataOrder(TypedDict):
 
         return dimensions
 
+class GeometryLabels(TypedDict):
+    RANDOM: str
+    RANDOM_INT: str
+
+
 image_labels: ImageLabels = {"RANDOM": "random",
                              "RANDOM_INT": "random_int",
                              "CHANNEL": "channel",
@@ -89,14 +94,14 @@ image_labels: ImageLabels = {"RANDOM": "random",
                              "HORIZONTAL_X": "horizontal_x",
                              "HORIZONTAL_Y": "horizontal_y"}
 
-acquisition_labels: AcquisitionLabels = {"RANDOM": "random",
-                                         "RANDOM_INT": "random_int",
+acquisition_labels: AcquisitionLabels = {"RANDOM": image_labels["RANDOM"],
+                                         "RANDOM_INT": image_labels["RANDOM_INT"],
                                          "ANGLE_UNIT": "angle_unit",
                                          "DEGREE": "degree",
                                          "RADIAN": "radian",
-                                         "CHANNEL": "channel",
+                                         "CHANNEL": image_labels["CHANNEL"],
                                          "ANGLE": "angle",
-                                         "VERTICAL": "vertical",
+                                         "VERTICAL": image_labels["VERTICAL"],
                                          "HORIZONTAL": "horizontal",
                                          "PARALLEL": "parallel",
                                          "CONE": "cone",
@@ -113,6 +118,9 @@ data_order: DataOrder = \
      "CIL_AG_LABELS": [acquisition_labels["CHANNEL"], acquisition_labels["ANGLE"], acquisition_labels["VERTICAL"], acquisition_labels["HORIZONTAL"]],
      "TOMOPHANTOM_IG_LABELS": [image_labels["CHANNEL"], image_labels["VERTICAL"], image_labels["HORIZONTAL_Y"], image_labels["HORIZONTAL_X"]]
     }
+
+geometry_labels: GeometryLabels = {"RANDOM": image_labels["RANDOM"], "RANDOM_INT": image_labels["RANDOM_INT"]}
+
 
 get_order_for_engine = DataOrder.get_order_for_engine  # type: ignore[attr-defined]
 

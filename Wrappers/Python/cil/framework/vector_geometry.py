@@ -17,14 +17,23 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import copy
 from numbers import Number
+import warnings
 
 import numpy
 
+from .label import geometry_labels
 
 class VectorGeometry:
     '''Geometry describing VectorData to contain 1D array'''
-    RANDOM = 'random'
-    RANDOM_INT = 'random_int'
+    @property
+    def RANDOM(self):
+        warnings.warn("use geometry_labels['RANDOM'] instead", DeprecationWarning, stacklevel=2)
+        return geometry_labels['RANDOM']
+
+    @property
+    def RANDOM_INT(self):
+        warnings.warn("use geometry_labels['RANDOM_INT'] instead", DeprecationWarning, stacklevel=2)
+        return geometry_labels['RANDOM_INT']
 
     @property
     def dtype(self):
@@ -89,7 +98,7 @@ class VectorGeometry:
             if value != 0:
                 out += value
         else:
-            if value == VectorGeometry.RANDOM:
+            if value == geometry_labels["RANDOM"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -97,7 +106,7 @@ class VectorGeometry:
                     out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == VectorGeometry.RANDOM_INT:
+            elif value == geometry_labels["RANDOM_INT"]:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

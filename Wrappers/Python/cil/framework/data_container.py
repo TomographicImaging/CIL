@@ -28,16 +28,6 @@ from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
 
 
-def message(cls, msg, *args):
-    msg = "{0}: " + msg
-    for i in range(len(args)):
-        msg += " {%d}" %(i+1)
-    args = list(args)
-    args.insert(0, cls.__name__ )
-
-    return msg.format(*args )
-
-
 class DataContainer(object):
     '''Generic class to hold data
 
@@ -454,21 +444,17 @@ class DataContainer(object):
                 #       dimension_labels=self.dimension_labels,
                 #       geometry=self.geometry)
                 return out
-            else:
-                raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
+            raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
         elif issubclass(type(out), DataContainer) and \
              isinstance(x2, (Number, numpy.ndarray)):
             if self.check_dimensions(out):
                 if isinstance(x2, numpy.ndarray) and\
                     not (x2.shape == self.shape and x2.dtype == self.dtype):
-                    raise ValueError(message(type(self),
-                        "Wrong size for data memory: out {} x2 {} expected {}"\
-                            .format( out.shape,x2.shape ,self.shape)))
+                    raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )
                 return out
-            else:
-                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+            raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
                 kwargs['out'] = out
@@ -478,7 +464,7 @@ class DataContainer(object):
                 #       dimension_labels=self.dimension_labels,
                 #       geometry=self.geometry)
         else:
-            raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
+            raise ValueError(f"incompatible class: {pwop.__name__} {type(out)}")
 
     def add(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
@@ -679,13 +665,13 @@ class DataContainer(object):
                 kwargs['out'] = out.as_array()
                 pwop(self.as_array(), *args, **kwargs )
             else:
-                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+                raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
                 kwargs['out'] = out
                 pwop(self.as_array(), *args, **kwargs)
         else:
-            raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
+            raise ValueError("incompatible class: {pwop.__name__} {type(out)}")
 
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)

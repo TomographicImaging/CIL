@@ -21,11 +21,6 @@ import weakref
 from .data_container import DataContainer
 
 
-def find_key(dic, val):
-    """return the key of dictionary dic given the value"""
-    return [k for k, v in dic.items() if v == val][0]
-
-
 class Processor(object):
 
     '''Defines a generic DataContainer processor

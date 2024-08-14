@@ -58,19 +58,11 @@ class FBP(DataProcessor):
     This uses the ram-lak filter only.
 
     """
-    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu', **kwargs):
-        sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        if sinogram_geometry is not None:
-            acquisition_geometry = sinogram_geometry
-            warnings.warn("Use acquisition_geometry instead of sinogram_geometry", DeprecationWarning, stacklevel=2)
-        volume_geometry = kwargs.get('volume_geometry', None)
-        if volume_geometry is not None:
-            image_geometry = volume_geometry
-            warnings.warn("Use image_geometry instead of volume_geometry", DeprecationWarning, stacklevel=2)
 
+
+    def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 

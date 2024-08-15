@@ -33,7 +33,7 @@ class CIL2TIGREGeometry(object):
         #angles
         angles = ag.config.angles.angle_data + ag.config.angles.initial_angle
 
-        if UnitsAngles.get_enum_member(ag.config.angles.angle_unit) == UnitsAngles.DEGREE:
+        if ag.config.angles.angle_unit == UnitsAngles.DEGREE:
             angles *= (np.pi/180.)
 
         #convert CIL to TIGRE angles s

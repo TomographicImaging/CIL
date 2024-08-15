@@ -150,7 +150,7 @@ def get_ImageData(num_model, geometry):
     ig.set_labels(DimensionLabelsImage.get_default_order_for_engine('cil'))
     num_dims = len(ig.dimension_labels)
 
-    if DimensionLabelsImage.CHANNEL.value in ig.dimension_labels:
+    if DimensionLabelsImage.CHANNEL in ig.dimension_labels:
         if not is_model_temporal(num_model):
             raise ValueError('Selected model {} is not a temporal model, please change your selection'.format(num_model))
         if num_dims == 4:

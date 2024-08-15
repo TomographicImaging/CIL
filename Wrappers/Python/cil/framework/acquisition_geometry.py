@@ -2207,7 +2207,6 @@ class AcquisitionGeometry(object):
             out.array.fill(value)
         elif value is not None:
             FillTypes.validate(value)
-            value = FillTypes.get_enum_member(value)
 
             if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)

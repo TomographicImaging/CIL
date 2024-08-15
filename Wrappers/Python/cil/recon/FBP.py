@@ -376,7 +376,7 @@ class FDK(GenericFilteredBackProjection):
         #call parent initialiser
         super().__init__(input, image_geometry, filter, backend='tigre')
 
-        if  AcquisitionType.get_enum_member(input.geometry.geom_type) != AcquisitionType.CONE:
+        if  input.geometry.geom_type != AcquisitionType.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
 
@@ -485,7 +485,7 @@ class FBP(GenericFilteredBackProjection):
         super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
-        if  AcquisitionType.get_enum_member(input.geometry.geom_type) != AcquisitionType.PARALLEL:
+        if input.geometry.geom_type != AcquisitionType.PARALLEL:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
 

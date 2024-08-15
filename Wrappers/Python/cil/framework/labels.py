@@ -16,66 +16,49 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from enum import Enum
+from enum import Enum, EnumMeta
 
 class _LabelsBase(Enum):
 
     @classmethod
     def validate(cls, label):
-        """
-        Validate if the given label is present in the class or its values.
-        Parameters:
-        label (str): The label to validate.
-        Returns:
-        bool: True if the label is present in the class or its values
-        Raises:
-        ValueError: If the label is not present in the class or its values.
-        """
-        if isinstance(label, cls):
-            return True
-        elif label in [e.name for e in cls]:
-            return True
-        elif label in [e.value for e in cls]:
-            return True
-        else:
-            raise ValueError(f"Expected one of {[e.value for e in cls]}, got {label}")
+        try:
+            for member in cls:
+                if member == label:
+                    return True 
+        except:
+            pass
 
-    @classmethod
-    def member_from_value(cls, label):
-        if isinstance(label, str):
-            label = label.lower()
+        raise ValueError(f"Expected one of {[e.value for e in cls]} from {cls.__name__}, got {label}")
 
-        for member in cls:
-            if member.value == label:
-                return member
-        raise ValueError(f"{label} is not a valid {cls.__name__}")
-
-    @classmethod
-    def member_from_key(cls, label):
-        for member in cls:
-            if member.name == label:
-                return member
-        raise ValueError(f"{label} is not a valid {cls.__name__}")
-    
     @classmethod
     def get_enum_member(cls, label):
-        if isinstance(label, cls):
-            return label
-        elif label in [e.name for e in cls]:
-            return cls.member_from_key(label)
-        elif label in [e.value for e in cls]:
-            return cls.member_from_value(label)
-        else:
-            raise ValueError(f"{label} is not a valid {cls.__name__}")
+        try:
+            for member in cls:
+                if member == label:
+                    return member 
+        except:
+            pass
+        
+        raise ValueError(f"Expected one of {[e.value for e in cls]} from {cls.__name__}, got {label}")
         
     @classmethod
     def get_enum_value(cls, label):
         return cls.get_enum_member(label).value
         
     def __eq__(self, other):
-        if isinstance(other, str):
-            return self.value == other or self.name == other
-        return super().__eq__(other)
+        if self.value == other:
+            return True
+        return False
+        
+    def __contains__(cls, item):
+        for member in cls:
+            if member.value == item:
+                return True
+        return False
+        
+# Needed for python < 3.12
+EnumMeta.__contains__ = _LabelsBase.__contains__
 
 class Backends(_LabelsBase):
     ASTRA = "astra"

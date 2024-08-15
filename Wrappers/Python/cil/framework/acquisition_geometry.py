@@ -200,7 +200,7 @@ class SystemConfiguration(object):
 
     @property
     def geometry(self):
-        return self._geometry
+        return self._geometry.value
 
     @geometry.setter
     def geometry(self,val):

@@ -19,6 +19,7 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import logging
+import warnings 
 
 log = logging.getLogger(__name__)
 
@@ -36,13 +37,6 @@ class CGLS(Algorithm):
       \min_x || A x - b ||^2_2
       
       
-    Note
-    ----
-    By default, this algorithm will terminate if the value of :math:`||A^T(Ax-b)||_2 < tol*||A^T(Ax_0-b)||_2` where 'tol' is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
-    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2>1/{tol}`. 
-    
-    By setting 'tolerance' to be '0' you can prevent the algorithm stopping on either of these criteria. 
-
     Parameters
     ------------
     operator : Operator
@@ -51,24 +45,33 @@ class CGLS(Algorithm):
         Initial guess 
     data : Data Container in the range of the operator 
         Acquired data to reconstruct
-    tolerance: float, default 1e-6 
-        Tolerance/ Stopping Criterion to end CGLS algorithm.  
+        
+    Note
+    -----
+    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour.
 
     Reference
     ---------
     https://web.stanford.edu/group/SOL/software/cgls/
     '''
-    def __init__(self, initial=None, operator=None, data=None, tolerance=1e-6, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None,  **kwargs):
         '''initialisation of the algorithm
         '''
+        #We are deprecating tolerance 
+        self.tolerance=kwargs.pop("tolerance", None)
+        if self.tolerance is not None:
+            warnings.warn( stacklevel=2, category=DeprecationWarning, message="Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour")
+        else:
+            self.tolerance = 0
+        
         super(CGLS, self).__init__(**kwargs)
 
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
         if initial is not None and operator is not None and data is not None:
-            self.set_up(initial=initial, operator=operator, data=data, tolerance=tolerance)
+            self.set_up(initial=initial, operator=operator, data=data) 
 
-    def set_up(self, initial, operator, data, tolerance=1e-6):
+    def set_up(self, initial, operator, data):
         r'''initialisation of the algorithm
         Parameters
         ------------
@@ -78,14 +81,12 @@ class CGLS(Algorithm):
             Initial guess 
         data : Data Container in the range of the operator 
             Acquired data to reconstruct
-        tolerance: float, default 1e-6 
-            Tolerance/ Stopping Criterion to end the CGLS algorithm
+
         '''
         
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator
-        self.tolerance = tolerance
 
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
@@ -124,7 +125,7 @@ class CGLS(Algorithm):
         #self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
-        self.normx = self.x.norm()
+        self.normx = self.x.norm()#Can be deprecated with tolerance 
 
 
     def update_objective(self):
@@ -133,10 +134,10 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
 
-    def should_stop(self):
+    def should_stop(self): #can be deprecated with tolerance 
         return self.flag() or super().should_stop()
 
-    def flag(self):
+    def flag(self): #can be deprecated with tolerance 
         '''returns whether the tolerance has been reached'''
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
 

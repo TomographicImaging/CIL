@@ -18,7 +18,7 @@
 
 from enum import Enum
 
-class LabelsBase(Enum):
+class _LabelsBase(Enum):
 
     @classmethod
     def validate(cls, label):
@@ -77,12 +77,12 @@ class LabelsBase(Enum):
             return self.value == other or self.name == other
         return super().__eq__(other)
 
-class Backends(LabelsBase):
+class Backends(_LabelsBase):
     ASTRA = "astra"
     TIGRE = "tigre"
     CIL = "cil"
 
-class DimensionLabelsImage(LabelsBase):
+class DimensionLabelsImage(_LabelsBase):
     CHANNEL = "channel"
     VERTICAL = "vertical"
     HORIZONTAL_X = "horizontal_x"
@@ -119,7 +119,7 @@ class DimensionLabelsImage(LabelsBase):
                 "Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                 .format(order_requested, list(geometry.dimension_labels), engine))
         
-class DimensionLabelsAcquisition(LabelsBase):
+class DimensionLabelsAcquisition(_LabelsBase):
     CHANNEL = "channel"
     ANGLE = "angle"
     VERTICAL = "vertical"
@@ -156,20 +156,19 @@ class DimensionLabelsAcquisition(LabelsBase):
                 "Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                 .format(order_requested, list(geometry.dimension_labels), engine))
     
-class FillTypes(LabelsBase):
+class FillTypes(_LabelsBase):
     RANDOM = "random"
     RANDOM_INT = "random_int"
 
-class UnitsAngles(LabelsBase):
+class UnitsAngles(_LabelsBase):
     DEGREE = "degree"
     RADIAN = "radian"
 
-
-class AcquisitionType(LabelsBase):
+class AcquisitionType(_LabelsBase):
     PARALLEL = "parallel"
     CONE = "cone"
 
-class AcquisitionDimension(LabelsBase):
+class AcquisitionDimension(_LabelsBase):
     DIM2 = "2D"
     DIM3 = "3D"
 

@@ -21,7 +21,7 @@ import warnings
 
 import numpy
 
-from .label import FillTypes
+from .labels import FillTypes
 
 class VectorGeometry:
     '''Geometry describing VectorData to contain 1D array'''

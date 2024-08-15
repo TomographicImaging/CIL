@@ -18,7 +18,7 @@
 import numpy
 
 from .data_container import DataContainer
-from .label import DimensionLabelsImage, Backends
+from .labels import ImageDimensionLabels, Backends
 
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -201,7 +201,7 @@ class ImageData(DataContainer):
 
         try:
             Backends.validate(order)            
-            order = DimensionLabelsImage.get_order_for_engine(order, self.geometry) 
+            order = ImageDimensionLabels.get_order_for_engine(order, self.geometry) 
         except ValueError:
             pass
 

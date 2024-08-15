@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, DimensionLabelsImage
+from cil.framework import ImageData, ImageDimensionLabels
 import tomophantom
 from tomophantom import TomoP2D, TomoP3D
 import os
@@ -147,10 +147,10 @@ def get_ImageData(num_model, geometry):
 
     '''
     ig = geometry.copy()
-    ig.set_labels(DimensionLabelsImage.get_default_order_for_engine('cil'))
+    ig.set_labels(ImageDimensionLabels.get_default_order_for_engine('cil'))
     num_dims = len(ig.dimension_labels)
 
-    if DimensionLabelsImage.CHANNEL in ig.dimension_labels:
+    if ImageDimensionLabels.CHANNEL in ig.dimension_labels:
         if not is_model_temporal(num_model):
             raise ValueError('Selected model {} is not a temporal model, please change your selection'.format(num_model))
         if num_dims == 4:

@@ -82,7 +82,7 @@ class Backends(_LabelsBase):
     TIGRE = "tigre"
     CIL = "cil"
 
-class DimensionLabelsImage(_LabelsBase):
+class ImageDimensionLabels(_LabelsBase):
     CHANNEL = "channel"
     VERTICAL = "vertical"
     HORIZONTAL_X = "horizontal_x"
@@ -119,7 +119,7 @@ class DimensionLabelsImage(_LabelsBase):
                 "Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                 .format(order_requested, list(geometry.dimension_labels), engine))
         
-class DimensionLabelsAcquisition(_LabelsBase):
+class AcquisitionDimensionLabels(_LabelsBase):
     CHANNEL = "channel"
     ANGLE = "angle"
     VERTICAL = "vertical"

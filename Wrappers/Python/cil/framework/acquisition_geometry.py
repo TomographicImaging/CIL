@@ -22,7 +22,7 @@ from numbers import Number
 
 import numpy
 
-from .label import DimensionLabelsAcquisition, UnitsAngles, AcquisitionType, FillTypes, AcquisitionDimension
+from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionType, FillTypes, AcquisitionDimension
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
 
@@ -1624,13 +1624,13 @@ class AcquisitionGeometry(object):
     #for backwards compatibility
     @property
     def ANGLE(self):
-        warnings.warn("use DimensionLabelsAcquisition.Angle instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsAcquisition.ANGLE
+        warnings.warn("use AcquisitionDimensionLabels.Angle instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimensionLabels.ANGLE
 
     @property
     def CHANNEL(self):
-        warnings.warn("use DimensionLabelsAcquisition.Channel instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsAcquisition.CHANNEL
+        warnings.warn("use AcquisitionDimensionLabels.Channel instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimensionLabels.CHANNEL
 
     @property
     def DEGREE(self):
@@ -1639,8 +1639,8 @@ class AcquisitionGeometry(object):
 
     @property
     def HORIZONTAL(self):
-        warnings.warn("use DimensionLabelsAcquisition.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsAcquisition.HORIZONTAL
+        warnings.warn("use AcquisitionDimensionLabels.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimensionLabels.HORIZONTAL
 
     @property
     def RADIAN(self):
@@ -1649,8 +1649,8 @@ class AcquisitionGeometry(object):
 
     @property
     def VERTICAL(self):
-        warnings.warn("use DimensionLabelsAcquisition.VERTICAL instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsAcquisition.VERTICAL
+        warnings.warn("use AcquisitionDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimensionLabels.VERTICAL
 
     @property
     def geom_type(self):
@@ -1722,10 +1722,10 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {DimensionLabelsAcquisition.CHANNEL.value: self.config.channels.num_channels,
-                      DimensionLabelsAcquisition.ANGLE.value: self.config.angles.num_positions,
-                      DimensionLabelsAcquisition.VERTICAL.value: self.config.panel.num_pixels[1],
-                      DimensionLabelsAcquisition.HORIZONTAL.value: self.config.panel.num_pixels[0]}
+        shape_dict = {AcquisitionDimensionLabels.CHANNEL.value: self.config.channels.num_channels,
+                      AcquisitionDimensionLabels.ANGLE.value: self.config.angles.num_positions,
+                      AcquisitionDimensionLabels.VERTICAL.value: self.config.panel.num_pixels[1],
+                      AcquisitionDimensionLabels.HORIZONTAL.value: self.config.panel.num_pixels[0]}
         shape = []
         for label in self.dimension_labels:
             shape.append(shape_dict[label])
@@ -1734,7 +1734,7 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
-        labels_default = DimensionLabelsAcquisition.get_default_order_for_engine("CIL")
+        labels_default = AcquisitionDimensionLabels.get_default_order_for_engine("CIL")
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -1765,8 +1765,8 @@ class AcquisitionGeometry(object):
         if val is not None:
             label_new=[]
             for x in val:
-                if DimensionLabelsAcquisition.validate(x):
-                    label_new.append(DimensionLabelsAcquisition.get_enum_value(x))
+                if AcquisitionDimensionLabels.validate(x):
+                    label_new.append(AcquisitionDimensionLabels.get_enum_value(x))
 
             self._dimension_labels = tuple(label_new)
 

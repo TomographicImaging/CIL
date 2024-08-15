@@ -22,24 +22,24 @@ from numbers import Number
 import numpy
 
 from .image_data import ImageData
-from .label import DimensionLabelsImage, FillTypes
+from .labels import ImageDimensionLabels, FillTypes
 
 
 class ImageGeometry:
     @property
     def CHANNEL(self):
-        warnings.warn("use DimensionLabelsImage.CHANNEL instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsImage.CHANNEL
+        warnings.warn("use ImageDimensionLabels.CHANNEL instead", DeprecationWarning, stacklevel=2)
+        return ImageDimensionLabels.CHANNEL
 
     @property
     def HORIZONTAL_X(self):
-        warnings.warn("use DimensionLabelsImage.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsImage.HORIZONTAL_X
+        warnings.warn("use ImageDimensionLabels.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
+        return ImageDimensionLabels.HORIZONTAL_X
 
     @property
     def HORIZONTAL_Y(self):
-        warnings.warn("use DimensionLabelsImage.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsImage.HORIZONTAL_Y
+        warnings.warn("use ImageDimensionLabels.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
+        return ImageDimensionLabels.HORIZONTAL_Y
 
     @property
     def RANDOM(self):
@@ -52,15 +52,15 @@ class ImageGeometry:
 
     @property
     def VERTICAL(self):
-        warnings.warn("use DimensionLabelsImage.VERTICAL instead", DeprecationWarning, stacklevel=2)
-        return DimensionLabelsImage.VERTICAL
+        warnings.warn("use ImageDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return ImageDimensionLabels.VERTICAL
 
     @property
     def shape(self):   
-        shape_dict = {DimensionLabelsImage.CHANNEL.value: self.channels,
-                      DimensionLabelsImage.VERTICAL.value: self.voxel_num_z,
-                      DimensionLabelsImage.HORIZONTAL_Y.value: self.voxel_num_y,
-                      DimensionLabelsImage.HORIZONTAL_X.value: self.voxel_num_x}
+        shape_dict = {ImageDimensionLabels.CHANNEL.value: self.channels,
+                      ImageDimensionLabels.VERTICAL.value: self.voxel_num_z,
+                      ImageDimensionLabels.HORIZONTAL_Y.value: self.voxel_num_y,
+                      ImageDimensionLabels.HORIZONTAL_X.value: self.voxel_num_x}
 
         shape = []
         for label in self.dimension_labels:
@@ -75,10 +75,10 @@ class ImageGeometry:
     @property
     def spacing(self):
 
-        spacing_dict = {DimensionLabelsImage.CHANNEL.value: self.channel_spacing,
-                        DimensionLabelsImage.VERTICAL.value: self.voxel_size_z,
-                        DimensionLabelsImage.HORIZONTAL_Y.value: self.voxel_size_y,
-                        DimensionLabelsImage.HORIZONTAL_X.value: self.voxel_size_x}
+        spacing_dict = {ImageDimensionLabels.CHANNEL.value: self.channel_spacing,
+                        ImageDimensionLabels.VERTICAL.value: self.voxel_size_z,
+                        ImageDimensionLabels.HORIZONTAL_Y.value: self.voxel_size_y,
+                        ImageDimensionLabels.HORIZONTAL_X.value: self.voxel_size_x}
 
         spacing = []
         for label in self.dimension_labels:
@@ -97,7 +97,7 @@ class ImageGeometry:
     @property
     def dimension_labels(self):
 
-        labels_default = DimensionLabelsImage.get_default_order_for_engine("CIL")
+        labels_default = ImageDimensionLabels.get_default_order_for_engine("CIL")
 
         shape_default = [   self.channels,
                             self.voxel_num_z,
@@ -125,8 +125,8 @@ class ImageGeometry:
         if labels is not None:
             label_new=[]
             for x in labels:
-                if DimensionLabelsImage.validate(x):
-                    label_new.append(DimensionLabelsImage.get_enum_value(x))
+                if ImageDimensionLabels.validate(x):
+                    label_new.append(ImageDimensionLabels.get_enum_value(x))
 
             self._dimension_labels = tuple(label_new)
 

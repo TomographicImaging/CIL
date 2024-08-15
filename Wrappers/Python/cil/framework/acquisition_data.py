@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
 
-from .label import DimensionLabelsAcquisition, Backends
+from .labels import AcquisitionDimensionLabels, Backends
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
@@ -113,7 +113,7 @@ class AcquisitionData(DataContainer, Partitioner):
 
         try:
             Backends.validate(order)            
-            order = DimensionLabelsAcquisition.get_order_for_engine(order, self.geometry) 
+            order = AcquisitionDimensionLabels.get_order_for_engine(order, self.geometry) 
         except ValueError:
             pass
 

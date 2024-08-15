@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import (ImageData, AcquisitionData, DimensionLabelsAcquisition, DimensionLabelsImage,
+from cil.framework import (ImageData, AcquisitionData, AcquisitionDimensionLabels, ImageDimensionLabels,
                            BlockGeometry)
 from cil.optimisation.operators import BlockOperator, LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
@@ -145,8 +145,8 @@ class ProjectionOperator_ag(ProjectionOperator):
                 "TIGRE projectors are GPU only. Got device = {}".format(
                     device))
 
-        DimensionLabelsImage.check_order_for_engine('tigre', image_geometry)
-        DimensionLabelsAcquisition.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimensionLabels.check_order_for_engine('tigre', image_geometry)
+        AcquisitionDimensionLabels.check_order_for_engine('tigre', acquisition_geometry)
 
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)
@@ -221,7 +221,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != DimensionLabelsAcquisition.ANGLE:
+        if x.dimension_labels[0] != AcquisitionDimensionLabels.ANGLE:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:

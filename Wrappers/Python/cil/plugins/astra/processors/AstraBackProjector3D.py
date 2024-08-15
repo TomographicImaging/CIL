@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, ImageData, DimensionLabelsAcquisition, DimensionLabelsImage
+from cil.framework import DataProcessor, ImageData, AcquisitionDimensionLabels, ImageDimensionLabels
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
 from astra import astra_dict, algorithm, data3d
@@ -66,7 +66,7 @@ class AstraBackProjector3D(DataProcessor):
 
     def set_ImageGeometry(self, volume_geometry):
 
-        DimensionLabelsImage.check_order_for_engine('astra', volume_geometry)
+        ImageDimensionLabels.check_order_for_engine('astra', volume_geometry)
 
         if len(volume_geometry.dimension_labels) > 3:
             raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))
@@ -75,7 +75,7 @@ class AstraBackProjector3D(DataProcessor):
 
     def set_AcquisitionGeometry(self, sinogram_geometry):
 
-        DimensionLabelsAcquisition.check_order_for_engine('astra', sinogram_geometry)
+        AcquisitionDimensionLabels.check_order_for_engine('astra', sinogram_geometry)
 
         if len(sinogram_geometry.dimension_labels) > 3:
             raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))

@@ -18,7 +18,7 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, UnitsAngles, DimensionLabelsAcquisition, DimensionLabelsImage
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, UnitsAngles, AcquisitionDimensionLabels, ImageDimensionLabels
 import numpy as np
 import os
 import olefile
@@ -127,10 +127,10 @@ class ZEISSDataReader(object):
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                allowed_labels = [item.value for item in DimensionLabelsAcquisition]
+                allowed_labels = [item.value for item in AcquisitionDimensionLabels]
                 zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
             else:
-                allowed_labels = [item.value for item in DimensionLabelsImage]
+                allowed_labels = [item.value for item in ImageDimensionLabels]
                 zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
 
             # check roi labels and create tuple for slicing

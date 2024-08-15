@@ -22,7 +22,7 @@ from numbers import Number
 import numpy
 
 from ..utilities.multiprocessing import NUM_THREADS
-from .label import FillTypes
+from .labels import FillTypes
 
 
 class BlockGeometry(object):

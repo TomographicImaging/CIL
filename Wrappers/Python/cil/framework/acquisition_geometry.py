@@ -1734,7 +1734,7 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
-        labels_default = AcquisitionDimensionLabels.get_default_order_for_engine("CIL")
+        labels_default = AcquisitionDimensionLabels.get_default_order_for_engine("cil")
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,

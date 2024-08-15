@@ -591,11 +591,11 @@ class TestCGLS(CCPiTestClass):
                    update_objective_interval=2)
 
         
-    def test_initialization_with_default_tolerance(self):
+    def test_initialization_with_default_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
 
         self.assertEqual(self.alg.tolerance, 0)
     
-    def test_initialization_with_custom_tolerance(self):
+    def test_initialization_with_custom_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
         with self.assertWarns(DeprecationWarning):
             alg = CGLS(initial=self.initial, operator=self.operator, data=self.data, tolerance=0.01)
         self.assertEqual(alg.tolerance, 0.01)
@@ -628,7 +628,7 @@ class TestCGLS(CCPiTestClass):
         self.alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(self.alg.x.as_array(), self.data.as_array())
         
-    def test_should_stop_flag_false(self):
+    def test_should_stop_flag_false(self): #can be deprecated when tolerance is deprecated in CGLS
         # Mocking norms to ensure tolerance isn't reached
         self.alg.run(2)
         self.alg.norms = 10
@@ -638,7 +638,7 @@ class TestCGLS(CCPiTestClass):
 
         self.assertFalse(self.alg.flag())
         
-    def test_should_stop_flag_true(self):
+    def test_should_stop_flag_true(self): #can be deprecated when tolerance is deprecated in CGLS
         # Mocking norms to ensure tolerance is reached
         self.alg.run(4)
         self.alg.norms = 1

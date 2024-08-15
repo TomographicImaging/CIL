@@ -1465,12 +1465,12 @@ class Angles(object):
 
     @property
     def angle_unit(self):
-        return self._angle_unit
+        return self._angle_unit.value
 
     @angle_unit.setter
     def angle_unit(self,val):
         UnitsAngles.validate(val)
-        self._angle_unit = UnitsAngles.get_enum_value(val)
+        self._angle_unit = UnitsAngles.get_enum_member(val)
 
     def __str__(self):
         repres = "Acquisition description:\n"

@@ -22,7 +22,7 @@ import unittest
 
 from cil.framework.labels import (_LabelsBase, 
                                   FillTypes, UnitsAngles, 
-                                  AcquisitionType, AcquisitionDimension, 
+                                  AcquisitionTypes, AcquisitionDimensions, 
                                   ImageDimensionLabels, AcquisitionDimensionLabels, Backends)
 
 from cil.framework import AcquisitionGeometry, ImageGeometry
@@ -31,66 +31,66 @@ class Test_Lables(unittest.TestCase):
 
     def test_labels_validate(self):
 
-        input_good = ["3D", AcquisitionDimension.DIM3]
+        input_good = ["3D", AcquisitionDimensions.DIM3]
         input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
 
         for input in input_good:
-            self.assertTrue(AcquisitionDimension.validate(input))
+            self.assertTrue(AcquisitionDimensions.validate(input))
 
         for input in input_bad:
             with self.assertRaises(ValueError):
-                AcquisitionDimension.validate(input)
+                AcquisitionDimensions.validate(input)
 
 
     def test_labels_get_enum_member(self):
-        out_gold = AcquisitionDimension.DIM3
+        out_gold = AcquisitionDimensions.DIM3
 
-        input_good = ["3D", AcquisitionDimension.DIM3]
+        input_good = ["3D", AcquisitionDimensions.DIM3]
         input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
 
         for input in input_good:
-            out =  AcquisitionDimension.get_enum_member(input)
+            out =  AcquisitionDimensions.get_enum_member(input)
             self.assertEqual(out, out_gold)
-            self.assertTrue(isinstance(out, AcquisitionDimension))
+            self.assertTrue(isinstance(out, AcquisitionDimensions))
         
         for input in input_bad:
             with self.assertRaises(ValueError):
-                AcquisitionDimension.get_enum_member(input)
+                AcquisitionDimensions.get_enum_member(input)
 
 
     def test_labels_get_enum_value(self):
         out_gold = "3D"
 
-        input_good = ["3D", AcquisitionDimension.DIM3]
+        input_good = ["3D", AcquisitionDimensions.DIM3]
         input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
 
         for input in input_good:
-            out =  AcquisitionDimension.get_enum_value(input)
+            out =  AcquisitionDimensions.get_enum_value(input)
             self.assertEqual(out, out_gold)
             self.assertTrue(isinstance(out, str))
         
         for input in input_bad:
             with self.assertRaises(ValueError):
-                AcquisitionDimension.get_enum_value(input)
+                AcquisitionDimensions.get_enum_value(input)
 
 
     def test_labels_eq(self):
-        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimension.DIM3, "3D"))
-        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimension.DIM3, AcquisitionDimension.DIM3))
+        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "3D"))
+        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM3))
 
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimension.DIM3, "DIM3"))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimension.DIM3, "2D"))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimension.DIM3, AcquisitionDimension.DIM2))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimension.DIM3, AcquisitionDimension))
+        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "DIM3"))
+        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "2D"))
+        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM2))
+        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions))
 
 
     def test_labels_contains(self):
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimension, "3D"))
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimension, AcquisitionDimension.DIM3))
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimension, AcquisitionDimension.DIM2))
+        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, "3D"))
+        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions.DIM3))
+        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions.DIM2))
 
-        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimension, "DIM3"))
-        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimension, AcquisitionDimension))
+        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimensions, "DIM3"))
+        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions))
 
 
     def test_backends(self):
@@ -114,16 +114,16 @@ class Test_Lables(unittest.TestCase):
         self.assertTrue(UnitsAngles.RADIAN in UnitsAngles)
 
     def test_acquisition_type(self):
-        self.assertTrue('parallel' in AcquisitionType)
-        self.assertTrue('cone' in AcquisitionType)
-        self.assertTrue(AcquisitionType.PARALLEL in AcquisitionType)
-        self.assertTrue(AcquisitionType.CONE in AcquisitionType)
+        self.assertTrue('parallel' in AcquisitionTypes)
+        self.assertTrue('cone' in AcquisitionTypes)
+        self.assertTrue(AcquisitionTypes.PARALLEL in AcquisitionTypes)
+        self.assertTrue(AcquisitionTypes.CONE in AcquisitionTypes)
 
     def test_acquisition_dimension(self):
-        self.assertTrue('2D' in AcquisitionDimension)
-        self.assertTrue('3D' in AcquisitionDimension)
-        self.assertTrue(AcquisitionDimension.DIM2 in AcquisitionDimension)
-        self.assertTrue(AcquisitionDimension.DIM3 in AcquisitionDimension)
+        self.assertTrue('2D' in AcquisitionDimensions)
+        self.assertTrue('3D' in AcquisitionDimensions)
+        self.assertTrue(AcquisitionDimensions.DIM2 in AcquisitionDimensions)
+        self.assertTrue(AcquisitionDimensions.DIM3 in AcquisitionDimensions)
 
     def test_image_dimension_labels(self):
         self.assertTrue('channel' in ImageDimensionLabels)

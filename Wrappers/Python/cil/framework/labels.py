@@ -147,11 +147,11 @@ class UnitsAngles(_LabelsBase):
     DEGREE = "degree"
     RADIAN = "radian"
 
-class AcquisitionType(_LabelsBase):
+class AcquisitionTypes(_LabelsBase):
     PARALLEL = "parallel"
     CONE = "cone"
 
-class AcquisitionDimension(_LabelsBase):
+class AcquisitionDimensions(_LabelsBase):
     DIM2 = "2D"
     DIM3 = "3D"
 

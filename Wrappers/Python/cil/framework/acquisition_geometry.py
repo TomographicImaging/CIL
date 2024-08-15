@@ -22,7 +22,7 @@ from numbers import Number
 
 import numpy
 
-from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionType, FillTypes, AcquisitionDimension
+from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionTypes, FillTypes, AcquisitionDimensions
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
 
@@ -187,9 +187,9 @@ class SystemConfiguration(object):
     @property
     def dimension(self):
         if self._dimension == 2:
-            return AcquisitionDimension.DIM2.value
+            return AcquisitionDimensions.DIM2.value
         else:
-            return AcquisitionDimension.DIM3.value
+            return AcquisitionDimensions.DIM3.value
 
     @dimension.setter
     def dimension(self,val):
@@ -204,8 +204,8 @@ class SystemConfiguration(object):
 
     @geometry.setter
     def geometry(self,val):
-        AcquisitionType.validate(val)
-        self._geometry = AcquisitionType.get_enum_member(val)
+        AcquisitionTypes.validate(val)
+        self._geometry = AcquisitionTypes.get_enum_member(val)
 
     def __init__(self, dof, geometry, units='units'):
         """Initialises the system component attributes for the acquisition type
@@ -214,7 +214,7 @@ class SystemConfiguration(object):
         self.geometry = geometry
         self.units = units
 
-        if self.geometry == AcquisitionType.PARALLEL:
+        if self.geometry == AcquisitionTypes.PARALLEL:
             self.ray = DirectionVector(dof)
         else:
             self.source = PositionVector(dof)
@@ -345,7 +345,7 @@ class Parallel2D(SystemConfiguration):
     def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Parallel2D, self).__init__(dof=2, geometry = AcquisitionType.PARALLEL, units=units)
+        super(Parallel2D, self).__init__(dof=2, geometry = AcquisitionTypes.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -519,7 +519,7 @@ class Parallel3D(SystemConfiguration):
     def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Parallel3D, self).__init__(dof=3, geometry = AcquisitionType.PARALLEL, units=units)
+        super(Parallel3D, self).__init__(dof=3, geometry = AcquisitionTypes.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -804,7 +804,7 @@ class Cone2D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Cone2D, self).__init__(dof=2, geometry = AcquisitionType.CONE, units=units)
+        super(Cone2D, self).__init__(dof=2, geometry = AcquisitionTypes.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -983,7 +983,7 @@ class Cone3D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Cone3D, self).__init__(dof=3, geometry = AcquisitionType.CONE, units=units)
+        super(Cone3D, self).__init__(dof=3, geometry = AcquisitionTypes.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -2175,7 +2175,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
 
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionType.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+            if geometry_new.geom_type == AcquisitionTypes.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))

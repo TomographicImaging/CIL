@@ -27,4 +27,4 @@ from .vector_geometry import VectorGeometry
 from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer
 from .block import BlockDataContainer, BlockGeometry
 from .partitioner import Partitioner
-from .labels import AcquisitionDimensionLabels, ImageDimensionLabels, FillTypes, UnitsAngles, AcquisitionType, AcquisitionDimension
+from .labels import AcquisitionDimensionLabels, ImageDimensionLabels, FillTypes, UnitsAngles, AcquisitionTypes, AcquisitionDimensions

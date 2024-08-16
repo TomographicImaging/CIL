@@ -193,10 +193,12 @@ class ImageData(DataContainer):
 
     def reorder(self, order=None):
         '''
-        reorders the data in memory as requested.
+        Reorders the data in memory as requested. This is an in-place operation.
 
-        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
-        :type order: list, sting
+        Parameters
+        ----------
+        order : list or str
+            Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.
         '''
 
         if order in Backends:

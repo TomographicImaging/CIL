@@ -6,7 +6,7 @@
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
-    - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency. (#1692)
+    - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
 
 * 24.1.0
   - New Features:

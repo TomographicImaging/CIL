@@ -204,4 +204,4 @@ class ImageData(DataContainer):
         if order in Backends:
             order = ImageDimensionLabels.get_order_for_engine(order, self.geometry)
 
-        super(ImageData, self).reorder(order)
+        super().reorder(order)

@@ -29,49 +29,21 @@ from cil.framework import AcquisitionGeometry, ImageGeometry
 
 class Test_Lables(unittest.TestCase):
 
-    def test_labels_validate(self):
+    def test_base_labels(self):
 
-        input_good = ["3D", AcquisitionDimensions.DIM3]
-        input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
-
-        for input in input_good:
-            self.assertTrue(AcquisitionDimensions.validate(input))
-
-        for input in input_bad:
-            with self.assertRaises(ValueError):
-                AcquisitionDimensions.validate(input)
-
-
-    def test_labels_get_enum_member(self):
         out_gold = AcquisitionDimensions.DIM3
 
         input_good = ["3D", AcquisitionDimensions.DIM3]
         input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
 
-        for input in input_good:
-            out =  AcquisitionDimensions.get_enum_member(input)
+        for item in input_good:
+            out = AcquisitionDimensions(item)
             self.assertEqual(out, out_gold)
             self.assertTrue(isinstance(out, AcquisitionDimensions))
-        
-        for input in input_bad:
+
+        for item in input_bad:
             with self.assertRaises(ValueError):
-                AcquisitionDimensions.get_enum_member(input)
-
-
-    def test_labels_get_enum_value(self):
-        out_gold = "3D"
-
-        input_good = ["3D", AcquisitionDimensions.DIM3]
-        input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
-
-        for input in input_good:
-            out =  AcquisitionDimensions.get_enum_value(input)
-            self.assertEqual(out, out_gold)
-            self.assertTrue(isinstance(out, str))
-        
-        for input in input_bad:
-            with self.assertRaises(ValueError):
-                AcquisitionDimensions.get_enum_value(input)
+                AcquisitionDimensions(item)
 
 
     def test_labels_eq(self):

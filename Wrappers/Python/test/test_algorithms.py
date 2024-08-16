@@ -648,6 +648,12 @@ class TestCGLS(CCPiTestClass):
 
         self.assertTrue(self.alg.flag())
         
+    def test_tolerance_reached_immediately(self): #can be deprecated when tolerance is deprecated in CGLS
+        alg = CGLS(initial=self.operator.domain_geometry().allocate(0), operator=self.operator, data=self.operator.domain_geometry().allocate(0))
+        alg.run(2)
+
+        
+        
     def test_update_objective(self):
         # Mocking squared_norm to return a finite value
 

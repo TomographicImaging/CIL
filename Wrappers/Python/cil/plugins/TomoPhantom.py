@@ -147,7 +147,7 @@ def get_ImageData(num_model, geometry):
 
     '''
     ig = geometry.copy()
-    ig.set_labels(ImageDimensionLabels.get_default_order_for_engine('cil'))
+    ig.set_labels(ImageDimensionLabels.get_order_for_engine('cil'))
     num_dims = len(ig.dimension_labels)
 
     if ImageDimensionLabels.CHANNEL in ig.dimension_labels:

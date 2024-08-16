@@ -97,7 +97,7 @@ class ImageGeometry:
     @property
     def dimension_labels(self):
 
-        labels_default = ImageDimensionLabels.get_default_order_for_engine("cil")
+        labels_default = ImageDimensionLabels.get_order_for_engine("cil")
 
         shape_default = [   self.channels,
                             self.voxel_num_z,

@@ -139,17 +139,17 @@ class Test_Lables(unittest.TestCase):
         
         order_gold = [ImageDimensionLabels.CHANNEL, ImageDimensionLabels.VERTICAL, ImageDimensionLabels.HORIZONTAL_Y, ImageDimensionLabels.HORIZONTAL_X]
 
-        order = ImageDimensionLabels.get_default_order_for_engine("cil")
+        order = ImageDimensionLabels.get_order_for_engine("cil")
         self.assertEqual(order,order_gold )
 
-        order = ImageDimensionLabels.get_default_order_for_engine("tigre")
+        order = ImageDimensionLabels.get_order_for_engine("tigre")
         self.assertEqual(order,order_gold)
 
-        order = ImageDimensionLabels.get_default_order_for_engine("astra")
+        order = ImageDimensionLabels.get_order_for_engine("astra")
         self.assertEqual(order, order_gold)
 
         with self.assertRaises(ValueError):
-            order = AcquisitionDimensionLabels.get_default_order_for_engine("bad_engine")  
+            order = AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
 
 
     def test_image_dimension_labels_get_order(self):
@@ -196,17 +196,17 @@ class Test_Lables(unittest.TestCase):
         self.assertTrue(AcquisitionDimensionLabels.HORIZONTAL in AcquisitionDimensionLabels)
 
     def test_acquisition_dimension_labels_default_order(self):
-        order = AcquisitionDimensionLabels.get_default_order_for_engine("cil")
+        order = AcquisitionDimensionLabels.get_order_for_engine("cil")
         self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.HORIZONTAL])
 
-        order = AcquisitionDimensionLabels.get_default_order_for_engine("tigre")
+        order = AcquisitionDimensionLabels.get_order_for_engine("tigre")
         self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.HORIZONTAL])
 
-        order = AcquisitionDimensionLabels.get_default_order_for_engine("astra")
+        order = AcquisitionDimensionLabels.get_order_for_engine("astra")
         self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.HORIZONTAL])
 
         with self.assertRaises(ValueError):
-            order = AcquisitionDimensionLabels.get_default_order_for_engine("bad_engine")  
+            order = AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
 
     def test_acquisition_dimension_labels_get_order(self):
 

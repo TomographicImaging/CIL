@@ -20,104 +20,13 @@ from enum import Enum, EnumMeta
 
 class _LabelsBase(Enum):
     """
-    Base class for labels enumeration.
+    Base class for labels enumeration. These changes are needed for python < 3.12.
 
     Methods:
     --------
-    - validate(label): Validates if the given label is a valid member of the enumeration.
-    - get_enum_member(label): Returns the enum member corresponding to the given label.
-    - get_enum_value(label): Returns the value of the enum member corresponding to the given label.
-    - __eq__(other): Checks if the enum value is equal to the given value.
-    - __contains__(item): Checks if the enum contains the given value.
+    - __eq__(other): Checks if the enum or enum values are equal
+    - __contains__(item): Checks if the enum contains the given value
     """
-
-    @classmethod
-    def validate(cls, label):
-        """
-        Validates if the given label is a valid member of the specified class.
-
-        Parameters:
-        ----------
-        label : str, enum
-            The label to validate.
-
-        Raises:
-        -------
-        ValueError
-            If the label is not a valid member of the class.
-
-        Returns:
-        --------
-        bool
-            True if the label is a valid member of the class, False otherwise.
-        """
-
-        try:
-            for member in cls:
-                if member == label:
-                    return True
-        except AttributeError:
-            pass
-
-        raise ValueError(f"Expected one of {[e.value for e in cls]} \
-                         from {cls.__name__}, got {label}")
-
-
-    @classmethod
-    def get_enum_member(cls, label):
-        """
-        Returns the enum member corresponding to the given label.
-
-        Parameters:
-        ----------
-        label : str
-            The label to get the corresponding enum member.
-
-        Raises:
-        -------
-        ValueError
-            If the label is not a valid member of the class.
-
-        Returns:
-        --------
-        Enum
-            The enum member corresponding to the given label.
-        """
-
-        try:
-            for member in cls:
-                if member == label:
-                    return member
-        except AttributeError:
-            pass
-
-        raise ValueError(f"Expected one of {[e.value for e in cls]} \
-                         from {cls.__name__}, got {label}")
-
-
-    @classmethod
-    def get_enum_value(cls, label):
-        """
-        Returns the value of the enum member corresponding to the given label.
-
-        Parameters:
-        ----------
-        label : str
-            The enum member to get the corresponding enum value.
-
-        Raises:
-        -------
-        ValueError
-            If the label is not a valid member of the class.
-
-        Returns:
-        --------
-        str
-            The value of the enum member corresponding to the given label.
-        """
-
-        return cls.get_enum_member(label).value
-
 
     def __eq__(self, other):
         if self.value == other:
@@ -174,39 +83,7 @@ class ImageDimensionLabels(_LabelsBase):
     HORIZONTAL_Y = "horizontal_y"
 
     @classmethod
-    def get_default_order_for_engine(cls, engine):
-        """
-        Returns the default dimension order for the given engine.
-        
-        Parameters
-        ----------
-        engine : str
-            The engine to get the default dimension order for.
-
-        Returns
-        -------
-        list
-            The default dimension order for the given engine.
-
-        Raises
-        ------
-        ValueError
-            If the engine is not a valid member of the Backends enumeration
-        """
-        order = [cls.CHANNEL.value, cls.VERTICAL.value, \
-                 cls.HORIZONTAL_Y.value, cls.HORIZONTAL_X.value]
-        engine_orders = {
-            Backends.ASTRA.value: order,
-            Backends.TIGRE.value: order,
-            Backends.CIL.value: order
-        }
-        Backends.validate(engine)
-        engine = Backends.get_enum_value(engine)
-
-        return engine_orders[engine]
-
-    @classmethod
-    def get_order_for_engine(cls, engine, geometry):
+    def get_order_for_engine(cls, engine, geometry=None):
         """
         Returns the order of dimensions for a specific engine and geometry.
 
@@ -214,18 +91,29 @@ class ImageDimensionLabels(_LabelsBase):
         ----------
         engine : str
             The engine name.
-        geometry : ImageGeometry
+        geometry : ImageGeometry, optional
+            The geometry object. If None, the default order is returned.
 
         Returns:
         --------
         list
             The order of dimensions for the given engine and geometry.
         """
+        order = [cls.CHANNEL.value, cls.VERTICAL.value, \
+                 cls.HORIZONTAL_Y.value, cls.HORIZONTAL_X.value]
+        
+        engine_orders = {
+            Backends.ASTRA.value: order,
+            Backends.TIGRE.value: order,
+            Backends.CIL.value: order
+        }
 
-        dim_order = cls.get_default_order_for_engine(engine)
-        dimensions = [label for label in dim_order if label in geometry.dimension_labels ]
+        dim_order = engine_orders[Backends(engine).value]
 
-        return dimensions
+        if geometry is None:
+            return dim_order
+        else:
+            return [label for label in dim_order if label in geometry.dimension_labels ]
 
     @classmethod
     def check_order_for_engine(cls, engine, geometry):
@@ -242,7 +130,7 @@ class ImageDimensionLabels(_LabelsBase):
         Returns:
         --------
         bool
-            True if the order of dimensions is correct, False otherwise.
+            True if the order of dimensions is correct.
 
         Raises:
         -------
@@ -283,27 +171,24 @@ class AcquisitionDimensionLabels(_LabelsBase):
     VERTICAL = "vertical"
     HORIZONTAL = "horizontal"
 
-    @classmethod
-    def get_default_order_for_engine(cls, engine):
-        """
-        Returns the default dimension order for the given engine.
 
-        Parameters
+    @classmethod
+    def get_order_for_engine(cls, engine, geometry=None):
+        """
+        Returns the order of dimensions for a specific engine and geometry.
+
+        Parameters:
         ----------
         engine : str
-            The engine to get the default dimension order for.
+            The engine name.
+        geometry : AcquisitionGeometry, optional
+            The geometry object. If None, the default order is returned.
 
-        Returns
-        -------
+        Returns:
+        --------
         list
-            The default dimension order for the given engine.
-
-        Raises
-        ------
-        ValueError
-            If the engine is not a valid member of the Backends enumeration
+            The order of dimensions for the given engine and geometry.
         """
-
         engine_orders = {
             Backends.ASTRA.value: [cls.CHANNEL.value, cls.VERTICAL.value, \
                                    cls.ANGLE.value, cls.HORIZONTAL.value],
@@ -312,32 +197,14 @@ class AcquisitionDimensionLabels(_LabelsBase):
             Backends.CIL.value: [cls.CHANNEL.value, cls.ANGLE.value, \
                                  cls.VERTICAL.value, cls.HORIZONTAL.value]
         }
-        Backends.validate(engine)
-        engine = Backends.get_enum_value(engine)
 
-        return engine_orders[engine]
+        dim_order = engine_orders[Backends(engine).value]
 
-    @classmethod
-    def get_order_for_engine(cls, engine, geometry):
-        """
-        Returns the order of dimensions for a specific engine and geometry.
+        if geometry is None:
+            return dim_order
+        else:
+            return [label for label in dim_order if label in geometry.dimension_labels ]
 
-        Parameters:
-        ----------
-        engine : str
-            The engine name.
-        geometry : AcquisitionGeometry
-
-        Returns:
-        --------
-        list
-            The order of dimensions for the given engine and geometry.
-        """
-
-        dim_order = cls.get_default_order_for_engine(engine)
-        dimensions = [label for label in dim_order if label in geometry.dimension_labels ]
-
-        return dimensions
 
     @classmethod
     def check_order_for_engine(cls, engine, geometry):
@@ -353,7 +220,7 @@ class AcquisitionDimensionLabels(_LabelsBase):
         Returns:
         --------
         bool
-            True if the order of dimensions is correct, False otherwise.
+            True if the order of dimensions is correct
 
         Raises:
         -------

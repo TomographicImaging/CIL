@@ -111,10 +111,7 @@ class AcquisitionData(DataContainer, Partitioner):
         :type order: list, sting
         '''
 
-        try:
-            Backends.validate(order)            
-            order = AcquisitionDimensionLabels.get_order_for_engine(order, self.geometry) 
-        except ValueError:
-            pass
+        if order in Backends :
+            order = AcquisitionDimensionLabels.get_order_for_engine(order, self.geometry)
 
         super(AcquisitionData, self).reorder(order)

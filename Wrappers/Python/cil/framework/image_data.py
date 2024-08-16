@@ -199,10 +199,7 @@ class ImageData(DataContainer):
         :type order: list, sting
         '''
 
-        try:
-            Backends.validate(order)            
-            order = ImageDimensionLabels.get_order_for_engine(order, self.geometry) 
-        except ValueError:
-            pass
+        if order in Backends:
+            order = ImageDimensionLabels.get_order_for_engine(order, self.geometry)
 
         super(ImageData, self).reorder(order)

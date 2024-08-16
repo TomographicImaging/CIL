@@ -97,9 +97,7 @@ class VectorGeometry:
         if isinstance(value, Number):
             if value != 0:
                 out += value
-        elif value is not None:
-            FillTypes.validate(value)
-
+        elif value in FillTypes:
             if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -117,8 +115,8 @@ class VectorGeometry:
                     out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
                 else:
                     out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
-            elif value is None:
-                pass
-            else:
-                raise ValueError('Value {} unknown'.format(value))
+        elif value is None:
+            pass
+        else:
+            raise ValueError(f'Value {value} unknown')
         return out

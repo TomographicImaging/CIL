@@ -123,11 +123,7 @@ class ImageGeometry:
 
     def set_labels(self, labels):
         if labels is not None:
-            label_new=[]
-            for x in labels:
-                if ImageDimensionLabels.validate(x):
-                    label_new.append(ImageDimensionLabels.get_enum_value(x))
-
+            label_new=[ImageDimensionLabels(x).value for x in labels if x in ImageDimensionLabels]
             self._dimension_labels = tuple(label_new)
 
     def __eq__(self, other):
@@ -290,9 +286,7 @@ class ImageGeometry:
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        elif value is not None:
-            FillTypes.validate(value)
-
+        elif value in FillTypes:
             if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -312,4 +306,8 @@ class ImageGeometry:
                     out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
                 else:
                     out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+        elif value is None:
+            pass
+        else:
+            raise ValueError(f'Value {value} unknown')
         return out

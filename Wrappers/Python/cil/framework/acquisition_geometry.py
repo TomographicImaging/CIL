@@ -204,8 +204,7 @@ class SystemConfiguration(object):
 
     @geometry.setter
     def geometry(self,val):
-        AcquisitionTypes.validate(val)
-        self._geometry = AcquisitionTypes.get_enum_member(val)
+        self._geometry = AcquisitionTypes(val)
 
     def __init__(self, dof, geometry, units='units'):
         """Initialises the system component attributes for the acquisition type
@@ -1469,8 +1468,7 @@ class Angles(object):
 
     @angle_unit.setter
     def angle_unit(self,val):
-        UnitsAngles.validate(val)
-        self._angle_unit = UnitsAngles.get_enum_member(val)
+        self._angle_unit = UnitsAngles(val)
 
     def __str__(self):
         repres = "Acquisition description:\n"
@@ -1761,13 +1759,8 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
 
-
         if val is not None:
-            label_new=[]
-            for x in val:
-                if AcquisitionDimensionLabels.validate(x):
-                    label_new.append(AcquisitionDimensionLabels.get_enum_value(x))
-
+            label_new=[AcquisitionDimensionLabels(x).value for x in val if x in AcquisitionDimensionLabels]
             self._dimension_labels = tuple(label_new)
 
     @property
@@ -1839,8 +1832,7 @@ class AcquisitionGeometry(object):
         else:
             raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
 
-        UnitsAngles.validate(angle_units)
-        angle_units = UnitsAngles.get_enum_member(angle_units)
+        angle_units = UnitsAngles(angle_units)
 
         angle = angle_rad
         if angle_units == UnitsAngles.DEGREE:
@@ -1884,8 +1876,7 @@ class AcquisitionGeometry(object):
             raise NotImplementedError()
 
 
-        UnitsAngles.validate(angle_units)
-        angle_units = UnitsAngles.get_enum_member(angle_units)
+        angle_units = UnitsAngles(angle_units)
 
         angle_rad = angle
         if angle_units == UnitsAngles.DEGREE:
@@ -2205,9 +2196,7 @@ class AcquisitionGeometry(object):
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        elif value is not None:
-            FillTypes.validate(value)
-
+        elif value in FillTypes:
             if value == FillTypes.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -2227,5 +2216,8 @@ class AcquisitionGeometry(object):
                 else:
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=dtype))
-
+        elif value is None:
+            pass
+        else:
+            raise ValueError(f'Value {value} unknown')
         return out

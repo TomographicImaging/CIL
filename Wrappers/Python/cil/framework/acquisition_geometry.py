@@ -1737,9 +1737,10 @@ class AcquisitionGeometry(object):
                             ]
 
         try:
-            labels = list(self._dimension_labels)
+            labels = self._dimension_labels
         except AttributeError:
-            labels = labels_default.copy()
+            labels = labels_default
+        labels = list(labels)
 
         #remove from list labels where len == 1
         #

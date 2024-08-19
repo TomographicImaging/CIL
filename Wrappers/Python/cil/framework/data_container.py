@@ -56,8 +56,8 @@ class DataContainer(object):
     def dimension_labels(self, val):
         if val is None:
             self._dimension_labels = None
-        elif len(list(val))==self.number_of_dimensions:
-            self._dimension_labels = tuple(val)
+        elif len(val_tuple := tuple(val)) == self.number_of_dimensions:
+            self._dimension_labels = val_tuple
         else:
             raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
@@ -260,7 +260,7 @@ class DataContainer(object):
         else:
 
             axis = [':']* self.number_of_dimensions
-            dimension_labels = list(self.dimension_labels)
+            dimension_labels = tuple(self.dimension_labels)
             for k,v in dimension.items():
                 i = dimension_labels.index(k)
                 axis[i] = v

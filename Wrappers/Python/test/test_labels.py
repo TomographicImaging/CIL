@@ -88,7 +88,7 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(getattr(ImageDimensionLabels, i), ImageDimensionLabels)
 
     def test_image_dimension_labels_default_order(self):
-        order_gold = [ImageDimensionLabels.CHANNEL, 'VERTICAL', 'horizontal_y', 'HORIZONTAL_X']
+        order_gold = ImageDimensionLabels.CHANNEL, 'VERTICAL', 'horizontal_y', 'HORIZONTAL_X'
         for i in ('CIL', 'TIGRE', 'ASTRA'):
             self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine(i), order_gold)
 
@@ -100,7 +100,7 @@ class Test_Lables(unittest.TestCase):
         ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
 
         # for 2D all engines have the same order
-        order_gold = [ImageDimensionLabels.CHANNEL, 'HORIZONTAL_Y', 'horizontal_x']
+        order_gold = ImageDimensionLabels.CHANNEL, 'HORIZONTAL_Y', 'horizontal_x'
         self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('cil', ig), order_gold)
         self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('tigre', ig), order_gold)
         self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('astra', ig), order_gold)
@@ -125,9 +125,11 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(getattr(AcquisitionDimensionLabels, i), AcquisitionDimensionLabels)
 
     def test_acquisition_dimension_labels_default_order(self):
-        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine('CIL'), [AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'vertical', 'HORIZONTAL'])
-        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine(Backends.TIGRE), ['CHANNEL', 'ANGLE', 'VERTICAL', 'HORIZONTAL'])
-        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine('astra'), ['CHANNEL', 'VERTICAL', 'ANGLE', 'HORIZONTAL'])
+        gold = AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'vertical', 'HORIZONTAL'
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('CIL'), gold)
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine(Backends.TIGRE), gold)
+        gold = 'CHANNEL', 'VERTICAL', 'ANGLE', 'HORIZONTAL'
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('astra'), gold)
 
         with self.assertRaises((KeyError, ValueError)):
             AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
@@ -140,7 +142,7 @@ class Test_Lables(unittest.TestCase):
             .set_labels(['angle', 'horizontal', 'channel'])
 
         # for 2D all engines have the same order
-        order_gold = [AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'horizontal']
+        order_gold = AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'horizontal'
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('CIL', ag), order_gold)
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('TIGRE', ag), order_gold)
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('ASTRA', ag), order_gold)
@@ -150,10 +152,10 @@ class Test_Lables(unittest.TestCase):
             .set_panel((4,2))\
             .set_labels(['angle', 'horizontal', 'vertical'])
 
-        order_gold = [AcquisitionDimensionLabels.ANGLE, 'VERTICAL', 'horizontal']
+        order_gold = AcquisitionDimensionLabels.ANGLE, 'VERTICAL', 'horizontal'
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("cil", ag), order_gold)
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("tigre", ag), order_gold)
-        order_gold = [AcquisitionDimensionLabels.VERTICAL, 'ANGLE', 'horizontal']
+        order_gold = AcquisitionDimensionLabels.VERTICAL, 'ANGLE', 'horizontal'
         self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("astra", ag), order_gold)
 
     def test_acquisition_dimension_labels_check_order(self):

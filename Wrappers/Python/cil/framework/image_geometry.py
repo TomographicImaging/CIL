@@ -94,9 +94,10 @@ class ImageGeometry:
                             self.voxel_num_x]
 
         try:
-            labels = list(self._dimension_labels)
+            labels = self._dimension_labels
         except AttributeError:
-            labels = labels_default.copy()
+            labels = labels_default
+        labels = list(labels)
 
         for i, x in enumerate(shape_default):
             if x == 0 or x==1:

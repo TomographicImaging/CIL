@@ -151,7 +151,6 @@ class TestDataContainer(CCPiTestClass):
         steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
 
-
     def test_unary_operations(self):
         X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
@@ -176,14 +175,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(ds.as_array()[0][0][0],
                          numpy.sqrt(2., dtype='float32'))
 
-    def test_binary_operations(self):
-        self.binary_add()
-        self.binary_subtract()
-        self.binary_multiply()
-        self.binary_divide()
-
-    def binary_add(self):
-        X, Y, Z = 512, 512, 512
+    def test_binary_add(self):
+        X, Y, Z = 128, 512, 512
         #X, Y, Z = 1024, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
@@ -211,24 +204,23 @@ class TestDataContainer(CCPiTestClass):
         ds0 = ds
         dt1 = 0
         dt2 = 0
-        for i in range(1):
-            steps.append(timer())
-            ds0.add(2, out=out)
-            steps.append(timer())
-            self.assertEqual(3., out.as_array()[0][0][0])
 
-            dt1 += dt(steps)/10
-            steps.append(timer())
-            ds3 = ds0.add(2)
-            steps.append(timer())
-            dt2 += dt(steps)/10
+        steps.append(timer())
+        ds0.add(2, out=out)
+        steps.append(timer())
+        self.assertEqual(3., out.as_array()[0][0][0])
+
+        dt1 += dt(steps)/10
+        steps.append(timer())
+        ds3 = ds0.add(2)
+        steps.append(timer())
+        dt2 += dt(steps)/10
 
         self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
         #self.assertLess(dt1, dt2)
 
-
-    def binary_subtract(self):
-        X, Y, Z = 512, 512, 512
+    def test_binary_subtract(self):
+        X, Y, Z = 128, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
         steps.append(timer())
@@ -271,8 +263,7 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(-1., ds0.as_array()[0][0][0])
         self.assertEqual(-3., ds3.as_array()[0][0][0])
 
-
-    def binary_multiply(self):
+    def test_binary_multiply(self):
         X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
         steps = [timer()]
@@ -311,8 +302,7 @@ class TestDataContainer(CCPiTestClass):
         ds.multiply(2.5, out=ds0)
         self.assertEqual(2.5*2., ds0.as_array()[0][0][0])
 
-
-    def binary_divide(self):
+    def test_binary_divide(self):
         X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
         steps = [timer()]
@@ -327,15 +317,15 @@ class TestDataContainer(CCPiTestClass):
         t1 = 0
         t2 = 0
         N=1
-        for i in range(N):
-            steps.append(timer())
-            ds.divide(ds1, out=ds)
-            steps.append(timer())
-            t1 += dt(steps)/N
-            steps.append(timer())
-            ds2 = ds.divide(ds1)
-            steps.append(timer())
-            t2 += dt(steps)/N
+
+        steps.append(timer())
+        ds.divide(ds1, out=ds)
+        steps.append(timer())
+        t1 += dt(steps)/N
+        steps.append(timer())
+        ds2 = ds.divide(ds1)
+        steps.append(timer())
+        t2 += dt(steps)/N
 
         #self.assertLess(t1, t2)
         self.assertEqual(ds.as_array()[0][0][0], 1.)
@@ -352,7 +342,6 @@ class TestDataContainer(CCPiTestClass):
         #self.assertLess(dt1, dt2)
         self.assertEqual(.25, ds3.as_array()[0][0][0])
         self.assertEqual(.5, ds.as_array()[0][0][0])
-
 
     def test_reverse_operand_algebra(self):
         number = 3/2

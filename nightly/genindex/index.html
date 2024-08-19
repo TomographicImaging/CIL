@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; CIL 24.1.1.dev11+geb254e0b documentation</title>
+    <title>Index &#8212; CIL 24.1.1.dev12+g646264d0 documentation</title>
   
   
   
@@ -15,14 +15,23 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -32,11 +41,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=4cb0e87c476518279630"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=2a862767"></script>
+    <script src="../_static/documentation_options.js?v=958c7b20"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -46,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev11+geb254e0b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev12+g646264d0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="#" />
@@ -129,7 +138,7 @@
     
     
     <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
   
   
 </a></div>
@@ -232,15 +241,11 @@
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
       
     </div>
     
@@ -357,15 +362,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
         
       </div>
     
@@ -389,28 +390,24 @@ document.write(`
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
         <div class="sidebar-primary-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         <div class="sidebar-primary-item">
 <h3><a href="../">Table of Contents</a></h3>
 <ul>
@@ -763,7 +760,7 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.utilities.preconditioner.AdaptiveSensitivity.apply">apply() (cil.optimisation.utilities.preconditioner.AdaptiveSensitivity method)</a>
 
       <ul>
-        <li><a href="../optimisation/#cil.optimisation.utilities.preconditioner.Preconditioner.apply">(cil.optimisation.utilities.preconditioner.Preconditioner method)</a>, <a href="../optimisation/#id45">[1]</a>
+        <li><a href="../optimisation/#cil.optimisation.utilities.preconditioner.Preconditioner.apply">(cil.optimisation.utilities.preconditioner.Preconditioner method)</a>, <a href="../optimisation/#id53">[1]</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.utilities.preconditioner.Sensitivity.apply">(cil.optimisation.utilities.preconditioner.Sensitivity method)</a>
 </li>
@@ -773,11 +770,15 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.approximate_gradient">approximate_gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.approximate_gradient">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.approximate_gradient">(cil.optimisation.functions.SAGAFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.approximate_gradient">(cil.optimisation.functions.SAGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.approximate_gradient">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.approximate_gradient">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
       </ul></li>
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction">ApproximateGradientSumFunction (class in cil.optimisation.functions)</a>
@@ -863,6 +864,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.centered_at">(cil.optimisation.functions.LeastSquares method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.centered_at">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.centered_at">(cil.optimisation.functions.MixedL11Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.centered_at">(cil.optimisation.functions.MixedL21Norm method)</a>
@@ -884,6 +887,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.centered_at">(cil.optimisation.functions.SumFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.centered_at">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.centered_at">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.centered_at">(cil.optimisation.functions.TotalVariation method)</a>
 </li>
@@ -964,6 +969,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.convex_conjugate">(cil.optimisation.functions.LeastSquares method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.convex_conjugate">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.convex_conjugate">(cil.optimisation.functions.MixedL11Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.convex_conjugate">(cil.optimisation.functions.MixedL21Norm method)</a>
@@ -985,6 +992,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.convex_conjugate">(cil.optimisation.functions.SumFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.convex_conjugate">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.convex_conjugate">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.convex_conjugate">(cil.optimisation.functions.TotalVariation method)</a>
 </li>
@@ -1032,21 +1041,29 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.data_passes">data_passes (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.data_passes">(cil.optimisation.functions.LSVRGFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.data_passes">(cil.optimisation.functions.SAGAFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.data_passes">(cil.optimisation.functions.SAGFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.data_passes">(cil.optimisation.functions.SGFunction property)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.data_passes">(cil.optimisation.functions.SVRGFunction property)</a>
+</li>
       </ul></li>
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.data_passes_indices">data_passes_indices (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.data_passes_indices">(cil.optimisation.functions.LSVRGFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.data_passes_indices">(cil.optimisation.functions.SAGAFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.data_passes_indices">(cil.optimisation.functions.SAGFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.data_passes_indices">(cil.optimisation.functions.SGFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.data_passes_indices">(cil.optimisation.functions.SVRGFunction property)</a>
 </li>
       </ul></li>
       <li><a href="../framework/#cil.framework.DataContainer">DataContainer (class in cil.framework)</a>
@@ -1183,16 +1200,20 @@ document.write(`
 </li>
       <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.flag">flag() (cil.optimisation.algorithms.CGLS method)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.from_function">from_function() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id43">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.from_function">from_function() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id51">[1]</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.full_gradient">full_gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.full_gradient">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.full_gradient">(cil.optimisation.functions.SAGAFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.full_gradient">(cil.optimisation.functions.SAGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.full_gradient">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.full_gradient">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
       </ul></li>
       <li><a href="../optimisation/#cil.optimisation.functions.Function">Function (class in cil.optimisation.functions)</a>
@@ -1420,6 +1441,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.gradient">(cil.optimisation.functions.LeastSquares method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.gradient">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.gradient">(cil.optimisation.functions.MixedL11Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.gradient">(cil.optimisation.functions.MixedL21Norm method)</a>
@@ -1441,6 +1464,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.gradient">(cil.optimisation.functions.SumFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.gradient">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.gradient">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.gradient">(cil.optimisation.functions.TotalVariation method)</a>
 </li>
@@ -1465,7 +1490,7 @@ document.write(`
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">herman_meyer() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id44">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">herman_meyer() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id52">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1590,6 +1615,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.L">(cil.optimisation.functions.LeastSquares property)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.L">(cil.optimisation.functions.LSVRGFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.L">(cil.optimisation.functions.MixedL11Norm property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.L">(cil.optimisation.functions.MixedL21Norm property)</a>
@@ -1611,6 +1638,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.L">(cil.optimisation.functions.SumFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.L">(cil.optimisation.functions.SumScalarFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.L">(cil.optimisation.functions.SVRGFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.L">(cil.optimisation.functions.TotalVariation property)</a>
 </li>
@@ -1642,6 +1671,8 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.Lmax">Lmax (cil.optimisation.functions.ApproximateGradientSumFunction property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.Lmax">(cil.optimisation.functions.LSVRGFunction property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.Lmax">(cil.optimisation.functions.SAGAFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.Lmax">(cil.optimisation.functions.SAGFunction property)</a>
@@ -1651,6 +1682,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.Lmax">(cil.optimisation.functions.SumFunction property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.Lmax">(cil.optimisation.functions.SumScalarFunction property)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.Lmax">(cil.optimisation.functions.SVRGFunction property)</a>
 </li>
       </ul></li>
       <li><a href="../utilities/#cil.utilities.dataexample.TestData.load">load() (cil.utilities.dataexample.TestData method)</a>
@@ -1691,6 +1724,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.algorithms.SPDHG.loss">(cil.optimisation.algorithms.SPDHG property)</a>
 </li>
       </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction">LSVRGFunction (class in cil.optimisation.functions)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1953,6 +1988,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.proximal">(cil.optimisation.functions.LeastSquares method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.proximal">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal">(cil.optimisation.functions.MixedL11Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.proximal">(cil.optimisation.functions.MixedL21Norm method)</a>
@@ -1974,6 +2011,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.proximal">(cil.optimisation.functions.SumFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.proximal">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.proximal">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.proximal">(cil.optimisation.functions.TotalVariation method)</a>
 </li>
@@ -2007,6 +2046,8 @@ document.write(`
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.LeastSquares.proximal_conjugate">(cil.optimisation.functions.LeastSquares method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.proximal_conjugate">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal_conjugate">(cil.optimisation.functions.MixedL11Norm method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.MixedL21Norm.proximal_conjugate">(cil.optimisation.functions.MixedL21Norm method)</a>
@@ -2028,6 +2069,8 @@ document.write(`
         <li><a href="../optimisation/#cil.optimisation.functions.SumFunction.proximal_conjugate">(cil.optimisation.functions.SumFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction.proximal_conjugate">(cil.optimisation.functions.SumScalarFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.proximal_conjugate">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.TotalVariation.proximal_conjugate">(cil.optimisation.functions.TotalVariation method)</a>
 </li>
@@ -2056,9 +2099,9 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="../utilities/#cil.utilities.dataexample.TestData.random_noise">random_noise() (cil.utilities.dataexample.TestData static method)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">random_with_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id41">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">random_with_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id49">[1]</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">random_without_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id42">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">random_without_replacement() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id50">[1]</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.operators.BlockOperator.range_geometry">range_geometry() (cil.optimisation.operators.BlockOperator method)</a>
 
@@ -2195,11 +2238,15 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.set_data_partition_weights">set_data_partition_weights() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.functions.LSVRGFunction.set_data_partition_weights">(cil.optimisation.functions.LSVRGFunction method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGAFunction.set_data_partition_weights">(cil.optimisation.functions.SAGAFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SAGFunction.set_data_partition_weights">(cil.optimisation.functions.SAGFunction method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.functions.SGFunction.set_data_partition_weights">(cil.optimisation.functions.SGFunction method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction.set_data_partition_weights">(cil.optimisation.functions.SVRGFunction method)</a>
 </li>
       </ul></li>
       <li><a href="../recon/#cil.recon.FBP.set_fft_order">set_fft_order() (cil.recon.FBP method)</a>
@@ -2282,10 +2329,10 @@ document.write(`
 </li>
       <li><a href="../optimisation/#cil.optimisation.algorithms.PDHG.set_step_sizes">set_step_sizes() (cil.optimisation.algorithms.PDHG method)</a>
 </li>
-      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">set_suppress_evaluation() (cil.optimisation.functions.IndicatorBox method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="../optimisation/#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">set_suppress_evaluation() (cil.optimisation.functions.IndicatorBox method)</a>
+</li>
       <li><a href="../io/#cil.io.NEXUSDataReader.set_up">set_up() (cil.io.NEXUSDataReader method)</a>
 
       <ul>
@@ -2388,7 +2435,7 @@ document.write(`
         <li><a href="../framework/#cil.framework.VectorData.squared_norm">(cil.framework.VectorData method)</a>
 </li>
       </ul></li>
-      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.staggered">staggered() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id40">[1]</a>
+      <li><a href="../optimisation/#cil.optimisation.utilities.Sampler.staggered">staggered() (cil.optimisation.utilities.Sampler static method)</a>, <a href="../optimisation/#id48">[1]</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.utilities.StepSizeMethods.StepSizeRule">StepSizeRule (class in cil.optimisation.utilities.StepSizeMethods)</a>
 </li>
@@ -2409,6 +2456,8 @@ document.write(`
       <li><a href="../optimisation/#cil.optimisation.operators.SumOperator">SumOperator (class in cil.optimisation.operators)</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.functions.SumScalarFunction">SumScalarFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.functions.SVRGFunction">SVRGFunction (class in cil.optimisation.functions)</a>
 </li>
       <li><a href="../processors/#cil.processors.Padder.symmetric">symmetric() (cil.processors.Padder static method)</a>
 </li>
@@ -2592,8 +2641,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

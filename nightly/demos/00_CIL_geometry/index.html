@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A detailed look at CIL geometry &#8212; CIL 24.1.1.dev11+geb254e0b documentation</title>
+    <title>A detailed look at CIL geometry &#8212; CIL 24.1.1.dev12+g646264d0 documentation</title>
   
   
   
@@ -16,14 +16,23 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -31,14 +40,14 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=4cb0e87c476518279630"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../_static/documentation_options.js?v=2a862767"></script>
+    <script src="../../_static/documentation_options.js?v=958c7b20"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +59,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev11+geb254e0b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev12+g646264d0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../genindex/" />
@@ -135,7 +144,7 @@
     
     
     <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
   
   
 </a></div>
@@ -238,15 +247,11 @@
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
       
     </div>
     
@@ -361,15 +366,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
         
       </div>
     
@@ -393,28 +394,24 @@ document.write(`
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
         <div class="sidebar-primary-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         <div class="sidebar-primary-item">
 <h3><a href="../../">Table of Contents</a></h3>
 <ul class="current">
@@ -667,7 +664,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf3b97320&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f42bfa330&gt;
 </pre></div></div>
 </div>
 </section>
@@ -708,7 +705,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf3b5ebd0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f42bc3920&gt;
 </pre></div></div>
 </div>
 </section>
@@ -749,7 +746,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf0bd2ae0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f421abf80&gt;
 </pre></div></div>
 </div>
 </section>
@@ -786,7 +783,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf0bd05f0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f42bc2690&gt;
 </pre></div></div>
 </div>
 </section>
@@ -821,7 +818,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf0bf5610&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f40d157c0&gt;
 </pre></div></div>
 </div>
 <p>You can set <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code>, <code class="docutils literal notranslate"><span class="pre">detector_direction_x</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_direction_y</span></code> by specifying a 3D directional vector <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code>.</p>
@@ -853,7 +850,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf0bf6600&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f40bcbf80&gt;
 </pre></div></div>
 </div>
 <p>In 3D datasets we can tilt the rotation axis to describe laminograpy geometry by changing <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code></p>
@@ -882,7 +879,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf3bbf0e0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f42bc1f40&gt;
 </pre></div></div>
 </div>
 </section>
@@ -1043,7 +1040,7 @@ ImageGeometry - Offset RoI
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7feaf387a630&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f3f42cb5c40&gt;
 </pre></div></div>
 </div>
 <p>We can also create an <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> directly.</p>
@@ -1107,8 +1104,8 @@ ImageGeometry - Offset RoI
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

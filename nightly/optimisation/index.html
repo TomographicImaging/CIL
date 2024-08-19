@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.1.1.dev11+geb254e0b documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.1.1.dev12+g646264d0 documentation</title>
   
   
   
@@ -16,14 +16,23 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=4cb0e87c476518279630" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=4cb0e87c476518279630" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=f283d04fae41aba60e43" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -33,11 +42,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=4cb0e87c476518279630"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=2a862767"></script>
+    <script src="../_static/documentation_options.js?v=958c7b20"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +58,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev11+geb254e0b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev12+g646264d0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -134,7 +143,7 @@
     
     
     <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
-    <script>document.write(`<img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark" alt="CIL - Home"/>`);</script>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
   
   
 </a></div>
@@ -237,15 +246,11 @@
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
       
     </div>
     
@@ -360,15 +365,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+  <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+</button></div>
         
       </div>
     
@@ -392,28 +393,24 @@ document.write(`
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
         <div class="sidebar-primary-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         <div class="sidebar-primary-item">
 <h3><a href="../">Table of Contents</a></h3>
 <ul class="current">
@@ -465,6 +462,8 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="#stochastic-gradient-function">Stochastic Gradient function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sag-function">SAG function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#saga-function">SAGA function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stochastic-variance-reduced-gradient-function">Stochastic Variance Reduced Gradient Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loopless-stochastic-variance-reduced-gradient-function">Loopless Stochastic Variance Reduced Gradient Function</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
@@ -995,7 +994,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SIRT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Link to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id62" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id70" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1163,7 +1162,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">ISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Link to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id60" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id59" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Iterative Shrinkage-Thresholding Algorithm (ISTA)</p>
 <div class="math notranslate nohighlight">
 \[x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))\]</div>
@@ -1178,7 +1177,7 @@ is the <code class="code docutils literal notranslate"><span class="pre">step_si
 is guaranteed if</p>
 <div class="math notranslate nohighlight">
 \[\alpha\in(0, \frac{2}{L}),\]</div>
-<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id64" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id72" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1491,7 +1490,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">FISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Link to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id60" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id59" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
 <p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
@@ -1520,8 +1519,8 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id54" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
-<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id53" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id62" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id61" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1813,7 +1812,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">PDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_fconj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/PDHG/#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Link to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id55" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id56" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id63" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id64" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1839,7 +1838,7 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id58" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id57" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id66" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id65" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -2500,7 +2499,8 @@ The multiplication ensures that the (SAGA, SGD, and SVRG  and LSVRG) approximate
 <h3>Memory requirements<a class="headerlink" href="#memory-requirements" title="Link to this heading">#</a></h3>
 <p>Note that the approximate gradient methods have different memory requirements:
 + The <cite>SGFunction</cite> has the same requirements as a <cite>SumFunction</cite>, so no increased memory usage
-+ <cite>SAGFunction</cite> and <cite>SAGAFunction</cite> both store <cite>n+3</cite> times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations.</p>
++ <cite>SAGFunction</cite> and <cite>SAGAFunction</cite> both store <cite>n+3</cite> times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations.
++ <cite>SVRGFunction</cite> and <cite>LSVRGFunction</cite> with the default <cite>store_gradients = False</cite> store 4 times the image size in memory, including the “snapshot” point and gradient. If <cite>store_gradients = True</cite>, some computational effort is saved, at the expensive of stored memory <cite>n+4</cite> times the image size.</p>
 </section>
 </section>
 <section id="operators">
@@ -2728,7 +2728,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id65"><span class="problematic" id="id66">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id73"><span class="problematic" id="id74">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -4495,7 +4495,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id69"><span class="problematic" id="id70">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id77"><span class="problematic" id="id78">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -5754,7 +5754,7 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 <dt class="sig sig-object py" id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/MixedL21Norm/#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Link to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id67"><span class="problematic" id="id68">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id75"><span class="problematic" id="id76">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py property">
@@ -5975,7 +5975,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id71"><span class="problematic" id="id72">problem_</span></a> of the above problem, see <span id="id20">[<a class="reference internal" href="#id60" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id21">[<a class="reference internal" href="#id59" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id22">[<a class="reference internal" href="#id63" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
+applied to the _dual <a href="#id79"><span class="problematic" id="id80">problem_</span></a> of the above problem, see <span id="id20">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id21">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id22">[<a class="reference internal" href="#id71" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -6023,7 +6023,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id23">[<a class="reference internal" href="#id61" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id24">[<a class="reference internal" href="#id55" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id23">[<a class="reference internal" href="#id69" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id24">[<a class="reference internal" href="#id63" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -7050,6 +7050,450 @@ abla f_i(x_0)\)</span> for initial point <span class="math notranslate nohighlig
 </dd></dl>
 
 </section>
+<section id="stochastic-variance-reduced-gradient-function">
+<h3>Stochastic Variance Reduced Gradient Function<a class="headerlink" href="#stochastic-variance-reduced-gradient-function" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></span><span class="sig-name descname"><span class="pre">SVRGFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_update_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_gradients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/SVRGFunction/#SVRGFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction" title="Link to this definition">#</a></dt>
+<dd><p>The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of <span class="math notranslate nohighlight">\(\sum_{i=1}^{n-1}f_i\)</span>.  For this approximation, every <cite>snapshot_update_interval</cite> number of iterations, a full gradient calculation is made at this “snapshot” point. Intermediate gradient calculations update this snapshot by taking a index <span class="math notranslate nohighlight">\(i_k\)</span> and calculating the gradient of :math:<a href="#id36"><span class="problematic" id="id37">`</span></a>f_{i_k}`s at the current iterate and the snapshot, updating the approximate gradient to be:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(\tilde{x}\)</span> is the latest “snapshot” point and <span class="math notranslate nohighlight">\(x_k\)</span> is the value at the current iteration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Compared with the literature, we multiply by <span class="math notranslate nohighlight">\(n\)</span>, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case where <cite>store_gradients=False</cite> the memory requirements are 4 times the image size (1 stored full gradient at the “snapshot”, one stored “snapshot” point and two lots of intermediary calculations). Alternatively, if  <cite>store_gradients=True</cite>  the memory requirement is <cite>n+4</cite> (<cite>n</cite> gradients at the snapshot for each function in the sum, one stored full gradient at the “snapshot”, one stored “snapshot” point and two lots of intermediary calculations).</p>
+<p>Johnson, R. and Zhang, T., 2013. Accelerating stochastic gradient descent using predictive variance reduction. Advances in neural information processing systems, 26.https://proceedings.neurips.cc/paper_files/paper/2013/file/ac1dd209cbcc5e5d1c6e28598e8cbbe8-Paper.pdf</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>functions</strong> (<cite>list</cite>  of functions) – A list of functions: <code class="code docutils literal notranslate"><span class="pre">[f_{0},</span> <span class="pre">f_{1},</span> <span class="pre">...,</span> <span class="pre">f_{n-1}]</span></code>. Each function is assumed to be smooth with an implemented <a class="reference internal" href="#cil.optimisation.functions.Function.gradient" title="cil.optimisation.functions.Function.gradient"><code class="xref py py-func docutils literal notranslate"><span class="pre">gradient()</span></code></a> method. All functions must have the same domain. The number of functions must be strictly greater than 1.</p></li>
+<li><p><strong>sampler</strong> (An instance of a CIL Sampler class ( <code class="xref py py-meth docutils literal notranslate"><span class="pre">sampler()</span></code>) or of another class which has a <cite>next</cite> function implemented to output integers in {0, 1, …, n-1}.) – This sampler is called each time gradient is called and  sets the internal <cite>function_num</cite> passed to the <cite>approximate_gradient</cite> function.  Default is <cite>Sampler.random_with_replacement(len(functions))</cite>.</p></li>
+<li><p><strong>snapshot_update_interval</strong> (<em>positive int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The interval for updating the full gradient (taking a snapshot). The default is 2*len(functions) so a “snapshot” is taken every 2*len(functions) iterations. If the user passes <cite>0</cite> then no full gradient snapshots will be taken.</p></li>
+<li><p><strong>store_gradients</strong> (bool, default: <cite>False</cite>) – Flag indicating whether to store an update a list of gradients for each function <span class="math notranslate nohighlight">\(f_i\)</span> or just to store the snapshot point :math:` tilde{x}` and its gradient <span class="math notranslate nohighlight">\(\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/SVRGFunction/#SVRGFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.gradient" title="Link to this definition">#</a></dt>
+<dd><p>Selects a random function using the <cite>sampler</cite> and then calls the approximate gradient at <code class="code docutils literal notranslate"><span class="pre">x</span></code> or calculates a full gradient depending on the update frequency</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> (</em><em>e.g. ImageData object</em><em>)</em>)</p></li>
+<li><p><strong>out</strong> (return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the value of the approximate gradient of the sum function at <code class="code docutils literal notranslate"><span class="pre">x</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> (e.g. ImageData object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.approximate_gradient">
+<span class="sig-name descname"><span class="pre">approximate_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/SVRGFunction/#SVRGFunction.approximate_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.approximate_gradient" title="Link to this definition">#</a></dt>
+<dd><dl>
+<dt>Calculates the stochastic gradient at the point <span class="math notranslate nohighlight">\(x\)</span> by using the gradient of the selected function, indexed by <span class="math notranslate nohighlight">\(i_k\)</span>, the <cite>function_number</cite> in {0,…,len(functions)-1}, and the full gradient at the snapshot :math:`     ilde{x}`</dt><dd><div class="math notranslate nohighlight">
+\[n*\]</div>
+</dd>
+</dl>
+<p>abla f_{i_k}(x_k) - n*
+abla f_{i_k}(   ilde{x}) +
+abla sum_{i=0}^{n-1}f_i(       ilde{x})</p>
+<blockquote>
+<div><p>Compared with the literature, we multiply by <span class="math notranslate nohighlight">\(n\)</span>, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</p>
+<p>x : DataContainer (e.g. ImageData object)
+out: return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.
+function_num: <cite>int</cite></p>
+<blockquote>
+<div><p>Between 0 and n-1, where n is the number of functions in the list</p>
+</div></blockquote>
+<dl class="simple">
+<dt>DataContainer (e.g. ImageData object)</dt><dd><p>the value of the approximate gradient of the sum function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> given a <cite>function_number</cite> in {0,…,len(functions)-1}</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.L">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.L" title="Link to this definition">#</a></dt>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.Lmax">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Lmax</span></span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.Lmax" title="Link to this definition">#</a></dt>
+<dd><p>Returns the maximum Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \max_{i}\{L_{i}\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.centered_at">
+<span class="sig-name descname"><span class="pre">centered_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.centered_at" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.</dt><dd><p>TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>center</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The point to center the function at.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The translated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.convex_conjugate">
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.convex_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Evaluation of the function F* at x, where F* is the convex conjugate of function F,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the convex conjugate of the function at x.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.data_passes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_passes</span></span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.data_passes" title="Link to this definition">#</a></dt>
+<dd><p>if your functions do not contain an equal <cite>amount</cite> of data, for example your data was not partitioned into equal batches, then you must first use the <a href="#id38"><span class="problematic" id="id39">`</span></a>set_data_partition_weights” function for this to be accurate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes</span></code> is a list of floats that holds the amount of data that has been processed up until each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.data_passes_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_passes_indices</span></span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.data_passes_indices" title="Link to this definition">#</a></dt>
+<dd><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes_indices</span></code> is a list of lists holding the indices of the functions that are processed in each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending a list of the indices of the functions used to calculate the gradient.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.full_gradient">
+<span class="sig-name descname"><span class="pre">full_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.full_gradient" title="Link to this definition">#</a></dt>
+<dd><p>Returns the value of the  full gradient of the sum of functions at <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\nabla_x(f_{0} + f_{1} + ... + f_{n-1})(x) = \nabla_xf_{0}(x) + \nabla_xf_{1}(x) + ... + \nabla_xf_{n-1}(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the gradient of the sum function at x or nothing if <cite>out</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.proximal">
+<span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.proximal" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span>  evaluated at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>)</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the proximal operator of the function at x with scalar <span class="math notranslate nohighlight">\(\tau\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.proximal_conjugate">
+<span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.proximal_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>)</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the value of the proximal operator of the convex conjugate at point <span class="math notranslate nohighlight">\(x\)</span> for scalar <span class="math notranslate nohighlight">\(\tau\)</span> or None if <cite>out</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.SVRGFunction.set_data_partition_weights">
+<span class="sig-name descname"><span class="pre">set_data_partition_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.SVRGFunction.set_data_partition_weights" title="Link to this definition">#</a></dt>
+<dd><p>Setter for the partition weights used to calculate the data passes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>weights</strong> (<em>list</em><em> of </em><em>positive floats that sum to one.</em>) – The proportion of the data held in each function. Equivalent to the proportions that you partitioned your data into.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="loopless-stochastic-variance-reduced-gradient-function">
+<h3>Loopless Stochastic Variance Reduced Gradient Function<a class="headerlink" href="#loopless-stochastic-variance-reduced-gradient-function" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></span><span class="sig-name descname"><span class="pre">LSVRGFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_update_probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_gradients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/SVRGFunction/#LSVRGFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction" title="Link to this definition">#</a></dt>
+<dd><dl>
+<dt>“”</dt><dd><p>A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a “snapshot”  is calculated at random intervals rather than at fixed numbers of iterations.</p>
+<p>Kovalev, D., Horváth, S. &amp;; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from <a class="reference external" href="https://proceedings.mlr.press/v117/kovalev20a.html">https://proceedings.mlr.press/v117/kovalev20a.html</a>.</p>
+<blockquote>
+<div><dl>
+<dt>functions<span class="classifier"><cite>list</cite>  of functions</span></dt><dd><p>A list of functions: <code class="code docutils literal notranslate"><span class="pre">[f_{0},</span> <span class="pre">f_{1},</span> <span class="pre">...,</span> <span class="pre">f_{n-1}]</span></code>. Each function is assumed to be smooth with an implemented <a class="reference internal" href="#cil.optimisation.functions.Function.gradient" title="cil.optimisation.functions.Function.gradient"><code class="xref py py-func docutils literal notranslate"><span class="pre">gradient()</span></code></a> method. All functions must have the same domain. The number of functions <cite>n</cite> must be strictly greater than 1.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>sampler: An instance of a CIL Sampler class ( <code class="xref py py-meth docutils literal notranslate"><span class="pre">sampler()</span></code>) or of another class which has a <cite>next</cite> function implemented to output integers in {0,…,n-1}.</dt><dd><p>This sampler is called each time gradient is called and  sets the internal <cite>function_num</cite> passed to the <cite>approximate_gradient</cite> function.  Default is <cite>Sampler.random_with_replacement(len(functions))</cite>.</p>
+</dd>
+<dt>snapshot_update_probability: positive float, default: 1/n</dt><dd><p>The probability of updating the full gradient (taking a snapshot) at each iteration. The default is <span class="math notranslate nohighlight">\(1./n\)</span> so, in expectation, a snapshot will be taken every <span class="math notranslate nohighlight">\(n\)</span> iterations.</p>
+</dd>
+<dt>store_gradients<span class="classifier">bool, default: <cite>False</cite></span></dt><dd><p>Flag indicating whether to store an update a list of gradients for each function <span class="math notranslate nohighlight">\(f_i\)</span> or just to store the snapshot point :math:`        ilde{x}` and it’s gradient :math:<a href="#id40"><span class="problematic" id="id41">`</span></a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>abla sum_{i=0}^{n-1}f_i(       ilde{x})`.</p>
+<blockquote>
+<div><p>In the case where <cite>store_gradients=False</cite> the memory requirements are 4 times the image size (1 stored full gradient at the “snapshot”, one stored “snapshot” point and two lots of intermediary calculations). Alternatively, if  <cite>store_gradients=True</cite>  the memory requirement is <cite>n+4</cite> (<cite>n</cite> gradients at the snapshot for each function in the sum, one stored full gradient at the “snapshot”, one stored “snapshot” point and two lots of intermediary calculations).</p>
+</div></blockquote>
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.L">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.L" title="Link to this definition">#</a></dt>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.Lmax">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Lmax</span></span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.Lmax" title="Link to this definition">#</a></dt>
+<dd><p>Returns the maximum Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \max_{i}\{L_{i}\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.approximate_gradient">
+<span class="sig-name descname"><span class="pre">approximate_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.approximate_gradient" title="Link to this definition">#</a></dt>
+<dd><dl>
+<dt>Calculates the stochastic gradient at the point <span class="math notranslate nohighlight">\(x\)</span> by using the gradient of the selected function, indexed by <span class="math notranslate nohighlight">\(i_k\)</span>, the <cite>function_number</cite> in {0,…,len(functions)-1}, and the full gradient at the snapshot :math:`     ilde{x}`</dt><dd><div class="math notranslate nohighlight">
+\[n*\]</div>
+</dd>
+</dl>
+<p>abla f_{i_k}(x_k) - n*
+abla f_{i_k}(   ilde{x}) +
+abla sum_{i=0}^{n-1}f_i(       ilde{x})</p>
+<blockquote>
+<div><p>Compared with the literature, we multiply by <span class="math notranslate nohighlight">\(n\)</span>, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</p>
+<p>x : DataContainer (e.g. ImageData object)
+out: return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.
+function_num: <cite>int</cite></p>
+<blockquote>
+<div><p>Between 0 and n-1, where n is the number of functions in the list</p>
+</div></blockquote>
+<dl class="simple">
+<dt>DataContainer (e.g. ImageData object)</dt><dd><p>the value of the approximate gradient of the sum function at <code class="code docutils literal notranslate"><span class="pre">x</span></code> given a <cite>function_number</cite> in {0,…,len(functions)-1}</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.centered_at">
+<span class="sig-name descname"><span class="pre">centered_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.centered_at" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.</dt><dd><p>TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>center</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The point to center the function at.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The translated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.convex_conjugate">
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.convex_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Evaluation of the function F* at x, where F* is the convex conjugate of function F,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - F(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the convex conjugate of the function at x.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.data_passes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_passes</span></span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.data_passes" title="Link to this definition">#</a></dt>
+<dd><p>if your functions do not contain an equal <cite>amount</cite> of data, for example your data was not partitioned into equal batches, then you must first use the <a href="#id42"><span class="problematic" id="id43">`</span></a>set_data_partition_weights” function for this to be accurate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes</span></code> is a list of floats that holds the amount of data that has been processed up until each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.data_passes_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_passes_indices</span></span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.data_passes_indices" title="Link to this definition">#</a></dt>
+<dd><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes_indices</span></code> is a list of lists holding the indices of the functions that are processed in each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending a list of the indices of the functions used to calculate the gradient.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.full_gradient">
+<span class="sig-name descname"><span class="pre">full_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.full_gradient" title="Link to this definition">#</a></dt>
+<dd><p>Returns the value of the  full gradient of the sum of functions at <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\nabla_x(f_{0} + f_{1} + ... + f_{n-1})(x) = \nabla_xf_{0}(x) + \nabla_xf_{1}(x) + ... + \nabla_xf_{n-1}(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the gradient of the sum function at x or nothing if <cite>out</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.proximal">
+<span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.proximal" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of function <span class="math notranslate nohighlight">\(\tau F\)</span>  evaluated at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>)</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the proximal operator of the function at x with scalar <span class="math notranslate nohighlight">\(\tau\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.proximal_conjugate">
+<span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.proximal_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>)</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the value of the proximal operator of the convex conjugate at point <span class="math notranslate nohighlight">\(x\)</span> for scalar <span class="math notranslate nohighlight">\(\tau\)</span> or None if <cite>out</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.set_data_partition_weights">
+<span class="sig-name descname"><span class="pre">set_data_partition_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.set_data_partition_weights" title="Link to this definition">#</a></dt>
+<dd><p>Setter for the partition weights used to calculate the data passes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>weights</strong> (<em>list</em><em> of </em><em>positive floats that sum to one.</em>) – The proportion of the data held in each function. Equivalent to the proportions that you partitioned your data into.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.LSVRGFunction.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/SVRGFunction/#LSVRGFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.LSVRGFunction.gradient" title="Link to this definition">#</a></dt>
+<dd><p>Selects a random function using the <cite>sampler</cite> and then calls the approximate gradient at <code class="code docutils literal notranslate"><span class="pre">x</span></code> or calculates a full gradient depending on the update probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> (</em><em>e.g. ImageData objects</em><em>)</em>)</p></li>
+<li><p><strong>out</strong> (return DataContainer, if <cite>None</cite> a new DataContainer is returned, default <cite>None</cite>.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the value of the approximate gradient of the sum function at <code class="code docutils literal notranslate"><span class="pre">x</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> (e.g. ImageData object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 <section id="utilities">
 <h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h2>
@@ -7365,7 +7809,7 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.utilities.Sampler.next">
 <span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.Sampler.next" title="Link to this definition">#</a></dt>
-<dd><p>Returns a sample from the list of indices <a href="#id36"><span class="problematic" id="id37">`</span></a>{0, 1, …, N-1}, where N is the number of indices and increments the sampler.</p>
+<dd><p>Returns a sample from the list of indices <a href="#id44"><span class="problematic" id="id45">`</span></a>{0, 1, …, N-1}, where N is the number of indices and increments the sampler.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -7377,7 +7821,7 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 <dd class="field-odd"><p><strong>num_samples</strong> (<em>int</em>) – The number of samples to return.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The first <a href="#id38"><span class="problematic" id="id39">`</span></a>num_samples” output by the sampler.</p>
+<dd class="field-even"><p>The first <a href="#id46"><span class="problematic" id="id47">`</span></a>num_samples” output by the sampler.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List</p>
@@ -7413,8 +7857,8 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id40">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">staggered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.staggered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id40" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id48">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">staggered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.staggered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id48" title="Link to this definition">#</a></dt>
 <dd><p>Instantiates a sampler which outputs in a staggered order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -7453,8 +7897,8 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id41">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_with_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.random_with_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id41" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id49">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_with_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.random_with_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id49" title="Link to this definition">#</a></dt>
 <dd><p>Instantiates a sampler which outputs an index between 0 - num_indices with a given probability.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -7489,8 +7933,8 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id42">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_without_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.random_without_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id42" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id50">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_without_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.random_without_replacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id50" title="Link to this definition">#</a></dt>
 <dd><p>Instantiates a sampler which outputs an index between 0 - num_indices. Once sampled the index will not be sampled again until all indices have been returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -7515,8 +7959,8 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id43">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.from_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id43" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id51">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.from_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id51" title="Link to this definition">#</a></dt>
 <dd><blockquote>
 <div><p>Instantiate a sampler that wraps a function for index selection.</p>
 <dl class="simple">
@@ -7580,8 +8024,8 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id44">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">herman_meyer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.herman_meyer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id44" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id52">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">herman_meyer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/sampler/#Sampler.herman_meyer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id52" title="Link to this definition">#</a></dt>
 <dd><p>Instantiates a sampler which outputs in a Herman Meyer order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -7673,7 +8117,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </section>
 <section id="callbacks">
 <h3>Callbacks<a class="headerlink" href="#callbacks" title="Link to this heading">#</a></h3>
-<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id73"><span class="problematic" id="id74">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
+<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id81"><span class="problematic" id="id82">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.utilities.callbacks</span> <span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
 <span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
@@ -7861,8 +8305,8 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id45">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/preconditioner/#Preconditioner.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id45" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id53">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/preconditioner/#Preconditioner.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id53" title="Link to this definition">#</a></dt>
 <dd><p>Abstract method to apply the preconditioner.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -8031,8 +8475,8 @@ do basic algebra between <a class="reference internal" href="#blockdatacontainer
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id46"><span class="problematic" id="id47">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id48"><span class="problematic" id="id49">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id54"><span class="problematic" id="id55">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id56"><span class="problematic" id="id57">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -8176,8 +8620,8 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 </ul>
 </dd>
 </dl>
-<section id="id50">
-<h3>Example:<a class="headerlink" href="#id50" title="Link to this heading">#</a></h3>
+<section id="id58">
+<h3>Example:<a class="headerlink" href="#id58" title="Link to this heading">#</a></h3>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
@@ -8673,56 +9117,56 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <section id="references">
 <h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
-<div class="docutils container" id="id52">
+<div class="docutils container" id="id60">
 <div role="list" class="citation-list">
-<div class="citation" id="id60" role="doc-biblioentry">
+<div class="citation" id="id68" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id20">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
 </div>
-<div class="citation" id="id59" role="doc-biblioentry">
+<div class="citation" id="id67" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id21">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
 </div>
-<div class="citation" id="id55" role="doc-biblioentry">
+<div class="citation" id="id63" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id24">2</a>)</span>
 <p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </div>
-<div class="citation" id="id64" role="doc-biblioentry">
+<div class="citation" id="id72" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. <em>Multiscale Modeling &amp; Simulation</em>, 4(4):1168–1200, 2005. URL: <a class="reference external" href="https://doi.org/10.1137/050626090">https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/050626090">arXiv:https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://doi.org/10.1137/050626090">doi:10.1137/050626090</a>.</p>
 </div>
-<div class="citation" id="id56" role="doc-biblioentry">
+<div class="citation" id="id64" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">5</a><span class="fn-bracket">]</span></span>
 <p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </div>
-<div class="citation" id="id53" role="doc-biblioentry">
+<div class="citation" id="id61" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">6</a><span class="fn-bracket">]</span></span>
 <p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
 </div>
-<div class="citation" id="id58" role="doc-biblioentry">
+<div class="citation" id="id66" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">7</a><span class="fn-bracket">]</span></span>
 <p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </div>
-<div class="citation" id="id62" role="doc-biblioentry">
+<div class="citation" id="id70" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">8</a><span class="fn-bracket">]</span></span>
 <p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </div>
-<div class="citation" id="id54" role="doc-biblioentry">
+<div class="citation" id="id62" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">9</a><span class="fn-bracket">]</span></span>
 <p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
 </div>
-<div class="citation" id="id57" role="doc-biblioentry">
+<div class="citation" id="id65" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">10</a><span class="fn-bracket">]</span></span>
 <p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </div>
-<div class="citation" id="id61" role="doc-biblioentry">
+<div class="citation" id="id69" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id23">11</a><span class="fn-bracket">]</span></span>
 <p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </div>
-<div class="citation" id="id63" role="doc-biblioentry">
+<div class="citation" id="id71" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id22">12</a><span class="fn-bracket">]</span></span>
 <p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </div>
@@ -8778,8 +9222,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=4cb0e87c476518279630"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=4cb0e87c476518279630"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=f283d04fae41aba60e43"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

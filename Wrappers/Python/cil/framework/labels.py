@@ -15,7 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-from enum import Enum, auto, unique
+from enum import Enum, Flag as _Flag, auto, unique
 try:
     from enum import EnumType
 except ImportError: # Python<3.11
@@ -40,7 +40,6 @@ class StrEnum(str, Enum, metaclass=_StrEnumMeta):
         return cls.__members__.get(value.upper(), None)
 
     def __eq__(self, value: str) -> bool:
-        """Uses value.upper() for case-insensitivity"""
         try:
             value = self.__class__[value.upper()]
         except (KeyError, ValueError, AttributeError):
@@ -58,7 +57,6 @@ class StrEnum(str, Enum, metaclass=_StrEnumMeta):
     @staticmethod
     def _generate_next_value_(name: str, start, count, last_values) -> str:
         return name.lower()
-
 
 
 class Backends(StrEnum):
@@ -228,27 +226,46 @@ class UnitsAngles(StrEnum):
     RADIAN = auto()
 
 
-class AcquisitionTypes(StrEnum):
+class _FlagMeta(EnumType):
+    """Python<3.12 requires this in a metaclass (rather than directly in Flag)"""
+    def __contains__(self, item) -> bool:
+        return item.upper() in self.__members__ if isinstance(item, str) else super().__contains__(item)
+
+
+@unique
+class Flag(_Flag, metaclass=_FlagMeta):
+    """Case-insensitive Flag"""
+    @classmethod
+    def _missing_(cls, value):
+        return cls.__members__.get(value.upper(), None) if isinstance(value, str) else super()._missing_(value)
+
+    def __eq__(self, value: str) -> bool:
+        return super().__eq__(self.__class__[value.upper()] if isinstance(value, str) else value)
+
+
+class AcquisitionType(Flag):
     """
-    Available acquisition types.
+    Available acquisition types & dimensions.
 
     Attributes
     ----------
     PARALLEL: Parallel beam.
     CONE: Cone beam.
+    DIM2: 2D acquisition.
+    DIM3: 3D acquisition.
     """
     PARALLEL = auto()
     CONE = auto()
+    DIM2 = auto()
+    DIM3 = auto()
 
+    @classmethod
+    def _missing_(cls, value):
+        """2D/3D aliases"""
+        if isinstance(value, str):
+            value = {'2D': 'DIM2', '3D': 'DIM3'}.get(value.upper(), value)
+        return super()._missing_(value)
 
-class AcquisitionDimensions(StrEnum):
-    """
-    Available acquisition dimensions.
-
-    Attributes
-    ----------
-    DIM2 ('2D'): 2D acquisition.
-    DIM3 ('3D'): 3D acquisition.
-    """
-    DIM2 = "2D"
-    DIM3 = "3D"
+    def __str__(self) -> str:
+        """2D/3D special handling"""
+        return '2D' if self == self.DIM2 else '3D' if self == self.DIM3 else self.name

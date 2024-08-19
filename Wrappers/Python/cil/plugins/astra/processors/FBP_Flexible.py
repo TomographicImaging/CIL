@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import AcquisitionGeometry, Processor, ImageData
+from cil.framework import AcquisitionGeometry, Processor, ImageData, AcquisitionType
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D, convert_geometry_to_astra
 import logging
@@ -76,7 +76,7 @@ class FBP_Flexible(FDK_Flexible):
         detector_position = sino_geom_cone.config.system.detector.position
         detector_direction_x = sino_geom_cone.config.system.detector.direction_x
 
-        if sino_geom_cone.dimension == '2D':
+        if AcquisitionType.DIM2 & sino_geom_cone.dimension:
             tmp = AcquisitionGeometry.create_Cone2D(cone_source, detector_position, detector_direction_x)
         else:
             detector_direction_y = sino_geom_cone.config.system.detector.direction_y
@@ -141,7 +141,7 @@ class FBP_CPU(Processor):
             raise ValueError("Expected input data to be parallel beam geometry , got {0}"\
                  .format(self.sinogram_geometry.geom_type))
 
-        if self.sinogram_geometry.dimension != '2D':
+        if not AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
             raise ValueError("Expected input data to be 2D , got {0}"\
                  .format(self.sinogram_geometry.dimension))
 

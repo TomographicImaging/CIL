@@ -19,7 +19,7 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
+from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer, AcquisitionType
 import numpy as np
 import warnings
 
@@ -700,10 +700,8 @@ class _Arrow3D(FancyArrowPatch):
         return np.min(zs)
 
 class _ShowGeometry(object):
-
     def __init__(self, acquisition_geometry, image_geometry=None):
-
-        if acquisition_geometry.dimension == "2D":
+        if AcquisitionType.DIM2 & acquisition_geometry.dimension:
             self.ndim = 2
             sys = acquisition_geometry.config.system
             if acquisition_geometry.geom_type == 'cone':
@@ -1051,8 +1049,7 @@ class show_geometry(show_base):
 
 
     def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
-
-        if acquisition_geometry.dimension == '2D':
+        if AcquisitionType.DIM2 & acquisition_geometry.dimension:
             elevation = 90
             azimuthal = 0
 

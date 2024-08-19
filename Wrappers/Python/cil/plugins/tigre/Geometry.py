@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import UnitsAngles
+from cil.framework import AcquisitionType, UnitsAngles
 import numpy as np
 
 try:
@@ -109,7 +109,7 @@ class TIGREGeometry(Geometry):
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
 
-        if ag_in.dimension == '2D':
+        if AcquisitionType.DIM2 & ag_in.dimension:
             self.is2D = True
 
             #fix IG to single slice in z

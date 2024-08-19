@@ -22,7 +22,7 @@ from numbers import Number
 
 import numpy
 
-from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionTypes, FillTypes, AcquisitionDimensions
+from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionType, FillTypes
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
 
@@ -186,10 +186,7 @@ class SystemConfiguration(object):
 
     @property
     def dimension(self):
-        if self._dimension == 2:
-            return AcquisitionDimensions.DIM2.value
-        else:
-            return AcquisitionDimensions.DIM3.value
+        return AcquisitionType.DIM2 if self._dimension == 2 else AcquisitionType.DIM3
 
     @dimension.setter
     def dimension(self,val):
@@ -203,8 +200,8 @@ class SystemConfiguration(object):
         return self._geometry
 
     @geometry.setter
-    def geometry(self,val):
-        self._geometry = AcquisitionTypes(val)
+    def geometry(self, val):
+        self._geometry = AcquisitionType(val)
 
     def __init__(self, dof, geometry, units='units'):
         """Initialises the system component attributes for the acquisition type
@@ -213,7 +210,7 @@ class SystemConfiguration(object):
         self.geometry = geometry
         self.units = units
 
-        if self.geometry == AcquisitionTypes.PARALLEL:
+        if AcquisitionType.PARALLEL & self.geometry:
             self.ray = DirectionVector(dof)
         else:
             self.source = PositionVector(dof)
@@ -344,7 +341,7 @@ class Parallel2D(SystemConfiguration):
     def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Parallel2D, self).__init__(dof=2, geometry=AcquisitionTypes.PARALLEL, units=units)
+        super(Parallel2D, self).__init__(dof=2, geometry=AcquisitionType.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -518,7 +515,7 @@ class Parallel3D(SystemConfiguration):
     def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Parallel3D, self).__init__(dof=3, geometry=AcquisitionTypes.PARALLEL, units=units)
+        super(Parallel3D, self).__init__(dof=3, geometry=AcquisitionType.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -803,7 +800,7 @@ class Cone2D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Cone2D, self).__init__(dof=2, geometry=AcquisitionTypes.CONE, units=units)
+        super(Cone2D, self).__init__(dof=2, geometry=AcquisitionType.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -982,7 +979,7 @@ class Cone3D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Cone3D, self).__init__(dof=3, geometry=AcquisitionTypes.CONE, units=units)
+        super(Cone3D, self).__init__(dof=3, geometry=AcquisitionType.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -1819,7 +1816,7 @@ class AcquisitionGeometry(object):
             offset = offset_distance/ self.config.panel.pixel_size[0]
             offset_units = 'pixels'
 
-            if self.dimension == '3D' and self.config.panel.pixel_size[0] != self.config.panel.pixel_size[1]:
+            if AcquisitionType.DIM3 & self.dimension and self.config.panel.pixel_size[0] != self.config.panel.pixel_size[1]:
                 #if aspect ratio of pixels isn't 1:1 need to convert angle by new ratio
                 y_pix = 1 /self.config.panel.pixel_size[1]
                 x_pix = math.tan(angle_rad)/self.config.panel.pixel_size[0]
@@ -1884,7 +1881,7 @@ class AcquisitionGeometry(object):
         else:
             raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
 
-        if self.dimension == '2D':
+        if AcquisitionType.DIM2 & self.dimension:
             self.config.system.set_centre_of_rotation(offset_distance)
         else:
             self.config.system.set_centre_of_rotation(offset_distance, angle_rad)
@@ -1921,7 +1918,7 @@ class AcquisitionGeometry(object):
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
             raise NotImplementedError()
 
-        if self.dimension == '2D':
+        if AcquisitionType.DIM2 & self.dimension:
             if offset2 is not None:
                 warnings.warn("2D so offset2 is ingored", UserWarning, stacklevel=2)
             self.set_centre_of_rotation(offset1)
@@ -2118,7 +2115,7 @@ class AcquisitionGeometry(object):
     def get_centre_slice(self):
         '''returns a 2D AcquisitionGeometry that corresponds to the centre slice of the input'''
 
-        if self.dimension == '2D':
+        if AcquisitionType.DIM2 & self.dimension:
             return self
 
         AG_2D = copy.deepcopy(self)
@@ -2133,7 +2130,7 @@ class AcquisitionGeometry(object):
         num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
         voxel_size_xy = self.config.panel.pixel_size[0] / (resolution * self.magnification)
 
-        if self.dimension == '3D':
+        if AcquisitionType.DIM3 & self.dimension:
             num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
             voxel_size_z = self.config.panel.pixel_size[1] / (resolution * self.magnification)
         else:
@@ -2161,7 +2158,7 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
 
         if vertical is not None:
-            if geometry_new.geom_type == AcquisitionTypes.PARALLEL or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+            if AcquisitionType.PARALLEL & geometry_new.geom_type or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
                 geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))

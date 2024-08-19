@@ -20,34 +20,31 @@ import unittest
 import numpy as np
 
 from cil.framework import AcquisitionGeometry, ImageGeometry
-from cil.framework.labels import (StrEnum,
-                                  FillTypes, UnitsAngles,
-                                  AcquisitionTypes, AcquisitionDimensions,
-                                  ImageDimensionLabels, AcquisitionDimensionLabels, Backends)
+from cil.framework.labels import FillTypes, UnitsAngles, AcquisitionType, ImageDimensionLabels, AcquisitionDimensionLabels, Backends
 
 
 class Test_Lables(unittest.TestCase):
     def test_labels_strenum(self):
-        for item in ("3D", "DIM3", AcquisitionDimensions.DIM3):
-            out = AcquisitionDimensions(item)
-            self.assertEqual(out, AcquisitionDimensions.DIM3)
-            self.assertTrue(isinstance(out, AcquisitionDimensions))
-        for item in ("bad_str", "4D", "DIM4", UnitsAngles.DEGREE):
+        for item in (UnitsAngles.DEGREE, "DEGREE", "degree"):
+            out = UnitsAngles(item)
+            self.assertEqual(out, UnitsAngles.DEGREE)
+            self.assertTrue(isinstance(out, UnitsAngles))
+        for item in ("bad_str", FillTypes.RANDOM):
             with self.assertRaises(ValueError):
-                AcquisitionDimensions(item)
+                UnitsAngles(item)
 
     def test_labels_strenum_eq(self):
-        for i in ("3D", "DIM3", AcquisitionDimensions.DIM3):
-            self.assertEqual(AcquisitionDimensions.DIM3, i)
-            self.assertEqual(i, AcquisitionDimensions.DIM3)
-        for i in ("2D", "DIM2", AcquisitionDimensions.DIM2, AcquisitionDimensions):
-            self.assertNotEqual(AcquisitionDimensions.DIM3, i)
+        for i in (UnitsAngles.RADIAN, "RADIAN", "radian"):
+            self.assertEqual(UnitsAngles.RADIAN, i)
+            self.assertEqual(i, UnitsAngles.RADIAN)
+        for i in ("DEGREE", UnitsAngles.DEGREE, UnitsAngles):
+            self.assertNotEqual(UnitsAngles.RADIAN, i)
 
     def test_labels_contains(self):
-        for i in ("3D", "DIM3", AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM2):
-            self.assertIn(i, AcquisitionDimensions)
-        for i in ("4D", "DIM4", AcquisitionDimensions):
-            self.assertNotIn(i, AcquisitionDimensions)
+        for i in ("RADIAN", "degree", UnitsAngles.RADIAN, UnitsAngles.DEGREE):
+            self.assertIn(i, UnitsAngles)
+        for i in ("bad_str", UnitsAngles):
+            self.assertNotIn(i, UnitsAngles)
 
     def test_backends(self):
         for i in ('ASTRA', 'CIL', 'TIGRE'):
@@ -68,18 +65,10 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(getattr(UnitsAngles, i), UnitsAngles)
 
     def test_acquisition_type(self):
-        for i in ('PARALLEL', 'CONE'):
-            self.assertIn(i, AcquisitionTypes)
-            self.assertIn(i.lower(), AcquisitionTypes)
-            self.assertIn(getattr(AcquisitionTypes, i), AcquisitionTypes)
-
-    def test_acquisition_dimension(self):
-        for i in ('2D', '3D'):
-            self.assertIn(i, AcquisitionDimensions)
-        for i in ('DIM2', 'DIM3'):
-            self.assertIn(i, AcquisitionDimensions)
-            self.assertIn(i.lower(), AcquisitionDimensions)
-            self.assertIn(getattr(AcquisitionDimensions, i), AcquisitionDimensions)
+        for i in ('PARALLEL', 'CONE', 'DIM2', 'DIM3'):
+            self.assertIn(i, AcquisitionType)
+            self.assertIn(i.lower(), AcquisitionType)
+            self.assertIn(getattr(AcquisitionType, i), AcquisitionType)
 
     def test_image_dimension_labels(self):
         for i in ('CHANNEL', 'VERTICAL', 'HORIZONTAL_X', 'HORIZONTAL_Y'):

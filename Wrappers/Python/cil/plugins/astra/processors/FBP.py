@@ -15,9 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-import warnings
-
-from cil.framework import DataProcessor, ImageDimensionLabels, AcquisitionDimensionLabels
+from cil.framework import DataProcessor, ImageDimensionLabels, AcquisitionDimensionLabels, AcquisitionType
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
@@ -81,7 +79,7 @@ class FBP(DataProcessor):
             if acquisition_geometry.geom_type == 'cone':
                 raise NotImplementedError("Cannot process cone-beam data without a GPU")
 
-            if acquisition_geometry.dimension == '2D':
+            if AcquisitionType.DIM2 & acquisition_geometry.dimension:
                 processor = FBP_CPU(image_geometry, acquisition_geometry)
             else:
                 raise NotImplementedError("Cannot process 3D data without a GPU")

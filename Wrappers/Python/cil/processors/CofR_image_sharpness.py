@@ -16,15 +16,13 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, AcquisitionDimensionLabels
+from cil.framework import Processor, AcquisitionData, AcquisitionDimensionLabels, AcquisitionType
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
-import inspect
 import logging
 import math
 import importlib
-import warnings
 
 log = logging.getLogger(__name__)
 
@@ -123,10 +121,7 @@ class CofR_image_sharpness(Processor):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         #check order for single slice data
-        if data.geometry.dimension == '3D':
-            test_geom = data.geometry.get_slice(vertical='centre')
-        else:
-            test_geom = data.geometry
+        test_geom = data.geometry.get_slice(vertical='centre') if AcquisitionType.DIM3 & data.geometry.dimension else data.geometry
 
         if not AcquisitionDimensionLabels.check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
@@ -250,16 +245,12 @@ class CofR_image_sharpness(Processor):
         w1 = ind_centre - ind0
         return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
 
-
     def process(self, out=None):
-
         #get slice
-        data_full = self.get_input()
+        data = data_full = self.get_input()
 
-        if data_full.geometry.dimension == '3D':
-            data = data_full.get_slice(vertical=self.slice_index)
-        else:
-            data = data_full
+        if AcquisitionType.DIM3 & data_full.geometry.dimension:
+            data = data.get_slice(vertical=self.slice_index)
 
         data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]

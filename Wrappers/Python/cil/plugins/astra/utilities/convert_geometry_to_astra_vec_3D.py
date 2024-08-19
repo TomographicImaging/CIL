@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework import UnitsAngles
+from cil.framework import AcquisitionType, UnitsAngles
 
 def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
@@ -57,7 +57,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     #get units
     degrees = angles.angle_unit == UnitsAngles.DEGREE
 
-    if sinogram_geometry.dimension == '2D':
+    if AcquisitionType.DIM2 & sinogram_geometry.dimension:
         #create a 3D astra geom from 2D CIL geometry
         volume_geometry_temp = volume_geometry.copy()
         volume_geometry_temp.voxel_num_z = 1

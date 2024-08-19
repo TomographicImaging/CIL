@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework import UnitsAngles
+from cil.framework import AcquisitionType, UnitsAngles
 
 def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
     """
@@ -39,13 +39,8 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
         The ASTRA vol_geom and proj_geom
 
     """
-
     # determine if the geometry is 2D or 3D
-
-    if sinogram_geometry.pixel_num_v > 1:
-        dimension = '3D'
-    else:
-        dimension = '2D'
+    dimension = AcquisitionType.DIM3 if sinogram_geometry.pixel_num_v > 1 else AcquisitionType.DIM2
 
     #get units
 
@@ -54,7 +49,7 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
     else:
         angles_rad = sinogram_geometry.config.angles.angle_data
 
-    if dimension == '2D':
+    if AcquisitionType.DIM2 & dimension:
         vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y,
                                          volume_geometry.voxel_num_x,
                                          volume_geometry.get_min_x(),
@@ -77,7 +72,7 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
         else:
             NotImplemented
 
-    elif dimension == '3D':
+    elif AcquisitionType.DIM3 & dimension:
         vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y,
                                          volume_geometry.voxel_num_x,
                                          volume_geometry.voxel_num_z,

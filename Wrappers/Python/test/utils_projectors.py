@@ -19,7 +19,7 @@
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
-from cil.framework import AcquisitionGeometry, AcquisitionDimensionLabels
+from cil.framework import AcquisitionGeometry, AcquisitionDimensionLabels, AcquisitionType
 
 class SimData(object):
 
@@ -375,7 +375,7 @@ class TestCommon_ProjectionOperator(object):
                 if (i + j)% 2 == 0:
                     checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones * 16
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
@@ -408,7 +408,7 @@ class TestCommon_ProjectionOperator(object):
                 if (i + k)% 2 == 0:
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
@@ -482,7 +482,7 @@ class TestCommon_FBP_SIM(SimData):
         reco = FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
 
-        if self.ag.dimension == '3D':
+        if AcquisitionType.DIM3 & self.ag.dimension:
             FBP = self.FBP(self.ig_single_slice, self.ag, **self.FBP_args)
             reco = FBP(self.acq_data)
             np.testing.assert_allclose(reco.as_array(), self.gold_roi_single_slice, atol=self.tolerance_fbp_roi)

@@ -18,7 +18,7 @@
 
 import logging
 
-from cil.framework import BlockGeometry, AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework import BlockGeometry, AcquisitionDimensionLabels, ImageDimensionLabels, AcquisitionType
 from cil.optimisation.operators import BlockOperator, LinearOperator, ChannelwiseOperator
 from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
 
@@ -127,7 +127,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         if device == 'gpu':
             operator = AstraProjector3D(volume_geometry_sc,
                                         sinogram_geometry_sc)
-        elif self.sinogram_geometry.dimension == '2D':
+        elif AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
             operator = AstraProjector2D(volume_geometry_sc,
                                         sinogram_geometry_sc,
                                         device=device)

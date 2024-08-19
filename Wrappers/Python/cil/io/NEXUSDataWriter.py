@@ -145,23 +145,19 @@ class NEXUSDataWriter(object):
                 ds_data.write_direct(self.data.array)
 
             # set up dataset attributes
-            if (isinstance(self.data, ImageData)):
-                ds_data.attrs['data_type'] = 'ImageData'
-            else:
-                ds_data.attrs['data_type'] = 'AcquisitionData'
+            ds_data.attrs['data_type'] = 'ImageData' if isinstance(self.data, ImageData) else 'AcquisitionData'
 
             for i in range(self.data.number_of_dimensions):
-                ds_data.attrs['dim{}'.format(i)] = self.data.dimension_labels[i]
+                ds_data.attrs[f'dim{i}'] = str(self.data.dimension_labels[i])
 
-            if (isinstance(self.data, AcquisitionData)):
-
+            if isinstance(self.data, AcquisitionData):
                 # create group to store configuration
                 f.create_group('entry1/tomo_entry/config')
                 f.create_group('entry1/tomo_entry/config/source')
                 f.create_group('entry1/tomo_entry/config/detector')
                 f.create_group('entry1/tomo_entry/config/rotation_axis')
 
-                ds_data.attrs['geometry'] = self.data.geometry.config.system.geometry
+                ds_data.attrs['geometry'] = str(self.data.geometry.config.system.geometry)
                 ds_data.attrs['dimension'] = self.data.geometry.config.system.dimension
                 ds_data.attrs['num_channels'] = self.data.geometry.config.channels.num_channels
 

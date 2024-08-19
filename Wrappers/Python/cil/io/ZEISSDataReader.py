@@ -127,17 +127,16 @@ class ZEISSDataReader(object):
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                allowed_labels = [item.value for item in AcquisitionDimensionLabels]
-                zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
+                zeiss_data_order = {AcquisitionDimensionLabels.ANGLE: 0,
+                                    AcquisitionDimensionLabels.VERTICAL: 1,
+                                    AcquisitionDimensionLabels.HORIZONTAL: 2}
             else:
-                allowed_labels = [item.value for item in ImageDimensionLabels]
-                zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
+                zeiss_data_order = {ImageDimensionLabels.VERTICAL: 0,
+                                    ImageDimensionLabels.HORIZONTAL_Y: 1,
+                                    ImageDimensionLabels.HORIZONTAL_X: 2}
 
             # check roi labels and create tuple for slicing
             for key in roi.keys():
-                if key not in allowed_labels:
-                    raise Exception("Wrong label, got {0}. Expected dimension labels in {1}, {2}, {3}".format(key,**allowed_labels))
-
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
@@ -289,4 +288,3 @@ class ZEISSDataReader(object):
     def get_metadata(self):
         '''return the metadata of the file'''
         return self._metadata
-

@@ -865,19 +865,19 @@ class TestDataContainer(CCPiTestClass):
         expected = expected_func(data.as_array(), axis=1)
         expected_dimension_labels = data.dimension_labels[0],data.dimension_labels[2]
         numpy.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
-        numpy.testing.assert_equal(result.dimension_labels, expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
+        self.assertEqual(result.dimension_labels, expected_dimension_labels, f"{function_name} 'with 1 axis'")
         # test specifying axis with an int
         result = test_func(axis=1)
         numpy.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
-        numpy.testing.assert_equal(result.dimension_labels,expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
+        self.assertEqual(result.dimension_labels,expected_dimension_labels, f"{function_name} 'with 1 axis'")
         # test specifying function in 2 axes
         result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1]))
         numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
-        numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
+        self.assertEqual(result.dimension_labels, (data.dimension_labels[2],), f"{function_name} 'with 2 axes'")
         # test specifying function in 2 axes with an int
         result = test_func(axis=(0,1))
         numpy.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
-        numpy.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
+        self.assertEqual(result.dimension_labels, (data.dimension_labels[2],), f"{function_name} 'with 2 axes'")
         # test specifying function in 3 axes
         result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]))
         numpy.testing.assert_almost_equal(result, expected_func(data.as_array()), err_msg=error_message(function_name, "'with 3 axes'"))
@@ -885,10 +885,10 @@ class TestDataContainer(CCPiTestClass):
         expected_array = expected_func(data.as_array(), axis = 0)
         test_func(axis=0, out=out)
         numpy.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
-        numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
+        self.assertEqual(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), f"{function_name} 'of out argument'")
         test_func(axis=data.dimension_labels[0], out=out)
         numpy.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
-        numpy.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
+        self.assertEqual(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), f"{function_name} 'of out argument'")
         # test providing a numpy array to out
         out = numpy.zeros((2,2), dtype=data.dtype)
         test_func(axis=0, out=out)

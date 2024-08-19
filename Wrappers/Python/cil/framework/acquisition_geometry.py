@@ -200,7 +200,7 @@ class SystemConfiguration(object):
 
     @property
     def geometry(self):
-        return self._geometry.value
+        return self._geometry
 
     @geometry.setter
     def geometry(self,val):
@@ -1720,15 +1720,11 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {AcquisitionDimensionLabels.CHANNEL.value: self.config.channels.num_channels,
-                      AcquisitionDimensionLabels.ANGLE.value: self.config.angles.num_positions,
-                      AcquisitionDimensionLabels.VERTICAL.value: self.config.panel.num_pixels[1],
-                      AcquisitionDimensionLabels.HORIZONTAL.value: self.config.panel.num_pixels[0]}
-        shape = []
-        for label in self.dimension_labels:
-            shape.append(shape_dict[label])
-
-        return tuple(shape)
+        shape_dict = {AcquisitionDimensionLabels.CHANNEL: self.config.channels.num_channels,
+                      AcquisitionDimensionLabels.ANGLE: self.config.angles.num_positions,
+                      AcquisitionDimensionLabels.VERTICAL: self.config.panel.num_pixels[1],
+                      AcquisitionDimensionLabels.HORIZONTAL: self.config.panel.num_pixels[0]}
+        return tuple(shape_dict[label] for label in self.dimension_labels)
 
     @property
     def dimension_labels(self):
@@ -1758,10 +1754,8 @@ class AcquisitionGeometry(object):
 
     @dimension_labels.setter
     def dimension_labels(self, val):
-
         if val is not None:
-            label_new=[AcquisitionDimensionLabels(x).value for x in val if x in AcquisitionDimensionLabels]
-            self._dimension_labels = tuple(label_new)
+            self._dimension_labels = tuple(AcquisitionDimensionLabels(x) for x in val if x in AcquisitionDimensionLabels)
 
     @property
     def ndim(self):

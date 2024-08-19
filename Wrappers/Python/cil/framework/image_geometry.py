@@ -56,17 +56,12 @@ class ImageGeometry:
         return ImageDimensionLabels.VERTICAL
 
     @property
-    def shape(self):   
-        shape_dict = {ImageDimensionLabels.CHANNEL.value: self.channels,
-                      ImageDimensionLabels.VERTICAL.value: self.voxel_num_z,
-                      ImageDimensionLabels.HORIZONTAL_Y.value: self.voxel_num_y,
-                      ImageDimensionLabels.HORIZONTAL_X.value: self.voxel_num_x}
-
-        shape = []
-        for label in self.dimension_labels:
-            shape.append(shape_dict[label])
-
-        return tuple(shape)
+    def shape(self):
+        shape_dict = {ImageDimensionLabels.CHANNEL: self.channels,
+                      ImageDimensionLabels.VERTICAL: self.voxel_num_z,
+                      ImageDimensionLabels.HORIZONTAL_Y: self.voxel_num_y,
+                      ImageDimensionLabels.HORIZONTAL_X: self.voxel_num_x}
+        return tuple(shape_dict[label] for label in self.dimension_labels)
 
     @shape.setter
     def shape(self, val):
@@ -74,17 +69,11 @@ class ImageGeometry:
 
     @property
     def spacing(self):
-
-        spacing_dict = {ImageDimensionLabels.CHANNEL.value: self.channel_spacing,
-                        ImageDimensionLabels.VERTICAL.value: self.voxel_size_z,
-                        ImageDimensionLabels.HORIZONTAL_Y.value: self.voxel_size_y,
-                        ImageDimensionLabels.HORIZONTAL_X.value: self.voxel_size_x}
-
-        spacing = []
-        for label in self.dimension_labels:
-            spacing.append(spacing_dict[label])
-
-        return tuple(spacing)
+        spacing_dict = {ImageDimensionLabels.CHANNEL: self.channel_spacing,
+                        ImageDimensionLabels.VERTICAL: self.voxel_size_z,
+                        ImageDimensionLabels.HORIZONTAL_Y: self.voxel_size_y,
+                        ImageDimensionLabels.HORIZONTAL_X: self.voxel_size_x}
+        return tuple(spacing_dict[label] for label in self.dimension_labels)
 
     @property
     def length(self):
@@ -123,8 +112,7 @@ class ImageGeometry:
 
     def set_labels(self, labels):
         if labels is not None:
-            label_new=[ImageDimensionLabels(x).value for x in labels if x in ImageDimensionLabels]
-            self._dimension_labels = tuple(label_new)
+            self._dimension_labels = tuple(ImageDimensionLabels(x) for x in labels if x in ImageDimensionLabels)
 
     def __eq__(self, other):
 

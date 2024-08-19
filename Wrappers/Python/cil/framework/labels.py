@@ -27,7 +27,7 @@ class _StrEnumMeta(EnumType):
     def __contains__(self, item: str) -> bool:
         try:
             key = item.upper()
-        except AttributeError:
+        except (AttributeError, TypeError):
             return False
         return key in self.__members__ or item in self.__members__.values()
 
@@ -42,9 +42,10 @@ class StrEnum(str, Enum, metaclass=_StrEnumMeta):
     def __eq__(self, value: str) -> bool:
         """Uses value.upper() for case-insensitivity"""
         try:
-            return super().__eq__(self.__class__[value.upper()])
-        except (KeyError, ValueError):
-            return False
+            value = self.__class__[value.upper()]
+        except (KeyError, ValueError, AttributeError):
+            pass
+        return super().__eq__(value)
 
     def __hash__(self) -> int:
         """consistent hashing for dictionary keys"""
@@ -104,7 +105,7 @@ class ImageDimensionLabels(StrEnum):
         """
         order = [cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X]
         engine_orders = {Backends.ASTRA: order, Backends.TIGRE: order, Backends.CIL: order}
-        dim_order = engine_orders[Backends[engine.upper()]]
+        dim_order = engine_orders[Backends(engine)]
 
         if geometry is None:
             return dim_order
@@ -164,7 +165,7 @@ class AcquisitionDimensionLabels(StrEnum):
             Backends.ASTRA: [cls.CHANNEL, cls.VERTICAL, cls.ANGLE, cls.HORIZONTAL],
             Backends.TIGRE: [cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL],
             Backends.CIL: [cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL]}
-        dim_order = engine_orders[Backends[engine.upper()]]
+        dim_order = engine_orders[Backends(engine)]
 
         if geometry is None:
             return dim_order

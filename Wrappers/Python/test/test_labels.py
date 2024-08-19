@@ -15,229 +15,161 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import unittest
 
 import numpy as np
 
-import unittest
-
-from cil.framework.labels import (_LabelsBase, 
-                                  FillTypes, UnitsAngles, 
-                                  AcquisitionTypes, AcquisitionDimensions, 
+from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework.labels import (StrEnum,
+                                  FillTypes, UnitsAngles,
+                                  AcquisitionTypes, AcquisitionDimensions,
                                   ImageDimensionLabels, AcquisitionDimensionLabels, Backends)
 
-from cil.framework import AcquisitionGeometry, ImageGeometry
 
 class Test_Lables(unittest.TestCase):
-
-    def test_base_labels(self):
-
-        out_gold = AcquisitionDimensions.DIM3
-
-        input_good = ["3D", AcquisitionDimensions.DIM3]
-        input_bad = ["bad_str", "DIM3", UnitsAngles.DEGREE]
-
-        for item in input_good:
+    def test_labels_strenum(self):
+        for item in ("3D", "DIM3", AcquisitionDimensions.DIM3):
             out = AcquisitionDimensions(item)
-            self.assertEqual(out, out_gold)
+            self.assertEqual(out, AcquisitionDimensions.DIM3)
             self.assertTrue(isinstance(out, AcquisitionDimensions))
-
-        for item in input_bad:
+        for item in ("bad_str", "4D", "DIM4", UnitsAngles.DEGREE):
             with self.assertRaises(ValueError):
                 AcquisitionDimensions(item)
 
-
-    def test_labels_eq(self):
-        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "3D"))
-        self.assertTrue(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM3))
-
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "DIM3"))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, "2D"))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM2))
-        self.assertFalse(_LabelsBase.__eq__(AcquisitionDimensions.DIM3, AcquisitionDimensions))
-
+    def test_labels_strenum_eq(self):
+        for i in ("3D", "DIM3", AcquisitionDimensions.DIM3):
+            self.assertEqual(AcquisitionDimensions.DIM3, i)
+            self.assertEqual(i, AcquisitionDimensions.DIM3)
+        for i in ("2D", "DIM2", AcquisitionDimensions.DIM2, AcquisitionDimensions):
+            self.assertNotEqual(AcquisitionDimensions.DIM3, i)
 
     def test_labels_contains(self):
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, "3D"))
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions.DIM3))
-        self.assertTrue(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions.DIM2))
-
-        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimensions, "DIM3"))
-        self.assertFalse(_LabelsBase.__contains__(AcquisitionDimensions, AcquisitionDimensions))
-
+        for i in ("3D", "DIM3", AcquisitionDimensions.DIM3, AcquisitionDimensions.DIM2):
+            self.assertIn(i, AcquisitionDimensions)
+        for i in ("4D", "DIM4", AcquisitionDimensions):
+            self.assertNotIn(i, AcquisitionDimensions)
 
     def test_backends(self):
-        self.assertTrue('astra' in Backends)
-        self.assertTrue('cil' in Backends)
-        self.assertTrue('tigre' in Backends)
-        self.assertTrue(Backends.ASTRA in Backends)
-        self.assertTrue(Backends.CIL in Backends)
-        self.assertTrue(Backends.TIGRE in Backends)
+        for i in ('ASTRA', 'CIL', 'TIGRE'):
+            self.assertIn(i, Backends)
+            self.assertIn(i.lower(), Backends)
+            self.assertIn(getattr(Backends, i), Backends)
 
     def test_fill_types(self):
-        self.assertTrue('random' in FillTypes)
-        self.assertTrue('random_int' in FillTypes)
-        self.assertTrue(FillTypes.RANDOM in FillTypes)
-        self.assertTrue(FillTypes.RANDOM_INT in FillTypes)
-    
+        for i in ('RANDOM', 'RANDOM_INT'):
+            self.assertIn(i, FillTypes)
+            self.assertIn(i.lower(), FillTypes)
+            self.assertIn(getattr(FillTypes, i), FillTypes)
+
     def test_units_angles(self):
-        self.assertTrue('degree' in UnitsAngles)
-        self.assertTrue('radian' in UnitsAngles)
-        self.assertTrue(UnitsAngles.DEGREE in UnitsAngles)
-        self.assertTrue(UnitsAngles.RADIAN in UnitsAngles)
+        for i in ('DEGREE', 'RADIAN'):
+            self.assertIn(i, UnitsAngles)
+            self.assertIn(i.lower(), UnitsAngles)
+            self.assertIn(getattr(UnitsAngles, i), UnitsAngles)
 
     def test_acquisition_type(self):
-        self.assertTrue('parallel' in AcquisitionTypes)
-        self.assertTrue('cone' in AcquisitionTypes)
-        self.assertTrue(AcquisitionTypes.PARALLEL in AcquisitionTypes)
-        self.assertTrue(AcquisitionTypes.CONE in AcquisitionTypes)
+        for i in ('PARALLEL', 'CONE'):
+            self.assertIn(i, AcquisitionTypes)
+            self.assertIn(i.lower(), AcquisitionTypes)
+            self.assertIn(getattr(AcquisitionTypes, i), AcquisitionTypes)
 
     def test_acquisition_dimension(self):
-        self.assertTrue('2D' in AcquisitionDimensions)
-        self.assertTrue('3D' in AcquisitionDimensions)
-        self.assertTrue(AcquisitionDimensions.DIM2 in AcquisitionDimensions)
-        self.assertTrue(AcquisitionDimensions.DIM3 in AcquisitionDimensions)
+        for i in ('2D', '3D'):
+            self.assertIn(i, AcquisitionDimensions)
+        for i in ('DIM2', 'DIM3'):
+            self.assertIn(i, AcquisitionDimensions)
+            self.assertIn(i.lower(), AcquisitionDimensions)
+            self.assertIn(getattr(AcquisitionDimensions, i), AcquisitionDimensions)
 
     def test_image_dimension_labels(self):
-        self.assertTrue('channel' in ImageDimensionLabels)
-        self.assertTrue('vertical' in ImageDimensionLabels)
-        self.assertTrue('horizontal_x' in ImageDimensionLabels)
-        self.assertTrue('horizontal_y' in ImageDimensionLabels)
-        self.assertTrue(ImageDimensionLabels.CHANNEL in ImageDimensionLabels)
-        self.assertTrue(ImageDimensionLabels.VERTICAL in ImageDimensionLabels)
-        self.assertTrue(ImageDimensionLabels.HORIZONTAL_X in ImageDimensionLabels)
-        self.assertTrue(ImageDimensionLabels.HORIZONTAL_Y in ImageDimensionLabels)
+        for i in ('CHANNEL', 'VERTICAL', 'HORIZONTAL_X', 'HORIZONTAL_Y'):
+            self.assertIn(i, ImageDimensionLabels)
+            self.assertIn(i.lower(), ImageDimensionLabels)
+            self.assertIn(getattr(ImageDimensionLabels, i), ImageDimensionLabels)
 
     def test_image_dimension_labels_default_order(self):
-        
-        order_gold = [ImageDimensionLabels.CHANNEL, ImageDimensionLabels.VERTICAL, ImageDimensionLabels.HORIZONTAL_Y, ImageDimensionLabels.HORIZONTAL_X]
+        order_gold = [ImageDimensionLabels.CHANNEL, 'VERTICAL', 'horizontal_y', 'HORIZONTAL_X']
+        for i in ('CIL', 'TIGRE', 'ASTRA'):
+            self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine(i), order_gold)
 
-        order = ImageDimensionLabels.get_order_for_engine("cil")
-        self.assertEqual(order,order_gold )
-
-        order = ImageDimensionLabels.get_order_for_engine("tigre")
-        self.assertEqual(order,order_gold)
-
-        order = ImageDimensionLabels.get_order_for_engine("astra")
-        self.assertEqual(order, order_gold)
-
-        with self.assertRaises(ValueError):
-            order = AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
-
+        with self.assertRaises((KeyError, ValueError)):
+            AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
 
     def test_image_dimension_labels_get_order(self):
         ig = ImageGeometry(4, 8, 1, channels=2)
         ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
 
         # for 2D all engines have the same order
-        order_gold = [ImageDimensionLabels.CHANNEL, ImageDimensionLabels.HORIZONTAL_Y, ImageDimensionLabels.HORIZONTAL_X]
-        order = ImageDimensionLabels.get_order_for_engine("cil", ig)
-        self.assertEqual(order, order_gold)
-
-        order = ImageDimensionLabels.get_order_for_engine("tigre", ig)
-        self.assertEqual(order, order_gold)
-
-        order = ImageDimensionLabels.get_order_for_engine("astra", ig)
-        self.assertEqual(order, order_gold)
+        order_gold = [ImageDimensionLabels.CHANNEL, 'HORIZONTAL_Y', 'horizontal_x']
+        self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('cil', ig), order_gold)
+        self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('tigre', ig), order_gold)
+        self.assertSequenceEqual(ImageDimensionLabels.get_order_for_engine('astra', ig), order_gold)
 
     def test_image_dimension_labels_check_order(self):
         ig = ImageGeometry(4, 8, 1, channels=2)
         ig.set_labels(['horizontal_x', 'horizontal_y', 'channel'])
 
-        with self.assertRaises(ValueError):
-            ImageDimensionLabels.check_order_for_engine("cil", ig)
-        
-        with self.assertRaises(ValueError):
-            ImageDimensionLabels.check_order_for_engine("tigre", ig)
-
-        with self.assertRaises(ValueError):
-            ImageDimensionLabels.check_order_for_engine("astra", ig)
+        for i in ('cil', 'tigre', 'astra'):
+            with self.assertRaises(ValueError):
+                ImageDimensionLabels.check_order_for_engine(i, ig)
 
         ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
-        self.assertTrue( ImageDimensionLabels.check_order_for_engine("cil", ig))
-        self.assertTrue( ImageDimensionLabels.check_order_for_engine("tigre", ig))
-        self.assertTrue( ImageDimensionLabels.check_order_for_engine("astra", ig))
+        self.assertTrue(ImageDimensionLabels.check_order_for_engine("cil", ig))
+        self.assertTrue(ImageDimensionLabels.check_order_for_engine("tigre", ig))
+        self.assertTrue(ImageDimensionLabels.check_order_for_engine("astra", ig))
 
     def test_acquisition_dimension_labels(self):
-        self.assertTrue('channel' in AcquisitionDimensionLabels)
-        self.assertTrue('angle' in AcquisitionDimensionLabels)
-        self.assertTrue('vertical' in AcquisitionDimensionLabels)
-        self.assertTrue('horizontal' in AcquisitionDimensionLabels)
-        self.assertTrue(AcquisitionDimensionLabels.CHANNEL in AcquisitionDimensionLabels)
-        self.assertTrue(AcquisitionDimensionLabels.ANGLE in AcquisitionDimensionLabels)
-        self.assertTrue(AcquisitionDimensionLabels.VERTICAL in AcquisitionDimensionLabels)
-        self.assertTrue(AcquisitionDimensionLabels.HORIZONTAL in AcquisitionDimensionLabels)
+        for i in ('CHANNEL', 'ANGLE', 'VERTICAL', 'HORIZONTAL'):
+            self.assertIn(i, AcquisitionDimensionLabels)
+            self.assertIn(i.lower(), AcquisitionDimensionLabels)
+            self.assertIn(getattr(AcquisitionDimensionLabels, i), AcquisitionDimensionLabels)
 
     def test_acquisition_dimension_labels_default_order(self):
-        order = AcquisitionDimensionLabels.get_order_for_engine("cil")
-        self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.HORIZONTAL])
+        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine('CIL'), [AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'vertical', 'HORIZONTAL'])
+        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine(Backends.TIGRE), ['CHANNEL', 'ANGLE', 'VERTICAL', 'HORIZONTAL'])
+        self.assertEqual(AcquisitionDimensionLabels.get_order_for_engine('astra'), ['CHANNEL', 'VERTICAL', 'ANGLE', 'HORIZONTAL'])
 
-        order = AcquisitionDimensionLabels.get_order_for_engine("tigre")
-        self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.HORIZONTAL])
-
-        order = AcquisitionDimensionLabels.get_order_for_engine("astra")
-        self.assertEqual(order, [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.HORIZONTAL])
-
-        with self.assertRaises(ValueError):
-            order = AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
+        with self.assertRaises((KeyError, ValueError)):
+            AcquisitionDimensionLabels.get_order_for_engine("bad_engine")
 
     def test_acquisition_dimension_labels_get_order(self):
-
         ag = AcquisitionGeometry.create_Parallel2D()\
             .set_angles(np.arange(0,16 , 1), angle_unit="degree")\
             .set_panel(4)\
             .set_channels(8)\
             .set_labels(['angle', 'horizontal', 'channel'])
-        
+
         # for 2D all engines have the same order
-        order_gold = [AcquisitionDimensionLabels.CHANNEL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.HORIZONTAL]
-        order = AcquisitionDimensionLabels.get_order_for_engine("cil", ag)
-        self.assertEqual(order, order_gold)
-
-        order = AcquisitionDimensionLabels.get_order_for_engine("tigre", ag)
-        self.assertEqual(order, order_gold)
-
-        order = AcquisitionDimensionLabels.get_order_for_engine("astra", ag)
-        self.assertEqual(order, order_gold)
-
+        order_gold = [AcquisitionDimensionLabels.CHANNEL, 'ANGLE', 'horizontal']
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('CIL', ag), order_gold)
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('TIGRE', ag), order_gold)
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine('ASTRA', ag), order_gold)
 
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_angles(np.arange(0,16 , 1), angle_unit="degree")\
             .set_panel((4,2))\
             .set_labels(['angle', 'horizontal', 'vertical'])
-        
 
-        order_gold = [AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.HORIZONTAL]
-        order = AcquisitionDimensionLabels.get_order_for_engine("cil", ag)
-        self.assertEqual(order, order_gold)
-
-        order = AcquisitionDimensionLabels.get_order_for_engine("tigre", ag)
-        self.assertEqual(order, order_gold)
-
-        order_gold = [AcquisitionDimensionLabels.VERTICAL, AcquisitionDimensionLabels.ANGLE, AcquisitionDimensionLabels.HORIZONTAL]
-        order = AcquisitionDimensionLabels.get_order_for_engine("astra", ag)
-        self.assertEqual(order, order_gold)
-
+        order_gold = [AcquisitionDimensionLabels.ANGLE, 'VERTICAL', 'horizontal']
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("cil", ag), order_gold)
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("tigre", ag), order_gold)
+        order_gold = [AcquisitionDimensionLabels.VERTICAL, 'ANGLE', 'horizontal']
+        self.assertSequenceEqual(AcquisitionDimensionLabels.get_order_for_engine("astra", ag), order_gold)
 
     def test_acquisition_dimension_labels_check_order(self):
-
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_angles(np.arange(0,16 , 1), angle_unit="degree")\
             .set_panel((8,4))\
             .set_channels(2)\
             .set_labels(['angle', 'horizontal', 'channel', 'vertical'])
-        
-        with self.assertRaises(ValueError):
-            AcquisitionDimensionLabels.check_order_for_engine("cil", ag)
 
-        with self.assertRaises(ValueError):
-            AcquisitionDimensionLabels.check_order_for_engine("tigre", ag)
-
-        with self.assertRaises(ValueError):
-            AcquisitionDimensionLabels.check_order_for_engine("astra", ag)
+        for i in ('cil', 'tigre', 'astra'):
+            with self.assertRaises(ValueError):
+                AcquisitionDimensionLabels.check_order_for_engine(i, ag)
 
         ag.set_labels(['channel', 'angle', 'vertical', 'horizontal'])
-        self.assertTrue( AcquisitionDimensionLabels.check_order_for_engine("cil", ag))
-        self.assertTrue( AcquisitionDimensionLabels.check_order_for_engine("tigre", ag))
+        self.assertTrue(AcquisitionDimensionLabels.check_order_for_engine("cil", ag))
+        self.assertTrue(AcquisitionDimensionLabels.check_order_for_engine("tigre", ag))
 
         ag.set_labels(['channel', 'vertical', 'angle', 'horizontal'])
-        self.assertTrue( AcquisitionDimensionLabels.check_order_for_engine("astra", ag))
+        self.assertTrue(AcquisitionDimensionLabels.check_order_for_engine("astra", ag))

@@ -28,6 +28,7 @@ from cil.framework import VectorData
 from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction, SAGFunction, SAGAFunction
+from cil.optimisation.functions import SVRGFunction, LSVRGFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
@@ -69,29 +70,6 @@ class TestApproximateGradientSumFunction(CCPiTestClass):
             self.stochastic_objective = ApproximateGradientSumFunction(
                 self.functions, self.sampler)
 
-
-
-class TestApproximateGradientSumFunction(CCPiTestClass):
-
-    def setUp(self):
-        self.sampler = Sampler.random_with_replacement(5)
-        self.initial = VectorData(np.zeros(10))
-        self.b = VectorData(np.random.normal(0, 1, 10))
-        self.functions = []
-        for i in range(5):
-            diagonal = np.zeros(10)
-            diagonal[2*i:2*(i+1)] = 1
-            A = MatrixOperator(np.diag(diagonal))
-            self.functions.append(LeastSquares(A, A.direct(self.b)))
-            if i == 0:
-                self.objective = LeastSquares(A, A.direct(self.b))
-            else:
-                self.objective += LeastSquares(A, A.direct(self.b))
-
-    def test_ABC(self):
-        with self.assertRaises(TypeError):
-            self.stochastic_objective = ApproximateGradientSumFunction(
-                self.functions, self.sampler)
 
 
 class approx_gradient_child_class_testing():
@@ -337,3 +315,231 @@ class TestSAGA(CCPiTestClass,approx_gradient_child_class_testing):
             alg_stochastic.x.as_array(), u_cvxpy.value, 3)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), 3)
+        
+
+class TestSVRG(CCPiTestClass, approx_gradient_child_class_testing):
+
+    def setUp(self):
+        self.stochastic_estimator=SVRGFunction
+        self.n_subsets=5
+        self.set_up()
+
+    
+
+    def test_SVRG_init(self):
+        self.assertEqual(self.f_stochastic.snapshot_update_interval,
+                         2*self.f_stochastic.num_functions)
+        self.assertListEqual(self.f_stochastic.data_passes, [])
+        self.assertListEqual(self.f_stochastic.data_passes_indices, [])
+        self.assertEqual(self.f_stochastic.store_gradients, False)
+        f2 = SVRGFunction(self.f_subsets, snapshot_update_interval=2,
+                          store_gradients=True)
+        self.assertEqual(f2.snapshot_update_interval, 2)
+        self.assertListEqual(f2.data_passes, [])
+        self.assertListEqual(f2.data_passes_indices, [])
+        self.assertEqual(f2.store_gradients, True)
+
+    def test_SVRG_snapshot_update_interval_and_data_passes(self):
+        sampler = Sampler.random_with_replacement(self.n_subsets)
+        objective = SVRGFunction(self.f_subsets, sampler)
+        alg_stochastic = GD(initial=self.initial,
+                            objective_function=objective, update_objective_interval=500,
+                            step_size=5e-8, max_iteration=5000)
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5, 7./5, 8./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array([
+                                         1., 6./5, 7./5, 8./5, 9./5, 10./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array(
+            [1., 6./5, 7./5, 8./5, 9./5, 10./5, 11./5, 12./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array(
+            [1., 6./5, 7./5, 8./5, 9./5, 10./5, 11./5, 12./5, 13./5, 14./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array(
+            [1., 6./5, 7./5, 8./5, 9./5, 10./5, 11./5, 12./5, 13./5, 14./5, 19./5, 20./5]))
+        objective = SVRGFunction(
+            self.f_subsets, self.sampler, snapshot_update_interval=3)
+        alg_stochastic = GD(initial=self.initial,
+                            objective_function=objective, update_objective_interval=500,
+                            step_size=5e-8, max_iteration=5000)
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5, 7./5, 12./5]))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array([
+                                         1., 6./5, 7./5, 12./5, 13./5, 14./5]))
+        alg_stochastic.run(2, verbose=0)
+
+    def test_SVRG_store_gradients(self):
+        objective = SVRGFunction(self.f_subsets, self.sampler)
+        self.assertEqual(objective._list_stored_gradients, None)
+        objective.gradient(self.initial)
+        self.assertEqual(objective._list_stored_gradients, None)
+
+        objective = SVRGFunction(
+            self.f_subsets, self.sampler, store_gradients=True)
+        self.assertEqual(objective._list_stored_gradients, None)
+        objective.gradient(self.initial)
+        self.assertNumpyArrayAlmostEqual(
+            objective._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(
+            objective._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
+
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_SVRG_toy_example_store_gradients(self):
+        sampler = Sampler.sequential(3)
+        initial = VectorData(np.zeros(15))
+        np.random.seed(4)
+        b = VectorData(np.random.normal(0, 3, 15))
+        functions = []
+        for i in range(3):
+            diagonal = np.zeros(15)
+            diagonal[5*i:5*(i+1)] = 1
+            A = MatrixOperator(np.diag(diagonal))
+            functions.append(LeastSquares(A, A.direct(b)))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
+
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+        
+        
+        stochastic_objective = SVRGFunction(functions, sampler, store_gradients=True)
+
+        alg_stochastic = GD(initial=initial,
+                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            step_size=1/stochastic_objective.L)
+
+        alg_stochastic.run(10, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(stochastic_objective.data_passes), 
+           np.array( [1.]+[4./3, 5./3, 6./3, 7./3,  8./3, 11./3, 12./3, 13./3, 14./3]), 4)
+        self.assertListEqual(stochastic_objective.data_passes_indices[:2], [list(range(3)), [0]])
+
+        alg_stochastic.run(100, verbose=0)
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), b.as_array(), 3)
+
+    
+
+class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
+
+    def setUp(self):
+        self.stochastic_estimator=LSVRGFunction
+        self.n_subsets=5
+        self.set_up()
+
+    def test_approximate_gradient_not_equal_full(self):
+        self.f_stochastic.gradient(self.initial)
+        self.assertFalse((self.f_stochastic.full_gradient(
+            self.initial+1) == self.f_stochastic.approximate_gradient(self.initial+1,3).array).all())
+
+
+    def test_LSVRG_init(self):
+        self.assertEqual(self.f_stochastic.snapshot_update_probability, 1/self.n_subsets)
+        self.assertListEqual(self.f_stochastic.data_passes, [])
+        self.assertListEqual(self.f_stochastic.data_passes_indices, [])
+        self.assertEqual(self.f_stochastic.store_gradients, False)
+
+        f2 = LSVRGFunction(self.f_subsets, snapshot_update_probability=1 /
+                           2, store_gradients=True, seed=1)
+        self.assertEqual(f2.snapshot_update_probability, 1/2)
+        self.assertListEqual(f2.data_passes, [])
+        self.assertEqual(f2.store_gradients, True)
+
+    def test_LSVRG_data_passes_and_snapshot_update_probability_and_seed(self):
+        objective = LSVRGFunction(self.f_subsets, self.sampler, snapshot_update_probability=1)
+        alg_stochastic = GD(initial=self.initial,  update_objective_interval=500,
+                            objective_function=objective,                               step_size=5e-8, max_iteration=5000)
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 2,]))
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes_indices[-1]), np.array(list(range(self.n_subsets))))
+        alg_stochastic.run(2, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 2., 3., 4.]))
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes_indices[-1]), np.array(list(range(self.n_subsets))))
+        objective = LSVRGFunction(self.f_subsets, self.sampler, seed=3)
+        alg_stochastic = GD(initial=self.initial,
+                            objective_function=objective, update_objective_interval=500,
+                            step_size=5e-8, max_iteration=5000)
+        alg_stochastic.run(10, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), 
+            np.array([1., 2., 2.2, 2.4, 2.6, 3.6, 3.8, 4., 5., 5.2]))
+
+    def test_LSVRG_store_gradients(self):
+        objective = LSVRGFunction(self.f_subsets, self.sampler)
+        
+        self.assertEqual(objective._list_stored_gradients, None)
+        objective.gradient(self.initial)
+        self.assertEqual(objective._list_stored_gradients, None)
+
+        objective = LSVRGFunction(
+            self.f_subsets, self.sampler, store_gradients=True)
+        self.assertEqual(objective._list_stored_gradients, None)
+        objective.gradient(self.initial)
+        self.assertNumpyArrayAlmostEqual(
+            objective._list_stored_gradients[0].array, self.f_subsets[0].gradient(self.initial).array)
+        self.assertNumpyArrayAlmostEqual(
+            objective._list_stored_gradients[1].array, self.f_subsets[1].gradient(self.initial).array)
+
+
+
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_LSVRG_toy_example_store_gradients(self):
+        sampler = Sampler.sequential(3)
+        initial = VectorData(np.zeros(15))
+        np.random.seed(4)
+        b = VectorData(np.random.normal(0, 3, 15))
+        functions = []
+        for i in range(3):
+            diagonal = np.zeros(15)
+            diagonal[5*i:5*(i+1)] = 1
+            A = MatrixOperator(np.diag(diagonal))
+            functions.append(LeastSquares(A, A.direct(b)))
+        Aop=MatrixOperator(np.diag(np.ones(15)))
+
+        u_cvxpy = cvxpy.Variable(b.shape[0])
+        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4) 
+        
+        
+        stochastic_objective = LSVRGFunction(functions, sampler, store_gradients=True)
+
+        alg_stochastic = GD(initial=initial,
+                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            step_size=1/stochastic_objective.L)
+
+
+
+        alg_stochastic.run(100, verbose=0)
+        np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
+        self.assertNumpyArrayAlmostEqual(
+            alg_stochastic.x.as_array(), b.as_array(), 3)
+        
+    def test_sampler_out_of_range(self):
+        def g(index):
+            return -2
+        bad_sampler = Sampler.from_function(12,g)
+        f = self.stochastic_estimator([self.f]*10, bad_sampler, seed=25)
+        with self.assertRaises(IndexError):
+            f.gradient(self.initial)
+            f.gradient(self.initial)
+            

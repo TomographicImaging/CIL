@@ -15,279 +15,232 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+from enum import Enum, auto, unique
+try:
+    from enum import EnumType
+except ImportError: # Python<3.11
+    from enum import EnumMeta as EnumType
 
-from enum import Enum, EnumMeta
 
-class _LabelsBase(Enum):
-    """
-    Base class for labels enumeration. These changes are needed for python < 3.12.
+class _StrEnumMeta(EnumType):
+    """Python<3.12 requires this in a metaclass (rather than directly in StrEnum)"""
+    def __contains__(self, item: str) -> bool:
+        try:
+            key = item.upper()
+        except AttributeError:
+            return False
+        return key in self.__members__ or item in self.__members__.values()
 
-    Methods:
-    --------
-    - __eq__(other): Checks if the enum or enum values are equal
-    - __contains__(item): Checks if the enum contains the given value
-    """
 
-    def __eq__(self, other):
-        if self.value == other:
-            return True
-        return False
+@unique
+class StrEnum(str, Enum, metaclass=_StrEnumMeta):
+    """Case-insensitive StrEnum"""
+    @classmethod
+    def _missing_(cls, value: str):
+        return cls.__members__.get(value.upper(), None)
 
-    def __contains__(self, item):
-        for member in self:
-            if member.value == item:
-                return True
-        return False
+    def __eq__(self, value: str) -> bool:
+        """Uses value.upper() for case-insensitivity"""
+        try:
+            return super().__eq__(self.__class__[value.upper()])
+        except (KeyError, ValueError):
+            return False
 
-# Needed for python < 3.12
-EnumMeta.__contains__ = _LabelsBase.__contains__
+    def __hash__(self) -> int:
+        """consistent hashing for dictionary keys"""
+        return hash(self.value)
 
-class Backends(_LabelsBase):
+    # compatibility with Python>=3.11 `enum.StrEnum`
+    __str__ = str.__str__
+    __format__ = str.__format__
+
+    @staticmethod
+    def _generate_next_value_(name: str, start, count, last_values) -> str:
+        return name.lower()
+
+
+
+class Backends(StrEnum):
     """
     Available backends for CIL.
 
-    Attributes
-    ----------
-    ASTRA ('astra'): The ASTRA toolbox.
-    TIGRE ('tigre'): The TIGRE toolbox.
-    CIL ('cil'): Native CIL implementation.
-
     Examples
     --------
+    ```
     FBP(data, backend=Backends.ASTRA)
     FBP(data, backend="astra")
+    ```
     """
-    ASTRA = "astra"
-    TIGRE = "tigre"
-    CIL = "cil"
+    ASTRA = auto()
+    TIGRE = auto()
+    CIL = auto()
 
-class ImageDimensionLabels(_LabelsBase):
+
+class ImageDimensionLabels(StrEnum):
     """
     Available dimension labels for image data.
-    
-    Attributes
-    ----------
-    CHANNEL ('channel'): The channel dimension.
-    VERTICAL ('vertical'): The vertical dimension.
-    HORIZONTAL_X ('horizontal_x'): The horizontal dimension in x.
-    HORIZONTAL_Y ('horizontal_y'): The horizontal dimension in y.
 
     Examples
     --------
+    ```
     data.reorder([ImageDimensionLabels.HORIZONTAL_X, ImageDimensionLabels.VERTICAL])
     data.reorder(["horizontal_x", "vertical"])
+    ```
     """
-    CHANNEL = "channel"
-    VERTICAL = "vertical"
-    HORIZONTAL_X = "horizontal_x"
-    HORIZONTAL_Y = "horizontal_y"
+    CHANNEL = auto()
+    VERTICAL = auto()
+    HORIZONTAL_X = auto()
+    HORIZONTAL_Y = auto()
 
     @classmethod
-    def get_order_for_engine(cls, engine, geometry=None):
+    def get_order_for_engine(cls, engine: str, geometry=None) -> list:
         """
         Returns the order of dimensions for a specific engine and geometry.
 
-        Parameters:
+        Parameters
         ----------
-        engine : str
-            The engine name.
-        geometry : ImageGeometry, optional
-            The geometry object. If None, the default order is returned.
-
-        Returns:
-        --------
-        list
-            The order of dimensions for the given engine and geometry.
+        geometry: ImageGeometry, optional
+            If unspecified, the default order is returned.
         """
-        order = [cls.CHANNEL.value, cls.VERTICAL.value, \
-                 cls.HORIZONTAL_Y.value, cls.HORIZONTAL_X.value]
-        
-        engine_orders = {
-            Backends.ASTRA.value: order,
-            Backends.TIGRE.value: order,
-            Backends.CIL.value: order
-        }
-
-        dim_order = engine_orders[Backends(engine).value]
+        order = [cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X]
+        engine_orders = {Backends.ASTRA: order, Backends.TIGRE: order, Backends.CIL: order}
+        dim_order = engine_orders[Backends[engine.upper()]]
 
         if geometry is None:
             return dim_order
-        else:
-            return [label for label in dim_order if label in geometry.dimension_labels ]
+        return [label for label in dim_order if label in geometry.dimension_labels]
 
     @classmethod
-    def check_order_for_engine(cls, engine, geometry):
+    def check_order_for_engine(cls, engine: str, geometry) -> bool:
         """
-        Checks if the order of dimensions is correct for a specific engine and geometry.
+        Returns True iff the order of dimensions is correct for a specific engine and geometry.
 
-        Parameters:
+        Parameters
         ----------
-        engine : str
-            The engine name.
-        geometry : ImageGeometry
-            The geometry object.
+        geometry: ImageGeometry
 
-        Returns:
-        --------
-        bool
-            True if the order of dimensions is correct.
-
-        Raises:
-        -------
-        ValueError
-            If the order of dimensions is incorrect.
+        Raises
+        ------
+        ValueError if the order of dimensions is incorrect.
         """
         order_requested = cls.get_order_for_engine(engine, geometry)
-
         if order_requested == list(geometry.dimension_labels):
             return True
-        else:
-            raise ValueError(
-                f"Expected dimension_label order {order_requested}, \
-                    got {list(geometry.dimension_labels)}.\n\
-                    Try using `data.reorder('{engine}')` to permute for {engine}")
+        raise ValueError(
+            f"Expected dimension_label order {order_requested}"
+            f" got {list(geometry.dimension_labels)}."
+            f" Try using `data.reorder('{engine}')` to permute for {engine}")
 
-class AcquisitionDimensionLabels(_LabelsBase):
+
+class AcquisitionDimensionLabels(StrEnum):
     """
     Available dimension labels for acquisition data.
-    
-    Attributes
-    ----------
-    CHANNEL ('channel'): The channel dimension.
-    ANGLE ('angle'): The angle dimension.
-    VERTICAL ('vertical'): The vertical dimension.
-    HORIZONTAL ('horizontal'): The horizontal dimension.
-    
+
     Examples
     --------
+    ```
     data.reorder([AcquisitionDimensionLabels.CHANNEL,
                   AcquisitionDimensionLabels.ANGLE,
                   AcquisitionDimensionLabels.HORIZONTAL])
     data.reorder(["channel", "angle", "horizontal"])
+    ```
     """
-
-    CHANNEL = "channel"
-    ANGLE = "angle"
-    VERTICAL = "vertical"
-    HORIZONTAL = "horizontal"
-
+    CHANNEL = auto()
+    ANGLE = auto()
+    VERTICAL = auto()
+    HORIZONTAL = auto()
 
     @classmethod
-    def get_order_for_engine(cls, engine, geometry=None):
+    def get_order_for_engine(cls, engine: str, geometry=None) -> list:
         """
         Returns the order of dimensions for a specific engine and geometry.
 
-        Parameters:
+        Parameters
         ----------
-        engine : str
-            The engine name.
         geometry : AcquisitionGeometry, optional
-            The geometry object. If None, the default order is returned.
-
-        Returns:
-        --------
-        list
-            The order of dimensions for the given engine and geometry.
+            If unspecified, the default order is returned.
         """
         engine_orders = {
-            Backends.ASTRA.value: [cls.CHANNEL.value, cls.VERTICAL.value, \
-                                   cls.ANGLE.value, cls.HORIZONTAL.value],
-            Backends.TIGRE.value: [cls.CHANNEL.value, cls.ANGLE.value, \
-                                   cls.VERTICAL.value, cls.HORIZONTAL.value],
-            Backends.CIL.value: [cls.CHANNEL.value, cls.ANGLE.value, \
-                                 cls.VERTICAL.value, cls.HORIZONTAL.value]
-        }
-
-        dim_order = engine_orders[Backends(engine).value]
+            Backends.ASTRA: [cls.CHANNEL, cls.VERTICAL, cls.ANGLE, cls.HORIZONTAL],
+            Backends.TIGRE: [cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL],
+            Backends.CIL: [cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL]}
+        dim_order = engine_orders[Backends[engine.upper()]]
 
         if geometry is None:
             return dim_order
-        else:
-            return [label for label in dim_order if label in geometry.dimension_labels ]
-
+        return [label for label in dim_order if label in geometry.dimension_labels]
 
     @classmethod
-    def check_order_for_engine(cls, engine, geometry):
+    def check_order_for_engine(cls, engine: str, geometry) -> bool:
         """
-        Checks if the order of dimensions is correct for a specific engine and geometry.
+        Returns True iff the order of dimensions is correct for a specific engine and geometry.
 
-        Parameters:
+        Parameters
         ----------
-        engine : str
-            The engine name.
-        geometry : AcquisitionGeometry
+        geometry: AcquisitionGeometry
 
-        Returns:
-        --------
-        bool
-            True if the order of dimensions is correct
-
-        Raises:
-        -------
-        ValueError
-            If the order of dimensions is incorrect.
+        Raises
+        ------
+        ValueError if the order of dimensions is incorrect.
         """
-
         order_requested = cls.get_order_for_engine(engine, geometry)
-
         if order_requested == list(geometry.dimension_labels):
             return True
-        else:
-            raise ValueError(
-                f"Expected dimension_label order {order_requested}, \
-                got {list(geometry.dimension_labels)}.\n\
-                Try using `data.reorder('{engine}')` to permute for {engine}")
+        raise ValueError(
+            f"Expected dimension_label order {order_requested},"
+            f" got {list(geometry.dimension_labels)}."
+            f" Try using `data.reorder('{engine}')` to permute for {engine}")
 
-class FillTypes(_LabelsBase):
+
+class FillTypes(StrEnum):
     """
     Available fill types for image data.
 
     Attributes
     ----------
-    RANDOM ('random'): Fill with random values.
-    RANDOM_INT ('random_int'): Fill with random integers.
+    RANDOM: Fill with random values.
+    RANDOM_INT: Fill with random integers.
 
     Examples
     --------
-    data.fill(FillTypes.random)
+    ```
+    data.fill(FillTypes.RANDOM)
     data.fill("random")
+    ```
     """
+    RANDOM = auto()
+    RANDOM_INT = auto()
 
-    RANDOM = "random"
-    RANDOM_INT = "random_int"
 
-class UnitsAngles(_LabelsBase):
+class UnitsAngles(StrEnum):
     """
     Available units for angles.
 
-    Attributes
-    ----------
-    DEGREE ('degree'): Degrees.
-    RADIAN ('radian'): Radians.
-
     Examples
     --------
+    ```
     data.geometry.set_unitangles(angle_data, angle_units=UnitsAngles.DEGREE)
     data.geometry.set_unit(angle_data, angle_units="degree")
+    ```
     """
+    DEGREE = auto()
+    RADIAN = auto()
 
-    DEGREE = "degree"
-    RADIAN = "radian"
 
-class AcquisitionTypes(_LabelsBase):
+class AcquisitionTypes(StrEnum):
     """
     Available acquisition types.
 
     Attributes
     ----------
-    PARALLEL ('parallel'): Parallel beam.
-    CONE ('cone'): Cone beam.
+    PARALLEL: Parallel beam.
+    CONE: Cone beam.
     """
+    PARALLEL = auto()
+    CONE = auto()
 
-    PARALLEL = "parallel"
-    CONE = "cone"
 
-class AcquisitionDimensions(_LabelsBase):
+class AcquisitionDimensions(StrEnum):
     """
     Available acquisition dimensions.
 
@@ -296,6 +249,5 @@ class AcquisitionDimensions(_LabelsBase):
     DIM2 ('2D'): 2D acquisition.
     DIM3 ('3D'): 3D acquisition.
     """
-
     DIM2 = "2D"
     DIM3 = "3D"

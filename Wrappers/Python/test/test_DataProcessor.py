@@ -3135,6 +3135,15 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
 
+    def test_preview_configuration(self):
+        # Test error in preview configuration if there is no roi
+        processor = FluxNormaliser(flux=10)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor.preview_configuration()
+
+        
+
     def test_FluxNormaliser(self):
         processor = FluxNormaliser(flux=10)
         processor.set_input(self.data_cone)

@@ -74,41 +74,45 @@ class FluxNormaliser(Processor):
             else:
                 if isinstance(self.roi,dict):
                     if not all (r in dataset.dimension_labels for r in self.roi):
-                        raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
+                        raise ValueError("roi labels must be in the dataset dimension_labels, found {}"
                                         .format(str(self.roi)))
 
                     slc = [slice(None)]*len(dataset.shape)
                     axes=[]
-                    roi_list = list(dataset.dimension_labels)
-                    
-                    # loop through all dimensions in the dataset apart from angle
-                    roi_list.remove('angle')
-                    for r in roi_list:
-                        # check the dimension is in the user specified roi
-                        if r in self.roi:
-                            # only allow horizontal and vertical roi
-                            if (r == 'horizontal' or r == 'vertical'):
-                                # check indices are ints
-                                if not all(isinstance(i, int) for i in self.roi[r]):
-                                    raise TypeError("roi values must be int, found {} and {}"
-                                    .format(str(type(self.roi[r][0])), str(type(self.roi[r][1]))))
-                                # check indices are in range
-                                elif (self.roi[r][0] >= self.roi[r][1]) or (self.roi[r][0] < 0) or self.roi[r][1] > dataset.get_dimension_size(r):
-                                    raise ValueError("roi values must be start > stop and between 0 and {}, found start={} and stop={} for direction '{}'"
-                                    .format(str(dataset.get_dimension_size(r)), str(self.roi[r][0]), str(self.roi[r][1]), r ))
-                                # create slice
-                                else:
-                                    ax = dataset.get_dimension_axis(r)
-                                    slc[ax] = slice(self.roi[r][0], self.roi[r][1])
-                                    axes.append(ax)
-                            else:
-                                raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
+
+                    for r in self.roi:
+                        # only allow roi to be specified in horizontal and vertical
+                        if (r != 'horizontal' and r != 'vertical'):
+                            raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
                                 .format(str(r)))
+                    
+                    dimension_label_list = list(dataset.dimension_labels)
+                    # loop through all dimensions in the dataset apart from angle
+                    if 'angle' in dimension_label_list:
+                        dimension_label_list.remove('angle')
+
+                    for d in dimension_label_list:
+                        # check the dimension is in the user specified roi
+                        if d in self.roi:
+                            # check indices are ints
+                            if not all(isinstance(i, int) for i in self.roi[d]):
+                                raise TypeError("roi values must be int, found {} and {}"
+                                .format(str(type(self.roi[d][0])), str(type(self.roi[d][1]))))
+                            # check indices are in range
+                            elif (self.roi[d][0] >= self.roi[d][1]) or (self.roi[d][0] < 0) or self.roi[d][1] > dataset.get_dimension_size(d):
+                                raise ValueError("roi values must be start > stop and between 0 and {}, found start={} and stop={} for direction '{}'"
+                                .format(str(dataset.get_dimension_size(d)), str(self.roi[d][0]), str(self.roi[d][1]), d ))
+                            # create slice
+                            else:
+                                ax = dataset.get_dimension_axis(d)
+                                slc[ax] = slice(self.roi[d][0], self.roi[d][1])
+                                axes.append(ax)
+                            
                         # if the dimension is not in roi, average across the whole dimension
                         else:
-                            ax = dataset.get_dimension_axis(r)
+                            ax = dataset.get_dimension_axis(d)
                             axes.append(ax)
-                            self.roi.update({r:(0,dataset.get_dimension_size(r))})
+                            self.roi.update({d:(0,dataset.get_dimension_size(d))})
 
                     self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
                     self.roi_slice = slc
@@ -131,7 +135,7 @@ class FluxNormaliser(Processor):
             
         return True
 
-    def preview_configuration(self, angle='min_and_max', log=False):
+    def preview_configuration(self, angle=None, channel=None, log=False):
         '''
         Preview the FluxNormalisation processor configuration for roi mode.
         Plots the region of interest on the image and the mean, maximum and 
@@ -140,9 +144,14 @@ class FluxNormaliser(Processor):
         Parameters:
         -----------
         angle: float or str (optional)
-            Angle to plot, default='min_and_max' displays the data with the minimum
+            Angle to plot, default=None displays the data with the minimum
             and maximum pixel values in the roi, otherwise the angle to display 
-            can be specified as a float (closest angle is displayed).
+            can be specified as a float and the closest angle will be displayed.
+            For 2D data, the roi is plotted on the sinogram.
+
+        channel: int (optional)
+            The channel to plot, default=None displays the central channel if
+            the data has channels
 
         log: bool (optional)
             If True, plot the image with a log scale, default is False
@@ -151,51 +160,112 @@ class FluxNormaliser(Processor):
             raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
         else:
             data = self.get_input()
+            
             min = numpy.min(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
             max = numpy.max(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
             
-            if angle=='min_and_max':
-                self._plot_slice_roi_angle(angle_index=numpy.argmin(min), log=log, ax=221)
-                self._plot_slice_roi_angle(angle_index=numpy.argmax(max), log=log, ax=222)
+            if data.geometry.dimension == '3D':
+                if angle is None:
+                    if 'angle' in data.dimension_labels:
+                        self._plot_slice_roi(angle_index=numpy.argmin(min), channel_index=channel, log=log, ax=221)
+                        self._plot_slice_roi(angle_index=numpy.argmax(max), channel_index=channel, log=log, ax=222)
+                    else:
+                        self._plot_slice_roi(log=log, channel_index=channel, ax=211)
+                else:
+                    if 'angle' in data.dimension_labels:
+                        angle_index = numpy.argmin(numpy.abs(angle-data.geometry.angles))
+                        self._plot_slice_roi(angle_index=angle_index, channel_index=channel, log=log, ax=211)
+                    else:
+                        self._plot_slice_roi(log=log, channel_index=channel, ax=211)
+                        
+            # if data is 2D plot roi on all angles
+            elif data.geometry.dimension == '2D':
+                if angle is None:
+                    self._plot_slice_roi(channel_index=channel, log=log, ax=211)
+                else:
+                    raise ValueError("Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram")
 
-                plt.subplot(212)
-                
+            plt.subplot(212)
+            if len(data.geometry.angles)==1:
+                plt.plot(data.geometry.angles, self.flux, '.r', label='Mean')
+                plt.plot(data.geometry.angles, min,'.k', label='Minimum')
+                plt.plot(data.geometry.angles, max,'.k', label='Maximum')
             else:
-                plt.figure(figsize=(3,6))
-                angle_index = numpy.argmin(numpy.abs(angle-data.geometry.angles))
-                self._plot_slice_roi_angle(angle_index=angle_index, log=log, ax=211)
-
-                plt.subplot(212)
-            
-            plt.plot(data.geometry.angles, self.flux, 'r', label='Mean')
-            plt.plot(data.geometry.angles, min,'--k', label='Minimum')
-            plt.plot(data.geometry.angles, max,'--k', label='Maximum')
+                plt.plot(data.geometry.angles, self.flux, 'r', label='Mean')
+                plt.plot(data.geometry.angles, min,'--k', label='Minimum')
+                plt.plot(data.geometry.angles, max,'--k', label='Maximum')
             plt.legend()
             plt.xlabel('Angle')
             plt.ylabel('Intensity in roi')
             plt.grid()
             plt.tight_layout()
    
-    def _plot_slice_roi_angle(self, angle_index, log=False, ax=111):
+    def _plot_slice_roi(self, angle_index=None, channel_index=None, log=False, ax=111):
+        
         data = self.get_input()
-        data_slice = data.get_slice(angle=angle_index)
+        if angle_index is not None and 'angle' in data.dimension_labels:
+            data_slice = data.get_slice(angle=angle_index)
+        else:
+            data_slice = data
+        
+        if 'channel' in data.dimension_labels:
+            if channel_index is None:
+                channel_index = int(numpy.round(data_slice.get_dimension_size('channel')/2))
+            data_slice = data_slice.get_slice(channel=channel_index)
+        else:
+            if channel_index is not None:
+                raise ValueError("Channel not found")
+
+        if len(data_slice.shape) != 2:
+            raise ValueError("Data shape not compatible with preview_configuration(), data must have at least two of 'horizontal', 'vertical' and 'angle'")
+
+        extent = [0, data_slice.shape[1], 0, data_slice.shape[0]]
+        if 'angle' in data_slice.dimension_labels:
+            min_angle = data_slice.geometry.angles[0]
+            max_angle = data_slice.geometry.angles[-1]
+            for i, d in enumerate(data_slice.dimension_labels):
+                if d !='angle':
+                    extent[i*2]=min_angle
+                    extent[i*2+1]=max_angle
+
         plt.subplot(ax)
         if log:
-            plt.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower')
+            plt.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower', extent=extent)
         else:
-            plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower')
+            plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower', extent=extent)
 
-        h = data_slice.dimension_labels[0]
-        v = data_slice.dimension_labels[1]
-        plt.plot([self.roi[v][0],self.roi[v][0]], [self.roi[h][0],self.roi[h][1]],'--r')
-        plt.plot([self.roi[v][1],self.roi[v][1]], [self.roi[h][0],self.roi[h][1]],'--r')
+        h = data_slice.dimension_labels[1]
+        v = data_slice.dimension_labels[0]
 
-        plt.plot([self.roi[v][0],self.roi[v][1]], [self.roi[h][0],self.roi[h][0]],'--r')
-        plt.plot([self.roi[v][0],self.roi[v][1]], [self.roi[h][1],self.roi[h][1]],'--r')
+        if h == 'angle':
+            h_min = min_angle
+            h_max = max_angle
+        else:
+            h_min = self.roi[h][0]
+            h_max = self.roi[h][1]
 
-        plt.xlabel(v)
-        plt.ylabel(h)
-        plt.title('Angle = ' + str(data.geometry.angles[angle_index]))
+        if v == 'angle':
+            v_min = min_angle
+            v_max = max_angle
+        else:
+            v_min = self.roi[v][0]
+            v_max = self.roi[v][1]
+
+        plt.plot([h_min, h_max],[v_min, v_min],'--r')
+        plt.plot([h_min, h_max],[v_max, v_max],'--r')
+
+        plt.plot([h_min, h_min],[v_min, v_max],'--r')
+        plt.plot([h_max, h_max],[v_min, v_max],'--r')
+        
+        title = 'ROI'
+        if angle_index is not None:
+            title += ' angle = ' + str(data.geometry.angles[angle_index])
+        if channel_index is not None:
+            title += ' channel = ' + str(channel_index)
+        plt.title(title)
+
+        plt.xlabel(h)
+        plt.ylabel(v)
 
     def process(self, out=None):
         

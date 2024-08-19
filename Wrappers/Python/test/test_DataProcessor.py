@@ -3084,6 +3084,10 @@ class TestFluxNormaliser(unittest.TestCase):
             .set_channels(4)
 
         self.data_multichannel = ag.allocate('random')
+        self.data_slice = self.data_parallel.get_slice(vertical=1)
+        self.data_reorder = self.data_cone
+        self.data_reorder.reorder(['horizontal','angle','vertical'])
+        self.data_single_angle = self.data_cone.get_slice(angle=1)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3091,15 +3095,15 @@ class TestFluxNormaliser(unittest.TestCase):
     def test_init(self):
         # test default values are initialised
         processor = FluxNormaliser()
-        test_parameter = ['flux','roi','tolerance']
-        test_value = [None, None, 1e-5]
+        test_parameter = ['flux','roi','norm_value', 'tolerance']
+        test_value = [None, None, None, 1e-5]
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = FluxNormaliser(1,2,3)
-        test_value = [1, 2, 3]
+        processor = FluxNormaliser(1,2,3,4)
+        test_value = [1, 2, 3, 4]
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
@@ -3142,30 +3146,91 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.preview_configuration()
 
-        
+        # Test error in preview configuration if set_input not called
+        roi = {'horizontal':(25,40)}
+        processor = FluxNormaliser(roi=roi)
+        with self.assertRaises(ValueError):
+            processor.preview_configuration()
+
+        # Test no error with preview_configuration with different data shapes
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
+                     self.data_slice, self.data_reorder, self.data_single_angle]:
+            roi = {'horizontal':(25,40)}
+            processor = FluxNormaliser(roi=roi)
+            processor.set_input(data)
+            processor.preview_configuration()
+
+            # for 3D, check no error specifying a single angle to plot
+            if data.geometry.dimension == '3D':
+                processor.preview_configuration(angle=1)
+            # if 2D, attempt to plot single angle should cause error
+            else:
+                with self.assertRaises(ValueError):
+                    processor.preview_configuration(angle=1)
+
+            # if data is multichannel, check no error specifying a single channel to plot
+            if 'channel' in data.dimension_labels:
+                processor.preview_configuration(angle=1, channel=1)
+                processor.preview_configuration(channel=1)
+            # if single channel, check specifying channel causes an error
+            else:
+                with self.assertRaises(ValueError):
+                    processor.preview_configuration(channel=1)
+
 
     def test_FluxNormaliser(self):
+        #Test flux with no norm_value
         processor = FluxNormaliser(flux=10)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
-        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array/10)
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
         
+        #Test flux with norm_value
+        processor = FluxNormaliser(flux=10, norm_value=5)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        
+        #Test flux array with no norm_value
         processor = FluxNormaliser(flux=10*numpy.ones(self.data_cone.get_dimension_size('angle')))
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
-        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array/10)
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
+        #Test flux array with norm_value
+        processor = FluxNormaliser(flux=10*numpy.ones(self.data_cone.get_dimension_size('angle')), norm_value=5)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+
+        #Test roi with no norm_value
         roi = {'vertical':(0,10), 'horizontal':(0,10)}
         processor = FluxNormaliser(roi=roi)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
-        roi = {'vertical':(0,2)}
-        processor = FluxNormaliser(roi=roi)
+        #Test roi with norm_value
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi, norm_value=5)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
-        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+
+        # Test roi with just one dimension
+        roi = {'vertical':(0,2)}
+        processor = FluxNormaliser(roi=roi, norm_value=5)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+
+        # for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
+        #              self.data_slice, self.data_reorder, self.data_single_angle]:
+        #     roi = {'horizontal':(25,40)}
+        #     processor = FluxNormaliser(roi=roi)
+        #     processor.set_input(data)
+        #     data_norm = processor.get_output()
+        #     numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
 
 if __name__ == "__main__":
 

@@ -191,16 +191,15 @@ class ImageData(DataContainer):
             return image_data_out
 
 
-    def reorder(self, order=None):
+    def reorder(self, order):
         '''
         Reorders the data in memory as requested. This is an in-place operation.
 
         Parameters
         ----------
-        order : list or str
+        order: list or str
             Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.
         '''
-
         if order in Backends:
             order = ImageDimensionLabels.get_order_for_engine(order, self.geometry)
 

@@ -185,7 +185,7 @@ class DataContainer(object):
         from .vector_data import VectorData
         return VectorData(new_array, dimension_labels=dimension_labels_list)
 
-    def reorder(self, order=None):
+    def reorder(self, order):
         '''
         reorders the data in memory as requested.
 

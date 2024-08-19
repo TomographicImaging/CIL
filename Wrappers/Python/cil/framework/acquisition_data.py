@@ -112,8 +112,7 @@ class AcquisitionData(DataContainer, Partitioner):
         order : list or str
             Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.
         '''
-
-        if order in Backends :
+        if order in Backends:
             order = AcquisitionDimensionLabels.get_order_for_engine(order, self.geometry)
 
         super().reorder(order)

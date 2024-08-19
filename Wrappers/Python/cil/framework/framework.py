@@ -3813,7 +3813,7 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
-        if numpy.squeeze(array).shape != geometry.shape:
+        if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)

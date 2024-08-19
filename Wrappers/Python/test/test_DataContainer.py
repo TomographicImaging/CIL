@@ -462,6 +462,41 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
 
 
+    def test_ImageData_from_numpy(self):
+        """
+        Test the creation and manipulation of ImageData from a numpy array.
+        """
+        # Initialize array and ImageGeometry
+        arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
+        ig = ImageGeometry(voxel_num_x=4, voxel_num_y=3, voxel_num_z=2)
+        data = ImageData(arr, deep_copy=True, geometry=ig)
+        
+        # Check initial shape, geometry, and deep copy
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ig)
+        self.assertNotEqual(id(data.array), id(arr))
+    
+        # Fill with zeros and check
+        data.fill(0)
+        numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ig.shape))
+        
+        # Fill with original array and check
+        data.fill(arr)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ig)  
+        
+        # Reshape array with singleton dimension and create new ImageData
+        arr = arr.reshape(1, 2, 3, 4)
+        data = ImageData(arr, geometry=ig)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ig)
+    
+        # Fill with zeros and reshaped array, then check
+        data.fill(0)
+        data.fill(arr)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ig)
+
     def test_ImageData_apply_circular_mask(self):
         ig = ImageGeometry(voxel_num_x=6, voxel_num_y=3, voxel_size_x=0.5, voxel_size_y = 1)
         data_orig = ig.allocate(1)
@@ -486,8 +521,6 @@ class TestDataContainer(CCPiTestClass):
 
 
 
-
-
     def test_AcquisitionData(self):
         sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(numpy.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
 
@@ -507,6 +540,48 @@ class TestDataContainer(CCPiTestClass):
         data = ag2.allocate()
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag2.shape))
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
+
+    def test_AcquisitionData_from_numpy(self):
+        """
+        Test the creation and manipulation of AcquisitionData from a numpy array.
+        """
+        arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles([0, 1]).set_panel((4, 3))
+        data = AcquisitionData(arr, deep_copy=True, geometry=ag)
+        
+        # Check initial shape, geometry, and deep copy
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ag)
+        self.assertNotEqual(id(data.array), id(arr))
+
+        # Fill with zeros and check
+        data.fill(0)
+        numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ag.shape))
+        
+        # Fill with original array and check
+        data.fill(arr)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ag)
+        numpy.testing.assert_array_equal(data.as_array(), arr)
+
+        # Reshape array to add empty dimensions and test create AcquisitionData
+        arr = arr.reshape(1, 2, 3, 4)
+        data = AcquisitionData(arr, geometry=ag)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ag)
+
+        # Fill with reshaped array
+        data.fill(0)
+        data.fill(arr)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ag)  
+
+        # Change dtype to float64, fill, and check
+        arr = arr.astype(numpy.float64)
+        data.fill(arr)
+        self.assertEqual(data.shape, (2, 3, 4))
+        self.assertEqual(data.geometry, ag)
+        self.assertEqual(data.dtype, numpy.float32)
 
 
     def test_ImageGeometry_allocate(self):

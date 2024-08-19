@@ -93,8 +93,6 @@ class DataContainer(object):
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
-        '''Holds the data'''
-
         if type(array) == numpy.ndarray:
             if deep_copy:
                 self.array = array.copy()
@@ -192,8 +190,6 @@ class DataContainer(object):
         :param order: ordered list of labels from self.dimension_labels
         :type order: list, sting
         '''
-
-
         try:
             if len(order) != len(self.shape):
                 raise ValueError('The axes list for resorting must have {0} dimensions. Got {1}'.format(len(self.shape), len(order)))
@@ -220,7 +216,6 @@ class DataContainer(object):
         else:
             self.geometry.set_labels(dimension_labels_new)
 
-
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
 
@@ -243,10 +238,6 @@ class DataContainer(object):
             return
         if dimension == {}:
             if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
                 self.array.fill(array)
@@ -543,7 +534,6 @@ class DataContainer(object):
         ax = self * a
         y.multiply(b, out=out)
         out.add(ax, out=out)
-
         return out
 
     def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
@@ -629,19 +619,19 @@ class DataContainer(object):
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the second array
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the third array
                                   ctypes.POINTER(ctypes.c_float),  # pointer to A
-                                  ctypes.c_int,  # type of type of A selector (int)
+                                  ctypes.c_int,                    # type of type of A selector (int)
                                   ctypes.POINTER(ctypes.c_float),  # pointer to B
-                                  ctypes.c_int,  # type of type of B selector (int)
-                                  ctypes.c_longlong,  # type of size of first array
+                                  ctypes.c_int,                    # type of type of B selector (int)
+                                  ctypes.c_longlong,               # type of size of first array
                                   ctypes.c_int]                    # number of threads
-        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double),  # pointer to the first array
-                                  ctypes.POINTER(ctypes.c_double),  # pointer to the second array
-                                  ctypes.POINTER(ctypes.c_double),  # pointer to the third array
-                                  ctypes.POINTER(ctypes.c_double),  # type of A (c_double)
-                                  ctypes.c_int,  # type of type of A selector (int)
-                                  ctypes.POINTER(ctypes.c_double),  # type of B (c_double)
-                                  ctypes.c_int,  # type of type of B selector (int)
-                                  ctypes.c_longlong,  # type of size of first array
+        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array
+                                  ctypes.POINTER(ctypes.c_double), # type of A (c_double)
+                                  ctypes.c_int,                    # type of type of A selector (int)
+                                  ctypes.POINTER(ctypes.c_double), # type of B (c_double)
+                                  ctypes.c_int,                    # type of type of B selector (int)
+                                  ctypes.c_longlong,               # type of size of first array
                                   ctypes.c_int]                    # number of threads
 
         if f(x_p, y_p, out_p, a_p, a_vec, b_p, b_vec, ndx.size, num_threads) != 0:

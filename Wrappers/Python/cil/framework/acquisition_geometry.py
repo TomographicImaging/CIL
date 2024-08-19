@@ -344,7 +344,7 @@ class Parallel2D(SystemConfiguration):
     def __init__ (self, ray_direction, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Parallel2D, self).__init__(dof=2, geometry = AcquisitionTypes.PARALLEL, units=units)
+        super(Parallel2D, self).__init__(dof=2, geometry=AcquisitionTypes.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -518,7 +518,7 @@ class Parallel3D(SystemConfiguration):
     def __init__ (self,  ray_direction, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Parallel3D, self).__init__(dof=3, geometry = AcquisitionTypes.PARALLEL, units=units)
+        super(Parallel3D, self).__init__(dof=3, geometry=AcquisitionTypes.PARALLEL, units=units)
 
         #source
         self.ray.direction = ray_direction
@@ -803,7 +803,7 @@ class Cone2D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, rotation_axis_pos, units='units'):
         """Constructor method
         """
-        super(Cone2D, self).__init__(dof=2, geometry = AcquisitionTypes.CONE, units=units)
+        super(Cone2D, self).__init__(dof=2, geometry=AcquisitionTypes.CONE, units=units)
 
         #source
         self.source.position = source_pos
@@ -982,7 +982,7 @@ class Cone3D(SystemConfiguration):
     def __init__ (self, source_pos, detector_pos, detector_direction_x, detector_direction_y, rotation_axis_pos, rotation_axis_direction, units='units'):
         """Constructor method
         """
-        super(Cone3D, self).__init__(dof=3, geometry = AcquisitionTypes.CONE, units=units)
+        super(Cone3D, self).__init__(dof=3, geometry=AcquisitionTypes.CONE, units=units)
 
         #source
         self.source.position = source_pos

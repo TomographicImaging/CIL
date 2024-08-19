@@ -21,6 +21,7 @@ from .labels import AcquisitionDimensionLabels, Backends
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
+
 class AcquisitionData(DataContainer, Partitioner):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
@@ -62,7 +63,8 @@ class AcquisitionData(DataContainer, Partitioner):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 

@@ -153,10 +153,10 @@ class Processor(object):
 
         return out
 
-
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''
     pass
+
 
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor

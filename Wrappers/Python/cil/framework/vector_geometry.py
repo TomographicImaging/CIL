@@ -23,6 +23,7 @@ import numpy
 
 from .labels import FillTypes
 
+
 class VectorGeometry:
     '''Geometry describing VectorData to contain 1D array'''
     @property

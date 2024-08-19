@@ -63,7 +63,8 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
@@ -189,7 +190,6 @@ class ImageData(DataContainer):
             image_data_out.reorder(labels_orig)
 
             return image_data_out
-
 
     def reorder(self, order):
         '''

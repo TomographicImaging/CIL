@@ -32,17 +32,28 @@ class FluxNormaliser(Processor):
 
     This processor reads in a AcquisitionData and normalises it based on
     a float or array of float values, or a region of interest.
+    
+    The normalised image :math:`I_{norm}` is calculated from the original image
+    :math:`I` by
+    I_{norm} = I*(norm_value/flux)
+
 
     Parameters:
     -----------
     flux: float or list of floats (optional)
-        Divide the image by the flux value. If flux is a list it must have length 
-        equal to the number of angles in the dataset.
+        The value to divide the image by. If flux is a list it must have length 
+        equal to the number of angles in the dataset. If flux=None, calculate
+        flux from the roi, default is None.
     
     roi: dict (optional)
         Dictionary describing the region of interest containing the background
-        in the image. The image is divided by the mean value in the roi.
+        in the image. The image is divided by the mean value in the roi. If None,
+        specify flux direcrtly, default is None.
 
+    norm_value: float (optional)
+        The value to multiply the image by. If None, the mean flux value will 
+        be used, default is None.
+        
     tolerance: float (optional)
         Small number to set to when there is a division by zero, default is 1e-5.
 
@@ -51,12 +62,13 @@ class FluxNormaliser(Processor):
     Output: AcquisitionData normalised by flux or mean intensity in roi
     '''
 
-    def __init__(self, flux=None, roi=None, tolerance=1e-5):
+    def __init__(self, flux=None, roi=None, norm_value=None, tolerance=1e-5):
             kwargs = {
                     'flux'  : flux,
                     'roi' : roi,
                     'roi_slice' : None,
                     'roi_axes' : None,
+                    'norm_value' : norm_value,
                     'tolerance'   : tolerance
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
@@ -132,6 +144,9 @@ class FluxNormaliser(Processor):
                 raise ValueError("Flux must be a scalar or array with length \
                                     \n = data.geometry.angles, found {} and {}"
                                     .format(flux_size, data_size))
+            
+        if self.norm_value is None:
+            self.norm_value = numpy.mean(self.flux)
             
         return True
 
@@ -275,20 +290,23 @@ class FluxNormaliser(Processor):
             out = data.copy()
 
         flux_size = (numpy.shape(self.flux))
-        
-        proj_axis = data.get_dimension_axis('angle')
-        slice_proj = [slice(None)]*len(data.shape)
-        slice_proj[proj_axis] = 0
-        
         f = self.flux
-        for i in range(numpy.shape(data)[proj_axis]):
-            if len(flux_size) > 0:
-                f = self.flux[i]
+        
+        if 'angle' in data.dimension_labels:
+            proj_axis = data.get_dimension_axis('angle')
+            slice_proj = [slice(None)]*len(data.shape)
+            slice_proj[proj_axis] = 0
+        
+            for i in range(len(data.geometry.angles)):
+                if len(flux_size) > 0:
+                    f = self.flux[i]
+                slice_proj[proj_axis] = i
+                with numpy.errstate(divide='ignore', invalid='ignore'):
+                    out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.norm_value/f
+        else:
+           with numpy.errstate(divide='ignore', invalid='ignore'):
+                out.array = data.array*self.norm_value/f 
 
-            slice_proj[proj_axis] = i
-            with numpy.errstate(divide='ignore', invalid='ignore'):
-                out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]/f
-                        
         out.array[ ~ numpy.isfinite( out.array )] = self.tolerance
 
         return out

@@ -468,6 +468,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
+    
     def allocate(self, value=0, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance
 
@@ -2768,7 +2769,6 @@ class DataContainer(object):
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
-        '''Holds the data'''
 
         if type(array) == numpy.ndarray:
             if deep_copy:
@@ -2920,11 +2920,7 @@ class DataContainer(object):
             return
         if dimension == {}:
             if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
-                numpy.copyto(self.array, array)
+                numpy.copyto(self.array, array)               
             elif isinstance(array, Number):
                 self.array.fill(array)
             elif issubclass(array.__class__ , DataContainer):
@@ -3641,7 +3637,8 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
@@ -3798,6 +3795,7 @@ class AcquisitionData(DataContainer, Partitioner):
 
         dtype = kwargs.get('dtype', numpy.float32)
 
+        
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
 
@@ -3810,7 +3808,8 @@ class AcquisitionData(DataContainer, Partitioner):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 

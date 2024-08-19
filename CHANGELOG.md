@@ -6,6 +6,8 @@
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+  - Bug fixes
+    - Make Binner accept accelerated=False (#1887)
 
 * 24.1.0
   - New Features:

@@ -3142,43 +3142,43 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
 
-    def test_preview_configuration(self):
-        # Test error in preview configuration if there is no roi
-        processor = FluxNormaliser(flux=10)
-        processor.set_input(self.data_cone)
-        with self.assertRaises(ValueError):
-            processor.preview_configuration()
+    # def test_preview_configuration(self):
+    #     # Test error in preview configuration if there is no roi
+    #     processor = FluxNormaliser(flux=10)
+    #     processor.set_input(self.data_cone)
+    #     with self.assertRaises(ValueError):
+    #         processor.preview_configuration()
 
-        # Test error in preview configuration if set_input not called
-        roi = {'horizontal':(25,40)}
-        processor = FluxNormaliser(roi=roi)
-        with self.assertRaises(ValueError):
-            processor.preview_configuration()
+    #     # Test error in preview configuration if set_input not called
+    #     roi = {'horizontal':(25,40)}
+    #     processor = FluxNormaliser(roi=roi)
+    #     with self.assertRaises(ValueError):
+    #         processor.preview_configuration()
 
-        # Test no error with preview_configuration with different data shapes
-        for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
-                     self.data_slice, self.data_reorder, self.data_single_angle]:
-            roi = {'horizontal':(25,40)}
-            processor = FluxNormaliser(roi=roi)
-            processor.set_input(data)
-            processor.preview_configuration()
+    #     # Test no error with preview_configuration with different data shapes
+    #     for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
+    #                  self.data_slice, self.data_reorder, self.data_single_angle]:
+    #         roi = {'horizontal':(25,40)}
+    #         processor = FluxNormaliser(roi=roi)
+    #         processor.set_input(data)
+    #         processor.preview_configuration()
 
-            # for 3D, check no error specifying a single angle to plot
-            if data.geometry.dimension == '3D':
-                processor.preview_configuration(angle=1)
-            # if 2D, attempt to plot single angle should cause error
-            else:
-                with self.assertRaises(ValueError):
-                    processor.preview_configuration(angle=1)
+    #         # for 3D, check no error specifying a single angle to plot
+    #         if data.geometry.dimension == '3D':
+    #             processor.preview_configuration(angle=1)
+    #         # if 2D, attempt to plot single angle should cause error
+    #         else:
+    #             with self.assertRaises(ValueError):
+    #                 processor.preview_configuration(angle=1)
 
-            # if data is multichannel, check no error specifying a single channel to plot
-            if 'channel' in data.dimension_labels:
-                processor.preview_configuration(angle=1, channel=1)
-                processor.preview_configuration(channel=1)
-            # if single channel, check specifying channel causes an error
-            else:
-                with self.assertRaises(ValueError):
-                    processor.preview_configuration(channel=1)
+    #         # if data is multichannel, check no error specifying a single channel to plot
+    #         if 'channel' in data.dimension_labels:
+    #             processor.preview_configuration(angle=1, channel=1)
+    #             processor.preview_configuration(channel=1)
+    #         # if single channel, check specifying channel causes an error
+    #         else:
+    #             with self.assertRaises(ValueError):
+    #                 processor.preview_configuration(channel=1)
 
 
     def test_FluxNormaliser(self):

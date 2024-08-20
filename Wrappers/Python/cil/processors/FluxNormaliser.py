@@ -226,7 +226,7 @@ class FluxNormaliser(Processor):
         
         if 'channel' in data.dimension_labels:
             if channel_index is None:
-                channel_index = int(numpy.round(data_slice.get_dimension_size('channel')/2))
+                channel_index = int(data_slice.get_dimension_size('channel')/2)
             data_slice = data_slice.get_slice(channel=channel_index)
         else:
             if channel_index is not None:

@@ -220,8 +220,8 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         if gradient_norm < 1e-8:
             raise StopIteration
 
-        self.store_x = algorithm.x - self.store_x  # Can change to algorithm.x.minus(self.store_x, out=self.store_x) when we add minus to vector geometry
-        self.store_grad = algorithm.gradient_update - self.store_grad # Similar to above line algorithm.gradient_update.minus(self.store_grad, out=self.store_grad)
+        algorithm.x.subtract(self.store_x, out=self.store_x) 
+        algorithm.gradient_update.subtract(self.store_grad, out=self.store_grad)
         if self.current_mode == 'long':
             ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
         elif self.current_mode == 'short':

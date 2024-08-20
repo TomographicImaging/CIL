@@ -3229,7 +3229,7 @@ class TestFluxNormaliser(unittest.TestCase):
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
-    def test_FluxNormaliser2(self):
+
         # test roi with different data shapes
         for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
                      self.data_slice, self.data_reorder]:

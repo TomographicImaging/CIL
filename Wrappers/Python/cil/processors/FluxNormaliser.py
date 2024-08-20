@@ -200,7 +200,7 @@ class FluxNormaliser(Processor):
                     self._plot_slice_roi(channel_index=channel, log=log, ax=211)
                 else:
                     raise ValueError("Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram")
-
+            plt.figure()
             plt.subplot(212)
             if len(data.geometry.angles)==1:
                 plt.plot(data.geometry.angles, self.flux, '.r', label='Mean')
@@ -215,7 +215,8 @@ class FluxNormaliser(Processor):
             plt.ylabel('Intensity in roi')
             plt.grid()
             plt.tight_layout()
-   
+            plt.show()
+            
     def _plot_slice_roi(self, angle_index=None, channel_index=None, log=False, ax=111):
         
         data = self.get_input()

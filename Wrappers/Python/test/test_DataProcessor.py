@@ -3144,7 +3144,7 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
 
-    @patch("matplotlib.pyplot")
+    @patch("matplotlib.pyplot.figure")
     def test_preview_configuration(self, mock_plot):
         # Test error in preview configuration if there is no roi
         processor = FluxNormaliser(flux=10)
@@ -3182,7 +3182,6 @@ class TestFluxNormaliser(unittest.TestCase):
             else:
                 with self.assertRaises(ValueError):
                     processor.preview_configuration(channel=1)
-
 
     def test_FluxNormaliser(self):
         #Test flux with no norm_value

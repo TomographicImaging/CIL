@@ -140,4 +140,12 @@ Ring Remover
    :inherited-members: set_input, get_output
 
 
+Paganin Processor
+-----------------
+
+.. autoclass:: cil.processors.PaganinProcessor
+   :exclude-members: check_input, get_input
+   :members:
+   :inherited-members:
+
 :ref:`Return Home <mastertoc>`

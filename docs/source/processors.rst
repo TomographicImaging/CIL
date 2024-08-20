@@ -146,6 +146,14 @@ Paganin Processor
 .. autoclass:: cil.processors.PaganinProcessor
    :exclude-members: check_input, get_input
    :members:
-   :inherited-members:
+   :inherited-members: set_input, get_output
+
+Flux Normaliser
+-----------------
+
+.. autoclass:: cil.processors.FluxNormaliser
+   :exclude-members: check_input, get_input
+   :members:
+   :inherited-members: set_input, get_output
 
 :ref:`Return Home <mastertoc>`

@@ -27,7 +27,7 @@ from scipy import stats
 log = logging.getLogger(__name__)
 
 class FluxNormaliser(Processor):
-    '''
+    r'''
     Flux normalisation based on float or region of interest
 
     This processor reads in a AcquisitionData and normalises it based on
@@ -35,8 +35,10 @@ class FluxNormaliser(Processor):
     
     The normalised image :math:`I_{norm}` is calculated from the original image
     :math:`I` by
-    I_{norm} = I*(norm_value/flux)
 
+    .. math:: I_{norm} = I\frac{n}{F}
+
+    where :math:`F` is the flux and :math:`n` is the norm_value
 
     Parameters:
     -----------

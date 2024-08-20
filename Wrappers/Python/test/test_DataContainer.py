@@ -15,27 +15,25 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import unittest
-from utils import initialise_tests
+import functools
+import logging
 import sys
+import unittest
+from time import time
+
 import numpy
+
+from cil.framework import AcquisitionData
+from cil.framework import AcquisitionGeometry
 from cil.framework import DataContainer
 from cil.framework import ImageData
-from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, VectorData
-from cil.framework import AcquisitionGeometry
-from timeit import default_timer as timer
-import logging
+
 from testclass import CCPiTestClass
-import functools
+from utils import initialise_tests
 
 log = logging.getLogger(__name__)
 initialise_tests()
-
-
-def dt(steps):
-    return steps[-1] - steps[-2]
 
 
 def aid(x):
@@ -59,21 +57,15 @@ class TestDataContainer(CCPiTestClass):
         return (ig, Phantom)
 
     def create_DataContainer(self, X,Y,Z, value=1):
-        steps = [timer()]
         a = value * numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         return ds
 
     def test_creation_nocopy(self):
-        shape = (2, 3, 4, 5)
-        size = shape[0]
-        for i in range(1, len(shape)):
-            size = size * shape[i]
-        #print("a refcount " , sys.getrefcount(a))
-        a = numpy.asarray([i for i in range(size)])
+        shape = 2, 3, 4, 5
+        size = numpy.prod(shape)
+        a = numpy.arange(size)
         #print("a refcount " , sys.getrefcount(a))
         a = numpy.reshape(a, shape)
         #print("a refcount " , sys.getrefcount(a))
@@ -83,12 +75,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(ds.dimension_labels, ('X', 'Y', 'Z', 'W'))
 
     def testGb_creation_nocopy(self):
-        X, Y, Z = 512, 512, 512
         X, Y, Z = 256, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         #print("a refcount " , sys.getrefcount(a))
@@ -99,203 +87,120 @@ class TestDataContainer(CCPiTestClass):
         self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
 
     def test_ndim(self):
-
         x_np = numpy.arange(0, 60).reshape(3,4,5)
         x_cil = DataContainer(x_np)
         self.assertEqual(x_np.ndim, x_cil.ndim)
         self.assertEqual(3, x_cil.ndim)
 
     def testInlineAlgebra(self):
-        X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
-        #ds.__iadd__( 2 )
         ds += 2
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 3.)
-        #ds.__isub__( 2 )
         ds -= 2
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
-        #ds.__imul__( 2 )
         ds *= 2
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 2.)
-        #ds.__idiv__( 2 )
         ds /= 2
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
 
         ds1 = ds.copy()
-        #ds1.__iadd__( 1 )
         ds1 += 1
-        #ds.__iadd__( ds1 )
         ds += ds1
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 3.)
-        #ds.__isub__( ds1 )
         ds -= ds1
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
-        #ds.__imul__( ds1 )
         ds *= ds1
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 2.)
-        #ds.__idiv__( ds1 )
         ds /= ds1
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
 
     def test_unary_operations(self):
-        X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
-        steps = [timer()]
         a = -numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
 
         ds.sign(out=ds)
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], -1.)
 
         ds.abs(out=ds)
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0], 1.)
 
-        ds.__imul__(2)
+        ds *= 2
         ds.sqrt(out=ds)
-        steps.append(timer())
         self.assertEqual(ds.as_array()[0][0][0],
                          numpy.sqrt(2., dtype='float32'))
 
     def test_binary_add(self):
         X, Y, Z = 128, 512, 512
-        #X, Y, Z = 1024, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
 
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
         out = ds.copy()
 
-        steps.append(timer())
+        t0 = time()
         ds.add(ds1, out=out)
-        steps.append(timer())
-        t1 = dt(steps)
-        steps.append(timer())
+        t1 = time()
         ds2 = ds.add(ds1)
-        steps.append(timer())
-        t2 = dt(steps)
-
-        #self.assertLess(t1, t2)
+        t2 = time()
+        self.assertLess(t1 - t0, t2 - t1)
         self.assertEqual(out.as_array()[0][0][0], 2.)
         self.assertNumpyArrayEqual(out.as_array(), ds2.as_array())
 
         ds0 = ds
-        dt1 = 0
-        dt2 = 0
-
-        steps.append(timer())
         ds0.add(2, out=out)
-        steps.append(timer())
         self.assertEqual(3., out.as_array()[0][0][0])
 
-        dt1 += dt(steps)/10
-        steps.append(timer())
         ds3 = ds0.add(2)
-        steps.append(timer())
-        dt2 += dt(steps)/10
-
         self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
-        #self.assertLess(dt1, dt2)
 
     def test_binary_subtract(self):
         X, Y, Z = 128, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
 
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
         out = ds.copy()
 
-        steps.append(timer())
+        t0 = time()
         ds.subtract(ds1, out=out)
-        steps.append(timer())
-        t1 = dt(steps)
-        self.assertEqual(0., out.as_array()[0][0][0])
-
-        steps.append(timer())
+        t1 = time()
         ds2 = out.subtract(ds1)
+        t2 = time()
+        self.assertEqual(0., out.as_array()[0][0][0])
         self.assertEqual(-1., ds2.as_array()[0][0][0])
-
-        steps.append(timer())
-        t2 = dt(steps)
-
-        #self.assertLess(t1, t2)
+        self.assertLess(t1 - t0, t2 - t1)
 
         del ds1
         ds0 = ds.copy()
-        steps.append(timer())
         ds0.subtract(2, out=ds0)
-        #ds0.__isub__( 2 )
-        steps.append(timer())
-
         self.assertEqual(-1., ds0.as_array()[0][0][0])
 
-        dt1 = dt(steps)
         ds3 = ds0.subtract(2)
-        steps.append(timer())
-        dt2 = dt(steps)
-        #self.assertLess(dt1, dt2)
         self.assertEqual(-1., ds0.as_array()[0][0][0])
         self.assertEqual(-3., ds3.as_array()[0][0][0])
 
     def test_binary_multiply(self):
-        X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
 
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
 
-        steps.append(timer())
+        t0 = time()
         ds.multiply(ds1, out=ds)
-        steps.append(timer())
-        t1 = dt(steps)
-        steps.append(timer())
+        t1 = time()
         ds2 = ds.multiply(ds1)
-        steps.append(timer())
-        t2 = dt(steps)
-
-        #self.assertLess(t1, t2)
+        t2 = time()
+        self.assertLess(t1 - t0, t2 - t1)
 
         ds0 = ds
         ds0.multiply(2, out=ds0)
-        steps.append(timer())
         self.assertEqual(2., ds0.as_array()[0][0][0])
 
-        dt1 = dt(steps)
         ds3 = ds0.multiply(2)
-        steps.append(timer())
-        dt2 = dt(steps)
-        #self.assertLess(dt1, dt2)
         self.assertEqual(4., ds3.as_array()[0][0][0])
         self.assertEqual(2., ds.as_array()[0][0][0])
 
@@ -303,43 +208,25 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(2.5*2., ds0.as_array()[0][0][0])
 
     def test_binary_divide(self):
-        X, Y, Z = 1024, 512, 512
         X, Y, Z = 256, 512, 512
-        steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
-        steps.append(timer())
-        t0 = dt(steps)
 
-        #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
 
-        t1 = 0
-        t2 = 0
-        N=1
-
-        steps.append(timer())
+        t0 = time()
         ds.divide(ds1, out=ds)
-        steps.append(timer())
-        t1 += dt(steps)/N
-        steps.append(timer())
+        t1 = time()
         ds2 = ds.divide(ds1)
-        steps.append(timer())
-        t2 += dt(steps)/N
-
-        #self.assertLess(t1, t2)
+        t2 = time()
         self.assertEqual(ds.as_array()[0][0][0], 1.)
+        self.assertLess(t1 - t0, t2 - t1)
 
         ds0 = ds
         ds0.divide(2, out=ds0)
-        steps.append(timer())
         self.assertEqual(0.5, ds0.as_array()[0][0][0])
 
-        dt1 = dt(steps)
         ds3 = ds0.divide(2)
-        steps.append(timer())
-        dt2 = dt(steps)
-        #self.assertLess(dt1, dt2)
         self.assertEqual(.25, ds3.as_array()[0][0][0])
         self.assertEqual(.5, ds.as_array()[0][0][0])
 
@@ -370,14 +257,10 @@ class TestDataContainer(CCPiTestClass):
         b = number ** ds
         numpy.testing.assert_array_almost_equal(a * 8, b.as_array())
 
-
     def test_creation_copy(self):
-        shape = (2, 3, 4, 5)
-        size = shape[0]
-        for i in range(1, len(shape)):
-            size = size * shape[i]
-        #print("a refcount " , sys.getrefcount(a))
-        a = numpy.asarray([i for i in range(size)])
+        shape = 2, 3, 4, 5
+        size = numpy.prod(shape)
+        a = numpy.arange(size)
         #print("a refcount " , sys.getrefcount(a))
         a = numpy.reshape(a, shape)
         #print("a refcount " , sys.getrefcount(a))
@@ -385,17 +268,16 @@ class TestDataContainer(CCPiTestClass):
         #print("a refcount " , sys.getrefcount(a))
         self.assertEqual(sys.getrefcount(a), 2)
 
-
     def test_dot(self):
-        a0 = numpy.asarray([i for i in range(2*3*4)])
-        a1 = numpy.asarray([2*i for i in range(2*3*4)])
+        a0 = numpy.arange(2*3*4)
+        a1 = a0 * 2
 
         ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
         ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
 
         numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
 
-        a2 = numpy.asarray([2*i for i in range(2*3*5)])
+        a2 = numpy.arange(0, 2*3*5*2, 2)
         ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
 
         # it should fail if the shape is wrong
@@ -409,9 +291,8 @@ class TestDataContainer(CCPiTestClass):
         n1 = ds0.as_array().ravel().dot(ds1.as_array().ravel())
         self.assertEqual(n0, n1)
 
-
     def test_exp_log(self):
-        a0 = numpy.asarray([1. for i in range(2*3*4)])
+        a0 = numpy.ones(2*3*4)
 
         ds0 = DataContainer(numpy.reshape(a0,(2,3,4)), suppress_warning=True)
         # ds1 = DataContainer(numpy.reshape(a1,(2,3,4)), suppress_warning=True)
@@ -420,7 +301,6 @@ class TestDataContainer(CCPiTestClass):
 
         self.assertEqual(ds0.exp().as_array()[0][0][0], numpy.exp(1))
         self.assertEqual(ds0.log().as_array()[0][0][0], 0.)
-
 
     def test_ImageData(self):
         # create ImageData from geometry
@@ -455,7 +335,6 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ig2.shape))
         self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
 
-
     def test_ImageData_from_numpy(self):
         """
         Test the creation and manipulation of ImageData from a numpy array.
@@ -464,27 +343,27 @@ class TestDataContainer(CCPiTestClass):
         arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
         ig = ImageGeometry(voxel_num_x=4, voxel_num_y=3, voxel_num_z=2)
         data = ImageData(arr, deep_copy=True, geometry=ig)
-        
+
         # Check initial shape, geometry, and deep copy
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ig)
         self.assertNotEqual(id(data.array), id(arr))
-    
+
         # Fill with zeros and check
         data.fill(0)
         numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ig.shape))
-        
+
         # Fill with original array and check
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
-        self.assertEqual(data.geometry, ig)  
-        
+        self.assertEqual(data.geometry, ig)
+
         # Reshape array with singleton dimension and create new ImageData
         arr = arr.reshape(1, 2, 3, 4)
         data = ImageData(arr, geometry=ig)
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ig)
-    
+
         # Fill with zeros and reshaped array, then check
         data.fill(0)
         data.fill(arr)
@@ -542,7 +421,7 @@ class TestDataContainer(CCPiTestClass):
         arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
         ag = AcquisitionGeometry.create_Parallel3D().set_angles([0, 1]).set_panel((4, 3))
         data = AcquisitionData(arr, deep_copy=True, geometry=ag)
-        
+
         # Check initial shape, geometry, and deep copy
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ag)
@@ -551,7 +430,7 @@ class TestDataContainer(CCPiTestClass):
         # Fill with zeros and check
         data.fill(0)
         numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ag.shape))
-        
+
         # Fill with original array and check
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
@@ -568,7 +447,7 @@ class TestDataContainer(CCPiTestClass):
         data.fill(0)
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
-        self.assertEqual(data.geometry, ag)  
+        self.assertEqual(data.geometry, ag)
 
         # Change dtype to float64, fill, and check
         arr = arr.astype(numpy.float64)

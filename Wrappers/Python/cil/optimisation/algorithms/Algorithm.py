@@ -25,9 +25,10 @@ from cil.optimisation.utilities.callbacks import Callback, LogfileCallback, _Old
 
 
 class Algorithm:
-    r"""Base class for iterative algorithms that provides the minimal infrastructure.
+    r"""Base class providing minimal infrastructure for iterative algorithms.
 
-    Algorithms are iterables so can be easily run in a for loop. They will stop as soon as the stop criterion is met.
+   An iterative algorithm is designed to solve an optimization problem by repeatedly refining a solution. In CIL, we use iterative algorithms to minimize an objective function, often referred to as a loss. The process begins with an initial guess, and with each iteration, the algorithm updates the current solution based on the results of previous iterations (previous iterates). Iterative algorithms typically continue until a stopping criterion is met, indicating that an optimal or sufficiently good solution has been found. In CIL, stopping criteria can be implemented using a callback function (`cil.optimisation.utilities.callbacks`).
+     
     The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective` methods.
 
     The method :code:`run` is available to run :code:`n` iterations. The method accepts a :code:`callbacks` list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.
@@ -136,7 +137,7 @@ class Algorithm:
         return self.x
 
     def _provable_convergence_condition(self):
-        r""" Checks if the algorithm meets a mathematical convergence criterion.
+        r""" Checks if the algorithm set-up (e.g. chosen step-sizes or other parameters) meets a mathematical convergence criterion.
         
         Returns
         -------
@@ -161,7 +162,7 @@ class Algorithm:
         return self.get_output()
 
     def get_last_loss(self, return_all=False):
-        r'''Returns the last stored value of the loss function. If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
+        r'''Returns the last stored value of the loss function. "Loss" is an alias for "objective value". If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
         
         Parameters
         ----------
@@ -195,7 +196,7 @@ class Algorithm:
     
     @property
     def loss(self):
-        '''returns the list of the values of the objective during the iteration
+        '''returns a list of the values of the objective (alias of loss) during the iteration
 
         The length of this list may be shorter than the number of iterations run when the `update_objective_interval` > 1
         '''

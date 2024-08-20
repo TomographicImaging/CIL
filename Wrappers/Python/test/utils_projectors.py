@@ -44,6 +44,15 @@ class SimData(object):
 
         self.gold_roi = self.img_data.array[index_roi[0][0]:index_roi[0][1],index_roi[1][0]:index_roi[1][1],index_roi[2][0]:index_roi[2][1]]
 
+        # single slice roi
+        self.ig_single_slice = self.ig.copy()
+        slice_index = 20
+        slice_offset = -(self.ig.voxel_num_z-1)/2 + slice_index
+        self.ig_single_slice.voxel_num_z = 1
+        self.ig_single_slice.center_z = slice_offset*self.ig_roi.voxel_size_z
+
+        self.gold_roi_single_slice = self.img_data.array[slice_index,:,:]
+
 
     def _get_roi_2D(self):
         roi = [30,40]
@@ -459,27 +468,32 @@ class TestCommon_FBP_SIM(SimData):
     '''
     def test_FBP(self):
 
-        self.FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
+        FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
         reco2 = reco.copy()
         reco2.fill(0)
-        self.FBP(self.acq_data,out=reco2)
+        FBP(self.acq_data,out=reco2)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
 
 
     def test_FBP_roi(self):
-        self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
+        FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
+
+        if self.ag.dimension == '3D':
+            FBP = self.FBP(self.ig_single_slice, self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.gold_roi_single_slice, atol=self.tolerance_fbp_roi)
 
 
     def test_input_arguments(self):
 
         #default image_geometry, named parameter acquisition_geometry
-        self.FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
+        FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
 class TestCommon_ProjectionOperatorBlockOperator(object):

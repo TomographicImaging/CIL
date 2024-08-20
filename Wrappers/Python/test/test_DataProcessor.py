@@ -3223,14 +3223,47 @@ class TestFluxNormaliser(unittest.TestCase):
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+    def test_FluxNormaliser2(self):
+        # test roi with different data shapes
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
+                     self.data_slice, self.data_reorder]:
+            roi = {'horizontal':(25,40)}
+            processor = FluxNormaliser(roi=roi, norm_value=5)
+            processor.set_input(data)
+            data_norm = processor.get_output()
 
-        # for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
-        #              self.data_slice, self.data_reorder, self.data_single_angle]:
-        #     roi = {'horizontal':(25,40)}
-        #     processor = FluxNormaliser(roi=roi)
-        #     processor.set_input(data)
-        #     data_norm = processor.get_output()
-        #     numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+            ax = data.get_dimension_axis('horizontal')
+            slc = [slice(None)]*len(data.shape)
+            slc[ax] = slice(25,40)
+            axes=[ax]
+            if 'vertical' in data.dimension_labels:
+                axes.append(data.get_dimension_axis('vertical'))
+            if 'channel' in data.dimension_labels:
+                axes.append(data.get_dimension_axis('channel'))
+            flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+            slice_proj = [slice(None)]*len(data.shape)
+            proj_axis = data.get_dimension_axis('angle')
+            data_norm_test = data.copy()
+            for i in range(len(data.geometry.angles)):
+                f = flux[i]
+                slice_proj[proj_axis] = i
+                with numpy.errstate(divide='ignore', invalid='ignore'):
+                    data_norm_test.array[tuple(slice_proj)] = 5/f*data.array[tuple(slice_proj)]
+            numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6, 
+            err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+
+        data = self.data_single_angle
+        processor = FluxNormaliser(roi=roi, norm_value=5)
+        processor.set_input(data)
+        data_norm = processor.get_output()
+        ax = data.get_dimension_axis('horizontal')
+        slc = [slice(None)]*len(data.shape)
+        slc[ax] = slice(25,40)
+        axes=[ax,data.get_dimension_axis('vertical')]
+        flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+
+        numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
+        err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
 
 if __name__ == "__main__":
 

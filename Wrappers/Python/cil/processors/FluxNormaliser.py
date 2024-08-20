@@ -22,7 +22,6 @@ from cil.utilities.display import show2D
 import numpy
 import logging
 import matplotlib.pyplot as plt
-from scipy import stats
 
 log = logging.getLogger(__name__)
 

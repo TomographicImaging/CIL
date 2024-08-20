@@ -95,7 +95,7 @@ class Binner(Slicer):
             raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
 
         super(Binner,self).__init__(roi = roi)
-        self._accelerated = True
+        self._accelerated = accelerated
 
 
     def _configure(self):

@@ -179,6 +179,11 @@ class TestBinner(unittest.TestCase):
         horizontal_x = range(0,4,4)
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        
+        # check init non-default values
+        proc = Binner(roi=roi,accelerated=False)
+        self.assertTrue(proc._accelerated==False)
+        
         proc = Binner(roi,accelerated=True)
         proc.set_input(data)
         proc._set_up()
@@ -3082,8 +3087,7 @@ class TestPaganinProcessor(unittest.TestCase):
         output = processor.get_output(override_geometry={'propagation_distance':1})
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
-        # 'horizontal, vertical, angles
-        
+
 if __name__ == "__main__":
 
     d = TestDataProcessor()

@@ -1,5 +1,6 @@
 * 24.x.x
   - New Features:
+    - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)
   - Enhancements:
@@ -8,6 +9,10 @@
     - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
+  - Bug fixes:
+    - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
+    - Make Binner accept accelerated=False (#1887)
+
 
 * 24.1.0
   - New Features:

@@ -43,7 +43,7 @@ class CGLS(Algorithm):
         Linear operator for the inverse problem
     initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
         Initial guess 
-    data : Data Container in the range of the operator 
+    data : DataContainer in the range of the operator 
         Acquired data to reconstruct
         
     Note
@@ -54,7 +54,7 @@ class CGLS(Algorithm):
     ---------
     https://web.stanford.edu/group/SOL/software/cgls/
     '''
-    def __init__(self, initial=None, operator=None, data=None,  **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, **kwargs):
         '''initialisation of the algorithm
         '''
         #We are deprecating tolerance 
@@ -72,14 +72,14 @@ class CGLS(Algorithm):
             self.set_up(initial=initial, operator=operator, data=data) 
 
     def set_up(self, initial, operator, data):
-        r'''initialisation of the algorithm
+        r'''Initialisation of the algorithm
         Parameters
         ------------
         operator : Operator
             Linear operator for the inverse problem
         initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
             Initial guess 
-        data : Data Container in the range of the operator 
+        data : DataContainer in the range of the operator 
             Acquired data to reconstruct
 
         '''
@@ -125,7 +125,7 @@ class CGLS(Algorithm):
         #self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
-        self.normx = self.x.norm()#Can be deprecated with tolerance 
+        self.normx = self.x.norm()# TODO: Deprecated, remove when CGLS tolerance is removed
 
 
     def update_objective(self):
@@ -134,10 +134,10 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
 
-    def should_stop(self): #can be deprecated with tolerance 
+    def should_stop(self): # TODO: Deprecated, remove when CGLS tolerance is removed
         return self.flag() or super().should_stop()
 
-    def flag(self): #can be deprecated with tolerance 
+    def flag(self): # TODO: Deprecated, remove when CGLS tolerance is removed
         '''returns whether the tolerance has been reached'''
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
 

@@ -1387,19 +1387,40 @@ class TestCallbacks(unittest.TestCase):
         operator = IdentityOperator(ig)
         alg = CGLS(initial=initial, operator=operator, data=data,
                    update_objective_interval=2)
-        # Mocking norms to ensure tolerance isn't reached
+       
+        #Test init
+        cb = callbacks.CGLSEarlyStopping(epsilon = 0.1, omega = 33)
+        self.assertEqual(cb.epsilon, 0.1)
+        self.assertEqual(cb.omega, 33)
         
+        #Test default values
+        cb = callbacks.CGLSEarlyStopping()
+        self.assertEqual(cb.epsilon, 1e-6)
+        self.assertEqual(cb.omega, 1e6)
+        
+        #Tests it doesn't stops iterations if the norm of the current residual is not less than epsilon times the norm of the original residual
         alg.norms = 10
         alg.norms0 = 99
-        alg.normx = 0.1
-        callbacks.CGLSEarlyStopping(0.1)(alg)
+        callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
         
-        # Mocking norms to ensure tolerance is reached
+        #Test it stops iterations if the norm of the current residual is less than epsilon times the norm of the original residual
         alg.norms = 1
         alg.norms0 = 100
-     
         with self.assertRaises(StopIteration):
-            callbacks.CGLSEarlyStopping(0.1)(alg)
+            callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
+           
+        #Test it doesn't stop iterations if the norm of x is smaller than omega 
+        alg.norms = 10
+        alg.norms0 = 99
+        alg.x = data
+        callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
+        
+        #Test it stops iterations if the norm of x is larger than omega
+        alg.norms = 10
+        alg.norms0 = 99
+        alg.x = data
+        with self.assertRaises(StopIteration):
+            callbacks.CGLSEarlyStopping(epsilon = 0.1, omega = 0.33)(alg)
 
     def test_EarlyStoppingObjectiveValue(self):
         ig = ImageGeometry(10, 2)

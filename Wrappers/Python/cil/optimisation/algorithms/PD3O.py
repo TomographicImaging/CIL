@@ -88,8 +88,7 @@ class PD3O(Algorithm):
         else:
             self.x = initial.copy()
 
-        self.x_bar = self.x.copy()    
-        self.x_old = self.operator.domain_geometry().allocate(0)
+        self.x_old = self.x.copy()    
         
         self.s_old = self.operator.range_geometry().allocate(0)
         self.s = self.operator.range_geometry().allocate(0)
@@ -98,6 +97,11 @@ class PD3O(Algorithm):
   
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
+        
+        # proximal conjugate step
+        self.operator.direct(self.x_old, out=self.s)
+        self.s_old.sapyb(1, self.s, self.delta, out=self.s_old)
+        self.h.proximal_conjugate(self.s_old, self.delta, out=self.s)
         
 
     def update(self):
@@ -108,10 +112,10 @@ class PD3O(Algorithm):
         # in this case order of proximal steps we recover the (primal) PDHG, when f=0
 
         
-        # proximal conjugate step
-        self.operator.direct(self.x_bar, out=self.s)
-        self.s_old.sapyb(1, self.s, self.delta, out=self.s_old)
-        self.h.proximal_conjugate(self.s_old, self.delta, out=self.s)
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp
+        
         
         # proximal step        
         self.f.gradient(self.x_old, out=self.grad_f)
@@ -119,22 +123,32 @@ class PD3O(Algorithm):
         self.operator.adjoint(self.s, out=self.x_old)
         self.x_old.sapyb(-self.gamma, self.grad_f, 1.0, out=self.x_old)
         self.g.proximal(self.x_old, self.gamma, out = self.x)
-
+    
         # update step        
-        self.f.gradient(self.x, out=self.x_bar)                    
-        self.x_bar *= self.gamma
-        self.grad_f += self.x_bar
-        self.x.sapyb(2, self.grad_f, -1.0,  out=self.x_bar) # 2*x - x_old + gamma*(grad_f_x_old) - gamma*(grad_f_x)
+        self.f.gradient(self.x, out=self.x_old)                    
+        self.x_old *= self.gamma
+        self.grad_f += self.x_old
+        self.x.sapyb(2, self.grad_f, -1.0,  out=self.x_old) # 2*x - x_old + gamma*(grad_f_x_old) - gamma*(grad_f_x)
         
-        self.x_old.fill(self.x)      
-        self.s_old.fill(self.s)         
+        tmp = self.s_old
+        self.s_old = self.s
+        self.s = tmp
+        
+        # proximal conjugate step
+        self.operator.direct(self.x_old, out=self.s)
+        self.s_old.sapyb(1, self.s, self.delta, out=self.s_old)
+        self.h.proximal_conjugate(self.s_old, self.delta, out=self.s)
+        
+        
+               
+           
                                                                         
     def update_objective(self):
         """
         Evaluates the primal objective
-        """        
-                 
-        fun_h = self.h(self.operator.direct(self.x))
+        """
+        self.operator.direct(self.x, out=self.s_old)        
+        fun_h = self.h(self.s_old)         
         fun_g = self.g(self.x)
         fun_f = self.f(self.x)
         p1 = fun_f + fun_g + fun_h

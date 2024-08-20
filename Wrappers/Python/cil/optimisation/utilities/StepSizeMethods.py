@@ -150,7 +150,10 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     - :math:`\alpha _k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
 
     - :math:`\alpha _k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
+    
     Where the operator :math:`\cdot` is the standard inner product between two vectors. 
+    
+    This is suitable for use with gradient based iterative methods where the calcualted gradient is stored as `algorithm.gradient_update`.
     Parameters
     ----------
     initial: float, greater than zero 
@@ -177,6 +180,9 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         '''
  
         self.mode=mode
+        self.current_mode = mode
+        if self.current_mode == "alternate":
+            self.current_mode = 'long'
         self.store_grad=None 
         self.store_x=None
         self.initial=initial
@@ -209,26 +215,35 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
             self.store_grad=algorithm.gradient_update.copy()# We store the last gradient in order to calculate the BB step size 
             return self.initial
         
+        gradient_norm = algorithm.gradient_update.norm()
         #If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations. 
-        if algorithm.gradient_update.norm()<1e-8:
+        if gradient_norm < 1e-8:
             raise StopIteration
 
-        if self.mode=='long' or (self.mode =='alternate' and algorithm.iteration%2 ==0):
-            ret = (( algorithm.x-self.store_x).dot(algorithm.x-self.store_x))/ (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))
-        elif self.mode=='short' or (self.mode =='alternate' and algorithm.iteration%2 ==1):
-            ret = (( algorithm.x-self.store_x).dot(algorithm.gradient_update-self.store_grad))/ (( algorithm.gradient_update-self.store_grad).dot(algorithm.gradient_update-self.store_grad))
+        self.store_x = algorithm.x - self.store_x  # Can change to algorithm.x.minus(self.store_x, out=self.store_x) when we add minus to vector geometry
+        self.store_grad = algorithm.gradient_update - self.store_grad # Similar to above line algorithm.gradient_update.minus(self.store_grad, out=self.store_grad)
+        if self.current_mode == 'long':
+            ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
+        elif self.current_mode == 'short':
+            ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
         else:
             raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
         
         #This computes the default stabilisation parameter, using the first three iterations
         if (algorithm.iteration <=3 and self.adaptive):
-            self.stabilisation_param = min(self.stabilisation_param,(algorithm.x-self.store_x).norm() )
+            self.stabilisation_param = min(self.stabilisation_param, self.store_x.norm() )
         
         # Computes the step size as the minimum of the ret, above, and :math:`\Delta/\|g_k\|` ignoring any NaN values. 
-        ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/algorithm.gradient_update.norm()]))
+        ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/gradient_norm]))
         
         # We store the last iterate and gradient in order to calculate the BB step size 
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
+        
+        if self.mode == "alternate":
+            if self.current_mode == 'long':
+                self.current_mode = "short"
+            else:
+                self.current_mode = 'long'
            
         return ret

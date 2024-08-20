@@ -37,4 +37,6 @@ from .TotalVariation import TotalVariation
 from .L1Sparsity import L1Sparsity
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 from .SGFunction import SGFunction
+from .SVRGFunction import SVRGFunction, LSVRGFunction
+from .SAGFunction import SAGFunction, SAGAFunction
 

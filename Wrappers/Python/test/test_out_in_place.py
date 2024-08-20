@@ -110,7 +110,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),
             (MixedL11Norm(), bg),
-            (BlockFunction(L1Norm(),L2NormSquared()), bg),
+            (BlockFunction(L2NormSquared(),L2NormSquared()), bg),
             (L1Sparsity(WaveletOperator(ig)), ig)
 
         ]

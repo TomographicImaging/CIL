@@ -78,26 +78,28 @@ class CCPiTestClass(unittest.TestCase):
             np.testing.assert_allclose(container1.as_array(), container2.as_array(), rtol=rtol, err_msg=msg)
 
     def assertDataContainerAllClose(self, container1, container2, rtol=1e-07, msg=None, strict=False):
-        # Test to check if two DataContainers are close, by checking
-        # - they are the same class
-        # - they have arrays that are all close
-        # - if they have geometry, the geometries are equal
-        # - and if strict=True, their data type is the same
-        # 
-        # Parameters
-        # ----------
-        # container1 : DataContainer
-        #     The first DataContainer to compare.
-        # container2 : DataContainer
-        #     The second DataContainer to compare.
-        # rtol : float, optional
-        #     The relative tolerance for the array comparison
-        # msg : string, optional
-        #     The error message to be printed in case of failure
-        # strict : bool, optional
-        #     If True, raises an error if the data type in the DataContainers
-        #     is not equal
-
+        '''
+        Test to check if two DataContainers are close, by checking
+        - they are the same class
+        - they have arrays that are all close
+        - if they have geometry, the geometries are equal
+        - and if strict=True, their data type is the same
+        
+        Parameters
+        ----------
+        container1 : DataContainer
+            The first DataContainer to compare.
+        container2 : DataContainer
+            The second DataContainer to compare.
+        rtol : float, optional
+            The relative tolerance for the array comparison
+        msg : string, optional
+            The error message to be printed in case of failure
+        strict : bool, optional
+            If True, raises an error if the data type in the DataContainers
+            is not equal
+        '''
+        
         if not isinstance(container1, container2.__class__):
             raise TypeError("container2 is not the same class as container1")
         

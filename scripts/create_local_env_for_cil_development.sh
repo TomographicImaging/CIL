@@ -15,9 +15,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 set -euxo pipefail
-numpy='1.24'
-python='3.10'
-name=cil
+numpy='1.25'
+python='3.11'
+name=cil_tests_311_125
 test_deps=0
 cil_ver=''
 while getopts hn:p:e:tv: option ; do

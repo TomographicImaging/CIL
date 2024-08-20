@@ -83,8 +83,12 @@ class FBP(DataProcessor):
         DataOrder.check_order_for_engine('tigre', dataset.geometry)
         return True
     
-    def check_output(self, out):
-        return True
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.image_geometry.shape
 
     def process(self, out=None):
 

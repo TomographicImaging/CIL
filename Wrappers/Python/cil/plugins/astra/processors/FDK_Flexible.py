@@ -74,19 +74,13 @@ class FDK_Flexible(DataProcessor):
 
         return True
     
-    def check_output(self, out):
-        if out is not None:
-            data = self.get_input()
-            if data.array.dtype != out.array.dtype:
-                raise TypeError("out type mismatch: got {0} expecting {1}"\
-                            .format(out.array.dtype, data.array.dtype))
-            
-            if self.volume_geometry.shape != out.shape:
-                raise ValueError("out size mismatch: got {0} expecting {1}"\
-                                    .format(out.shape, self._shape_out))
-        return True
-
-
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
+    
     def process(self, out=None):
 
         # Get DATA

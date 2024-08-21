@@ -1745,7 +1745,7 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
-            self._dimension_labels = tuple(AcquisitionDimensionLabels(x) for x in val if x in AcquisitionDimensionLabels)
+            self._dimension_labels = tuple(map(AcquisitionDimensionLabels, val))
 
     @property
     def ndim(self):

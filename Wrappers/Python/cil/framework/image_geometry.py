@@ -113,10 +113,9 @@ class ImageGeometry:
 
     def set_labels(self, labels):
         if labels is not None:
-            self._dimension_labels = tuple(ImageDimensionLabels(x) for x in labels if x in ImageDimensionLabels)
+            self._dimension_labels = tuple(map(ImageDimensionLabels, labels))
 
     def __eq__(self, other):
-
         if not isinstance(other, self.__class__):
             return False
 

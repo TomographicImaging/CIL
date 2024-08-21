@@ -66,7 +66,7 @@ class Backend(StrEnum):
     Examples
     --------
     ```
-    FBP(data, backend=Backends.ASTRA)
+    FBP(data, backend=Backend.ASTRA)
     FBP(data, backend="astra")
     ```
     """
@@ -183,7 +183,7 @@ class FillType(StrEnum):
     Examples
     --------
     ```
-    data.fill(FillTypes.RANDOM)
+    data.fill(FillType.RANDOM)
     data.fill("random")
     ```
     """
@@ -198,7 +198,7 @@ class AngleUnit(StrEnum):
     Examples
     --------
     ```
-    data.geometry.set_angles(angle_data, angle_units=UnitsAngles.DEGREE)
+    data.geometry.set_angles(angle_data, angle_units=AngleUnit.DEGREE)
     data.geometry.set_angles(angle_data, angle_units="degree")
     ```
     """

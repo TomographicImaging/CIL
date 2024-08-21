@@ -1611,32 +1611,32 @@ class AcquisitionGeometry(object):
     #for backwards compatibility
     @property
     def ANGLE(self):
-        warnings.warn("use AcquisitionDimensionLabels.Angle instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AcquisitionDimension.Angle instead", DeprecationWarning, stacklevel=2)
         return AcquisitionDimension.ANGLE
 
     @property
     def CHANNEL(self):
-        warnings.warn("use AcquisitionDimensionLabels.Channel instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AcquisitionDimension.Channel instead", DeprecationWarning, stacklevel=2)
         return AcquisitionDimension.CHANNEL
 
     @property
     def DEGREE(self):
-        warnings.warn("use UnitsAngles.DEGREE", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AngleUnit.DEGREE", DeprecationWarning, stacklevel=2)
         return AngleUnit.DEGREE
 
     @property
     def HORIZONTAL(self):
-        warnings.warn("use AcquisitionDimensionLabels.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AcquisitionDimension.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
         return AcquisitionDimension.HORIZONTAL
 
     @property
     def RADIAN(self):
-        warnings.warn("use UnitsAngles.RADIAN instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AngleUnit.RADIAN instead", DeprecationWarning, stacklevel=2)
         return AngleUnit.RADIAN
 
     @property
     def VERTICAL(self):
-        warnings.warn("use AcquisitionDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use AcquisitionDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
         return AcquisitionDimension.VERTICAL
 
     @property

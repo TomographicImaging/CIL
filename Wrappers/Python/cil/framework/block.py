@@ -28,12 +28,12 @@ from .labels import FillType
 class BlockGeometry(object):
     @property
     def RANDOM(self):
-        warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM
 
     @property
     def RANDOM_INT(self):
-        warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM_INT
 
     @property

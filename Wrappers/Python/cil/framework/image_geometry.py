@@ -28,31 +28,31 @@ from .labels import ImageDimension, FillType
 class ImageGeometry:
     @property
     def CHANNEL(self):
-        warnings.warn("use ImageDimensionLabels.CHANNEL instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use ImageDimension.CHANNEL instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.CHANNEL
 
     @property
     def HORIZONTAL_X(self):
-        warnings.warn("use ImageDimensionLabels.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use ImageDimension.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.HORIZONTAL_X
 
     @property
     def HORIZONTAL_Y(self):
-        warnings.warn("use ImageDimensionLabels.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use ImageDimension.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.HORIZONTAL_Y
 
     @property
     def RANDOM(self):
-        warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM
     @property
     def RANDOM_INT(self):
-        warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM_INT
 
     @property
     def VERTICAL(self):
-        warnings.warn("use ImageDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        warnings.warn("use ImageDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.VERTICAL
 
     @property

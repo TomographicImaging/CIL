@@ -139,7 +139,7 @@ def get_ImageData(num_model, geometry):
           ag.set_panel((N,N-2))
 
       ag.set_channels(channels)
-      ag.set_angles(angles, angle_unit=UnitsAngles.DEGREE)
+      ag.set_angles(angles, angle_unit=AngleUnit.DEGREE)
 
       ig = ag.get_ImageGeometry()
       num_model = 1

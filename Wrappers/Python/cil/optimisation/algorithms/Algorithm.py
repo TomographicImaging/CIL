@@ -32,12 +32,12 @@ class Algorithm:
      
     The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective` methods.
 
-    The method :code:`run` is available to run :code:`n` iterations. The method accepts a :code:`callbacks` list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.
+    The method :code:`run` is available to run :code:`n` iterations. The method accepts :code:`callbacks`: a list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.
     
     Parameters
     ----------
     update_objective_interval: int, optional, default 1
-        the interval every which we would save the current objective. 1 means every iteration, 2 every 2 iteration and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.
+        The objective (or loss) is calculated and saved every `update_objective_interval`.  1 means every iteration, 2 every 2 iterations and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.
     """
 
     def __init__(self, update_objective_interval=1, max_iteration=None, log_file=None):
@@ -112,9 +112,8 @@ class Algorithm:
         return self.iteration
 
     def _update_previous_solution(self):
-        r""" Update the previous solution with the current one
-
-        The concrete algorithm calls update_previous_solution. Normally this would entail the swapping of pointers:
+        r""" An optional but common function that can be implemented by child classes to update a stored previous solution with the current one. 
+        Best practice for memory efficiency would be to do this by the swapping of pointers:
 
         .. highlight:: python
         .. code-block:: python

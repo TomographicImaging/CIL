@@ -178,9 +178,13 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         '''
  
         self.mode=mode
-        self.current_mode = mode
-        if self.current_mode == "alternate":
-            self.current_mode = 'long'
+        if self.mode == 'short':
+            self.is_short = True
+        elif self.mode == 'long' or self.mode == 'alternate':
+            self.is_short = False
+        else:
+            raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+        
         self.store_grad=None 
         self.store_x=None
         self.initial=initial
@@ -220,12 +224,11 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
         algorithm.x.subtract(self.store_x, out=self.store_x) 
         algorithm.gradient_update.subtract(self.store_grad, out=self.store_grad)
-        if self.current_mode == 'long':
+        if not self.is_short:
             ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
-        elif self.current_mode == 'short':
-            ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
         else:
-            raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+            ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
+        
         
         #This computes the default stabilisation parameter, using the first three iterations
         if (algorithm.iteration <=3 and self.adaptive):
@@ -239,9 +242,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad.fill(algorithm.gradient_update)
         
         if self.mode == "alternate":
-            if self.current_mode == 'long':
-                self.current_mode = "short"
-            else:
-                self.current_mode = 'long'
-           
+            self.is_short =  1 - self.is_short       
+        
         return ret

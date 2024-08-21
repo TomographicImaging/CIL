@@ -16,7 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageDimensionLabels
+from cil.framework import ImageData
+from cil.framework.labels import ImageDimensionLabels
 import tomophantom
 from tomophantom import TomoP2D, TomoP3D
 import os

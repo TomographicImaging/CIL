@@ -17,7 +17,8 @@
 # CIL Developers, listed at:
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, AcquisitionDimensionLabels
+from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionDimensionLabels
 
 import numpy as np
 from scipy.fft import fft2

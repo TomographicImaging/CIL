@@ -17,7 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import AcquisitionGeometry, Processor, ImageData, AcquisitionType
+from cil.framework import AcquisitionGeometry, Processor, ImageData
+from cil.framework.labels import AcquisitionType
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D, convert_geometry_to_astra
 import logging

@@ -16,7 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, AcquisitionDimensionLabels, AcquisitionType
+from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionDimensionLabels, AcquisitionType
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np

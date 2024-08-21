@@ -19,7 +19,8 @@ from utils import initialise_tests
 import sys
 import numpy
 from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
-                           AcquisitionGeometry, BlockGeometry, VectorData, ImageDimensionLabels, AcquisitionDimensionLabels)
+                           AcquisitionGeometry, BlockGeometry, VectorData)
+from cil.framework.labels import ImageDimensionLabels, AcquisitionDimensionLabels
 from timeit import default_timer as timer
 import logging
 from testclass import CCPiTestClass
@@ -470,27 +471,27 @@ class TestDataContainer(CCPiTestClass):
         arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
         ig = ImageGeometry(voxel_num_x=4, voxel_num_y=3, voxel_num_z=2)
         data = ImageData(arr, deep_copy=True, geometry=ig)
-        
+
         # Check initial shape, geometry, and deep copy
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ig)
         self.assertNotEqual(id(data.array), id(arr))
-    
+
         # Fill with zeros and check
         data.fill(0)
         numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ig.shape))
-        
+
         # Fill with original array and check
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
-        self.assertEqual(data.geometry, ig)  
-        
+        self.assertEqual(data.geometry, ig)
+
         # Reshape array with singleton dimension and create new ImageData
         arr = arr.reshape(1, 2, 3, 4)
         data = ImageData(arr, geometry=ig)
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ig)
-    
+
         # Fill with zeros and reshaped array, then check
         data.fill(0)
         data.fill(arr)
@@ -548,7 +549,7 @@ class TestDataContainer(CCPiTestClass):
         arr = numpy.arange(24, dtype=numpy.float32).reshape(2, 3, 4)
         ag = AcquisitionGeometry.create_Parallel3D().set_angles([0, 1]).set_panel((4, 3))
         data = AcquisitionData(arr, deep_copy=True, geometry=ag)
-        
+
         # Check initial shape, geometry, and deep copy
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ag)
@@ -557,7 +558,7 @@ class TestDataContainer(CCPiTestClass):
         # Fill with zeros and check
         data.fill(0)
         numpy.testing.assert_array_equal(data.as_array(), numpy.zeros(ag.shape))
-        
+
         # Fill with original array and check
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
@@ -574,7 +575,7 @@ class TestDataContainer(CCPiTestClass):
         data.fill(0)
         data.fill(arr)
         self.assertEqual(data.shape, (2, 3, 4))
-        self.assertEqual(data.geometry, ag)  
+        self.assertEqual(data.geometry, ag)
 
         # Change dtype to float64, fill, and check
         arr = arr.astype(numpy.float64)

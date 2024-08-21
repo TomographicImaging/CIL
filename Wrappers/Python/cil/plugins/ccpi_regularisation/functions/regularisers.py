@@ -23,7 +23,8 @@ except ImportError as exc:
     raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24.0.1"`') from exc
 
 
-from cil.framework import DataContainer, ImageDimensionLabels
+from cil.framework import DataContainer
+from cil.framework.labels import ImageDimensionLabels
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -139,7 +140,7 @@ class FGP_TV(TV_Base):
 
         Note
         -----
-        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default. 
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default.
 
         Parameters
         ----------
@@ -211,9 +212,9 @@ class FGP_TV(TV_Base):
         else:
             self.methodTV = 1
 
-        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init. 
+        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init.
             warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
-            nonnegativity=False 
+            nonnegativity=False
         if nonnegativity == True:
             self.nonnegativity = 1
         else:
@@ -412,7 +413,7 @@ class FGP_dTV(RegulariserFunction):
         return np.nan
 
     def proximal_numpy(self, in_arr, tau):
-        
+
         info = np.zeros((2,), dtype=np.float32)
 
         res = regularisers.FGP_dTV(\
@@ -470,7 +471,7 @@ class TNV(RegulariserFunction):
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
         in_arr = np.squeeze(in_arr)
-    
+
         res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,

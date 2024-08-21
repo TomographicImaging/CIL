@@ -15,10 +15,10 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 import logging
 
-from cil.framework import BlockGeometry, AcquisitionDimensionLabels, ImageDimensionLabels, AcquisitionType
+from cil.framework import BlockGeometry
+from cil.framework.labels import AcquisitionDimensionLabels, ImageDimensionLabels, AcquisitionType
 from cil.optimisation.operators import BlockOperator, LinearOperator, ChannelwiseOperator
 from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
 

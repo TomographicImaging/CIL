@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import cilacc
-from cil.framework import AcquisitionType
+from cil.framework.labels import AcquisitionType
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 

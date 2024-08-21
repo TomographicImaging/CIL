@@ -18,7 +18,8 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, UnitsAngles, AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework.labels import UnitsAngles, AcquisitionDimensionLabels, ImageDimensionLabels
 import numpy as np
 import os
 import olefile

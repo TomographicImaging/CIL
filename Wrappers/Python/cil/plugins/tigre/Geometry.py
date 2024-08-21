@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionType, UnitsAngles
+from cil.framework.labels import AcquisitionType, UnitsAngles
 import numpy as np
 
 try:

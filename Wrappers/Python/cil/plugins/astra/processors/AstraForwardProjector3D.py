@@ -15,9 +15,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-
-from cil.framework import DataProcessor, AcquisitionData, ImageDimensionLabels, AcquisitionDimensionLabels
+from cil.framework import DataProcessor, AcquisitionData
+from cil.framework.labels import ImageDimensionLabels, AcquisitionDimensionLabels
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
 from astra import astra_dict, algorithm, data3d

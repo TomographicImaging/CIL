@@ -19,7 +19,8 @@
 import unittest
 from utils import initialise_tests
 import numpy
-from cil.framework import DataContainer, ImageGeometry, AcquisitionGeometry, ImageDimensionLabels, AcquisitionDimensionLabels
+from cil.framework import DataContainer, ImageGeometry, AcquisitionGeometry
+from cil.framework.labels import ImageDimensionLabels, AcquisitionDimensionLabels
 from timeit import default_timer as timer
 
 initialise_tests()

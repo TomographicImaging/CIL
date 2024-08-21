@@ -16,7 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionData, ImageGeometry, AcquisitionDimensionLabels
+from cil.framework import AcquisitionData, ImageGeometry
+from cil.framework.labels import AcquisitionDimensionLabels
 import importlib
 import weakref
 

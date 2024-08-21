@@ -15,14 +15,14 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import logging
 
-from cil.framework import (ImageData, AcquisitionData, AcquisitionDimensionLabels, ImageDimensionLabels,
-                           BlockGeometry)
+import numpy as np
+
+from cil.framework import ImageData, AcquisitionData, BlockGeometry
+from cil.framework.labels import AcquisitionDimensionLabels, ImageDimensionLabels
 from cil.optimisation.operators import BlockOperator, LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
-import numpy as np
-import logging
-import warnings
 
 log = logging.getLogger(__name__)
 

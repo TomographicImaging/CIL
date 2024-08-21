@@ -18,7 +18,8 @@
 
 import unittest
 from cil.processors import RingRemover, TransmissionAbsorptionConverter, Slicer
-from cil.framework import ImageGeometry, AcquisitionGeometry, UnitsAngles
+from cil.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework.labels import UnitsAngles
 from cil.utilities import dataexample
 from cil.utilities.quality_measures import mse
 

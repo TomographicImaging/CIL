@@ -15,7 +15,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-from cil.framework import DataProcessor, ImageDimensionLabels, AcquisitionDimensionLabels, AcquisitionType
+from cil.framework import DataProcessor
+from cil.framework.labels import ImageDimensionLabels, AcquisitionDimensionLabels, AcquisitionType
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU

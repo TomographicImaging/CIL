@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework import AcquisitionType, UnitsAngles
+from cil.framework.labels import AcquisitionType, UnitsAngles
 
 def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 

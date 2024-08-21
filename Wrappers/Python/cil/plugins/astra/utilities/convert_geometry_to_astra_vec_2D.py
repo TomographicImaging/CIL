@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework import UnitsAngles
+from cil.framework.labels import UnitsAngles
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 

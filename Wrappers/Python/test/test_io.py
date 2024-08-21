@@ -22,7 +22,8 @@ from utils import initialise_tests
 
 import numpy as np
 import os
-from cil.framework import ImageGeometry, UnitsAngles
+from cil.framework import ImageGeometry
+from cil.framework.labels import UnitsAngles
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities

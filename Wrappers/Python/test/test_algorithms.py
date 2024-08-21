@@ -24,8 +24,9 @@ from tempfile import NamedTemporaryFile
 import numpy as np
 import logging
 
-from cil.framework import (ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry,
-                           BlockDataContainer, BlockGeometry, VectorData, FillTypes)
+from cil.framework import (ImageGeometry, ImageData, AcquisitionData, AcquisitionGeometry,
+                           BlockDataContainer, BlockGeometry, VectorData)
+from cil.framework.labels import FillTypes
 
 from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator

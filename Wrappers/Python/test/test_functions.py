@@ -21,8 +21,9 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, FillTypes, ImageGeometry, \
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, ImageGeometry, \
     AcquisitionGeometry
+from cil.framework.labels import FillTypes
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -96,7 +97,7 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
-        #negative function 
+        #negative function
         g = - L2NormSquared(b=noisy_data)
 
         # Compare call of g
@@ -955,7 +956,7 @@ class TestFunction(CCPiTestClass):
 
 
 class TestL1Norm (CCPiTestClass):
-    
+
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
         f2 = L1Norm(weight=None)
@@ -1003,7 +1004,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
-        
+
         np.random.seed(1)
         weights= geom.allocate('random').abs()
         w = weights.abs().sum()
@@ -1014,7 +1015,7 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
 
         np.random.seed(1)
         w = 1
@@ -1023,8 +1024,8 @@ class TestL1Norm (CCPiTestClass):
         f2 = L1Norm(weight=w)
 
         np.testing.assert_allclose(f1(x), f2(x))
-        
-    
+
+
         with self.assertRaises(ValueError):
             a=3+4j
             f2 = L1Norm(weight=a)
@@ -1041,18 +1042,18 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
         x=geom.allocate(3j)
         b=geom.allocate(2j)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
+
         x=geom.allocate(1+1j)
         b=geom.allocate(1)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
-        
+
+
     def test_ZeroWeights_L1Norm(self):
         weight = VectorData(np.array([0., 1.]))
         tau = 0.2
@@ -1142,7 +1143,7 @@ class TestL1Norm (CCPiTestClass):
         tau = -3j
         with self.assertRaises(ValueError):
             ret = soft_shrinkage(-0.5 *x, tau)
-            
+
         # tau np.ndarray
         tau = 1. * np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
@@ -1188,7 +1189,7 @@ class TestL1Norm (CCPiTestClass):
     def test_L1_prox_init(self):
         pass
 
-    def test_L1Sparsity(self):    
+    def test_L1Sparsity(self):
         from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
         N, M = 2,3
@@ -1201,13 +1202,13 @@ class TestL1Norm (CCPiTestClass):
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
         f2 = L1Sparsity(W, weight=weights)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b, weight=weights)
         self.L1SparsityTest(f3, f2, x)
 
         f2 = L1Sparsity(W)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b)
         self.L1SparsityTest(f3, f2, x)
 
@@ -1218,7 +1219,7 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
                                    f2.proximal(x, tau).as_array())
-        
+
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
 

@@ -19,7 +19,8 @@
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
-from cil.framework import AcquisitionGeometry, AcquisitionDimensionLabels, AcquisitionType
+from cil.framework import AcquisitionGeometry
+from cil.framework.labels import AcquisitionDimensionLabels, AcquisitionType
 
 class SimData(object):
 

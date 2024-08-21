@@ -15,14 +15,13 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 import contextlib
 import io
-import warnings
 
 import numpy as np
 
-from cil.framework import DataProcessor, ImageData, AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework import DataProcessor, ImageData
+from cil.framework.labels import AcquisitionDimensionLabels, ImageDimensionLabels
 from cil.plugins.tigre import CIL2TIGREGeometry
 
 try:

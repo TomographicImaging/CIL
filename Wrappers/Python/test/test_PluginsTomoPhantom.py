@@ -15,10 +15,12 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 import unittest
-from cil.framework import AcquisitionGeometry, UnitsAngles
+
 import numpy as np
+
+from cil.framework import AcquisitionGeometry
+from cil.framework.labels import UnitsAngles
 from utils import has_tomophantom, initialise_tests
 
 initialise_tests()

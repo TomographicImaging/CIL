@@ -19,9 +19,9 @@
 import unittest
 from unittest.mock import Mock
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer, FillTypes
-from cil.optimisation.operators import BlockOperator,\
-    FiniteDifferenceOperator, SymmetrisedGradientOperator
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer
+from cil.framework.labels import FillTypes
+from cil.optimisation.operators import FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
 from timeit import default_timer as timer
 from cil.optimisation.operators import GradientOperator, IdentityOperator,\
@@ -234,10 +234,10 @@ class TestOperator(CCPiTestClass):
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
-                
+
         #Check is_linear
         self.assertTrue(Id.is_linear())
-        
+
         #Check is_orthogonal
         self.assertTrue(Id.is_orthogonal())
 
@@ -506,7 +506,7 @@ class TestOperator(CCPiTestClass):
 
         res1 = bg.allocate(0)
         proj_map.adjoint(x, out=res1)
-        
+
         res2=bg.allocate('random')
         proj_map.adjoint(x, out=res2)
 

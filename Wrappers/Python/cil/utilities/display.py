@@ -19,7 +19,8 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer, AcquisitionType
+from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
+from cil.framework.labels import AcquisitionType
 import numpy as np
 import warnings
 

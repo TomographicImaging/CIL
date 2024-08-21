@@ -142,18 +142,18 @@ class ArmijoStepSizeRule(StepSizeRule):
 
 class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
-    """ 
-    Applies the Barzilai- Borwein rule to calculate the step size (step_size).
+    r""" Applies the Barzilai- Borwein rule to calculate the step size (step_size).
 
-    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k`th iterate (current solution after iteration :math:`k`) and :math:`g_k` is the gradient calculation in the :math:`k`th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha _kg_k` where the step size :math:`\alpha _k` is either
+    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k` th iterate (current solution after iteration :math:`k` ) and :math:`g_k` is the gradient calculation in the :math:`k` th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha_kg_k` where the step size :math:`\alpha _k` is either
 
-    - :math:`\alpha _k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
+    - :math:`\alpha_k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
 
-    - :math:`\alpha _k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
+    - :math:`\alpha_k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
     
     Where the operator :math:`\cdot` is the standard inner product between two vectors. 
     
-    This is suitable for use with gradient based iterative methods where the calcualted gradient is stored as `algorithm.gradient_update`.
+    This is suitable for use with gradient based iterative methods where the calculated gradient is stored as `algorithm.gradient_update`.
+    
     Parameters
     ----------
     initial: float, greater than zero 
@@ -161,10 +161,9 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
     stabilisation_param: 'auto', float or 'off', default is 'auto'
-        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or turn  "off" the stabilisation, equivalently passing `np.inf`.
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
         
     
-
     Reference
     ---------
     - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141

@@ -105,13 +105,13 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
 
-    def reorder(self, order=None):
+    def reorder(self, order):
         '''
         Reorders the data in memory as requested. This is an in-place operation.
 
         Parameters
         ----------
-        order : list or str
+        order: list or str
             Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.
         '''
         if order in Backends:

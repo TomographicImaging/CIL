@@ -121,12 +121,18 @@ class ImageDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for image data.
 
+    Attributes
+    ----------
+    CHANNEL
+    VERTICAL
+    HORIZONTAL_X
+    HORIZONTAL_Y
+
     Examples
     --------
-    ```
-    data.reorder([ImageDimension.HORIZONTAL_X, ImageDimension.VERTICAL])
-    data.reorder(["horizontal_x", "vertical"])
-    ```
+    >>> data.reorder([ImageDimension.HORIZONTAL_X, ImageDimension.VERTICAL])
+    >>> data.reorder(["horizontal_x", "vertical"])
+    
     """
     CHANNEL = auto()
     VERTICAL = auto()
@@ -147,14 +153,19 @@ class AcquisitionDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for acquisition data.
 
+    Attributes
+    ----------
+    CHANNEL
+    ANGLE
+    VERTICAL
+    HORIZONTAL
+
     Examples
     --------
-    ```
-    data.reorder([AcquisitionDimension.CHANNEL,
+    >>> data.reorder([AcquisitionDimension.CHANNEL,
                   AcquisitionDimension.ANGLE,
                   AcquisitionDimension.HORIZONTAL])
-    data.reorder(["channel", "angle", "horizontal"])
-    ```
+    >>> data.reorder(["channel", "angle", "horizontal"])
     """
     CHANNEL = auto()
     ANGLE = auto()
@@ -182,10 +193,8 @@ class FillType(StrEnum):
 
     Examples
     --------
-    ```
-    data.fill(FillType.RANDOM)
-    data.fill("random")
-    ```
+    >>> data.fill(FillType.RANDOM)
+    >>> data.fill("random")
     """
     RANDOM = auto()
     RANDOM_INT = auto()
@@ -194,13 +203,17 @@ class FillType(StrEnum):
 class AngleUnit(StrEnum):
     """
     Available units for angles.
+    
+    Attributes
+    ----------
+    DEGREE
+    RADIAN
 
     Examples
     --------
-    ```
-    data.geometry.set_angles(angle_data, angle_units=AngleUnit.DEGREE)
-    data.geometry.set_angles(angle_data, angle_units="degree")
-    ```
+    >>> data.geometry.set_angles(angle_data, angle_units=AngleUnit.DEGREE)
+    >>> data.geometry.set_angles(angle_data, angle_units="degree")
+
     """
     DEGREE = auto()
     RADIAN = auto()
@@ -240,16 +253,25 @@ class AcquisitionType(Flag):
     DIM3 = auto()
 
     def validate(self):
+        """
+        Check if the geometry and dimension types are allowed
+        """
         assert len(self.dimension) < 2, f"{self} must be 2D xor 3D"
         assert len(self.geometry) < 2, f"{self} must be parallel xor cone beam"
         return self
 
     @property
     def dimension(self):
+        """
+        Returns the label for the dimension type
+        """
         return self & (self.DIM2 | self.DIM3)
 
     @property
     def geometry(self):
+        """
+        Returns the label for the geometry type
+        """
         return self & (self.PARALLEL | self.CONE)
 
     @classmethod

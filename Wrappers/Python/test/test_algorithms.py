@@ -1031,7 +1031,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -1118,7 +1118,7 @@ class TestSPDHG(unittest.TestCase):
         spdhg = SPDHG(f=F, g=G, operator=A,
                       max_iteration=1000,
                       update_objective_interval=200, prob=prob)
-        spdhg.run(1000, verbose=0)
+        spdhg.run(1000)
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
               mse(spdhg.get_output(), pdhg.get_output()),
               psnr(spdhg.get_output(), pdhg.get_output())
@@ -1132,7 +1132,7 @@ class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1

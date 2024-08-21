@@ -75,7 +75,49 @@ class Backends(StrEnum):
     CIL = auto()
 
 
-class ImageDimensionLabels(StrEnum):
+class _DimensionBase:
+    @classmethod
+    def _default_order(cls, engine: str) -> tuple:
+        raise NotImplementedError
+
+    @classmethod
+    def get_order_for_engine(cls, engine: str, geometry=None) -> tuple:
+        """
+        Returns the order of dimensions for a specific engine and geometry.
+
+        Parameters
+        ----------
+        geometry: ImageGeometry | AcquisitionGeometry
+            If unspecified, the default order is returned.
+        """
+        order = cls._default_order(engine)
+        if geometry is None:
+            return order
+        return tuple(label for label in order if label in geometry.dimension_labels)
+
+    @classmethod
+    def check_order_for_engine(cls, engine: str, geometry) -> bool:
+        """
+        Returns True iff the order of dimensions is correct for a specific engine and geometry.
+
+        Parameters
+        ----------
+        geometry: ImageGeometry | AcquisitionGeometry
+
+        Raises
+        ------
+        ValueError if the order of dimensions is incorrect.
+        """
+        order_requested = cls.get_order_for_engine(engine, geometry)
+        if order_requested == tuple(geometry.dimension_labels):
+            return True
+        raise ValueError(
+            f"Expected dimension_label order {order_requested},"
+            f" got {tuple(geometry.dimension_labels)}."
+            f" Try using `data.reorder('{engine}')` to permute for {engine}")
+
+
+class ImageDimensionLabels(_DimensionBase, StrEnum):
     """
     Available dimension labels for image data.
 
@@ -92,46 +134,16 @@ class ImageDimensionLabels(StrEnum):
     HORIZONTAL_Y = auto()
 
     @classmethod
-    def get_order_for_engine(cls, engine: str, geometry=None) -> tuple:
-        """
-        Returns the order of dimensions for a specific engine and geometry.
-
-        Parameters
-        ----------
-        geometry: ImageGeometry, optional
-            If unspecified, the default order is returned.
-        """
-        order = cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X
-        engine_orders = {Backends.ASTRA: order, Backends.TIGRE: order, Backends.CIL: order}
-        dim_order = engine_orders[Backends(engine)]
-
-        if geometry is None:
-            return dim_order
-        return tuple(label for label in dim_order if label in geometry.dimension_labels)
-
-    @classmethod
-    def check_order_for_engine(cls, engine: str, geometry) -> bool:
-        """
-        Returns True iff the order of dimensions is correct for a specific engine and geometry.
-
-        Parameters
-        ----------
-        geometry: ImageGeometry
-
-        Raises
-        ------
-        ValueError if the order of dimensions is incorrect.
-        """
-        order_requested = cls.get_order_for_engine(engine, geometry)
-        if order_requested == tuple(geometry.dimension_labels):
-            return True
-        raise ValueError(
-            f"Expected dimension_label order {order_requested}"
-            f" got {tuple(geometry.dimension_labels)}."
-            f" Try using `data.reorder('{engine}')` to permute for {engine}")
+    def _default_order(cls, engine: str) -> tuple:
+        engine = Backends(engine)
+        orders = {
+            Backends.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
+            Backends.TIGRE: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
+            Backends.CIL: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X)}
+        return orders[engine]
 
 
-class AcquisitionDimensionLabels(StrEnum):
+class AcquisitionDimensionLabels(_DimensionBase, StrEnum):
     """
     Available dimension labels for acquisition data.
 
@@ -150,45 +162,13 @@ class AcquisitionDimensionLabels(StrEnum):
     HORIZONTAL = auto()
 
     @classmethod
-    def get_order_for_engine(cls, engine: str, geometry=None) -> tuple:
-        """
-        Returns the order of dimensions for a specific engine and geometry.
-
-        Parameters
-        ----------
-        geometry : AcquisitionGeometry, optional
-            If unspecified, the default order is returned.
-        """
-        engine_orders = {
+    def _default_order(cls, engine: str) -> tuple:
+        engine = Backends(engine)
+        orders = {
             Backends.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.ANGLE, cls.HORIZONTAL),
             Backends.TIGRE: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL),
             Backends.CIL: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL)}
-        dim_order = engine_orders[Backends(engine)]
-
-        if geometry is None:
-            return dim_order
-        return tuple(label for label in dim_order if label in geometry.dimension_labels)
-
-    @classmethod
-    def check_order_for_engine(cls, engine: str, geometry) -> bool:
-        """
-        Returns True iff the order of dimensions is correct for a specific engine and geometry.
-
-        Parameters
-        ----------
-        geometry: AcquisitionGeometry
-
-        Raises
-        ------
-        ValueError if the order of dimensions is incorrect.
-        """
-        order_requested = cls.get_order_for_engine(engine, geometry)
-        if order_requested == tuple(geometry.dimension_labels):
-            return True
-        raise ValueError(
-            f"Expected dimension_label order {order_requested},"
-            f" got {tuple(geometry.dimension_labels)}."
-            f" Try using `data.reorder('{engine}')` to permute for {engine}")
+        return orders[engine]
 
 
 class FillTypes(StrEnum):

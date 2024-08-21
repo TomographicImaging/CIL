@@ -242,6 +242,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad.fill(algorithm.gradient_update)
         
         if self.mode == "alternate":
-            self.is_short =  !self.is_short       
+            self.is_short =  not self.is_short       
         
         return ret

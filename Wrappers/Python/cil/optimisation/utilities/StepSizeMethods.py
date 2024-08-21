@@ -161,13 +161,12 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     mode: One of 'long', 'short' or 'alternate', default is 'short'. 
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
     stabilisation_param: 'auto', float or 'off', default is 'auto'
-        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math`:\Delta x: from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
         
     
     Reference
     ---------
     - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141
-    https://en.wikipedia.org/wiki/Barzilai-Borwein_method
     
     - Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). https://doi.org/10.4208/jcm.1911-m2019-0171
 

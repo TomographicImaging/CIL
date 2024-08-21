@@ -224,11 +224,11 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
         algorithm.x.subtract(self.store_x, out=self.store_x) 
         algorithm.gradient_update.subtract(self.store_grad, out=self.store_grad)
-        if not self.is_short:
-            ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
+        if self.is_short:
+                ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
         else:
-            ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
-        
+            ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
+
         
         #This computes the default stabilisation parameter, using the first three iterations
         if (algorithm.iteration <=3 and self.adaptive):
@@ -242,6 +242,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         self.store_grad.fill(algorithm.gradient_update)
         
         if self.mode == "alternate":
-            self.is_short =  1 - self.is_short       
+            self.is_short =  !self.is_short       
         
         return ret

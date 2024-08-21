@@ -218,8 +218,8 @@ class UnitsAngles(StrEnum):
     Examples
     --------
     ```
-    data.geometry.set_unitangles(angle_data, angle_units=UnitsAngles.DEGREE)
-    data.geometry.set_unit(angle_data, angle_units="degree")
+    data.geometry.set_angles(angle_data, angle_units=UnitsAngles.DEGREE)
+    data.geometry.set_angles(angle_data, angle_units="degree")
     ```
     """
     DEGREE = auto()

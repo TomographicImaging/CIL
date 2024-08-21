@@ -70,8 +70,7 @@ class ConstantStepSize(StepSizeRule):
 
 class ArmijoStepSizeRule(StepSizeRule):
 
-    """ 
-    Applies the Armijo rule to calculate the step size (step_size).
+    r""" Applies the Armijo rule to calculate the step size (step_size).
 
     The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.
 
@@ -85,9 +84,10 @@ class ArmijoStepSizeRule(StepSizeRule):
         The maximum number of iterations to find a suitable step size 
 
     Reference
-    ---------
-    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright) (https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
-     https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+    ------------
+    - Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
+    
+    - https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
 
     """
 

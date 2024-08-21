@@ -25,7 +25,7 @@ class PD3O(Algorithm):
     
 
     r"""Primal Dual Three Operator Splitting (PD3O) algorithm, see "A New Primal–Dual Algorithm for Minimizing the Sum
-        of Three Functions with a Linear Operator".  This is a primal dual algorithm for minimising :math:`f(x)+g(x)+h(Ax)` where all functions are proper, lower semi-continuous and convex
+        of Three Functions with a Linear Operator".  This is a primal dual algorithm for minimising :math:`f(x)+g(x)+h(Ax)` where all functions are proper, lower semi-continuous and convex, 
         :math:`f` should be differentiable with a Lipschitz continuous gradient and :math:`A` is a bounded linear operator. 
     
         Parameters
@@ -43,7 +43,7 @@ class PD3O(Algorithm):
         gamma: Float, optional, default is `2.0/f.L`
             The primal step size 
         initial : DataContainer, optional default is a container of zeros, in the domain of the operator 
-            Initial point for the ProxSkip algorithm.             
+            Initial point for the  algorithm.             
 
 
         Reference
@@ -98,7 +98,7 @@ class PD3O(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
         
-        # proximal conjugate step
+        # initial proximal conjugate step
         self.operator.direct(self.x_old, out=self.s)
         self.s_old.sapyb(1, self.s, self.delta, out=self.s_old)
         self.h.proximal_conjugate(self.s_old, self.delta, out=self.s)

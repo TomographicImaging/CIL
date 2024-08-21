@@ -176,38 +176,30 @@ class Detector2D(PositionVector):
         self._direction_x = x
 
 
-class SystemConfiguration(object):
-    r'''This is a generic class to hold the description of a tomography system
-     '''
-
+class SystemConfiguration:
+    '''This is a generic class to hold the description of a tomography system'''
     SYSTEM_SIMPLE = 'simple'
     SYSTEM_OFFSET = 'offset'
     SYSTEM_ADVANCED = 'advanced'
 
     @property
     def dimension(self):
-        return AcquisitionType.DIM2 if self._dimension == 2 else AcquisitionType.DIM3
-
-    @dimension.setter
-    def dimension(self,val):
-        if val != 2 and val != 3:
-            raise ValueError('Can set up 2D and 3D systems only. got {0}D'.format(val))
-        else:
-            self._dimension = val
+        return self.acquisition_type.dimension
 
     @property
     def geometry(self):
-        return self._geometry
+        return self.acquisition_type.geometry
 
-    @geometry.setter
-    def geometry(self, val):
-        self._geometry = AcquisitionType(val)
+    @property
+    def acquisition_type(self):
+        return self._acquisition_type
 
-    def __init__(self, dof, geometry, units='units'):
-        """Initialises the system component attributes for the acquisition type
-        """
-        self.dimension = dof
-        self.geometry = geometry
+    @acquisition_type.setter
+    def acquisition_type(self, val):
+        self._acquisition_type = AcquisitionType(val).validate()
+
+    def __init__(self, dof: int, geometry, units='units'):
+        self.acquisition_type = AcquisitionType(f"{dof}D") | AcquisitionType(geometry)
         self.units = units
 
         if AcquisitionType.PARALLEL & self.geometry:
@@ -215,7 +207,7 @@ class SystemConfiguration(object):
         else:
             self.source = PositionVector(dof)
 
-        if dof == 2:
+        if AcquisitionType.DIM2 & self.dimension:
             self.detector = Detector1D(dof)
             self.rotation_axis = PositionVector(dof)
         else:
@@ -1964,7 +1956,8 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry
         '''
-        self.config.panel = Panel(num_pixels, pixel_size, origin, self.config.system._dimension)
+        dof = {AcquisitionType.DIM2: 2, AcquisitionType.DIM3: 3}[self.config.system.dimension]
+        self.config.panel = Panel(num_pixels, pixel_size, origin, dof)
         return self
 
     def set_channels(self, num_channels=1, channel_labels=None):

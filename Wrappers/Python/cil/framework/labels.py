@@ -239,6 +239,19 @@ class AcquisitionType(Flag):
     DIM2 = auto()
     DIM3 = auto()
 
+    def validate(self):
+        assert len(self.dimension) < 2, f"{self} must be 2D xor 3D"
+        assert len(self.geometry) < 2, f"{self} must be parallel xor cone beam"
+        return self
+
+    @property
+    def dimension(self):
+        return self & (self.DIM2 | self.DIM3)
+
+    @property
+    def geometry(self):
+        return self & (self.PARALLEL | self.CONE)
+
     @classmethod
     def _missing_(cls, value):
         """2D/3D aliases"""
@@ -248,4 +261,12 @@ class AcquisitionType(Flag):
 
     def __str__(self) -> str:
         """2D/3D special handling"""
-        return '2D' if self == self.DIM2 else '3D' if self == self.DIM3 else self.name
+        return '2D' if self == self.DIM2 else '3D' if self == self.DIM3 else (self.name or super().__str__())
+
+    def __hash__(self) -> int:
+        """consistent hashing for dictionary keys"""
+        return hash(self.value)
+
+    # compatibility with Python>=3.11 `enum.Flag`
+    def __len__(self) -> int:
+        return bin(self.value).count('1')

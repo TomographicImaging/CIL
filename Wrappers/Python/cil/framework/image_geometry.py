@@ -22,45 +22,45 @@ from numbers import Number
 import numpy
 
 from .image_data import ImageData
-from .labels import ImageDimensionLabels, FillTypes
+from .labels import ImageDimension, FillType
 
 
 class ImageGeometry:
     @property
     def CHANNEL(self):
         warnings.warn("use ImageDimensionLabels.CHANNEL instead", DeprecationWarning, stacklevel=2)
-        return ImageDimensionLabels.CHANNEL
+        return ImageDimension.CHANNEL
 
     @property
     def HORIZONTAL_X(self):
         warnings.warn("use ImageDimensionLabels.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
-        return ImageDimensionLabels.HORIZONTAL_X
+        return ImageDimension.HORIZONTAL_X
 
     @property
     def HORIZONTAL_Y(self):
         warnings.warn("use ImageDimensionLabels.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
-        return ImageDimensionLabels.HORIZONTAL_Y
+        return ImageDimension.HORIZONTAL_Y
 
     @property
     def RANDOM(self):
         warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM
+        return FillType.RANDOM
     @property
     def RANDOM_INT(self):
         warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM_INT
+        return FillType.RANDOM_INT
 
     @property
     def VERTICAL(self):
         warnings.warn("use ImageDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
-        return ImageDimensionLabels.VERTICAL
+        return ImageDimension.VERTICAL
 
     @property
     def shape(self):
-        shape_dict = {ImageDimensionLabels.CHANNEL: self.channels,
-                      ImageDimensionLabels.VERTICAL: self.voxel_num_z,
-                      ImageDimensionLabels.HORIZONTAL_Y: self.voxel_num_y,
-                      ImageDimensionLabels.HORIZONTAL_X: self.voxel_num_x}
+        shape_dict = {ImageDimension.CHANNEL: self.channels,
+                      ImageDimension.VERTICAL: self.voxel_num_z,
+                      ImageDimension.HORIZONTAL_Y: self.voxel_num_y,
+                      ImageDimension.HORIZONTAL_X: self.voxel_num_x}
         return tuple(shape_dict[label] for label in self.dimension_labels)
 
     @shape.setter
@@ -69,10 +69,10 @@ class ImageGeometry:
 
     @property
     def spacing(self):
-        spacing_dict = {ImageDimensionLabels.CHANNEL: self.channel_spacing,
-                        ImageDimensionLabels.VERTICAL: self.voxel_size_z,
-                        ImageDimensionLabels.HORIZONTAL_Y: self.voxel_size_y,
-                        ImageDimensionLabels.HORIZONTAL_X: self.voxel_size_x}
+        spacing_dict = {ImageDimension.CHANNEL: self.channel_spacing,
+                        ImageDimension.VERTICAL: self.voxel_size_z,
+                        ImageDimension.HORIZONTAL_Y: self.voxel_size_y,
+                        ImageDimension.HORIZONTAL_X: self.voxel_size_x}
         return tuple(spacing_dict[label] for label in self.dimension_labels)
 
     @property
@@ -86,7 +86,7 @@ class ImageGeometry:
     @property
     def dimension_labels(self):
 
-        labels_default = ImageDimensionLabels.get_order_for_engine("cil")
+        labels_default = ImageDimension.get_order_for_engine("cil")
 
         shape_default = [   self.channels,
                             self.voxel_num_z,
@@ -113,7 +113,7 @@ class ImageGeometry:
 
     def set_labels(self, labels):
         if labels is not None:
-            self._dimension_labels = tuple(map(ImageDimensionLabels, labels))
+            self._dimension_labels = tuple(map(ImageDimension, labels))
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -274,8 +274,8 @@ class ImageGeometry:
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        elif value in FillTypes:
-            if value == FillTypes.RANDOM:
+        elif value in FillType:
+            if value == FillType.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -285,7 +285,7 @@ class ImageGeometry:
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
 
-            elif value == FillTypes.RANDOM_INT:
+            elif value == FillType.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

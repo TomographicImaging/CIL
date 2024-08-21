@@ -22,7 +22,7 @@ from numbers import Number
 
 import numpy
 
-from .labels import AcquisitionDimensionLabels, UnitsAngles, AcquisitionType, FillTypes
+from .labels import AcquisitionDimension, AngleUnit, AcquisitionType, FillType
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
 
@@ -1457,7 +1457,7 @@ class Angles(object):
 
     @angle_unit.setter
     def angle_unit(self,val):
-        self._angle_unit = UnitsAngles(val)
+        self._angle_unit = AngleUnit(val)
 
     def __str__(self):
         repres = "Acquisition description:\n"
@@ -1612,32 +1612,32 @@ class AcquisitionGeometry(object):
     @property
     def ANGLE(self):
         warnings.warn("use AcquisitionDimensionLabels.Angle instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimensionLabels.ANGLE
+        return AcquisitionDimension.ANGLE
 
     @property
     def CHANNEL(self):
         warnings.warn("use AcquisitionDimensionLabels.Channel instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimensionLabels.CHANNEL
+        return AcquisitionDimension.CHANNEL
 
     @property
     def DEGREE(self):
         warnings.warn("use UnitsAngles.DEGREE", DeprecationWarning, stacklevel=2)
-        return UnitsAngles.DEGREE
+        return AngleUnit.DEGREE
 
     @property
     def HORIZONTAL(self):
         warnings.warn("use AcquisitionDimensionLabels.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimensionLabels.HORIZONTAL
+        return AcquisitionDimension.HORIZONTAL
 
     @property
     def RADIAN(self):
         warnings.warn("use UnitsAngles.RADIAN instead", DeprecationWarning, stacklevel=2)
-        return UnitsAngles.RADIAN
+        return AngleUnit.RADIAN
 
     @property
     def VERTICAL(self):
         warnings.warn("use AcquisitionDimensionLabels.VERTICAL instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimensionLabels.VERTICAL
+        return AcquisitionDimension.VERTICAL
 
     @property
     def geom_type(self):
@@ -1709,15 +1709,15 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {AcquisitionDimensionLabels.CHANNEL: self.config.channels.num_channels,
-                      AcquisitionDimensionLabels.ANGLE: self.config.angles.num_positions,
-                      AcquisitionDimensionLabels.VERTICAL: self.config.panel.num_pixels[1],
-                      AcquisitionDimensionLabels.HORIZONTAL: self.config.panel.num_pixels[0]}
+        shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
+                      AcquisitionDimension.ANGLE: self.config.angles.num_positions,
+                      AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
+                      AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
         return tuple(shape_dict[label] for label in self.dimension_labels)
 
     @property
     def dimension_labels(self):
-        labels_default = AcquisitionDimensionLabels.get_order_for_engine("cil")
+        labels_default = AcquisitionDimension.get_order_for_engine("cil")
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -1745,7 +1745,7 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
-            self._dimension_labels = tuple(map(AcquisitionDimensionLabels, val))
+            self._dimension_labels = tuple(map(AcquisitionDimension, val))
 
     @property
     def ndim(self):
@@ -1816,10 +1816,10 @@ class AcquisitionGeometry(object):
         else:
             raise ValueError("`distance_units` is not recognised. Must be 'default' or 'pixels'. Got {}".format(distance_units))
 
-        angle_units = UnitsAngles(angle_units)
+        angle_units = AngleUnit(angle_units)
 
         angle = angle_rad
-        if angle_units == UnitsAngles.DEGREE:
+        if angle_units == AngleUnit.DEGREE:
             angle = numpy.degrees(angle_rad)
 
         return {'offset': (offset, offset_units), 'angle': (angle, angle_units.value)}
@@ -1860,10 +1860,10 @@ class AcquisitionGeometry(object):
             raise NotImplementedError()
 
 
-        angle_units = UnitsAngles(angle_units)
+        angle_units = AngleUnit(angle_units)
 
         angle_rad = angle
-        if angle_units == UnitsAngles.DEGREE:
+        if angle_units == AngleUnit.DEGREE:
             angle_rad = numpy.radians(angle)
 
         if distance_units =='default':
@@ -2181,8 +2181,8 @@ class AcquisitionGeometry(object):
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
-        elif value in FillTypes:
-            if value == FillTypes.RANDOM:
+        elif value in FillType:
+            if value == FillType.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -2191,7 +2191,7 @@ class AcquisitionGeometry(object):
                     out.fill(r)
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == FillTypes.RANDOM_INT:
+            elif value == FillType.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

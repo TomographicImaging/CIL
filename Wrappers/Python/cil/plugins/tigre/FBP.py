@@ -21,7 +21,7 @@ import io
 import numpy as np
 
 from cil.framework import DataProcessor, ImageData
-from cil.framework.labels import AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.plugins.tigre import CIL2TIGREGeometry
 
 try:
@@ -64,8 +64,8 @@ class FBP(DataProcessor):
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
 
-        AcquisitionDimensionLabels.check_order_for_engine('tigre', acquisition_geometry)
-        ImageDimensionLabels.check_order_for_engine('tigre', image_geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimension.check_order_for_engine('tigre', image_geometry)
 
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
@@ -80,7 +80,7 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.acquisition_geometry.channels))
 
-        AcquisitionDimensionLabels.check_order_for_engine('tigre', dataset.geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):

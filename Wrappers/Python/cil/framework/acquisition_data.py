@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
 
-from .labels import AcquisitionDimensionLabels, Backends
+from .labels import AcquisitionDimension, Backend
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
@@ -114,7 +114,7 @@ class AcquisitionData(DataContainer, Partitioner):
         order: list or str
             Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.
         '''
-        if order in Backends:
-            order = AcquisitionDimensionLabels.get_order_for_engine(order, self.geometry)
+        if order in Backend:
+            order = AcquisitionDimension.get_order_for_engine(order, self.geometry)
 
         super().reorder(order)

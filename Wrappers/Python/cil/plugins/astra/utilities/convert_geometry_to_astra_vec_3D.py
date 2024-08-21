@@ -19,7 +19,7 @@
 
 import astra
 import numpy as np
-from cil.framework.labels import AcquisitionType, UnitsAngles
+from cil.framework.labels import AcquisitionType, AngleUnit
 
 def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
@@ -55,7 +55,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     panel = sinogram_geometry.config.panel
 
     #get units
-    degrees = angles.angle_unit == UnitsAngles.DEGREE
+    degrees = angles.angle_unit == AngleUnit.DEGREE
 
     if AcquisitionType.DIM2 & sinogram_geometry.dimension:
         #create a 3D astra geom from 2D CIL geometry

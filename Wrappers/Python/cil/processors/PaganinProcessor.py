@@ -18,7 +18,7 @@
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.framework.labels import AcquisitionDimensionLabels
+from cil.framework.labels import AcquisitionDimension
 
 import numpy as np
 from scipy.fft import fft2
@@ -207,7 +207,7 @@ class PaganinProcessor(Processor):
     def process(self, out=None):
 
         data  = self.get_input()
-        cil_order = tuple(AcquisitionDimensionLabels.get_order_for_engine('cil',data.geometry))
+        cil_order = tuple(AcquisitionDimension.get_order_for_engine('cil',data.geometry))
         if data.dimension_labels != cil_order:
             log.warning(msg="This processor will work most efficiently using\
                         \nCIL data order, consider using `data.reorder('cil')`")

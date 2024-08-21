@@ -22,19 +22,19 @@ from numbers import Number
 import numpy
 
 from ..utilities.multiprocessing import NUM_THREADS
-from .labels import FillTypes
+from .labels import FillType
 
 
 class BlockGeometry(object):
     @property
     def RANDOM(self):
         warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM
+        return FillType.RANDOM
 
     @property
     def RANDOM_INT(self):
         warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM_INT
+        return FillType.RANDOM_INT
 
     @property
     def dtype(self):

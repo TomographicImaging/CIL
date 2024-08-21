@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.framework.labels import AcquisitionDimensionLabels, AcquisitionType
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
@@ -124,7 +124,7 @@ class CofR_image_sharpness(Processor):
         #check order for single slice data
         test_geom = data.geometry.get_slice(vertical='centre') if AcquisitionType.DIM3 & data.geometry.dimension else data.geometry
 
-        if not AcquisitionDimensionLabels.check_order_for_engine(self.backend, test_geom):
+        if not AcquisitionDimension.check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
 
         return True

@@ -21,7 +21,7 @@ import warnings
 
 import numpy
 
-from .labels import FillTypes
+from .labels import FillType
 
 
 class VectorGeometry:
@@ -29,12 +29,12 @@ class VectorGeometry:
     @property
     def RANDOM(self):
         warnings.warn("use FillTypes.RANDOM instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM
+        return FillType.RANDOM
 
     @property
     def RANDOM_INT(self):
         warnings.warn("use FillTypes.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
-        return FillTypes.RANDOM_INT
+        return FillType.RANDOM_INT
 
     @property
     def dtype(self):
@@ -98,8 +98,8 @@ class VectorGeometry:
         if isinstance(value, Number):
             if value != 0:
                 out += value
-        elif value in FillTypes:
-            if value == FillTypes.RANDOM:
+        elif value in FillType:
+            if value == FillType.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -107,7 +107,7 @@ class VectorGeometry:
                     out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
-            elif value == FillTypes.RANDOM_INT:
+            elif value == FillType.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

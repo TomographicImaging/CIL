@@ -20,7 +20,7 @@ import logging
 import numpy as np
 
 from cil.framework import ImageData, AcquisitionData, BlockGeometry
-from cil.framework.labels import AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.optimisation.operators import BlockOperator, LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 
@@ -145,8 +145,8 @@ class ProjectionOperator_ag(ProjectionOperator):
                 "TIGRE projectors are GPU only. Got device = {}".format(
                     device))
 
-        ImageDimensionLabels.check_order_for_engine('tigre', image_geometry)
-        AcquisitionDimensionLabels.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimension.check_order_for_engine('tigre', image_geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
 
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)
@@ -221,7 +221,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != AcquisitionDimensionLabels.ANGLE:
+        if x.dimension_labels[0] != AcquisitionDimension.ANGLE:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:

@@ -59,7 +59,7 @@ class StrEnum(str, Enum, metaclass=_StrEnumMeta):
         return name.lower()
 
 
-class Backends(StrEnum):
+class Backend(StrEnum):
     """
     Available backends for CIL.
 
@@ -117,14 +117,14 @@ class _DimensionBase:
             f" Try using `data.reorder('{engine}')` to permute for {engine}")
 
 
-class ImageDimensionLabels(_DimensionBase, StrEnum):
+class ImageDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for image data.
 
     Examples
     --------
     ```
-    data.reorder([ImageDimensionLabels.HORIZONTAL_X, ImageDimensionLabels.VERTICAL])
+    data.reorder([ImageDimension.HORIZONTAL_X, ImageDimension.VERTICAL])
     data.reorder(["horizontal_x", "vertical"])
     ```
     """
@@ -135,24 +135,24 @@ class ImageDimensionLabels(_DimensionBase, StrEnum):
 
     @classmethod
     def _default_order(cls, engine: str) -> tuple:
-        engine = Backends(engine)
+        engine = Backend(engine)
         orders = {
-            Backends.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
-            Backends.TIGRE: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
-            Backends.CIL: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X)}
+            Backend.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
+            Backend.TIGRE: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X),
+            Backend.CIL: (cls.CHANNEL, cls.VERTICAL, cls.HORIZONTAL_Y, cls.HORIZONTAL_X)}
         return orders[engine]
 
 
-class AcquisitionDimensionLabels(_DimensionBase, StrEnum):
+class AcquisitionDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for acquisition data.
 
     Examples
     --------
     ```
-    data.reorder([AcquisitionDimensionLabels.CHANNEL,
-                  AcquisitionDimensionLabels.ANGLE,
-                  AcquisitionDimensionLabels.HORIZONTAL])
+    data.reorder([AcquisitionDimension.CHANNEL,
+                  AcquisitionDimension.ANGLE,
+                  AcquisitionDimension.HORIZONTAL])
     data.reorder(["channel", "angle", "horizontal"])
     ```
     """
@@ -163,15 +163,15 @@ class AcquisitionDimensionLabels(_DimensionBase, StrEnum):
 
     @classmethod
     def _default_order(cls, engine: str) -> tuple:
-        engine = Backends(engine)
+        engine = Backend(engine)
         orders = {
-            Backends.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.ANGLE, cls.HORIZONTAL),
-            Backends.TIGRE: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL),
-            Backends.CIL: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL)}
+            Backend.ASTRA: (cls.CHANNEL, cls.VERTICAL, cls.ANGLE, cls.HORIZONTAL),
+            Backend.TIGRE: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL),
+            Backend.CIL: (cls.CHANNEL, cls.ANGLE, cls.VERTICAL, cls.HORIZONTAL)}
         return orders[engine]
 
 
-class FillTypes(StrEnum):
+class FillType(StrEnum):
     """
     Available fill types for image data.
 
@@ -191,7 +191,7 @@ class FillTypes(StrEnum):
     RANDOM_INT = auto()
 
 
-class UnitsAngles(StrEnum):
+class AngleUnit(StrEnum):
     """
     Available units for angles.
 

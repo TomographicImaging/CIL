@@ -20,7 +20,7 @@ import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry
-from cil.framework.labels import AcquisitionDimensionLabels, AcquisitionType
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
 class SimData(object):
 
@@ -148,7 +148,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
@@ -159,7 +159,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -169,7 +169,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -179,7 +179,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,1000,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_4.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -195,7 +195,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,1)\
                                             .set_angles([0])
-        ag_test_1.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
@@ -206,7 +206,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -216,7 +216,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -226,7 +226,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,1000])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_4.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -242,7 +242,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
@@ -252,7 +252,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -263,7 +263,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
@@ -281,7 +281,7 @@ class TestCommon_ProjectionOperator_TOY(object):
                                             .set_panel(16,1)\
                                             .set_angles([0])
 
-        ag_test_1.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
@@ -290,7 +290,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -301,7 +301,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(AcquisitionDimensionLabels.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
         norm_3 = 2

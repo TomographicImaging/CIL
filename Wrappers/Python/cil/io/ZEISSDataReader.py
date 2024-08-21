@@ -19,7 +19,7 @@
 
 
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-from cil.framework.labels import UnitsAngles, AcquisitionDimensionLabels, ImageDimensionLabels
+from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
 import olefile
@@ -128,13 +128,13 @@ class ZEISSDataReader(object):
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                zeiss_data_order = {AcquisitionDimensionLabels.ANGLE: 0,
-                                    AcquisitionDimensionLabels.VERTICAL: 1,
-                                    AcquisitionDimensionLabels.HORIZONTAL: 2}
+                zeiss_data_order = {AcquisitionDimension.ANGLE: 0,
+                                    AcquisitionDimension.VERTICAL: 1,
+                                    AcquisitionDimension.HORIZONTAL: 2}
             else:
-                zeiss_data_order = {ImageDimensionLabels.VERTICAL: 0,
-                                    ImageDimensionLabels.HORIZONTAL_Y: 1,
-                                    ImageDimensionLabels.HORIZONTAL_X: 2}
+                zeiss_data_order = {ImageDimension.VERTICAL: 0,
+                                    ImageDimension.HORIZONTAL_Y: 1,
+                                    ImageDimension.HORIZONTAL_X: 2}
 
             # check roi labels and create tuple for slicing
             for key in roi.keys():
@@ -232,11 +232,11 @@ class ZEISSDataReader(object):
                 ) \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
-                    .set_angles(self._metadata['thetas'],angle_unit=UnitsAngles.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         else:
             self._geometry = AcquisitionGeometry.create_Parallel3D()\
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']])\
-                    .set_angles(self._metadata['thetas'],angle_unit=UnitsAngles.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         self._geometry.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
     def _setup_image_geometry(self):

@@ -65,6 +65,8 @@ from cil.optimisation.functions import TotalVariation
 from testclass import CCPiTestClass
 from utils import has_astra, initialise_tests
 
+from unittest.mock import MagicMock
+
 log = logging.getLogger(__name__)
 initialise_tests()
 
@@ -579,30 +581,109 @@ class testISTA(CCPiTestClass):
 
 
 class TestCGLS(CCPiTestClass):
-    def test_CGLS(self):
-        ig = ImageGeometry(10, 2)
+    def setUp(self):
+        self.ig = ImageGeometry(10, 2)
         np.random.seed(2)
-        initial = ig.allocate(1.)
-        b = ig.allocate('random')
-        identity = IdentityOperator(ig)
+        self.initial = self.ig.allocate(1.)
+        self.data = self.ig.allocate('random')
+        self.operator = IdentityOperator(self.ig)
+        self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
+                   update_objective_interval=2)
 
-        alg = CGLS(initial=initial, operator=identity, data=b)
+        
+    def test_initialization_with_default_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
 
-        np.testing.assert_array_equal(
-            initial.as_array(), alg.solution.as_array())
+        self.assertEqual(self.alg.tolerance, 0)
+    
+    def test_initialization_with_custom_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
+        with self.assertWarns(DeprecationWarning):
+            alg = CGLS(initial=self.initial, operator=self.operator, data=self.data, tolerance=0.01)
+        self.assertEqual(alg.tolerance, 0.01)
+        
+    def test_set_up(self):
+        # Test the set_up method
+        
+        self.alg.set_up(initial=self.initial, operator=self.operator, data=self.data)
+        
+        # Check if internal variables are set up correctly
+        self.assertNumpyArrayEqual(self.alg.x.as_array(), self.initial.as_array())
+        self.assertEqual(self.alg.operator, self.operator)
+        self.assertNumpyArrayEqual(self.alg.r.as_array(), (self.data-self.initial).as_array())
+        self.assertNumpyArrayEqual(self.alg.s.as_array(), (self.data-self.initial).as_array())
+        self.assertNumpyArrayEqual(self.alg.p.as_array(), (self.data-self.initial).as_array())
+        self.assertTrue(self.alg.configured)
 
-        alg.max_iteration = 200
-        alg.run(20, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def test_update(self):
 
-        alg = CGLS(initial=initial, operator=identity, data=b,
-                   max_iteration=200, update_objective_interval=2)
-        self.assertTrue(alg.max_iteration == 200)
-        self.assertTrue(alg.update_objective_interval == 2)
-        alg.run(20, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        self.alg.set_up(initial=self.mock_initial, operator=self.mock_operator, data=self.mock_data)
+        
+        self.alg.update()
+        
+        self.mock_operator.direct.assert_called_with(self.mock_data, out=self.alg.q)
+        self.mock_operator.adjoint.assert_called_with(self.alg.r, out=self.alg.s)
+        
+    def test_convergence(self):
+
+        
+        self.alg.run(20, verbose=0)
+        self.assertNumpyArrayAlmostEqual(self.alg.x.as_array(), self.data.as_array())
+        
+    def test_should_stop_flag_false(self): #can be deprecated when tolerance is deprecated in CGLS
+        # Mocking norms to ensure tolerance isn't reached
+        self.alg.run(2)
+        self.alg.norms = 10
+        self.alg.norms0 = 99
+        self.alg.tolerance = 0.1
+        self.alg.normx = 0.1
+
+        self.assertFalse(self.alg.flag())
+        
+    def test_should_stop_flag_true(self): #can be deprecated when tolerance is deprecated in CGLS
+        # Mocking norms to ensure tolerance is reached
+        self.alg.run(4)
+        self.alg.norms = 1
+        self.alg.norms0 = 10
+        self.alg.tolerance = 0.1
+        self.alg.normx = 10
+
+        self.assertTrue(self.alg.flag())
+        
+    def test_tolerance_reached_immediately(self): #can be deprecated when tolerance is deprecated in CGLS
+        alg = CGLS(initial=self.operator.domain_geometry().allocate(0), operator=self.operator, data=self.operator.domain_geometry().allocate(0))
+        alg.run(2)
+
+        
+        
+    def test_update_objective(self):
+        # Mocking squared_norm to return a finite value
+
+        self.alg.r=MagicMock()
+        self.alg.r.squared_norm.return_value = 1.0
 
 
+        self.alg.update_objective()
+
+        # Ensure the loss list is updated
+        self.assertEqual(self.alg.loss, [1.0])
+        
+    def test_update_objective_with_nan_raises_stop_iteration(self):
+        # Mocking squared_norm to return NaN
+        self.alg.r=MagicMock()
+        self.alg.r.squared_norm.return_value = np.nan
+        
+        with self.assertRaises(StopIteration):
+            self.alg.update_objective()
+            
+    def test_update(self):
+        self.alg.gamma=4
+        
+        self.alg.update()
+        norm=(self.data-self.initial).squared_norm()
+        alpha=4/norm
+        self.assertNumpyArrayEqual(self.alg.x.as_array(), (self.initial+alpha*(self.data-self.initial)).as_array())
+        self.assertNumpyArrayEqual(self.alg.r.as_array(), (self.data - self.initial-alpha*(self.data-self.initial)).as_array())
+        beta= ((self.data - self.initial-alpha*(self.data-self.initial)).norm()**2)/4
+        self.assertNumpyArrayEqual(self.alg.p.as_array(), ((self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array())
 class TestPDHG(CCPiTestClass):
 
     def test_PDHG_Denoising(self):
@@ -1298,7 +1379,64 @@ class TestCallbacks(unittest.TestCase):
         algo.run(20, callbacks=[EarlyStopping()])
         self.assertEqual(algo.iteration, 15)
 
+    def test_CGLSEarlyStopping(self):
+        ig = ImageGeometry(10, 2)
+        np.random.seed(2)
+        initial = ig.allocate(1.)
+        data = ig.allocate('random')
+        operator = IdentityOperator(ig)
+        alg = CGLS(initial=initial, operator=operator, data=data,
+                   update_objective_interval=2)
+       
+        #Test init
+        cb = callbacks.CGLSEarlyStopping(epsilon = 0.1, omega = 33)
+        self.assertEqual(cb.epsilon, 0.1)
+        self.assertEqual(cb.omega, 33)
+        
+        #Test default values
+        cb = callbacks.CGLSEarlyStopping()
+        self.assertEqual(cb.epsilon, 1e-6)
+        self.assertEqual(cb.omega, 1e6)
+        
+        #Tests it doesn't stops iterations if the norm of the current residual is not less than epsilon times the norm of the original residual
+        alg.norms = 10
+        alg.norms0 = 99
+        callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
+        
+        #Test it stops iterations if the norm of the current residual is less than epsilon times the norm of the original residual
+        alg.norms = 1
+        alg.norms0 = 100
+        with self.assertRaises(StopIteration):
+            callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
+           
+        #Test it doesn't stop iterations if the norm of x is smaller than omega 
+        alg.norms = 10
+        alg.norms0 = 99
+        alg.x = data
+        callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
+        
+        #Test it stops iterations if the norm of x is larger than omega
+        alg.norms = 10
+        alg.norms0 = 99
+        alg.x = data
+        with self.assertRaises(StopIteration):
+            callbacks.CGLSEarlyStopping(epsilon = 0.1, omega = 0.33)(alg)
 
+    def test_EarlyStoppingObjectiveValue(self):
+        ig = ImageGeometry(10, 2)
+        np.random.seed(2)
+        alg = MagicMock()
+        alg.loss=[5]
+        callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
+        alg.loss=[]
+        callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
+        alg.loss=[5,10]
+        callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
+        alg.loss=[5, 5.001]
+        with self.assertRaises(StopIteration):
+            callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
+        
+        
 class TestADMM(unittest.TestCase):
     def setUp(self):
         ig = ImageGeometry(2, 3, 2)

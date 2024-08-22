@@ -85,7 +85,8 @@ class RingRemover(Processor):
         vertical = geom.pixel_num_v
 
         # allocate datacontainer space
-        out = 0.*data
+        if out is None:
+            out = 0.*data
 
         # for non multichannel data
         if 'channel' not in geom.dimension_labels:

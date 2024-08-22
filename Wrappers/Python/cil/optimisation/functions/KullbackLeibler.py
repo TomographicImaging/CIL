@@ -354,7 +354,7 @@ if has_numba:
                 accumulator[get_thread_id()] += Y
             else:
                 # out.flat[i] = numpy.inf
-                return numpy.inf
+                accumulator[get_thread_id()] = numpy.inf
         return sum(accumulator)
     
     @njit(parallel=True)
@@ -372,7 +372,7 @@ if has_numba:
                     accumulator[get_thread_id()] += Y
                 else:
                     # out.flat[i] = numpy.inf
-                    return numpy.inf
+                    accumulator[get_thread_id()] = numpy.inf
         return sum(accumulator)
 
     # convex conjugate

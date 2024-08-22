@@ -19,8 +19,7 @@
 import unittest
 from utils import initialise_tests
 import numpy as np
-from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry
-from cil.framework import ImageData, AcquisitionData, Partitioner
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
@@ -936,11 +935,6 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         with self.assertRaises(ValueError):
             data = self.data.partition(num_batches, 'sequential')
 
-
-
-
-
-
     def assertDataIsTheSame(self, data, idxs, msg=None):
         # let's check that the data is the same
         k = 0
@@ -1024,6 +1018,10 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
         assert cp0.geometry == cp1.geometry
 
+        cp1 = BlockDataContainer(data2,data2)
+
+        assert cp0 != cp1
+
         cp1 = BlockDataContainer(data2,data2,data2)
 
         assert cp0 != cp1
@@ -1034,7 +1032,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
         data0 = ig0.allocate(0)
         
         from cil.framework import DataContainer
-        X, Y, Z = 1, 12, 5
+        X, Y, Z = 2, 12, 5
         
         a = numpy.ones((X, Y, Z), dtype='float32')
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])

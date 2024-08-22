@@ -3,6 +3,7 @@
     - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)
+    - Added Barzilai-Borwein step size rule to work with GD, ISTA, FISTA (#1859)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)

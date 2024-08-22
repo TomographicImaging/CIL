@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.1.1.dev21+g6d9978bf documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.1.1.dev22+g1088bc36 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=ccf51832"></script>
+    <script src="../_static/documentation_options.js?v=d3d03223"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev21+g6d9978bf';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev22+g1088bc36';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -8263,10 +8263,13 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 <li><p><strong>beta</strong> (<em>float between 0 and 1</em><em>, </em><em>optional</em><em>, </em><em>default=0.5</em>) – The amount the step_size is reduced if the criterion is not met</p></li>
 <li><p><strong>max_iterations</strong> (<em>integer</em><em>, </em><em>optional</em><em>, </em><em>default is numpy.ceil</em><em> (</em><em>2 * numpy.log10</em><em>(</em><em>alpha</em><em>) </em><em>/ numpy.log10</em><em>(</em><em>2</em><em>)</em><em>)</em>) – The maximum number of iterations to find a suitable step size</p></li>
 <li><p><strong>Reference</strong></p></li>
-<li><p><strong>---------</strong></p></li>
-<li><p><strong>Optimization</strong> (<em>Algorithm 3.1</em><em> (</em><em>Numerical</em>) – <a class="reference external" href="https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080">https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</a></p></li>
-<li><p><strong>Nocedal</strong> (<em>//www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf</em><em>)</em>) – <a class="reference external" href="https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080">https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</a></p></li>
-<li><p><strong>(</strong><strong>https</strong> (<em>Wright</em><em>)</em>) – <a class="reference external" href="https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080">https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</a></p></li>
+<li><p><strong>------------</strong></p></li>
+<li><p><strong>Nocedal</strong> (<em>- Algorithm 3.1 in</em>)</p></li>
+<li><p><strong>Wright</strong> (<em>J. and</em>)</p></li>
+<li><p><strong>eds.</strong> (<em>S.J.</em>)</p></li>
+<li><p><strong>York</strong> (<em>1999. Numerical optimization. New</em>)</p></li>
+<li><p><strong>NY</strong> (Springer New York. <a class="reference external" href="https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf">https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf</a>))</p></li>
+<li><p><strong>https</strong> (<em>-</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -8284,6 +8287,50 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.StepSizeMethods.</span></span><span class="sig-name descname"><span class="pre">BarzilaiBorweinStepSizeRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'short'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stabilisation_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/StepSizeMethods/#BarzilaiBorweinStepSizeRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule" title="Link to this definition">#</a></dt>
+<dd><p>Applies the Barzilai- Borwein rule to calculate the step size (step_size).</p>
+<p>Let <span class="math notranslate nohighlight">\(\Delta x=x_k-x_{k-1}\)</span> and <span class="math notranslate nohighlight">\(\Delta g=g_k-g_{k-1}\)</span>. Where <span class="math notranslate nohighlight">\(x_k\)</span> is the <span class="math notranslate nohighlight">\(k\)</span> th iterate (current solution after iteration <span class="math notranslate nohighlight">\(k\)</span> ) and <span class="math notranslate nohighlight">\(g_k\)</span> is the gradient calculation in the <span class="math notranslate nohighlight">\(k\)</span> th iterate, found in <code class="code docutils literal notranslate"><span class="pre">algorithm.gradient_update</span></code>.  A Barzilai-Borwein (BB) iteration is <span class="math notranslate nohighlight">\(x_{k+1}=x_k-\alpha_kg_k\)</span> where the step size <span class="math notranslate nohighlight">\(\alpha _k\)</span> is either</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\alpha_k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}\)</span>, or</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha_k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}\)</span>.</p></li>
+</ul>
+<p>Where the operator <span class="math notranslate nohighlight">\(\cdot\)</span> is the standard inner product between two vectors.</p>
+<p>This is suitable for use with gradient based iterative methods where the calculated gradient is stored as <cite>algorithm.gradient_update</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial</strong> (<em>float</em><em>, </em><em>greater than zero</em>) – The step-size for the first iteration. We recommend something of the order <span class="math notranslate nohighlight">\(1/f.L\)</span> where <span class="math notranslate nohighlight">\(f\)</span> is the (differentiable part of) the objective you wish to minimise.</p></li>
+<li><p><strong>mode</strong> (<em>One</em><em> of </em><em>'long'</em><em>, </em><em>'short'</em><em> or </em><em>'alternate'</em><em>, </em><em>default is 'short'.</em>) – This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short.</p></li>
+<li><p><strong>stabilisation_param</strong> (<em>'auto'</em><em>, </em><em>float</em><em> or </em><em>'off'</em><em>, </em><em>default is 'auto'</em>) – In order to add stability the step-size has an upper limit of <span class="math notranslate nohighlight">\(\Delta/\|g_k\|\)</span> where by ‘default’, the <cite>stabilisation_param</cite>, <span class="math notranslate nohighlight">\(\Delta\)</span> is  determined automatically to be the minimium of <span class="math notranslate nohighlight">\(\Delta x\)</span> from the first 3 iterations. The user can also pass a fixed constant or turn “off” the stabilisation, equivalently passing <cite>np.inf</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<section id="reference">
+<h4>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>Barzilai, Jonathan; Borwein, Jonathan M. (1988). “Two-Point Step Size Gradient Methods”. IMA Journal of Numerical Analysis. 8: 141–148, <a class="reference external" href="https://doi.org/10.1093/imanum/8.1.141">https://doi.org/10.1093/imanum/8.1.141</a></p></li>
+<li><p>Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). <a class="reference external" href="https://doi.org/10.4208/jcm.1911-m2019-0171">https://doi.org/10.4208/jcm.1911-m2019-0171</a></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Barzilai-Borwein_method">https://en.wikipedia.org/wiki/Barzilai-Borwein_method</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule.get_step_size">
+<span class="sig-name descname"><span class="pre">get_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/StepSizeMethods/#BarzilaiBorweinStepSizeRule.get_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule.get_step_size" title="Link to this definition">#</a></dt>
+<dd><p>Applies the B-B rule to calculate the step size (<cite>step_size</cite>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>the calculated step size</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>

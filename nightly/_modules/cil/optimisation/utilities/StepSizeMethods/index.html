@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 24.1.1.dev21+g6d9978bf documentation</title>
+    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 24.1.1.dev22+g1088bc36 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=ccf51832"></script>
+    <script src="../../../../../_static/documentation_options.js?v=d3d03223"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev21+g6d9978bf';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev22+g1088bc36';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -497,7 +497,7 @@
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
 
 <div class="viewcode-block" id="StepSizeRule">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.StepSizeRule">[docs]</a>
@@ -563,8 +563,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule">[docs]</a>
 <span class="k">class</span> <span class="nc">ArmijoStepSizeRule</span><span class="p">(</span><span class="n">StepSizeRule</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">    Applies the Armijo rule to calculate the step size (step_size).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Applies the Armijo rule to calculate the step size (step_size).</span>
 
 <span class="sd">    The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.</span>
 
@@ -578,9 +577,10 @@
 <span class="sd">        The maximum number of iterations to find a suitable step size </span>
 
 <span class="sd">    Reference</span>
-<span class="sd">    ---------</span>
-<span class="sd">    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright) (https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)</span>
-<span class="sd">     https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</span>
+<span class="sd">    ------------</span>
+<span class="sd">    - Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)</span>
+<span class="sd">    </span>
+<span class="sd">    - https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -633,6 +633,119 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s1">&#39;Could not find a proper step_size in </span><span class="si">{}</span><span class="s1"> loops. Consider increasing alpha or max_iterations.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BarzilaiBorweinStepSizeRule">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule">[docs]</a>
+<span class="k">class</span> <span class="nc">BarzilaiBorweinStepSizeRule</span><span class="p">(</span><span class="n">StepSizeRule</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Applies the Barzilai- Borwein rule to calculate the step size (step_size).</span>
+
+<span class="sd">    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k` th iterate (current solution after iteration :math:`k` ) and :math:`g_k` is the gradient calculation in the :math:`k` th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha_kg_k` where the step size :math:`\alpha _k` is either</span>
+
+<span class="sd">    - :math:`\alpha_k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or</span>
+
+<span class="sd">    - :math:`\alpha_k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.</span>
+<span class="sd">    </span>
+<span class="sd">    Where the operator :math:`\cdot` is the standard inner product between two vectors. </span>
+<span class="sd">    </span>
+<span class="sd">    This is suitable for use with gradient based iterative methods where the calculated gradient is stored as `algorithm.gradient_update`.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial: float, greater than zero </span>
+<span class="sd">        The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.</span>
+<span class="sd">    mode: One of &#39;long&#39;, &#39;short&#39; or &#39;alternate&#39;, default is &#39;short&#39;. </span>
+<span class="sd">        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. </span>
+<span class="sd">    stabilisation_param: &#39;auto&#39;, float or &#39;off&#39;, default is &#39;auto&#39;</span>
+<span class="sd">        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by &#39;default&#39;, the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn &quot;off&quot; the stabilisation, equivalently passing `np.inf`.</span>
+<span class="sd">        </span>
+<span class="sd">    </span>
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). &quot;Two-Point Step Size Gradient Methods&quot;. IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141</span>
+<span class="sd">    </span>
+<span class="sd">    - Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). https://doi.org/10.4208/jcm.1911-m2019-0171</span>
+
+<span class="sd">    - https://en.wikipedia.org/wiki/Barzilai-Borwein_method</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">stabilisation_param</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the step size rule </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;long&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;alternate&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mode should be chosen from &quot;long&quot;, &quot;short&quot; or &quot;alternate&quot;. &#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">=</span><span class="kc">None</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span>
+        <span class="k">if</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">stabilisation_param</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">elif</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">False</span> 
+            <span class="n">stabilisation_param</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stabilisation_param</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">stabilisation_param</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">False</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot; The stabilisation_param should be &#39;auto&#39;, a positive number or &#39;off&#39;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stabilisation_param</span><span class="o">=</span><span class="n">stabilisation_param</span>
+        
+    
+
+<div class="viewcode-block" id="BarzilaiBorweinStepSizeRule.get_step_size">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule.get_step_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies the B-B rule to calculate the step size (`step_size`)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        the calculated step size:float</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#For the first iteration we use an initial step size because the BB step size requires a previous iterate. </span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">=</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># We store the last iterate in order to calculate the BB step size </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">=</span><span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="c1"># We store the last gradient in order to calculate the BB step size </span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial</span>
+        
+        <span class="n">gradient_norm</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+        <span class="c1">#If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations. </span>
+        <span class="k">if</span> <span class="n">gradient_norm</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+        <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="p">)</span> 
+        <span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="p">))</span><span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="p">))</span><span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="p">))</span>
+
+        
+        <span class="c1">#This computes the default stabilisation parameter, using the first three iterations</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&lt;=</span><span class="mi">3</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stabilisation_param</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stabilisation_param</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="p">)</span>
+        
+        <span class="c1"># Computes the step size as the minimum of the ret, above, and :math:`\Delta/\|g_k\|` ignoring any NaN values. </span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stabilisation_param</span><span class="o">/</span><span class="n">gradient_norm</span><span class="p">]))</span>
+        
+        <span class="c1"># We store the last iterate and gradient in order to calculate the BB step size </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;alternate&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span>  <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span>       
+        
+        <span class="k">return</span> <span class="n">ret</span></div>
 </div>
 
 </pre></div>

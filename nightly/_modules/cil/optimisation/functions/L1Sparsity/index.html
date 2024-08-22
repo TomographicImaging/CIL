@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.L1Sparsity &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.optimisation.functions.L1Sparsity &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -477,8 +477,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for cil.optimisation.functions.L1Sparsity</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span></span><span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2023 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -495,7 +494,6 @@
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
-
 <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">L1Norm</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -505,7 +503,7 @@
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Sparsity function</span>
 
-<span class="sd">    Calculates the following cases, depending on if the optional parameter `weight`  or data `b` is passed. For `weight=None`: </span>
+<span class="sd">    Calculates the following cases, depending on if the optional parameter `weight`  or data `b` is passed. For `weight=None`:</span>
 
 
 <span class="sd">    a) .. math:: F(x) = ||Qx||_{1}</span>
@@ -517,14 +515,14 @@
 <span class="sd">    b) .. math:: F(x) = ||Qx - b||_{L^1(w)}</span>
 
 <span class="sd">    with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.</span>
-<span class="sd">    </span>
-<span class="sd">    In all cases :math:`Q` is an orthogonal operator. </span>
-<span class="sd">    </span>
+
+<span class="sd">    In all cases :math:`Q` is an orthogonal operator.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ---------</span>
-<span class="sd">    Q: orthogonal Operator </span>
-<span class="sd">        Note that for the correct calculation of the proximal the provided operator must be orthogonal </span>
-<span class="sd">    b : Data, DataContainer, default is None </span>
+<span class="sd">    Q: orthogonal Operator</span>
+<span class="sd">        Note that for the correct calculation of the proximal the provided operator must be orthogonal</span>
+<span class="sd">    b : Data, DataContainer, default is None</span>
 <span class="sd">    weight: array, optional, default=None</span>
 <span class="sd">        non-negative weight array matching the size of the range of operator :math:`Q`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -533,7 +531,7 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">is_orthogonal</span><span class="p">():</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">is_orthogonal</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Invalid operator: `</span><span class="si">{</span><span class="n">Q</span><span class="si">}</span><span class="s2">`. L1Sparsity is properly defined only for orthogonal operators!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
@@ -555,8 +553,8 @@
 <span class="sd">        a) .. math:: F(x) = ||Qx||_{L^1(w)}</span>
 <span class="sd">        b) .. math:: F(x) = ||Qx - b||_{L^1(w)}</span>
 
-<span class="sd">        with :math:`|| y ||_{L^1(w)} = || y w ||_1 = \sum_{i=1}^{n} | y_i | w_i`. </span>
-<span class="sd">            </span>
+<span class="sd">        with :math:`|| y ||_{L^1(w)} = || y w ||_1 = \sum_{i=1}^{n} | y_i | w_i`.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">l1norm</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -565,11 +563,11 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Sparsity.convex_conjugate">[docs]</a>
     <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the L1Sparsity function at x.</span>
-<span class="sd">        Here, we need to use the convex conjugate of L1Sparsity, which is the Indicator of the unit </span>
+<span class="sd">        Here, we need to use the convex conjugate of L1Sparsity, which is the Indicator of the unit</span>
 <span class="sd">        :math:`\ell^{\infty}` norm on the range of the (bijective) operator Q.</span>
 
 
-<span class="sd">        Consider the non-weighted case: </span>
+<span class="sd">        Consider the non-weighted case:</span>
 
 
 <span class="sd">        a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(Qx^{*})</span>
@@ -592,8 +590,8 @@
 <span class="sd">        b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(Qx^{*}) + \langle Qx^{*},b\rangle</span>
 
 <span class="sd">        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0 / 0 are defined to be 1.</span>
-<span class="sd">    </span>
-<span class="sd">    </span>
+
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">l1norm</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">y</span><span class="p">)</span></div>

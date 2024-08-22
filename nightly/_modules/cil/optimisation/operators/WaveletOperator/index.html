@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.WaveletOperator &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.optimisation.operators.WaveletOperator &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -477,8 +477,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for cil.optimisation.operators.WaveletOperator</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span></span><span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2023 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -495,7 +494,6 @@
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pywt</span>  <span class="c1"># PyWavelets module</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -508,12 +506,12 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.WaveletOperator">[docs]</a>
 <span class="k">class</span> <span class="nc">WaveletOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;                  </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Computes forward or inverse (adjoint) discrete wavelet transform (DWT) of the input</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        domain_geometry: cil geometry </span>
+<span class="sd">        domain_geometry: cil geometry</span>
 <span class="sd">            Domain geometry for the WaveletOperator</span>
 <span class="sd">        range_geometry: cil geometry, optional</span>
 <span class="sd">            Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywavelets</span>
@@ -544,7 +542,7 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        We currently do not support wavelets that are not orthogonal or bi-orthogonal. </span>
+<span class="sd">        We currently do not support wavelets that are not orthogonal or bi-orthogonal.</span>
 <span class="sd">     &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span>
@@ -678,7 +676,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
-<span class="sd">        DataContainer, the value of the WaveletOperator applied to :math:`x` or `None` if `out`  </span>
+<span class="sd">        DataContainer, the value of the WaveletOperator applied to :math:`x` or `None` if `out`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -712,7 +710,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
-<span class="sd">        DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`  </span>
+<span class="sd">        DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -745,7 +743,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
-<span class="sd">        norm: float </span>
+<span class="sd">        norm: float</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wavelet</span><span class="o">.</span><span class="n">orthogonal</span><span class="p">:</span>
             <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -758,12 +756,12 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.WaveletOperator.is_orthogonal">[docs]</a>
     <span class="k">def</span> <span class="nf">is_orthogonal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns if the operator is orthogonal</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        `Bool`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wavelet</span><span class="o">.</span><span class="n">orthogonal</span> </div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wavelet</span><span class="o">.</span><span class="n">orthogonal</span></div>
 </div>
 
 </pre></div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -571,13 +571,11 @@ for docstring formatting and this rendered <a class="reference external" href="h
 <span class="sd">        ImageData</span>
 <span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">==</span> <span class="s1">&#39;advanced&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>

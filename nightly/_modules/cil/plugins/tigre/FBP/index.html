@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.tigre.FBP &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.plugins.tigre.FBP &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -494,14 +494,14 @@
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
-
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">ImageData</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
-<span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">io</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">ImageData</span>
+<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">ImageDimension</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">tigre.algorithms</span> <span class="kn">import</span> <span class="n">fdk</span><span class="p">,</span> <span class="n">fbp</span>
@@ -535,10 +535,8 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this processor&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 
@@ -546,8 +544,10 @@
         <span class="k">if</span> <span class="n">device</span> <span class="o">!=</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TIGRE FBP is GPU only. Got device = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
 
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
+
+        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
+        <span class="n">ImageDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
+
 
         <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span> <span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
@@ -561,7 +561,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input data to be single channel, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">))</span>
 
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     
     <span class="k">def</span> <span class="nf">_set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.recon.FBP &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.recon.FBP &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
@@ -496,7 +496,7 @@
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">cilacc</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">AcquisitionType</span>
 <span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">Reconstructor</span>
 <span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fftfreq</span>
 
@@ -733,13 +733,13 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hann&#39;</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span> 
-        
-    
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span>
+
+
     <span class="k">def</span> <span class="nf">plot_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a plot of the filter array.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        matplotlib.pyplot</span>
@@ -857,7 +857,7 @@
         <span class="c1">#call parent initialiser</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE</span> <span class="o">&amp;</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for cone-beam data only.&quot;</span><span class="p">)</span>
 
 
@@ -972,7 +972,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">PARALLEL</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for parallel-beam data only.&quot;</span><span class="p">)</span>
 
 
@@ -1056,13 +1056,11 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">==</span> <span class="s1">&#39;advanced&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>

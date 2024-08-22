@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.NEXUSDataWriter &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.io.NEXUSDataWriter &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
@@ -497,7 +497,8 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span>
+<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">AcquisitionType</span>
 <span class="kn">from</span> <span class="nn">cil.version</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">utilities</span>
@@ -631,24 +632,20 @@
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">write_direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
 
             <span class="c1"># set up dataset attributes</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)):</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ImageData&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AcquisitionData&#39;</span>
+            <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ImageData&#39;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;AcquisitionData&#39;</span>
 
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">):</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dim</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dim</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)):</span>
-
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">):</span>
                 <span class="c1"># create group to store configuration</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector&#39;</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis&#39;</span><span class="p">)</span>
 
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span>
 
                 <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_x&#39;</span><span class="p">,</span>
@@ -682,7 +679,7 @@
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;pixel_size_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;panel_origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;3D&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM3</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_y&#39;</span><span class="p">,</span>
                                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
                                      <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>

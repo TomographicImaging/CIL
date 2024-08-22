@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.astra.processors.FBP &#8212; CIL 24.1.1.dev23+gbd21df32 documentation</title>
+    <title>cil.plugins.astra.processors.FBP &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../../_static/documentation_options.js?v=57152b40"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=6625e36e"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev23+gbd21df32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../../genindex/" />
@@ -494,13 +494,11 @@
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
-
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
+<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">ImageDimension</span><span class="p">,</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">AcquisitionType</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_Flexible</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FDK_Flexible</span> <span class="kn">import</span> <span class="n">FDK_Flexible</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.processors.FBP_Flexible</span> <span class="kn">import</span> <span class="n">FBP_CPU</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 
 
 <div class="viewcode-block" id="FBP">
@@ -543,15 +541,13 @@
 
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="n">acquisition_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Please specify an acquisition_geometry to configure this processor&quot;</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">image_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
-        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
+        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
+        <span class="n">ImageDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;parallel&#39;</span><span class="p">:</span>
@@ -565,7 +561,7 @@
             <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process cone-beam data without a GPU&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
                 <span class="n">processor</span> <span class="o">=</span> <span class="n">FBP_CPU</span><span class="p">(</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process 3D data without a GPU&quot;</span><span class="p">)</span>

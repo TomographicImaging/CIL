@@ -24,6 +24,7 @@ import numpy as np
 from cil.utilities.errors import InPlaceError
 from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry, DataContainer
+from cil.framework.labels import AcquisitionType
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
 from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
@@ -434,7 +435,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         for geom in self.geometry_test_list:
             for i, data_array in enumerate(self.data_arrays):
                 data=geom.allocate(None)
-                if geom.dimension == '2D':
+                if AcquisitionType.DIM2 & geom.dimension:
                     data.fill(data_array)
                 else:
                     data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))

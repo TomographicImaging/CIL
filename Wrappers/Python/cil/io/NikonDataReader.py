@@ -16,9 +16,9 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionGeometry
+from cil.framework.labels import AcquisitionType
 from cil.io.TIFF import TIFFStackReader
-import warnings
 import numpy as np
 import os
 
@@ -334,7 +334,7 @@ class NikonDataReader(object):
     def get_roi(self):
         '''returns the roi'''
         roi = self._roi_par[:]
-        if self._ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self._ag.dimension:
             roi.pop(1)
 
         roidict = {}

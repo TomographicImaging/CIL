@@ -18,9 +18,7 @@
 
 import unittest
 import numpy
-from cil.framework import DataContainer
-from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import quality_measures
 

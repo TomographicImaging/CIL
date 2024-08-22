@@ -17,9 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, AcquisitionData, ImageData
-from numbers import Number
-from cil.framework import  DataContainer, AcquisitionGeometry, ImageGeometry
+from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
 import numpy as np
 import weakref
 

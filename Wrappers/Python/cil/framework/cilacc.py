@@ -1,5 +1,5 @@
-#  Copyright 2019 United Kingdom Research and Innovation
-#  Copyright 2019 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,15 +15,19 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import ctypes
+import platform
+from ctypes import util
+# check for the extension
 
-from .cilacc import cilacc
-from .acquisition_data import AcquisitionData
-from .acquisition_geometry import AcquisitionGeometry, SystemConfiguration
-from .data_container import DataContainer
-from .image_data import ImageData
-from .image_geometry import ImageGeometry
-from .vector_data import VectorData
-from .vector_geometry import VectorGeometry
-from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer
-from .block import BlockDataContainer, BlockGeometry
-from .partitioner import Partitioner
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll_file = 'cilacc.dll'
+    dll = util.find_library(dll_file)
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+cilacc = ctypes.cdll.LoadLibrary(dll)

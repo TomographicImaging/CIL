@@ -24,13 +24,9 @@ from tempfile import NamedTemporaryFile
 import numpy as np
 import logging
 
-from cil.framework import VectorData
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
-from cil.framework import AcquisitionGeometry
-from cil.framework import BlockDataContainer
-from cil.framework import BlockGeometry
+from cil.framework import (ImageGeometry, ImageData, AcquisitionData, AcquisitionGeometry,
+                           BlockDataContainer, BlockGeometry, VectorData)
+from cil.framework.labels import FillType
 
 from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator
@@ -58,7 +54,6 @@ from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 from cil.optimisation.functions import Rosenbrock
 from cil.optimisation.utilities import callbacks
-from cil.framework import VectorData, VectorGeometry
 from cil.utilities.quality_measures import mae, mse, psnr
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
@@ -236,7 +231,7 @@ class TestGD(CCPiTestClass):
                  max_iteration=20, update_objective_interval=2)
         # alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
-        self.assertTrue(alg.update_objective_interval == 2)
+        self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
@@ -259,7 +254,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(FillType["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -362,9 +357,9 @@ class TestFISTA(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        b = ig.allocate(FillType["RANDOM"])
         # fill with random numbers
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(FillType["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -391,7 +386,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(FillType["RANDOM"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)

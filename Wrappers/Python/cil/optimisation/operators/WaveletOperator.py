@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2023 United Kingdom Research and Innovation
 #  Copyright 2023 The University of Manchester
 #
@@ -16,7 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 import numpy as np
 import pywt  # PyWavelets module
 import warnings
@@ -27,12 +25,12 @@ from cil.framework import VectorGeometry
 
 class WaveletOperator(LinearOperator):
 
-    r'''                  
+    r'''
         Computes forward or inverse (adjoint) discrete wavelet transform (DWT) of the input
 
         Parameters
         ----------
-        domain_geometry: cil geometry 
+        domain_geometry: cil geometry
             Domain geometry for the WaveletOperator
         range_geometry: cil geometry, optional
             Output geometry for the WaveletOperator. Default = domain_geometry with the right coefficient array size deduced from pywavelets
@@ -63,7 +61,7 @@ class WaveletOperator(LinearOperator):
 
         Note
         ----
-        We currently do not support wavelets that are not orthogonal or bi-orthogonal. 
+        We currently do not support wavelets that are not orthogonal or bi-orthogonal.
      '''
 
     def __init__(self, domain_geometry,
@@ -195,7 +193,7 @@ class WaveletOperator(LinearOperator):
 
         Returns
         --------
-        DataContainer, the value of the WaveletOperator applied to :math:`x` or `None` if `out`  
+        DataContainer, the value of the WaveletOperator applied to :math:`x` or `None` if `out`
 
         """
 
@@ -226,7 +224,7 @@ class WaveletOperator(LinearOperator):
 
         Returns
         --------
-        DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`  
+        DataContainer, the value of the adjoint of the WaveletOperator applied to :math:`x` or `None` if `out`
 
         """
 
@@ -256,7 +254,7 @@ class WaveletOperator(LinearOperator):
 
         Returns
         --------
-        norm: float 
+        norm: float
         '''
         if self._wavelet.orthogonal:
             norm = 1.0
@@ -266,9 +264,9 @@ class WaveletOperator(LinearOperator):
 
     def is_orthogonal(self):
         '''Returns if the operator is orthogonal
-        
+
         Returns
         -------
         `Bool`
         '''
-        return self._wavelet.orthogonal 
+        return self._wavelet.orthogonal

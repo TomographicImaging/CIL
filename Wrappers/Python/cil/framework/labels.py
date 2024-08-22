@@ -121,13 +121,6 @@ class ImageDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for image data.
 
-    Attributes
-    ----------
-    CHANNEL
-    VERTICAL
-    HORIZONTAL_X
-    HORIZONTAL_Y
-
     Examples
     --------
     >>> data.reorder([ImageDimension.HORIZONTAL_X, ImageDimension.VERTICAL])
@@ -152,13 +145,6 @@ class ImageDimension(_DimensionBase, StrEnum):
 class AcquisitionDimension(_DimensionBase, StrEnum):
     """
     Available dimension labels for acquisition data.
-
-    Attributes
-    ----------
-    CHANNEL
-    ANGLE
-    VERTICAL
-    HORIZONTAL
 
     Examples
     --------
@@ -188,8 +174,10 @@ class FillType(StrEnum):
 
     Attributes
     ----------
-    RANDOM: Fill with random values.
-    RANDOM_INT: Fill with random integers.
+    RANDOM: 
+        Fill with random values.
+    RANDOM_INT: 
+        Fill with random integers.
 
     Examples
     --------
@@ -203,11 +191,6 @@ class FillType(StrEnum):
 class AngleUnit(StrEnum):
     """
     Available units for angles.
-    
-    Attributes
-    ----------
-    DEGREE
-    RADIAN
 
     Examples
     --------
@@ -242,10 +225,14 @@ class AcquisitionType(Flag):
 
     Attributes
     ----------
-    PARALLEL: Parallel beam.
-    CONE: Cone beam.
-    DIM2: 2D acquisition.
-    DIM3: 3D acquisition.
+    PARALLEL: 
+        Parallel beam.
+    CONE: 
+        Cone beam.
+    DIM2: 
+        2D acquisition.
+    DIM3: 
+        3D acquisition.
     """
     PARALLEL = auto()
     CONE = auto()

@@ -238,15 +238,18 @@ Classes which define the accepted labels
 
 .. autoclass:: cil.framework.labels.ImageDimension
    :members:
+   :undoc-members:
 
 .. autoclass:: cil.framework.labels.AcquisitionDimension
    :members:
+   :undoc-members:
 
 .. autoclass:: cil.framework.labels.FillType
    :members:
 
 .. autoclass:: cil.framework.labels.AngleUnit
    :members:
+   :undoc-members:
 
 .. autoclass:: cil.framework.labels.AcquisitionType
    :members:

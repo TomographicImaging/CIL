@@ -132,9 +132,6 @@ class show1D(show_base):
         Linestyle(s) for each line plot
     axis_labels : tuple of str, list of str, default=('Index','Value')
         Axis labels in the form (x_axis_label,y_axis_label)
-    num_cols : int, default=3
-        The number of columns in the grid of subplots produced in the case
-        of multiple plots
     size : tuple, default=(8,6)
         The size of the figure
 

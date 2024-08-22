@@ -24,15 +24,18 @@ import logging
 from cil.optimisation.utilities import Sampler
 from numbers import Number
 import warnings
+from cil.framework import BlockDataContainer
 
 log = logging.getLogger(__name__)
 
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
+    .. math::
 
-    Problem:
-    .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+
+    where :math:`f_i` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous.
 
     Parameters
     ----------
@@ -42,11 +45,11 @@ class SPDHG(Algorithm):
         A convex function with a "simple" proximal
     operator : BlockOperator
         BlockOperator must contain Linear Operators
-    tau : positive float, optional, default=None
-        Step size parameter for Primal problem
-    sigma : list of positive float, optional, default=None
-        List of Step size parameters for Dual problem
-    initial : DataContainer, optional, default=None
+    tau : positive float, optional, default= see note
+        Step size parameter for primal problem
+    sigma : list of positive float, optional, default= see note
+        List of Step size parameters for dual problem
+    initial : DataContainer, optional, default to a zero DataContainer in the range of the `operator`.
         Initial point for the SPDHG algorithm
     gamma : float, optional
             Parameter controlling the trade-off between the primal and dual step sizes
@@ -55,13 +58,6 @@ class SPDHG(Algorithm):
     prob_weights: optional, list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
 
-
-    **kwargs
-    ---------
-    prob : list of floats, optional, default=None
-        List of probabilities. If None each subset will have probability = 1/number of subsets. To be deprecated.
-    norms : list of floats
-        Precalculated list of norms of the operators. To be deprecated and placed by the `set_norms` functionalist in a BlockOperator.
 
 
     Example
@@ -95,17 +91,17 @@ class SPDHG(Algorithm):
 
     - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
 
-    .. math:: \sigma_i=0.99 / (\|K_i\|**2)
+    .. math:: \sigma_i= \frac{0.99}{\|K_i\|^2}
 
     and `tau` is set as per case 2
 
     - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
-    .. math:: \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+    .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })
 
     - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
-    .. math:: \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+    .. math:: \sigma_i= \frac{0.99 p_i}{\tau\|K_i\|^2}
 
     - Case 4: Both `sigma` and `tau` are provided.
 
@@ -115,7 +111,7 @@ class SPDHG(Algorithm):
 
     Convergence is guaranteed provided that [2, eq. (12)]:
 
-    .. math:: \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
+    .. math:: \|\sigma[i]^{1/2}  K[i]  \tau^{1/2} \|^2  < p_i \text{ for all } i
 
     References
     ----------
@@ -133,42 +129,19 @@ class SPDHG(Algorithm):
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
                  initial=None, sampler=None, prob_weights=None,   **kwargs):
 
-
         update_objective_interval = kwargs.pop('update_objective_interval', 1)
-        super(SPDHG, self).__init__(update_objective_interval=update_objective_interval)
+        super(SPDHG, self).__init__(
+            update_objective_interval=update_objective_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                     initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
 
     def set_up(self, f, g, operator, sigma=None, tau=None,
                initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
-
         '''set-up of the algorithm
-        
-        Parameters
-        ----------
-        f : BlockFunction
-            Each must be a convex function with a "simple" proximal method of its conjugate
-        g : Function
-            A convex function with a "simple" proximal
-        operator : BlockOperator
-            BlockOperator must contain Linear Operators
-        tau : positive float, optional, default=None
-            Step size parameter for Primal problem
-        sigma : list of positive float, optional, default=None
-            List of Step size parameters for Dual problem
-        initial : DataContainer, optional, default=None
-            Initial point for the SPDHG algorithm
-        gamma : float, optional
-            parameter controlling the trade-off between the primal and dual step sizes
-        sampler: optional, an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting a sample from {1,...,len(operator)}. 
-             Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling  with replacement and each index will have probability = 1/len(operator)
-        prob_weights: optional, list of floats of length num_indices that sum to 1. Defaults to [1/len(operator)]*len(operator)
-            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute. 
-
         '''
         log.info("%s setting up", self.__class__.__name__)
-    
+
         # algorithmic parameters
         self.f = f
         self.g = g
@@ -211,13 +184,15 @@ class SPDHG(Algorithm):
 
         # initialize dual variable to 0
         self._y_old = operator.range_geometry().allocate(0)
+        if not isinstance(self._y_old, BlockDataContainer): #This can be removed once #1863 is fixed
+            self._y_old =BlockDataContainer(self._y_old)
 
         # initialize variable z corresponding to back-projected dual variable
         self._z = operator.domain_geometry().allocate(0)
         self._zbar = operator.domain_geometry().allocate(0)
         # relaxation parameter
         self._theta = 1
-        
+
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
@@ -239,7 +214,7 @@ class SPDHG(Algorithm):
 
         if prob is not None:
             if self._prob_weights is None:
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilites to the calculation for `sigma` and `tau` please use `prob_weights`. ')
+                warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
                 self._prob_weights = prob
             else:
 
@@ -249,11 +224,10 @@ class SPDHG(Algorithm):
         if norms is not None:
             self.operator.set_norms(norms)
             warnings.warn(
-                ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`')
+                ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`', DeprecationWarning, stacklevel=2)
 
         if deprecated_kwargs:
-            raise ValueError("Additional keyword arguments passed but not used: {}".format(
-                deprecated_kwargs))
+            raise ValueError("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
 
     @property
     def sigma(self):
@@ -267,9 +241,10 @@ class SPDHG(Algorithm):
         r""" Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
 
         The step sizes `sigma` and `tau` are set using the equations:
-        .. math:: \sigma_i=\gamma\rho / (\|K_i\|**2)\\
-            
-        .. math::  \tau = \rho\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+
+        .. math:: \sigma_i= \frac{\gamma\rho }{\|K_i\|^2}
+
+        .. math::  \tau = \rho\min_i([ \frac{p_i }{\sigma_i  \|K_i\|^2})
 
 
         Parameters
@@ -279,8 +254,8 @@ class SPDHG(Algorithm):
             rho : Positive float
                  parameter controlling the size of the product :math: \sigma\tau :math:
 
-        
-        
+
+
         """
         if isinstance(gamma, Number):
             if gamma <= 0:
@@ -311,28 +286,27 @@ class SPDHG(Algorithm):
 
         - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
 
-        .. math:: \sigma_i=0.99 / (\|K_i\|**2)`
-
+        .. math:: \sigma_i= \frac{0.99}{\|K_i\|^2}
 
         and `tau` is set as per case 2
 
         - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
 
-        .. math:: \tau = 0.99\min_i([p_i / (\sigma_i * \|K_i\|**2) ])
+        .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })
 
         - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
 
-        .. math:: \sigma_i=0.99 p_i / (\tau*\|K_i\|**2)
+        .. math:: \sigma_i= \frac{0.99 p_i}{\tau\|K_i\|^2}
 
         - Case 4: Both `sigma` and `tau` are provided.
-        
-        
+
+
         Parameters
         ----------
-            sigma : list of positive float, optional, default=None
-                List of Step size parameters for Dual problem
-            tau : positive float, optional, default=None
-                Step size parameter for Primal problem
+            sigma : list of positive float, optional, default= see docstring
+                List of Step size parameters for dual problem
+            tau : positive float, optional, default= see docstring
+                Step size parameter for primal problem
 
         """
         gamma = 1.
@@ -351,7 +325,7 @@ class SPDHG(Algorithm):
             self._sigma = sigma
 
         elif tau is None:
-            self._sigma = [gamma* rho / ni for ni in self._norms]
+            self._sigma = [gamma * rho / ni for ni in self._norms]
         else:
             self._sigma = [
                 rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
@@ -360,7 +334,7 @@ class SPDHG(Algorithm):
             values = [rho*pi / (si * ni**2) for pi, ni,
                       si in zip(self._prob_weights, self._norms, self._sigma)]
             self._tau = min([value for value in values if value > 1e-8])
-            
+
         else:
             if isinstance(tau, Number) and tau > 0:
                 pass
@@ -377,11 +351,11 @@ class SPDHG(Algorithm):
         -------
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. 
-            
+
         Note
         -----
         Convergence criterion currently can only be checked for scalar values of tau.
-        
+
         Note
         ----
         This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge. 
@@ -433,7 +407,7 @@ class SPDHG(Algorithm):
         # zbar = z + (theta/p[i]) * x_tmp
 
         self._z.sapyb(1., self._x_tmp, self._theta /
-                     self._prob_weights[i], out=self._zbar)
+                      self._prob_weights[i], out=self._zbar)
 
         # save previous iteration
         self._save_previous_iteration(i, y_k)
@@ -455,6 +429,7 @@ class SPDHG(Algorithm):
     @property
     def objective(self):
         '''The saved primal objectives. 
+
         Returns
         -------
         list
@@ -465,6 +440,7 @@ class SPDHG(Algorithm):
     @property
     def dual_objective(self):
         '''The saved dual objectives. 
+
         Returns
         -------
         list
@@ -475,6 +451,7 @@ class SPDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         '''The saved primal-dual gap. 
+
         Returns
         -------
         list

@@ -1120,7 +1120,7 @@ class TestSPDHG(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
         self.subsets = 10
         
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -1277,42 +1277,48 @@ class TestSPDHG(CCPiTestClass):
         spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertTrue(spdhg.check_convergence())
 
-    # def test_SPDHG_num_subsets_1(self): TODO: fix this!
-    #     data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
+    def test_SPDHG_num_subsets_1(self): 
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
 
-    #     subsets = 1
+        subsets = 1
 
-    #     ig = data.geometry
-    #     ig.voxel_size_x = 0.1
-    #     ig.voxel_size_y = 0.1
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
 
-    #     detectors = ig.shape[0]
-    #     angles = np.linspace(0, np.pi, 90)
-    #     ag = AcquisitionGeometry.create_Parallel2D().set_angles(
-    #         angles, angle_unit='radian').set_panel(detectors, 0.1)
-    #     # Select device
-    #     dev = 'cpu'
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 90)
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
+            angles, angle_unit='radian').set_panel(detectors, 0.1)
+        # Select device
+        dev = 'cpu'
 
-    #     Aop = ProjectionOperator(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
 
-    #     sin = Aop.direct(data)
-    #     partitioned_data = sin.partition(subsets, 'sequential')
-    #     A = BlockOperator(
-    #         *[IdentityOperator(partitioned_data[i].geometry) for i in range(subsets)])
+        sin = Aop.direct(data)
+        partitioned_data = sin.partition(subsets, 'sequential')
+        A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(subsets)])
        
-    #     # block function
-    #     F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-    #                              for i in range(subsets)])
-    #     alpha = 0.025
-    #     G = alpha * FGP_TV()
+        # block function
+        F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                 for i in range(subsets)])
         
-    #     spdhg = SPDHG(f=F, g=G, operator=A,  update_objective_interval=10)
+        F_phdhg=L2NormSquared(b=partitioned_data[0])
+        A_pdhg = IdentityOperator(partitioned_data[0].geometry) 
+                            
+        alpha = 0.025
+        G = alpha * FGP_TV()
         
-    #     spdhg.run(7)   
-    #     pdhg = PDHG(f=F, g=G, operator=A, update_objective_interval=10)
+        spdhg = SPDHG(f=F, g=G, operator=A,  update_objective_interval=10)
         
-    #     pdhg.run(7)       
-    #     self.assertNumpyArrayAlmostEqual(pdhg.solution.as_array(), spdhg.solution.as_array(), decimal=3)
+        spdhg.run(7)   
+        
+        pdhg = PDHG(f=F_phdhg, g=G, operator=A_pdhg, update_objective_interval=10)
+        
+        pdhg.run(7) 
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.solution.as_array(), spdhg.solution.as_array(), decimal=3)
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):

@@ -1,7 +1,27 @@
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Richard Brown (UCL)
 
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_BUILD_TYPE Release)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
 
 message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
 find_package(OpenMP REQUIRED)
@@ -23,7 +43,7 @@ message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
 message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
 message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
   set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
 else()
   message(WARNING "Your CMake version is old. OpenMP linking flags  might be incorrect.")
@@ -89,25 +109,23 @@ endif()
 #	RUNTIME DESTINATION bin
 #    LIBRARY DESTINATION lib
 #    ARCHIVE DESTINATION lib
-#	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
+#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
 #	)
 
 if (UNIX)
 message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS cilacc
 	LIBRARY DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
+	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
 	)
 elseif(WIN32)
 message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
-  install(TARGETS cilacc 
+  install(TARGETS cilacc
 	RUNTIME DESTINATION Library/bin
 	ARCHIVE DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
+	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
 	)
 endif()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil) 
-
-
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)

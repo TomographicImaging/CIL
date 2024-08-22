@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2022 United Kingdom Research and Innovation
+#  Copyright 2022 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from cil.framework import AcquisitionGeometry
@@ -26,11 +28,11 @@ if has_astra:
     from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
 class TestGeometry(unittest.TestCase):
-    def setUp(self): 
+    def setUp(self):
         # Define image geometry.
         pixels_x = 128
         pixels_y = 3
-        
+
         angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
         angles_rad = angles_deg * np.pi /180.0
 
@@ -38,7 +40,7 @@ class TestGeometry(unittest.TestCase):
                                 .set_angles(angles_rad, angle_unit='radian')\
                                 .set_labels(['angle','horizontal'])\
                                 .set_panel(pixels_x, 0.1)
-        
+
         ig = ag.get_ImageGeometry()
 
 
@@ -53,7 +55,7 @@ class TestGeometry(unittest.TestCase):
                                      .set_panel(pixels_x, 0.1)
 
 
-        
+
         ag3 = AcquisitionGeometry.create_Parallel3D()\
                                  .set_angles(angles_rad, angle_unit='radian')\
                                  .set_labels(['vertical', 'angle','horizontal'])\
@@ -75,7 +77,7 @@ class TestGeometry(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_convert_geometry_to_astra(self):
-        
+
         #2D parallel radians
         astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
 
@@ -110,7 +112,7 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(astra_sino['DetectorRowCount'], self.ag3.pixel_num_v)
         self.assertEqual(astra_sino['DetectorSpacingX'], self.ag3.pixel_size_h)
         self.assertEqual(astra_sino['DetectorSpacingY'], self.ag3.pixel_size_h)
-        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag3.angles) 
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag3.angles)
 
         self.assertEqual(astra_vol['GridColCount'], self.ig3.voxel_num_x)
         self.assertEqual(astra_vol['GridRowCount'], self.ig3.voxel_num_y)
@@ -152,7 +154,7 @@ class TestGeometry(unittest.TestCase):
         vectors[1][0] = 1.0
         vectors[1][7] = -self.ag.pixel_size_h
         vectors[1][11] = self.ag.pixel_size_h
-    
+
         vectors[2][1] = -1.0
         vectors[2][6] = -self.ag.pixel_size_h
         vectors[2][11] = self.ag.pixel_size_h
@@ -196,7 +198,7 @@ class TestGeometry(unittest.TestCase):
         vectors[2][1] = self.ag_cone.dist_source_center
         vectors[2][4] = -1 * self.ag_cone.dist_center_detector
         vectors[2][6] = -1 * self.ag_cone.pixel_size_h
-        vectors[2][11] = pixel_size_v     
+        vectors[2][11] = pixel_size_v
 
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
@@ -220,7 +222,6 @@ class TestGeometry(unittest.TestCase):
         vectors[2][1] = self.ag_cone.dist_source_center
         vectors[2][4] = -1 * self.ag_cone.dist_center_detector
         vectors[2][6] = -1 * self.ag_cone.pixel_size_h
-        vectors[2][11] = self.ag_cone.pixel_size_h       
+        vectors[2][11] = self.ag_cone.pixel_size_h
 
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
-        

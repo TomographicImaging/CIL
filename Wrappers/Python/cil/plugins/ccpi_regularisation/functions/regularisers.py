@@ -1,29 +1,30 @@
-# Copyright 2022 United Kingdom Research and Innovation
-# Copyright 2022 The University of Manchester
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#     http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 try:
     from ccpi.filters import regularisers
-    from ccpi.filters.cpu_regularisers import TV_ENERGY
-except ImportError as ie:
-    raise ImportError(ie , "\n\n", 
-                      "This plugin requires the additional package ccpi-regularisation\n" +
-                      "Please install it via conda as ccpi-regulariser from the ccpi channel\n"+
-                      "Minimal version is 20.04")
+    from ccpi.filters.TV import TV_ENERGY
+except ImportError as exc:
+    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24.0.1"`') from exc
 
 
-from cil.framework import DataOrder
+from cil.framework import DataContainer
+from cil.framework.labels import ImageDimension
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -31,11 +32,11 @@ from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
- 
+
         r""" Generic proximal method for a RegulariserFunction
 
         .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}
-        
+
         Parameters
         ----------
 
@@ -47,8 +48,8 @@ class RegulariserFunction(Function):
             Output :class:`Datacontainer` in which the result is placed.
 
         Note
-        ----    
-        
+        ----
+
         If the :class:`ImageData` contains complex data, rather than the default `float32`, the regularisation
         is run independently on the real and imaginary part.
 
@@ -95,8 +96,8 @@ class TV_Base(RegulariserFunction):
 
     Parameters
     ----------
-    
-    strong_convexity_constant : Number 
+
+    strong_convexity_constant : Number
                               Positive parameter that allows Total variation regulariser to be strongly convex. Default = 0.
 
     Note
@@ -104,7 +105,7 @@ class TV_Base(RegulariserFunction):
 
     By definition, Total variation is a convex function. However,
     adding a strongly convex term makes it a strongly convex function.
-    Then, we say that `TV` is a :math:`\gamma>0` strongly convex function i.e., 
+    Then, we say that `TV` is a :math:`\gamma>0` strongly convex function i.e.,
 
     .. math:: TV(u) = \alpha \|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2}
 
@@ -122,7 +123,7 @@ class TV_Base(RegulariserFunction):
         else:
             return 0.5*EnergyValTV[0]
 
-    def convex_conjugate(self,x):     
+    def convex_conjugate(self,x):
         return 0.0
 
 
@@ -133,16 +134,19 @@ class FGP_TV(TV_Base):
         The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser
 
         .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .
-        
-        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm 
+
+        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
         applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
+        Note
+        -----
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default.
 
         Parameters
         ----------
 
         alpha : :obj:`Number` (positive), default = 1.0 .
-                Total variation regularisation parameter. 
+                Total variation regularisation parameter.
 
         max_iteration : :obj:`int`. Default = 100 .
                 Maximum number of iterations for the Fast Gradient Projection algorithm.
@@ -154,24 +158,24 @@ class FGP_TV(TV_Base):
 
                     .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
 
-        nonnegativity : :obj:`boolean`. Default = True .
+        nonnegativity : :obj:`boolean`. Default = False .
                         Non-negativity constraint for the solution of the FGP algorithm.
 
         tolerance : :obj:`float`, Default = 0 .
                     Stopping criterion for the FGP algorithm.
-                    
+
                     .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
 
         device : :obj:`str`, Default = 'cpu' .
                 FGP_TV algorithm runs on `cpu` or `gpu`.
 
         strong_convexity_constant : :obj:`float`, default = 0
-                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
+                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation.
                 Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
 
                 .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
 
-                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u)
 
 
         Examples
@@ -191,8 +195,8 @@ class FGP_TV(TV_Base):
 
         >>> G1 = (alpha/ig.voxel_size_x) * FGP_TV(max_iteration=100, device='gpu')
         >>> G2 = alpha * TotalVariation(max_iteration=100, lower=0.)
-        
-        
+
+
         See Also
         --------
         :class:`~cil.optimisation.functions.TotalVariation`
@@ -201,13 +205,16 @@ class FGP_TV(TV_Base):
         """
 
 
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
-        
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=None, device='cpu', strong_convexity_constant=0):
+
         if isotropic == True:
             self.methodTV = 0
         else:
             self.methodTV = 1
 
+        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init.
+            warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
+            nonnegativity=False
         if nonnegativity == True:
             self.nonnegativity = 1
         else:
@@ -217,25 +224,28 @@ class FGP_TV(TV_Base):
         self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
-        self.device = device 
+        self.device = device
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
 
     def _fista_on_dual_rof(self, in_arr, tau):
-        
-        r""" Implements the Fast Gradient Projection algorithm on the dual problem 
+
+        r""" Implements the Fast Gradient Projection algorithm on the dual problem
         of the Total Variation Denoising problem (ROF).
 
-        """    
+        """
 
-        res , info = regularisers.FGP_TV(\
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
               self.max_iteration,\
               self.tolerance,\
               self.methodTV,\
               self.nonnegativity,\
-              self.device)
+              infovector = info,
+              device = self.device)
 
         return res, info
 
@@ -246,7 +256,7 @@ class FGP_TV(TV_Base):
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
             in_arr /= strongly_convex_factor
             tau /= strongly_convex_factor
-        
+
         solution = self._fista_on_dual_rof(in_arr, tau)
 
         if self.strong_convexity_constant>0:
@@ -254,10 +264,10 @@ class FGP_TV(TV_Base):
             tau *= strongly_convex_factor
 
         return solution
-                
+
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
-        
+
         this changes the regularisation parameter in the plugin'''
         if not isinstance (scalar, Number):
             raise NotImplemented
@@ -265,13 +275,13 @@ class FGP_TV(TV_Base):
             self.alpha *= scalar
             return self
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
-        
+
 class TGV(RegulariserFunction):
 
     def __init__(self, alpha=1, gamma=1, max_iteration=100, tolerance=0, device='cpu' , **kwargs):
-        '''Creator of Total Generalised Variation Function 
+        '''Creator of Total Generalised Variation Function
 
         :param alpha: regularisation parameter
         :type alpha: number, default 1
@@ -283,9 +293,9 @@ class TGV(RegulariserFunction):
         :type tolerance: float, default 0
         :param device: determines if the code runs on CPU or GPU
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
-        
+
         '''
-        
+
         self.alpha = alpha
         self.gamma = gamma
         self.max_iteration = max_iteration
@@ -295,7 +305,7 @@ class TGV(RegulariserFunction):
         if kwargs.get('iter_TGV', None) is not None:
             # raise ValueError('iter_TGV parameter has been superseded by num_iter. Use that instead.')
             self.num_iter = kwargs.get('iter_TGV')
-        
+
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
@@ -312,29 +322,33 @@ class TGV(RegulariserFunction):
     @property
     def alpha1(self):
         return 1.
-    
+
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.TGV(in_arr,
+
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.TGV(in_arr,
               self.alpha * tau,
               self.alpha1,
               self.alpha2,
               self.max_iteration,
               self.LipshitzConstant,
               self.tolerance,
-              self.device)
-                
+              infovector = info,
+              device = self.device)
+
         # info: return number of iteration and reached tolerance
         # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
-        # Stopping Criteria  || u^k - u^(k-1) ||_{2} / || u^{k} ||_{2}    
+        # Stopping Criteria  || u^k - u^(k-1) ||_{2} / || u^{k} ||_{2}
         return res, info
-    
+
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
-        
+
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
-        
+
         this changes the regularisation parameter in the plugin'''
         if not isinstance (scalar, Number):
             raise NotImplemented
@@ -346,13 +360,13 @@ class TGV(RegulariserFunction):
         # f = alpha * f
 
     def check_input(self, input):
-        if len(input.dimension_labels) == 2:
+        if len(input.shape) == 2:
             self.LipshitzConstant = 12
-        elif len(input.dimension_labels) == 3:
+        elif len(input.shape) == 3:
             self.LipshitzConstant = 16 # Vaggelis to confirm
         else:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
-        
+
 
 class FGP_dTV(RegulariserFunction):
     '''Creator of FGP_dTV Function
@@ -393,13 +407,16 @@ class FGP_dTV(RegulariserFunction):
         self.device = device # string for 'cpu' or 'gpu'
         self.reference = np.asarray(reference.as_array(), dtype=np.float32)
         self.eta = eta
-        
+
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
     def proximal_numpy(self, in_arr, tau):
-        res , info = regularisers.FGP_dTV(\
+
+        info = np.zeros((2,), dtype=np.float32)
+
+        res = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
                 self.alpha * tau,\
@@ -408,16 +425,17 @@ class FGP_dTV(RegulariserFunction):
                 self.eta,\
                 self.methodTV,\
                 self.nonnegativity,\
-                self.device)
+                infovector = info,
+                device = self.device)
         return res, info
 
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
-    
+
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
-        
+
         this changes the regularisation parameter in the plugin'''
         if not isinstance (scalar, Number):
             raise NotImplemented
@@ -426,11 +444,11 @@ class FGP_dTV(RegulariserFunction):
             return self
 
     def check_input(self, input):
-        if input.geometry.length > 3:
+        if len(input.shape) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
 
 class TNV(RegulariserFunction):
-    
+
     def __init__(self,alpha=1, max_iteration=100, tolerance=0):
         '''Creator of TNV Function
 
@@ -445,16 +463,16 @@ class TNV(RegulariserFunction):
         self.alpha = alpha
         self.max_iteration = max_iteration
         self.tolerance = tolerance
-        
+
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
-    
+
     def proximal_numpy(self, in_arr, tau):
-        if in_arr.ndim != 3:
-            # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Python/src/cpu_regularisers.pyx#L584-L588
-            raise ValueError('Only 3D data is supported. Passed data has {} dimensions'.format(in_arr.ndim))
-        res = regularisers.TNV(in_arr, 
+        # remove any dimension of size 1
+        in_arr = np.squeeze(in_arr)
+
+        res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,
               self.tolerance)
@@ -466,7 +484,7 @@ class TNV(RegulariserFunction):
 
     def __rmul__(self, scalar):
         '''Define the multiplication with a scalar
-        
+
         this changes the regularisation parameter in the plugin'''
         if not isinstance (scalar, Number):
             raise NotImplemented
@@ -476,8 +494,12 @@ class TNV(RegulariserFunction):
 
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
-        DataOrder.check_order_for_engine('cil', input.geometry)
-        if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
-            raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
-        
-
+        if isinstance(input, DataContainer):
+            ImageDimension.check_order_for_engine('cil', input.geometry)
+            if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
+                raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        else:
+            # if it is not a CIL DataContainer we assume that the data is passed in the correct order
+            # discard any dimension of size 1
+            if sum(1 for i in input.shape if i!=1) != 3:
+                raise ValueError('TNV requires 3D data (with channel as first axis). Got {}'.format(input.shape))

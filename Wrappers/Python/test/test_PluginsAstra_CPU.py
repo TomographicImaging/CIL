@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2022 United Kingdom Research and Innovation
+#  Copyright 2022 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
@@ -25,7 +27,7 @@ initialise_tests()
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
     import astra
-    
+
 def setup_parameters(self):
 
     self.backend = 'astra'
@@ -87,7 +89,7 @@ class Test_Parallel2D_Projectors_CPU_sim(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
-        self.tolerance_fp = 0.16 
+        self.tolerance_fp = 0.16
 
 
 class Test_Parallel2D_Projectors_CPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):

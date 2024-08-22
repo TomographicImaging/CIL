@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import os
 import subprocess
@@ -31,7 +33,7 @@ def startTestRun(self):
     """Called once before any tests are executed.
     """
     #set logging
-    logging.basicConfig(level=logging.WARNING) 
+    logging.basicConfig(level=logging.WARNING)
 
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
@@ -55,12 +57,16 @@ try:
     subprocess.check_output('nvidia-smi')
     has_nvidia = True
 except:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_nvidia = False
 system_state['has_nvidia']=has_nvidia
 
 #astra
 module_info = importlib.util.find_spec("astra")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_astra = False
 else:
     has_astra = True
@@ -69,6 +75,8 @@ system_state['has_astra']=has_astra
 #tigre
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_tigre = False
 else:
     has_tigre = True
@@ -92,12 +100,13 @@ system_state['has_ipp']=has_ipp
 #ccpi-regularisation toolkit
 module_info = importlib.util.find_spec("ccpi")
 if module_info != None:
-    module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+    module_info = importlib.util.find_spec("ccpi.filters.regularisers")
 
 if module_info is None:
     has_ccpi_regularisation = False
 else:
     has_ccpi_regularisation = True
+
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
 
 

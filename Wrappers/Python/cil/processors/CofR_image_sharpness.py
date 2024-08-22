@@ -1,35 +1,36 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-from cil.framework import Processor, AcquisitionData, DataOrder
+from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
-import inspect
 import logging
 import math
 import importlib
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class CofR_image_sharpness(Processor):
 
     """This creates a CentreOfRotationCorrector processor.
-    
+
     The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
 
     Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
@@ -47,15 +48,10 @@ class CofR_image_sharpness(Processor):
         The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.
 
     search_range : int
-        The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
+        The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.
 
     initial_binning : int
         The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
-
-    Other Parameters
-    ----------------
-    **kwargs : dict
-        FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
     Example
@@ -84,17 +80,7 @@ class CofR_image_sharpness(Processor):
     """
     _supported_backends = ['astra', 'tigre']
 
-    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
-        
-
-        FBP = kwargs.get('FBP', None)
-        if  FBP is not None:
-            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
-                            Please pass backend='astra' or 'tigre'")
-
-            if inspect.isclass(FBP):
-                if 'astra' in str(inspect.getmodule(FBP)):
-                    backend = 'astra'
+    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
 
         FBP = self._configure_FBP(backend)
 
@@ -113,7 +99,7 @@ class CofR_image_sharpness(Processor):
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):
             raise Exception('Processor supports only AcquisitionData')
-        
+
         if data.geometry == None:
             raise Exception('Geometry is not defined.')
 
@@ -122,7 +108,7 @@ class CofR_image_sharpness(Processor):
 
         if data.geometry.system_description not in ['simple','offset']:
             raise NotImplementedError("Not implemented for rotated system geometries")
-            
+
         if data.geometry.channels > 1:
             raise ValueError("Only single channel data is supported with this algorithm")
 
@@ -136,12 +122,9 @@ class CofR_image_sharpness(Processor):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         #check order for single slice data
-        if data.geometry.dimension == '3D':
-            test_geom = data.geometry.get_slice(vertical='centre')
-        else:
-            test_geom = data.geometry
+        test_geom = data.geometry.get_slice(vertical='centre') if AcquisitionType.DIM3 & data.geometry.dimension else data.geometry
 
-        if not DataOrder.check_order_for_engine(self.backend, test_geom):
+        if not AcquisitionDimension.check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
 
         return True
@@ -150,18 +133,17 @@ class CofR_image_sharpness(Processor):
     def _configure_FBP(self, backend='tigre'):
         """
         Configures the processor for the right engine. Checks the data order.
-        """        
+        """
         if backend not in self._supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
 
         #set FBPOperator class from backend
         try:
-            module = importlib.import_module('cil.plugins.'+backend)
-        except ImportError:
-            if backend == 'tigre':
-                raise ImportError("Cannot import the {} plugin module. Please install TIGRE or select a different backend".format(self.backend))
-            if backend == 'astra':
-                raise ImportError("Cannot import the {} plugin module. Please install ASTRA-TOOLBOX or select a different backend".format(self.backend))
+            module = importlib.import_module(f'cil.plugins.{backend}')
+        except ImportError as exc:
+            msg = {'tigre': "TIGRE (e.g. `conda install conda-forge::tigre`)",
+                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
+            raise ImportError(f"Please install {msg} or select a different backend") from exc
 
         return module.FBP
 
@@ -169,7 +151,7 @@ class CofR_image_sharpness(Processor):
     def gss(self, data, ig, search_range, tolerance, binning):
         '''Golden section search'''
         # intervals c:cr:c where r = φ − 1=0.619... and c = 1 − r = 0.381..., φ
-        logger.debug("GSS between %f and %f", *search_range)
+        log.debug("GSS between %f and %f", *search_range)
         phi = (1 + math.sqrt(5))*0.5
         r = phi - 1
         #1/(r+2)
@@ -218,15 +200,15 @@ class CofR_image_sharpness(Processor):
             if interval < tolerance:
                 break
 
-            sample_points.insert(ind, new_point)      
+            sample_points.insert(ind, new_point)
             obj = self.calculate(data, ig, new_point)
             evaluation.insert(ind, obj)
             all_data[new_point] = obj
 
             count +=1
 
-        logger.info("evaluated %d points",len(all_data))
-        if logger.isEnabledFor(logging.DEBUG):
+        log.info("evaluated %d points",len(all_data))
+        if log.isEnabledFor(logging.DEBUG):
             keys, values = zip(*all_data.items())
             self.plot(keys, values, ig.voxel_size_x/binning)
 
@@ -247,9 +229,9 @@ class CofR_image_sharpness(Processor):
         return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
-        x=[x / vox_size for x in offsets] 
+        x=[x / vox_size for x in offsets]
         y=values
-                 
+
         plt.figure()
         plt.scatter(x,y)
         plt.show()
@@ -264,16 +246,12 @@ class CofR_image_sharpness(Processor):
         w1 = ind_centre - ind0
         return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
 
-
     def process(self, out=None):
-
         #get slice
-        data_full = self.get_input()
+        data = data_full = self.get_input()
 
-        if data_full.geometry.dimension == '3D':
-            data = data_full.get_slice(vertical=self.slice_index)
-        else:
-            data = data_full
+        if AcquisitionType.DIM3 & data_full.geometry.dimension:
+            data = data.get_slice(vertical=self.slice_index)
 
         data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
@@ -285,9 +263,9 @@ class CofR_image_sharpness(Processor):
         if self.initial_binning is None:
             self.initial_binning = min(int(np.ceil(width / 128)),16)
 
-        logger.debug("Initial search:")
-        logger.debug("search range is %d", self.search_range)
-        logger.debug("initial binning is %d", self.initial_binning)
+        log.debug("Initial search:")
+        log.debug("search range is %d", self.search_range)
+        log.debug("initial binning is %d", self.initial_binning)
 
         #filter full projections
         data_filtered = data.copy()
@@ -316,7 +294,7 @@ class CofR_image_sharpness(Processor):
             for i in range(data.shape[0]):
                 data_binned.fill(np.interp(sampling_points, initial_coordinates, data.array[i,:]),angle=i)
 
-            #filter 
+            #filter
             data_binned_filtered = data_binned.copy()
             data_binned_filtered.fill(scipy.ndimage.sobel(data_binned.as_array(), axis=1, mode='reflect', cval=0.0))
             data_processed = data_binned_filtered
@@ -334,7 +312,7 @@ class CofR_image_sharpness(Processor):
         for offset in offsets:
             obj_vals.append(self.calculate(data_processed, ig, offset))
 
-        if logger.isEnabledFor(logging.DEBUG):
+        if log.isEnabledFor(logging.DEBUG):
             self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
 
         ind = np.argmin(obj_vals)
@@ -345,13 +323,13 @@ class CofR_image_sharpness(Processor):
 
         if self.initial_binning > 8:
             #binned search continued
-            logger.debug("binned search starting at %f", centre)
+            log.debug("binned search starting at %f", centre)
             a = centre - ig.voxel_size_x *2
             b = centre + ig.voxel_size_x *2
             centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, self.initial_binning )
 
         #fine search
-        logger.debug("fine search starting at %f", centre)
+        log.debug("fine search starting at %f", centre)
         data_processed = data_filtered
         ig = data_processed.geometry.get_ImageGeometry()
         a = centre - ig.voxel_size_x *2
@@ -360,15 +338,16 @@ class CofR_image_sharpness(Processor):
 
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
-        
-        logger.info("Centre of rotation correction found using image_sharpness")
-        logger.info("backend FBP/FDK {}".format(self.backend))
-        logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
-        logger.info("Centre of rotation shift = %f units at the object", centre)
-        logger.info("Return new dataset with centred geometry")
-        
+
+        log.info("Centre of rotation correction found using image_sharpness")
+        log.info("backend FBP/FDK {}".format(self.backend))
+        log.info("Calculated from slice: %s", str(self.slice_index))
+        log.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        log.info("Centre of rotation shift = %f units at the object", centre)
+        log.info("Return new dataset with centred geometry")
+
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
         else:
             out.geometry = new_geometry
+            return out

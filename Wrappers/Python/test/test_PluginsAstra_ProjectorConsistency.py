@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2022 United Kingdom Research and Innovation
+#  Copyright 2022 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from cil.framework import AcquisitionGeometry
@@ -26,7 +28,7 @@ if has_astra:
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
 
 class TestAstraConeBeamProjectors(unittest.TestCase):
-    def setUp(self): 
+    def setUp(self):
         #%% Setup Geometry
         voxel_num_xy = 255
         voxel_num_z = 15
@@ -70,9 +72,9 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         circle3 = [25,0,90] #r,x,y
         dist3 = ((x - circle3[1])**2 + (y - circle3[2])**2)**0.5
 
-        mask1 =(dist1 - circle1[0]).clip(0,1) 
-        mask2 =(dist2 - circle2[0]).clip(0,1) 
-        mask3 =(dist3 - circle3[0]).clip(0,1) 
+        mask1 =(dist1 - circle1[0]).clip(0,1)
+        mask2 =(dist2 - circle2[0]).clip(0,1)
+        mask3 =(dist3 - circle3[0]).clip(0,1)
         phantom = 1 - np.logical_and(np.logical_and(mask1, mask2),mask3)
 
         self.golden_data = self.ig_3D.allocate(0)
@@ -84,7 +86,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
 
     @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
-    
+
         # #%% AstraProjector2D cpu
         ig = self.ig_2D.copy()
         ag = self.ag_slice.copy()
@@ -145,7 +147,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
 
     @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
-        
+
         # #%% AstraProjector2D cpu
         ig = self.ig_2D.copy()
         ag = self.ag_slice.copy()
@@ -202,7 +204,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
 
 
 class TestAstraParallelBeamProjectors(unittest.TestCase):
-    def setUp(self): 
+    def setUp(self):
         #%% Setup Geometry
         voxel_num_xy = 255
         voxel_num_z = 15
@@ -242,9 +244,9 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
         circle3 = [25,0,90] #r,x,y
         dist3 = ((x - circle3[1])**2 + (y - circle3[2])**2)**0.5
 
-        mask1 =(dist1 - circle1[0]).clip(0,1) 
-        mask2 =(dist2 - circle2[0]).clip(0,1) 
-        mask3 =(dist3 - circle3[0]).clip(0,1) 
+        mask1 =(dist1 - circle1[0]).clip(0,1)
+        mask2 =(dist2 - circle2[0]).clip(0,1)
+        mask3 =(dist3 - circle3[0]).clip(0,1)
         phantom = 1 - np.logical_and(np.logical_and(mask1, mask2),mask3)
 
         self.golden_data = self.ig_3D.allocate(0)
@@ -256,7 +258,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
 
     @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_consistency(self):
-    
+
         # #%% AstraProjector2D cpu
         ig = self.ig_2D.copy()
         ag = self.ag_slice.copy()
@@ -296,7 +298,7 @@ class TestAstraParallelBeamProjectors(unittest.TestCase):
 
     @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator(self):
-        
+
         # #%% AstraProjector2D cpu
         ig = self.ig_2D.copy()
         ag = self.ag_slice.copy()

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +12,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework.labels import AcquisitionType, AngleUnit
 import numpy as np
 
 try:
@@ -31,8 +33,8 @@ class CIL2TIGREGeometry(object):
         #angles
         angles = ag.config.angles.angle_data + ag.config.angles.initial_angle
 
-        if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
-            angles *= (np.pi/180.) 
+        if ag.config.angles.angle_unit == AngleUnit.DEGREE:
+            angles *= (np.pi/180.)
 
         #convert CIL to TIGRE angles s
         angles = -(angles + np.pi/2 +tg.theta )
@@ -58,19 +60,19 @@ class TIGREGeometry(Geometry):
         system.align_reference_frame('tigre')
 
 
-        #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped 
+        #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped
         #https://github.com/CERN/TIGRE/issues/353
         lenx = (ig.voxel_num_x * ig.voxel_size_x)
         leny = (ig.voxel_num_y * ig.voxel_size_y)
         lenz = (ig.voxel_num_z * ig.voxel_size_z)
-    
+
         panel_width = max(ag_in.config.panel.num_pixels * ag_in.config.panel.pixel_size)*0.5
         clearance_len =  np.sqrt(lenx**2 + leny**2 + lenz**2)/2 + panel_width
 
-        if ag_in.geom_type == 'cone':  
+        if ag_in.geom_type == 'cone':
 
             if system.detector.position[1] < clearance_len:
-        
+
                 src = system.source.position.astype(np.float64)
                 vec1 = system.detector.position.astype(np.float64) - src
 
@@ -80,9 +82,9 @@ class TIGREGeometry(Geometry):
 
                 system.detector.position = src + vec1 * scale
                 ag_in.config.panel.pixel_size[0] *= scale
-                ag_in.config.panel.pixel_size[1] *= scale            
+                ag_in.config.panel.pixel_size[1] *= scale
 
-            self.DSO = -system.source.position[1]       
+            self.DSO = -system.source.position[1]
             self.DSD = self.DSO + system.detector.position[1]
             self.mode = 'cone'
 
@@ -107,7 +109,7 @@ class TIGREGeometry(Geometry):
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
 
-        if ag_in.dimension == '2D':
+        if AcquisitionType.DIM2 & ag_in.dimension:
             self.is2D = True
 
             #fix IG to single slice in z
@@ -117,10 +119,10 @@ class TIGREGeometry(Geometry):
             self.offOrigin = np.array( [0, 0, 0] )
 
             # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-            if ag_in.geom_type == 'cone':  
+            if ag_in.geom_type == 'cone':
                 self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
             else:
-                self.offDetector = np.array( [0, system.detector.position[0], 0 ]) 
+                self.offDetector = np.array( [0, system.detector.position[0], 0 ])
 
             #convert roll, pitch, yaw
             U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
@@ -130,7 +132,7 @@ class TIGREGeometry(Geometry):
 
         else:
             self.is2D = False
-            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
+            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
 
@@ -170,10 +172,10 @@ class TIGREGeometry(Geometry):
         elif 'top' in panel_origin:
             pitch += np.pi
 
-        self.rotDetector = np.array((roll, pitch, yaw)) 
+        self.rotDetector = np.array((roll, pitch, yaw))
 
         # total size of the image       (mm)
-        self.sVoxel = self.nVoxel * self.dVoxel                                         
+        self.sVoxel = self.nVoxel * self.dVoxel
 
         # Auxiliary
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)

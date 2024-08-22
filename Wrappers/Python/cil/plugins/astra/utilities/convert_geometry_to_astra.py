@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,10 +12,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
 import astra
 import numpy as np
+from cil.framework.labels import AcquisitionType, AngleUnit
 
 def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
     """
@@ -36,29 +39,24 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
         The ASTRA vol_geom and proj_geom
 
     """
-
     # determine if the geometry is 2D or 3D
-
-    if sinogram_geometry.pixel_num_v > 1:
-        dimension = '3D'
-    else:
-        dimension = '2D'
+    dimension = AcquisitionType.DIM3 if sinogram_geometry.pixel_num_v > 1 else AcquisitionType.DIM2
 
     #get units
 
-    if sinogram_geometry.config.angles.angle_unit == sinogram_geometry.DEGREE:
+    if sinogram_geometry.config.angles.angle_unit == AngleUnit.DEGREE:
         angles_rad = sinogram_geometry.config.angles.angle_data * np.pi / 180.0
     else:
         angles_rad = sinogram_geometry.config.angles.angle_data
 
-    if dimension == '2D':
-        vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y, 
-                                         volume_geometry.voxel_num_x, 
-                                         volume_geometry.get_min_x(), 
-                                         volume_geometry.get_max_x(), 
-                                         volume_geometry.get_min_y(), 
+    if AcquisitionType.DIM2 & dimension:
+        vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y,
+                                         volume_geometry.voxel_num_x,
+                                         volume_geometry.get_min_x(),
+                                         volume_geometry.get_max_x(),
+                                         volume_geometry.get_min_y(),
                                          volume_geometry.get_max_y())
-        
+
         if sinogram_geometry.geom_type == 'parallel':
             proj_geom = astra.create_proj_geom('parallel',
                                                sinogram_geometry.pixel_size_h,
@@ -73,18 +71,18 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
                                                np.abs(sinogram_geometry.dist_center_detector))
         else:
             NotImplemented
-            
-    elif dimension == '3D':
-        vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y, 
-                                         volume_geometry.voxel_num_x, 
-                                         volume_geometry.voxel_num_z, 
-                                         volume_geometry.get_min_x(), 
-                                         volume_geometry.get_max_x(), 
-                                         volume_geometry.get_min_y(), 
-                                         volume_geometry.get_max_y(), 
-                                         volume_geometry.get_min_z(), 
+
+    elif AcquisitionType.DIM3 & dimension:
+        vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y,
+                                         volume_geometry.voxel_num_x,
+                                         volume_geometry.voxel_num_z,
+                                         volume_geometry.get_min_x(),
+                                         volume_geometry.get_max_x(),
+                                         volume_geometry.get_min_y(),
+                                         volume_geometry.get_max_y(),
+                                         volume_geometry.get_min_z(),
                                          volume_geometry.get_max_z())
-        
+
         if sinogram_geometry.geom_type == 'parallel':
             proj_geom = astra.create_proj_geom('parallel3d',
                                                sinogram_geometry.pixel_size_h,
@@ -103,8 +101,8 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
                                                np.abs(sinogram_geometry.dist_center_detector))
         else:
             NotImplemented
-            
+
     else:
         NotImplemented
-    
+
     return vol_geom, proj_geom

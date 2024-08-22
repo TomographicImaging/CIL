@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2019 - 2022 United Kingdom Research and Innovation
-#  Copyright 2019 - 2022 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
 from cil.optimisation.operators import LinearOperator
@@ -44,25 +46,25 @@ class AstraProjector2D(LinearOperator):
     >>> forward_projection = PO.direct(image)
     >>> backward_projection = PO.adjoint(data)
 
-    """    
+    """
     def __init__(self, image_geometry, acquisition_geometry, device):
 
         super(AstraProjector2D, self).__init__(image_geometry, range_geometry=acquisition_geometry)
-        
+
         self.fp = AstraForwardProjector2D(volume_geometry=image_geometry,
                                         sinogram_geometry=acquisition_geometry,
                                         proj_id = None,
                                         device=device)
-        
+
         self.bp = AstraBackProjector2D(volume_geometry = image_geometry,
                                         sinogram_geometry = acquisition_geometry,
                                         proj_id = None,
                                         device = device)
-                           
-        
+
+
     def direct(self, x, out=None):
         '''Applies the direct of the operator i.e. the forward projection.
-        
+
         Parameters
         ----------
         x : ImageData
@@ -70,7 +72,7 @@ class AstraProjector2D(LinearOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer
@@ -89,7 +91,7 @@ class AstraProjector2D(LinearOperator):
 
         out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
-        
+
         Returns
         -------
         DataContainer

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,10 +12,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import unittest
-from cil.framework import ImageGeometry, AcquisitionGeometry
+
 import numpy as np
+
+from cil.framework import AcquisitionGeometry
+from cil.framework.labels import AngleUnit
 from utils import has_tomophantom, initialise_tests
 
 initialise_tests()
@@ -27,14 +31,14 @@ if has_tomophantom:
 
 class TestTomoPhantom2D(unittest.TestCase):
     def setUp(self):
-        
+
         N=128
         angles = np.linspace(0, 360, 50, True, dtype=np.float32)
         offset = 0.4
         ag = AcquisitionGeometry.create_Cone2D((offset,-100), (offset,100))
         ag.set_panel(N)
-        
-        ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
+
+        ag.set_angles(angles, angle_unit=AngleUnit["DEGREE"])
         ig = ag.get_ImageGeometry()
         self.ag = ag
         self.ig = ig
@@ -94,14 +98,14 @@ class TestTomoPhantom2D(unittest.TestCase):
 
 class TestTomoPhantom3D(unittest.TestCase):
     def setUp(self):
-        
+
         N=128
         angles = np.linspace(0, 360, 50, True, dtype=np.float32)
         offset = 0.4
         ag = AcquisitionGeometry.create_Cone3D((offset,-100,0), (offset,100,0))
         ag.set_panel((N,N/2))
-        
-        ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
+
+        ag.set_angles(angles, angle_unit=AngleUnit["DEGREE"])
         ig = ag.get_ImageGeometry()
         self.ag = ag
         self.ig = ig
@@ -146,7 +150,7 @@ class TestTomoPhantom3D(unittest.TestCase):
         ag.set_channels(5)
         ig = ag.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(model, ig)
-        
+
         assert phantom.geometry.channels == ig.channels
         assert phantom.shape == ig.shape
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')

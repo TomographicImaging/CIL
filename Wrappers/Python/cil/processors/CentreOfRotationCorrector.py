@@ -1,19 +1,20 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
@@ -24,7 +25,7 @@ class CentreOfRotationCorrector(DataProcessor):
     """
     This class contains methods to create a CentreOfRotationCorrector processor using the desired algorithm.
     """
-       
+
     @staticmethod
     def xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1):
         r'''This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.
@@ -33,15 +34,15 @@ class CentreOfRotationCorrector(DataProcessor):
 
         Parameters
         ----------
+        slice_index: int or str, optional
+            An integer defining the vertical slice to run the algorithm on or string='centre' specifying the central slice should be used (default is 'centre')
 
-        slice_index : int, str='centre', default='centre'
-            An integer defining the vertical slice to run the algorithm on.
+        projection_index: int or list/tuple of ints, optional
+            An integer defining the index of the first projection the cross correlation algorithm will use, where the second projection is chosen as the projection closest to 180 degrees from this.
+            Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)
 
-        projection_index : int
-            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
-
-        ang_tol : float, default=0.1
-            The angular tolerance in degrees between the two input projections 180 degree gap
+        ang_tol: float, optional
+            The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)
 
         Example
         -------
@@ -68,7 +69,7 @@ class CentreOfRotationCorrector(DataProcessor):
 
         >>> processor = CentreOfRotationCorrector.xcorrelation(slice_index=120)
         >>> processor.set_input(data)
-        >>> data_centred = processor.get_ouput()
+        >>> data_centred = processor.get_output()
 
 
         Note
@@ -83,9 +84,9 @@ class CentreOfRotationCorrector(DataProcessor):
 
 
     @staticmethod
-    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
         """This creates a CentreOfRotationCorrector processor.
-        
+
         The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
 
         Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP/FDK.
@@ -103,15 +104,10 @@ class CentreOfRotationCorrector(DataProcessor):
             The tolerance of the fit in pixels, the default is 1/200 of a pixel. This is a stopping criteria, not a statement of accuracy of the algorithm.
 
         search_range : int
-            The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.  
+            The range in pixels to search either side of the panel centre. If `None` a quarter of the width of the panel is used.
 
         initial_binning : int
             The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
-
-        Other Parameters
-        ----------------
-        **kwargs : dict
-            FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
         Example
@@ -138,5 +134,5 @@ class CentreOfRotationCorrector(DataProcessor):
         This method is unreliable on half-scan data with 'tuning-fork' style artifacts.
 
         """
-        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning, **kwargs)
+        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

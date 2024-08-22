@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,9 +12,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-
-from cil.framework import DataProcessor, AcquisitionData, DataOrder
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+from cil.framework import DataProcessor, AcquisitionData
+from cil.framework.labels import ImageDimension, AcquisitionDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
 from astra import astra_dict, algorithm, data3d
@@ -34,7 +35,7 @@ class AstraForwardProjector3D(DataProcessor):
     sinogram_geometry : AcquisitionGeometry
         A description of the acquisition data
 
-    """  
+    """
 
     def __init__(self,
                  volume_geometry=None,
@@ -45,36 +46,43 @@ class AstraForwardProjector3D(DataProcessor):
                   'proj_geom'  : None,
                   'vol_geom'  : None,
                   }
-        
+
         super(AstraForwardProjector3D, self).__init__(**kwargs)
-        
+
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
-        
+
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
-        
+
     def check_input(self, dataset):
 
         if self.volume_geometry.shape != dataset.geometry.shape:
-            raise ValueError("Dataset not compatible with geometry used to create the projector")  
-    
+            raise ValueError("Dataset not compatible with geometry used to create the projector")
+
         return True
     
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.sinogram_geometry.shape
+
     def set_ImageGeometry(self, volume_geometry):
 
-        DataOrder.check_order_for_engine('astra', volume_geometry)
+        ImageDimension.check_order_for_engine('astra', volume_geometry)
 
         if len(volume_geometry.dimension_labels) > 3:
-            raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))  
+            raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))
 
         self.volume_geometry = volume_geometry.copy()
 
     def set_AcquisitionGeometry(self, sinogram_geometry):
 
-        DataOrder.check_order_for_engine('astra', sinogram_geometry)
+        AcquisitionDimension.check_order_for_engine('astra', sinogram_geometry)
 
         if len(sinogram_geometry.dimension_labels) > 3:
-            raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))  
+            raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))
 
         self.sinogram_geometry = sinogram_geometry.copy()
 
@@ -90,19 +98,19 @@ class AstraForwardProjector3D(DataProcessor):
         data_temp = IM.as_array().reshape(new_shape_ig)
 
         if out is None:
-            sinogram_id, arr_out = astra.create_sino3d_gpu(data_temp, 
+            sinogram_id, arr_out = astra.create_sino3d_gpu(data_temp,
                                                            self.proj_geom,
                                                            self.vol_geom)
         else:
             new_shape_ag = [self.sinogram_geometry.pixel_num_v,self.sinogram_geometry.num_projections,self.sinogram_geometry.pixel_num_h]
             arr_out = out.as_array().reshape(new_shape_ag)
-                
+
             sinogram_id = astra.data3d.link('-sino', self.proj_geom, arr_out)
             self.create_sino3d_gpu(data_temp, self.proj_geom, self.vol_geom, False, sino_id=sinogram_id)
 
         #clear the memory on GPU
         astra.data3d.delete(sinogram_id)
-        
+
         arr_out = np.squeeze(arr_out)
 
         if out is None:

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.PaganinProcessor &#8212; CIL 24.1.1.dev19+g9d7ebc48 documentation</title>
+    <title>cil.processors.PaganinProcessor &#8212; CIL 24.1.1.dev20+g66206d33 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=9884e702"></script>
+    <script src="../../../../_static/documentation_options.js?v=bf4fc694"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev19+g9d7ebc48';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev20+g66206d33';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
@@ -681,6 +681,9 @@
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">AcquisitionData</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor only supports AcquisitionData&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">!=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor only support dtype=float32&#39;</span><span class="p">)</span>
     
         <span class="k">return</span> <span class="kc">True</span>
         
@@ -713,7 +716,7 @@
         <span class="n">data_proj</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slice_proj</span><span class="p">)]</span>
 
         <span class="c1"># create an empty axis if the data is 2D</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_proj</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
             <span class="n">slice_proj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
             <span class="n">data_proj</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slice_proj</span><span class="p">)]</span>
@@ -722,6 +725,9 @@
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data must be 2D or 3D per channel&#39;</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
         
         <span class="c1"># create a filter based on the shape of the data</span>
         <span class="n">filter_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">data_proj</span><span class="p">)</span>
@@ -733,7 +739,7 @@
         <span class="n">scaling_factor</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
 
         <span class="c1"># allocate padded buffer</span>
-        <span class="n">padded_buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data_proj</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="n">padded_buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data_proj</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         
         <span class="c1"># make slice indices to unpad the data</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
@@ -742,32 +748,39 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">slice_pad</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">padded_buffer</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
         <span class="c1"># loop over the channels</span>
+        <span class="n">mag2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">magnification</span><span class="o">**</span><span class="mi">2</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">channel_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">slice_proj</span><span class="p">[</span><span class="n">channel_axis</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
             <span class="c1"># loop over the projections</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))):</span>
                 
                 <span class="n">slice_proj</span><span class="p">[</span><span class="n">angle_axis</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">padded_buffer</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">padded_buffer</span><span class="p">[</span><span class="n">slice_pad</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slice_proj</span><span class="p">))]</span>
                 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_retrieval</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
                     <span class="c1"># apply the filter in fourier space, apply log and scale </span>
                     <span class="c1"># by magnification</span>
-                    <span class="n">fI</span> <span class="o">=</span> <span class="n">fft2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">magnification</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">padded_buffer</span><span class="p">)</span>
-                    <span class="n">iffI</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span>
+                    <span class="n">padded_buffer</span><span class="o">*=</span><span class="n">mag2</span>
+                    <span class="n">fI</span> <span class="o">=</span> <span class="n">fft2</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">)</span>
+                    <span class="n">iffI</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">iffI</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">padded_buffer</span><span class="p">)</span>
                     <span class="c1"># apply scaling factor</span>
-                    <span class="n">padded_buffer</span> <span class="o">=</span> <span class="n">scaling_factor</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">iffI</span><span class="p">)</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">scaling_factor</span><span class="p">,</span> <span class="n">padded_buffer</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">padded_buffer</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># apply the filter in fourier space</span>
                     <span class="n">fI</span> <span class="o">=</span> <span class="n">fft2</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">)</span>
-                    <span class="n">padded_buffer</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span>
+                    <span class="n">padded_buffer</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
                 <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">[</span><span class="n">slice_pad</span><span class="p">]),</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> 
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">[</span><span class="n">slice_pad</span><span class="p">],</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> 
                              <span class="n">channel</span><span class="o">=</span><span class="n">j</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">[</span><span class="n">slice_pad</span><span class="p">]),</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">[</span><span class="n">slice_pad</span><span class="p">],</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                    
         <span class="n">data</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
     
 <div class="viewcode-block" id="PaganinProcessor.set_input">

@@ -69,6 +69,15 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(i, AcquisitionType)
             self.assertIn(i.lower(), AcquisitionType)
             self.assertIn(getattr(AcquisitionType, i), AcquisitionType)
+        combo = AcquisitionType.DIM2 | AcquisitionType.CONE
+        for i in (AcquisitionType.DIM2, AcquisitionType.CONE):
+            self.assertIn(i, combo)
+        for i in (AcquisitionType.DIM3, AcquisitionType.PARALLEL):
+            self.assertNotIn(i, combo)
+        for i in ('2D', 'DIM2', AcquisitionType.DIM2):
+            self.assertEqual(combo.dimension, i)
+        for i in ('CONE', 'cone', AcquisitionType.CONE):
+            self.assertEqual(combo.geometry, i)
 
     def test_image_dimension_labels(self):
         for i in ('CHANNEL', 'VERTICAL', 'HORIZONTAL_X', 'HORIZONTAL_Y'):

@@ -125,7 +125,7 @@ class ImageDimension(_DimensionBase, StrEnum):
     --------
     >>> data.reorder([ImageDimension.HORIZONTAL_X, ImageDimension.VERTICAL])
     >>> data.reorder(["horizontal_x", "vertical"])
-    
+
     """
     CHANNEL = auto()
     VERTICAL = auto()
@@ -174,9 +174,9 @@ class FillType(StrEnum):
 
     Attributes
     ----------
-    RANDOM: 
+    RANDOM:
         Fill with random values.
-    RANDOM_INT: 
+    RANDOM_INT:
         Fill with random integers.
 
     Examples
@@ -216,22 +216,25 @@ class Flag(_Flag, metaclass=_FlagMeta):
         return cls.__members__.get(value.upper(), None) if isinstance(value, str) else super()._missing_(value)
 
     def __eq__(self, value: str) -> bool:
-        return super().__eq__(self.__class__[value.upper()] if isinstance(value, str) else value)
+        return super().__eq__(self.__class__(value.upper()) if isinstance(value, str) else value)
 
 
 class AcquisitionType(Flag):
     """
     Available acquisition types & dimensions.
 
+    WARNING: It's best to use strings rather than integers to initialise.
+    >>> AcquisitionType(3) == AcquisitionType(2 | 1) == AcquisitionType.CONE|PARALLEL != AcquisitionType('3D')
+
     Attributes
     ----------
-    PARALLEL: 
+    PARALLEL:
         Parallel beam.
-    CONE: 
+    CONE:
         Cone beam.
-    DIM2: 
+    DIM2:
         2D acquisition.
-    DIM3: 
+    DIM3:
         3D acquisition.
     """
     PARALLEL = auto()

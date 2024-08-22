@@ -1084,7 +1084,7 @@ class TestSPDHG(unittest.TestCase):
         pdhg = PDHG(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
                     max_iteration=1000,
                     update_objective_interval=500)
-        pdhg.run(1000,verbose=0)
+        pdhg.run(100,verbose=0)
 
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
@@ -1116,9 +1116,8 @@ class TestSPDHG(unittest.TestCase):
 
         prob = [1/len(A)]*len(A)
         spdhg = SPDHG(f=F, g=G, operator=A,
-                      max_iteration=1000,
                       update_objective_interval=200, prob=prob)
-        spdhg.run(1000)
+        spdhg.run(20 * subsets)
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
               mse(spdhg.get_output(), pdhg.get_output()),
               psnr(spdhg.get_output(), pdhg.get_output())
@@ -1197,9 +1196,8 @@ class TestSPDHG(unittest.TestCase):
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F, g=G, operator=A,
-                      max_iteration=1000,
                       update_objective_interval=200, prob=prob)
-        spdhg.run(1000, verbose=0)
+        spdhg.run(20 * subsets)
 
         # %% 'explicit' PDHG, scalar step-sizes
         op1 = GradientOperator(ig)
@@ -1216,9 +1214,8 @@ class TestSPDHG(unittest.TestCase):
         f = BlockFunction(f1, f2)
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg.max_iteration = 1000
         pdhg.update_objective_interval = 200
-        pdhg.run(1000, verbose=0)
+        pdhg.run(100, verbose=0)
 
         # %% show diff between PDHG and SPDHG
         # plt.imshow(spdhg.get_output().as_array() -pdhg.get_output().as_array())

@@ -18,17 +18,12 @@
 import functools
 import logging
 import sys
-import unittest
-from time import time
 
-import numpy
 import numpy as np
 
-from cil.framework import AcquisitionData
-from cil.framework import AcquisitionGeometry
-from cil.framework import DataContainer
-from cil.framework import ImageData
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, VectorData
+from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
+                           AcquisitionGeometry, BlockGeometry, VectorData)
+from cil.framework.labels import ImageDimension, AcquisitionDimension
 
 from testclass import CCPiTestClass
 from utils import initialise_tests
@@ -39,7 +34,7 @@ initialise_tests()
 
 def aid(x):
     """returns the memory block address of an array"""
-    return x.__array_interface__['data'][0]
+    return x.as_array().__array_interface__['data'][0]
 
 
 class TestDataContainer(CCPiTestClass):
@@ -83,9 +78,9 @@ class TestDataContainer(CCPiTestClass):
         #print("a refcount " , sys.getrefcount(a))
         self.assertEqual(sys.getrefcount(a), 3)
         ds1 = ds.copy()
-        self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
+        self.assertNotEqual(aid(ds), aid(ds1))
         ds1 = ds.clone()
-        self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
+        self.assertNotEqual(aid(ds), aid(ds1))
 
     def test_ndim(self):
         x_np = np.arange(0, 60).reshape(3,4,5)
@@ -104,15 +99,15 @@ class TestDataContainer(CCPiTestClass):
         ds -= 2
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
         np.testing.assert_array_almost_equal(ds.as_array(), b)
-        
+
         ds *= 2
         # self.assertEqual(ds.as_array()[0][0][0], 2.)
         np.testing.assert_array_almost_equal(ds.as_array(), b * 2)
-        
+
         ds /= 2
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
         np.testing.assert_array_almost_equal(ds.as_array(), b)
-        
+
         ds1 = ds.copy()
         ds1 += 1
         ds += ds1
@@ -137,7 +132,7 @@ class TestDataContainer(CCPiTestClass):
         ds.sign(out=ds)
         # self.assertEqual(ds.as_array()[0][0][0], -1.)
         np.testing.assert_array_almost_equal(ds.as_array(), -b)
-        
+
 
         ds.abs(out=ds)
         np.testing.assert_array_almost_equal(ds.as_array(), b)
@@ -146,7 +141,7 @@ class TestDataContainer(CCPiTestClass):
         ds *= 2
         ds.sqrt(out=ds)
         np.testing.assert_array_almost_equal(ds.as_array(),np.sqrt(2) * b)
-        
+
         # self.assertEqual(ds.as_array()[0][0][0],
         #                  np.sqrt(2., dtype='float32'))
 
@@ -161,14 +156,14 @@ class TestDataContainer(CCPiTestClass):
 
         ds.add(ds1, out=out)
         ds2 = ds.add(ds1)
-        
+
         self.assertNumpyArrayEqual(out.as_array(), ds2.as_array())
 
         ds0 = ds
         ds0.add(2, out=out)
         # self.assertEqual(3., out.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(out.as_array(), 3* b)
-        
+
 
         ds3 = ds0.add(2)
         self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
@@ -182,7 +177,7 @@ class TestDataContainer(CCPiTestClass):
         ds1 = ds.copy()
         out = ds.copy()
 
-        
+
         ds.subtract(ds1, out=out)
         ds2 = out.subtract(ds1)
         self.assertNumpyArrayEqual(out.as_array(), b * 0)
@@ -196,15 +191,15 @@ class TestDataContainer(CCPiTestClass):
         ds0.subtract(2, out=ds0)
         # self.assertEqual(-1., ds0.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds0.as_array(), - b)
-        
+
 
         ds3 = ds0.subtract(2)
         # self.assertEqual(-1., ds0.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds0.as_array(), - b)
-        
+
         # self.assertEqual(-3., ds3.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds3.as_array(), -3 * b)
-        
+
     def test_binary_multiply(self):
         X, Y, Z = 8, 16, 32
         a = np.ones((X, Y, Z), dtype='float32')
@@ -215,23 +210,23 @@ class TestDataContainer(CCPiTestClass):
         ds.multiply(ds1, out=ds)
         ds2 = ds.multiply(ds1)
         np.testing.assert_array_almost_equal(ds.as_array(), ds2.as_array())
-        
+
         ds0 = ds
         ds0.multiply(2, out=ds0)
         # self.assertEqual(2., ds0.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds0.as_array(), b * 2)
-        
+
         ds3 = ds0.multiply(2)
         # self.assertEqual(4., ds3.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds3.as_array(), 4 * b)
-        
+
         # self.assertEqual(2., ds.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds.as_array(), 2 * b)
-        
+
         ds.multiply(2.5, out=ds0)
         # self.assertEqual(2.5*2., ds0.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds.as_array(), 5 * b)
-        
+
     def test_binary_divide(self):
         X, Y, Z = 8, 16, 32
         a = np.ones((X, Y, Z), dtype='float32')
@@ -243,20 +238,20 @@ class TestDataContainer(CCPiTestClass):
         ds.divide(ds1, out=ds)
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
         np.testing.assert_array_almost_equal(ds.as_array(), b)
-        
+
         ds0 = ds
         ds0.divide(2, out=ds0)
         # self.assertEqual(0.5, ds0.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds0.as_array(), 0.5 * b)
-        
+
 
         ds3 = ds0.divide(2)
         # self.assertEqual(.25, ds3.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds3.as_array(), 0.25 * b)
-        
+
         # self.assertEqual(.5, ds.as_array()[0][0][0])
         np.testing.assert_array_almost_equal(ds.as_array(), 0.5 * b)
-        
+
 
     def test_reverse_operand_algebra(self):
         number = 3/2
@@ -357,8 +352,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(vol.number_of_dimensions, 3)
 
         ig2 = ImageGeometry (voxel_num_x=2,voxel_num_y=3,voxel_num_z=4,
-                     dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y,
-                 ImageGeometry.VERTICAL])
+                     dimension_labels=[ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"],
+                 ImageDimension["VERTICAL"]])
         data = ig2.allocate()
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ig2.shape))
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
@@ -435,8 +430,8 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
 
         ag2 = AcquisitionGeometry.create_Parallel3D().set_angles(np.linspace(0, 180, num=10)).set_panel((2,3)).set_channels(4)\
-                                 .set_labels([AcquisitionGeometry.VERTICAL ,
-                         AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL, AcquisitionGeometry.CHANNEL])
+                                 .set_labels([AcquisitionDimension["VERTICAL"] ,
+                         AcquisitionDimension["ANGLE"], AcquisitionDimension["HORIZONTAL"], AcquisitionDimension["CHANNEL"]])
 
         data = ag2.allocate()
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ag2.shape))
@@ -715,27 +710,27 @@ class TestDataContainer(CCPiTestClass):
 
         # expected dimension_labels
 
-        self.assertListEqual([AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL],
+        self.assertListEqual([AcquisitionDimension["CHANNEL"] ,
+                 AcquisitionDimension["ANGLE"] , AcquisitionDimension["VERTICAL"] ,
+                 AcquisitionDimension["HORIZONTAL"]],
                               list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
-        new_order = [AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.ANGLE]
+        new_order = [AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"] ,
+                 AcquisitionDimension["ANGLE"]]
         sino.reorder(new_order)
 
         self.assertListEqual(new_order, list(sino.geometry.dimension_labels))
 
         ss1 = sino.get_slice(vertical = 0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], list(ss1.geometry.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["CHANNEL"]  ,
+                 AcquisitionDimension["ANGLE"]], list(ss1.geometry.dimension_labels))
         ss2 = sino.get_slice(vertical = 0, channel=0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], list(ss2.geometry.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["ANGLE"]], list(ss2.geometry.dimension_labels))
 
 
     def test_ImageDataSubset(self):
@@ -759,42 +754,42 @@ class TestDataContainer(CCPiTestClass):
         self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
 
         vg = ImageGeometry(3,4,5,channels=2)
-        self.assertListEqual([ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X],
+        self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["VERTICAL"],
+                ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]],
                               list(vg.dimension_labels))
         ss2 = vg.allocate()
         ss3 = vol.get_slice(channel=0)
-        self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
+        self.assertListEqual([ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], list(ss3.geometry.dimension_labels))
 
     def test_DataContainerSubset(self):
         dc = DataContainer(np.ones((2,3,4,5)))
 
-        dc.dimension_labels =[AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
+        dc.dimension_labels =[AcquisitionDimension["CHANNEL"] ,
+                 AcquisitionDimension["ANGLE"] , AcquisitionDimension["VERTICAL"] ,
+                 AcquisitionDimension["HORIZONTAL"]]
 
         # test reshape
-        new_order = [AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.ANGLE]
+        new_order = [AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"] ,
+                 AcquisitionDimension["ANGLE"]]
         dc.reorder(new_order)
 
         self.assertListEqual(new_order, list(dc.dimension_labels))
 
         ss1 = dc.get_slice(vertical=0)
 
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], list(ss1.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["CHANNEL"]  ,
+                 AcquisitionDimension["ANGLE"]], list(ss1.dimension_labels))
 
         ss2 = dc.get_slice(vertical=0, channel=0)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], list(ss2.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["ANGLE"]], list(ss2.dimension_labels))
 
         # Check we can get slice still even if force parameter is passed:
         ss3 = dc.get_slice(vertical=0, channel=0, force=True)
-        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                    AcquisitionGeometry.ANGLE], list(ss3.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                    AcquisitionDimension["ANGLE"]], list(ss3.dimension_labels))
 
 
     def test_DataContainerChaining(self):
@@ -841,19 +836,19 @@ class TestDataContainer(CCPiTestClass):
         expected = expected_func(data.as_array(), axis=1)
         expected_dimension_labels = data.dimension_labels[0],data.dimension_labels[2]
         np.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
-        np.testing.assert_equal(result.dimension_labels, expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
+        self.assertEqual(result.dimension_labels, expected_dimension_labels, f"{function_name} 'with 1 axis'")
         # test specifying axis with an int
         result = test_func(axis=1)
         np.testing.assert_almost_equal(result.as_array(), expected, err_msg=error_message(function_name, "'with 1 axis'"))
-        np.testing.assert_equal(result.dimension_labels,expected_dimension_labels, err_msg=error_message(function_name, "'with 1 axis'"))
+        self.assertEqual(result.dimension_labels,expected_dimension_labels, f"{function_name} 'with 1 axis'")
         # test specifying function in 2 axes
         result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1]))
         np.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
-        np.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
+        self.assertEqual(result.dimension_labels, (data.dimension_labels[2],), f"{function_name} 'with 2 axes'")
         # test specifying function in 2 axes with an int
         result = test_func(axis=(0,1))
         np.testing.assert_almost_equal(result.as_array(), expected_func(data.as_array(), axis=(0,1)), err_msg=error_message(function_name, "'with 2 axes'"))
-        np.testing.assert_equal(result.dimension_labels,(data.dimension_labels[2],), err_msg=error_message(function_name, "'with 2 axes'"))
+        self.assertEqual(result.dimension_labels, (data.dimension_labels[2],), f"{function_name} 'with 2 axes'")
         # test specifying function in 3 axes
         result = test_func(axis=(data.dimension_labels[0],data.dimension_labels[1],data.dimension_labels[2]))
         np.testing.assert_almost_equal(result, expected_func(data.as_array()), err_msg=error_message(function_name, "'with 3 axes'"))
@@ -861,10 +856,10 @@ class TestDataContainer(CCPiTestClass):
         expected_array = expected_func(data.as_array(), axis = 0)
         test_func(axis=0, out=out)
         np.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
-        np.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
+        self.assertEqual(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), f"{function_name} 'of out argument'")
         test_func(axis=data.dimension_labels[0], out=out)
         np.testing.assert_almost_equal(out.as_array(), expected_array, err_msg=error_message(function_name, "'of out argument'"))
-        np.testing.assert_equal(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), err_msg=error_message(function_name, "'of out argument'"))
+        self.assertEqual(out.dimension_labels, (data.dimension_labels[1],data.dimension_labels[2]), f"{function_name} 'of out argument'")
         # test providing a numpy array to out
         out = np.zeros((2,2), dtype=data.dtype)
         test_func(axis=0, out=out)
@@ -900,7 +895,7 @@ class TestDataContainer(CCPiTestClass):
         for j in np.arange(len(data_classes)):
             function_names = ['mean','sum','min','max']
             for i in np.arange(len(function_names)):
-                self.directional_reduction_unary_test(data_classes[j], getattr(data_classes[j],function_names[i]), getattr(numpy,function_names[i]), out_classes[j], function_names[i])
+                self.directional_reduction_unary_test(data_classes[j], getattr(data_classes[j],function_names[i]), getattr(np, function_names[i]), out_classes[j], function_names[i])
 
 
     def test_mean_direction(self):
@@ -941,7 +936,7 @@ class TestDataContainer(CCPiTestClass):
 
         np.testing.assert_array_equal(a, u.as_array())
 
-        #u = ig.allocate(ImageGeometry.RANDOM_INT, seed=1)
+        #u = ig.allocate(ImageDimension["RANDOM_INT"], seed=1)
         l = functools.reduce(lambda x,y: x*y, (10,11,12), 1)
 
         a = np.zeros((l, ), dtype=np.float32)
@@ -1250,7 +1245,7 @@ class TestDataContainer(CCPiTestClass):
         ig = ImageGeometry(2,3,4)
         u = ig.allocate(0)
         a = np.ones((4,2))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
 
         data = u.as_array()
         axis_number = u.get_dimension_axis('horizontal_y')
@@ -1278,7 +1273,7 @@ class TestDataContainer(CCPiTestClass):
         ag.set_labels(('horizontal','angle','vertical','channel'))
         u = ag.allocate(0)
         a = np.ones((4,2))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
 
         data = u.as_array()
         axis_number = u.get_dimension_axis('horizontal_y')
@@ -1312,7 +1307,7 @@ class TestDataContainer(CCPiTestClass):
         u = ag.allocate(0)
         # (2, 5, 3, 4)
         a = np.ones((2,5))
-        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
         b = u.get_slice(channel=0, vertical=0)
         data = u.as_array()
 

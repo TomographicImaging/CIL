@@ -3,13 +3,24 @@
     - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)
+    - Added  PD3O algorithm (#1834)
+    - Added Barzilai-Borwein step size rule to work with GD, ISTA, FISTA (#1859)
+    - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
+    - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
+    - Added `labels` module with `ImageDimension`, `AcquisitionDimension`, `AcquisitionType`, `AngleUnit`, `FillType` (#1692)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+    - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
+    - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
+    - Internal refactor: Separate framework into multiple files (#1692)
+  - Testing:
+    - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)
-    - SPDHG vs PDHG unit test has been updated to reduce the time it takes and parameters have been adjusted (#1898)
+  - Changes that break backwards compatibility:
+    - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
 
 * 24.1.0
   - New Features:
@@ -37,9 +48,6 @@
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).
-
-
-
 
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.

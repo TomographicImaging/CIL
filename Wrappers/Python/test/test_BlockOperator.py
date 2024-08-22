@@ -20,9 +20,9 @@ import unittest
 from utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator, GradientOperator
-from cil.framework import BlockDataContainer
+from cil.framework import BlockDataContainer, BlockGeometry, ImageGeometry
+from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator
-from cil.framework import ImageGeometry, ImageData, BlockGeometry
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
 from testclass import CCPiTestClass
@@ -35,7 +35,7 @@ def dt(steps):
     return steps[-1] - steps[-2]
 
 class TestBlockOperator(CCPiTestClass):
-    
+
     def setUp(self):
         numpy.random.seed(1)
 
@@ -59,7 +59,7 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertBlockDataContainerEqual(z1, res)
 
-        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
+        z1 = B.range_geometry().allocate(FillType["RANDOM"])
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -160,7 +160,7 @@ class TestBlockOperator(CCPiTestClass):
             )
 
         B1 = BlockOperator(G, Id)
-        U = ig.allocate(ImageGeometry.RANDOM)
+        U = ig.allocate(FillType["RANDOM"])
         #U = BlockDataContainer(u,u)
         RES1 = B1.range_geometry().allocate()
 
@@ -168,7 +168,7 @@ class TestBlockOperator(CCPiTestClass):
         B1.direct(U, out = RES1)
 
         self.assertBlockDataContainerEqual(Z1,RES1)
-        
+
     def test_block_operator_1_1(self):
         M, N ,W = 3, 4, 5
         ig = ImageGeometry(M, N, W)
@@ -181,20 +181,20 @@ class TestBlockOperator(CCPiTestClass):
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.as_array(), ig.allocate(0).as_array())
         self.assertFalse(isinstance(ans, BlockDataContainer))
-        
+
         self.assertEqual(K.range_geometry(), ig)
 
-        
+
         ans2 = K.adjoint(ans)
         self.assertTrue(isinstance(ans2, BlockDataContainer))
         self.assertNumpyArrayEqual(ans2.shape, (2,1))
-        
+
         range_data=ans.geometry.allocate('random', seed=2)
         ans3=K.adjoint(range_data)
         self.assertNumpyArrayEqual(ans3.shape, (2,1))
         self.assertNumpyArrayEqual(ans3.get_item(0).as_array(), range_data.as_array())
         self.assertNumpyArrayEqual(ans3.get_item(1).as_array(), -range_data.as_array())
-        
+
         M, N ,W = 3, 4, 5
         ig = ImageGeometry(M, N, W)
         operator0=IdentityOperator(ig)
@@ -206,10 +206,10 @@ class TestBlockOperator(CCPiTestClass):
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.get_item(0).as_array(), data.as_array())
         self.assertNumpyArrayEqual( ans.get_item(1).as_array(), -data.as_array())
-        
+
         self.assertEqual(K.domain_geometry(), ig)
-        
-        
+
+
 
     @unittest.skipIf(True, 'Skipping time tests')
     def test_timedifference(self):
@@ -285,7 +285,7 @@ class TestBlockOperator(CCPiTestClass):
         B = BlockOperator(G, Id)
         # Nx1 case
         u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
+        w = B.range_geometry().allocate(FillType["RANDOM"], seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
         self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
@@ -339,9 +339,6 @@ class TestBlockOperator(CCPiTestClass):
         #Check that numbers in the list are positive
         with self.assertRaises(ValueError):
             A.set_norms([-1,-3])
-
-    
-
 
     def test_BlockOperator(self):
         ig = [ ImageGeometry(10,20,30) , \

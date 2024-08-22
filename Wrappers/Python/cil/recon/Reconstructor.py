@@ -16,7 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionData, ImageGeometry, DataOrder
+from cil.framework import AcquisitionData, ImageGeometry
+from cil.framework.labels import AcquisitionDimension
 import importlib
 import weakref
 
@@ -105,7 +106,7 @@ class Reconstructor(object):
         if backend not in self.supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self.supported_backends))
 
-        if not DataOrder.check_order_for_engine(backend, self.acquisition_geometry):
+        if not AcquisitionDimension.check_order_for_engine(backend, self.acquisition_geometry):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(backend))
 
         #set ProjectionOperator class from backend

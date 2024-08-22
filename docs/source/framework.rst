@@ -232,11 +232,28 @@ The :code:`partition` method is defined as part of:
    :members:
    
 
-DataOrder
+Labels
 =========
-.. autoclass:: cil.framework.DataOrder
+Classes which define the accepted labels
+
+.. autoclass:: cil.framework.labels.ImageDimension
    :members:
-   :inherited-members:
+   :undoc-members:
+
+.. autoclass:: cil.framework.labels.AcquisitionDimension
+   :members:
+   :undoc-members:
+
+.. autoclass:: cil.framework.labels.FillType
+   :members:
+
+.. autoclass:: cil.framework.labels.AngleUnit
+   :members:
+   :undoc-members:
+
+.. autoclass:: cil.framework.labels.AcquisitionType
+   :members:
+   
 
 DataProcessor
 =============

@@ -3,12 +3,16 @@
     - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)
+    - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
+    - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)
+  - Changes that break backwards compatibility:
+    - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
 
 * 24.1.0
   - New Features:

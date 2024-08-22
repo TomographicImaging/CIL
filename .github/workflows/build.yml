@@ -25,6 +25,7 @@ on:
     - 'scripts/**'
     - 'NOTICE.txt'
     - 'README.md'
+    - '.mailmap'
   pull_request:
     branches: [master]
     paths-ignore:
@@ -34,6 +35,7 @@ on:
     - 'scripts/**'
     - 'NOTICE.txt'
     - 'README.md'
+    - '.mailmap'
 jobs:
   test-cuda:
     defaults: {run: {shell: 'bash -el {0}'}}

@@ -468,6 +468,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
+    
     def allocate(self, value=0, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance
 
@@ -967,7 +968,22 @@ class Parallel2D(SystemConfiguration):
         return self
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -1116,7 +1132,22 @@ class Parallel3D(SystemConfiguration):
         return False
 
     def calculate_magnification(self):
-        return [None, None, 1.0]
+        '''Method to calculate magnification and distance from the sample to 
+        the detector using the detector positions and the rotation axis. 
+        For parallel beam geometry magnification = 1
+        
+        Returns
+        -------
+        list
+            A list containing the [0] distance from the source to the rotate 
+            axis, [1] distance from the rotate axis to the detector, 
+            [2] magnification of the system
+
+        '''
+        ab = (self.rotation_axis.position - self.detector.position)
+        dist_center_detector = float(numpy.sqrt(ab.dot(ab)))
+
+        return [None, dist_center_detector, 1.0]
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
@@ -2557,7 +2588,9 @@ class AcquisitionGeometry(object):
 
     def __eq__(self, other):
 
-        if isinstance(other, self.__class__) and self.config == other.config :
+        if isinstance(other, self.__class__) \
+            and self.config == other.config \
+            and self.dtype == other.dtype:
             return True
         return False
 
@@ -2738,7 +2771,6 @@ class DataContainer(object):
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
-        '''Holds the data'''
 
         if type(array) == numpy.ndarray:
             if deep_copy:
@@ -2890,11 +2922,7 @@ class DataContainer(object):
             return
         if dimension == {}:
             if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
-                numpy.copyto(self.array, array)
+                numpy.copyto(self.array, array)               
             elif isinstance(array, Number):
                 self.array.fill(array)
             elif issubclass(array.__class__ , DataContainer):
@@ -3611,7 +3639,8 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
@@ -3768,6 +3797,7 @@ class AcquisitionData(DataContainer, Partitioner):
 
         dtype = kwargs.get('dtype', numpy.float32)
 
+        
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
 
@@ -3780,7 +3810,8 @@ class AcquisitionData(DataContainer, Partitioner):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
-            pass
+            # remove singleton dimensions
+            array = numpy.squeeze(array)
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
@@ -3842,6 +3873,7 @@ class Processor(object):
         attributes['output'] = None
         attributes['shouldRun'] = True
         attributes['input'] = None
+        attributes['_shape_out'] = None,
 
         for key, value in attributes.items():
             self.__dict__[key] = value
@@ -3861,6 +3893,14 @@ class Processor(object):
                 self.__dict__['shouldRun'] = True
         else:
             raise KeyError('Attribute {0} not found'.format(name))
+        
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        dataset = self.get_input()
+        self._shape_out = dataset.shape
 
     def set_input(self, dataset):
         """
@@ -3871,7 +3911,6 @@ class Processor(object):
         input : DataContainer
             The input DataContainer
         """
-
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = weakref.ref(dataset)
@@ -3881,7 +3920,8 @@ class Processor(object):
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
-
+        
+        self._set_up()
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
@@ -3898,27 +3938,40 @@ class Processor(object):
         Parameters
         ----------
         out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced DataContainer with the processed data
 
         Returns
         -------
         DataContainer
-            The processed data. Suppressed if `out` is passed
+            The processed data
         """
+        if not self.check_output(out):
+            raise ValueError('Output data not compatible with processor')
+        
         if self.output is None or self.shouldRun:
-            if out is None:
-                out = self.process()
-            else:
-                self.process(out=out)
-
+            out = self.process(out=out)
             if self.store_output:
                 self.output = out.copy()
-
             return out
-
         else:
-            return self.output.copy()
-
+            if out is not None:
+                out.fill(self.output)
+                return out
+        return self.output.copy()
+    
+    def check_output(self, out):
+        
+        if out is not None:
+            data = self.get_input()
+            if data.array.dtype != out.array.dtype:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, data.array.dtype))
+            
+            if self._shape_out != out.shape:
+                raise ValueError("out size mismatch: got {0} expecting {1}"\
+                                 .format(out.shape, self._shape_out))
+         
+        return True
 
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
@@ -3947,14 +4000,7 @@ class Processor(object):
     def __call__(self, x, out=None):
 
         self.set_input(x)
-
-        if out is None:
-            out = self.get_output()
-        else:
-            self.get_output(out=out)
-
-        return out
-
+        return self.get_output(out=out)
 
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''
@@ -4001,17 +4047,20 @@ class AX(DataProcessor):
     def check_input(self, dataset):
         return True
 
+    def check_output(self, dataset):
+        return True
+
     def process(self, out=None):
 
         dsi = self.get_input()
         a = self.scalar
         if out is None:
-            y = DataContainer( a * dsi.as_array() , True,
+            out = DataContainer( a * dsi.as_array() , True,
                         dimension_labels=dsi.dimension_labels )
             #self.setParameter(output_dataset=y)
-            return y
         else:
             out.fill(a * dsi.as_array())
+        return out
 
 
 ###### Example of DataProcessors
@@ -4037,6 +4086,9 @@ class CastDataContainer(DataProcessor):
         super(CastDataContainer, self).__init__(**kwargs)
 
     def check_input(self, dataset):
+        return True
+    
+    def check_output(self, dataset):
         return True
 
     def process(self, out=None):

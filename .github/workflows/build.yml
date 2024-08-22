@@ -122,7 +122,7 @@ jobs:
       working-directory: recipe
       run: |
         conda install boa
-        conda mambabuild . -c conda-forge -c intel -c ccpi --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
+        conda mambabuild . -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
     - name: Upload artifact of the conda package
       uses: actions/upload-artifact@v4
       with:

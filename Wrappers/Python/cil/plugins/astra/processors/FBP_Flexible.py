@@ -149,7 +149,13 @@ class FBP_CPU(Processor):
             log.warning("The ASTRA backend FBP will use simple geometry only. Any configuration offsets or rotations may be ignored.")
 
         return True
-
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
 
     def process(self, out=None):
 

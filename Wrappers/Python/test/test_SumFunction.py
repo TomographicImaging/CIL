@@ -151,11 +151,9 @@ class TestFunction(CCPiTestClass):
 
 
     def test_SumFunction_inputs(self):
-        try:
-            f = SumFunction(self.list1[0])
-            self.assertFalse(True, "passed only one function and SumFunction accepted it!")
-        except ValueError as ve:
-            self.assertTrue(True, "Correctly failed" + str(ve))
+        f = SumFunction(self.list1[0])
+        with self.assertRaises(IndexError, msg="SumFunction should require an argument"):
+            f = SumFunction()
 
 
     def test_SumFunction_more_inputs(self):

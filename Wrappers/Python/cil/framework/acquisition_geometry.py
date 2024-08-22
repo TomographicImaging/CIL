@@ -2093,7 +2093,9 @@ class AcquisitionGeometry(object):
 
     def __eq__(self, other):
 
-        if isinstance(other, self.__class__) and self.config == other.config :
+        if isinstance(other, self.__class__) \
+            and self.config == other.config \
+            and self.dtype == other.dtype:
             return True
         return False
 

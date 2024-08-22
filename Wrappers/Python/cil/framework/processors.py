@@ -40,6 +40,7 @@ class Processor(object):
         attributes['output'] = None
         attributes['shouldRun'] = True
         attributes['input'] = None
+        attributes['_shape_out'] = None
 
         for key, value in attributes.items():
             self.__dict__[key] = value
@@ -60,6 +61,14 @@ class Processor(object):
         else:
             raise KeyError('Attribute {0} not found'.format(name))
 
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        dataset = self.get_input()
+        self._shape_out = dataset.shape
+
     def set_input(self, dataset):
         """
         Set the input data to the processor
@@ -69,7 +78,6 @@ class Processor(object):
         input : DataContainer
             The input DataContainer
         """
-
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = weakref.ref(dataset)
@@ -79,7 +87,8 @@ class Processor(object):
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}" \
                             .format(type(dataset), DataContainer))
-
+        
+        self._set_up()
 
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
@@ -96,28 +105,41 @@ class Processor(object):
         Parameters
         ----------
         out : DataContainer, optional
-           Fills the referenced DataContainer with the processed data and suppresses the return
+           Fills the referenced DataContainer with the processed data
 
         Returns
         -------
         DataContainer
-            The processed data. Suppressed if `out` is passed
+            The processed data
         """
+        if not self.check_output(out):
+            raise ValueError('Output data not compatible with processor')
+        
         if self.output is None or self.shouldRun:
-            if out is None:
-                out = self.process()
-            else:
-                self.process(out=out)
-
+            out = self.process(out=out)
             if self.store_output:
                 self.output = out.copy()
-
             return out
-
         else:
-            return self.output.copy()
-
-
+            if out is not None:
+                out.fill(self.output)
+                return out
+        return self.output.copy()
+    
+    def check_output(self, out):
+        
+        if out is not None:
+            data = self.get_input()
+            if data.array.dtype != out.array.dtype:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, data.array.dtype))
+            
+            if self._shape_out != out.shape:
+                raise ValueError("out size mismatch: got {0} expecting {1}"\
+                                 .format(out.shape, self._shape_out))
+         
+        return True
+    
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
             self.__dict__['input'] =  weakref.ref(processor)
@@ -145,13 +167,7 @@ class Processor(object):
     def __call__(self, x, out=None):
 
         self.set_input(x)
-
-        if out is None:
-            out = self.get_output()
-        else:
-            self.get_output(out=out)
-
-        return out
+        return self.get_output(out=out)
 
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''
@@ -198,18 +214,21 @@ class AX(DataProcessor):
 
     def check_input(self, dataset):
         return True
+    
+    def check_output(self, dataset):
+        return True
 
     def process(self, out=None):
 
         dsi = self.get_input()
         a = self.scalar
         if out is None:
-            y = DataContainer(a * dsi.as_array(), True,
+            out = DataContainer(a * dsi.as_array(), True,
                               dimension_labels=dsi.dimension_labels)
-            #self.setParameter(output_dataset=y)
-            return y
         else:
             out.fill(a * dsi.as_array())
+
+        return out
 
 
 ###### Example of DataProcessors
@@ -235,6 +254,9 @@ class CastDataContainer(DataProcessor):
         super(CastDataContainer, self).__init__(**kwargs)
 
     def check_input(self, dataset):
+        return True
+    
+    def check_output(self, dataset):
         return True
 
     def process(self, out=None):

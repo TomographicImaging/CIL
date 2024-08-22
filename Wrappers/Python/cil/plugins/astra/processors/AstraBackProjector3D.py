@@ -55,13 +55,19 @@ class AstraBackProjector3D(DataProcessor):
 
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
 
-
     def check_input(self, dataset):
 
         if self.sinogram_geometry.shape != dataset.geometry.shape:
             raise ValueError("Dataset not compatible with geometry used to create the projector")
 
         return True
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
 
     def set_ImageGeometry(self, volume_geometry):
 

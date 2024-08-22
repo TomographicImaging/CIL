@@ -60,6 +60,13 @@ class AstraForwardProjector3D(DataProcessor):
             raise ValueError("Dataset not compatible with geometry used to create the projector")
 
         return True
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.sinogram_geometry.shape
 
     def set_ImageGeometry(self, volume_geometry):
 

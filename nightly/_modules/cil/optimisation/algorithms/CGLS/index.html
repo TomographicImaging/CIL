@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.CGLS &#8212; CIL 24.1.1.dev20+g66206d33 documentation</title>
+    <title>cil.optimisation.algorithms.CGLS &#8212; CIL 24.1.1.dev21+g6d9978bf documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=bf4fc694"></script>
+    <script src="../../../../../_static/documentation_options.js?v=ccf51832"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev20+g66206d33';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev21+g6d9978bf';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -498,6 +498,7 @@
 <span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">Algorithm</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span> 
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -506,55 +507,69 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS">[docs]</a>
 <span class="k">class</span> <span class="nc">CGLS</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Conjugate Gradient Least Squares algorithm</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Conjugate Gradient Least Squares (CGLS) algorithm</span>
+<span class="sd">    </span>
+<span class="sd">    The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.</span>
 
 <span class="sd">    Problem:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      \min || A x - b ||^2_2</span>
+<span class="sd">      \min_x || A x - b ||^2_2</span>
+<span class="sd">      </span>
+<span class="sd">      </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ------------</span>
+<span class="sd">    operator : Operator</span>
+<span class="sd">        Linear operator for the inverse problem</span>
+<span class="sd">    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. </span>
+<span class="sd">        Initial guess </span>
+<span class="sd">    data : DataContainer in the range of the operator </span>
+<span class="sd">        Acquired data to reconstruct</span>
+<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour.</span>
 
-<span class="sd">    |</span>
-
-<span class="sd">    Parameters :</span>
-
-<span class="sd">      :parameter operator : Linear operator for the inverse problem</span>
-<span class="sd">      :parameter initial : Initial guess ( Default initial = 0)</span>
-<span class="sd">      :parameter data : Acquired data to reconstruct</span>
-<span class="sd">      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        https://web.stanford.edu/group/SOL/software/cgls/</span>
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    https://web.stanford.edu/group/SOL/software/cgls/</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;initialisation of the algorithm</span>
-
-<span class="sd">        :param operator : Linear operator for the inverse problem</span>
-<span class="sd">        :param initial : Initial guess ( Default initial = 0)</span>
-<span class="sd">        :param data : Acquired data to reconstruct</span>
-<span class="sd">        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1">#We are deprecating tolerance </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tolerance&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="mi">0</span>
+        
         <span class="nb">super</span><span class="p">(</span><span class="n">CGLS</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">operator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">initial</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">operator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span> 
 
 <div class="viewcode-block" id="CGLS.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.set_up">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;initialisation of the algorithm</span>
+    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Initialisation of the algorithm</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ------------</span>
+<span class="sd">        operator : Operator</span>
+<span class="sd">            Linear operator for the inverse problem</span>
+<span class="sd">        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. </span>
+<span class="sd">            Initial guess </span>
+<span class="sd">        data : DataContainer in the range of the operator </span>
+<span class="sd">            Acquired data to reconstruct</span>
 
-<span class="sd">        :param operator: Linear operator for the inverse problem</span>
-<span class="sd">        :param initial: Initial guess ( Default initial = 0)</span>
-<span class="sd">        :param data: Acquired data to reconstruct</span>
-<span class="sd">        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
@@ -596,7 +611,7 @@
         <span class="c1">#self.p = self.s + self.beta * self.p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="c1"># TODO: Deprecated, remove when CGLS tolerance is removed</span></div>
 
 
 
@@ -611,20 +626,18 @@
 
 <div class="viewcode-block" id="CGLS.should_stop">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.should_stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># TODO: Deprecated, remove when CGLS tolerance is removed</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="CGLS.flag">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.CGLS.flag">[docs]</a>
-    <span class="k">def</span> <span class="nf">flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># TODO: Deprecated, remove when CGLS tolerance is removed</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns whether the tolerance has been reached&#39;&#39;&#39;</span>
         <span class="n">flag</span>  <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norms</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norms0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_objective</span><span class="p">()</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="nb">print</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose_output</span><span class="p">())</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tolerance is reached: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">flag</span></div>

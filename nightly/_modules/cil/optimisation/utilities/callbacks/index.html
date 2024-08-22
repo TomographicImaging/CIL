@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.callbacks &#8212; CIL 24.1.1.dev20+g66206d33 documentation</title>
+    <title>cil.optimisation.utilities.callbacks &#8212; CIL 24.1.1.dev21+g6d9978bf documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=bf4fc694"></script>
+    <script src="../../../../../_static/documentation_options.js?v=ccf51832"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev20+g66206d33';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev21+g6d9978bf';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -482,6 +482,7 @@
 
 <span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span> <span class="k">as</span> <span class="n">tqdm_auto</span>
 <span class="kn">from</span> <span class="nn">tqdm.std</span> <span class="kn">import</span> <span class="n">tqdm</span> <span class="k">as</span> <span class="n">tqdm_std</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
 <div class="viewcode-block" id="Callback">
@@ -625,6 +626,58 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+        
+<span class="k">class</span> <span class="nc">EarlyStoppingObjectiveValue</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Callback that stops iterations if the change in the objective value is less than a provided threshold value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    threshold: float, default 1e-6 </span>
+
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    This callback only compares the last two calculated objective values. If `update_objective_interval` is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every `update_objective_interval` iterations.</span>
+<span class="sd">    </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span>
+    
+    
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">loss</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">algorithm</span><span class="o">.</span><span class="n">loss</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StopIteration</span>
+                
+<span class="k">class</span> <span class="nc">CGLSEarlyStopping</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as &#39;1e-6&#39;, :math:`x` is the current iterate and :math:`x_0` is the initial value. </span>
+<span class="sd">    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2&gt; \omega`, where `omega` is set to default as 1e6. </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epsilon: float, default 1e-6 </span>
+<span class="sd">        Usually a small number: the algorithm to terminate if :math:`||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2`</span>
+<span class="sd">    omega: float, default 1e6 </span>
+<span class="sd">        Usually a large number: the algorithm will terminate if  :math:`||x||_2&gt; \omega`</span>
+<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions &lt;=24. It also replicates the behaviour of https://web.stanford.edu/group/SOL/software/cgls/. </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="mf">1e6</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="o">=</span><span class="n">omega</span>
+    
+    
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">norms</span> <span class="o">&lt;=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">norms0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the residual is less than </span><span class="si">{}</span><span class="s1"> times the norm of the initial residual and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">normx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the solution is greater than </span><span class="si">{}</span><span class="s1"> and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+            
+        
 </pre></div>
 
                 </article>

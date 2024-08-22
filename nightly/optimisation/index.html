@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.1.1.dev20+g66206d33 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.1.1.dev21+g6d9978bf documentation</title>
   
   
   
@@ -46,7 +46,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=bf4fc694"></script>
+    <script src="../_static/documentation_options.js?v=ccf51832"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev20+g66206d33';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev21+g6d9978bf';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -853,39 +853,36 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <h3>CGLS<a class="headerlink" href="#cgls" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">CGLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/CGLS/#CGLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.CGLS" title="Link to this definition">#</a></dt>
-<dd><p>Conjugate Gradient Least Squares algorithm</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">CGLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/CGLS/#CGLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.CGLS" title="Link to this definition">#</a></dt>
+<dd><p>Conjugate Gradient Least Squares (CGLS) algorithm</p>
+<p>The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.</p>
 <p>Problem:</p>
 <div class="math notranslate nohighlight">
-\[\min || A x - b ||^2_2\]</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<p>Parameters :</p>
-<blockquote>
-<div><p>:parameter operator : Linear operator for the inverse problem
-:parameter initial : Initial guess ( Default initial = 0)
-:parameter data : Acquired data to reconstruct
-:parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm</p>
-</div></blockquote>
-<dl class="simple">
-<dt>Reference:</dt><dd><p><a class="reference external" href="https://web.stanford.edu/group/SOL/software/cgls/">https://web.stanford.edu/group/SOL/software/cgls/</a></p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.set_up">
-<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/CGLS/#CGLS.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.set_up" title="Link to this definition">#</a></dt>
-<dd><p>initialisation of the algorithm</p>
+\[\min_x || A x - b ||^2_2\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – Linear operator for the inverse problem</p></li>
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
-<li><p><strong>data</strong> – Acquired data to reconstruct</p></li>
-<li><p><strong>tolerance</strong> – Tolerance/ Stopping Criterion to end CGLS algorithm</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Linear operator for the inverse problem</p></li>
+<li><p><strong>initial</strong> (<em>(</em><em>optional</em><em>) </em><em>DataContainer in the domain</em><em> of </em><em>the operator</em><em>, </em><em>default is a DataContainer filled with zeros.</em>) – Initial guess</p></li>
+<li><p><strong>data</strong> (<em>DataContainer in the range</em><em> of </em><em>the operator</em>) – Acquired data to reconstruct</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: <a class="reference external" href="https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks">https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks</a> and in particular the CGLSEarlyStopping callback replicated the old behaviour.</p>
+<p><a class="reference external" href="https://web.stanford.edu/group/SOL/software/cgls/">https://web.stanford.edu/group/SOL/software/cgls/</a></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/CGLS/#CGLS.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.set_up" title="Link to this definition">#</a></dt>
+<dd><p>Initialisation of the algorithm
+:param operator: Linear operator for the inverse problem
+:type operator: Operator
+:param initial: Initial guess
+:type initial: (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros.
+:param data: Acquired data to reconstruct
+:type data: DataContainer in the range of the operator</p>
 </dd></dl>
 
 <dl class="py method">

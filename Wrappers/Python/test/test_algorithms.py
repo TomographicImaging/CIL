@@ -1158,7 +1158,6 @@ class TestSPDHG(unittest.TestCase):
 
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f, g=g, operator=operator, tau=tau, sigma=sigma,
-                    max_iteration=1000,
                     update_objective_interval=500)
         pdhg.run(100)
         # %% 'explicit' SPDHG, scalar step-sizes

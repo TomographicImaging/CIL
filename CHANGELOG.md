@@ -9,6 +9,7 @@
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)
+    - SPDHG vs PDHG unit test has been updated to reduce the time it takes and parameters have been adjusted (#1898)
 
 * 24.1.0
   - New Features:

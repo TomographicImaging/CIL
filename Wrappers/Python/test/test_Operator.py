@@ -19,9 +19,9 @@
 import unittest
 from unittest.mock import Mock
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
-from cil.optimisation.operators import BlockOperator,\
-    FiniteDifferenceOperator, SymmetrisedGradientOperator
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer
+from cil.framework.labels import FillType
+from cil.optimisation.operators import FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
 from timeit import default_timer as timer
 from cil.optimisation.operators import GradientOperator, IdentityOperator,\
@@ -45,8 +45,6 @@ def dt(steps):
 
 
 class TestOperator(CCPiTestClass):
-
-
     def test_MatrixOperator(self):
         m = 30
         n = 20
@@ -81,9 +79,6 @@ class TestOperator(CCPiTestClass):
         Amat = numpy.random.randn(m, n) + 1j*numpy.random.randn(m, n)
         A = MatrixOperator(Amat)
         self.assertTrue(A.dot_test(A))
-
-
-
 
     def test_ZeroOperator(self):
         ig = ImageGeometry(10,20,30)
@@ -211,7 +206,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(100,100)
 
         # Parameters for point spread function PSF (size and std)
-        ks          = 11;
+        ks          = 11
         ksigma      = 5.0
 
         # Create 1D PSF and 2D as outer product, then normalise.
@@ -239,10 +234,10 @@ class TestOperator(CCPiTestClass):
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
-                
+
         #Check is_linear
         self.assertTrue(Id.is_linear())
-        
+
         #Check is_orthogonal
         self.assertTrue(Id.is_orthogonal())
 
@@ -254,14 +249,13 @@ class TestOperator(CCPiTestClass):
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
-
-        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = FD.domain_geometry().allocate(FillType["RANDOM"])
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = Id.domain_geometry().allocate(FillType["RANDOM"])
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -270,14 +264,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.range_geometry().allocate(FillType["RANDOM"])
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.domain_geometry().allocate(FillType["RANDOM"])
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -512,7 +506,7 @@ class TestOperator(CCPiTestClass):
 
         res1 = bg.allocate(0)
         proj_map.adjoint(x, out=res1)
-        
+
         res2=bg.allocate('random')
         proj_map.adjoint(x, out=res2)
 
@@ -656,9 +650,6 @@ class TestGradients(CCPiTestClass):
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
         self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
 
-
-
- 
 
 class TestOperatorCompositionSum(unittest.TestCase):
     def setUp(self):

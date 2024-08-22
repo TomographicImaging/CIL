@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionType
 import numpy as np
 
 import logging
@@ -138,14 +139,9 @@ class CofR_xcorrelation(Processor):
         return np.abs(angles_deg - 180).argmin()
 
     def process(self, out=None):
-
-        data_full = self.get_input()
-
-        if data_full.geometry.dimension == '3D':
-
-            data = data_full.get_slice(vertical=self.slice_index)
-        else:
-            data = data_full
+        data = data_full = self.get_input()
+        if AcquisitionType.DIM3 & data_full.geometry.dimension:
+            data = data.get_slice(vertical=self.slice_index)
 
         geometry = data.geometry
 

@@ -664,6 +664,10 @@ We also have a number of example classes:
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
    :members:
 
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
+
 
 Preconditioners
 ----------------

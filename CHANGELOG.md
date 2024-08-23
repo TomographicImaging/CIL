@@ -11,6 +11,7 @@
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+    - Updated the documentation for the algorithm base class (#1809)
     - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
     - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
     - Internal refactor: Separate framework into multiple files (#1692)

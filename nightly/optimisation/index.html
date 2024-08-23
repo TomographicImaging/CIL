@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.1.1.dev103+g75f439c7 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../_static/documentation_options.js?v=6625e36e"></script>
+    <script src="../_static/documentation_options.js?v=375481fe"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev103+g75f439c7';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -610,17 +610,16 @@ print to screen of the status of the optimisation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">Algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_objective_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm" title="Link to this definition">#</a></dt>
-<dd><p>Base class for iterative algorithms</p>
-<p>provides the minimal infrastructure.</p>
-<p>Algorithms are iterables so can be easily run in a for loop. They will
-stop as soon as the stop criterion is met.
-The user is required to implement the <code class="code docutils literal notranslate"><span class="pre">set_up</span></code>, <code class="code docutils literal notranslate"><span class="pre">__init__</span></code>, <code class="code docutils literal notranslate"><span class="pre">update</span></code> and
-and <code class="code docutils literal notranslate"><span class="pre">update_objective</span></code> methods</p>
-<p>A courtesy method <code class="code docutils literal notranslate"><span class="pre">run</span></code> is available to run <code class="code docutils literal notranslate"><span class="pre">n</span></code> iterations. The method accepts
-a <code class="code docutils literal notranslate"><span class="pre">callbacks</span></code> list of callables, each of which receive the current Algorithm object
-(which in turn contains the iteration number and the actual objective value)
-and can be used to trigger print to screens and other user interactions. The <code class="code docutils literal notranslate"><span class="pre">run</span></code>
-method will stop when the stopping criterion is met or <cite>StopIteration</cite> is raised.</p>
+<dd><p>Base class providing minimal infrastructure for iterative algorithms.</p>
+<p>An iterative algorithm is designed to solve an optimization problem by repeatedly refining a solution. In CIL, we use iterative algorithms to minimize an objective function, often referred to as a loss. The process begins with an initial guess, and with each iteration, the algorithm updates the current solution based on the results of previous iterations (previous iterates). Iterative algorithms typically continue until a stopping criterion is met, indicating that an optimal or sufficiently good solution has been found. In CIL, stopping criteria can be implemented using a callback function (<cite>cil.optimisation.utilities.callbacks</cite>).</p>
+<blockquote>
+<div><p>The user is required to implement the <code class="code docutils literal notranslate"><span class="pre">set_up</span></code>, <code class="code docutils literal notranslate"><span class="pre">__init__</span></code>, <code class="code docutils literal notranslate"><span class="pre">update</span></code> and <code class="code docutils literal notranslate"><span class="pre">update_objective</span></code> methods.</p>
+<p>The method <code class="code docutils literal notranslate"><span class="pre">run</span></code> is available to run <code class="code docutils literal notranslate"><span class="pre">n</span></code> iterations. The method accepts <code class="code docutils literal notranslate"><span class="pre">callbacks</span></code>: a list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The <code class="code docutils literal notranslate"><span class="pre">run</span></code> method will stop when the stopping criterion is met or <cite>StopIteration</cite> is raised.</p>
+<dl class="simple">
+<dt>update_objective_interval: int, optional, default 1</dt><dd><p>The objective (or loss) is calculated and saved every <cite>update_objective_interval</cite>.  1 means every iteration, 2 every 2 iterations and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.</p>
+</dd>
+</dl>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.set_up" title="Link to this definition">#</a></dt>
@@ -641,31 +640,77 @@ method will stop when the stopping criterion is met or <cite>StopIteration</cite
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.max_iteration_stop_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.is_provably_convergent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.get_last_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -683,17 +728,15 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -702,21 +745,50 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.objective_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.objective_to_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.verbose_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.Algorithm.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/Algorithm/#Algorithm.verbose_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.Algorithm.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -777,29 +849,63 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -811,9 +917,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.GD.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -822,29 +927,69 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.GD.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.GD.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.GD.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -914,29 +1059,63 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -948,9 +1127,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -959,29 +1137,69 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -1075,29 +1293,63 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1109,9 +1361,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1120,26 +1371,42 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1150,6 +1417,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -1219,13 +1510,7 @@ is guaranteed if</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Set the minimal number of parameters:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.set_up">
@@ -1409,23 +1694,49 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1437,9 +1748,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1448,26 +1758,42 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1478,6 +1804,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -1537,13 +1887,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__init__" title="Link to this definition">#</a></dt>
-<dd><p>Set the minimal number of parameters:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>update_objective_interval</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 1</em>) – the interval every which we would save the current                                       objective. 1 means every iteration, 2 every 2 iteration                                       and so forth. This is by default 1 and should be increased                                       when evaluating the objective is computationally expensive.</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.update">
@@ -1711,17 +2055,35 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1734,6 +2096,14 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1745,9 +2115,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1756,26 +2125,42 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1794,12 +2179,36 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.update_objective">
 <span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective" title="Link to this definition">#</a></dt>
 <dd><p>Updates the objective</p>
 <div class="math notranslate nohighlight">
 \[f(x) + g(x)\]</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -2043,31 +2452,56 @@ The case where both functions are strongly convex is not available at the moment
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -2079,9 +2513,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2091,17 +2524,34 @@ the update_objective_interval &gt; 1</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2112,6 +2562,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -2155,29 +2629,63 @@ where in the PDHG a proximal and proximal conjugate.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -2189,9 +2697,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2200,26 +2707,42 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2230,6 +2753,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>
@@ -2280,29 +2827,63 @@ of Three Functions with a Linear Operator”.  This is a primal dual algorithm f
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -2314,9 +2895,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2325,26 +2905,42 @@ the update_objective_interval &gt; 1</p>
 <dd><p>gets the maximum number of iterations</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.objective" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2355,6 +2951,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.PD3O.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.PD3O.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </section>
@@ -2479,29 +3099,63 @@ Physics in Medicine &amp; Biology, Volume 64, Number 22, 2019.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.get_last_loss" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.get_last_objective">
 <span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.get_last_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the last stored value of the loss function</p>
-<p>if update_objective_interval is 1 it is the value of the objective at the current
-iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.is_provably_convergent">
 <span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.is_provably_convergent" title="Link to this definition">#</a></dt>
 <dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -2513,9 +3167,8 @@ iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.loss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.loss" title="Link to this definition">#</a></dt>
-<dd><p>returns the list of the values of the objective during the iteration</p>
-<p>The length of this list may be shorter than the number of iterations run when
-the update_objective_interval &gt; 1</p>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2525,17 +3178,34 @@ the update_objective_interval &gt; 1</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.run" title="Link to this definition">#</a></dt>
 <dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> – number of iterations to run. If not set the algorithm will
-run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
-<li><p><strong>verbose</strong> – 0=quiet, 1=info, 2=debug</p></li>
-<li><p><strong>callbacks</strong> – list of callables which are passed the current Algorithm
-object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2546,6 +3216,30 @@ object each iteration. Defaults to <code class="code docutils literal notranslat
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>default stopping criterion: number of iterations</p>
 <p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.solution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.update_objective_interval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 
 </dd></dl>

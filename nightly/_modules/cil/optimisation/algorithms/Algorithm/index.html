@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.Algorithm &#8212; CIL 24.1.1.dev102+gf708a1f2 documentation</title>
+    <title>cil.optimisation.algorithms.Algorithm &#8212; CIL 24.1.1.dev103+g75f439c7 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f283d04fae41aba60e43" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=f283d04fae41aba60e43"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=6625e36e"></script>
+    <script src="../../../../../_static/documentation_options.js?v=375481fe"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev102+gf708a1f2';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev103+g75f439c7';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
@@ -507,31 +507,22 @@
 <div class="viewcode-block" id="Algorithm">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm">[docs]</a>
 <span class="k">class</span> <span class="nc">Algorithm</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Base class for iterative algorithms</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class providing minimal infrastructure for iterative algorithms.</span>
 
-<span class="sd">      provides the minimal infrastructure.</span>
+<span class="sd">   An iterative algorithm is designed to solve an optimization problem by repeatedly refining a solution. In CIL, we use iterative algorithms to minimize an objective function, often referred to as a loss. The process begins with an initial guess, and with each iteration, the algorithm updates the current solution based on the results of previous iterations (previous iterates). Iterative algorithms typically continue until a stopping criterion is met, indicating that an optimal or sufficiently good solution has been found. In CIL, stopping criteria can be implemented using a callback function (`cil.optimisation.utilities.callbacks`).</span>
+<span class="sd">     </span>
+<span class="sd">    The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective` methods.</span>
 
-<span class="sd">      Algorithms are iterables so can be easily run in a for loop. They will</span>
-<span class="sd">      stop as soon as the stop criterion is met.</span>
-<span class="sd">      The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and</span>
-<span class="sd">      and :code:`update_objective` methods</span>
-
-<span class="sd">      A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts</span>
-<span class="sd">      a :code:`callbacks` list of callables, each of which receive the current Algorithm object</span>
-<span class="sd">      (which in turn contains the iteration number and the actual objective value)</span>
-<span class="sd">      and can be used to trigger print to screens and other user interactions. The :code:`run`</span>
-<span class="sd">      method will stop when the stopping criterion is met or `StopIteration` is raised.</span>
-<span class="sd">   &#39;&#39;&#39;</span>
+<span class="sd">    The method :code:`run` is available to run :code:`n` iterations. The method accepts :code:`callbacks`: a list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    update_objective_interval: int, optional, default 1</span>
+<span class="sd">        The objective (or loss) is calculated and saved every `update_objective_interval`.  1 means every iteration, 2 every 2 iterations and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the minimal number of parameters:</span>
 
-<span class="sd">        :param update_objective_interval: the interval every which we would save the current\</span>
-<span class="sd">                                       objective. 1 means every iteration, 2 every 2 iteration\</span>
-<span class="sd">                                       and so forth. This is by default 1 and should be increased\</span>
-<span class="sd">                                       when evaluating the objective is computationally expensive.</span>
-<span class="sd">        :type update_objective_interval: int, optional, default 1</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_iteration</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">max_iteration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -572,11 +563,16 @@
 
 
     <span class="k">def</span> <span class="nf">__set_up_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do not use: this is being deprecated&quot;&quot;&quot;</span>
         <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Algorithm.max_iteration_stop_criterion">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">[docs]</a>
     <span class="k">def</span> <span class="nf">max_iteration_stop_criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do not use: this is being deprecated&quot;&quot;&quot;</span>
         <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `should_stop()` instead of `max_iteration_stop_criterion()`&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iteration</span></div>
+
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algorithm is an iterable&#39;&#39;&#39;</span>
@@ -609,10 +605,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span>
 
     <span class="k">def</span> <span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Update the previous solution with the current one</span>
-
-<span class="sd">        The concrete algorithm calls update_previous_solution. Normally this would</span>
-<span class="sd">        entail the swapping of pointers:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; An optional but common function that can be implemented by child classes to update a stored previous solution with the current one. </span>
+<span class="sd">        Best practice for memory efficiency would be to do this by the swapping of pointers:</span>
 
 <span class="sd">        .. highlight:: python</span>
 <span class="sd">        .. code-block:: python</span>
@@ -627,32 +621,60 @@
 <div class="viewcode-block" id="Algorithm.get_output">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_output">[docs]</a>
     <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot; Returns the current solution. &quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Returns the current solution. </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            The current solution </span>
+<span class="sd">             </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span></div>
 
 
     <span class="k">def</span> <span class="nf">_provable_convergence_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Checks if the algorithm set-up (e.g. chosen step-sizes or other parameters) meets a mathematical convergence criterion.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool: Outcome of the convergence check  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot; Convergence criterion is not implemented for this algorithm. &quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Algorithm.is_provably_convergent">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.is_provably_convergent">[docs]</a>
     <span class="k">def</span> <span class="nf">is_provably_convergent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Check if the algorithm is convergent based on the provable convergence criterion.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Boolean</span>
+<span class="sd">            Outcome of the convergence check  </span>
+<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provable_convergence_condition</span><span class="p">()</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot; Returns the current solution. &quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Algorithm.get_last_loss">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_loss">[docs]</a>
     <span class="k">def</span> <span class="nf">get_last_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the last stored value of the loss function</span>
-
-<span class="sd">        if update_objective_interval is 1 it is the value of the objective at the current</span>
-<span class="sd">        iteration. If update_objective_interval &gt; 1 it is the last stored value.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns the last stored value of the loss function. &quot;Loss&quot; is an alias for &quot;objective value&quot;. If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        return_all: Boolean, default is False</span>
+<span class="sd">            If True, returns all the stored loss functions </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Float</span>
+<span class="sd">            Last stored value of the loss function </span>
+<span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">objective</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -676,12 +698,12 @@
     <span class="k">def</span> <span class="nf">iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the iterations at which the objective has been evaluated&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span>
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the list of the values of the objective during the iteration</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a list of the values of the objective (alias of loss) during the iteration</span>
 
-<span class="sd">        The length of this list may be shorter than the number of iterations run when</span>
-<span class="sd">        the update_objective_interval &gt; 1</span>
+<span class="sd">        The length of this list may be shorter than the number of iterations run when the `update_objective_interval` &gt; 1</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loss</span>
 
@@ -700,10 +722,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">update_objective_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;gets the update_objective_interval&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__update_objective_interval</span>
 
     <span class="nd">@update_objective_interval</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">update_objective_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;sets the update_objective_interval&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;interval must be an integer &gt;= 0&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__update_objective_interval</span> <span class="o">=</span> <span class="n">value</span>
@@ -711,14 +735,20 @@
 <div class="viewcode-block" id="Algorithm.run">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.run">[docs]</a>
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Callback</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;run upto :code:`iterations` with callbacks/logging.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;run upto :code:`iterations` with callbacks/logging.</span>
+<span class="sd">        </span>
+<span class="sd">        For a demonstration of callbacks see https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb</span>
 
-<span class="sd">        :param iterations: number of iterations to run. If not set the algorithm will</span>
-<span class="sd">          run until :code:`should_stop()` is reached</span>
-<span class="sd">        :param verbose: 0=quiet, 1=info, 2=debug</span>
-<span class="sd">        :param callbacks: list of callables which are passed the current Algorithm</span>
-<span class="sd">          object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        iterations: int, default is None</span>
+<span class="sd">            Number of iterations to run. If not set the algorithm will run until :code:`should_stop()` is reached</span>
+<span class="sd">        callbacks: list of callables, default is Defaults to :code:`[ProgressCallback(verbose)]`</span>
+<span class="sd">            List of callables which are passed the current Algorithm object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.</span>
+<span class="sd">        verbose: 0=quiet, 1=info, 2=debug</span>
+<span class="sd">            Passed to the default callback to determine the verbosity of the printed output. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">if</span> <span class="s1">&#39;print_interval&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `TextProgressCallback(miniters)` instead of `run(print_interval)`&quot;</span><span class="p">,</span>
                  <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -752,23 +782,39 @@
                 <span class="k">break</span></div>
 
 
+<div class="viewcode-block" id="Algorithm.objective_to_dict">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.objective_to_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">objective_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function to save and print objective functions&quot;&quot;&quot;</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;primal&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;dual&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;primal_dual&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span></div>
 
+
+<div class="viewcode-block" id="Algorithm.objective_to_string">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.objective_to_string">[docs]</a>
     <span class="k">def</span> <span class="nf">objective_to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do not use: this is being deprecated&quot;&quot;&quot;</span>
         <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;consider using `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_to_dict</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_to_dict</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span></div>
 
+
+<div class="viewcode-block" id="Algorithm.verbose_output">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_output">[docs]</a>
     <span class="k">def</span> <span class="nf">verbose_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[ProgressCallback()])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do not use: this is being deprecated&quot;&quot;&quot;</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use `run(callbacks=[ProgressCallback()])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="Algorithm.verbose_header">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_header">[docs]</a>
     <span class="k">def</span> <span class="nf">verbose_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do not use: this is being deprecated&quot;&quot;&quot;</span>
         <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;consider using `run(callbacks=[LogfileCallback(log_file)])` instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

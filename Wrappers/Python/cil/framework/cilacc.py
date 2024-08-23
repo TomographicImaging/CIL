@@ -15,14 +15,19 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import ctypes
+import platform
+from ctypes import util
+# check for the extension
 
-from .Algorithm import Algorithm
-from .CGLS import CGLS
-from .SIRT import SIRT
-from .GD import GD
-from .FISTA import FISTA
-from .FISTA import ISTA
-from .PDHG import PDHG
-from .ADMM import LADMM
-from .SPDHG import SPDHG
-from .PD3O import PD3O
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll_file = 'cilacc.dll'
+    dll = util.find_library(dll_file)
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+cilacc = ctypes.cdll.LoadLibrary(dll)

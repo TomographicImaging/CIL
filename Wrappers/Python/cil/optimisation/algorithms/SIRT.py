@@ -101,10 +101,19 @@ class SIRT(Algorithm):
         """Initialisation of the algorithm"""
         log.info("%s setting up", self.__class__.__name__)
         
+        warning = 0
         if operator is None:
-            raise ValueError('You must pass an `operator` to the SIRT algorithm')
+            warning += 1
+            msg = "an `operator`"
         if data is None:
-            raise ValueError('You must pass `data` to the SIRT algorithm')
+            warning += 10
+            if warning > 10:
+                msg += " and `data`"
+            else:
+                msg = "`data`"
+        if warning > 0:
+            raise ValueError(f'You must pass {msg} to the SIRT algorithm' )
+        
         if initial is None:
             initial = operator.domain_geometry().allocate(0)
         

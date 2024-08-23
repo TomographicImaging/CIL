@@ -1004,13 +1004,16 @@ class TestSIRT(CCPiTestClass):
 
         with self.assertRaises(ValueError) as context:
             sirt = SIRT(initial=None, operator=None, data=self.b2)
-        self.assertEqual(str(context.exception), 'You must pass an `operator` to the SIRT algorithm')
+            self.assertEqual(str(context.exception), 'You must pass an `operator` to the SIRT algorithm')
     
 
         with self.assertRaises(ValueError) as context:
             sirt = SIRT(initial=None, operator=self.A2, data=None)
-        self.assertEqual(str(context.exception), 'You must pass `data` to the SIRT algorithm')
-
+            self.assertEqual(str(context.exception), 'You must pass `data` to the SIRT algorithm')
+        with self.assertRaises(ValueError) as context:  
+            sirt = SIRT(initial=None, operator=None, data=None)  
+            self.assertEqual(str(context.exception), 
+                'You must pass an `operator` and `data` to the SIRT algorithm')  
 
         sirt = SIRT(initial=None, operator=self.A2, data=self.b2)
         self.assertTrue(sirt.configured)

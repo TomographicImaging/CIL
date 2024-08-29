@@ -38,7 +38,7 @@ test:
     - tomophantom=2.0.0       # [ linux ]
     - tigre=2.6
     - packaging
-    - ccpi-regulariser=24.0.0 # [ not osx ]
+    - ccpi-regulariser=24.0.1 # [ not osx ]
     - astra-toolbox=2.1=cuda* # [ not osx ]
 
   source_files:
@@ -55,7 +55,8 @@ requirements:
     - python
     - numpy {{ numpy }}
     - pip
-    - setuptools
+    - setuptools >=64
+    - setuptools_scm >=8
     - cmake         # [not osx]
     - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]
@@ -93,10 +94,10 @@ requirements:
     - tomophantom=2.0.0
     - astra-toolbox>=1.9.9.dev5,<=2.1
     - tigre>=2.4,<=2.6
-    - ccpi-regulariser=24.0.0
+    - ccpi-regulariser=24.0.1
     - ipywidgets
 
 about:
-  home: http://www.ccpi.ac.uk/cil
+  home: https://ccpi.ac.uk/cil
   license:  Apache 2.0 License
   summary: 'CCPi Core Imaging Library'

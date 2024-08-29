@@ -63,10 +63,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
         data = self.get_input()
 
-        return_val = False
         if out is None:
             out = data.geometry.allocate(None)
-            return_val = True
 
         arr_in = data.as_array()
         arr_out = out.as_array()
@@ -87,5 +85,4 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
         out.fill(arr_out)
 
-        if return_val:
-            return out
+        return out

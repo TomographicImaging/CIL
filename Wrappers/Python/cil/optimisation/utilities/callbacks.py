@@ -134,3 +134,16 @@ class LogfileCallback(TextProgressCallback):
     def __init__(self, log_file, mode='a', **kwargs):
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, **kwargs)
+
+class SaveIterates(Callback):
+    
+    def __init__(self, interval=1):
+
+        self.iterates=[]
+        self.interval=interval
+
+        super(SaveIterates, self).__init__()  
+
+    def __call__(self, algo):
+
+        self.iterates.append( algo.get_output().copy())

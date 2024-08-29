@@ -606,6 +606,16 @@ A list of :code:`Callback` s to be executed each iteration can be passed to `Alg
 
 Built-in callbacks include:
 
+.. autoclass:: cil.optimisation.utilities.callbacks.SaveIterates
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.CGLSEarlyStopping
+   :members:
+
+
 .. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
    :members:
 

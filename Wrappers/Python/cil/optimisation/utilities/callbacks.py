@@ -4,6 +4,7 @@ from functools import partialmethod
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
 import numpy as np
+from cil.processors import Slicer
 
 
 class Callback(ABC):
@@ -189,14 +190,47 @@ class CGLSEarlyStopping(Callback):
             
         
 class SaveIterates(Callback):
+    '''Callback to save iterates every set number of iterations.  
+    Parameters
+    ----------
+    interval: integer, 
+        The iterates will be saved every `interval` number of iterations e.g. if `interval =4` the 0, 4, 8, 12,... iterates will be saved. 
     
-    def __init__(self, interval=1):
+    writer: TiffWriter, optional, default is None
+        If a writer is passed, it will be used to save the iterates. If not the iterates will be saved as a list in the class object `iterates`
+    
+    roi: dict, optional default is None and no slicing will be applied
+        The region-of-interest to slice {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
+        The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description
 
-        self.iterates=[]
+        Start: Starting index of input data. Must be an integer, or `None` defaults to index 0.
+        Stop: Stopping index of input data. Must be an integer, or `None` defaults to index N.
+        Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
+        
+    '''
+    def __init__(self, interval=1, writer=None, roi=None): #TODO: optionally pass an ROI 
+
+        self.writer=writer
+        if self.writer is None: 
+            self.iterates=[]
+            
         self.interval=interval
+        self.roi=roi 
+        if self.roi is not None:
+            self.slicer= Slicer(roi=self.roi)
 
         super(SaveIterates, self).__init__()  
 
     def __call__(self, algo):
-
-        self.iterates.append( algo.get_output().copy())
+        if algo.iteration % self.interval ==0:
+            if self.roi is None:
+                if self.writer is None:
+                    self.iterates.append( algo.solution.copy())
+                else:
+                    self.writer.write(algo.solution)
+            else:
+                self.slicer.set_input(algo.solution)
+                if self.writer is None:
+                    self.iterates.append( self.slicer.get_output())
+                else:
+                    self.writer.write( self.slicer.get_output())

@@ -1428,6 +1428,81 @@ class TestCallbacks(unittest.TestCase):
             callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
         
         
+
+class TestSaveIteratesCallback(unittest.TestCase):
+
+    class MockAlgo(Algorithm):
+        def __init__(self, initial, update_objective_interval=10, **kwargs):
+            super().__init__(update_objective_interval=update_objective_interval, **kwargs)
+            self.configured = True
+            self.x=initial
+
+        def update(self):
+            self.x -= 1
+
+        def update_objective(self):
+            self.loss.append(2 ** getattr(self, 'x', np.nan))
+            
+            
+    def setUp(self):
+        # Mock the algorithm object
+        
+        self.image_geometry = ImageGeometry(10, 2)
+        self.data = self.image_geometry.allocate(10)
+        self.mock_algorithm = self.MockAlgo(self.data)
+
+    def test_save_iterates_no_writer_no_roi(self):
+        # Test saving iterates to a list with no writer and no ROI
+        callback = callbacks.SaveIterates(interval=1)
+        
+        # Call the callback multiple times and increment iteration
+        self.mock_algorithm.run(5, callbacks=[callback])
+        
+        # Check if iterates are saved correctly
+        self.assertEqual(len(callback.iterates), 6)
+        for i in range(5):
+            np.testing.assert_array_equal(callback.iterates[i].array, (10-i)*np.ones((2,10)))
+
+    def test_save_iterates_with_writer(self):
+        # Test saving iterates using a writer
+        mock_writer = MagicMock()
+        callback = callbacks.SaveIterates(interval=1, writer=mock_writer)
+
+        # Call the callback and check if writer.write() was called
+        callback(self.mock_algorithm)
+        mock_writer.write.assert_called_once_with(self.mock_algorithm.x)
+
+    def test_save_iterates_with_roi(self):
+        # Test saving iterates with an ROI applied
+        roi = {'horizontal_x': (0, 2, 1)}
+        from cil.processors import Slicer
+
+
+        callback = callbacks.SaveIterates(interval=1, roi=roi)
+
+        # Call the callback and check if slicer was used
+        callback(self.mock_algorithm)
+        
+        np.testing.assert_array_equal(callback.iterates[0].array, 10*np.ones([2, 2]))
+
+    def test_save_iterates_with_interval(self):
+        # Test saving iterates with a specified interval
+        callback = callbacks.SaveIterates(interval=2)
+
+        # Call the callback multiple times and increment iteration
+        self.mock_algorithm.run(5, callbacks=[callback])
+
+        # Check if iterates were saved only at the correct intervals
+        self.assertEqual(len(callback.iterates), 3)
+        np.testing.assert_array_equal(callback.iterates[0].array, (10-0)*np.ones((2,10)))
+        np.testing.assert_array_equal(callback.iterates[1].array, (10-2)*np.ones((2,10)))
+        np.testing.assert_array_equal(callback.iterates[2].array, (10-4)*np.ones((2,10)))
+
+
+
+
+
+
 class TestADMM(unittest.TestCase):
     def setUp(self):
         ig = ImageGeometry(2, 3, 2)

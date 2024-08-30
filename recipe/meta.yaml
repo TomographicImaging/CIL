@@ -47,9 +47,9 @@ requirements:
     - openmp        # [osx]
     - vc 14         # [win]
     - cil-data
-    - ipp-include {{ ipp_version }} 
-    - ipp-devel {{ ipp_version }} 
-    - ipp {{ ipp_version }} 
+    - ipp-include =2021.12
+    - ipp-devel =2021.12
+    - ipp =2021.12
 
   run:
     - python

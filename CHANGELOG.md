@@ -24,6 +24,7 @@
     - Make Binner accept accelerated=False (#1887)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
+    - Make Paganin Processor work with AcquistionData with one angle (#1920)
 
 * 24.1.0
   - New Features:

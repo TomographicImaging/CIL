@@ -35,7 +35,6 @@ test:
     - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
 
-
 requirements:
   build:
     - python
@@ -51,9 +50,9 @@ requirements:
     - openmp        # [osx]
     - vc 14         # [win]
     - ninja         # [not win]
-    - ipp-include {{ ipp_version }}
-    - ipp-devel {{ ipp_version }}
-    - ipp {{ ipp_version }}
+    - ipp-include =2021.12
+    - ipp-devel =2021.12
+    - ipp =2021.12
     - scikit-build-core >=0.10
 
   run:

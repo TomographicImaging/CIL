@@ -224,8 +224,11 @@ class PaganinProcessor(Processor):
 
         # make slice indices to get the projection
         slice_proj = [slice(None)]*len(data.shape)
-        angle_axis = data.get_dimension_axis('angle')
-        slice_proj[angle_axis] = 0
+        if 'angle' in data.dimension_labels:
+            angle_axis = data.get_dimension_axis('angle')
+            slice_proj[angle_axis] = 0
+        else:
+            angle_axis = None
 
         if data.geometry.channels>1:
             channel_axis = data.get_dimension_axis('channel')
@@ -236,18 +239,16 @@ class PaganinProcessor(Processor):
         data_proj = data.as_array()[tuple(slice_proj)]
 
         # create an empty axis if the data is 2D
-        if len(data.shape) == 2:
+        if data.geometry.dimension == '2D':
             data.array = np.expand_dims(data.array, len(data.shape))
             slice_proj.append(slice(None))
             data_proj = data.as_array()[tuple(slice_proj)]
+            if len(out.shape) == 2:
+                out.array = np.expand_dims(out.array, len(out.shape))
 
-        elif len(data_proj.shape) == 2:
-            pass
-        else:
+        if len(data_proj.shape) != 2:
             raise(ValueError('Data must be 2D or 3D per channel'))
         
-        if len(out.shape) == 2:
-            out.array = np.expand_dims(out.array, len(out.shape))
         
         # create a filter based on the shape of the data
         filter_shape = np.shape(data_proj)
@@ -275,7 +276,8 @@ class PaganinProcessor(Processor):
             # loop over the projections
             for i in tqdm(range(len(data.geometry.angles))):
                 
-                slice_proj[angle_axis] = i
+                if angle_axis is not None:
+                    slice_proj[angle_axis] = i
                 padded_buffer.fill(0)
                 padded_buffer[slice_pad] = data.array[(tuple(slice_proj))]
 
@@ -294,11 +296,17 @@ class PaganinProcessor(Processor):
                     padded_buffer[:] = ifft2(fI*self.filter).real
 
                 if data.geometry.channels>1:
-                    out.fill(padded_buffer[slice_pad], angle = i, 
-                             channel=j)
+                    if len(data.geometry.angles)>1:
+                        out.fill(padded_buffer[slice_pad], angle = i, 
+                                channel=j)
+                    else:
+                        out.fill(padded_buffer[slice_pad], channel=j)
                 else:
-                    out.fill(padded_buffer[slice_pad], angle = i)
-                    
+                    if len(data.geometry.angles)>1:
+                        out.fill(padded_buffer[slice_pad], angle = i)
+                    else:
+                        out.fill(padded_buffer[slice_pad])
+                        
         data.array = np.squeeze(data.array)
         out.array = np.squeeze(out.array)
         return out

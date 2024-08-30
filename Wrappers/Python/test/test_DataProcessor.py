@@ -3085,6 +3085,29 @@ class TestPaganinProcessor(unittest.TestCase):
         output = processor.get_output(override_geometry={'propagation_distance':1})
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
+    def test_PaganinProcessor_1angle(self):
+        data = self.data_cone.get_slice(angle=1)
+        data.geometry.config.units = 'm'
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data)
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+        # check with different data order
+        data.reorder(('horizontal','vertical'))
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data)
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
 
 if __name__ == "__main__":
 

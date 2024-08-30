@@ -897,9 +897,19 @@ class DataContainer(object):
 
     def __eq__(self, other):
         '''Returns boolean array of DataContainer equal to DataContainer/float'''
+        # Return True or False - breaking backwards
         if isinstance(other, DataContainer):
-            return self.as_array()==other.as_array()
-        return self.as_array()==other
+            # datatype
+            # shape
+            # geometry
+            # dimension_labels?
+            # do we check the elements?
+            if (self.as_array() == other.as_array()).all() and self.geometry == other.geometry and self.dimension_labels == other.dimension_labels and self.shape == other.shape:
+                return True # sort out what it returns
+        elif (self.as_array() == other).all():
+            return True
+        else:
+            return False # numpy.allclose(self.as_array(), other)
 
     def __ne__(self, other):
         '''Returns boolean array of DataContainer negative to DataContainer/float'''

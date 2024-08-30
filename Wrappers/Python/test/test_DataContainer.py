@@ -38,20 +38,6 @@ def aid(x):
 
 
 class TestDataContainer(CCPiTestClass):
-    def create_simple_ImageData(self):
-        N = 64
-        ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
-        Phantom = ImageData(geometry=ig)
-
-        x = Phantom.as_array()
-
-        x[int(round(N/4)):int(round(3*N/4)),
-          int(round(N/4)):int(round(3*N/4))] = 0.5
-        x[int(round(N/8)):int(round(7*N/8)),
-          int(round(3*N/8)):int(round(5*N/8))] = 1
-
-        return (ig, Phantom)
-
     def create_DataContainer(self, X,Y,Z, value=1):
         a = value * np.ones((X, Y, Z), dtype='float32')
         #print("a refcount " , sys.getrefcount(a))
@@ -87,6 +73,23 @@ class TestDataContainer(CCPiTestClass):
         x_cil = DataContainer(x_np)
         self.assertEqual(x_np.ndim, x_cil.ndim)
         self.assertEqual(3, x_cil.ndim)
+
+    def test_equal(self):
+        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+        geom = ImageGeometry(voxel_num_x=8, voxel_num_y=4)
+        data = ImageData(array, geometry=geom)
+
+        data1 = data.copy()
+
+        # Check two identical DataContainers are equal
+        self.assertTrue(data == data1)
+        # Check it works for comparing DataContainer with numpy array
+        self.assertTrue(data == data1.as_array())
+
+        # # Check two different DataContainers are not equal
+        data1 += 1
+        self.assertFalse(data ==  data1)
+
 
     def testInlineAlgebra(self):
         X, Y, Z = 8, 16, 32

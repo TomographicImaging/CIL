@@ -50,7 +50,7 @@ class SIRT(Algorithm):
     ----------
 
     initial : DataContainer, default = None
-        Starting point of the algorithm, default value = Zero DataContainer
+        Starting point of the algorithm, default value =  DataContainer in the domain of the operator allocated with zeros. 
     operator : LinearOperator
         The operator A.
     data : DataContainer
@@ -91,7 +91,7 @@ class SIRT(Algorithm):
     """
 
 
-    def __init__(self, initial, operator, data, lower=None, upper=None, constraint=None, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
 
         super(SIRT, self).__init__(**kwargs)
 
@@ -100,6 +100,23 @@ class SIRT(Algorithm):
     def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
         """Initialisation of the algorithm"""
         log.info("%s setting up", self.__class__.__name__)
+        
+        warning = 0
+        if operator is None:
+            warning += 1
+            msg = "an `operator`"
+        if data is None:
+            warning += 10
+            if warning > 10:
+                msg += " and `data`"
+            else:
+                msg = "`data`"
+        if warning > 0:
+            raise ValueError(f'You must pass {msg} to the SIRT algorithm' )
+        
+        if initial is None:
+            initial = operator.domain_geometry().allocate(0)
+        
         self.x = initial.copy()
         self.tmp_x = self.x * 0.0
         self.operator = operator

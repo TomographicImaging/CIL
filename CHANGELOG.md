@@ -15,9 +15,11 @@
     - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
     - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
     - Internal refactor: Separate framework into multiple files (#1692)
+    - Allow the SIRT algorithm to take `initial=None` (#1906)
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
     - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)
+    - Drop Jenkins in favour of GHA for conda builds (#1914)
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)

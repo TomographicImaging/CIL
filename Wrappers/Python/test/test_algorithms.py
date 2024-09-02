@@ -996,6 +996,53 @@ class TestSIRT(CCPiTestClass):
 
     def tearDown(self):
         pass
+    
+    def test_set_up(self):
+
+        initial = self.A2.domain_geometry().allocate(0)
+        sirt = SIRT(initial=initial, operator=self.A2, data=self.b2, lower=0, upper=1)
+        
+        # Test if set_up correctly configures the object
+        self.assertTrue(sirt.configured)
+        self.assertIsNotNone(sirt.x)
+        self.assertIsNotNone(sirt.r)
+        self.assertIsNotNone(sirt.constraint)
+        self.assertEqual(sirt.constraint.lower, 0)
+        self.assertEqual(sirt.constraint.upper, 1)
+        
+
+        constraint = IndicatorBox(lower=0, upper=1)
+        sirt = SIRT(initial=None, operator=self.A2, data=self.b2, constraint=constraint)
+        
+        # Test if set_up correctly configures the object with constraint
+        self.assertTrue(sirt.configured)
+        self.assertEqual(sirt.constraint, constraint)
+
+
+        with self.assertRaises(ValueError) as context:
+            sirt = SIRT(initial=None, operator=None, data=self.b2)
+            self.assertEqual(str(context.exception), 'You must pass an `operator` to the SIRT algorithm')
+    
+
+        with self.assertRaises(ValueError) as context:
+            sirt = SIRT(initial=None, operator=self.A2, data=None)
+            self.assertEqual(str(context.exception), 'You must pass `data` to the SIRT algorithm')
+        with self.assertRaises(ValueError) as context:  
+            sirt = SIRT(initial=None, operator=None, data=None)  
+            self.assertEqual(str(context.exception), 
+                'You must pass an `operator` and `data` to the SIRT algorithm')  
+
+        sirt = SIRT(initial=None, operator=self.A2, data=self.b2)
+        self.assertTrue(sirt.configured)
+        self.assertIsInstance(sirt.x, ImageData)
+        self.assertTrue((sirt.x.as_array() == 0).all())
+
+
+        initial = self.A2.domain_geometry().allocate(1)
+        sirt = SIRT(initial=initial, operator=self.A2, data=self.b2)
+        self.assertTrue(sirt.configured)
+        self.assertIsInstance(sirt.x, ImageData)
+        self.assertTrue((sirt.x.as_array() == 1).all())
 
     def test_update(self):
         # sirt run 5 iterations

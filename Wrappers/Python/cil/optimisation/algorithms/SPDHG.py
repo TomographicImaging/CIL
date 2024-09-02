@@ -375,7 +375,8 @@ class SPDHG(Algorithm):
         """
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self.x.sapyb(1., self._zbar,  -self._tau, out=self._x_tmp)
+        self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp )
+        self._x_tmp*=-1
 
         self.g.proximal(self._x_tmp, self._tau, out=self.x)
 

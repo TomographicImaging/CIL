@@ -225,9 +225,9 @@ class SaveIterates(Callback):
         
         if algo.iteration % self.interval ==0:
             if self.roi is None:
-                TIFFWriter(data=algo.solution, file_name=self.file_path+f'_{algo.iteration:04}.tif', counter_offset=-1,compression=self.compression ).write()
+                TIFFWriter(data=algo.solution, file_name=self.file_path+f'_{algo.iteration:04d}.tif', counter_offset=-1,compression=self.compression ).write()
             else:
                 self.slicer.set_input(algo.solution)
-                TIFFWriter(self.slicer.get_output(), file_name=self.file_path+f'_{algo.iteration:04}.tif', counter_offset=-1,compression=self.compression ).write()
+                TIFFWriter(self.slicer.get_output(), file_name=self.file_path+f'_{algo.iteration:04d}.tif', counter_offset=-1,compression=self.compression ).write()
                 
 

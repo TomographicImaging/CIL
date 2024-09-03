@@ -161,8 +161,9 @@ class EarlyStoppingObjectiveValue(Callback):
                 raise StopIteration
                 
 class CGLSEarlyStopping(Callback):
-    '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
+    r'''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
     It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`, where `omega` is set to default as 1e6. 
+    
     Parameters
     ----------
     epsilon: float, default 1e-6 
@@ -191,15 +192,16 @@ class CGLSEarlyStopping(Callback):
             
         
 class SaveIterates(Callback):
-    '''Callback to save iterates as tiff files every set number of iterations.  
+    r'''Callback to save iterates as tiff files every set number of iterations.  
+    
     Parameters
     ----------
     interval: integer, 
         The iterates will be saved every `interval` number of iterations e.g. if `interval =4` the 0, 4, 8, 12,... iterates will be saved. 
     file_name : string
-            This defines the file name prefix, i.e. the file name without the extension.
+        This defines the file name prefix, i.e. the file name without the extension.
     dir_path : string
-            The place to store the images 
+        The place to store the images 
     roi: dict, optional default is None and no slicing will be applied
         The region-of-interest to slice {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}
         The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description
@@ -207,8 +209,8 @@ class SaveIterates(Callback):
         Stop: Stopping index of input data. Must be an integer, or `None` defaults to index N.
         Step: Number of pixels to average together. Must be an integer or `None` defaults to 1.
     compression : str, default None. Accepted values None, 'uint8', 'uint16'
-            The lossy compression to apply. The default None will not compress data.
-            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
+        The lossy compression to apply. The default None will not compress data.
+        uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.
     '''
     def __init__(self, interval=1, file_name='iter',  dir_path='./', roi=None, compression=None): 
 

@@ -1455,7 +1455,7 @@ class TestTIFFLogger(unittest.TestCase):
 
     def test_save_iterates_no_writer_no_roi(self):
         # Test saving iterates to a list with no writer and no ROI
-        callback = callbacks.TIFFLogger(stem=self.file_name, directory=self.dir_path)
+        callback = callbacks.TIFFLogger(interval=1, stem=self.file_name, directory=self.dir_path)
 
         # Call the callback multiple times and increment iteration
         self.mock_algorithm.run(5, callbacks=[callback])
@@ -1475,7 +1475,7 @@ class TestTIFFLogger(unittest.TestCase):
         # Test saving iterates with an ROI applied
         roi = {'horizontal_x': (0, 2, 1)}
 
-        callback = callbacks.TIFFLogger(stem=self.file_name, directory=self.dir_path, roi=roi)
+        callback = callbacks.TIFFLogger(interval=1, stem=self.file_name, directory=self.dir_path, roi=roi)
 
         # Call the callback and check if slicer was used
         callback(self.mock_algorithm)
@@ -1490,7 +1490,7 @@ class TestTIFFLogger(unittest.TestCase):
 
     def test_save_iterates_with_interval(self):
         # Test saving iterates with a specified interval
-        callback = callbacks.TIFFLogger(stem=self.file_name, directory=self.dir_path)
+        callback = callbacks.TIFFLogger(interval=2, stem= self.file_name, directory=self.dir_path)
 
         # Call the callback multiple times and increment iteration
         self.mock_algorithm.run(5, callbacks=[callback])

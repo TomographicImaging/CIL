@@ -20,7 +20,7 @@ from utils import has_cvxpy
 import unittest
 from os import unlink
 from tempfile import NamedTemporaryFile
-
+import os, glob
 import numpy as np
 import logging
 
@@ -62,6 +62,8 @@ from testclass import CCPiTestClass
 from utils import has_astra, initialise_tests
 
 from unittest.mock import MagicMock
+
+from cil.io import TIFFStackReader
 
 log = logging.getLogger(__name__)
 initialise_tests()
@@ -1450,53 +1452,64 @@ class TestSaveIteratesCallback(unittest.TestCase):
         self.image_geometry = ImageGeometry(10, 2)
         self.data = self.image_geometry.allocate(10)
         self.mock_algorithm = self.MockAlgo(self.data)
-
+        self.file_name= 'myfile'
+        self.cwd = os.getcwd()
+        self.dir_path=os.path.join(self.cwd, 'test_tiff' )
+        
     def test_save_iterates_no_writer_no_roi(self):
         # Test saving iterates to a list with no writer and no ROI
-        callback = callbacks.SaveIterates(interval=1)
+        callback = callbacks.SaveIterates(interval=1, file_name= self.file_name, dir_path=self.dir_path)
         
         # Call the callback multiple times and increment iteration
         self.mock_algorithm.run(5, callbacks=[callback])
         
         # Check if iterates are saved correctly
-        self.assertEqual(len(callback.iterates), 6)
-        for i in range(5):
-            np.testing.assert_array_equal(callback.iterates[i].array, (10-i)*np.ones((2,10)))
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        assert len(files) == 6
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        for i in range(6):
+            np.testing.assert_array_equal(read[i], (10-i)*np.ones((2,10)))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
 
-    def test_save_iterates_with_writer(self):
-        # Test saving iterates using a writer
-        mock_writer = MagicMock()
-        callback = callbacks.SaveIterates(interval=1, writer=mock_writer)
-
-        # Call the callback and check if writer.write() was called
-        callback(self.mock_algorithm)
-        mock_writer.write.assert_called_once_with(self.mock_algorithm.x)
 
     def test_save_iterates_with_roi(self):
         # Test saving iterates with an ROI applied
         roi = {'horizontal_x': (0, 2, 1)}
-        from cil.processors import Slicer
 
-
-        callback = callbacks.SaveIterates(interval=1, roi=roi)
+        callback = callbacks.SaveIterates(interval=1, file_name= self.file_name, dir_path=self.dir_path, roi=roi)
 
         # Call the callback and check if slicer was used
         callback(self.mock_algorithm)
-        
-        np.testing.assert_array_equal(callback.iterates[0].array, 10*np.ones([2, 2]))
+        # Check if iterates are saved correctly
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        assert len(files) == 1
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        np.testing.assert_array_equal(read, 10*np.ones([2, 2]))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
 
     def test_save_iterates_with_interval(self):
         # Test saving iterates with a specified interval
-        callback = callbacks.SaveIterates(interval=2)
+        callback = callbacks.SaveIterates(interval=2, file_name= self.file_name, dir_path=self.dir_path)
 
         # Call the callback multiple times and increment iteration
         self.mock_algorithm.run(5, callbacks=[callback])
 
-        # Check if iterates were saved only at the correct intervals
-        self.assertEqual(len(callback.iterates), 3)
-        np.testing.assert_array_equal(callback.iterates[0].array, (10-0)*np.ones((2,10)))
-        np.testing.assert_array_equal(callback.iterates[1].array, (10-2)*np.ones((2,10)))
-        np.testing.assert_array_equal(callback.iterates[2].array, (10-4)*np.ones((2,10)))
+        # Check if iterates are saved correctly
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        print(files)
+        self.assertEqual( len(files), 3)
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        np.testing.assert_array_equal(read[0], (10-0)*np.ones((2,10)))
+        np.testing.assert_array_equal(read[1], (10-2)*np.ones((2,10)))
+        np.testing.assert_array_equal(read[2], (10-4)*np.ones((2,10)))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
+
 
 
 

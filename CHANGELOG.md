@@ -5,8 +5,8 @@
     - Allow `SumFunction` with 1 item (#1857)
     - Added  PD3O algorithm (#1834)
     - Added Barzilai-Borwein step size rule to work with GD, ISTA, FISTA (#1859)
-    - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
-    - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
+    - Added callback `optimisation.utilities.callbacks.EarlyStopping` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
+    - Added callback `optimisation.utilities.callbacks.EarlyStoppingCGLS` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
     - Added `labels` module with `ImageDimension`, `AcquisitionDimension`, `AcquisitionType`, `AngleUnit`, `FillType` (#1692)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)

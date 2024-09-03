@@ -212,7 +212,17 @@ class BlockOperator(Operator):
             
 
         else:
+            if not isinstance(out, BlockDataContainer):
+                if 1 == shape[0] == shape[1]:
+                    out = BlockDataContainer(out)
+                    flag_return_data_container = True
+                else:
+                    raise ValueError(f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
+            else:
+                flag_return_data_container = False
             tmp = self.range_geometry().allocate()
+            if not isinstance(tmp, BlockDataContainer):
+                tmp = BlockDataContainer(tmp)
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
                     if col == 0:
@@ -225,7 +235,10 @@ class BlockOperator(Operator):
                                                       x_b.get_item(col),
                                                       out=tmp.get_item(row))
                         temp_out_row += tmp.get_item(row)
-            return out
+            if flag_return_data_container:
+                return out.get_item(0)
+            else:
+                return out
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -265,6 +278,14 @@ class BlockOperator(Operator):
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
+            if not isinstance(out, BlockDataContainer):
+                if 1 == shape[0] == shape[1]:
+                    out = BlockDataContainer(out)
+                    flag_return_data_container = True
+                else:
+                    raise ValueError(f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
+            else:
+                flag_return_data_container = False
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):
                     if row == 0:
@@ -289,7 +310,10 @@ class BlockOperator(Operator):
                             temp_out_col += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row),
                                                         )
-            return out
+            if flag_return_data_container:
+                return out.get_item(0)
+            else:
+                return out
 
     def is_linear(self):
         '''Returns whether all the elements of the BlockOperator are linear'''

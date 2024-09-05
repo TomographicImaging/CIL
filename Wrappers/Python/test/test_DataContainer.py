@@ -104,19 +104,19 @@ class TestDataContainer(CCPiTestClass):
         data1 += 1
         self.assertFalse(data ==  data1)
 
-        # Check the equality of two DataContainers with different shapes
+        # Check the equality of two AcquisitionData with different shapes
         data_different_shape = data.copy()
         data_different_shape.array = data_different_shape.array.reshape(8, 4)
 
         self.assertFalse(data == data_different_shape)
 
-        # Check the equality of two DataContainers with different dtypes
+        # Check the equality of two AcquisitionData with different dtypes
         data_different_dtype = data.copy()
         data_different_dtype.array = data_different_dtype.array.astype(np.float64)
         self.assertFalse(data == data_different_dtype)
 
 
-        # Check the equality of two DataContainers with different labels
+        # Check the equality of two AcquisitionData with different labels
         data_different_labels = data.copy()
         print(data_different_labels.geometry.dimension_labels)
         data_different_labels.geometry.set_labels([AcquisitionDimension("ANGLE"), AcquisitionDimension("CHANNEL") ])
@@ -129,28 +129,28 @@ class TestDataContainer(CCPiTestClass):
 
         data1 = data.copy()
 
-        # Check two identical AcquisitionData are equal
+        # Check two identical ImageData are equal
         self.assertTrue(data == data1)
-        # Check it works for comparing AcquisitionData with numpy array
+        # Check it works for comparing ImageData with numpy array
         self.assertTrue(data == data1.as_array())
 
-        # # Check two different AcquisitionData are not equal
+        # # Check two different ImageData are not equal
         data1 += 1
         self.assertFalse(data ==  data1)
 
-        # Check the equality of two DataContainers with different shapes
+        # Check the equality of two ImageData with different shapes
         data_different_shape = data.copy()
         data_different_shape.array = data_different_shape.array.reshape(8, 4)
 
         self.assertFalse(data == data_different_shape)
 
-        # Check the equality of two DataContainers with different dtypes
+        # Check the equality of two ImageData with different dtypes
         data_different_dtype = data.copy()
         data_different_dtype.array = data_different_dtype.array.astype(np.float64)
         self.assertFalse(data == data_different_dtype)
 
 
-        # Check the equality of two DataContainers with different labels
+        # Check the equality of two ImageData with different labels
         data_different_labels = data.copy()
         data_different_labels.geometry.set_labels([ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
         self.assertFalse(data == data_different_labels)

@@ -23,11 +23,15 @@ Details on some of these jobs are given below.
 
 ## conda
 
-When opening or modifying a pull request to `master`, a single variant is built and tested. This variant is for linux with `python=3.11` and `numpy=1.25`.
+When opening or modifying a pull request to `master`, two variants are built and tested (for linux with minimum & maximum supported `python` & `numpy` versions).
 
 > [!NOTE]
-> The action does not publish to conda, instead this is done by jenkins. We will eventually move from jenkins to conda-forge instead.
 > When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
+
+<!-- <br/> -->
+
+> [!NOTE]
+> The action publishes `ccpi` as well as `https://tomography.stfc.ac.uk/conda/` conda channels. We will eventually move to conda-forge instead.
 
 It looks for conda-build dependencies in the channels listed [here](./build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
 

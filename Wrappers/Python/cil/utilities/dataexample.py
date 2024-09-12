@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import ImageGeometry
+from cil.framework.labels import ImageDimension
 import numpy
 import numpy as np
 from PIL import Image
@@ -32,7 +33,7 @@ class DATA(object):
     @classmethod
     def dfile(cls):
         return None
-    
+
 class CILDATA(DATA):
     data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
@@ -40,9 +41,9 @@ class CILDATA(DATA):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
-    
+
 class REMOTEDATA(DATA):
-    
+
     FOLDER = ''
     ZENODO_RECORD = ''
     ZIP_FILE = ''
@@ -184,15 +185,15 @@ class SIMULATED_SPHERE_VOLUME(CILDATA):
         -------
         ImageData
             The simulated spheres volume
-        '''       
+        '''
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
-    
+
 class WALNUT(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
     '''
     FOLDER = 'walnut'
     ZENODO_RECORD = '4822516'
@@ -201,7 +202,7 @@ class WALNUT(REMOTEDATA):
     @classmethod
     def get(cls, data_dir):
         '''
-        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -221,10 +222,10 @@ class WALNUT(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in specifed data_dir: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-     
+
 class USB(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
     '''
     FOLDER = 'USB' 
     ZENODO_RECORD = '4822516'
@@ -233,7 +234,7 @@ class USB(REMOTEDATA):
     @classmethod
     def get(cls, data_dir):
         '''
-        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -253,7 +254,7 @@ class USB(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-        
+
 class KORN(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
@@ -341,7 +342,7 @@ class TestData(object):
 
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        
+
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''
         Return a test data of the requested image
@@ -376,7 +377,7 @@ class TestData(object):
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
             sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(sdata)
 
@@ -391,7 +392,7 @@ class TestData(object):
                     N = size[0]
                     M = size[1]
 
-                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                 data = ig.allocate()
                 tmp = numpy.array(f.convert('L').resize((M,N)))
                 data.fill(tmp/numpy.max(tmp))
@@ -413,13 +414,13 @@ class TestData(object):
                         bands = tmp.getbands()
 
                     ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands),
-                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
+                    dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X,ImageDimension.CHANNEL])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
-                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.reorder([ImageDimension.CHANNEL,ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data.geometry.channel_labels = bands
                 else:
-                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
 

@@ -15,14 +15,14 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-from cil.framework import DataProcessor, ImageData
-from cil.framework import DataOrder
-from cil.plugins.tigre import CIL2TIGREGeometry
-import warnings
-import numpy as np
 import contextlib
 import io
+
+import numpy as np
+
+from cil.framework import DataProcessor, ImageData
+from cil.framework.labels import AcquisitionDimension, ImageDimension
+from cil.plugins.tigre import CIL2TIGREGeometry
 
 try:
     from tigre.algorithms import fdk, fbp
@@ -54,10 +54,8 @@ class FBP(DataProcessor):
     '''
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs):
-
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
@@ -65,8 +63,10 @@ class FBP(DataProcessor):
         if device != 'gpu':
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
+
+        AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimension.check_order_for_engine('tigre', image_geometry)
+
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -80,8 +80,15 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.acquisition_geometry.channels))
 
-        DataOrder.check_order_for_engine('tigre', dataset.geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', dataset.geometry)
         return True
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.image_geometry.shape
 
     def process(self, out=None):
 

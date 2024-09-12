@@ -38,7 +38,7 @@ Algorithms (Deterministic)
 A number of generic algorithm implementations are provided including
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
-Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+Gradient (PDHG), Primal dual three-operator (PD3O),  Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of
@@ -119,6 +119,11 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+PD3O
+----
+.. autoclass:: cil.optimisation.algorithms.PD3O
+   :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 
 Algorithms (Stochastic)
@@ -162,6 +167,7 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
 :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
 
+
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
 
 In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
@@ -182,9 +188,9 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SAGAFunction\ | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
 +----------------+-------+------------+----------------+
-| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
+| SVRGFunction\ | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
 +----------------+-------+------------+----------------+
-| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
+| LSVRGFunction\| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
 +----------------+-------+------------+----------------+
 
 \*In development 
@@ -243,6 +249,7 @@ Memory requirements
 Note that the approximate gradient methods have different memory requirements:
 + The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
 + `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
++ `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at the expensive of stored memory `n+4` times the image size.  
 
 
 Operators
@@ -531,6 +538,21 @@ SAGA function
 
 
 
+Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.SVRGFunction 
+   :members:
+   :inherited-members:
+
+
+Loopless Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.LSVRGFunction 
+   :members:
+   :inherited-members:
+
+
+
 Utilities
 =========
 
@@ -646,6 +668,10 @@ We also have a number of example classes:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
    :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
 
 
 Preconditioners

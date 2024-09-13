@@ -19,8 +19,7 @@
 import unittest
 from utils import initialise_tests
 import numpy as np
-from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry
-from cil.framework import ImageData, AcquisitionData, Partitioner
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
@@ -935,11 +934,6 @@ class TestAcquisitionDataPartition(unittest.TestCase):
         num_batches=10
         with self.assertRaises(ValueError):
             data = self.data.partition(num_batches, 'sequential')
-
-
-
-
-
 
     def assertDataIsTheSame(self, data, idxs, msg=None):
         # let's check that the data is the same

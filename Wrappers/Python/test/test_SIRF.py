@@ -16,23 +16,19 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import unittest
-from utils import initialise_tests
-import numpy as np
-from numpy.linalg import norm
 import os
 import shutil
+import unittest
+
+import numpy as np
+
 from cil.framework import BlockDataContainer
-from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler, IndicatorBox
 from cil.optimisation.algorithms import FISTA, ISTA
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler, IndicatorBox
+from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.utilities import AdaptiveSensitivity
-
-import os
-from cil.utilities.display import show2D
-
 from testclass import CCPiTestClass
-from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+from utils import has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 
@@ -47,7 +43,6 @@ except ImportError as ie:
     has_sirf = False
 
 if has_ccpi_regularisation:
-    from ccpi.filters import regularisers
     from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV
 
 

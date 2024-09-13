@@ -20,9 +20,8 @@ import unittest
 import numpy
 from unittest.mock import patch
 
-from cil.framework import DataContainer
-from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
+
 from cil.utilities import dataexample
 from cil.utilities import quality_measures
 
@@ -187,7 +186,8 @@ class TestBinner(unittest.TestCase):
         self.assertTrue(proc._accelerated==False)
         
         proc = Binner(roi,accelerated=True)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -198,7 +198,7 @@ class TestBinner(unittest.TestCase):
         (horizontal_x.stop - horizontal_x.start)//horizontal_x.step
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -814,7 +814,8 @@ class TestSlicer(unittest.TestCase):
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
         proc = Slicer(roi)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -826,7 +827,7 @@ class TestSlicer(unittest.TestCase):
             len(horizontal_x),
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -1679,7 +1680,7 @@ class TestPaddder(unittest.TestCase):
         self.data_test = ImageData(arr_in, True, ig)
 
 
-    def test_parse_input(self):
+    def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
@@ -1691,7 +1692,8 @@ class TestPaddder(unittest.TestCase):
 
         # check inputs
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(list(data.dimension_labels), proc._labels_in)
         self.assertListEqual(list(data.shape), proc._shape_in)
 
@@ -1712,21 +1714,24 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_width set-up
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=(1,2), pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_tuple, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_tuple, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dict_custom = [(0,0) if x == (0,0) else (0.1,0.1)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict_custom, proc._pad_values_param)
@@ -1735,14 +1740,16 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_value set-up
         proc = Padder('constant', pad_width=2, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_tuple, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=2, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_width_dict_custom = [(0,0) if x == (0,0) else (2,2)  for x in gold_value_dict]
         gold_shape_out_dict_custom = numpy.array(data.shape) + [4,4,0,4]
         self.assertListEqual(gold_width_dict_custom, proc._pad_width_param)
@@ -1751,7 +1758,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict_custom, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dictionary_custom = [(0,0) if x == (0,0) else (0.1,0.2)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dictionary_custom, proc._pad_values_param)
@@ -1759,7 +1767,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
@@ -1768,7 +1777,8 @@ class TestPaddder(unittest.TestCase):
         proc = Padder('constant', pad_width=pad_width, pad_values={'horizontal_x':(0.5,0.6)})
         # raise an error as not all axes values defined
         with self.assertRaises(ValueError):
-            proc._parse_input(data)
+            proc.set_input(data)
+            proc._set_up()
 
 
     def test_process_acquisition_geometry(self):
@@ -2991,7 +3001,7 @@ class TestPaganinProcessor(unittest.TestCase):
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
-            processor = PaganinProcessor(full_retrieval=True)
+            processor = PaganinProcessor(full_retrieval=True, return_units='m')
             processor.set_input(data)
             thickness = processor.get_output(override_geometry={'propagation_distance':1})
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
@@ -3001,7 +3011,7 @@ class TestPaganinProcessor(unittest.TestCase):
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test with GPM
-            processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method')
+            processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method', return_units='m')
             processor.set_input(data)
             thickness = processor.get_output(override_geometry={'propagation_distance':1})
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
@@ -3011,7 +3021,7 @@ class TestPaganinProcessor(unittest.TestCase):
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test with padding
-            processor = PaganinProcessor(full_retrieval=True, pad=10)
+            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
             processor.set_input(data)
             thickness = processor.get_output(override_geometry={'propagation_distance':1})
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
@@ -3021,7 +3031,7 @@ class TestPaganinProcessor(unittest.TestCase):
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test in-line
-            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10)(data, override_geometry={'propagation_distance':1})
+            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
             filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
@@ -3029,7 +3039,7 @@ class TestPaganinProcessor(unittest.TestCase):
             # check with different data order
             data.reorder('astra')
             data_abs = -(1/mu)*numpy.log(data)
-            processor = PaganinProcessor(full_retrieval=True, pad=10)
+            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
             processor.set_input(data)
             with self.assertLogs(level='WARN') as log:
                 thickness = processor.get_output(override_geometry={'propagation_distance':1})
@@ -3044,7 +3054,7 @@ class TestPaganinProcessor(unittest.TestCase):
             if data.geometry.channels>1:
                 data.reorder(('vertical','channel','horizontal','angle'))
                 data_abs = -(1/mu)*numpy.log(data)
-                processor = PaganinProcessor(full_retrieval=True, pad=10)
+                processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
                 processor.set_input(data)
                 with self.assertLogs(level='WARN') as log:
                     thickness = processor.get_output(override_geometry={'propagation_distance':1})

@@ -38,7 +38,7 @@ Algorithms (Deterministic)
 A number of generic algorithm implementations are provided including
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
-Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+Gradient (PDHG), Primal dual three-operator (PD3O),  Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of
@@ -119,6 +119,11 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+PD3O
+----
+.. autoclass:: cil.optimisation.algorithms.PD3O
+   :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 
 Algorithms (Stochastic)
@@ -663,6 +668,10 @@ We also have a number of example classes:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
    :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
 
 
 Preconditioners

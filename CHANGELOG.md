@@ -23,6 +23,7 @@
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)
+    - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
 

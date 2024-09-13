@@ -287,6 +287,7 @@ c_float_p = ctypes.POINTER(ctypes.c_float)
 cilacc.openMPtest.restypes = ctypes.c_int32
 cilacc.openMPtest.argtypes = [ctypes.c_int32]
 
+cilacc.fdiff4D.restype = ctypes.c_int32
 cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -300,6 +301,7 @@ cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32]
 
+cilacc.fdiff3D.restype = ctypes.c_int32
 cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -311,6 +313,7 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32]
 
+cilacc.fdiff2D.restype = ctypes.c_int32
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -404,7 +407,10 @@ class Gradient_C(LinearOperator):
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
         arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
-        self.fd(x_p, *args)
+        status = self.fd(x_p, *args)
+
+        if status != 0:
+            raise RuntimeError('Call to C gradient operator failed')
 
         for i, el in enumerate(self.voxel_size_order):
             if el != 1:
@@ -448,7 +454,10 @@ class Gradient_C(LinearOperator):
         arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
-        self.fd(out_p, *args)
+        status = self.fd(out_p, *args)
+        if status != 0:
+            raise RuntimeError('Call to C gradient operator failed')
+    
         out.fill(ndout)
 
         #reset input data

@@ -185,8 +185,11 @@ class TestRemoteData(unittest.TestCase):
         for data in self.data_list:
             test_func = getattr(dataexample, data)
             test_func.download_data(tmp_dir)
+            # Test the data file exists
             self.assertTrue(os.path.isfile(os.path.join(tmp_dir, getattr(test_func, 'FOLDER'), dataexample.TestData.SHAPES)), 
                             msg = "Download data test failed with dataset " + data)
+            # Test the zip file is removed
+            self.assertFalse(os.path.isfile(os.path.join(tmp_dir, getattr(test_func, 'ZIP_FILE'))))
         # return to standard print output
         sys.stdout = sys.__stdout__
         shutil.rmtree(tmp_dir)

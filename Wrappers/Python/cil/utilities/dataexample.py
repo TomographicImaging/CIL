@@ -297,15 +297,15 @@ class SANDSTONE(REMOTEDATA):
     ZENODO_RECORD = '4912435'
     ZIP_FILE = 'small.zip'
 
+    @classmethod
     def get(cls, data_dir, filename):
         '''
-        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
-        This function can be used to return selected projections or slices of the reconstruction
-
+        A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
+    A small subset of the data containing selected projections and 4 slices of the reconstruction
         Parameters
         ----------
         data_dir: str
-           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.SANDSTONE.download_data(data_dir)
 
         file: str
             The slices or projections to return, specify the path to the file within the data_dir

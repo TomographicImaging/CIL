@@ -49,7 +49,7 @@
     - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
     - BlurringOperator: remove check for geometry class (old SIRF integration bug) (#1807)
     - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
-    - Update dataexample remote data download to work with windows (#1774)
+    - Update dataexample remote data download to work with windows and use zenodo_get for data download (#1774)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).

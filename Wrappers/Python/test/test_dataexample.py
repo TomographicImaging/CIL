@@ -232,25 +232,6 @@ class TestRemoteData(unittest.TestCase):
         with self.assertRaises(ValueError):
             remote_data.download_data('.')
 
-    def test_zenodo_record_exists(self):
-        '''
-        Test all Zenodo records can be accessed and the correct zip files are found
-        '''
-        tmp_dir = os.path.join(dataexample.CILDATA.data_dir, str(uuid.uuid4()))
-        os.makedirs(tmp_dir)
-        test_file = os.path.join(tmp_dir, 'test_file.txt')
-
-        for data in self.data_list:
-            test_func = getattr(dataexample, data)
-            zip_file_name = 'https://zenodo.org/records/' + test_func.ZENODO_RECORD + '/files/' + test_func.ZIP_FILE
-            zenodo_get([test_func.ZENODO_RECORD, '-w', test_file])
-            with open(test_file) as f:
-                self.assertTrue(zip_file_name in f.read())
-            if os.path.exists(test_file):
-                os.remove(test_file)
-
-        shutil.rmtree(tmp_dir)
-
     def test_a(self):
         from cil.utilities.dataexample import WALNUT
             

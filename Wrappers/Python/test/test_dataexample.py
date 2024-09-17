@@ -250,4 +250,7 @@ class TestRemoteData(unittest.TestCase):
                 os.remove(test_file)
 
         shutil.rmtree(tmp_dir)
+
+    def test_a(self):
+        from cil.utilities.dataexample import WALNUT
             

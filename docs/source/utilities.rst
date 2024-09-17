@@ -53,6 +53,31 @@ Simulated image data
    :members:
    :inherited-members:
 
+Remote data
+-----------
+
+Walnut
+------
+
+.. autoclass:: cil.utilities.dataexample.WALNUT
+      :members:
+      :inherited-members:
+
+USB
+------
+
+.. autoclass:: cil.utilities.dataexample.USB
+      :members:
+      :inherited-members:
+
+.. autoclass:: cil.utilities.dataexample.KORN
+      :members:
+      :inherited-members:
+
+.. autoclass:: cil.utilities.dataexample.SANDSTONE
+      :members:
+      :inherited-members:
+
 
 
 Image Quality metrics

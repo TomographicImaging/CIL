@@ -194,6 +194,8 @@ class SIMULATED_SPHERE_VOLUME(CILDATA):
 class WALNUT(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
+    Download the dataset using dataexample.WALNUT.download_data(data_dir)
+    Then load the dataset using dataexample.WALNUT.get(data_dir)
     '''
     FOLDER = 'walnut'
     ZENODO_RECORD = '4822516'
@@ -214,6 +216,11 @@ class WALNUT(REMOTEDATA):
         -------
         ImageData
             The walnut dataset
+
+        Example
+        --------
+        dataexample.WALNUT.get(data_dir) # if the data is already in data_dir
+
         '''
         filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
         try:
@@ -226,6 +233,8 @@ class WALNUT(REMOTEDATA):
 class USB(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
+    Download the dataset using dataexample.USB.download_data(data_dir)
+    Then load the dataset using dataexample.USB.get(data_dir)
     '''
     FOLDER = 'USB' 
     ZENODO_RECORD = '4822516'
@@ -246,6 +255,10 @@ class USB(REMOTEDATA):
         -------
         ImageData
             The usb dataset
+
+        Example
+        --------
+        dataexample.USB.get(data_dir) # if the data is already in data_dir
         '''
         filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
         try:
@@ -258,6 +271,8 @@ class USB(REMOTEDATA):
 class KORN(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+    Download the dataset using dataexample.KORN.download_data(data_dir)
+    Then load the dataset using dataexample.KORN.get(data_dir)
     '''
     FOLDER = 'korn'
     ZENODO_RECORD = '6874123'
@@ -278,6 +293,10 @@ class KORN(REMOTEDATA):
         -------
         ImageData
             The korn dataset
+
+        Example
+        --------
+        dataexample.KORN.get(data_dir) # if the data is already in data_dir
         '''
         filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
@@ -292,6 +311,8 @@ class SANDSTONE(REMOTEDATA):
     '''
     A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
     A small subset of the data containing selected projections and 4 slices of the reconstruction
+    Download the dataset using dataexample.SANDSTONE.download_data(data_dir)
+    Then load the dataset using dataexample.SANDSTONE.get(data_dir)
     '''
     FOLDER = 'sandstone'
     ZENODO_RECORD = '4912435'
@@ -301,7 +322,7 @@ class SANDSTONE(REMOTEDATA):
     def get(cls, data_dir, filename):
         '''
         A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
-    A small subset of the data containing selected projections and 4 slices of the reconstruction
+        A small subset of the data containing selected projections and 4 slices of the reconstruction
         Parameters
         ----------
         data_dir: str
@@ -314,6 +335,10 @@ class SANDSTONE(REMOTEDATA):
         -------
         ImageData
             The selected sandstone dataset
+
+        Example
+        --------
+        dataexample.SANDSTONE.get(data_dir) # if the data is already in data_dir
         '''
         extension = os.path.splitext(filename)[1]
         if extension == '.mat':

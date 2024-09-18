@@ -3100,7 +3100,7 @@ class TestFluxNormaliser(unittest.TestCase):
 
         self.data_multichannel = ag.allocate('random')
         self.data_slice = self.data_parallel.get_slice(vertical=1)
-        self.data_reorder = self.data_cone
+        self.data_reorder = self.data_cone.copy()
         self.data_reorder.reorder(['horizontal','angle','vertical'])
         self.data_single_angle = self.data_cone.get_slice(angle=1)
 
@@ -3129,7 +3129,7 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
 
-        # check there is an error if no flux array size is not equal to the number of angles in data
+        # check there is an error if flux array size is not equal to the number of angles in data
         processor = FluxNormaliser(flux = [1,2,3])
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
@@ -3207,13 +3207,13 @@ class TestFluxNormaliser(unittest.TestCase):
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
         
         #Test flux array with no norm_value
-        processor = FluxNormaliser(flux=10*numpy.ones(self.data_cone.get_dimension_size('angle')))
+        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(data.get_dimension_size('angle'))))
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
         #Test flux array with norm_value
-        processor = FluxNormaliser(flux=10*numpy.ones(self.data_cone.get_dimension_size('angle')), norm_value=5)
+        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(data.get_dimension_size('angle'))), norm_value=5)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
@@ -3239,7 +3239,7 @@ class TestFluxNormaliser(unittest.TestCase):
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
 
-        # test roi with different data shapes
+        # test roi with different data shapes and different flux values per projection
         for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
                      self.data_slice, self.data_reorder]:
             roi = {'horizontal':(25,40)}

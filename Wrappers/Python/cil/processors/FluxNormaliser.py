@@ -16,8 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, DataContainer, AcquisitionData,\
- AcquisitionGeometry, ImageGeometry, ImageData
+from cil.framework import Processor, AcquisitionData
 from cil.utilities.display import show2D
 import numpy
 import logging
@@ -29,7 +28,7 @@ class FluxNormaliser(Processor):
     r'''
     Flux normalisation based on float or region of interest
 
-    This processor reads in a AcquisitionData and normalises it based on
+    This processor reads in an AcquisitionData and normalises it based on
     a float or array of float values, or a region of interest.
     
     The normalised image :math:`I_{norm}` is calculated from the original image
@@ -48,36 +47,64 @@ class FluxNormaliser(Processor):
     
     roi: dict (optional)
         Dictionary describing the region of interest containing the background
-        in the image. The image is divided by the mean value in the roi. If None,
-        specify flux direcrtly, default is None.
+        in the image. The roi is specified as `{‘axis_name1’:(start,stop), 
+        ‘axis_name2’:(start,stop)}`, where the key is the axis name to calculate
+        the flux from. If the dataset has an axis which is not specified in the 
+        roi dictionary, all data from that axis will be used in the calculation.
+        The image is divided by the mean value in the roi. If None, specify flux 
+        directly, default is None.
 
     norm_value: float (optional)
-        The value to multiply the image by. If None, the mean flux value will 
-        be used, default is None.
-        
-    tolerance: float (optional)
-        Small number to set to when there is a division by zero, default is 1e-5.
+        The value to multiply the image by. If None, the mean flux value will be used,
+         either the flux provided or the mean value in the roi across all 
+         projections, default is None.
 
     Returns:
     --------
     Output: AcquisitionData normalised by flux or mean intensity in roi
+
+    Example
+    -------
+    >>> from cil.processors import FluxNormaliser
+    >>> processor = FluxNormaliser(flux=10)
+    >>> processor.set_input(data)
+    >>> data_norm = processor.get_output()
+
+    Example
+    -------
+    >>> from cil.processors import FluxNormaliser
+    >>> processor = FluxNormaliser(flux=np.arange(1,2,(2-1)/(data.get_dimension_size('angle'))))
+    >>> processor.set_input(data)
+    >>> data_norm = processor.get_output()
+
+    Example
+    -------
+    >>> from cil.processors import FluxNormaliser
+    >>> processor = FluxNormaliser(flux=10)
+    >>> processor.set_input(data)
+    >>> data_norm = processor.get_output()
+
+    Note
+    ----
+    The roi indices provided are start inclusive, stop exclusive.
+    All elements along a dimension will be included if the axis does not appear 
+    in the roi dictionary
     '''
 
-    def __init__(self, flux=None, roi=None, norm_value=None, tolerance=1e-5):
+    def __init__(self, flux=None, roi=None, norm_value=None):
             kwargs = {
                     'flux'  : flux,
                     'roi' : roi,
                     'roi_slice' : None,
                     'roi_axes' : None,
-                    'norm_value' : norm_value,
-                    'tolerance'   : tolerance
+                    'norm_value' : norm_value
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
     def check_input(self, dataset):
         
-        if not issubclass(type(dataset), DataContainer):
-            raise TypeError("Expected DataContainer or subclass, found {}"
+        if not (type(dataset), AcquisitionData):
+            raise TypeError("Expected AcquistionData, found {}"
                             .format(type(dataset)))
 
         if self.roi is not None:
@@ -85,7 +112,7 @@ class FluxNormaliser(Processor):
                 raise ValueError("Please specify either flux or roi, not both")
 
             else:
-                if isinstance(self.roi,dict):
+                if isinstance(self.roi, dict):
                     if not all (r in dataset.dimension_labels for r in self.roi):
                         raise ValueError("roi labels must be in the dataset dimension_labels, found {}"
                                         .format(str(self.roi)))
@@ -155,6 +182,13 @@ class FluxNormaliser(Processor):
                 raise ValueError("Flux must be a scalar or array with length \
                                     \n = data.geometry.angles, found {} and {}"
                                     .format(flux_size, data_size))
+            if numpy.any(self.flux==0):
+                raise ValueError('Flux value can\'t be 0, provide a different flux\
+                                  or region of interest with non-zero values')
+        else:
+            if self.flux==0:
+                raise ValueError('Flux value can\'t be 0, provide a different flux\
+                                  or region of interest with non-zero values')
             
         if self.norm_value is None:
             self.norm_value = numpy.mean(self.flux)
@@ -165,7 +199,7 @@ class FluxNormaliser(Processor):
         '''
         Preview the FluxNormalisation processor configuration for roi mode.
         Plots the region of interest on the image and the mean, maximum and 
-        minimum intensity in the roi. the angles with minimum and maximum intensity in the roi, 
+        minimum intensity in the roi.
         
         Parameters:
         -----------
@@ -315,12 +349,8 @@ class FluxNormaliser(Processor):
                 if len(flux_size) > 0:
                     f = self.flux[i]
                 slice_proj[proj_axis] = i
-                with numpy.errstate(divide='ignore', invalid='ignore'):
-                    out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.norm_value/f
+                out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.norm_value/f
         else:
-           with numpy.errstate(divide='ignore', invalid='ignore'):
-                out.array = data.array*self.norm_value/f 
-
-        out.array[ ~ numpy.isfinite( out.array )] = self.tolerance
+            out.array = data.array*self.norm_value/f 
 
         return out

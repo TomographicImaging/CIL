@@ -128,6 +128,16 @@ class FluxNormaliser(Processor):
                             self.roi.update({d:(0,dataset.get_dimension_size(d))})
 
                     self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
+                    
+                    dataset_range = dataset.max(axis=tuple(axes)) - dataset.min(axis=tuple(axes)) 
+
+                    if (numpy.mean(self.flux) > dataset.mean()):
+                        if numpy.mean(self.flux/dataset_range.array) < 0.9:
+                            log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
+                    else:
+                        if numpy.mean(self.flux/dataset_range.array) > 0.1:
+                            log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
+
                     self.roi_slice = slc
                     self.roi_axes = axes
                     
@@ -179,7 +189,7 @@ class FluxNormaliser(Processor):
             
             min = numpy.min(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
             max = numpy.max(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
-            
+            plt.figure()
             if data.geometry.dimension == '3D':
                 if angle is None:
                     if 'angle' in data.dimension_labels:
@@ -200,7 +210,7 @@ class FluxNormaliser(Processor):
                     self._plot_slice_roi(channel_index=channel, log=log, ax=211)
                 else:
                     raise ValueError("Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram")
-            plt.figure()
+            
             plt.subplot(212)
             if len(data.geometry.angles)==1:
                 plt.plot(data.geometry.angles, self.flux, '.r', label='Mean')
@@ -247,9 +257,11 @@ class FluxNormaliser(Processor):
 
         plt.subplot(ax)
         if log:
-            plt.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower', extent=extent)
+            im = plt.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower', extent=extent)
+            plt.gcf().colorbar(im, ax=plt.gca())
         else:
-            plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower', extent=extent)
+            im = plt.imshow(data_slice.array, cmap='gray',aspect='equal', origin='lower', extent=extent)
+            plt.gcf().colorbar(im, ax=plt.gca())
 
         h = data_slice.dimension_labels[1]
         v = data_slice.dimension_labels[0]

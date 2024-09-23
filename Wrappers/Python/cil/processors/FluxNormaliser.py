@@ -156,13 +156,13 @@ class FluxNormaliser(Processor):
 
                     self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
                     
-                    dataset_range = dataset.max(axis=tuple(axes)) - dataset.min(axis=tuple(axes)) 
+                    dataset_range = numpy.max(dataset.array, axis=tuple(axes)) - numpy.min(dataset.array, axis=tuple(axes)) 
 
                     if (numpy.mean(self.flux) > dataset.mean()):
-                        if numpy.mean(self.flux/dataset_range.array) < 0.9:
+                        if numpy.mean(self.flux/dataset_range) < 0.9:
                             log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
                     else:
-                        if numpy.mean(self.flux/dataset_range.array) > 0.1:
+                        if numpy.mean(self.flux/dataset_range) > 0.1:
                             log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
 
                     self.roi_slice = slc

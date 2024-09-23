@@ -3110,15 +3110,15 @@ class TestFluxNormaliser(unittest.TestCase):
     def test_init(self):
         # test default values are initialised
         processor = FluxNormaliser()
-        test_parameter = ['flux','roi','norm_value', 'tolerance']
-        test_value = [None, None, None, 1e-5]
+        test_parameter = ['flux','roi','norm_value']
+        test_value = [None, None, None]
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = FluxNormaliser(1,2,3,4)
-        test_value = [1, 2, 3, 4]
+        processor = FluxNormaliser(1,2,3)
+        test_value = [1, 2, 3]
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
 
@@ -3207,13 +3207,13 @@ class TestFluxNormaliser(unittest.TestCase):
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
         
         #Test flux array with no norm_value
-        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(data.get_dimension_size('angle'))))
+        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle'))))
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
         #Test flux array with norm_value
-        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(data.get_dimension_size('angle'))), norm_value=5)
+        processor = FluxNormaliser(flux=numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle'))), norm_value=5)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)

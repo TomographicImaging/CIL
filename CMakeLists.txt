@@ -44,8 +44,5 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-find_package(Git REQUIRED)
-find_package(Python COMPONENTS Interpreter REQUIRED)
-
 add_subdirectory(src/Core)
 add_subdirectory(Wrappers/Python)

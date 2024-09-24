@@ -217,6 +217,14 @@ class TestRemoteData(unittest.TestCase):
             # return to standard print output
             sys.stdout = sys.__stdout__ 
 
+        # Test the zip file IS created with prompt=False i.e. prompt not used
+        dataexample.WALNUT.download_data(tmp_dir, prompt=False)
+        # Test the data file exists
+        self.assertTrue(os.path.isfile(os.path.join(tmp_dir, dataexample.WALNUT.FOLDER, dataexample.TestData.SHAPES)), 
+                        msg = "Download data test failed with dataset " + data)
+        # Test the zip file is removed
+        self.assertFalse(os.path.isfile(os.path.join(tmp_dir, dataexample.WALNUT.ZIP_FILE)))
+
         shutil.rmtree(tmp_dir)
 
 

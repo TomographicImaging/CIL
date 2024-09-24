@@ -67,7 +67,8 @@ class REMOTEDATA(DATA):
             print("Dataset folder already exists in " + data_dir)
         else:
             # get user confirmation for download
-            if input("Are you sure you want to download {} dataset from Zenodo record {} ? (y/n)").format(cls.ZIP_FILE, cls.ZENODO_RECORD) == "y": 
+            user_input = 'y' if not prompt else input("Are you sure you want to download {} dataset from Zenodo record {} ? (y/n)").format(cls.ZIP_FILE, cls.ZENODO_RECORD)
+            if  user_input == "y": 
                 zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
 
                 # unzip file

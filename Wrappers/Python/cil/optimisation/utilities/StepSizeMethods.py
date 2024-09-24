@@ -18,7 +18,7 @@
 
 from abc import ABC, abstractmethod
 import numpy
-
+from numbers import Number
 
 class StepSizeRule(ABC):
     """
@@ -70,8 +70,7 @@ class ConstantStepSize(StepSizeRule):
 
 class ArmijoStepSizeRule(StepSizeRule):
 
-    """ 
-    Applies the Armijo rule to calculate the step size (step_size).
+    r""" Applies the Armijo rule to calculate the step size (step_size).
 
     The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.
 
@@ -88,9 +87,10 @@ class ArmijoStepSizeRule(StepSizeRule):
         In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial. 
 
     Reference
-    ---------
-    Algorithm 3.1 (Numerical Optimization, Nocedal, Wright) (https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
-     https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+    ------------
+    - Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
+    
+    - https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
 
     """
 
@@ -145,3 +145,110 @@ class ArmijoStepSizeRule(StepSizeRule):
         if self.warmstart:
             self.alpha_orig= self.alpha 
         return self.alpha
+
+
+class BarzilaiBorweinStepSizeRule(StepSizeRule):
+
+    r""" Applies the Barzilai- Borwein rule to calculate the step size (step_size).
+
+    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k` th iterate (current solution after iteration :math:`k` ) and :math:`g_k` is the gradient calculation in the :math:`k` th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha_kg_k` where the step size :math:`\alpha _k` is either
+
+    - :math:`\alpha_k^{LONG}=\frac{\Delta x\cdot\Delta x}{\Delta x\cdot\Delta g}`, or
+
+    - :math:`\alpha_k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
+    
+    Where the operator :math:`\cdot` is the standard inner product between two vectors. 
+    
+    This is suitable for use with gradient based iterative methods where the calculated gradient is stored as `algorithm.gradient_update`.
+    
+    Parameters
+    ----------
+    initial: float, greater than zero 
+        The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.
+    mode: One of 'long', 'short' or 'alternate', default is 'short'. 
+        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
+    stabilisation_param: 'auto', float or 'off', default is 'auto'
+        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
+        
+    
+    Reference
+    ---------
+    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141
+    
+    - Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). https://doi.org/10.4208/jcm.1911-m2019-0171
+
+    - https://en.wikipedia.org/wiki/Barzilai-Borwein_method
+    """
+
+    def __init__(self, initial, mode='short', stabilisation_param="auto"):
+        '''Initialises the step size rule 
+        '''
+ 
+        self.mode=mode
+        if self.mode == 'short':
+            self.is_short = True
+        elif self.mode == 'long' or self.mode == 'alternate':
+            self.is_short = False
+        else:
+            raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
+        
+        self.store_grad=None 
+        self.store_x=None
+        self.initial=initial
+        if stabilisation_param == 'auto':
+            self.adaptive = True
+            stabilisation_param = numpy.inf
+        elif stabilisation_param == "off":
+            self.adaptive = False 
+            stabilisation_param = numpy.inf
+        elif ( isinstance(stabilisation_param, Number) and stabilisation_param >=0):
+            self.adaptive = False 
+        else:
+            raise TypeError(" The stabilisation_param should be 'auto', a positive number or 'off'")
+        self.stabilisation_param=stabilisation_param
+        
+    
+
+    def get_step_size(self, algorithm):
+        """
+        Applies the B-B rule to calculate the step size (`step_size`)
+
+        Returns
+        --------
+        the calculated step size:float
+
+        """
+        #For the first iteration we use an initial step size because the BB step size requires a previous iterate. 
+        if self.store_x is None:
+            self.store_x=algorithm.x.copy() # We store the last iterate in order to calculate the BB step size 
+            self.store_grad=algorithm.gradient_update.copy()# We store the last gradient in order to calculate the BB step size 
+            return self.initial
+        
+        gradient_norm = algorithm.gradient_update.norm()
+        #If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations. 
+        if gradient_norm < 1e-8:
+            raise StopIteration
+
+        algorithm.x.subtract(self.store_x, out=self.store_x) 
+        algorithm.gradient_update.subtract(self.store_grad, out=self.store_grad)
+        if self.is_short:
+                ret = (self.store_x.dot(self.store_grad))/ (self.store_grad.dot(self.store_grad))
+        else:
+            ret = (self.store_x.dot(self.store_x))/ (self.store_x.dot(self.store_grad))
+
+        
+        #This computes the default stabilisation parameter, using the first three iterations
+        if (algorithm.iteration <=3 and self.adaptive):
+            self.stabilisation_param = min(self.stabilisation_param, self.store_x.norm() )
+        
+        # Computes the step size as the minimum of the ret, above, and :math:`\Delta/\|g_k\|` ignoring any NaN values. 
+        ret = numpy.nanmin( numpy.array([ret, self.stabilisation_param/gradient_norm]))
+        
+        # We store the last iterate and gradient in order to calculate the BB step size 
+        self.store_x.fill(algorithm.x)
+        self.store_grad.fill(algorithm.gradient_update)
+        
+        if self.mode == "alternate":
+            self.is_short =  not self.is_short       
+        
+        return ret

@@ -21,9 +21,9 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.utilities.errors import InPlaceError
-from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, ImageGeometry, \
+    AcquisitionGeometry
+from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -39,7 +39,7 @@ from cil.optimisation.functions import BlockFunction
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
@@ -80,9 +80,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        noisy_data = ag.allocate(FillType["RANDOM"], dtype=numpy.float64)
 
-        d = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        d = ag.allocate(FillType["RANDOM"], dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -97,7 +97,7 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
-        #negative function 
+        #negative function
         g = - L2NormSquared(b=noisy_data)
 
         # Compare call of g
@@ -107,14 +107,13 @@ class TestFunction(CCPiTestClass):
         h = -g
         self.assertAlmostEqual(-a2, h(d))
 
-
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        u = ig.allocate(FillType["RANDOM"])
+        b = ig.allocate(FillType["RANDOM"])
 
         # check grad/call no data
         f = L2NormSquared()
@@ -224,8 +223,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM, seed=1)
-        b = ig.allocate(ImageGeometry.RANDOM, seed=2)
+        u = ig.allocate(FillType["RANDOM"], seed=1)
+        b = ig.allocate(FillType["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -909,7 +908,6 @@ class TestFunction(CCPiTestClass):
         assert f4.L == 2 * f2.L
 
     def test_proximal_conjugate(self):
-        from cil.framework import AcquisitionGeometry, BlockGeometry
         ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 
@@ -958,7 +956,7 @@ class TestFunction(CCPiTestClass):
 
 
 class TestL1Norm (CCPiTestClass):
-    
+
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
         f2 = L1Norm(weight=None)
@@ -1006,7 +1004,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
-        
+
         np.random.seed(1)
         weights= geom.allocate('random').abs()
         w = weights.abs().sum()
@@ -1017,7 +1015,7 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
 
         np.random.seed(1)
         w = 1
@@ -1026,8 +1024,8 @@ class TestL1Norm (CCPiTestClass):
         f2 = L1Norm(weight=w)
 
         np.testing.assert_allclose(f1(x), f2(x))
-        
-    
+
+
         with self.assertRaises(ValueError):
             a=3+4j
             f2 = L1Norm(weight=a)
@@ -1044,18 +1042,18 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
         x=geom.allocate(3j)
         b=geom.allocate(2j)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
+
         x=geom.allocate(1+1j)
         b=geom.allocate(1)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
-        
+
+
     def test_ZeroWeights_L1Norm(self):
         weight = VectorData(np.array([0., 1.]))
         tau = 0.2
@@ -1121,9 +1119,6 @@ class TestL1Norm (CCPiTestClass):
 
         xc = geom.allocate(1, dtype=np.complex64)
         self.soft_shrinkage_test(xc)
-        
-
-
 
     def soft_shrinkage_test(self, x):
         tau = 1.
@@ -1148,7 +1143,7 @@ class TestL1Norm (CCPiTestClass):
         tau = -3j
         with self.assertRaises(ValueError):
             ret = soft_shrinkage(-0.5 *x, tau)
-            
+
         # tau np.ndarray
         tau = 1. * np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
@@ -1191,12 +1186,10 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
-        
-
     def test_L1_prox_init(self):
         pass
 
-    def test_L1Sparsity(self):    
+    def test_L1Sparsity(self):
         from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
         N, M = 2,3
@@ -1209,17 +1202,15 @@ class TestL1Norm (CCPiTestClass):
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
         f2 = L1Sparsity(W, weight=weights)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b, weight=weights)
         self.L1SparsityTest(f3, f2, x)
 
         f2 = L1Sparsity(W)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b)
         self.L1SparsityTest(f3, f2, x)
-        
-        
 
     def L1SparsityTest(self, f1, f2, x):
         np.testing.assert_almost_equal(f1(x), f2(x))
@@ -1228,10 +1219,8 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
                                    f2.proximal(x, tau).as_array())
-        
+
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
-
-
 
 
 class TestTotalVariation(unittest.TestCase):
@@ -1967,7 +1956,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1975,7 +1964,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(

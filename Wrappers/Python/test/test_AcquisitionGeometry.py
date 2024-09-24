@@ -23,9 +23,7 @@ import math
 import re
 import io
 import sys
-from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry, AcquisitionData
-from cil.framework.framework import SystemConfiguration
-from cil.framework import Partitioner
+from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
 
 initialise_tests()
 
@@ -704,7 +702,8 @@ class Test_Parallel2D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel2D()
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [None, None, 1])
+        detector_position = np.array(AG.config.system.detector.position)
+        self.assertEqual(out, [None, float(np.sqrt(detector_position.dot(detector_position))), 1])
 
     def test_calculate_centre_of_rotation(self):
         AG = AcquisitionGeometry.create_Parallel2D()
@@ -858,7 +857,8 @@ class Test_Parallel3D(unittest.TestCase):
     def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel3D()
         out = AG.config.system.calculate_magnification()
-        self.assertEqual(out, [None, None, 1])
+        detector_position = np.array(AG.config.system.detector.position)
+        self.assertEqual(out, [None, float(np.sqrt(detector_position.dot(detector_position))), 1])
 
     def test_calculate_centre_of_rotation(self):
 

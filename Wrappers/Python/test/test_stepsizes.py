@@ -1,9 +1,9 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA
 from cil.optimisation.functions import LeastSquares, IndicatorBox
-from cil.framework import ImageGeometry, VectorGeometry
+from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -87,6 +87,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 2)
 
+
     def test_warmstart_true(self):
         
         rule = ArmijoStepSizeRule(warmstart=True, alpha=5000)
@@ -107,3 +108,171 @@ class TestStepSizeArmijo(CCPiTestClass):
         alg.update()
         self.assertTrue(rule.alpha_orig == 5000)
         self.assertFalse(rule.alpha_orig == rule.alpha)  
+
+  class TestStepSizeBB(CCPiTestClass):
+    def test_bb(self):
+        n = 10
+        m = 5
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        ig=Aop.domain
+        initial = ig.allocate()
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(2 )
+        self.assertEqual(ss_rule.mode, 'short')
+        self.assertEqual(ss_rule.initial, 2)
+        self.assertEqual(ss_rule.adaptive, True)
+        self.assertEqual(ss_rule.stabilisation_param, np.inf)
+        
+        #Check the right errors are raised for incorrect parameters 
+        
+        with self.assertRaises(TypeError):
+            ss_rule=BarzilaiBorweinStepSizeRule(2,'short',-4, )
+        with self.assertRaises(TypeError):
+            ss_rule=BarzilaiBorweinStepSizeRule(2,'long', 'banana', )
+        with self.assertRaises(ValueError):
+            ss_rule=BarzilaiBorweinStepSizeRule(2, 'banana',3 )
+            
+        
+        #Check stabilisation parameter unchanged if fixed 
+        ss_rule=BarzilaiBorweinStepSizeRule(2, 'long',3 )
+        self.assertEqual(ss_rule.mode, 'long')
+        self.assertFalse(ss_rule.adaptive)
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertEqual(ss_rule.stabilisation_param,3)
+        alg.run(2)
+        self.assertEqual(ss_rule.stabilisation_param,3)
+        
+        #Check infinity can be passed 
+        ss_rule=BarzilaiBorweinStepSizeRule(2, 'short',"off" )
+        self.assertEqual(ss_rule.mode, 'short')
+        self.assertFalse(ss_rule.adaptive)
+        self.assertEqual(ss_rule.stabilisation_param,np.inf)
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(2)
+           
+        n = 5
+        m = 5
+
+        A = np.eye(5).astype('float32')
+        b = (np.array([.5,.5,.5,.5,.5])).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        ig=Aop.domain
+        initial = ig.allocate(0)
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        ss_rule=BarzilaiBorweinStepSizeRule(0.22, 'long',np.inf )
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertFalse(ss_rule.is_short)
+        #Check the initial step size was used
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual( np.array([.11,.11,.11,.11,.11]), alg.x.as_array() )
+        self.assertFalse(ss_rule.is_short)
+        #check long 
+        alg.run(1)
+        x_change= np.array([.11,.11,.11,.11,.11])-np.array([0,0,0,0,0])
+        grad_change = -np.array([.39,.39,.39,.39,.39])+np.array([.5,.5,.5,.5,.5])
+        step= x_change.dot(x_change)/x_change.dot(grad_change)
+        self.assertNumpyArrayAlmostEqual( np.array([.11,.11,.11,.11,.11])+step*np.array([.39,.39,.39,.39,.39]), alg.x.as_array() )
+        self.assertFalse(ss_rule.is_short)
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(0.22, 'short',np.inf )
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertTrue(ss_rule.is_short)
+        #Check the initial step size was used
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual( np.array([.11,.11,.11,.11,.11]), alg.x.as_array() )
+        self.assertTrue(ss_rule.is_short)
+        #check short
+        alg.run(1)
+        x_change= np.array([.11,.11,.11,.11,.11])-np.array([0,0,0,0,0])
+        grad_change = -np.array([.39,.39,.39,.39,.39])+np.array([.5,.5,.5,.5,.5])
+        step= x_change.dot(grad_change)/grad_change.dot(grad_change)
+        self.assertNumpyArrayAlmostEqual( np.array([.11,.11,.11,.11,.11])+step*np.array([.39,.39,.39,.39,.39]), alg.x.as_array() )
+        self.assertTrue(ss_rule.is_short)
+        
+        #check stop iteration 
+        ss_rule=BarzilaiBorweinStepSizeRule(1, 'long',np.inf )
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(500)
+        self.assertEqual(alg.iteration, 1)
+        
+        #check adaptive
+        ss_rule=BarzilaiBorweinStepSizeRule(0.001, 'long',"auto")
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertEqual(ss_rule.stabilisation_param, np.inf)
+        alg.run(2)
+        self.assertNotEqual(ss_rule.stabilisation_param, np.inf)
+        
+        #check stops being adaptive 
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(0.0000001, 'long',"auto" )
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertEqual(ss_rule.stabilisation_param, np.inf)
+        alg.run(4)
+        self.assertNotEqual(ss_rule.stabilisation_param, np.inf)
+        a=ss_rule.stabilisation_param
+        alg.run(1)
+        self.assertEqual(ss_rule.stabilisation_param, a)
+        
+        #Test alternating
+        ss_rule=BarzilaiBorweinStepSizeRule(0.0000001, 'alternate',"auto" )
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        self.assertFalse(ss_rule.is_short)
+        alg.run(2)
+        self.assertTrue(ss_rule.is_short)
+        alg.run(1)
+        self.assertFalse(ss_rule.is_short)
+        alg.run(1)
+        self.assertTrue(ss_rule.is_short)
+
+        
+        
+        
+    def test_bb_converge(self):
+        n = 10
+        m = 5
+        np.random.seed(4)
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        ig=Aop.domain
+        initial = ig.allocate()
+        f = LeastSquares(Aop, b=bop, c=2)
+        
+        ss_rule=ArmijoStepSizeRule(max_iterations=40)
+        alg_true = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg_true .run(300, verbose=0)
+        
+       
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(80, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        
+
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'long')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+        alg.run(80, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        
+
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
+        alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
+
+        alg.run(80, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        
+        
+

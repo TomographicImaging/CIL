@@ -144,12 +144,12 @@ class BlockFunction(Function):
 
         if self.length != x.shape[0]:
             raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
-
-        out = [None]*self.length
+        if out is None:
+            out = x.geometry.allocate(0)
         for i in range(self.length):
-            out[i] = self.functions[i].gradient(x.get_item(i))
+            self.functions[i].gradient(x.get_item(i), out=out.get_item(i))
 
-        return  BlockDataContainer(*out)
+        return  out
 
     def proximal_conjugate(self, x, tau, out = None):
         r"""Proximal operator of the convex conjugate of BlockFunction at x:

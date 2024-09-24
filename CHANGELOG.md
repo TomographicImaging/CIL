@@ -7,19 +7,27 @@
     - Added Barzilai-Borwein step size rule to work with GD, ISTA, FISTA (#1859)
     - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
     - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
+    - Added `labels` module with `ImageDimension`, `AcquisitionDimension`, `AcquisitionType`, `AngleUnit`, `FillType` (#1692)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+    - Updated the documentation for the algorithm base class (#1809)
     - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
+    - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
+    - Internal refactor: Separate framework into multiple files (#1692)
+    - Allow the SIRT algorithm to take `initial=None` (#1906)
     - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
+    - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)
+    - Drop Jenkins in favour of GHA for conda builds (#1914)
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)
+    - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
+    - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
-
 
 * 24.1.0
   - New Features:
@@ -47,9 +55,6 @@
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).
-
-
-
 
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.

@@ -67,16 +67,14 @@ class REMOTEDATA(DATA):
             print("Dataset folder already exists in " + data_dir)
         else:
             user_input = input("Are you sure you want to download {cls.ZIP_FILE} dataset from Zenodo record {cls.ZENODO_RECORD}? [Y/n]: ") if prompt else 'y'
-            if  user_input.lower() == 'y':
-                zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
-
-                # unzip file
-                with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
-                    zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
-                os.remove(os.path.join(data_dir, cls.ZIP_FILE))
-            else:
+            if user_input.lower() not in ('y', 'yes'):
                 print('Download cancelled')
                 return False
+
+            zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
+            with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
+            os.remove(os.path.join(data_dir, cls.ZIP_FILE))
             return True
 
 class BOAT(CILDATA):

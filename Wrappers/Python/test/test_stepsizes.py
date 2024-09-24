@@ -79,11 +79,11 @@ class TestStepSizeArmijo(CCPiTestClass):
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 4)
 
-        alg.gradient_update = ig.allocate(-.5)
+        alg.gradient_update = self.ig.allocate(-.5)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 8)
 
-        alg.gradient_update = ig.allocate(-2)
+        alg.gradient_update = self.ig.allocate(-2)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 2)
 

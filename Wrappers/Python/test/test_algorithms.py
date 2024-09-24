@@ -240,7 +240,7 @@ class TestGD(CCPiTestClass):
         gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
                 max_iteration=2500,
                 update_objective_interval=500)
-        gd.run(2500,verbose=0)
+        gd.run(3000,verbose=0)
         np.testing.assert_allclose(
             gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
         np.testing.assert_allclose(

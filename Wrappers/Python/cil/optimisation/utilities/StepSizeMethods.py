@@ -83,6 +83,9 @@ class ArmijoStepSizeRule(StepSizeRule):
         The amount the step_size is reduced if the criterion is not met
     max_iterations: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
         The maximum number of iterations to find a suitable step size 
+    warmstart: Boolean, default is True
+        If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`. 
+        In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial. 
 
     Reference
     ---------
@@ -91,7 +94,7 @@ class ArmijoStepSizeRule(StepSizeRule):
 
     """
 
-    def __init__(self, alpha=1e6, beta=0.5, max_iterations=None):
+    def __init__(self, alpha=1e6, beta=0.5, max_iterations=None, warmstart=True):
         '''Initialises the step size rule 
         '''
         
@@ -106,6 +109,8 @@ class ArmijoStepSizeRule(StepSizeRule):
         self.max_iterations = max_iterations
         if self.max_iterations is None:
             self.max_iterations = numpy.ceil(2 * numpy.log10(self.alpha_orig) / numpy.log10(2))
+            
+        self.warmstart=warmstart
 
     def get_step_size(self, algorithm):
         """
@@ -137,4 +142,6 @@ class ArmijoStepSizeRule(StepSizeRule):
         if k == self.max_iterations:
             raise ValueError(
                 'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
+        if self.warmstart:
+            self.alpha_orig= self.alpha 
         return self.alpha

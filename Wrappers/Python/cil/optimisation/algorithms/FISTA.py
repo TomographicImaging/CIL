@@ -213,8 +213,19 @@ class ISTA(Algorithm):
         .. math:: f(x) + g(x)
 
         """
-        self.loss.append(self.f(self.x_old) + self.g(self.x_old))
+        self.loss.append(self.objective_function(self.x_old))
 
+    def objective_function(self, x):
+        """ Calculates the objective
+
+        .. math:: f(x) + g(x)
+        
+        Parameters
+        ----------
+        x : DataContainer
+        
+        """
+        return self.f(x) + self.g(x)
 
 class FISTA(ISTA):
 

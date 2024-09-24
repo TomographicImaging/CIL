@@ -87,6 +87,36 @@ class TestStepSizeArmijo(CCPiTestClass):
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 2)
 
+    def test_armijo_ISTA_and_FISTA(self):
+        test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, max_iterations=100, warmstart=False)
+
+        alg = ISTA(initial=self.ig.allocate(0), f=self.f, g=IndicatorBox(lower=0),
+                    max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
+        alg.gradient_update = self.ig.allocate(-1)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 4)
+
+        alg.gradient_update = self.ig.allocate(-.5)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 8)
+
+        alg.gradient_update = self.ig.allocate(-2)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 2)
+
+        alg = FISTA(initial=self.ig.allocate(0), f=self.f, g=IndicatorBox(lower=0),
+                    max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
+        alg.gradient_update = self.ig.allocate(-1)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 4)
+
+        alg.gradient_update = self.ig.allocate(-.5)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 8)
+
+        alg.gradient_update = self.ig.allocate(-2)
+        step_size = test_stepsize.get_step_size(alg)
+        self.assertAlmostEqual(step_size, 2)
 
     def test_warmstart_true(self):
         

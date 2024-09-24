@@ -53,7 +53,7 @@ class REMOTEDATA(DATA):
         return None
 
     @classmethod
-    def download_data(cls, data_dir):
+    def download_data(cls, data_dir, prompt=True):
         '''
         Download a dataset from a remote repository
 
@@ -77,7 +77,6 @@ class REMOTEDATA(DATA):
 
             else:
                 print('Download cancelled')
-                return
 
 class BOAT(CILDATA):
     @classmethod
@@ -239,7 +238,7 @@ class USB(REMOTEDATA):
     >>> dataexample.USB.download_data(data_dir) # download the data
     >>> dataexample.USB.get(data_dir) # load the data
     '''
-    FOLDER = 'USB' 
+    FOLDER = 'USB'
     ZENODO_RECORD = '4822516'
     ZIP_FILE = 'usb.zip'
 
@@ -343,6 +342,7 @@ class SANDSTONE(REMOTEDATA):
         extension = os.path.splitext(filename)[1]
         if extension == '.mat':
             return loadmat(os.path.join(data_dir,filename))
+        raise KeyError(f"Unknown extension: {extension}")
         
 
 class TestData(object):

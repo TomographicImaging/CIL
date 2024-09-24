@@ -109,7 +109,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         self.assertTrue(rule.alpha_orig == 5000)
         self.assertFalse(rule.alpha_orig == rule.alpha)  
 
-  class TestStepSizeBB(CCPiTestClass):
+class TestStepSizeBB(CCPiTestClass):
     def test_bb(self):
         n = 10
         m = 5

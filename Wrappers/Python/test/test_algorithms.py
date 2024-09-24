@@ -227,7 +227,7 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSizeRule(alpha=50)
+        armj = ArmijoStepSizeRule(alpha=50, max_iterations=50)
         gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
                 update_objective_interval=500)
         gd.run(3000,verbose=0)
@@ -1121,7 +1121,7 @@ class TestSIRT(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
         ig = data.geometry
         A = IdentityOperator(ig)
-        constraint = 1e6*TotalVariation(warm_start=True)
+        constraint = 1e6*TotalVariation(warm_start=True, max_iteration=100)
         initial = ig.allocate('random', seed=5)
         sirt = SIRT(initial=initial, operator=A, data=data,
                      constraint=constraint)

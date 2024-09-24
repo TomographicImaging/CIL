@@ -71,7 +71,7 @@ class TestStepSizeArmijo(CCPiTestClass):
             2 * np.log10(1e6) / np.log10(2)))
 
     def test_armijo_calculation(self):
-        test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, max_iterations=100)
+        test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, max_iterations=100, warmstart=False)
 
         alg = GD(initial=self.ig.allocate(0), objective_function=self.f,
                  max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
@@ -250,7 +250,7 @@ class TestStepSizeBB(CCPiTestClass):
         initial = ig.allocate()
         f = LeastSquares(Aop, b=bop, c=2)
         
-        ss_rule=ArmijoStepSizeRule(max_iterations=40)
+        ss_rule=ArmijoStepSizeRule(max_iterations=40, warmstart=False)
         alg_true = GD(initial=initial, objective_function=f, step_size=ss_rule)
         alg_true .run(300, verbose=0)
         

@@ -105,13 +105,10 @@ class TestGD(CCPiTestClass):
 
         alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6)
-        alg.max_iteration = 1000
         alg.run(1000,verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
-                 atol=1e-9, rtol=1e-6, max_iteration=20, update_objective_interval=2)
-        alg.max_iteration = 20
-        self.assertTrue(alg.max_iteration == 20)
+                 atol=1e-9, rtol=1e-6, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -132,7 +129,6 @@ class TestGD(CCPiTestClass):
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
                  objective_function=norm2sq,
-                 max_iteration=20,
                  update_objective_interval=0,
                  atol=1e-9, rtol=1e-6)
         self.assertTrue(alg.update_objective_interval == 0)
@@ -176,7 +172,6 @@ class TestGD(CCPiTestClass):
     def test_gd_fixed_step_size_rosen(self):
 
         gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002,
-                max_iteration=3000,
                 update_objective_interval=500)
         gd.run(3000, verbose=0)
         np.testing.assert_allclose(
@@ -224,21 +219,16 @@ class TestGD(CCPiTestClass):
         norm2sq = LeastSquares(identity, b)
 
         alg = GD(initial=initial, objective_function=norm2sq)
-        alg.max_iteration = 100
         alg.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, objective_function=norm2sq,
-                 max_iteration=20, update_objective_interval=2)
-        # alg.max_iteration = 20
-        self.assertTrue(alg.max_iteration == 20)
+        alg = GD(initial=initial, objective_function=norm2sq, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSizeRule(alpha=50, max_iterations=150)
+        armj = ArmijoStepSizeRule(alpha=50)
         gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
-                max_iteration=2500,
                 update_objective_interval=500)
         gd.run(3000,verbose=0)
         np.testing.assert_allclose(
@@ -262,31 +252,26 @@ class TestFISTA(CCPiTestClass):
         log.info("initial objective %s", norm2sq(initial))
 
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
-        alg.max_iteration = 2
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(),
-                    max_iteration=2, update_objective_interval=2)
+                     update_objective_interval=2)
 
-        self.assertTrue(alg.max_iteration == 2)
         self.assertTrue(alg.update_objective_interval == 2)
 
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         # Testing g=None
-        alg = FISTA(initial=initial, f=norm2sq, g=None,
-                    max_iteration=2, update_objective_interval=2)
-        self.assertTrue(alg.max_iteration == 2)
+        alg = FISTA(initial=initial, f=norm2sq, g=None, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         # Testing f=None
         alg = FISTA(initial=initial, f=None, g=L1Norm(b=b),
-                    max_iteration=2, update_objective_interval=2)
-        self.assertTrue(alg.max_iteration == 2)
+                     update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -294,7 +279,7 @@ class TestFISTA(CCPiTestClass):
         # Testing f and g is None
         with self.assertRaises(ValueError):
             alg = FISTA(initial=initial, f=None, g=None,
-                        max_iteration=2, update_objective_interval=2)
+                        update_objective_interval=2)
 
     def test_FISTA_update(self):
 
@@ -319,7 +304,7 @@ class TestFISTA(CCPiTestClass):
 
         # ista run 10 iteration
         tmp_initial = ig.allocate()
-        fista = FISTA(initial=tmp_initial, f=f, g=g, max_iteration=1)
+        fista = FISTA(initial=tmp_initial, f=f, g=g)
         fista.run(1)
 
         # fista update method
@@ -348,11 +333,11 @@ class TestFISTA(CCPiTestClass):
         self.assertTrue(res1 == res2)
 
         tmp_initial = ig.allocate()
-        fista1 = FISTA(initial=tmp_initial, f=f, g=g, max_iteration=1)
+        fista1 = FISTA(initial=tmp_initial, f=f, g=g)
         self.assertTrue(fista1.is_provably_convergent())
 
         fista1 = FISTA(initial=tmp_initial, f=f, g=g,
-                       max_iteration=1, step_size=30.0)
+                        step_size=30.0)
         self.assertFalse(fista1.is_provably_convergent())
 
     def test_FISTA_Norm2Sq(self):
@@ -367,13 +352,11 @@ class TestFISTA(CCPiTestClass):
         opt = {'tol': 1e-4, 'memopt': False}
         log.info("initial objective %s", norm2sq(initial))
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
-        alg.max_iteration = 2
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(),
-                    max_iteration=2, update_objective_interval=3)
-        self.assertTrue(alg.max_iteration == 2)
+                     update_objective_interval=3)
         self.assertTrue(alg.update_objective_interval == 3)
 
         alg.run(20, verbose=0)
@@ -419,7 +402,6 @@ class TestFISTA(CCPiTestClass):
 
         initial = ig.allocate()
         fista = FISTA(initial=initial, f=reg, g=fid)
-        fista.max_iteration = 3000
         fista.update_objective_interval = 500
         fista.run(3000, verbose=0)
         rmse = (fista.get_output() - data).norm() / data.as_array().size
@@ -483,7 +465,7 @@ class testISTA(CCPiTestClass):
 
         # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial=tmp_initial, f=self.f, g=self.g, max_iteration=1)
+        ista = ISTA(initial=tmp_initial, f=self.f, g=self.g)
         ista.run(1)
 
         x = tmp_initial.copy()
@@ -505,7 +487,7 @@ class testISTA(CCPiTestClass):
 
         # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial=tmp_initial, f=self.f, g=None,  max_iteration=1)
+        ista = ISTA(initial=tmp_initial, f=self.f, g=None)
         ista.run(1)
 
         x = tmp_initial.copy()
@@ -526,7 +508,7 @@ class testISTA(CCPiTestClass):
 
         # ista run 1 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial=tmp_initial, f=None, g=self.h,  max_iteration=1)
+        ista = ISTA(initial=tmp_initial, f=None, g=self.h)
         ista.run(1)
 
         x = tmp_initial.copy()
@@ -546,23 +528,23 @@ class testISTA(CCPiTestClass):
     def test_f_and_g_none(self):
         tmp_initial = self.ig.allocate()
         with self.assertRaises(ValueError):
-            ista = ISTA(initial=tmp_initial, f=None, g=None,  max_iteration=1)
+            ista = ISTA(initial=tmp_initial, f=None, g=None)
 
     def test_provable_condition(self):
 
         tmp_initial = self.ig.allocate()
-        ista1 = ISTA(initial=tmp_initial, f=self.f, g=self.g, max_iteration=10)
+        ista1 = ISTA(initial=tmp_initial, f=self.f, g=self.g)
         self.assertTrue(ista1.is_provably_convergent())
 
         ista1 = ISTA(initial=tmp_initial, f=self.f, g=self.g,
-                     max_iteration=10, step_size=30.0)
+                      step_size=30.0)
         self.assertFalse(ista1.is_provably_convergent())
 
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_with_cvxpy(self):
 
         ista = ISTA(initial=self.initial, f=self.f,
-                    g=self.g, max_iteration=2000)
+                    g=self.g)
         ista.run(2000, verbose=0)
 
         u_cvxpy = cvxpy.Variable(self.ig.shape[0])
@@ -738,7 +720,6 @@ class TestPDHG(CCPiTestClass):
 
         # Setup and run the PDHG algorithm
         pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg1.max_iteration = 2000
         pdhg1.update_objective_interval = 200
         pdhg1.run(1000, verbose=0)
 
@@ -763,7 +744,7 @@ class TestPDHG(CCPiTestClass):
 
         # Setup and run the PDHG algorithm
         pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma,
-                     max_iteration=2000, update_objective_interval=200)
+                     update_objective_interval=200)
 
         pdhg1.run(1000, verbose=0)
 
@@ -788,7 +769,6 @@ class TestPDHG(CCPiTestClass):
 
         # Setup and run the PDHG algorithm
         pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg1.max_iteration = 2000
         pdhg1.update_objective_interval = 200
         pdhg1.run(1000, verbose=0)
 
@@ -805,28 +785,28 @@ class TestPDHG(CCPiTestClass):
         operator = 3*IdentityOperator(ig)
 
         # check if sigma, tau are None
-        pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10)
+        pdhg = PDHG(f=f, g=g, operator=operator)
         self.assertAlmostEqual(pdhg.sigma, 1./operator.norm())
         self.assertAlmostEqual(pdhg.tau, 1./operator.norm())
 
         # check if sigma is negative
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        max_iteration=10, sigma=-1)
+                         sigma=-1)
 
         # check if tau is negative
         with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, tau=-1)
+            pdhg = PDHG(f=f, g=g, operator=operator,tau=-1)
 
         # check if tau is None
         sigma = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, max_iteration=10)
+        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma)
         self.assertAlmostEqual(pdhg.sigma, sigma)
         self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2))
 
         # check if sigma is None
         tau = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau, max_iteration=10)
+        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
         self.assertAlmostEqual(pdhg.tau, tau)
         self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2))
 
@@ -834,7 +814,7 @@ class TestPDHG(CCPiTestClass):
         tau = 1.0
         sigma = 1.0
         pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                    sigma=sigma, max_iteration=10)
+                    sigma=sigma)
         self.assertAlmostEqual(pdhg.tau, tau)
         self.assertAlmostEqual(pdhg.sigma, sigma)
 
@@ -843,29 +823,29 @@ class TestPDHG(CCPiTestClass):
         sigma = ig1.allocate()
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma=sigma, max_iteration=10)
+                        sigma=sigma)
 
         # check sigma/tau as arrays, tau wrong shape
         tau = ig1.allocate()
         with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau, max_iteration=10)
+            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
 
         # check sigma not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma="sigma", max_iteration=10)
+                        sigma="sigma")
 
         # check tau not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        tau="tau", max_iteration=10)
+                        tau="tau")
 
         # check warning message if condition is not satisfied
         sigma = 4
         tau = 1/3
         with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
             pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma, max_iteration=10)
+                        sigma=sigma)
 
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
@@ -880,7 +860,7 @@ class TestPDHG(CCPiTestClass):
         tau = 1.0
 
         pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    max_iteration=5, gamma_g=0.5)
+                     gamma_g=0.5)
         pdhg.run(1, verbose=0)
         self.assertAlmostEqual(
             pdhg.theta, 1.0 / np.sqrt(1 + 2 * pdhg.gamma_g * tau))
@@ -893,12 +873,12 @@ class TestPDHG(CCPiTestClass):
         # check negative strongly convex constant
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        max_iteration=5, gamma_g=-0.5)
+                         gamma_g=-0.5)
 
         # check strongly convex constant not a number
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        max_iteration=5, gamma_g="-0.5")
+                         gamma_g="-0.5")
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
         ig = ImageGeometry(3, 3)
@@ -913,7 +893,7 @@ class TestPDHG(CCPiTestClass):
         tau = 1.0
 
         pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    max_iteration=5, gamma_fconj=0.5)
+                     gamma_fconj=0.5)
         pdhg.run(1, verbose=0)
         self.assertEqual(pdhg.theta, 1.0 / np.sqrt(1 +
                          2 * pdhg.gamma_fconj * sigma))
@@ -926,14 +906,14 @@ class TestPDHG(CCPiTestClass):
         # check negative strongly convex constant
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        max_iteration=5, gamma_fconj=-0.5)
+                         gamma_fconj=-0.5)
         except ValueError as ve:
             log.info(str(ve))
 
         # check strongly convex constant not a number
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        max_iteration=5, gamma_fconj="-0.5")
+                         gamma_fconj="-0.5")
         except ValueError as ve:
             log.info(str(ve))
 
@@ -947,7 +927,7 @@ class TestPDHG(CCPiTestClass):
         operator = IdentityOperator(ig)
 
         try:
-            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10,
+            pdhg = PDHG(f=f, g=g, operator=operator, 
                         gamma_g=0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
         except ValueError as err:
@@ -1031,7 +1011,7 @@ class TestSIRT(CCPiTestClass):
         # sirt run 5 iterations
         tmp_initial = self.ig.allocate()
         sirt = SIRT(initial=tmp_initial, operator=self.Aop,
-                    data=self.bop, max_iteration=5)
+                    data=self.bop)
         sirt.run(5)
 
         x = tmp_initial.copy()
@@ -1046,22 +1026,22 @@ class TestSIRT(CCPiTestClass):
 
     def test_update_constraints(self):
         alg = SIRT(initial=self.initial2, operator=self.A2,
-                   data=self.b2, max_iteration=20)
+                   data=self.b2)
         alg.run(20,verbose=0)
         np.testing.assert_array_almost_equal(alg.x.array, self.b2.array)
 
         alg = SIRT(initial=self.initial2, operator=self.A2,
-                   data=self.b2, max_iteration=20, upper=0.3)
+                   data=self.b2,  upper=0.3)
         alg.run(20,verbose=0)
         np.testing.assert_almost_equal(alg.solution.max(), 0.3)
 
         alg = SIRT(initial=self.initial2, operator=self.A2,
-                   data=self.b2, max_iteration=20, lower=0.7)
+                   data=self.b2, lower=0.7)
         alg.run(20,verbose=0)
         np.testing.assert_almost_equal(alg.solution.min(), 0.7)
 
         alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,
-                   max_iteration=20, constraint=IndicatorBox(lower=0.1, upper=0.3))
+                    constraint=IndicatorBox(lower=0.1, upper=0.3))
         alg.run(20,verbose=0)
         np.testing.assert_almost_equal(alg.solution.max(), 0.3)
         np.testing.assert_almost_equal(alg.solution.min(), 0.1)
@@ -1069,7 +1049,7 @@ class TestSIRT(CCPiTestClass):
     def test_SIRT_relaxation_parameter(self):
         tmp_initial = self.ig.allocate()
         alg = SIRT(initial=tmp_initial, operator=self.Aop,
-                   data=self.bop, max_iteration=5)
+                   data=self.bop)
 
         with self.assertRaises(ValueError):
             alg.set_relaxation_parameter(0)
@@ -1078,7 +1058,7 @@ class TestSIRT(CCPiTestClass):
             alg.set_relaxation_parameter(2)
 
         alg = SIRT(initial=self.initial2, operator=self.A2,
-                   data=self.b2, max_iteration=20)
+                   data=self.b2)
         alg.set_relaxation_parameter(0.5)
 
         self.assertEqual(alg.relaxation_parameter, 0.5)
@@ -1095,7 +1075,7 @@ class TestSIRT(CCPiTestClass):
 
         tmp_initial = self.ig.allocate()
         sirt = SIRT(initial=tmp_initial, operator=Aop_nan_inf,
-                    data=self.bop, max_iteration=5)
+                    data=self.bop)
 
         self.assertFalse(np.any(sirt.M == np.inf))
         self.assertFalse(np.any(sirt.D == np.inf))
@@ -1117,7 +1097,7 @@ class TestSIRT(CCPiTestClass):
         tmp_initial = ig.allocate()
 
         sirt = SIRT(initial=tmp_initial, operator=Aop,
-                    data=bop, max_iteration=5)
+                    data=bop)
         for el in sirt.M.containers:
             self.assertFalse(np.any(el == np.inf))
 
@@ -1127,13 +1107,13 @@ class TestSIRT(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
         ig = data.geometry
         A = IdentityOperator(ig)
-        constraint = TotalVariation(warm_start=False, max_iteration=100)
+        constraint = TotalVariation(warm_start=False)
         initial = ig.allocate('random', seed=5)
         sirt = SIRT(initial=initial, operator=A, data=data,
-                    max_iteration=2, constraint=constraint)
+                     constraint=constraint)
         sirt.run(2, verbose=0)
         f = LeastSquares(A, data, c=0.5)
-        fista = FISTA(initial=initial, f=f, g=constraint, max_iteration=1000)
+        fista = FISTA(initial=initial, f=f, g=constraint)
         fista.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(fista.x.as_array(), sirt.x.as_array())
 
@@ -1141,10 +1121,10 @@ class TestSIRT(CCPiTestClass):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128, 128))
         ig = data.geometry
         A = IdentityOperator(ig)
-        constraint = 1e6*TotalVariation(warm_start=True, max_iteration=100)
+        constraint = 1e6*TotalVariation(warm_start=True)
         initial = ig.allocate('random', seed=5)
         sirt = SIRT(initial=initial, operator=A, data=data,
-                    max_iteration=150, constraint=constraint)
+                     constraint=constraint)
         sirt.run(25, verbose=0)
 
         self.assertNumpyArrayAlmostEqual(
@@ -1470,11 +1450,11 @@ class TestADMM(unittest.TestCase):
         F = self.F
 
         admm = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
-                     max_iteration=100, update_objective_interval=10)
+                     update_objective_interval=10)
         admm.run(1, verbose=0)
 
         admm_noaxpby = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
-                             max_iteration=100, update_objective_interval=10)
+                             update_objective_interval=10)
         admm_noaxpby.run(1, verbose=0)
         np.testing.assert_array_almost_equal(
             admm.solution.as_array(), admm_noaxpby.solution.as_array())
@@ -1506,14 +1486,14 @@ class TestADMM(unittest.TestCase):
         tau = 1./normK
 
         pdhg = PDHG(f=F, g=G, operator=K, tau=tau, sigma=sigma,
-                    max_iteration=500, update_objective_interval=10)
+                     update_objective_interval=10)
         pdhg.run(500,verbose=0)
 
         sigma = 1
         tau = sigma/normK**2
 
         admm = LADMM(f=G, g=F, operator=K, tau=tau, sigma=sigma,
-                     max_iteration=500, update_objective_interval=10)
+                      update_objective_interval=10)
         admm.run(500,verbose=0)
         np.testing.assert_almost_equal(
             admm.solution.array, pdhg.solution.array,  decimal=3)
@@ -1564,8 +1544,7 @@ class Test_PD3O(unittest.TestCase):
         G = 0.5 * L2NormSquared(b=self.data)
         sigma = 1./norm_op
         tau = 1./norm_op
-        pdhg = PDHG(f=F, g=G, operator=operator, tau=tau, sigma=sigma, update_objective_interval = 100, 
-                    max_iteration = 2000)
+        pdhg = PDHG(f=F, g=G, operator=operator, tau=tau, sigma=sigma, update_objective_interval = 100)
         pdhg.run(1)
 
         # setup PD3O denoising  (F=ZeroFunction)   
@@ -1576,8 +1555,7 @@ class Test_PD3O(unittest.TestCase):
         delta = 1./norm_op
 
         pd3O = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
-                    update_objective_interval = 100, 
-                    max_iteration = 2000)
+                    update_objective_interval = 100)
         pd3O.run(1)      
                
         # PD3O vs pdhg

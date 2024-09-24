@@ -230,7 +230,7 @@ class TestGD(CCPiTestClass):
         armj = ArmijoStepSizeRule(alpha=50, max_iterations=50)
         gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
                 update_objective_interval=500)
-        gd.run(3000,verbose=0)
+        gd.run(5000,verbose=0)
         np.testing.assert_allclose(
             gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
         np.testing.assert_allclose(

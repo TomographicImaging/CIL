@@ -21,7 +21,7 @@ class TestStepSizes(CCPiTestClass):
         step_size_test.get_step_size = MagicMock(return_value=.1)
         f = LeastSquares(A=A, b=data, c=0.5)
         alg = GD(initial=ig.allocate('random', seed=10), objective_function=f, step_size=step_size_test,
-                 max_iteration=100, update_objective_interval=1)
+                  update_objective_interval=1)
 
         alg.run(5)
 
@@ -30,14 +30,14 @@ class TestStepSizes(CCPiTestClass):
         step_size_test = ConstantStepSize(3)
         step_size_test.get_step_size = MagicMock(return_value=.1)
         alg = ISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
-                   max_iteration=100, update_objective_interval=1)
+                    update_objective_interval=1)
         alg.run(5)
         self.assertEqual(len(step_size_test.get_step_size.mock_calls), 5)
 
         step_size_test = ConstantStepSize(3)
         step_size_test.get_step_size = MagicMock(return_value=.1)
         alg = FISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
-                    max_iteration=100, update_objective_interval=1)
+                     update_objective_interval=1)
         alg.run(5)
         self.assertEqual(len(step_size_test.get_step_size.mock_calls), 5)
 
@@ -74,7 +74,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, max_iterations=100, warmstart=False)
 
         alg = GD(initial=self.ig.allocate(0), objective_function=self.f,
-                 max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
+                  update_objective_interval=1, step_size=test_stepsize)
         alg.gradient_update = self.ig.allocate(-1)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 4)
@@ -91,7 +91,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         test_stepsize = ArmijoStepSizeRule(alpha=8, beta=0.5, max_iterations=100, warmstart=False)
 
         alg = ISTA(initial=self.ig.allocate(0), f=self.f, g=IndicatorBox(lower=0),
-                    max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
+                     update_objective_interval=1, step_size=test_stepsize)
         alg.gradient_update = self.ig.allocate(-1)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 4)
@@ -105,7 +105,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         self.assertAlmostEqual(step_size, 2)
 
         alg = FISTA(initial=self.ig.allocate(0), f=self.f, g=IndicatorBox(lower=0),
-                    max_iteration=100, update_objective_interval=1, step_size=test_stepsize)
+                     update_objective_interval=1, step_size=test_stepsize)
         alg.gradient_update = self.ig.allocate(-1)
         step_size = test_stepsize.get_step_size(alg)
         self.assertAlmostEqual(step_size, 4)
@@ -124,7 +124,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         self.assertTrue(rule.warmstart)
         self.assertTrue(rule.alpha_orig == 5000)
         alg = GD(initial=self.ig.allocate(0), objective_function=self.f,
-                 max_iteration=100, update_objective_interval=1, step_size=rule)
+                  update_objective_interval=1, step_size=rule)
         alg.update()
         self.assertFalse(rule.alpha_orig == 5000)
         self.assertTrue(rule.alpha_orig == rule.alpha)  
@@ -134,7 +134,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         self.assertFalse(rule.warmstart)
         self.assertTrue(rule.alpha_orig == 5000)
         alg = GD(initial=self.ig.allocate(0), objective_function=self.f,
-                 max_iteration=100, update_objective_interval=1, step_size=rule)
+                  update_objective_interval=1, step_size=rule)
         alg.update()
         self.assertTrue(rule.alpha_orig == 5000)
         self.assertFalse(rule.alpha_orig == rule.alpha)  

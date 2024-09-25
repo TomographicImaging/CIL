@@ -76,7 +76,32 @@ class ImageData(DataContainer):
 
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
 
+    def __eq__(self, other):
+        '''
+        Check if two ImageData objects are equal. This is done by checking if the geometry, data and dtype are equal.
+        Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.
+        
+        Parameters
+        ----------
+        other: ImageData or numpy.ndarray
+            The object to compare with.
+        
+        Returns
+        -------
+        bool
+            True if the two objects are equal, False otherwise.
+        '''
 
+        if isinstance(other, ImageData):
+            if numpy.array_equal(self.as_array(), other.as_array()) \
+                and self.geometry == other.geometry \
+                and self.dtype == other.dtype:
+                return True 
+        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+            return True
+        else:
+            return False
+    
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
         Returns a new ImageData of a single slice of in the requested direction.

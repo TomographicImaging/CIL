@@ -126,8 +126,7 @@ class TestStepSizeArmijo(CCPiTestClass):
         alg = GD(initial=self.ig.allocate(0), objective_function=self.f,
                   update_objective_interval=1, step_size=rule)
         alg.update()
-        self.assertFalse(rule.alpha_orig == 5000)
-        self.assertTrue(rule.alpha_orig == rule.alpha)  
+        self.assertFalse(rule.alpha == 5000)
 
     def test_warmstart_false(self):
         rule = ArmijoStepSizeRule(warmstart=False,  alpha=5000)

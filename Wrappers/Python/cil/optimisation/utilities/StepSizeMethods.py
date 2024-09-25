@@ -101,7 +101,7 @@ class ArmijoStepSizeRule(StepSizeRule):
         self.alpha_orig = alpha
         if self.alpha_orig is None: # Can be removed when alpha and beta are deprecated in GD
             self.alpha_orig = 1e6 
-
+        self.alpha = self.alpha_orig
         self.beta = beta 
         if self.beta is None:  # Can be removed when alpha and beta are deprecated in GD
             self.beta = 0.5
@@ -122,7 +122,7 @@ class ArmijoStepSizeRule(StepSizeRule):
 
         """
         k = 0
-        self.alpha = self.alpha_orig
+        
         f_x = algorithm.objective_function(algorithm.solution)
 
         self.x_armijo = algorithm.solution.copy()
@@ -142,8 +142,8 @@ class ArmijoStepSizeRule(StepSizeRule):
         if k == self.max_iterations:
             raise ValueError(
                 'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
-        if self.warmstart:
-            self.alpha_orig= self.alpha 
+        if not self.warmstart:  
+            self.alpha = self.alpha_orig 
         return self.alpha
 
 

@@ -2692,6 +2692,12 @@ class TestMasker(unittest.TestCase):
         self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
         numpy.testing.assert_array_equal(mask.as_array(), self.mask_2D_manual.as_array())
 
+        mask = self.mask_3D_manual.copy()
+        self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_3D_manual.as_array())
+
+
+
     def test_Masker_doesnt_modify_input_integer_mask(self):
         mask = self.mask_int_manual.copy()
         self.Masker_check(self.mask_int_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)

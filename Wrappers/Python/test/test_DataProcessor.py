@@ -2673,7 +2673,7 @@ class TestMasker(unittest.TestCase):
 
         # make a copy of mask_manual with 1s and 0s instead of bools:
         mask_int_manual = mask_2D_manual.astype(numpy.int32)
-        self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data.dimension_labels)
+        self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data_2D.dimension_labels)
 
 
     def test_Masker_Manual(self):
@@ -2685,16 +2685,16 @@ class TestMasker(unittest.TestCase):
         self.Masker_check(self.mask_3D_generated, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
     def test_Masker_with_integer_mask(self):
-        self.Masker_check(self.mask_int_manual, self.data, self.data_init, self.mask_coords_2D)
+        self.Masker_check(self.mask_int_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
 
     def test_Masker_doesnt_modify_input_mask(self):
-        mask = self.mask_manual.copy()
-        self.Masker_check(self.mask_manual, self.data, self.data_init)
-        numpy.testing.assert_array_equal(mask.as_array(), self.mask_manual.as_array())
+        mask = self.mask_2D_manual.copy()
+        self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_2D_manual.as_array())
 
     def test_Masker_doesnt_modify_input_integer_mask(self):
         mask = self.mask_int_manual.copy()
-        self.Masker_check(self.mask_int_manual, self.data, self.data_init)
+        self.Masker_check(self.mask_int_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
         numpy.testing.assert_array_equal(mask.as_array(), self.mask_int_manual.as_array())
 
     def Masker_check(self, mask, data, data_init, mask_coords): 

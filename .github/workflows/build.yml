@@ -243,7 +243,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: docker/build-push-action@v5
+    - uses: docker/build-push-action@v6
       with:
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -254,7 +254,7 @@ jobs:
       run: >
         docker run --rm -v .:/CIL tomographicimaging/cil:test /bin/bash -c
         'python -m unittest discover -v /CIL/Wrappers/Python/test'
-    - uses: docker/build-push-action@v5
+    - uses: docker/build-push-action@v6
       with:
         cache-from: type=gha
         cache-to: type=gha,mode=max

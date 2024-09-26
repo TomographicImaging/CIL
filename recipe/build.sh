@@ -16,7 +16,5 @@ fi
 cmake ${RECIPE_DIR}/../ $extra_args \
                         -DCONDA_BUILD=ON \
                         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                        -DLIBRARY_LIB=$CONDA_PREFIX/lib \
-                        -DLIBRARY_INC=$CONDA_PREFIX/include \
                         -DCMAKE_INSTALL_PREFIX=$PREFIX
 cmake --build . --target install

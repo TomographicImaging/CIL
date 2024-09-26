@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -24,13 +23,13 @@ from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, Image
 
 h5pyAvailable = True
 try:
-    import h5py 
+    import h5py
 except:
     h5pyAvailable = False
 
 
 class NEXUSDataReader(object):
-    
+
     """
     Create a reader for NeXus files.
 
@@ -43,11 +42,11 @@ class NEXUSDataReader(object):
     def __init__(self, file_name=None):
 
         self.file_name = file_name
-        
+
         if self.file_name is not None:
             self.set_up(file_name = self.file_name)
-            
-    def set_up(self, 
+
+    def set_up(self,
                file_name = None):
         """
         Initialise reader.
@@ -63,28 +62,28 @@ class NEXUSDataReader(object):
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot load NEXUS files.')
-            
+
         if self.file_name == None:
             raise Exception('Path to nexus file is required.')
-        
+
         # check if nexus file exists
         if not(os.path.isfile(self.file_name)):
-            raise Exception('File\n {}\n does not exist.'.format(self.file_name))  
-        
+            raise Exception('File\n {}\n does not exist.'.format(self.file_name))
+
         self._geometry = None
-    
+
     def read_dimension_labels(self, attrs):
         dimension_labels = [None] * 4
         for k,v in attrs.items():
             if k in ['dim0', 'dim1', 'dim2' , 'dim3']:
-                dimension_labels[int(k[3:])] = v   
-        
+                dimension_labels[int(k[3:])] = v
+
         # remove Nones
-        dimension_labels = [i for i in dimension_labels if i] 
+        dimension_labels = [i for i in dimension_labels if i]
 
         if len(dimension_labels) == 0:
             dimension_labels = None
-            
+
         return dimension_labels
 
     def get_geometry(self):
@@ -98,16 +97,16 @@ class NEXUSDataReader(object):
             Acquisition or reconstructed volume parameters. Exact type
             depends on file content.
         """
-        
+
         with h5py.File(self.file_name,'r') as dfile:
-            
-            if np.string_(dfile.attrs['creator']) != np.string_('NEXUSDataWriter.py'):
+
+            if np.bytes_(dfile.attrs['creator']) != np.bytes_('NEXUSDataWriter.py'):
                 raise Exception('We can parse only files created by NEXUSDataWriter.py')
-            
+
             ds_data = dfile['entry1/tomo_entry/data/data']
-            
+
             if ds_data.attrs['data_type'] == 'ImageData':
-                
+
                 self._geometry = ImageGeometry(voxel_num_x = int(ds_data.attrs['voxel_num_x']),
                                                 voxel_num_y = int(ds_data.attrs['voxel_num_y']),
                                                 voxel_num_z = int(ds_data.attrs['voxel_num_z']),
@@ -118,13 +117,13 @@ class NEXUSDataReader(object):
                                                 center_y = ds_data.attrs['center_y'],
                                                 center_z = ds_data.attrs['center_z'],
                                                 channels = ds_data.attrs['channels'])
-                
+
                 if ds_data.attrs.__contains__('channel_spacing') == True:
                     self._geometry.channel_spacing = ds_data.attrs['channel_spacing']
-                                
+
                 # read the dimension_labels from dim{}
                 dimension_labels = self.read_dimension_labels(ds_data.attrs)
-                
+
             else:   # AcquisitionData
                 if ds_data.attrs.__contains__('dist_source_center') or dfile['entry1/tomo_entry'].__contains__('config/source/position'):
                     geom_type = 'cone'
@@ -160,7 +159,7 @@ class NEXUSDataReader(object):
                     elif geom_type == 'parallel' and dim == 2:
                         self._geometry = AcquisitionGeometry.create_Parallel2D()
 
-    
+
                 else:
                     num_pixels_h = ds_data.attrs.get('num_pixels_h', 1)
                     num_channels = ds_data.attrs['num_channels']
@@ -174,7 +173,7 @@ class NEXUSDataReader(object):
                         detector_direction_x = list(dfile['entry1/tomo_entry/config/detector/direction_x'])
                     else:
                         detector_direction_x = list(dfile['entry1/tomo_entry/config/detector/direction_row'])
- 
+
                     if ds_detector.__contains__('direction_y'):
                         detector_direction_y = list(dfile['entry1/tomo_entry/config/detector/direction_y'])
                     elif ds_detector.__contains__('direction_col'):
@@ -222,17 +221,17 @@ class NEXUSDataReader(object):
 
                 dimension_labels = []
                 dimension_labels = self.read_dimension_labels(ds_data.attrs)
-            
+
         #set labels
         self._geometry.set_labels(dimension_labels)
 
         return self._geometry
-    
+
     def get_data_scale(self):
         """
         Parse NEXUS file and return the scale factor applied to compress
         the dataset.
-        
+
         Returns
         -------
         scale : float
@@ -240,7 +239,7 @@ class NEXUSDataReader(object):
         """
 
         with h5py.File(self.file_name,'r') as dfile:
-            ds_data = dfile['entry1/tomo_entry/data/data'] 
+            ds_data = dfile['entry1/tomo_entry/data/data']
             try:
                 scale = ds_data.attrs['scale']
             except:
@@ -252,15 +251,15 @@ class NEXUSDataReader(object):
         """
         Parse NEXUS file and return the offset factor applied to compress
         the dataset.
-        
+
         Returns
         -------
         offset : float
             The offset factor applied to compress the dataset
         """
-        
+
         with h5py.File(self.file_name,'r') as dfile:
-            ds_data = dfile['entry1/tomo_entry/data/data'] 
+            ds_data = dfile['entry1/tomo_entry/data/data']
             try:
                 offset = ds_data.attrs['offset']
             except:
@@ -271,7 +270,7 @@ class NEXUSDataReader(object):
     def __read_as(self, dtype=np.float32):
         """
         Parse NEXUS file and return raw file content.
-        
+
         Parameters
         ----------
         dtype : data-type
@@ -291,11 +290,11 @@ class NEXUSDataReader(object):
 
         with h5py.File(self.file_name,'r') as dfile:
 
-            ds_data = dfile['entry1/tomo_entry/data/data']   
+            ds_data = dfile['entry1/tomo_entry/data/data']
             ds_data.read_direct(output.array)
 
         return output
-        
+
     def read_as_original(self):
         """
         Returns the compressed data from the file.
@@ -305,11 +304,11 @@ class NEXUSDataReader(object):
         output : ImageData or AcquisitionData
             The raw, compressed data. Exact type depends on file content.
         """
-        
+
         with h5py.File(self.file_name,'r') as dfile:
             ds_data = dfile['entry1/tomo_entry/data/data']
             dtype = ds_data.dtype
-        
+
         return self.__read_as(dtype)
 
 
@@ -322,7 +321,7 @@ class NEXUSDataReader(object):
         output : ImageData or AcquisitionData
             The uncompressed data. Exact type depends on file content.
         """
-        
+
         output = self.__read_as(np.float32)
         scale = self.get_data_scale()
         offset = self.get_data_offset()
@@ -331,10 +330,10 @@ class NEXUSDataReader(object):
             output -= offset
         if scale != 1:
             output /= scale
-        
+
         return output
-    
-          
+
+
     def load_data(self):
         """
         Alias of `read`.
@@ -343,16 +342,16 @@ class NEXUSDataReader(object):
         --------
         read
         """
-        
+
         return self.read()
 
     def is_old_file_version(self):
         #return ds_data.attrs.__contains__('geom_type')
         with h5py.File(self.file_name,'r') as dfile:
-                
-            if np.string_(dfile.attrs['creator']) != np.string_('NEXUSDataWriter.py'):
+
+            if np.bytes_(dfile.attrs['creator']) != np.bytes_('NEXUSDataWriter.py'):
                 raise Exception('We can parse only files created by NEXUSDataWriter.py')
-            
+
             ds_data = dfile['entry1/tomo_entry/data/data']
 
             return 'geom_type' in ds_data.attrs.keys()

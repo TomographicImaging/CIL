@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -28,7 +27,7 @@ if has_astra:
 
 def setup_parameters(self):
 
-    self.backend = 'astra'   
+    self.backend = 'astra'
     self.FBP = FBP
     self.FBP_args={'device':'gpu'}
 

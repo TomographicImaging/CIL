@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -24,7 +23,7 @@ from cil.framework import VectorData, VectorGeometry
 class Rosenbrock(Function):
     r'''Rosenbrock function
 
-    .. math:: 
+    .. math::
 
     F(x,y) = (\alpha - x)^2 + \beta(y-x^2)^2
 
@@ -47,7 +46,7 @@ class Rosenbrock(Function):
 
     def gradient(self, x, out=None):
         r'''Gradient of the Rosenbrock function
-        
+
         .. math::
 
         \nabla f(x,y) = \left[ 2*((x-\alpha) - 2\beta x(y-x^2)) ; 2\beta (y - x^2)  \right]
@@ -65,7 +64,7 @@ class Rosenbrock(Function):
         res[1] = 2 * self.beta * b
 
         if out is not None:
-            out.fill (res)
+            out.fill(res)
+            return out
         else:
-            return VectorData(res) 
-
+            return VectorData(res)

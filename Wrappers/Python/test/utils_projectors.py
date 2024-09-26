@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -21,7 +20,7 @@ import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry
-from cil.framework import DataOrder
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
 class SimData(object):
 
@@ -44,6 +43,15 @@ class SimData(object):
             index_roi[i] = (ind0, ind1)
 
         self.gold_roi = self.img_data.array[index_roi[0][0]:index_roi[0][1],index_roi[1][0]:index_roi[1][1],index_roi[2][0]:index_roi[2][1]]
+
+        # single slice roi
+        self.ig_single_slice = self.ig.copy()
+        slice_index = 20
+        slice_offset = -(self.ig.voxel_num_z-1)/2 + slice_index
+        self.ig_single_slice.voxel_num_z = 1
+        self.ig_single_slice.center_z = slice_offset*self.ig_roi.voxel_size_z
+
+        self.gold_roi_single_slice = self.img_data.array[slice_index,:,:]
 
 
     def _get_roi_2D(self):
@@ -68,7 +76,7 @@ class SimData(object):
     def Cone3D(self):
         self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         self.acq_data=np.log(self.acq_data)
@@ -83,7 +91,7 @@ class SimData(object):
     def Parallel3D(self):
         self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         self.acq_data=np.log(self.acq_data)
@@ -99,7 +107,7 @@ class SimData(object):
 
         self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get().get_slice(vertical='centre')
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
 
         self.acq_data=np.log(self.acq_data)
@@ -115,7 +123,7 @@ class SimData(object):
 
         self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical='centre')
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
 
         self.acq_data=np.log(self.acq_data)
@@ -140,9 +148,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
@@ -151,7 +159,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -161,7 +169,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -171,7 +179,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,1000,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_4.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -187,9 +195,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,1)\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
@@ -198,7 +206,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -208,7 +216,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -218,7 +226,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,1000])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_4.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -234,9 +242,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, norm_1))
@@ -244,7 +252,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -255,7 +263,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
@@ -273,7 +281,7 @@ class TestCommon_ProjectionOperator_TOY(object):
                                             .set_panel(16,1)\
                                             .set_angles([0])
 
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
@@ -282,7 +290,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -293,7 +301,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
         norm_3 = 2
@@ -357,7 +365,7 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,16,4))
         for k in range(4):
             for i in range(4):
-                if (i + k)% 2 == 0: 
+                if (i + k)% 2 == 0:
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
         #create checker-board forward projection for parallel rays
@@ -365,10 +373,10 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,4))
         for j in range(4):
             for i in range(4):
-                if (i + j)% 2 == 0: 
+                if (i + j)% 2 == 0:
                     checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones * 16
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
@@ -390,7 +398,7 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,4))
         for j in range(4):
             for i in range(4):
-                if (i + j)% 2 == 0: 
+                if (i + j)% 2 == 0:
                     checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones
 
         #create backprojection of checker-board
@@ -398,10 +406,10 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,16,4))
         for k in range(4):
             for i in range(4):
-                if (i + k)% 2 == 0: 
+                if (i + k)% 2 == 0:
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
@@ -427,12 +435,12 @@ class TestCommon_ProjectionOperator_SIM(SimData):
     def test_forward_projector(self):
         Op = self.ProjectionOperator(self.ig, self.ag, **self.PO_args)
         fp = Op.direct(self.img_data)
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
 
         fp2 = fp.copy()
         fp2.fill(0)
         Op.direct(self.img_data,out=fp2)
-        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)    
+        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
 
 
     def test_backward_projectors_functionality(self):
@@ -443,7 +451,7 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         bp2 = bp.copy()
         bp2.fill(0)
         Op.adjoint(self.acq_data,out=bp2)
-        np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
+        np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)
 
 
     def test_input_arguments(self):
@@ -451,7 +459,7 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         #default image_geometry, named parameter acquisition_geometry
         Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
         fp = Op.direct(self.img_data)
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
 
 
 class TestCommon_FBP_SIM(SimData):
@@ -460,28 +468,33 @@ class TestCommon_FBP_SIM(SimData):
     '''
     def test_FBP(self):
 
-        self.FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
+        FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
         reco2 = reco.copy()
         reco2.fill(0)
-        self.FBP(self.acq_data,out=reco2)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)   
+        FBP(self.acq_data,out=reco2)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
 
 
     def test_FBP_roi(self):
-        self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi) 
+        FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
 
-    
+        if AcquisitionType.DIM3 & self.ag.dimension:
+            FBP = self.FBP(self.ig_single_slice, self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.gold_roi_single_slice, atol=self.tolerance_fbp_roi)
+
+
     def test_input_arguments(self):
 
         #default image_geometry, named parameter acquisition_geometry
-        self.FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
+        FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
 class TestCommon_ProjectionOperatorBlockOperator(object):
     # def setUp(self):
@@ -491,13 +504,13 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
     #     A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
     #     self.projectionOperator = (A, K)
     def partition_test(self):
-        
+
         A, K = self.projectionOperator
 
         u = A.adjoint(self.data)
         v = K.adjoint(self.datasplit)
 
-        # the images are not entirely the same as the BlockOperator's requires to 
+        # the images are not entirely the same as the BlockOperator's requires to
         # add all the data of the adjoint operator, which may result in a slightly
         # different image
         np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
@@ -528,7 +541,7 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
                     k += 1
 
             assert wrong == 0
-        
+
             # reassemlbe the data
             out = x * 0
             k = 0

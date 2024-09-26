@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2021 United Kingdom Research and Innovation
 //  Copyright 2021 The University of Manchester
 //
@@ -19,8 +18,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <ipp.h>
-#include <ipps.h>
+#include "ipp.h"
 #include <chrono>
 #include <omp.h>
 #include <random>

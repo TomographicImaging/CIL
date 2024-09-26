@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2019 United Kingdom Research and Innovation
 //  Copyright 2019 The University of Manchester
 //
@@ -267,21 +266,34 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 	//runs over full data in x, y, z. then corrects elements for bounday conditions and sums
 	const size_t volume = nx * ny * nz;
 
-	//assumes nx and ny > 1
-	const bool z_dim = nz > 1;
-
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;
 	const float *inimageY = inimageYfull;
 	const float *inimageZ = inimageZfull;
 
 	float *tempX = (float *)malloc(volume * sizeof(float));
-	float *tempY = (float *)malloc(volume * sizeof(float));
-	float *tempZ;
+	if (tempX == nullptr)
+	{
+		fprintf(stderr, "Error: Memory allocation failed\n");
+		return -1;
+	}
 
-	if (z_dim)
+	float *tempY = (float *)malloc(volume * sizeof(float));
+	if (tempY == nullptr)
+	{
+		fprintf(stderr, "Error: Memory allocation failed\n");
+		return -1;
+	}
+
+	float *tempZ = nullptr;
+	if (nz > 1)
 	{
 		tempZ = (float *)malloc(volume * sizeof(float));
+		if (tempZ == nullptr)
+		{
+			fprintf(stderr, "Error: Memory allocation failed\n");
+			return -1;
+		}
 	}
 
 	long long c;
@@ -322,7 +334,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 				}
 			}
 
-			if (z_dim)
+			if (tempZ != nullptr)
 			{
 #pragma omp for
 				for (ind = nx * ny; ind < volume; ind++)
@@ -359,7 +371,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 	free(tempX);
 	free(tempY);
 
-	if (z_dim)
+	if (tempZ != nullptr)
 		free(tempZ);
 
 	//	//now the rest of the channels
@@ -392,21 +404,35 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	//runs over full data in x, y, z. then correctects elements for bounday conditions and sums
 	const size_t volume = nx * ny * nz;
 
-	//assumes nx and ny > 1
-	const bool z_dim = nz > 1;
-
 	float *outimage = outimagefull;
 	const float *inimageX = inimageXfull;
 	const float *inimageY = inimageYfull;
 	const float *inimageZ = inimageZfull;
 
 	float *tempX = (float *)malloc(volume * sizeof(float));
-	float *tempY = (float *)malloc(volume * sizeof(float));
-	float *tempZ;
+	if (tempX == nullptr)
+	{
+		fprintf(stderr, "Error: Memory allocation failed\n");
+		return -1;
+	}
 
-	if (z_dim)
+	float *tempY = (float *)malloc(volume * sizeof(float));
+	if (tempY == nullptr)
+	{
+		fprintf(stderr, "Error: Memory allocation failed\n");
+		return -1;
+	}
+
+	float *tempZ = nullptr;
+
+	if (nz > 1)
 	{
 		tempZ = (float *)malloc(volume * sizeof(float));
+		if (tempZ == nullptr)
+		{
+			fprintf(stderr, "Error: Memory allocation failed\n");
+			return -1;
+		}
 	}
 
 	long long c;
@@ -446,7 +472,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 				}
 			}
 
-			if (z_dim)
+			if (tempZ != nullptr)
 			{
 
 #pragma omp for
@@ -484,7 +510,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	free(tempX);
 	free(tempY);
 
-	if (z_dim)
+	if (tempZ != nullptr)
 		free(tempZ);
 
 	//now the rest of the channels
@@ -517,68 +543,70 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, flo
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
 
+	int status;
 	if (boundary)
 	{
 		if (direction)
-			fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 		else
-			fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 	}
 	else
 	{
 		if (direction)
-			fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 		else
-			fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 	}
 
 	omp_set_num_threads(nThreads_initial);
-	return 0;
+	return status;
 }
 DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
+	int status;
 
 	if (boundary)
 	{
 		if (direction)
-			fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 		else
-			fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 	}
 	else
 	{
 		if (direction)
-			fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 		else
-			fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);
-	return 0;
+	return status;
 }
 DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
+	int status;
 
 	if (boundary)
 	{
 		if (direction)
-			fdiff_direct_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
 		else
-			fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
 	}
 	else
 	{
 		if (direction)
-			fdiff_direct_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
 		else
-			fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);
-	return 0;
+	return status;
 }
-

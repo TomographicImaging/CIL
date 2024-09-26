@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2020 United Kingdom Research and Innovation
 #  Copyright 2020 The University of Manchester
 #
@@ -20,6 +19,7 @@
 
 import astra
 import numpy as np
+from cil.framework.labels import AngleUnit
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
@@ -41,8 +41,8 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
     """
     sinogram_geometry = sinogram_geometry_in.copy()
-    
-    #this catches behaviour modified after CIL 21.3.1 
+
+    #this catches behaviour modified after CIL 21.3.1
     try:
         sinogram_geometry.config.system.align_reference_frame('cil')
     except:
@@ -53,8 +53,8 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
     panel = sinogram_geometry.config.panel
 
     #get units
-    degrees = angles.angle_unit == sinogram_geometry.DEGREE
-    
+    degrees = angles.angle_unit == AngleUnit.DEGREE
+
     #create a 2D astra geom from 2D CIL geometry, 2D astra geometry has axis flipped compared to 3D
     volume_geometry_temp = volume_geometry.copy()
 
@@ -90,8 +90,7 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
         vectors[i, 2:4] = rotation_matrix.dot(det).reshape(2)
         vectors[i, 4:6] = rotation_matrix.dot(row).reshape(2)
 
-    
-    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[0], vectors)    
+    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
                                     volume_geometry_temp.voxel_num_x,
                                     volume_geometry_temp.get_min_x(),
@@ -124,5 +123,5 @@ def rotation_matrix_z_from_euler(angle, degrees):
     rot_matrix[0][1] = -np.sin(alpha)
     rot_matrix[1][0] = np.sin(alpha)
     rot_matrix[1][1] = np.cos(alpha)
-    
+
     return rot_matrix

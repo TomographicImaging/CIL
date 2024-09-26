@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2023 United Kingdom Research and Innovation
 //  Copyright 2023 The University of Manchester
 //
@@ -22,8 +21,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <cstddef>
-#include <ipp.h>
-#include <ipps.h>
+#include "ipp.h"
 #include <omp.h>
 #include "utilities.h"
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -20,11 +19,14 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
 from cil.framework import BlockDataContainer
-from numpy import inf
+from cil.utilities.errors import InPlaceError
 import numpy
 import logging
 
-class SIRT(Algorithm):    
+log = logging.getLogger(__name__)
+
+
+class SIRT(Algorithm):
 
     r"""Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.
 
@@ -33,9 +35,9 @@ class SIRT(Algorithm):
 
     .. math:: A x = b
 
-    The SIRT algorithm is 
+    The SIRT algorithm is
 
-    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) ),
+    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),
 
     where,
     :math:`M = \frac{1}{A*\mathbb{1}}`,
@@ -48,23 +50,23 @@ class SIRT(Algorithm):
     ----------
 
     initial : DataContainer, default = None
-        Starting point of the algorithm, default value = Zero DataContainer 
+        Starting point of the algorithm, default value =  DataContainer in the domain of the operator allocated with zeros. 
     operator : LinearOperator
         The operator A.
     data : DataContainer
         The data b.
     lower : :obj:`float`, default = None
-        Lower bound constraint 
+        Lower bound constraint
     upper : :obj:`float`, default = None
         Upper bound constraint
     constraint : Function, default = None
-        A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`, 
+        A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,
         or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
 
     kwargs:
-        Keyword arguments used from the base class :class:`.Algorithm`.    
+        Keyword arguments used from the base class :class:`.Algorithm`.
 
-    Note 
+    Note
     ----
     If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.
 
@@ -82,60 +84,71 @@ class SIRT(Algorithm):
 
     Examples
     --------
-    .. math:: \underset{x}{\mathrm{argmin}} \| x - d\|^{2}
-    
-    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5) 
+    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}
 
-    """    
+    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5)
+
+    """
 
 
-    def __init__(self, initial, operator, data, lower=None, upper=None, constraint=None, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
 
         super(SIRT, self).__init__(**kwargs)
-        
-        self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)         
+
+        self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
 
     def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
-
-        """
-        Initialisation of the algorithm    
-        """
-
-        logging.info("{} setting up".format(self.__class__.__name__, ))
+        """Initialisation of the algorithm"""
+        log.info("%s setting up", self.__class__.__name__)
+        
+        warning = 0
+        if operator is None:
+            warning += 1
+            msg = "an `operator`"
+        if data is None:
+            warning += 10
+            if warning > 10:
+                msg += " and `data`"
+            else:
+                msg = "`data`"
+        if warning > 0:
+            raise ValueError(f'You must pass {msg} to the SIRT algorithm' )
+        
+        if initial is None:
+            initial = operator.domain_geometry().allocate(0)
         
         self.x = initial.copy()
         self.tmp_x = self.x * 0.0
         self.operator = operator
         self.data = data
-        
+
         self.r = data.copy()
-        
+
         self.constraint = constraint
         if constraint is None:
             if lower is not None or upper is not None:
                 # IndicatorBox accepts None for lower and/or upper
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
-        
+
         self._relaxation_parameter = 1
 
         # Set up scaling matrices D and M.
         self._set_up_weights()
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
-
+        log.info("%s configured", self.__class__.__name__)
 
     @property
     def relaxation_parameter(self):
         return self._relaxation_parameter
-        
+
     @property
     def D(self):
         return self._Dscaled / self._relaxation_parameter
 
     def set_relaxation_parameter(self, value=1.0):
         """Set the relaxation parameter :math:`\omega`
-       
+
         Parameters
         ----------
         value : float
@@ -151,25 +164,25 @@ class SIRT(Algorithm):
 
 
     def _set_up_weights(self):
-        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
+        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))
         self._Dscaled = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
-        
-        for arr in [self.M, self._Dscaled]:  
+
+        for arr in [self.M, self._Dscaled]:
             self._remove_nan_or_inf(arr, replace_with=1.0)
 
 
     def _remove_nan_or_inf(self, datacontainer, replace_with=1.0):
         """Replace nan and inf in datacontainer with a given value.
-        
+
         Parameters:
         -------------
-        
+
         datacontainer: DataContainer, BlockDataContainer
-        
+
         replace_with: float, default 1.0
             Value to replace elements that evaluate to NaN or inf
-            
-            
+
+
         In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`.
         """
         if isinstance(datacontainer, BlockDataContainer):
@@ -188,25 +201,26 @@ class SIRT(Algorithm):
         .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )
 
         """
-        
+
         # self.r = self.data - self.operator.direct(self.x)
         self.operator.direct(self.x, out=self.r)
         self.r.sapyb(-1, self.data, 1.0, out=self.r)
-        
+
         # self.D is prescaled by _relaxation_parameter (default 1)
         self.r *= self.M
         self.operator.adjoint(self.r, out=self.tmp_x)
         self.x.sapyb(1.0, self.tmp_x, self._Dscaled, out=self.x)
 
-
         if self.constraint is not None:
-            # IndicatorBox allows inplace operation for proximal
-            self.constraint.proximal(self.x, tau=1, out=self.x)
+            try:
+                self.constraint.proximal(self.x, tau=1, out=self.x)
+            except InPlaceError:
+                self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
-        r"""Returns the objective 
+        r"""Returns the objective
 
-        .. math:: \|A x - b\|^{2}
+        .. math:: \frac{1}{2}\|A x - b\|^{2}
 
         """
-        self.loss.append(self.r.squared_norm())
+        self.loss.append(0.5*self.r.squared_norm())

@@ -1,49 +1,39 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2021 United Kingdom Research and Innovation
-#  Copyright 2021 The University of Manchester
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
+# Copyright 2021 United Kingdom Research and Innovation
+# Copyright 2021 The University of Manchester
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-name: docs
+name: cil_dev
 channels:
   - conda-forge
-  - intel
+  - https://software.repos.intel.com/python/conda
   - ccpi
   - defaults
-  - astra-toolbox
 dependencies:
-  - dxchange
-  - python-wget
-  - scikit-image
-  - packaging
-  - numba
-  - tigre=2.4
+  # in addition to CIL deps (see ../scripts/requirements-test.yml)
+  - jinja2
+  # - pydata-sphinx-theme
+  - recommonmark
+  - sphinx
   - sphinx_rtd_theme
+  - sphinx-autobuild
+  - sphinx-click
+  - sphinx-copybutton
+  - sphinx-panels
   - sphinxcontrib-bibtex
-  - pydata-sphinx-theme<0.9
-  - sphinx=3.5.*
-  - recommonmark=0.6.*
-  - sphinx-panels=0.5
-  - sphinx-autobuild=0.7
-  - sphinx-click=2.7
-  - sphinx-copybutton=0.3
-  - astra-toolbox>=1.9.9.dev5,<2.1
-  - ccpi-regulariser=22.0.0
-  - tomophantom=2.0.0
-  - ipywidgets
-  - tqdm
-  - jinja2<3.1
-  - cil-data
+  - nbsphinx
+  - sphinx-gallery
+  - sphinx-copybutton
+  - notebook
+  # TODO: remove after https://github.com/pydata/pydata-sphinx-theme/pull/1795 is released
+  - pip
+  - pip:
+    - git+https://github.com/pydata/pydata-sphinx-theme

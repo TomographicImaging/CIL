@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2018 United Kingdom Research and Innovation
 #  Copyright 2018 The University of Manchester
 #
@@ -26,3 +25,4 @@ from .FISTA import ISTA
 from .PDHG import PDHG
 from .ADMM import LADMM
 from .SPDHG import SPDHG
+from .PD3O import PD3O

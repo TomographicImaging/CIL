@@ -5,7 +5,7 @@ if not "%GIT_DESCRIBE_NUMBER%"=="0" (
     set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%.dev%GIT_DESCRIBE_NUMBER%+%GIT_DESCRIBE_HASH%
 )
 
-cmake "%RECIPE_DIR%\.." -G "NMake Makefiles" ^
+cmake "%RECIPE_DIR%\.." -G "NMake Makefiles" -DPython_ROOT_DIR="%BUILD_PREFIX%" ^
   -DCONDA_BUILD=ON ^
   -DCMAKE_BUILD_TYPE=RelWithDebInfo ^
   -DLIBRARY_LIB=%CONDA_PREFIX%\lib ^

@@ -12,14 +12,17 @@
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
     - Updated the documentation for the algorithm base class (#1809)
-    - Add checks on out argument passed to processors to ensure corrrect dtype and size (#1805)
+    - Add checks on out argument passed to processors to ensure correct dtype and size (#1805)
     - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
     - Internal refactor: Separate framework into multiple files (#1692)
     - Allow the SIRT algorithm to take `initial=None` (#1906)
+    - Add checks on equality method of `AcquisitionData` and `ImageData` for equality of data type and geometry (#1919)
+    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)    
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
     - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)
     - Drop Jenkins in favour of GHA for conda builds (#1914)
+    - New unit tests for `DataContainer`, `AcquisitionData` and `ImageData` to check equality method (`__eq__`) behaves as expected (#1919)
   - Bug fixes:
     - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
     - Make Binner accept accelerated=False (#1887)

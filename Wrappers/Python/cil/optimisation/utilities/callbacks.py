@@ -1,21 +1,34 @@
+import logging
 from abc import ABC, abstractmethod
 from functools import partialmethod
+from pathlib import Path
 
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
-import numpy as np
+from cil.processors import Slicer
+from cil.io import TIFFWriter
+
+log = logging.getLogger(__name__)
 
 
 class Callback(ABC):
-    '''Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.
+    """Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.
 
     Parameters
     ----------
-    verbose: int, choice of 0,1,2, default 1
+    verbose:
         0=quiet, 1=info, 2=debug.
-    '''
-    def __init__(self, verbose=1):
+    interval:
+        Used by :code:`skip_iteration()`.
+    """
+    def __init__(self, verbose: int = 1, interval: int = 1 << 31):
         self.verbose = verbose
+        self.interval = interval
+
+    def skip_iteration(self, algorithm) -> bool:
+        """Checks `min(self.interval, algorithm.update_objective_interval)`"""
+        interval = min(self.interval, algorithm.update_objective_interval)
+        return interval > 0 and algorithm.iteration % interval != 0 and algorithm.iteration != algorithm.max_iteration
 
     @abstractmethod
     def __call__(self, algorithm):
@@ -23,37 +36,39 @@ class Callback(ABC):
 
 
 class _OldCallback(Callback):
-    '''Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.
+    """Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.
 
     Parameters
     ----------
     callback: :code:`callable(iteration, objective, x)`
-    '''
+    """
     def __init__(self, callback, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.func = callback
 
     def __call__(self, algorithm):
-        if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
+        if not self.skip_iteration(algorithm):
             self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose>=2), algorithm.x)
 
 
 class ProgressCallback(Callback):
-    ''':code:`tqdm`-based progress bar.
+    """:code:`tqdm`-based progress bar.
 
     Parameters
     ----------
     tqdm_class: default :code:`tqdm.auto.tqdm`
     **tqdm_kwargs:
         Passed to :code:`tqdm_class`.
-    '''
-    def __init__(self, verbose=1, tqdm_class=tqdm_auto, **tqdm_kwargs):
-        super().__init__(verbose=verbose)
+    """
+    def __init__(self, verbose: int = 1, interval: int = 1 << 31, tqdm_class=tqdm_auto, **tqdm_kwargs):
+        super().__init__(verbose=verbose, interval=interval)
         self.tqdm_class = tqdm_class
         self.tqdm_kwargs = tqdm_kwargs
         self._obj_len = 0  # number of objective updates
 
     def __call__(self, algorithm):
+        if self.skip_iteration(algorithm):
+            return
         if not hasattr(self, 'pbar'):
             tqdm_kwargs = self.tqdm_kwargs
             tqdm_kwargs.setdefault('total', algorithm.max_iteration)
@@ -67,16 +82,16 @@ class ProgressCallback(Callback):
 
 
 class _TqdmText(tqdm_std):
-    ''':code:`tqdm`-based progress but text-only updates on separate lines.
+    """:code:`tqdm`-based progress but text-only updates on separate lines.
 
     Parameters
     ----------
-    num_format: str
+    num_format:
         Format spec for postfix numbers (i.e. objective values).
-    bar_format: str
+    bar_format:
         Passed to :code:`tqdm`.
-    '''
-    def __init__(self, *args, num_format='+8.3e', bar_format="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
+    """
+    def __init__(self, *args, num_format: str='+8.3e', bar_format: str="{n:>6d}/{total_fmt:<6} {rate_fmt:>9}{postfix}", **kwargs):
         self.num_format = num_format
         super().__init__(*args, bar_format=bar_format, mininterval=0, maxinterval=0, position=0, **kwargs)
         self._instances.remove(self)  # don't interfere with external progress bars
@@ -105,85 +120,138 @@ class _TqdmText(tqdm_std):
 
 
 class TextProgressCallback(ProgressCallback):
-    ''':code:`ProgressCallback` but printed on separate lines to screen.
+    """:code:`ProgressCallback` but printed on separate lines to screen.
 
     Parameters
     ----------
-    miniters: int, default :code:`Algorithm.update_objective_interval`
+    miniters: int, default :code:`min(Algorithm.update_objective_interval, Callback.interval)`
         Number of algorithm iterations between screen prints.
-    '''
+    """
     __init__ = partialmethod(ProgressCallback.__init__, tqdm_class=_TqdmText)
 
     def __call__(self, algorithm):
         if not hasattr(self, 'pbar'):
             self.tqdm_kwargs['miniters'] = min((
                 self.tqdm_kwargs.get('miniters', algorithm.update_objective_interval),
-                algorithm.update_objective_interval))
+                algorithm.update_objective_interval,
+                self.interval))
         return super().__call__(algorithm)
 
 
 class LogfileCallback(TextProgressCallback):
-    ''':code:`TextProgressCallback` but to a file instead of screen.
+    """:code:`TextProgressCallback` but to a file instead of screen.
 
     Parameters
     ----------
     log_file: FileDescriptorOrPath
         Passed to :code:`open()`.
-    mode: str
+    mode:
         Passed to :code:`open()`.
-    '''
-    def __init__(self, log_file, mode='a', **kwargs):
+    **kwargs:
+        Passed to :code:`TextProgressCallback`.
+    """
+    def __init__(self, log_file, mode: str='a', **kwargs):
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, **kwargs)
-        
-class EarlyStoppingObjectiveValue(Callback):
-    '''Callback that stops iterations if the change in the objective value is less than a provided threshold value.
+
+
+class EarlyStopping(Callback):
+    """Terminates if objective value change < :code:`delta`.
 
     Parameters
     ----------
-    threshold: float, default 1e-6 
+    delta:
+        Usually a small number.
+    **kwargs:
+        Passed to :code:`Callback`.
 
     Note
-    -----
-    This callback only compares the last two calculated objective values. If `update_objective_interval` is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every `update_objective_interval` iterations.
-    
-        '''
-    def __init__(self, threshold=1e-6):
-        self.threshold=threshold
-    
-    
+    ----
+    This callback only compares the last two calculated objective values.
+    If :code:`algorithm.update_objective_interval > 1`, the objective value is not calculated at each iteration.
+    """
+    def __init__(self, delta: float=1e-6, **kwargs):
+        super().__init__(**kwargs)
+        self.threshold = delta
+
     def __call__(self, algorithm):
-        if len(algorithm.loss)>=2:
-            if np.abs(algorithm.loss[-1]-algorithm.loss[-2])<self.threshold:
-                raise StopIteration
-                
-class CGLSEarlyStopping(Callback):
-    '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
-    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`, where `omega` is set to default as 1e6. 
+        if not self.skip_iteration(algorithm) and len(loss := algorithm.loss) >= 2 and abs(loss[-1] - loss[-2]) < self.threshold:
+            raise StopIteration
+
+
+class EarlyStoppingCGLS(Callback):
+    r"""Terminates CGLS if :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2`, where
+
+    - :math:`x` is the current iterate, and
+    - :math:`x_0` is the initial value.
+
+    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`.
+
     Parameters
     ----------
-    epsilon: float, default 1e-6 
-        Usually a small number: the algorithm to terminate if :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2`
-    omega: float, default 1e6 
-        Usually a large number: the algorithm will terminate if  :math:`||x||_2> \omega`
-        
+    epsilon:
+        Usually a small number.
+    omega:
+        Usually a large number.
+    **kwargs:
+        Passed to :code:`Callback`.
+
     Note
-    -----
-    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions <=24. It also replicates the behaviour of https://web.stanford.edu/group/SOL/software/cgls/. 
-    '''
-    def __init__(self, epsilon=1e-6, omega=1e6):
-        self.epsilon=epsilon
-        self.omega=omega
-    
-    
+    ----
+    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions <=24.
+    It also replicates the behaviour of <https://web.stanford.edu/group/SOL/software/cgls/>.
+    """
+    def __init__(self, epsilon: float=1e-6, omega: float=1e6, **kwargs):
+        super().__init__(**kwargs)
+        self.epsilon = epsilon
+        self.omega = omega
+
     def __call__(self, algorithm):
-        
+        if self.skip_iteration(algorithm):
+            return
         if (algorithm.norms <= algorithm.norms0 * self.epsilon):
-            print('The norm of the residual is less than {} times the norm of the initial residual and so the algorithm is terminated'.format(self.epsilon))
+            if self.verbose:
+                log.info('StopIteration: (residual/initial) norm <= %d', self.epsilon)
             raise StopIteration
         self.normx = algorithm.x.norm()
         if algorithm.normx >= self.omega:
-            print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
+            if self.verbose:
+                log.info('StopIteration: solution norm >= %d', self.omega)
             raise StopIteration
-            
-        
+
+
+class TIFFLogger(Callback):
+    """Saves solution as tiff files.
+
+    Parameters
+    ----------
+    directory: FileDescriptorOrPath
+        Where to save the images.
+    stem:
+        The image filename pattern (without filetype suffix).
+    roi:
+        The region of interest to slice: `{'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}`
+        - start: int or None: index, default 0.
+        - stop: int or None: index, default N.
+        - step: int or None: number of pixels to average together, default 1.
+    compression:
+        Passed to :code:`cil.io.TIFFWriter`.
+    **kwargs:
+        Passed to :code:`Callback`.
+    """
+    def __init__(self, directory='.', stem='iter_{iteration:04d}', roi: dict|None=None, compression=None, **kwargs):
+        super().__init__(**kwargs)
+        self.file_name = f'{Path(directory) / stem}.tif'
+        self.slicer = Slicer(roi=roi) if roi is not None else None
+        self.compression = compression
+
+    def __call__(self, algorithm):
+        if self.skip_iteration(algorithm):
+            return
+        if self.slicer is None:
+            data = algorithm.solution
+        else:
+            self.slicer.set_input(algorithm.solution)
+            data = self.slicer.get_output()
+        w = TIFFWriter(data, file_name=self.file_name.format(iteration=algorithm.iteration), counter_offset=-1, compression=self.compression)
+        w.write()

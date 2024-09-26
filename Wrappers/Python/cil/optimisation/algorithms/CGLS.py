@@ -19,7 +19,7 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import logging
-import warnings 
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 class CGLS(Algorithm):
 
     r'''Conjugate Gradient Least Squares (CGLS) algorithm
-    
+
     The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.
 
     Problem:
@@ -35,20 +35,20 @@ class CGLS(Algorithm):
     .. math::
 
       \min_x || A x - b ||^2_2
-      
-      
+
+
     Parameters
     ------------
     operator : Operator
         Linear operator for the inverse problem
-    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
-        Initial guess 
-    data : DataContainer in the range of the operator 
+    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros.
+        Initial guess
+    data : DataContainer in the range of the operator
         Acquired data to reconstruct
-        
+
     Note
     -----
-    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour.
+    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the EarlyStoppingCGLS callback replicated the old behaviour.
 
     Reference
     ---------
@@ -57,19 +57,19 @@ class CGLS(Algorithm):
     def __init__(self, initial=None, operator=None, data=None, **kwargs):
         '''initialisation of the algorithm
         '''
-        #We are deprecating tolerance 
-        self.tolerance=kwargs.pop("tolerance", None)
+        kwargs = kwargs.copy()
+        self.tolerance = kwargs.pop("tolerance", None)
         if self.tolerance is not None:
-            warnings.warn( stacklevel=2, category=DeprecationWarning, message="Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour")
+            warnings.warn(stacklevel=2, category=DeprecationWarning, message="Use EarlyStoppingCGLS insead of `tolerance`. See https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks")
         else:
             self.tolerance = 0
-        
+
         super(CGLS, self).__init__(**kwargs)
 
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
         if initial is not None and operator is not None and data is not None:
-            self.set_up(initial=initial, operator=operator, data=data) 
+            self.set_up(initial=initial, operator=operator, data=data)
 
     def set_up(self, initial, operator, data):
         r'''Initialisation of the algorithm
@@ -77,13 +77,13 @@ class CGLS(Algorithm):
         ------------
         operator : Operator
             Linear operator for the inverse problem
-        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
-            Initial guess 
-        data : DataContainer in the range of the operator 
+        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros.
+            Initial guess
+        data : DataContainer in the range of the operator
             Acquired data to reconstruct
 
         '''
-        
+
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator

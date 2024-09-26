@@ -84,7 +84,7 @@ class GD(Algorithm):
         log.info("%s setting up", self.__class__.__name__)
 
         self.x = initial.copy()
-        self.objective_function = objective_function
+        self._objective_function = objective_function
 
         if step_size is None:
             self.step_size_rule = ArmijoStepSizeRule(
@@ -106,7 +106,7 @@ class GD(Algorithm):
 
     def update(self):
         '''Performs a single iteration of the gradient descent algorithm'''
-        self.objective_function.gradient(self.x, out=self.gradient_update)
+        self._objective_function.gradient(self.x, out=self.gradient_update)
 
         if self.preconditioner is not None:
             self.preconditioner.apply(
@@ -117,7 +117,7 @@ class GD(Algorithm):
         self.x.sapyb(1.0, self.gradient_update, -step_size, out=self.x)
 
     def update_objective(self):
-        self.loss.append(self.objective_function(self.solution))
+        self.loss.append(self._objective_function(self.solution))
 
     def should_stop(self):
         '''Stopping criterion for the gradient descent algorithm '''
@@ -132,3 +132,20 @@ class GD(Algorithm):
         else:
             raise TypeError(
                 "There is not a constant step size, it is set by a step-size rule")
+
+    def calculate_objective_function_at_point(self, x):
+        """ Calculates the objective at a given point x
+
+        .. math:: f(x) + g(x)
+        
+        Parameters
+        ----------
+        x : DataContainer
+        
+        """
+        return self._objective_function(x)
+    
+    @property
+    def objective_function(self):
+        warn('The attribute `objective_function` will be deprecated in the future. Please use `calculate_objective_function_at_point` instead.', DeprecationWarning, stacklevel=2)  
+        return self._objective_function

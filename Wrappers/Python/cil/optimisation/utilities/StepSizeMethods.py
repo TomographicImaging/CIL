@@ -19,6 +19,9 @@
 from abc import ABC, abstractmethod
 import numpy
 from numbers import Number
+import logging
+
+log = logging.getLogger(__name__)
 
 class StepSizeRule(ABC):
     """
@@ -125,21 +128,25 @@ class ArmijoStepSizeRule(StepSizeRule):
         if not self.warmstart:  
             self.alpha = self.alpha_orig
         
-        f_x = algorithm.objective_function(algorithm.solution)
+        f_x = algorithm.calculate_objective_function_at_point(algorithm.solution)
 
         self.x_armijo = algorithm.solution.copy()
-
+        
+        log.debug("Starting Armijo backtracking with initial step size: %f", self.alpha)
+        
         while k < self.max_iterations:
 
             algorithm.gradient_update.multiply(self.alpha, out=self.x_armijo)
             algorithm.solution.subtract(self.x_armijo, out=self.x_armijo)
 
-            f_x_a = algorithm.objective_function(self.x_armijo)
+            f_x_a = algorithm.calculate_objective_function_at_point(self.x_armijo)
             sqnorm = algorithm.gradient_update.squared_norm()
             if f_x_a - f_x <= - (self.alpha/2.) * sqnorm:
                 break
             k += 1.
             self.alpha *= self.beta
+        
+        log.info("Armijo rule took %d iterations to find step size", k)
 
         if k == self.max_iterations:
             raise ValueError(

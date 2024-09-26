@@ -213,10 +213,10 @@ class ISTA(Algorithm):
         .. math:: f(x) + g(x)
 
         """
-        self.loss.append(self.objective_function(self.x_old))
+        self.loss.append(self.calculate_objective_function_at_point(self.x_old))
 
-    def objective_function(self, x):
-        """ Calculates the objective
+    def calculate_objective_function_at_point(self, x):
+        """ Calculates the objective at a given point x
 
         .. math:: f(x) + g(x)
         

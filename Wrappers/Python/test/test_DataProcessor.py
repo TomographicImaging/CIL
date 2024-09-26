@@ -2672,7 +2672,7 @@ class TestMasker(unittest.TestCase):
         self.mask_3D_generated = MaskGenerator.special_values()(self.data_3D)
 
         # make a copy of mask_manual with 1s and 0s instead of bools:
-        mask_int_manual = mask_manual.astype(numpy.int32)
+        mask_int_manual = mask_2D_manual.astype(numpy.int32)
         self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data.dimension_labels)
 
 
@@ -2685,7 +2685,7 @@ class TestMasker(unittest.TestCase):
         self.Masker_check(self.mask_3D_generated, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
     def test_Masker_with_integer_mask(self):
-        self.Masker_check(self.mask_int_manual, self.data, self.data_init)
+        self.Masker_check(self.mask_int_manual, self.data, self.data_init, self.mask_coords_2D)
 
     def test_Masker_doesnt_modify_input_mask(self):
         mask = self.mask_manual.copy()

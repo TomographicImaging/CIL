@@ -5,8 +5,13 @@ if not "%GIT_DESCRIBE_NUMBER%"=="0" (
     set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%.dev%GIT_DESCRIBE_NUMBER%+%GIT_DESCRIBE_HASH%
 )
 
-cmake -S "%RECIPE_DIR%\.." -B "%SRC_DIR%\build_framework" -G "NMake Makefiles" -DCONDA_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBRARY_LIB=%CONDA_PREFIX%\lib -DLIBRARY_INC=%CONDA_PREFIX% -DCMAKE_INSTALL_PREFIX=%PREFIX%
+cmake "%RECIPE_DIR%\.." -G "NMake Makefiles" ^
+  -DCONDA_BUILD=ON ^
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo ^
+  -DLIBRARY_LIB=%CONDA_PREFIX%\lib ^
+  -DLIBRARY_INC=%CONDA_PREFIX% ^
+  -DCMAKE_INSTALL_PREFIX=%PREFIX%
 if errorlevel 1 exit 1
 
-cmake --build "%SRC_DIR%\build_framework" --target install --config RelWithDebInfo
+cmake --build . --target install --config RelWithDebInfo
 if errorlevel 1 exit 1

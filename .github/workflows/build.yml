@@ -51,6 +51,8 @@ jobs:
         fetch-depth: 0
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
+    - if: matrix.os == 'windows'
+      uses: ilammy/msvc-dev-cmd@v1
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

@@ -116,7 +116,6 @@
     - `TXRMDataReader`
   - Added the ApproximateGradientSumFunction and SGFunction to allow for stochastic gradient algorithms to be created using functions with an approximate gradient and deterministic algorithms
 
->>>>>>> master
 * 23.1.0
   - Fix bug in IndicatorBox proximal_conjugate
   - Allow CCPi Regulariser functions for non CIL object

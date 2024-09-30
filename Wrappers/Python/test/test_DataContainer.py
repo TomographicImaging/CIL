@@ -38,20 +38,6 @@ def aid(x):
 
 
 class TestDataContainer(CCPiTestClass):
-    def create_simple_ImageData(self):
-        N = 64
-        ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
-        Phantom = ImageData(geometry=ig)
-
-        x = Phantom.as_array()
-
-        x[int(round(N/4)):int(round(3*N/4)),
-          int(round(N/4)):int(round(3*N/4))] = 0.5
-        x[int(round(N/8)):int(round(7*N/8)),
-          int(round(3*N/8)):int(round(5*N/8))] = 1
-
-        return (ig, Phantom)
-
     def create_DataContainer(self, X,Y,Z, value=1):
         a = value * np.ones((X, Y, Z), dtype='float32')
         #print("a refcount " , sys.getrefcount(a))
@@ -87,6 +73,88 @@ class TestDataContainer(CCPiTestClass):
         x_cil = DataContainer(x_np)
         self.assertEqual(x_np.ndim, x_cil.ndim)
         self.assertEqual(3, x_cil.ndim)
+
+    def test_DataContainer_equal(self):
+        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+        data = DataContainer(array)
+        data1 = data.copy()
+
+        # Check two identical DataContainers are equal
+        self.assertTrue((data == data1).all())
+        # Check it works for comparing DataContainer with numpy array
+        self.assertTrue((data == data1.as_array()).all())
+
+        # # Check two different DataContainers are not equal
+        data1 += 1
+        self.assertFalse((data ==  data1).all())
+
+    def test_AcquisitionData_equal(self):
+        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+        geom = AcquisitionGeometry.create_Parallel3D().set_panel((8, 4)).set_channels(1).set_angles([1])
+        data = AcquisitionData(array, geometry=geom)
+
+        data1 = data.copy()
+
+        # Check two identical AcquisitionData are equal
+        self.assertTrue(data == data1)
+        # Check it works for comparing AcquisitionData with numpy array
+        self.assertTrue(data == data1.as_array())
+
+        # # Check two different AcquisitionData are not equal
+        data1 += 1
+        self.assertFalse(data ==  data1)
+
+        # Check the equality of two AcquisitionData with different shapes
+        data_different_shape = data.copy()
+        data_different_shape.array = data_different_shape.array.reshape(8, 4)
+
+        self.assertFalse(data == data_different_shape)
+
+        # Check the equality of two AcquisitionData with different dtypes
+        data_different_dtype = data.copy()
+        data_different_dtype.array = data_different_dtype.array.astype(np.float64)
+        self.assertFalse(data == data_different_dtype)
+
+
+        # Check the equality of two AcquisitionData with different labels
+        data_different_labels = data.copy()
+        print(data_different_labels.geometry.dimension_labels)
+        data_different_labels.geometry.set_labels([AcquisitionDimension("ANGLE"), AcquisitionDimension("CHANNEL") ])
+        self.assertFalse(data == data_different_labels)
+
+    def test_ImageData_equal(self):
+        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+        geom = ImageGeometry(voxel_num_x=8, voxel_num_y=4)
+        data = ImageData(array, geometry=geom)
+
+        data1 = data.copy()
+
+        # Check two identical ImageData are equal
+        self.assertTrue(data == data1)
+        # Check it works for comparing ImageData with numpy array
+        self.assertTrue(data == data1.as_array())
+
+        # # Check two different ImageData are not equal
+        data1 += 1
+        self.assertFalse(data ==  data1)
+
+        # Check the equality of two ImageData with different shapes
+        data_different_shape = data.copy()
+        data_different_shape.array = data_different_shape.array.reshape(8, 4)
+
+        self.assertFalse(data == data_different_shape)
+
+        # Check the equality of two ImageData with different dtypes
+        data_different_dtype = data.copy()
+        data_different_dtype.array = data_different_dtype.array.astype(np.float64)
+        self.assertFalse(data == data_different_dtype)
+
+
+        # Check the equality of two ImageData with different labels
+        data_different_labels = data.copy()
+        data_different_labels.geometry.set_labels([ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
+        self.assertFalse(data == data_different_labels)
+
 
     def testInlineAlgebra(self):
         X, Y, Z = 8, 16, 32

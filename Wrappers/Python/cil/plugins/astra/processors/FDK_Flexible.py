@@ -73,8 +73,14 @@ class FDK_Flexible(DataProcessor):
                  .format(self.sinogram_geometry.geom_type))
 
         return True
-
-
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
+    
     def process(self, out=None):
 
         # Get DATA

@@ -15,16 +15,26 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import functools
+import warnings
+from numbers import Number
 
 import numpy
-from numbers import Number
-import functools
-from cil.utilities.multiprocessing import NUM_THREADS
+
+from ..utilities.multiprocessing import NUM_THREADS
+from .labels import FillType
+
 
 class BlockGeometry(object):
+    @property
+    def RANDOM(self):
+        warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
+        return FillType.RANDOM
 
-    RANDOM = 'random'
-    RANDOM_INT = 'random_int'
+    @property
+    def RANDOM_INT(self):
+        warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
+        return FillType.RANDOM_INT
 
     @property
     def dtype(self):
@@ -106,7 +116,7 @@ class BlockGeometry(object):
         else:
             self.index = 0
             raise StopIteration
-    
+
     def __eq__(self, value: object) -> bool:
         if len(self.geometries) != len(value.geometries):
             return False
@@ -710,7 +720,7 @@ class BlockDataContainer(object):
     def __len__(self):
 
         return self.shape[0]
-    
+
     @property
     def geometry(self):
         try:

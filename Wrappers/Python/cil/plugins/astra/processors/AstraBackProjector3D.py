@@ -15,9 +15,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-
-from cil.framework import DataProcessor, ImageData, DataOrder
+from cil.framework import DataProcessor, ImageData
+from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
 from astra import astra_dict, algorithm, data3d
@@ -56,17 +55,23 @@ class AstraBackProjector3D(DataProcessor):
 
         self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
 
-
     def check_input(self, dataset):
 
         if self.sinogram_geometry.shape != dataset.geometry.shape:
             raise ValueError("Dataset not compatible with geometry used to create the projector")
 
         return True
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
 
     def set_ImageGeometry(self, volume_geometry):
 
-        DataOrder.check_order_for_engine('astra', volume_geometry)
+        ImageDimension.check_order_for_engine('astra', volume_geometry)
 
         if len(volume_geometry.dimension_labels) > 3:
             raise ValueError("Supports 2D and 3D data only, got {0}".format(volume_geometry.number_of_dimensions))
@@ -75,7 +80,7 @@ class AstraBackProjector3D(DataProcessor):
 
     def set_AcquisitionGeometry(self, sinogram_geometry):
 
-        DataOrder.check_order_for_engine('astra', sinogram_geometry)
+        AcquisitionDimension.check_order_for_engine('astra', sinogram_geometry)
 
         if len(sinogram_geometry.dimension_labels) > 3:
             raise ValueError("Supports 2D and 3D data only, got {0}".format(sinogram_geometry.number_of_dimensions))

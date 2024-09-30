@@ -1,5 +1,5 @@
-#  Copyright 2020 United Kingdom Research and Innovation
-#  Copyright 2020 The University of Manchester
+#  Copyright 2018 United Kingdom Research and Innovation
+#  Copyright 2018 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,6 +15,19 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import ctypes
+import platform
+from ctypes import util
+# check for the extension
 
-import os
-print (os.path.dirname(os.__file__))
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll_file = 'cilacc.dll'
+    dll = util.find_library(dll_file)
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+cilacc = ctypes.cdll.LoadLibrary(dll)

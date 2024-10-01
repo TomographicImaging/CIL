@@ -73,6 +73,31 @@ class AcquisitionData(DataContainer, Partitioner):
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
 
+    def __eq__(self, other):
+        '''
+        Check if two AcquisitionData objects are equal. This is done by checking if the geometry, data and dtype are equal.
+        Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.
+        
+        Parameters
+        ----------
+        other: AcquisitionData or numpy.ndarray
+            The object to compare with.
+        
+        Returns
+        -------
+        bool
+            True if the two objects are equal, False otherwise.
+        '''
+
+        if isinstance(other, AcquisitionData):
+            if numpy.array_equal(self.as_array(), other.as_array()) \
+                and self.geometry == other.geometry \
+                and self.dtype == other.dtype:
+                return True 
+        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+            return True
+        else:
+            return False
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
         '''Returns a new dataset of a single slice in the requested direction.'''

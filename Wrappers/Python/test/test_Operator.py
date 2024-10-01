@@ -19,9 +19,9 @@
 import unittest
 from unittest.mock import Mock
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, BlockDataContainer, DataContainer
-from cil.optimisation.operators import BlockOperator,\
-    FiniteDifferenceOperator, SymmetrisedGradientOperator
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer
+from cil.framework.labels import FillType
+from cil.optimisation.operators import FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
 from timeit import default_timer as timer
 from cil.optimisation.operators import GradientOperator, IdentityOperator,\
@@ -31,7 +31,6 @@ import numpy
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 
 from cil.utilities import dataexample
-import logging
 from testclass import CCPiTestClass
 import scipy
 
@@ -46,8 +45,6 @@ def dt(steps):
 
 
 class TestOperator(CCPiTestClass):
-
-
     def test_MatrixOperator(self):
         m = 30
         n = 20
@@ -82,9 +79,6 @@ class TestOperator(CCPiTestClass):
         Amat = numpy.random.randn(m, n) + 1j*numpy.random.randn(m, n)
         A = MatrixOperator(Amat)
         self.assertTrue(A.dot_test(A))
-
-
-
 
     def test_ZeroOperator(self):
         ig = ImageGeometry(10,20,30)
@@ -212,7 +206,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(100,100)
 
         # Parameters for point spread function PSF (size and std)
-        ks          = 11;
+        ks          = 11
         ksigma      = 5.0
 
         # Create 1D PSF and 2D as outer product, then normalise.
@@ -233,13 +227,19 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         # img.fill(numpy.ones((30,20,10)))
-        self.assertTrue(img.shape == (30,20,10))
+        self.assertNumpyArrayEqual(img.shape , (30,20,10))
         #self.assertEqual(img.sum(), 2*float(10*20*30))
         self.assertEqual(img.sum(), 0.)
         Id = IdentityOperator(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
+
+        #Check is_linear
+        self.assertTrue(Id.is_linear())
+
+        #Check is_orthogonal
+        self.assertTrue(Id.is_orthogonal())
 
     def test_FiniteDifference(self):
         N, M = 2, 3
@@ -249,14 +249,13 @@ class TestOperator(CCPiTestClass):
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
-
-        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = FD.domain_geometry().allocate(FillType["RANDOM"])
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM)
+        res = Id.domain_geometry().allocate(FillType["RANDOM"])
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -265,14 +264,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.range_geometry().allocate(FillType["RANDOM"])
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
+        u = G.domain_geometry().allocate(FillType["RANDOM"])
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -508,11 +507,15 @@ class TestOperator(CCPiTestClass):
         res1 = bg.allocate(0)
         proj_map.adjoint(x, out=res1)
 
+        res2=bg.allocate('random')
+        proj_map.adjoint(x, out=res2)
+
         # check if all indices return arrays filled with 0, except the input index
 
         for i in range(len(bg.geometries)):
             if i!=index:
                 numpy.testing.assert_array_almost_equal(res1[i].as_array(), bg.geometries[i].allocate().as_array())
+                numpy.testing.assert_array_almost_equal(res2[i].as_array(), bg.geometries[i].allocate().as_array())
 
         # Check error messages
         # Check if index is correct wrt length of Cartesian Product
@@ -646,220 +649,6 @@ class TestGradients(CCPiTestClass):
         # self.assertAlmostEqual(lhs3, rhs3)
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
         self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
-
-
-class TestBlockOperator(CCPiTestClass):
-    def setUp(self):
-        numpy.random.seed(1)
-
-
-    def test_BlockOperator(self):
-        M, N  = 3, 4
-        ig = ImageGeometry(M, N)
-        arr = ig.allocate('random')
-
-        G = GradientOperator(ig)
-        Id = IdentityOperator(ig)
-
-        B = BlockOperator(G, Id)
-        # Nx1 case
-        u = ig.allocate('random')
-        z1 = B.direct(u)
-
-        res = B.range_geometry().allocate()
-        #res = z1.copy()
-        B.direct(u, out=res)
-
-        self.assertBlockDataContainerEqual(z1, res)
-
-        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
-
-        res1 = B.adjoint(z1)
-        res2 = B.domain_geometry().allocate()
-        B.adjoint(z1, out=res2)
-
-        self.assertNumpyArrayEqual(res1.as_array(), res2.as_array())
-
-        BB = BlockOperator( Id, 2 * Id)
-        B = BlockOperator( BB, Id )
-        v = B.domain_geometry().allocate()
-        B.adjoint(res,out=v)
-        vv = B.adjoint(res)
-        el1 = B.get_item(0,0).adjoint(z1.get_item(0)) +\
-              B.get_item(1,0).adjoint(z1.get_item(1))
-
-        self.assertNumpyArrayEqual(v.as_array(),vv.as_array())
-        # test adjoint
-
-        BB = BlockOperator( Id, 2 * Id)
-        u = ig.allocate(1)
-        z1 = BB.direct(u)
-        res = BB.range_geometry().allocate(0)
-        BB.direct(u, out=res)
-
-        self.assertNumpyArrayEqual(z1.get_item(0).as_array(),
-                                   u.as_array())
-        self.assertNumpyArrayEqual(z1.get_item(1).as_array(),
-                                   2 * u.as_array())
-        self.assertNumpyArrayEqual(res.get_item(0).as_array(),
-                                   u.as_array())
-        self.assertNumpyArrayEqual(res.get_item(1).as_array(),
-                                   2 * u.as_array())
-
-        x1 = BB.adjoint(z1)
-
-        res1 = BB.domain_geometry().allocate()
-        BB.adjoint(z1, out=res1)
-        self.assertNumpyArrayEqual(x1.as_array(),
-                                   res1.as_array())
-
-        self.assertNumpyArrayEqual(x1.as_array(),
-                                   5 * u.as_array())
-        self.assertNumpyArrayEqual(res1.as_array(),
-                                   5 * u.as_array())
-        #################################################
-
-        BB = BlockOperator( Id, 2 * Id, 3 * Id,  Id, shape=(2,2))
-        B = BB
-        u = ig.allocate(1)
-        U = BlockDataContainer(u,u)
-        z1 = B.direct(U)
-
-        self.assertNumpyArrayEqual(z1.get_item(0).as_array(),
-                                   3 * u.as_array())
-        self.assertNumpyArrayEqual(z1.get_item(1).as_array(),
-                                   4 * u.as_array())
-        res = B.range_geometry().allocate()
-        B.direct(U, out=res)
-        self.assertNumpyArrayEqual(res.get_item(0).as_array(),
-                                   3 * u.as_array())
-        self.assertNumpyArrayEqual(res.get_item(1).as_array(),
-                                   4 * u.as_array())
-
-
-        x1 = B.adjoint(z1)
-        # this should be [15 u, 10 u]
-        el1 = B.get_item(0,0).adjoint(z1.get_item(0)) + B.get_item(1,0).adjoint(z1.get_item(1))
-        el2 = B.get_item(0,1).adjoint(z1.get_item(0)) + B.get_item(1,1).adjoint(z1.get_item(1))
-
-        shape = B.get_output_shape(z1.shape, adjoint=True)
-        out = B.domain_geometry().allocate()
-
-        for col in range(B.shape[1]):
-            for row in range(B.shape[0]):
-                if row == 0:
-                    el = B.get_item(row,col).adjoint(z1.get_item(row))
-                else:
-                    el += B.get_item(row,col).adjoint(z1.get_item(row))
-            out.get_item(col).fill(el)
-
-        self.assertNumpyArrayEqual(out.get_item(0).as_array(),
-                                   15 * u.as_array())
-        self.assertNumpyArrayEqual(out.get_item(1).as_array(),
-                                   10 * u.as_array())
-
-        res2 = B.domain_geometry().allocate()
-        #print (res2, res2.as_array())
-        B.adjoint(z1, out = res2)
-
-        #print ("adjoint",x1.as_array(),"\n",res2.as_array())
-        self.assertNumpyArrayEqual(
-            out.get_item(0).as_array(),
-            res2.get_item(0).as_array()
-            )
-        self.assertNumpyArrayEqual(
-            out.get_item(1).as_array(),
-            res2.get_item(1).as_array()
-            )
-
-        B1 = BlockOperator(G, Id)
-        U = ig.allocate(ImageGeometry.RANDOM)
-        #U = BlockDataContainer(u,u)
-        RES1 = B1.range_geometry().allocate()
-
-        Z1 = B1.direct(U)
-        B1.direct(U, out = RES1)
-
-        self.assertBlockDataContainerEqual(Z1,RES1)
-
-    @unittest.skipIf(True, 'Skipping time tests')
-    def test_timedifference(self):
-        M, N ,W = 100, 512, 512
-        ig = ImageGeometry(M, N, W)
-        arr = ig.allocate('random')
-
-        G = GradientOperator(ig, backend='numpy')
-        Id = IdentityOperator(ig)
-
-        B = BlockOperator(G, Id)
-
-
-        # Nx1 case
-        u = ig.allocate('random')
-        steps = [timer()]
-        i = 0
-        n = 10.
-        t1 = t2 = 0
-        res = B.range_geometry().allocate()
-
-        while (i < n):
-            steps.append(timer())
-            z1 = B.direct(u)
-            steps.append(timer())
-            t = dt(steps)
-            #print ("B.direct(u) " ,t)
-            t1 += t/n
-
-            steps.append(timer())
-            B.direct(u, out = res)
-            steps.append(timer())
-            t = dt(steps)
-            #print ("B.direct(u, out=res) " ,t)
-            t2 += t/n
-            i += 1
-
-        self.assertGreater(t1,t2)
-
-        steps = [timer()]
-        i = 0
-        #n = 50.
-        t1 = t2 = 0
-        resd = B.domain_geometry().allocate()
-        z1 = B.direct(u)
-        #B.adjoint(z1, out=resd)
-
-        while (i < n):
-            steps.append(timer())
-            w1 = B.adjoint(z1)
-            steps.append(timer())
-            t = dt(steps)
-            #print ("B.adjoint(z1) " ,t)
-            t1 += t/n
-
-            steps.append(timer())
-            B.adjoint(z1, out=resd)
-            steps.append(timer())
-            t = dt(steps)
-            #print ("B.adjoint(z1, out=res) " ,t)
-            t2 += t/n
-            i += 1
-
-
-    def test_BlockOperatorLinearValidity(self):
-        M, N  = 3, 4
-        ig = ImageGeometry(M, N)
-        arr = ig.allocate('random', seed=1)
-
-        G = GradientOperator(ig)
-        Id = IdentityOperator(ig)
-
-        B = BlockOperator(G, Id)
-        # Nx1 case
-        u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
-        w1 = B.direct(u)
-        u1 = B.adjoint(w)
-        self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
 
 
 class TestOperatorCompositionSum(unittest.TestCase):

@@ -15,23 +15,22 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
+import sys
 import unittest
 from unittest.mock import patch
 from utils import initialise_tests
-from cil.framework import AcquisitionGeometry
+
 import numpy as np
 import os
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader, NikonDataReader, ZEISSDataReader
+from cil.framework.labels import AngleUnit
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
-from cil.utilities.dataexample import data_dir
 from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
-import shutil
 import logging
 import glob
 import json
@@ -65,7 +64,7 @@ if has_astra:
 # change basedir to point to the location of the walnut dataset which can
 # be downloaded from https://zenodo.org/record/4822516
 # basedir = os.path.abspath('/home/edo/scratch/Data/Walnut/valnut_2014-03-21_643_28/tomo-A/')
-basedir = data_dir
+basedir = data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
 filename = os.path.join(basedir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
 
@@ -75,29 +74,21 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia an
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
 logging.basicConfig(level=logging.WARNING)
-
-logging.info ("has_astra {}".format(has_astra))
-logging.info ("has_wget {}".format(has_wget))
-logging.info ("has_olefile {}".format(has_olefile))
-logging.info ("has_dxchange {}".format(has_dxchange))
-logging.info ("has_file {}".format(has_file))
-
+log = logging.getLogger(__name__)
+log.info("has_astra %s", has_astra)
+log.info("has_wget %s", has_wget)
+log.info("has_olefile %s", has_olefile)
+log.info("has_dxchange %s", has_dxchange)
+log.info("has_file %s", has_file)
 if not has_file:
-    logging.info("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+    log.info("This unittest requires the walnut Zeiss dataset saved in %s", data_dir)
 
 
-class TestTXRMDataReader(unittest.TestCase):
-
-
+class TestZeissDataReader(unittest.TestCase):
     def setUp(self):
-        logging.info ("has_astra {}".format(has_astra))
-        logging.info ("has_wget {}".format(has_wget))
-        logging.info ("has_olefile {}".format(has_olefile))
-        logging.info ("has_dxchange {}".format(has_dxchange))
-        logging.info ("has_file {}".format(has_file))
         if has_file:
-            self.reader = TXRMDataReader()
-            angle_unit = AcquisitionGeometry.RADIAN
+            self.reader = ZEISSDataReader()
+            angle_unit = AngleUnit["RADIAN"]
 
             self.reader.set_up(file_name=filename,
                                angle_unit=angle_unit)
@@ -165,11 +156,15 @@ class TestTXRMDataReader(unittest.TestCase):
         gt = reader.read()
 
         qm = mse(gt, recfbp)
-        logging.info ("MSE {}".format(qm) )
+        log.info("MSE %r", qm)
 
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
+
+    def test_file_not_found_error(self):
+        with self.assertRaises(FileNotFoundError):
+            reader = ZEISSDataReader(file_name='no-file')
 
 
 class TestTIFF(unittest.TestCase):
@@ -469,7 +464,7 @@ class Test_HDF5_utilities(unittest.TestCase):
         dset_dict = HDF5_utilities.get_dataset_metadata(self.path, self.dset_path)
 
         dict_by_hand  ={'ndim': 3, 'shape': (91, 135, 160), 'size': 1965600, 'dtype': np.float32, 'compression': None, 'chunks': None, 'is_virtual': False}
-        self.assertDictContainsSubset(dict_by_hand,dset_dict)
+        self.assertEqual(dset_dict, dict_by_hand | dset_dict)
 
 
     def test_read(self):
@@ -544,14 +539,3 @@ class TestNikonReader(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             reader = NikonDataReader(file_name='no-file')
-
-
-class TestZeissReader(unittest.TestCase):
-
-    def test_setup(self):
-
-        reader = ZEISSDataReader()
-        self.assertEqual(reader.file_name, None)
-
-        with self.assertRaises(FileNotFoundError):
-            reader = ZEISSDataReader(file_name='no-file')

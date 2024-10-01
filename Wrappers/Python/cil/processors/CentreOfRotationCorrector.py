@@ -34,15 +34,15 @@ class CentreOfRotationCorrector(DataProcessor):
 
         Parameters
         ----------
+        slice_index: int or str, optional
+            An integer defining the vertical slice to run the algorithm on or string='centre' specifying the central slice should be used (default is 'centre')
 
-        slice_index : int, str='centre', default='centre'
-            An integer defining the vertical slice to run the algorithm on.
+        projection_index: int or list/tuple of ints, optional
+            An integer defining the index of the first projection the cross correlation algorithm will use, where the second projection is chosen as the projection closest to 180 degrees from this.
+            Or a list/tuple of ints specifying the two indices to be used for cross correlation (default is 0)
 
-        projection_index : int
-            An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.
-
-        ang_tol : float, default=0.1
-            The angular tolerance in degrees between the two input projections 180 degree gap
+        ang_tol: float, optional
+            The angular tolerance in degrees between the two input projections 180 degree gap (default is 0.1)
 
         Example
         -------
@@ -84,7 +84,7 @@ class CentreOfRotationCorrector(DataProcessor):
 
 
     @staticmethod
-    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
+    def image_sharpness(slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
         """This creates a CentreOfRotationCorrector processor.
 
         The processor will find the centre offset by maximising the sharpness of a reconstructed slice.
@@ -108,11 +108,6 @@ class CentreOfRotationCorrector(DataProcessor):
 
         initial_binning : int
             The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
-
-        Other Parameters
-        ----------------
-        **kwargs : dict
-            FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
         Example
@@ -139,5 +134,5 @@ class CentreOfRotationCorrector(DataProcessor):
         This method is unreliable on half-scan data with 'tuning-fork' style artifacts.
 
         """
-        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning, **kwargs)
+        processor = CofR_image_sharpness(slice_index=slice_index, backend=backend, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

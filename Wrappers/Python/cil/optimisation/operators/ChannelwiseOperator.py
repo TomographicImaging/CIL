@@ -16,11 +16,9 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import numpy as np
-from cil.framework import ImageData
+from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 from cil.optimisation.operators import LinearOperator
 
-from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 
 class ChannelwiseOperator(LinearOperator):
 
@@ -82,45 +80,29 @@ class ChannelwiseOperator(LinearOperator):
         self.channels = channels
 
     def direct(self,x,out=None):
-
         '''Returns D(x)'''
-
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's direct method and fill into multi-channel output data set.
         if out is None:
-            output = self.range_geometry().allocate()
-            cury = self.op.range_geometry().allocate()
-            for k in range(self.channels):
-                self.op.direct(x.get_slice(channel=k),cury)
-                output.fill(cury.as_array(),channel=k)
-            return output
-        else:
-            cury = self.op.range_geometry().allocate()
-            for k in range(self.channels):
-                self.op.direct(x.get_slice(channel=k),cury)
-                out.fill(cury.as_array(),channel=k)
+            out = self.range_geometry().allocate()
+        cury = self.op.range_geometry().allocate()
+        for k in range(self.channels):
+            self.op.direct(x.get_slice(channel=k),cury)
+            out.fill(cury.as_array(),channel=k)
+        return out
 
     def adjoint(self,x, out=None):
-
         '''Returns D^{*}(y)'''
-
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's adjoint method and fill into multi-channel output data set.
         if out is None:
-            output = self.domain_geometry().allocate()
-            cury = self.op.domain_geometry().allocate()
-            for k in range(self.channels):
-                self.op.adjoint(x.get_slice(channel=k),cury)
-                output.fill(cury.as_array(),channel=k)
-            return output
-        else:
-            cury = self.op.domain_geometry().allocate()
-            for k in range(self.channels):
-                self.op.adjoint(x.get_slice(channel=k),cury)
-                out.fill(cury.as_array(),channel=k)
+            out = self.domain_geometry().allocate()
+        cury = self.op.domain_geometry().allocate()
+        for k in range(self.channels):
+            self.op.adjoint(x.get_slice(channel=k),cury)
+            out.fill(cury.as_array(),channel=k)
+        return out
 
     def calculate_norm(self, **kwargs):
-
         '''Evaluates operator norm of DiagonalOperator'''
-
         return self.op.norm()

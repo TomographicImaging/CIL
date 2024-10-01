@@ -18,29 +18,52 @@
 
 from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
-from cil.utilities.errors import InPlaceError
 import numpy as np
+import warnings
 
 def soft_shrinkage(x, tau, out=None):
 
-    r"""Returns the value of the soft-shrinkage operator at x.
+    r"""Returns the value of the soft-shrinkage operator at x. This is used for the calculation of the proximal. 
+    
+    .. math:: soft_shrinkage (x) = \begin{cases}
+                x-\tau, \mbox{if } x > \tau \
+                    x+\tau, \mbox{if } x < -\tau \
+                0, \mbox{otherwise}
+                \end{cases}.
+   
+
+
 
     Parameters
     -----------
     x : DataContainer
         where to evaluate the soft-shrinkage operator.
-    tau : float, numpy ndarray, DataContainer
+    tau : float, non-negative real,  numpy ndarray, DataContainer
     out : DataContainer, default None
         where to store the result. If None, a new DataContainer is created.
 
     Returns
     --------
     the value of the soft-shrinkage operator at x: DataContainer.
+    
+    Note
+    ------
+    Note that this function can deal with complex inputs, defining the `sgn` function as: 
+    .. math:: sgn (z) = \begin{cases}
+                0, \mbox{if } z = 0 \
+                \frac{z}{|z|}, \mbox{otherwise}
+                \end{cases}.
+                
     """
-    if  id(x)==id(out):
-        raise InPlaceError(message="The soft_shrinkage function cannot be used in place" )
+    if np.min(tau) < 0:
+        warnings.warn(
+                "tau should be non-negative!", UserWarning)
+    if np.linalg.norm(np.imag(tau))>0:
+        raise ValueError("tau should be real!")
 
-    should_return = False
+    # get the sign of the input
+    dsign = np.exp(1j*np.angle(x.as_array())) if np.iscomplexobj(x) else x.sign()
+
     if out is None:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             out = x * 0
@@ -49,7 +72,6 @@ def soft_shrinkage(x, tau, out=None):
             out.fill(outarr)
         else:
             out = x.abs()
-        should_return = True
     else:
         if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
             outarr = out.as_array()
@@ -60,15 +82,9 @@ def soft_shrinkage(x, tau, out=None):
             x.abs(out = out)
     out -= tau
     out.maximum(0, out = out)
-    if x.dtype in [np.csingle, np.cdouble, np.clongdouble]:
-        out *= np.exp(1j*np.angle(x.as_array()))
+    out *= dsign
+    return out
 
-    else:
-        out *= x.sign()
-
-
-    if should_return:
-        return out
 
 class L1Norm(Function):
     r"""L1Norm function
@@ -78,18 +94,18 @@ class L1Norm(Function):
     a) .. math:: F(x) = ||x||_{1}
     b) .. math:: F(x) = ||x - b||_{1}
 
-    In the weighted case, :math:`w` is an array of positive weights.
+    In the weighted case, :math:`w` is an array of non-negative weights.
 
     a) .. math:: F(x) = ||x||_{L^1(w)}
     b) .. math:: F(x) = ||x - b||_{L^1(w)}
 
-    with :math:`||x||_{L^1(w)} = || x \cdot w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
+    with :math:`||x||_{L^1(w)} = || x  w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
 
     Parameters
     -----------
 
         weight: DataContainer, numpy ndarray, default None
-            Array of positive weights. If :code:`None` returns the L1 Norm.
+            Array of non-negative weights. If :code:`None` returns the L1 Norm.
         b: DataContainer, default None
             Translation of the function.
 
@@ -126,7 +142,7 @@ class L1Norm(Function):
         \end{cases}
 
     In the weighted case the convex conjugate is the indicator of the unit
-    :math:`L^{\infty}` norm.
+    :math:`L^{\infty}(w^{-1})` norm.
 
     See:
     https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
@@ -134,7 +150,7 @@ class L1Norm(Function):
     a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
     b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
 
-    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}`.
+    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0/0 are defined to be 1..
 
     Parameters
     -----------
@@ -155,8 +171,8 @@ class L1Norm(Function):
 
     Consider the following cases:
 
-    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b
+    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b
 
     where,
 
@@ -166,13 +182,13 @@ class L1Norm(Function):
     by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
 
     a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x) + b
+    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b
 
 
     Parameters
     -----------
     x: DataContainer
-    tau: float, ndarray, DataContainer
+    tau: float, real,  ndarray, DataContainer
     out: DataContainer, default None
         If not None, the result will be stored in this object.
 
@@ -181,6 +197,7 @@ class L1Norm(Function):
     The value of the proximal operator of the L1 norm function at x: DataContainer.
 
         """
+            
         return self.function.proximal(x, tau, out=out)
 
 
@@ -214,8 +231,7 @@ class _L1Norm(Function):
         return y.abs().sum()
 
     def convex_conjugate(self,x):
-        tmp = x.abs().max() - 1
-        if tmp<=1e-5:
+        if x.abs().max() - 1 <=0:
             if self.b is not None:
                 return self.b.dot(x)
             else:
@@ -224,18 +240,12 @@ class _L1Norm(Function):
 
 
     def proximal(self, x, tau, out=None):
-        if out is None:
-            if self.b is not None:
-                return self.b + soft_shrinkage(x - self.b, tau)
-            else:
-                return soft_shrinkage(x, tau)
+        if self.b is not None:
+            ret = soft_shrinkage(x - self.b, tau, out=out)
+            ret += self.b
         else:
-
-            if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
-                out += self.b
-            else:
-                soft_shrinkage(x, tau, out = out)
+            ret = soft_shrinkage(x, tau, out=out)
+        return ret
 
 
 class _WeightedL1Norm(Function):
@@ -245,31 +255,32 @@ class _WeightedL1Norm(Function):
         self.weight = weight
         self.b = b
 
-        if np.min(weight) <= 0:
-            raise ValueError("Weights should be strictly positive!")
+        if np.min(weight) < 0:
+            raise ValueError("Weights should be non-negative!")
+        
+        if np.linalg.norm(np.imag(weight))>0:
+            raise ValueError("Weights should be real!")
 
     def __call__(self, x):
         y = x*self.weight
 
         if self.b is not None:
-            y -= self.b
+            y -= self.b*self.weight 
 
         return y.abs().sum()
 
     def convex_conjugate(self,x):
-        tmp = (x.abs()/self.weight).max() - 1
-
-        if tmp<=1e-5:
+        if np.any(x.abs() > self.weight): # This handles weight being zero problems
+            return np.inf
+        else:
             if self.b is not None:
                 return self.b.dot(x)
             else:
                 return 0.
-        return np.inf
+        
 
     def proximal(self, x, tau, out=None):
-        tau *= self.weight
-        ret = _L1Norm.proximal(self, x, tau, out=out)
-        tau /= self.weight
+        ret = _L1Norm.proximal(self, x, tau*self.weight, out=out)
         return ret
 
 class MixedL11Norm(Function):

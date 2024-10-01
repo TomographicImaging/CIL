@@ -15,12 +15,14 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import contextlib
+import io
+
+import numpy as np
 
 from cil.framework import DataProcessor, ImageData
-from cil.framework import DataOrder
+from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.plugins.tigre import CIL2TIGREGeometry
-import logging
-import numpy as np
 
 try:
     from tigre.algorithms import fdk, fbp
@@ -47,27 +49,13 @@ class FBP(DataProcessor):
     >>> from cil.plugins.tigre import FBP
     >>> fbp = FBP(image_geometry, data.geometry)
     >>> fbp.set_input(data)
-    >>> reconstruction = fbp.get_ouput()
+    >>> reconstruction = fbp.get_output()
 
     '''
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, **kwargs):
-
-
-        sinogram_geometry = kwargs.get('sinogram_geometry', None)
-        volume_geometry = kwargs.get('volume_geometry', None)
-
-        if sinogram_geometry is not None:
-            acquisition_geometry = sinogram_geometry
-            logging.warning("sinogram_geometry has been deprecated. Please use acquisition_geometry instead.")
-
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
-        if volume_geometry is not None:
-            image_geometry = volume_geometry
-            logging.warning("volume_geometry has been deprecated. Please use image_geometry instead.")
-
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
@@ -75,8 +63,10 @@ class FBP(DataProcessor):
         if device != 'gpu':
             raise ValueError("TIGRE FBP is GPU only. Got device = {}".format(device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
+
+        AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimension.check_order_for_engine('tigre', image_geometry)
+
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -90,8 +80,15 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.acquisition_geometry.channels))
 
-        DataOrder.check_order_for_engine('tigre', dataset.geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', dataset.geometry)
         return True
+    
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.image_geometry.shape
 
     def process(self, out=None):
 
@@ -99,13 +96,17 @@ class FBP(DataProcessor):
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 
             if self.acquisition_geometry.geom_type == 'cone':
-                arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
+                # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
+                with contextlib.redirect_stdout(io.StringIO()):
+                    arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
             if self.acquisition_geometry.geom_type == 'cone':
-                arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
+                # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
+                with contextlib.redirect_stdout(io.StringIO()):
+                    arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
             else:
                 arr_out = fbp(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
 

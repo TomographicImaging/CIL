@@ -18,7 +18,8 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, DataOrder
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
 import olefile
@@ -29,7 +30,6 @@ dxchange_logger.setLevel(logging.ERROR)
 import dxchange
 import warnings
 
-logger = logging.getLogger(__name__)
 
 class ZEISSDataReader(object):
 
@@ -128,17 +128,16 @@ class ZEISSDataReader(object):
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                allowed_labels = DataOrder.CIL_AG_LABELS
-                zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
+                zeiss_data_order = {AcquisitionDimension.ANGLE: 0,
+                                    AcquisitionDimension.VERTICAL: 1,
+                                    AcquisitionDimension.HORIZONTAL: 2}
             else:
-                allowed_labels = DataOrder.CIL_IG_LABELS
-                zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
+                zeiss_data_order = {ImageDimension.VERTICAL: 0,
+                                    ImageDimension.HORIZONTAL_Y: 1,
+                                    ImageDimension.HORIZONTAL_X: 2}
 
             # check roi labels and create tuple for slicing
             for key in roi.keys():
-                if key not in allowed_labels:
-                    raise Exception("Wrong label, got {0}. Expected dimension labels in {1}, {2}, {3}".format(key,**allowed_labels))
-
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
@@ -233,11 +232,11 @@ class ZEISSDataReader(object):
                 ) \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         else:
             self._geometry = AcquisitionGeometry.create_Parallel3D()\
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         self._geometry.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
     def _setup_image_geometry(self):
@@ -290,12 +289,3 @@ class ZEISSDataReader(object):
     def get_metadata(self):
         '''return the metadata of the file'''
         return self._metadata
-
-
-class TXRMDataReader(ZEISSDataReader):
-    def __init__(self,
-                 **kwargs):
-        warnings.warn('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead',
-              DeprecationWarning)
-        logger.warning('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead')
-        super().__init__(**kwargs)

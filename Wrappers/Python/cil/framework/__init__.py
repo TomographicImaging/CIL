@@ -16,20 +16,14 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-import numpy
-import sys
-from datetime import timedelta, datetime
-import warnings
-from functools import reduce
-from .framework import cilacc
-from .framework import DataContainer
-from .framework import ImageData, AcquisitionData
-from .framework import ImageGeometry, AcquisitionGeometry
-from .framework import VectorData, VectorGeometry
-from .framework import find_key, message
-from .framework import DataProcessor, Processor
-from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
-from .BlockDataContainer import BlockDataContainer
-from .BlockGeometry import BlockGeometry
-from .framework import DataOrder
-from .framework import Partitioner
+from .cilacc import cilacc
+from .acquisition_data import AcquisitionData
+from .acquisition_geometry import AcquisitionGeometry, SystemConfiguration
+from .data_container import DataContainer
+from .image_data import ImageData
+from .image_geometry import ImageGeometry
+from .vector_data import VectorData
+from .vector_geometry import VectorGeometry
+from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer
+from .block import BlockDataContainer, BlockGeometry
+from .partitioner import Partitioner

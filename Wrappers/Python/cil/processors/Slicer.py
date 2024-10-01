@@ -16,11 +16,14 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
-from cil.framework import AcquisitionGeometry, ImageGeometry, VectorGeometry
+from cil.framework import (DataProcessor, AcquisitionData, ImageData, DataContainer, ImageGeometry, VectorGeometry,
+                           AcquisitionGeometry)
 import numpy as np
 import weakref
 import logging
+
+log = logging.getLogger(__name__)
+
 
 # Note to developers: Binner and Slicer share a lot of common code
 # so Binner has been implemented as a child of Slicer.  This makes use
@@ -92,9 +95,9 @@ class Slicer(DataProcessor):
             '_geometry': None,
             '_processed_dims':None,
             '_shape_in':None,
+            '_shape_out_full':None,
             '_shape_out':None,
-            'shape_out':None,
-            'labels_out':None,
+            '_labels_out':None,
             '_labels_in':None,
             '_pixel_indices':None,
             '_accelerated': True
@@ -123,6 +126,7 @@ class Slicer(DataProcessor):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
 
+        self._set_up()
 
     def check_input(self, data):
 
@@ -153,23 +157,22 @@ class Slicer(DataProcessor):
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
 
-        self._set_up_processor(data)
-
         return True
 
 
-    def _set_up_processor(self, data):
+    def _set_up(self):
         """
         This parses the input roi generically and then configures the processor according to its class.
         """
         #read input
+        data = self.get_input()
         self._parse_roi(data.ndim, data.shape, data.dimension_labels)
         #processor specific configurations
         self._configure()
         # set boolean of dimensions to process
-        self._processed_dims = [0 if self._shape_out[i] == self._shape_in[i] else 1 for i in range(4)]
-        self.shape_out = tuple([i for i in self._shape_out if i > 1])
-        self.labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out) if x > 1]
+        self._processed_dims = [0 if self._shape_out_full[i] == self._shape_in[i] else 1 for i in range(4)]
+        self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
+        self._labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out_full) if x > 1]
 
     def _parse_roi(self, ndim, shape, dimension_labels):
         '''
@@ -224,14 +227,17 @@ class Slicer(DataProcessor):
                 stop += shape_in[offset + i]
 
             if stop > shape_in[offset+i]:
-                logging.warning("ROI for axis {0} has 'stop' out of bounds. Using axis length as stop value. Got stop index: {1}, using {2}".format(dimension_labels[i],stop, shape_in[offset+i]))
+                log.warning(f"ROI for axis {dimension_labels[i]} has 'stop' out of bounds. Using axis length as stop value."
+                            f" Got stop index: {stop}, using {shape_in[offset+i]}")
                 stop = shape_in[offset+i]
 
             if start > shape_in[offset+i]:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1} for axis length {2}".format(dimension_labels[i]),start, shape_in[offset+i])
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start} for axis length {shape_in[offset+i]}")
 
             if start >= stop:
-                raise ValueError("ROI for axis {0} has 'start' out of bounds. Got start index: {1}, stop index {2}".format(dimension_labels[i]),start, stop)
+                raise ValueError(f"ROI for axis {dimension_labels[i]} has 'start' out of bounds."
+                                 f" Got start index: {start}, stop index {stop}")
 
             # set values
             range_list[offset+ i] = range(int(start), int(stop), int(step))
@@ -246,7 +252,7 @@ class Slicer(DataProcessor):
         """
         Once the ROI has been parsed this configure the input specifically for use with Slicer
         """
-        self._shape_out = [len(x) for x in self._roi_ordered]
+        self._shape_out_full = [len(x) for x in self._roi_ordered]
         self._pixel_indices = [(x[0],x[-1]) for x in self._roi_ordered]
 
 
@@ -288,7 +294,7 @@ class Slicer(DataProcessor):
                         position = self._get_slice_position(roi)
                         geometry_new = geometry_new.get_slice(vertical = position)
                     except ValueError:
-                        logging.warn("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
+                        log.warning("Unable to calculate the requested 2D geometry. Returning geometry=`None`")
                         return None
 
                 geometry_new.config.panel.pixel_size[1] *= roi.step
@@ -325,10 +331,10 @@ class Slicer(DataProcessor):
         Creates the new image geometry
         """
 
-        if len(self.shape_out) == 0:
+        if len(self._shape_out) == 0:
             return None
-        elif len(self.shape_out) ==1:
-            return VectorGeometry(self.shape_out[0], dimension_labels=self.labels_out[0])
+        elif len(self._shape_out) ==1:
+            return VectorGeometry(self._shape_out[0], dimension_labels=self._labels_out[0])
 
         geometry_new = self._geometry.copy()
         for i, axis in enumerate(self._labels_in):
@@ -407,13 +413,13 @@ class Slicer(DataProcessor):
             if new_geometry is not None:
                 data_out = new_geometry.allocate(None)
             else:
-                processed_array = np.empty(self.shape_out,dtype=np.float32)
-                data_out = DataContainer(processed_array,False, self.labels_out)
+                processed_array = np.empty(self._shape_out,dtype=np.float32)
+                data_out = DataContainer(processed_array,False, self._labels_out)
         else:
             try:
-                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self.shape_out)
+                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
             except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self.shape_out, np.float32, out.array.shape, out.array.dtype))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
 
             if new_geometry is not None:
                 if out.geometry != new_geometry:
@@ -424,5 +430,5 @@ class Slicer(DataProcessor):
 
         self._process_data(data, data_out)
 
-        if out is None:
-            return data_out
+
+        return data_out

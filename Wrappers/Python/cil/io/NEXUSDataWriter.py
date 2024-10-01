@@ -18,7 +18,8 @@
 
 import numpy as np
 import os
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework import AcquisitionData, ImageData
+from cil.framework.labels import AcquisitionType
 from cil.version import version
 import datetime
 from cil.io import utilities
@@ -123,7 +124,7 @@ class NEXUSDataWriter(object):
             f.attrs['file_name'] = self.file_name
             f.attrs['cil_version'] = version
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
-            f.attrs['creator'] = np.string_('NEXUSDataWriter.py')
+            f.attrs['creator'] = np.bytes_('NEXUSDataWriter.py')
             f.attrs['NeXus_version'] = '4.3.0'
             f.attrs['HDF5_Version'] = h5py.version.hdf5_version
             f.attrs['h5py_version'] = h5py.version.version
@@ -145,24 +146,20 @@ class NEXUSDataWriter(object):
                 ds_data.write_direct(self.data.array)
 
             # set up dataset attributes
-            if (isinstance(self.data, ImageData)):
-                ds_data.attrs['data_type'] = 'ImageData'
-            else:
-                ds_data.attrs['data_type'] = 'AcquisitionData'
+            ds_data.attrs['data_type'] = 'ImageData' if isinstance(self.data, ImageData) else 'AcquisitionData'
 
             for i in range(self.data.number_of_dimensions):
-                ds_data.attrs['dim{}'.format(i)] = self.data.dimension_labels[i]
+                ds_data.attrs[f'dim{i}'] = str(self.data.dimension_labels[i])
 
-            if (isinstance(self.data, AcquisitionData)):
-
+            if isinstance(self.data, AcquisitionData):
                 # create group to store configuration
                 f.create_group('entry1/tomo_entry/config')
                 f.create_group('entry1/tomo_entry/config/source')
                 f.create_group('entry1/tomo_entry/config/detector')
                 f.create_group('entry1/tomo_entry/config/rotation_axis')
 
-                ds_data.attrs['geometry'] = self.data.geometry.config.system.geometry
-                ds_data.attrs['dimension'] = self.data.geometry.config.system.dimension
+                ds_data.attrs['geometry'] = str(self.data.geometry.config.system.geometry)
+                ds_data.attrs['dimension'] = str(self.data.geometry.config.system.dimension)
                 ds_data.attrs['num_channels'] = self.data.geometry.config.channels.num_channels
 
                 f.create_dataset('entry1/tomo_entry/config/detector/direction_x',
@@ -196,7 +193,7 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['pixel_size_h'] = self.data.geometry.config.panel.pixel_size[0]
                 ds_data.attrs['panel_origin'] = self.data.geometry.config.panel.origin
 
-                if self.data.geometry.config.system.dimension == '3D':
+                if AcquisitionType.DIM3 & self.data.geometry.config.system.dimension:
                     f.create_dataset('entry1/tomo_entry/config/detector/direction_y',
                                      (self.data.geometry.config.system.detector.direction_y.shape),
                                      dtype = 'float32',

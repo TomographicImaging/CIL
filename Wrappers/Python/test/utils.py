@@ -57,12 +57,16 @@ try:
     subprocess.check_output('nvidia-smi')
     has_nvidia = True
 except:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_nvidia = False
 system_state['has_nvidia']=has_nvidia
 
 #astra
 module_info = importlib.util.find_spec("astra")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_astra = False
 else:
     has_astra = True
@@ -71,6 +75,8 @@ system_state['has_astra']=has_astra
 #tigre
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_tigre = False
 else:
     has_tigre = True
@@ -94,12 +100,13 @@ system_state['has_ipp']=has_ipp
 #ccpi-regularisation toolkit
 module_info = importlib.util.find_spec("ccpi")
 if module_info != None:
-    module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+    module_info = importlib.util.find_spec("ccpi.filters.regularisers")
 
 if module_info is None:
     has_ccpi_regularisation = False
 else:
     has_ccpi_regularisation = True
+
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
 
 

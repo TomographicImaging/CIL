@@ -1,21 +1,17 @@
-..    Copyright 2020 United Kingdom Research and Innovation
-      Copyright 2020 The University of Manchester
-
-      Licensed under the Apache License, Version 2.0 (the "License");
-      you may not use this file except in compliance with the License.
-      You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-      Unless required by applicable law or agreed to in writing, software
-      distributed under the License is distributed on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      See the License for the specific language governing permissions and
-      limitations under the License.
-
-     Authors:
-     CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-     Kyle Pidgeon (UKRI-STFC)
+.. Copyright 2020 United Kingdom Research and Innovation
+   Copyright 2020 The University of Manchester
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   Authors:
+   CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+   Kyle Pidgeon (UKRI-STFC)
 
 Developers' Guide
 *****************
@@ -92,7 +88,9 @@ Rendered
 Building documentation locally
 ------------------------------
 
-The easiest way to test changes to documentation is to build the docs locally. To do this, you will need a working ``cil`` installation.
+The easiest way to test documentation changes is to open a pull request and `download the rendered documentation from the CI <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
+
+Alternatively, to build the docs locally, you will need a working ``cil`` installation.
 For development of the documentation embedded within the source code itself (e.g. docstrings), you should build ``cil`` from source.
 
 The following steps can be used to create an environment that is suitable for building ``cil`` and its documentation, and to start
@@ -102,33 +100,31 @@ a HTTP server to view the documentation.
 #. Update conda with ``conda update -n base -c defaults conda``
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
-#. Install packages from ``docs/docs_environment.yml`` (with 'name' changed to ENVIRONMENT_NAME) using ``conda env update -f docs_environment.yml``
-#. Download the notebooks for rendering in the documentation with ``python mkdemos.py``
-#. Build the documentation ``sphinx-build -b dirhtml source build``
-#. Start a HTTP server to serve documentation with ``python -m http.server --directory build``
+#. Install packages from ``docs_environment.yml``
+#. [Install Ruby version 3.2](https://www.ruby-lang.org/en/documentation/installation/#installers)
+#. Install the web dependencies with ``make web-deps``
+#. Build the documentation with ``make dirhtml web``
+#. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
 
 Example:
 ::
 
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
+  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
-  mkdir build
-  cd build
   conda activate ENVIRONMENT_NAME
-  cmake .. -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
-  cmake --build . --target install
-  cd ../docs/
+  cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+  cmake --build ./build --target install
+  cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  python mkdemos.py
-  sphinx-build -b dirhtml source build
-  python -m http.server -d build
+  make web-deps  # install dependencies (requires ruby 3.2)
+  make dirhtml web serve
 
 Notebooks gallery
 -----------------
 
-The ``mkdemos.py`` script:
+The ``mkdemos.py`` script (called by ``make dirhtml``):
 
 - downloads notebooks from external URLs to ``source/demos/*.ipynb``
 - uses the ``demos-template.rst`` file to generate the gallery in ``source/demos.rst``
@@ -142,18 +138,14 @@ Make sure that each contributed file contains the following text enclosed in the
 
 ::
 
-..Copyright 2022 United Kingdom Research and Innovation
-  Copyright 2022 The University of Manchester
+  Copyright [yyyy] United Kingdom Research and Innovation
+  Copyright [yyyy] The University of Manchester
   Copyright [yyyy] [name of copyright owner]
-
   Author(s): [Author name, Author email (optional)]
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

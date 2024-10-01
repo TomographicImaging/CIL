@@ -32,13 +32,13 @@ The fundamental components are:
 
 
 
-Algorithms
-==========
+Algorithms (Deterministic)
+==========================
 
 A number of generic algorithm implementations are provided including
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
-Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+Gradient (PDHG), Primal dual three-operator (PD3O),  Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of
@@ -119,34 +119,138 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+PD3O
+----
+.. autoclass:: cil.optimisation.algorithms.PD3O
+   :members:
+   :inherited-members: run, update_objective_interval, max_iteration
+
+
+Algorithms (Stochastic)
+========================
+
+Consider optimisation problems that take the form of a separable sum: 
+
+.. math:: \min_{x} f(x)+g(x) = \min_{x} \sum_{i=0}^{n-1} f_{i}(x) + g(x) = \min_{x} (f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x))+g(x)
+
+where :math:`n` is the number of functions.  Where there is a large number of :math:`f_i` or their gradients are expensive to calculate, stochastic optimisation methods could prove more efficient.   
+There is a growing range of Stochastic optimisation algorithms available with potential benefits of faster convergence in number of iterations or in computational cost. 
+This is an area of continued development for CIL and, depending on  the properties of the :math:`f_i` and the regulariser :math:`g`, there is a range of different options for the user. 
+
+
+
 SPDHG
 -----
+Stochastic Primal Dual Hybrid Gradient (SPDHG) is a stochastic version of PDHG and deals with optimisation problems of the form: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+
+where :math:`f_i` and the regulariser :math:`g` need only be proper, convex and lower semi-continuous ( i.e. do not need to be differentiable). 
+Each iteration considers just one index of the sum, potentially reducing computational cost. For more examples see our [user notebooks]( https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py).
+
+
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-Callbacks
----------
 
-A list of :code:`Callback`s to be executed each iteration can be passed to :code:`Algorithm`'s :code:`run` method.
+Approximate gradient methods
+----------------------------------
+
+Alternatively, consider that, in addition to the functions :math:`f_i` and the regulariser :math:`g` being proper, convex and lower semi-continuous, the :math:`f_i` are differentiable. In this case we consider stochastic methods that replace a gradient calculation in a deterministic algorithm with a, potentially cheaper to calculate, approximate gradient. 
+For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilises iterations of the form
+
+   .. math::
+      x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
+:math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
+
+
+Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
+In addition, if :math:`g(x)\neq 0` and has a calculable proximal ( need not be differentiable) one can consider ISTA iterations: 
+
+   .. math::
+         x_{k+1}=prox_{\alpha g}(x_k-\alpha \nabla f(x_k) )=prox_{\alpha g}(x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k))
+
+and again replacing :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with an approximate gradient. 
+
+In a similar way, plugging approximate gradient calculations into deterministic algorithms can lead to a range of stochastic algorithms. In the following table, the left hand column has the approximate gradient function subclass, :ref:`Approximate Gradient base class` the header row has one of CIL's deterministic optimisation algorithm and the body of the table has the resulting stochastic algorithm.
+
++----------------+-------+------------+----------------+
+|                | GD    | ISTA       | FISTA          |
++----------------+-------+------------+----------------+
+| SGFunction     | SGD   | Prox-SGD   | Acc-Prox-SGD   |
++----------------+-------+------------+----------------+
+| SAGFunction\  | SAG   | Prox-SAG   | Acc-Prox-SAG   |
++----------------+-------+------------+----------------+
+| SAGAFunction\ | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
++----------------+-------+------------+----------------+
+| SVRGFunction\ | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
++----------------+-------+------------+----------------+
+| LSVRGFunction\| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
++----------------+-------+------------+----------------+
+
+\*In development 
+
+The stochastic gradient functions can be found listed under functions in the documentation. 
+
+Stochastic Gradient Descent Example
+----------------------------------
+The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:
 
 .. code-block :: python
 
-   from cil.utilities.callbacks import LogfileCallback
-   ...
-   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
+   from cil.optimisation.utilities import Sampler
+   from cil.optimisation.algorithms import GD 
+   from cil.optimisation.functions import LeastSquares, SGFunction
+   from cil.utilities import dataexample
+   from cil.plugins.astra.operators import ProjectionOperator
+   
+   # get the data  
+   data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+   data.reorder('astra')
+   data = data.get_slice(vertical='centre')
 
-.. autoclass:: cil.utilities.callbacks.Callback
-   :members:
+   # create the geometries 
+   ag = data.geometry 
+   ig = ag.get_ImageGeometry()
 
-.. autoclass:: cil.utilities.callbacks.ProgressCallback
-   :members:
+   # partition the data and build the projectors
+   n_subsets = 10 
+   partitioned_data = data.partition(n_subsets, 'sequential')
+   A_partitioned = ProjectionOperator(ig, partitioned_data.geometry, device = "cpu")
 
-.. autoclass:: cil.utilities.callbacks.TextProgressCallback
-   :members:
+   # create the list of functions for the stochastic sum 
+   list_of_functions = [LeastSquares(Ai, b=bi) for Ai,bi in zip(A_partitioned, partitioned_data)]
 
-.. autoclass:: cil.utilities.callbacks.LogfileCallback
-   :members:
+   #define the sampler and the stochastic gradient function 
+   sampler = Sampler.staggered(len(list_of_functions), stride=2)
+   f = SGFunction(list_of_functions, sampler=sampler)  
+   
+   #set up and run the gradient descent algorithm 
+   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg.run(300)
+
+
+Note
+----
+ All the approximate gradients written in CIL are of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
+ The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets.
+ The multiplication ensures that the (SAGA, SGD, and SVRG  and LSVRG) approximate gradients are an unbiased estimator of the full gradient ie :math:`\mathbb{E}\left[\tilde\nabla f(x)\right] =\nabla f(x)``.
+  This has an implication when choosing step sizes. For example, a suitable step size for GD with a SGFunction could be 
+  :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
+
+  
+Memory requirements
+-------------------
+Note that the approximate gradient methods have different memory requirements:
++ The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
++ `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
++ `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at the expensive of stored memory `n+4` times the image size.  
+
 
 Operators
 =========
@@ -214,6 +318,8 @@ Trivial operators are the following.
    :members:
 
 
+.. autoclass:: cil.optimisation.operators.ProjectionMap
+   :members:
 
 GradientOperator
 -----------------
@@ -232,7 +338,12 @@ GradientOperator
    :members:
 
 
+WaveletOperator
+---------------
+We utilise PyWavelets (https://pywavelets.readthedocs.io/en/latest/index.html) to build wavelet operators in CIL:
 
+.. autoclass:: cil.optimisation.operators.WaveletOperator
+   :members:
 
 
 
@@ -360,6 +471,14 @@ Least Squares
    :members:
    :inherited-members:
 
+
+L1 Sparsity
+----------
+.. autoclass:: cil.optimisation.functions.L1Sparsity
+   :members:
+   :inherited-members:
+
+
 Mixed L21 norm
 --------------
 
@@ -388,15 +507,62 @@ Total variation
    :members:
    :inherited-members:
 
+Approximate Gradient base class 
+--------------------------------
+
+.. autoclass:: cil.optimisation.functions.ApproximateGradientSumFunction 
+   :members:
+   :inherited-members:
+   
+
+Stochastic Gradient function 
+-----------------------------
+
+.. autoclass:: cil.optimisation.functions.SGFunction 
+   :members:
+   :inherited-members:
+
+SAG function
+-------------
+
+.. autoclass:: cil.optimisation.functions.SAGFunction 
+   :members:
+   :inherited-members:
+
+SAGA function
+--------------
+
+.. autoclass:: cil.optimisation.functions.SAGAFunction 
+   :members:
+   :inherited-members:
+
+
+
+Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.SVRGFunction 
+   :members:
+   :inherited-members:
+
+
+Loopless Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.LSVRGFunction 
+   :members:
+   :inherited-members:
+
+
 
 Utilities
-=======
+=========
+
 Contains utilities for the CIL optimisation framework.
 
 Samplers
 --------
+
 Here, we define samplers that select from a list of indices {0, 1, …, N-1} either randomly or by some deterministic pattern.
-The `cil.optimisation.utilities.sampler` class defines a function next() which gives the next sample. It also has utility to `get_samples` to access which samples have or will be drawn.
+The :code:`cil.optimisation.utilities.sampler` class defines a function :code:`next()` which gives the next sample. It also has utility to :code:`get_samples` to access which samples have or will be drawn.
 
 For ease of use we provide the following static methods in `cil.optimisation.utilities.sampler` that allow you to configure your sampler object rather than initialising the classes directly:
 
@@ -424,7 +590,106 @@ In addition, we provide a random sampling class which is a child class of  `cil.
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
    :members:
 
+Callbacks
+---------
 
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+
+.. code-block :: python
+
+   from cil.optimisation.utilities.callbacks import LogfileCallback
+   ...
+   algorithm.run(..., callbacks=[LogfileCallback("log.txt")])
+
+.. autoclass:: cil.optimisation.utilities.callbacks.Callback
+   :members:
+
+Built-in callbacks include:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.ProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.TextProgressCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+Users can also write custom callbacks.
+
+Below is an example of a custom callback implementing early stopping.
+In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by :math:`5`. The :code:`EarlyStopping` callback terminates the algorithm when :math:`x \le -15`. The algorithm thus terminates after :math:`3` iterations.
+
+.. code:: python
+
+   from cil.optimisation.algorithms import Algorithm
+   from cil.optimisation.utilities import callbacks
+
+   class TestAlgo(Algorithm):
+       def __init__(self, *args, **kwargs):
+           self.x = 0
+           super().__init__(*args, **kwargs)
+           self.configured = True
+
+       def update(self):
+           self.x -= 5
+
+       def update_objective(self):
+           self.loss.append(2 ** self.x)
+
+   class EarlyStopping(callbacks.Callback):
+       def __call__(self, algorithm: Algorithm):
+           if algorithm.x <= -15:  # arbitrary stopping criterion
+               raise StopIteration
+
+   algo = TestAlgo()
+   algo.run(20, callbacks=[callbacks.ProgressCallback(), EarlyStopping()])
+
+
+.. code:: raw
+
+   Output:
+    15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
+
+
+Step size methods 
+------------------
+A step size method is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA`  `cil.optimisation.algorithm.FISTA` and it's method `get_step_size` is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.StepSizeRule
+   :members:
+
+We also have a number of example classes:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ConstantStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
+
+
+Preconditioners
+----------------
+A preconditioner is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA` or `cil.optimisation.algorithm.FISTA` and it's method `apply` is called after the calculation of the gradient before the gradient descent step is taken. It modifies and returns a passed `gradient`. 
+
+Currently in CIL we have a base class:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Preconditioner
+   :members:
+
+We also have a number of already provided pre-conditioners
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.Sensitivity
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.preconditioner.AdaptiveSensitivity
+   :members:
 
 
 
@@ -447,7 +712,7 @@ The block framework consists of:
 
 
 
-The block framework allows writing more advanced `optimisation problems`_. Consider the typical
+The block framework allows writing more advanced optimisation problems. Consider the typical
 `Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
 
 .. math::
@@ -622,9 +887,10 @@ Which in Python would be like
 
 :ref:`Return Home <mastertoc>`
 
-.. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
-.. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
-.. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+.. _BlockDataContainer: #blockdatacontainer
+.. _DataContainer: ../framework/#datacontainer
+.. _BlockFunction: #block-function
+.. _BlockOperator: #block-operator
 
 
 

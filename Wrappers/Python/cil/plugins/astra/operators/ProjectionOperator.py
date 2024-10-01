@@ -15,14 +15,14 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-from cil.framework import DataOrder
-from cil.optimisation.operators import LinearOperator, ChannelwiseOperator
-from cil.framework.BlockGeometry import BlockGeometry
-from cil.optimisation.operators import BlockOperator
-from cil.plugins.astra.operators import AstraProjector3D
-from cil.plugins.astra.operators import AstraProjector2D
 import logging
+
+from cil.framework import BlockGeometry
+from cil.framework.labels import AcquisitionDimension, ImageDimension, AcquisitionType
+from cil.optimisation.operators import BlockOperator, LinearOperator, ChannelwiseOperator
+from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
+
+log = logging.getLogger(__name__)
 
 
 class ProjectionOperator(LinearOperator):
@@ -55,7 +55,7 @@ class ProjectionOperator(LinearOperator):
     def __new__(cls, image_geometry=None, acquisition_geometry=None, \
         device='gpu', **kwargs):
         if isinstance(acquisition_geometry, BlockGeometry):
-            logging.info("BlockOperator is returned.")
+            log.info("BlockOperator is returned.")
 
             K = []
             for ag in acquisition_geometry:
@@ -65,7 +65,7 @@ class ProjectionOperator(LinearOperator):
                 )
             return BlockOperator(*K)
         else:
-            logging.info("Standard Operator is returned.")
+            log.info("Standard Operator is returned.")
             return super(ProjectionOperator,
                          cls).__new__(ProjectionOperator_ag)
 
@@ -115,8 +115,8 @@ class ProjectionOperator_ag(ProjectionOperator):
               self).__init__(domain_geometry=image_geometry,
                              range_geometry=acquisition_geometry)
 
-        DataOrder.check_order_for_engine('astra', image_geometry)
-        DataOrder.check_order_for_engine('astra', acquisition_geometry)
+        AcquisitionDimension.check_order_for_engine('astra',acquisition_geometry)
+        ImageDimension.check_order_for_engine('astra',image_geometry)
 
         self.volume_geometry = image_geometry
         self.sinogram_geometry = acquisition_geometry
@@ -127,7 +127,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         if device == 'gpu':
             operator = AstraProjector3D(volume_geometry_sc,
                                         sinogram_geometry_sc)
-        elif self.sinogram_geometry.dimension == '2D':
+        elif AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
             operator = AstraProjector2D(volume_geometry_sc,
                                         sinogram_geometry_sc,
                                         device=device)

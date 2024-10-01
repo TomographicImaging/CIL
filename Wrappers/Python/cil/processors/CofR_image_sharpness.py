@@ -16,16 +16,16 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, DataOrder
+from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
-import inspect
 import logging
 import math
 import importlib
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class CofR_image_sharpness(Processor):
 
@@ -52,11 +52,6 @@ class CofR_image_sharpness(Processor):
 
     initial_binning : int
         The size of the bins for the initial search. If `None` will bin the image to a step corresponding to <128 pixels. The fine search will be on unbinned data.
-
-    Other Parameters
-    ----------------
-    **kwargs : dict
-        FBP : The FBP class to use as the backend imported from `cil.plugins.[backend].FBP`  - This has been deprecated please use 'backend' instead
 
 
     Example
@@ -85,17 +80,7 @@ class CofR_image_sharpness(Processor):
     """
     _supported_backends = ['astra', 'tigre']
 
-    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None, **kwargs):
-
-
-        FBP = kwargs.get('FBP', None)
-        if  FBP is not None:
-            logging.warning("Instantiation with an FBP class has been deprecated and will be removed in future versions.\
-                            Please pass backend='astra' or 'tigre'")
-
-            if inspect.isclass(FBP):
-                if 'astra' in str(inspect.getmodule(FBP)):
-                    backend = 'astra'
+    def __init__(self, slice_index='centre', backend='tigre', tolerance=0.005, search_range=None, initial_binning=None):
 
         FBP = self._configure_FBP(backend)
 
@@ -137,12 +122,9 @@ class CofR_image_sharpness(Processor):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         #check order for single slice data
-        if data.geometry.dimension == '3D':
-            test_geom = data.geometry.get_slice(vertical='centre')
-        else:
-            test_geom = data.geometry
+        test_geom = data.geometry.get_slice(vertical='centre') if AcquisitionType.DIM3 & data.geometry.dimension else data.geometry
 
-        if not DataOrder.check_order_for_engine(self.backend, test_geom):
+        if not AcquisitionDimension.check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
 
         return True
@@ -169,7 +151,7 @@ class CofR_image_sharpness(Processor):
     def gss(self, data, ig, search_range, tolerance, binning):
         '''Golden section search'''
         # intervals c:cr:c where r = φ − 1=0.619... and c = 1 − r = 0.381..., φ
-        logger.debug("GSS between %f and %f", *search_range)
+        log.debug("GSS between %f and %f", *search_range)
         phi = (1 + math.sqrt(5))*0.5
         r = phi - 1
         #1/(r+2)
@@ -225,8 +207,8 @@ class CofR_image_sharpness(Processor):
 
             count +=1
 
-        logger.info("evaluated %d points",len(all_data))
-        if logger.isEnabledFor(logging.DEBUG):
+        log.info("evaluated %d points",len(all_data))
+        if log.isEnabledFor(logging.DEBUG):
             keys, values = zip(*all_data.items())
             self.plot(keys, values, ig.voxel_size_x/binning)
 
@@ -264,16 +246,12 @@ class CofR_image_sharpness(Processor):
         w1 = ind_centre - ind0
         return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
 
-
     def process(self, out=None):
-
         #get slice
-        data_full = self.get_input()
+        data = data_full = self.get_input()
 
-        if data_full.geometry.dimension == '3D':
-            data = data_full.get_slice(vertical=self.slice_index)
-        else:
-            data = data_full
+        if AcquisitionType.DIM3 & data_full.geometry.dimension:
+            data = data.get_slice(vertical=self.slice_index)
 
         data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
@@ -285,9 +263,9 @@ class CofR_image_sharpness(Processor):
         if self.initial_binning is None:
             self.initial_binning = min(int(np.ceil(width / 128)),16)
 
-        logger.debug("Initial search:")
-        logger.debug("search range is %d", self.search_range)
-        logger.debug("initial binning is %d", self.initial_binning)
+        log.debug("Initial search:")
+        log.debug("search range is %d", self.search_range)
+        log.debug("initial binning is %d", self.initial_binning)
 
         #filter full projections
         data_filtered = data.copy()
@@ -334,7 +312,7 @@ class CofR_image_sharpness(Processor):
         for offset in offsets:
             obj_vals.append(self.calculate(data_processed, ig, offset))
 
-        if logger.isEnabledFor(logging.DEBUG):
+        if log.isEnabledFor(logging.DEBUG):
             self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
 
         ind = np.argmin(obj_vals)
@@ -345,13 +323,13 @@ class CofR_image_sharpness(Processor):
 
         if self.initial_binning > 8:
             #binned search continued
-            logger.debug("binned search starting at %f", centre)
+            log.debug("binned search starting at %f", centre)
             a = centre - ig.voxel_size_x *2
             b = centre + ig.voxel_size_x *2
             centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, self.initial_binning )
 
         #fine search
-        logger.debug("fine search starting at %f", centre)
+        log.debug("fine search starting at %f", centre)
         data_processed = data_filtered
         ig = data_processed.geometry.get_ImageGeometry()
         a = centre - ig.voxel_size_x *2
@@ -361,14 +339,15 @@ class CofR_image_sharpness(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
 
-        logger.info("Centre of rotation correction found using image_sharpness")
-        logger.info("backend FBP/FDK {}".format(self.backend))
-        logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
-        logger.info("Centre of rotation shift = %f units at the object", centre)
-        logger.info("Return new dataset with centred geometry")
+        log.info("Centre of rotation correction found using image_sharpness")
+        log.info("backend FBP/FDK {}".format(self.backend))
+        log.info("Calculated from slice: %s", str(self.slice_index))
+        log.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        log.info("Centre of rotation shift = %f units at the object", centre)
+        log.info("Return new dataset with centred geometry")
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
         else:
             out.geometry = new_geometry
+            return out

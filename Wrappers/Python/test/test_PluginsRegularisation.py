@@ -35,7 +35,7 @@ if has_ccpi_regularisation:
 class TestPlugin(unittest.TestCase):
     def setUp(self):
         #Default test image
-        self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,64))
+        self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,30))
         self.alpha = 2.0
         self.iterations = 1000
 
@@ -46,7 +46,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
         cmpx = np.zeros(data.shape, dtype=np.complex64)
         cmpx.real = datarr[:]
@@ -90,7 +90,7 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_dTV_rmul(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         f = FGP_dTV(data)
 
         self.rmul_test(f)
@@ -98,34 +98,34 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_FGP_TV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
 
         tau = 1.
         fcil = FGP_TV()
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, 'cpu' )
+        outrgl = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, device='cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_TGV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
 
         tau = 1.
         fcil = TGV()
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, 'cpu' )
+        outrgl = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, device='cpu' )
 
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_FGP_dTV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
         ref = data*0.3
 
@@ -133,7 +133,7 @@ class TestPlugin(unittest.TestCase):
         fcil = FGP_dTV(ref)
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, 'cpu' )
+        outrgl = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, device='cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
 
@@ -160,7 +160,7 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_TNV_raise_on_2D(self):
         # data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
 
         tau = 1.
@@ -173,7 +173,7 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_TNV_raise_on_3D_nochannel(self):
         # data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.CAMERA.get(size=(256,100))
         datarr = data.as_array()
         tau = 1.
 

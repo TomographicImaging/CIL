@@ -17,13 +17,14 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import cilacc
-from cil.framework import AcquisitionGeometry
+from cil.framework.labels import AcquisitionType
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 
 import numpy as np
 import ctypes
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -154,6 +155,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def preset_filters(self):
         return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
 
+
     def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
         Set the filter used by the reconstruction.
@@ -254,6 +256,30 @@ class GenericFilteredBackProjection(Reconstructor):
 
         return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order)
 
+
+    def plot_filter(self):
+        """
+        Returns a plot of the filter array.
+
+        Returns
+        -------
+        matplotlib.pyplot
+            A plot of the filter
+        """
+        filter_array = self.get_filter_array()
+        filter_length = 2**self.fft_order
+        freq = fftfreq(filter_length)
+        freq *= 2
+        ind_sorted = np.argsort(freq)
+        plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
+        plt.xlabel('Frequency (rads/pixel)')
+        plt.ylabel('Magnitude')
+        theta = np.linspace(-1, 1, 9, True)
+        plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/4', 'π'])
+        plt.legend()
+        return plt
+
+
     def _calculate_weights(self):
         return NotImplementedError
 
@@ -350,7 +376,7 @@ class FDK(GenericFilteredBackProjection):
         #call parent initialiser
         super().__init__(input, image_geometry, filter, backend='tigre')
 
-        if  input.geometry.geom_type != AcquisitionGeometry.CONE:
+        if not AcquisitionType.CONE & input.geometry.geom_type:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
 
@@ -459,7 +485,7 @@ class FBP(GenericFilteredBackProjection):
         super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
-        if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
+        if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
 
@@ -538,13 +564,11 @@ class FBP(GenericFilteredBackProjection):
         ImageData
             The reconstructed volume. Suppressed if `out` is passed
         """
-
         if verbose:
             print(self)
 
         if self.slices_per_chunk:
-
-            if self.acquisition_geometry.dimension == '2D':
+            if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.system_description == 'advanced':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")

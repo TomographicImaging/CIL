@@ -18,18 +18,21 @@
 
 import unittest
 import numpy
-from cil.framework import DataContainer
-from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 from cil.utilities import dataexample
+from cil.utilities import quality_measures
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor
 import gc
+
+from scipy import constants
+from scipy.fft import ifftshift
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
 
@@ -48,9 +51,8 @@ if has_ipp:
     from cil.processors.cilacc_binner import Binner_IPP
 
 
+@unittest.skipUnless(has_ipp, "Requires IPP libraries")
 class TestBinner_cillacc(unittest.TestCase):
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp(self):
 
         shape_in = [4,12,16,32]
@@ -72,8 +74,6 @@ class TestBinner_cillacc(unittest.TestCase):
         with self.assertRaises(ValueError):
             binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D_data(self):
 
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -103,8 +103,6 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_4D(self):
 
         shape_in = [9,21,40,92]
@@ -136,8 +134,6 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D(self):
 
         shape_in = [1,1,3,3]
@@ -171,9 +167,7 @@ class TestBinner_cillacc(unittest.TestCase):
 
 
 class TestBinner(unittest.TestCase):
-
     def test_set_up_processor(self):
-
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
 
@@ -183,8 +177,14 @@ class TestBinner(unittest.TestCase):
         horizontal_x = range(0,4,4)
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        
+        # check init non-default values
+        proc = Binner(roi=roi,accelerated=False)
+        self.assertTrue(proc._accelerated==False)
+        
         proc = Binner(roi,accelerated=True)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -195,7 +195,7 @@ class TestBinner(unittest.TestCase):
         (horizontal_x.stop - horizontal_x.start)//horizontal_x.step
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -580,21 +580,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -614,21 +614,21 @@ class TestBinner(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -665,7 +665,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test bins a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -696,7 +696,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -731,7 +731,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -811,7 +811,8 @@ class TestSlicer(unittest.TestCase):
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
         proc = Slicer(roi)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -823,7 +824,7 @@ class TestSlicer(unittest.TestCase):
             len(horizontal_x),
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -1066,9 +1067,7 @@ class TestSlicer(unittest.TestCase):
 
                  # slice to single element
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
-
         ]
-
 
         offset_x =0.1*(8-1-1*4)/2
         offset_y =0.2*(16-1-3 * 5)/2
@@ -1199,7 +1198,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test slices a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -1229,7 +1228,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1265,7 +1264,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1351,21 +1350,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1383,21 +1382,21 @@ class TestSlicer(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1429,7 +1428,132 @@ class TestSlicer(unittest.TestCase):
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
 
+class TestCofR_xcorrelation(unittest.TestCase):
+    def setUp(self):
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
 
+        self.angles_list = [numpy.array([590, 0, 2, -310.5, 1]),
+                       numpy.array([0.5, 10, 20, 180, 1]),
+                       numpy.array([-360,-300, -240, -180.5, 0]),
+                       numpy.array([-0.5, -90, -100, -179.5, 1])]
+        
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(self.angles_list[0]).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.ones([len(self.angles_list[0]), 2, 2]))
+        self.data_test = ad
+
+    def test_CofR_xcorrelation_init(self):
+        # test default values are set
+        processor = CofR_xcorrelation()
+        self.assertEqual(processor.slice_index, 'centre')
+        self.assertEqual(processor.projection_index, 0)
+        self.assertEqual(processor.ang_tol, 0.1)
+
+        # test non-default values are set
+        processor = CofR_xcorrelation(11, 12, 13)
+        self.assertEqual(processor.slice_index, 11)
+        self.assertEqual(processor.projection_index, 12)
+        self.assertEqual(processor.ang_tol, 13)
+
+    def test_CofR_xcorrelation_check_input(self):
+        
+        # test default values
+        processor = CofR_xcorrelation()
+        processor.set_input(self.data_DLS)
+        
+        # test there is no error when slice_index is specified with different values in range
+        slice_indices = [0, self.data_DLS.get_dimension_size('vertical')-1]
+        for slice_index in slice_indices:
+            processor = CofR_xcorrelation(slice_index=slice_index)
+            processor.check_input(self.data_DLS)
+
+        # test there is an error when slice index is specified with an un-recognised string, numbers out of range, or list
+        slice_indices = ['a', -10, self.data_DLS.get_dimension_size('vertical'), [0,1]]
+        for slice_index in slice_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(slice_index=slice_index)
+                processor.check_input(self.data_DLS)
+        
+        # test an error is raised passing string or out of range indices to projection index 
+        projection_indices = ['a', [0, 'b'], -1, [self.data_DLS.get_dimension_size('angle'), 0]]
+        for projection_index in projection_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(projection_index=projection_index)
+                processor.check_input(self.data_DLS)
+
+        # test there is no error when an angle can be found 180 degrees +/- tolerance from the projection_index,
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+        
+        # test there is an error when no angle can be found 180 degrees +/- tolerance from the projection_index  
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=0.1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is no error when projection indices are specified as list 180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,3], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+
+        # test there is no error when projection indices are specified as tuple 180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=(0,3), ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+
+        # test there is an error when projection indices are specified as >180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is an error when more than 2 projection indices are specified
+        processor = CofR_xcorrelation(projection_index=[0,3,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+    def test_CofR_xcorrelation_return_180_index(self):
+        # test finding angle 180 degrees apart to correlate with
+        for angles in self.angles_list:
+            index_180 = CofR_xcorrelation._return_180_index(angles, 0)
+            self.assertEqual(angles[3], angles[index_180])
+
+    def test_CofR_xcorrelation_process(self):
+        # test processor returns expected output with DLS data
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(self.data_DLS)
+        data_out = processor.process()
+        self.assertAlmostEqual(6.33, data_out.geometry.config.system.rotation_axis.position[0],places=2) 
+        
+        # test processor returns expected output with DLS data using out
+        data = self.data_DLS
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(data)
+        processor.process(out = data)
+        self.assertAlmostEqual(6.33, data.geometry.config.system.rotation_axis.position[0],places=2) 
+
+        # test processor returns expected (but less accurate) output with DLS data with limited angles
+        data_limited = Slicer(roi={'angle': ((abs(self.data_DLS.geometry.angles+86)).argmin(), (abs(self.data_DLS.geometry.angles-92)).argmin(), 1)})(self.data_DLS)
+        processor = CofR_xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=5)
+        processor.set_input(data_limited) 
+        processor.get_output(out=data_limited)
+        self.assertAlmostEqual(6.33, data_limited.geometry.config.system.rotation_axis.position[0],places=0) 
+
+        # test there is an error when the target angle is not within tolerance
+        processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
+        with self.assertRaises(ValueError):
+            processor.set_input(data_limited)           
+    
 class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def setUp(self):
@@ -1437,7 +1561,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_CofR_xcorrelation(self):
+    def test_CofR_xcorrelation(self):      
 
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
@@ -1449,6 +1573,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
 
+        
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
 
@@ -1552,7 +1677,7 @@ class TestPaddder(unittest.TestCase):
         self.data_test = ImageData(arr_in, True, ig)
 
 
-    def test_parse_input(self):
+    def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
@@ -1564,7 +1689,8 @@ class TestPaddder(unittest.TestCase):
 
         # check inputs
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(list(data.dimension_labels), proc._labels_in)
         self.assertListEqual(list(data.shape), proc._shape_in)
 
@@ -1585,21 +1711,24 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_width set-up
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=(1,2), pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_tuple, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_tuple, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dict_custom = [(0,0) if x == (0,0) else (0.1,0.1)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict_custom, proc._pad_values_param)
@@ -1608,14 +1737,16 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_value set-up
         proc = Padder('constant', pad_width=2, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_tuple, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=2, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_width_dict_custom = [(0,0) if x == (0,0) else (2,2)  for x in gold_value_dict]
         gold_shape_out_dict_custom = numpy.array(data.shape) + [4,4,0,4]
         self.assertListEqual(gold_width_dict_custom, proc._pad_width_param)
@@ -1624,7 +1755,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict_custom, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dictionary_custom = [(0,0) if x == (0,0) else (0.1,0.2)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dictionary_custom, proc._pad_values_param)
@@ -1632,7 +1764,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
@@ -1641,7 +1774,8 @@ class TestPaddder(unittest.TestCase):
         proc = Padder('constant', pad_width=pad_width, pad_values={'horizontal_x':(0.5,0.6)})
         # raise an error as not all axes values defined
         with self.assertRaises(ValueError):
-            proc._parse_input(data)
+            proc.set_input(data)
+            proc._set_up()
 
 
     def test_process_acquisition_geometry(self):
@@ -1652,7 +1786,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag_padded,
+        self.assertEqual(geometry_padded, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
 
 
@@ -1666,7 +1800,7 @@ class TestPaddder(unittest.TestCase):
             0.,   90.,  180.,  270.,\
             360., 450.,  540., 630., 720.]
 
-        self.assertEquals(geometry_padded, geometry_gold,
+        self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
@@ -1677,7 +1811,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag2_padded,
+        self.assertEqual(geometry_padded, self.ag2_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
 
 
@@ -1689,7 +1823,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_image_geometry()
 
-        self.assertEquals(geometry_padded, self.ig_padded,
+        self.assertEqual(geometry_padded, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
 
 
@@ -1728,21 +1862,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ag_padded,
+        self.assertEqual(geometry_out, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
@@ -1762,21 +1896,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ig_padded,
+        self.assertEqual(geometry_out, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 
@@ -1999,7 +2133,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_pad_ad_full(self):
+    def test_pad_ad_full_tigre(self):
         """
         This test pads a acquisition data asymmetrically.
         It then compares the FBP of the padded and unpadded data on the same ImageGeometry.
@@ -2041,7 +2175,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_pad_id_full(self):
+    def test_pad_id_full_astra(self):
         """
         This test pads an image data asymmetrically.
         It then compares the forward projection of the padded and unpadded phantom on the same AcquisitionGeometry.
@@ -2640,9 +2774,316 @@ class TestMasker(unittest.TestCase):
         data_test = data.copy().as_array()
         data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
         data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
 
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
 
+class TestPaganinProcessor(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel([128,128],0.1)\
+            .set_channels(4)
+
+        self.data_multichannel = ag.allocate('random')
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_PaganinProcessor_init(self):
+        # test default values are initialised
+        processor = PaganinProcessor()
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'full_retrieval', 
+                          'filter_type', 'pad', 'return_units']
+        test_value = [40000, 1e2*(constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 
+                      1, 1e-2, True, 'paganin_method', 0, 'cm']
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = PaganinProcessor(1, 2, 3, 'keV', False, 'string', 19, 'mm')
+        test_value = [3, 1e3*(constants.h*constants.speed_of_light)/(3000*constants.electron_volt), 1, 2, False, 'string', 19, 'mm']
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        with self.assertRaises(ValueError):
+            processor = PaganinProcessor(return_units='string')
+
+    def test_PaganinProcessor_energy_to_wavelength(self):
+        processor = PaganinProcessor()
+        wavelength = processor._energy_to_wavelength(10, 'meV', 'mm')
+        self.assertAlmostEqual(wavelength, 0.12398419)
+
+
+    def test_PaganinProcessor_check_input(self):
+        processor = PaganinProcessor()
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel]:
+            processor.set_input(data)
+            data2 = processor.get_input()
+            numpy.testing.assert_allclose(data2.as_array(), data.as_array())
+
+            # check there is an error when the wrong data type is input
+            with self.assertRaises(TypeError):
+                processor.set_input(data.geometry)
+
+            with self.assertRaises(TypeError):
+                processor.set_input(data.as_array())
+
+            dc = DataContainer(data.as_array())
+            with self.assertRaises(TypeError):
+                processor.set_input(dc)
+
+
+    def test_PaganinProcessor_set_geometry(self):
+        processor = PaganinProcessor()
+        data = self.data_cone
+        # check there is an error when the data geometry does not have units
+        processor.set_input(data)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(data.geometry, None)
+        
+        # check there is no error when the geometry unit is provided
+        data.geometry.config.units = 'um'
+        processor._set_geometry(data.geometry, None)
+        multiplier = 1e-4 # convert um to return units cm
+        
+        # check the processor finds the correct geometry values, scaled by the units
+        self.assertAlmostEqual(processor.propagation_distance, data.geometry.dist_center_detector*multiplier, 
+                         msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, data.geometry.magnification, 
+                         msg=self.error_message(processor, 'magnification'))
+        self.assertAlmostEqual(processor.pixel_size, data.geometry.pixel_size_h*multiplier, 
+                         msg=self.error_message(processor, 'pixel_size'))
+                
+        # check there is an error when the data geometry does not have propagation distance, and it is not provided in override geometry
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, None)
+        
+        # check override_geometry
+        for data in [self.data_parallel, self.data_cone, self.data_multichannel]:
+            processor.set_input(data)
+            processor._set_geometry(self.data_cone.geometry, override_geometry={'propagation_distance':1,'magnification':2, 'pixel_size':3})
+            
+            self.assertEqual(processor.propagation_distance, 1, 
+                            msg=self.error_message(processor, 'propagation_distance'))
+            self.assertEqual(processor.magnification, 2, 
+                            msg=self.error_message(processor, 'magnification'))
+            self.assertEqual(processor.pixel_size, 3, 
+                            msg=self.error_message(processor, 'pixel_size'))
+        
+        # check the processor goes back to values from geometry if the geometry over-ride is not passed
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        self.assertAlmostEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector*multiplier, 
+                        msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, self.data_cone.geometry.magnification, 
+                        msg=self.error_message(processor, 'magnification'))
+        self.assertAlmostEqual(processor.pixel_size, self.data_cone.geometry.pixel_size_h*multiplier, 
+                        msg=self.error_message(processor, 'pixel_size'))
+        
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry)
+
+        # check there is an error when the pixel_size_h and pixel_size_v are different
+        self.data_parallel.geometry.pixel_size_h = 9
+        self.data_parallel.geometry.pixel_size_h = 10
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, override_geometry={'propagation_distance':1})
+
+    def test_PaganinProcessor_create_filter(self):
+        image = self.data_cone.get_slice(angle=0).as_array()
+        Nx, Ny = image.shape
+        
+        delta = 1
+        beta = 2
+        energy = 3
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, return_units='m')
+
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+
+        self.data_cone.geometry.config.units='m'
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
+        
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        
+        kx,ky = numpy.meshgrid( 
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            sparse=False, 
+            indexing='ij'
+            )
+        
+        # check default filter is created with paganin_method
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+        # check generalised_paganin_method
+        processor = PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='generalised_paganin_method', return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
+        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+        # check unknown method raises error
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='unknown_method', return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        with self.assertRaises(ValueError):
+            processor._create_filter()
+
+        # check parameter override 
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        delta = 100
+        beta=200
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter(override_filter={'delta':delta, 'beta':beta})
+        
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+        
+        # test specifying alpha, delta and beta
+        delta = 12
+        beta = 13
+        alpha = 14
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        with self.assertLogs(level='WARN') as log:
+            processor._create_filter(override_filter = {'delta':delta, 'beta':beta, 'alpha':alpha})
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+    def test_PaganinProcessor(self):
+
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength)        
+
+        data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
+        for data in data_array:
+            data.geometry.config.units = 'm'
+            data_abs = -(1/mu)*numpy.log(data)
+            processor = PaganinProcessor(full_retrieval=True, return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False)
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with GPM
+            processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method', return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, filter_type='generalised_paganin_method')
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with padding
+            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, pad=10)
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test in-line
+            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')(data, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
+            filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
+
+            # check with different data order
+            data.reorder('astra')
+            data_abs = -(1/mu)*numpy.log(data)
+            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
+            processor.set_input(data)
+            with self.assertLogs(level='WARN') as log:
+                thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, pad=10)
+            processor.set_input(data)
+            with self.assertLogs(level='WARN') as log:
+                filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+            
+            # check with different channel data order
+            if data.geometry.channels>1:
+                data.reorder(('vertical','channel','horizontal','angle'))
+                data_abs = -(1/mu)*numpy.log(data)
+                processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
+                processor.set_input(data)
+                with self.assertLogs(level='WARN') as log:
+                    thickness = processor.get_output(override_geometry={'propagation_distance':1})
+                self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+                processor = PaganinProcessor(full_retrieval=False, pad=10)
+                processor.set_input(data)
+                with self.assertLogs(level='WARN') as log:
+                    filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+                self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+    def test_PaganinProcessor_2D(self):
+        self.data_parallel.geometry.config.units = 'm'
+        data_slice = self.data_parallel.get_slice(vertical=10)
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data_slice)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data_slice)
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+        # check with different data order
+        data_slice.reorder(('horizontal','angle'))
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data_slice)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data_slice)
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
 
 if __name__ == "__main__":

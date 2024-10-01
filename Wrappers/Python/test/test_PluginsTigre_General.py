@@ -17,8 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from cil.framework import AcquisitionGeometry
-from cil.framework.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
 from cil.utilities.display import show2D
 from cil.utilities import dataexample
@@ -275,9 +274,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
 
-class TestMechanics(unittest.TestCase):
-
-    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class TestMechanics_tigre(unittest.TestCase):
     def setUp(self):
         self.ag = AcquisitionGeometry.create_Cone2D([0,-500],[0,500]).set_angles([0]).set_panel(5,1)
 
@@ -322,7 +320,6 @@ class TestTIGREBlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlo
         self.data = data.get_slice(vertical='centre')
         ig = self.data.geometry.get_ImageGeometry()
         self.datasplit = self.data.partition(10, 'sequential')
-
 
         K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)

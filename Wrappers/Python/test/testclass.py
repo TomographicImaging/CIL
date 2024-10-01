@@ -62,7 +62,7 @@ class CCPiTestClass(unittest.TestCase):
 
 
     def assertDataArraysInContainerAllClose(self, container1, container2, rtol=1e-07, msg=None):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        self.assertTrue(issubclass(container1.__class__, container2.__class__), msg=msg)
         if isinstance(container1, BlockDataContainer):
             for col in range(container1.shape[0]):
                 if issubclass(container1.get_item(col).__class__, DataContainer):
@@ -76,3 +76,37 @@ class CCPiTestClass(unittest.TestCase):
                     self.assertDataArraysInContainerAllClose(container1.get_item(col),container2.get_item(col), rtol=rtol,  msg=msg)
         else:
             np.testing.assert_allclose(container1.as_array(), container2.as_array(), rtol=rtol, err_msg=msg)
+
+    def assertDataContainerAllClose(self, container1, container2, rtol=1e-07, msg=None, strict=False):
+        '''
+        Test to check if two DataContainers are close, by checking
+        - they are the same class
+        - they have arrays that are all close
+        - if they have geometry, the geometries are equal
+        - and if strict=True, their data type is the same
+        
+        Parameters
+        ----------
+        container1 : DataContainer
+            The first DataContainer to compare.
+        container2 : DataContainer
+            The second DataContainer to compare.
+        rtol : float, optional
+            The relative tolerance for the array comparison
+        msg : string, optional
+            The error message to be printed in case of failure
+        strict : bool, optional
+            If True, raises an error if the data type in the DataContainers
+            is not equal
+        '''
+        
+        if not isinstance(container1, container2.__class__):
+            raise TypeError("container2 is not the same class as container1")
+        
+        np.testing.assert_allclose(container1.array, container2.array, rtol=rtol, err_msg=msg)
+
+        if hasattr(container1, "geometry"):
+            np.testing.assert_equal(container1.geometry, container2.geometry, err_msg=msg)
+        
+        if strict:
+            np.testing.assert_equal(container1.dtype, container2.dtype, err_msg=msg)

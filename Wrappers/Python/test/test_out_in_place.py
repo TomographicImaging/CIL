@@ -111,6 +111,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (WeightedL2NormSquared(weight=b_ig), ig),
             (TotalVariation(backend='c', warm_start=False, max_iteration=100), ig),
             (TotalVariation(backend='numpy', warm_start=False, max_iteration=100), ig),
+            (TotalVariation(backend='numpy', warm_start=False, max_iteration=100, strong_convexity_constant=0.5), ig),
             (OperatorCompositionFunction(L2NormSquared(), A), ig),
             (MixedL21Norm(), bg),
             (SmoothMixedL21Norm(epsilon=0.3), bg),

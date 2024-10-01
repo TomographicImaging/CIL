@@ -28,40 +28,32 @@ class FluxNormaliser(Processor):
     r'''
     Flux normalisation based on float or region of interest
 
-    This processor reads in an AcquisitionData and normalises it based on
-    a float or array of float values, or a region of interest.
-    
-    The normalised image :math:`I_{norm}` is calculated from the original image
-    :math:`I` by
-
-    .. math:: I_{norm} = I\frac{n}{F}
-
-    where :math:`F` is the flux and :math:`n` is the norm_value
+    This processor reads in an AcquisitionData and normalises it by flux from
+    a float or array of float values, or the mean flux in a region of interest.
 
     Parameters:
     -----------
     flux: float or list of floats (optional)
         The value to divide the image by. If flux is a list it must have length 
-        equal to the number of angles in the dataset. If flux=None, calculate
+        equal to the number of projections in the dataset. If flux=None, calculate
         flux from the roi, default is None.
     
     roi: dict (optional)
         Dictionary describing the region of interest containing the background
-        in the image. The roi is specified as `{‘axis_name1’:(start,stop), 
-        ‘axis_name2’:(start,stop)}`, where the key is the axis name to calculate
-        the flux from. If the dataset has an axis which is not specified in the 
-        roi dictionary, all data from that axis will be used in the calculation.
-        The image is divided by the mean value in the roi. If None, specify flux 
-        directly, default is None.
+        in the image. The roi is specified as `{'axis_name1':(start,stop), 
+        'axis_name2':(start,stop)}`, where the key is the axis name 'vertical'
+        and/ or 'horizontal'. If an axis is not specified in the roi dictionary, 
+        the full range will be used, default is None.
 
-    norm_value: float (optional)
-        The value to multiply the image by. If None, the mean flux value will be used,
-         either the flux provided or the mean value in the roi across all 
-         projections, default is None.
+    target: string or float
+        The value to scale the normalised data with. If float, the data is scaled 
+        to the float value. If string 'mean' the data is scaled to the mean value 
+        of the input flux or flux in the roi, if 'first' the data is scaled to 
+        the first input flux value or the flux in the roi of the first projection.
 
     Returns:
     --------
-    Output: AcquisitionData normalised by flux or mean intensity in roi
+    Output: AcquisitionData normalised by flux
 
     Example
     -------
@@ -80,7 +72,7 @@ class FluxNormaliser(Processor):
     Example
     -------
     >>> from cil.processors import FluxNormaliser
-    >>> processor = FluxNormaliser(flux=10)
+    >>> processor = FluxNormaliser(roi=(roi={'horizontal':(5, 15))
     >>> processor.set_input(data)
     >>> data_norm = processor.get_output()
 
@@ -91,13 +83,19 @@ class FluxNormaliser(Processor):
     in the roi dictionary
     '''
 
-    def __init__(self, flux=None, roi=None, norm_value=None):
+    def __init__(self, flux=None, roi=None, target=None):
+            
+            if roi is not None and flux is not None:
+                raise ValueError("Please specify either flux or roi, not both")
+            if roi is None and flux is None:
+                raise ValueError("Please specify either flux or roi, found None")
+            
             kwargs = {
                     'flux'  : flux,
                     'roi' : roi,
                     'roi_slice' : None,
                     'roi_axes' : None,
-                    'norm_value' : norm_value
+                    'target' : target
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
@@ -106,81 +104,80 @@ class FluxNormaliser(Processor):
         if not (type(dataset), AcquisitionData):
             raise TypeError("Expected AcquistionData, found {}"
                             .format(type(dataset)))
+        
+        return True
 
-        if self.roi is not None:
-            if self.flux is not None:
-                raise ValueError("Please specify either flux or roi, not both")
 
-            else:
-                if isinstance(self.roi, dict):
-                    if not all (r in dataset.dimension_labels for r in self.roi):
-                        raise ValueError("roi labels must be in the dataset dimension_labels, found {}"
-                                        .format(str(self.roi)))
+    def _calculate_flux(self):
+        dataset = self.get_input()
+        # convert flux to float32
 
-                    slc = [slice(None)]*len(dataset.shape)
-                    axes=[]
+        if self.flux is None:
 
-                    for r in self.roi:
-                        # only allow roi to be specified in horizontal and vertical
-                        if (r != 'horizontal' and r != 'vertical'):
-                            raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
-                                .format(str(r)))
-                    
-                    dimension_label_list = list(dataset.dimension_labels)
-                    # loop through all dimensions in the dataset apart from angle
-                    if 'angle' in dimension_label_list:
-                        dimension_label_list.remove('angle')
+            if isinstance(self.roi, dict):
+                if not all (r in dataset.dimension_labels for r in self.roi):
+                    raise ValueError("roi labels must be in the dataset dimension_labels, found {}"
+                                    .format(str(self.roi)))
 
-                    for d in dimension_label_list:
-                        # check the dimension is in the user specified roi
-                        if d in self.roi:
-                            # check indices are ints
-                            if not all(isinstance(i, int) for i in self.roi[d]):
-                                raise TypeError("roi values must be int, found {} and {}"
-                                .format(str(type(self.roi[d][0])), str(type(self.roi[d][1]))))
-                            # check indices are in range
-                            elif (self.roi[d][0] >= self.roi[d][1]) or (self.roi[d][0] < 0) or self.roi[d][1] > dataset.get_dimension_size(d):
-                                raise ValueError("roi values must be start > stop and between 0 and {}, found start={} and stop={} for direction '{}'"
-                                .format(str(dataset.get_dimension_size(d)), str(self.roi[d][0]), str(self.roi[d][1]), d ))
-                            # create slice
-                            else:
-                                ax = dataset.get_dimension_axis(d)
-                                slc[ax] = slice(self.roi[d][0], self.roi[d][1])
-                                axes.append(ax)
-                            
-                        # if the dimension is not in roi, average across the whole dimension
+                slc = [slice(None)]*len(dataset.shape)
+                axes=[]
+
+                for r in self.roi:
+                    # only allow roi to be specified in horizontal and vertical
+                    if (r != 'horizontal' and r != 'vertical'):
+                        raise ValueError("roi must be 'horizontal' or 'vertical', found '{}'"
+                            .format(str(r)))
+                
+                dimension_label_list = list(self.roi.keys())
+
+                for d in dimension_label_list:
+                    # check the dimension is in the user specified roi
+                    if d in self.roi:
+                        # check indices are ints
+                        if not all(isinstance(i, int) for i in self.roi[d]):
+                            raise TypeError("roi values must be int, found {} and {}"
+                            .format(str(type(self.roi[d][0])), str(type(self.roi[d][1]))))
+                        # check indices are in range
+                        elif (self.roi[d][0] >= self.roi[d][1]) or (self.roi[d][0] < 0) or self.roi[d][1] > dataset.get_dimension_size(d):
+                            raise ValueError("roi values must be start > stop and between 0 and {}, found start={} and stop={} for direction '{}'"
+                            .format(str(dataset.get_dimension_size(d)), str(self.roi[d][0]), str(self.roi[d][1]), d ))
+                        # create slice
                         else:
                             ax = dataset.get_dimension_axis(d)
+                            slc[ax] = slice(self.roi[d][0], self.roi[d][1])
                             axes.append(ax)
-                            self.roi.update({d:(0,dataset.get_dimension_size(d))})
-
-                    self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
-                    
-                    dataset_range = numpy.max(dataset.array, axis=tuple(axes)) - numpy.min(dataset.array, axis=tuple(axes)) 
-
-                    if (numpy.mean(self.flux) > dataset.mean()):
-                        if numpy.mean(self.flux/dataset_range) < 0.9:
-                            log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
+                        
+                    # if the dimension is not in roi, average across the whole dimension
                     else:
-                        if numpy.mean(self.flux/dataset_range) > 0.1:
-                            log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
+                        ax = dataset.get_dimension_axis(d)
+                        axes.append(ax)
+                        self.roi.update({d:(0,dataset.get_dimension_size(d))})
 
-                    self.roi_slice = slc
-                    self.roi_axes = axes
-                    
+                self.flux = numpy.mean(dataset.array[tuple(slc)], axis=tuple(axes))
+                
+                dataset_range = numpy.max(dataset.array, axis=tuple(axes)) - numpy.min(dataset.array, axis=tuple(axes)) 
+
+                if (numpy.mean(self.flux) > dataset.mean()):
+                    if numpy.mean(self.flux/dataset_range) < 0.9:
+                        log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
                 else:
-                    raise TypeError("roi must be a dictionary, found {}"
-                    .format(str(type(self.roi))))
-        else:
-            if self.flux is None:
-                raise ValueError("Please specify flux or roi")
+                    if numpy.mean(self.flux/dataset_range) > 0.1:
+                        log.warning('Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background')
+
+                self.roi_slice = slc
+                self.roi_axes = axes
+                
+            else:
+                raise TypeError("roi must be a dictionary, found {}"
+                .format(str(type(self.roi))))
 
         flux_size = (numpy.shape(self.flux))
         if len(flux_size) > 0:
-            data_size = numpy.shape(dataset.geometry.angles)
+            # check this
+            data_size = numpy.shape(dataset.geometry.angles)*numpy.shape(dataset.geometry.channels)
             if data_size != flux_size:
                 raise ValueError("Flux must be a scalar or array with length \
-                                    \n = data.geometry.angles, found {} and {}"
+                                    \n = number of projections, found {} and {}"
                                     .format(flux_size, data_size))
             if numpy.any(self.flux==0):
                 raise ValueError('Flux value can\'t be 0, provide a different flux\
@@ -190,10 +187,15 @@ class FluxNormaliser(Processor):
                 raise ValueError('Flux value can\'t be 0, provide a different flux\
                                   or region of interest with non-zero values')
             
+        self.flux = numpy.float32(self.flux)
+            
         if self.norm_value is None:
             self.norm_value = numpy.mean(self.flux)
             
-        return True
+    # def _calculate_target():
+        # if isinstance(self.target, float):
+            
+
 
     def preview_configuration(self, angle=None, channel=None, log=False):
         '''
@@ -219,6 +221,7 @@ class FluxNormaliser(Processor):
         if self.roi_slice is None:
             raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
         else:
+            self._calculate_flux()
             data = self.get_input()
             
             min = numpy.min(data.array[tuple(self.roi_slice)], axis=tuple(self.roi_axes))
@@ -255,7 +258,7 @@ class FluxNormaliser(Processor):
                 plt.plot(data.geometry.angles, min,'--k', label='Minimum')
                 plt.plot(data.geometry.angles, max,'--k', label='Maximum')
             plt.legend()
-            plt.xlabel('Angle')
+            plt.xlabel('angle')
             plt.ylabel('Intensity in roi')
             plt.grid()
             plt.tight_layout()
@@ -331,7 +334,7 @@ class FluxNormaliser(Processor):
         plt.ylabel(v)
 
     def process(self, out=None):
-        
+        self._calculate_flux()
         data = self.get_input()
 
         if out is None:

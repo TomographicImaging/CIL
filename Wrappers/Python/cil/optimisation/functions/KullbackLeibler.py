@@ -343,9 +343,9 @@ if has_numba:
     @njit(parallel=True)
     def kl_div(x, y, eta):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        has_inf = numpy.zeros(get_num_threads(), dtype=numpy.int8)
+        has_inf = 0
         for i in prange(x.size):
-            if has_inf[get_thread_id()] == 0:
+            if has_inf == 0:
                 X = x.flat[i]
                 Y = y.flat[i] + eta.flat[i]
                 if X > 0 and Y > 0:
@@ -357,15 +357,15 @@ if has_numba:
                 else:
                     # out.flat[i] = numpy.inf
                     accumulator[get_thread_id()] = numpy.inf
-                    has_inf[get_thread_id()] = 1
+                    has_inf = 1
         return sum(accumulator)
     
     @njit(parallel=True)
     def kl_div_mask(x, y, eta, mask):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        has_inf = numpy.zeros(get_num_threads(), dtype=numpy.int8)
+        has_inf = 0
         for i in prange(x.size):
-            if has_inf[get_thread_id()] == 0:
+            if has_inf == 0:
                 if mask.flat[i] > 0:
                     X = x.flat[i]
                     Y = y.flat[i] + eta.flat[i]
@@ -378,7 +378,7 @@ if has_numba:
                     else:
                         # out.flat[i] = numpy.inf
                         accumulator[get_thread_id()] = numpy.inf
-                        has_inf[get_thread_id()] = 1
+                        has_inf = 1
         return sum(accumulator)
 
     # convex conjugate

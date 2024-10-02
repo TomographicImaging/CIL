@@ -28,6 +28,7 @@
     - Make Binner accept accelerated=False (#1887)
     - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
     - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
+    - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
 

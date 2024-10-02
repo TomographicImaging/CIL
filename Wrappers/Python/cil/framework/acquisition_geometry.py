@@ -2095,7 +2095,8 @@ class AcquisitionGeometry(object):
 
         if isinstance(other, self.__class__) \
             and self.config == other.config \
-            and self.dtype == other.dtype:
+            and self.dtype == other.dtype \
+            and self.dimension_labels == other.dimension_labels:
             return True
         return False
 

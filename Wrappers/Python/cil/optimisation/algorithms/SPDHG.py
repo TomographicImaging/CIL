@@ -153,26 +153,23 @@ class SPDHG(Algorithm):
         self._ndual_subsets = len(self.operator)
         self._sampler = sampler
 
-        #Set up the _prob_weights. In preference order they are taken from: the sampler, the prob_weights argument, the deprecated prob argument or set as defualt. 
-        self._prob_weights = getattr(self._sampler, 'prob_weights', None) # from the sampler
-        if self._prob_weights is None: #from prob_weights
-            self._prob_weights = prob_weights
-        elif prob_weights is not None:
-            raise ValueError(
-                    ' You passed a `prob_weights` argument and a sampler with attribute `prob_weights`, please remove the `prob_weights` argument.')
-
-        self._deprecated_prob(deprecated_kwargs) #from prob argument 
-
-        if self._prob_weights is None: #set from default 
+        # Set up sampler and prob weights from deprecated "prob" argument
+        self._deprecated_set_prob(deprecated_kwargs, prob_weights, sampler) 
+        
+        
+        self._prob_weights = getattr(self._sampler, 'prob_weights', prob_weights) 
+        if self._prob_weights is None: 
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
+        
+        if  prob_weights is not None and self._prob_weights != prob_weights:
+                    raise ValueError(' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
 
-        #Set the sampler 
         if self._sampler is None:
             self._sampler = Sampler.random_with_replacement(
                 len(operator), prob=self._prob_weights)
 
         #Set the norms of the operators
-        self._deprecated_norms(deprecated_kwargs) 
+        self._deprecated_set_norms(deprecated_kwargs) 
         self._norms = operator.get_norms_as_list()
         #Check for other kwargs
         self._deprecated_else(deprecated_kwargs)
@@ -201,7 +198,7 @@ class SPDHG(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-    def _deprecated_prob(self, deprecated_kwargs):
+    def _deprecated_set_prob(self, deprecated_kwargs, prob_weights, sampler):
         """
         Handle deprecated keyword arguments for backward compatibility.
 
@@ -209,6 +206,10 @@ class SPDHG(Algorithm):
         ----------
         deprecated_kwargs : dict
             Dictionary of keyword arguments.
+        prob_weights : list of floats
+            List of probabilities for each operator.
+        sampler : Sampler           
+            Sampler class for selecting the next index for the SPDHG update.
 
         Notes
         -----
@@ -218,17 +219,19 @@ class SPDHG(Algorithm):
         prob = deprecated_kwargs.pop('prob', None)
 
         if prob is not None:
-            if self._prob_weights is None:
+            if (prob_weights is None) and (sampler is None):
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
                 self._prob_weights = prob
+                self._sampler = Sampler.random_with_replacement(
+                    len(self.operator), prob=prob)
             else:
 
                 raise ValueError(
-                    '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler with a `prob_weights` property. Please give only one of the three. ')
+                    '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.')
 
 
 
-    def _deprecated_norms(self, deprecated_kwargs):
+    def _deprecated_set_norms(self, deprecated_kwargs):
         """
         Handle deprecated keyword arguments for backward compatibility.
 

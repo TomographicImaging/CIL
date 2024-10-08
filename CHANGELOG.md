@@ -28,8 +28,10 @@
     - Make Binner accept accelerated=False (#1887)
     - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
     - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
+    - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
+     
 
 * 24.1.0
   - New Features:

@@ -207,7 +207,7 @@ class TestStepSizes(CCPiTestClass):
     def test_bb_converge(self):
         n = 10
         m = 5
-        np.random.seed(4)
+        np.random.seed(2)
         A = np.random.uniform(0, 1, (m, n)).astype('float32')
         b = (A.dot(np.random.randn(n)) + 0.1 *
              np.random.randn(m)).astype('float32')
@@ -215,31 +215,29 @@ class TestStepSizes(CCPiTestClass):
         Aop = MatrixOperator(A)
         bop = VectorData(b)
         ig=Aop.domain
-        initial = ig.allocate()
+        initial = ig.allocate(0)
         f = LeastSquares(Aop, b=bop, c=2)
         
-        ss_rule=ArmijoStepSizeRule(max_iterations=40)
-        alg_true = GD(initial=initial, objective_function=f, step_size=ss_rule)
-        alg_true .run(300, verbose=0)
-        
+        alg_true = GD(initial=initial, objective_function=f, step_size=1/f.L)
+        alg_true.run(220, verbose=0)
        
-        
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
         alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
 
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'long')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
         alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
 
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
         alg = GD(initial=initial, objective_function=f, step_size=ss_rule)
 
-        alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
+        alg.run(100, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
         

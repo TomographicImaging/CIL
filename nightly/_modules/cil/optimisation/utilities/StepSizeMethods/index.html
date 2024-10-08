@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 24.1.1.dev115+gb91c0ebd documentation</title>
+    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 24.1.1.dev116+g0181b3fd documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
 
-    <script src="../../../../../_static/documentation_options.js?v=721fc42c"></script>
+    <script src="../../../../../_static/documentation_options.js?v=43cef8ff"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,14 +49,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev115+gb91c0ebd';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev116+g0181b3fd';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.1.1.dev115+gb91c0ebd" />
+  <meta name="docsearch:version" content="24.1.1.dev116+g0181b3fd" />
   </head>
   
   
@@ -484,6 +484,9 @@
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="StepSizeRule">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.StepSizeRule">[docs]</a>
@@ -561,6 +564,9 @@
 <span class="sd">        The amount the step_size is reduced if the criterion is not met</span>
 <span class="sd">    max_iterations: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))</span>
 <span class="sd">        The maximum number of iterations to find a suitable step size </span>
+<span class="sd">    warmstart: Boolean, default is True</span>
+<span class="sd">        If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`. </span>
+<span class="sd">        In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial. </span>
 
 <span class="sd">    Reference</span>
 <span class="sd">    ------------</span>
@@ -570,14 +576,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warmstart</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the step size rule </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Can be removed when alpha and beta are deprecated in GD</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span> <span class="o">=</span> <span class="mf">1e6</span> 
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span> 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Can be removed when alpha and beta are deprecated in GD</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -585,6 +591,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="o">=</span> <span class="n">max_iterations</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">warmstart</span><span class="o">=</span><span class="n">warmstart</span>
 
 <div class="viewcode-block" id="ArmijoStepSizeRule.get_step_size">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule.get_step_size">[docs]</a>
@@ -598,26 +606,33 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span>
-        <span class="n">f_x</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmstart</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span>
+        
+        <span class="n">f_x</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">calculate_objective_function_at_point</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
+        
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting Armijo backtracking with initial step size: </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+        
         <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">:</span>
 
             <span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
             <span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
 
-            <span class="n">f_x_a</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
+            <span class="n">f_x_a</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">calculate_objective_function_at_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span><span class="p">)</span>
             <span class="n">sqnorm</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">f_x_a</span> <span class="o">-</span> <span class="n">f_x</span> <span class="o">&lt;=</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="n">sqnorm</span><span class="p">:</span>
                 <span class="k">break</span>
             <span class="n">k</span> <span class="o">+=</span> <span class="mf">1.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span>
+        
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Armijo rule took </span><span class="si">%d</span><span class="s2"> iterations to find step size&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s1">&#39;Could not find a proper step_size in </span><span class="si">{}</span><span class="s1"> loops. Consider increasing alpha or max_iterations.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">))</span>
+        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span></div>
 </div>
 

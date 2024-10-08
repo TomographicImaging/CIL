@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.1.1.dev115+gb91c0ebd documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.1.1.dev116+g0181b3fd documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
 
-    <script src="../_static/documentation_options.js?v=721fc42c"></script>
+    <script src="../_static/documentation_options.js?v=43cef8ff"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev115+gb91c0ebd';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev116+g0181b3fd';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -61,7 +61,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.1.1.dev115+gb91c0ebd" />
+  <meta name="docsearch:version" content="24.1.1.dev116+g0181b3fd" />
   </head>
   
   
@@ -833,6 +833,19 @@ print to screen of the status of the optimisation.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.calculate_objective_function_at_point">
+<span class="sig-name descname"><span class="pre">calculate_objective_function_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/GD/#GD.calculate_objective_function_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD.calculate_objective_function_at_point" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the objective at a given point x</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.get_last_loss">
 <span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.GD.get_last_loss" title="Link to this definition">#</a></dt>
 <dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
@@ -1527,6 +1540,19 @@ is guaranteed if</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.calculate_objective_function_at_point">
+<span class="sig-name descname"><span class="pre">calculate_objective_function_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA.calculate_objective_function_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.calculate_objective_function_at_point" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the objective at a given point x</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__delattr__">
 <span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__delattr__" title="Link to this definition">#</a></dt>
 <dd><p>Implement delattr(self, name).</p>
@@ -2036,6 +2062,19 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__weakref__" title="Link to this definition">#</a></dt>
 <dd><p>list of weak references to the object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.calculate_objective_function_at_point">
+<span class="sig-name descname"><span class="pre">calculate_objective_function_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.calculate_objective_function_at_point" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the objective at a given point x</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -9060,7 +9099,7 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.StepSizeMethods.</span></span><span class="sig-name descname"><span class="pre">ArmijoStepSizeRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/StepSizeMethods/#ArmijoStepSizeRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.StepSizeMethods.</span></span><span class="sig-name descname"><span class="pre">ArmijoStepSizeRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/StepSizeMethods/#ArmijoStepSizeRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule" title="Link to this definition">#</a></dt>
 <dd><p>Applies the Armijo rule to calculate the step size (step_size).</p>
 <p>The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (<cite>alpha</cite>). The step_size is found by reducing the step size (by a factor <cite>beta</cite>) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (<cite>max_iterations</cite>) the while loop is run.</p>
 <dl class="field-list simple">
@@ -9069,6 +9108,8 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 <li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em><em>, </em><em>default=1e6</em>) – The starting point for the step size iterations</p></li>
 <li><p><strong>beta</strong> (<em>float between 0 and 1</em><em>, </em><em>optional</em><em>, </em><em>default=0.5</em>) – The amount the step_size is reduced if the criterion is not met</p></li>
 <li><p><strong>max_iterations</strong> (<em>integer</em><em>, </em><em>optional</em><em>, </em><em>default is numpy.ceil</em><em> (</em><em>2 * numpy.log10</em><em>(</em><em>alpha</em><em>) </em><em>/ numpy.log10</em><em>(</em><em>2</em><em>)</em><em>)</em>) – The maximum number of iterations to find a suitable step size</p></li>
+<li><p><strong>warmstart</strong> (<em>Boolean</em><em>, </em><em>default is True</em>) – If <cite>warmstart = True</cite> the initial step size at each Armijo iteration is the calculated step size from the last iteration. If <cite>warmstart = False</cite> at each  Armijo iteration, the initial step size is reset to the original, large <cite>alpha</cite>.
+In the case of <em>well-behaved</em> convex functions, <cite>warmstart = True</cite> is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting <cite>warmstart = False</cite> may be beneficial.</p></li>
 <li><p><strong>Reference</strong></p></li>
 <li><p><strong>------------</strong></p></li>
 <li><p><strong>Nocedal</strong> (<em>- Algorithm 3.1 in</em>)</p></li>

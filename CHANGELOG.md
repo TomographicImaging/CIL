@@ -50,6 +50,7 @@
     - Added documentation for the Partitioner to `framework.rst` (#1828)
     - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
     - Update to CCPi-Regularisation toolkit v24.0.1 (#1868)
+    - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes (#1644) 
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
@@ -59,6 +60,7 @@
     - Update dataexample remote data download to work with windows and use zenodo_get for data download (#1774)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).
 
 * 24.0.0
@@ -83,7 +85,6 @@
   - ZeroOperator no longer relies on the default of allocate
   - Bug fix in SIRF TotalVariation unit tests with warm_start
   - Allow show2D to be used with 3D `DataContainer` instances
-  - Added the a `Sampler` class as a CIL optimisation utility
   - Update documentation for symmetrised gradient
   - Added documentation for CompositionOperator and SumOperator
   - Updated FISTA and ISTA algorithms to allow input functions to be None

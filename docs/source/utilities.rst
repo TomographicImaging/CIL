@@ -53,6 +53,40 @@ Simulated image data
    :members:
    :inherited-members:
 
+Remote data
+-----------
+Remote data classes can be used to access specific datasets from zenodo. These
+datasets are not packaged as part of CIL, instead the `download_data(data_dir)`
+method can be used to download the dataset to a chosen data directory then loaded
+from that data directory using `get(data_dir)`.
+
+Walnut
+------
+
+.. autoclass:: cil.utilities.dataexample.WALNUT
+      :members:
+      :inherited-members:
+
+USB
+------
+
+.. autoclass:: cil.utilities.dataexample.USB
+      :members:
+      :inherited-members:
+
+KORN
+------
+
+.. autoclass:: cil.utilities.dataexample.KORN
+      :members:
+      :inherited-members:
+
+SANDSTONE
+------
+.. autoclass:: cil.utilities.dataexample.SANDSTONE
+      :members:
+      :inherited-members:
+
 
 
 Image Quality metrics

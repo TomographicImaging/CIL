@@ -28,8 +28,10 @@
     - Make Binner accept accelerated=False (#1887)
     - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
     - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
+    - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
+     
 
 * 24.1.0
   - New Features:
@@ -54,6 +56,7 @@
     - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
     - BlurringOperator: remove check for geometry class (old SIRF integration bug) (#1807)
     - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
+    - Update dataexample remote data download to work with windows and use zenodo_get for data download (#1774)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).

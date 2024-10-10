@@ -56,20 +56,22 @@ class CofR_image_sharpness(Processor):
 
     Example
     -------
-    from cil.processors import CentreOfRotationCorrector
+    .. code-block :: python 
+        from cil.processors import CentreOfRotationCorrector
 
-    processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
-    processor.set_input(data)
-    data_centred = processor.get_output()
+        processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
+        processor.set_input(data)
+        data_centred = processor.get_output()
 
 
     Example
     -------
-    from cil.processors import CentreOfRotationCorrector
+    .. code-block :: python
+        from cil.processors import CentreOfRotationCorrector
 
-    processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
-    processor.set_input(data)
-    processor.get_output(out=data)
+        processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
+        processor.set_input(data)
+        processor.get_output(out=data)
 
 
     Note

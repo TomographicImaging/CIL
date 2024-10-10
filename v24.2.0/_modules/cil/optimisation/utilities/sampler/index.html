@@ -1,0 +1,1280 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.optimisation.utilities.sampler &#8212; CIL 24.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=fd05d3ddc9a6e3fa7c66" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=fd05d3ddc9a6e3fa7c66" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../../_static/scripts/fontawesome.js?digest=fd05d3ddc9a6e3fa7c66"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
+
+    <script src="../../../../../_static/documentation_options.js?v=6cb63398"></script>
+    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/utilities/sampler';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
+        </script>
+    <link rel="index" title="Index" href="../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="24.2.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../../">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/">Tutorials</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">cil.optimisation.utilities.sampler</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for cil.optimisation.utilities.sampler</h1><div class="highlight"><pre>
+<span></span><span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi</span>
+<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with</span>
+<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+
+<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#   you may not use this file except in compliance with the License.</span>
+<span class="c1">#   You may obtain a copy of the License at</span>
+
+<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#   See the License for the specific language governing permissions and</span>
+<span class="c1">#   limitations under the License.</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+
+<div class="viewcode-block" id="Sampler">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler">[docs]</a>
+<span class="k">class</span> <span class="nc">Sampler</span><span class="p">():</span>
+    <span class="c1"># TODO: Work out how to make the examples testable</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialises a sampler that returns and then increments indices from a sequence defined by a function.</span>
+
+<span class="sd">    Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.</span>
+
+
+
+
+<span class="sd">    Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.</span>
+
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    function : Callable[[int], int]</span>
+<span class="sd">        A function that takes an integer iteration number and returns an integer between 0 and num_indices.</span>
+
+<span class="sd">    num_indices: int</span>
+<span class="sd">        The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">    sampling_type:str, optional,  default = None</span>
+<span class="sd">        The sampling type used. This is recorded for reference and printed when `print` is called.</span>
+
+<span class="sd">    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices</span>
+<span class="sd">        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sampler</span>
+<span class="sd">        An instance of the Sampler class representing the desired configuration.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.random_with_replacement(5)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(20))</span>
+<span class="sd">    [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
+<span class="sd">    &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">    4</span>
+
+
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.staggered(num_indices=21, stride=4)</span>
+<span class="sd">    &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">    0</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">    4</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">    [ 0  4  8 12 16]</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.sequential(10)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">    &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">    0</span>
+<span class="sd">    [0 1 2 3 4]</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">    1</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.herman_meyer(12)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(16))</span>
+<span class="sd">    [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
+
+
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    This example creates a sampler that outputs sequential indices, starting from 1.</span>
+
+<span class="sd">    &gt;&gt;&gt; num_indices=10</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; def my_sampling_function(iteration_number):</span>
+<span class="sd">    &gt;&gt;&gt;     return (iteration_number+1)%10</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)</span>
+<span class="sd">    &gt;&gt;&gt; print(list(sampler.get_samples(25)))</span>
+<span class="sd">    [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
+
+
+
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    The optimal choice of sampler depends on the data and the number of calls to the sampler.  Note that a low number of calls to a random sampler won&#39;t give an even distribution.</span>
+<span class="sd">    For a small number of samples (e.g. `&lt;5*num_indices`) the user may wish to consider another sampling method e.g. random without replacement, which, when calling `num_indices` samples is guaranteed to draw each index exactly once.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span>  <span class="n">sampling_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">sampling_type</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span> <span class="o">=</span> <span class="n">num_indices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`num_indices` should be an integer. &#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_function</span> <span class="o">=</span> <span class="n">function</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`function` should be an callable function. &#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prob_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prob_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="n">num_indices</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_indices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">prob_weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The provided prob_weights must sum to one&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prob_weights</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;The provided prob_weights must be greater than or equal to zero&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="n">prob_weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prob_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_iter_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
+
+<div class="viewcode-block" id="Sampler.next">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.next">[docs]</a>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a sample from the list of indices `{0, 1, …, N-1}, where N is the number of indices and increments the sampler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Sampler.get_samples">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.get_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">num_samples</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_samples: int</span>
+<span class="sd">            The number of samples to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        List</span>
+<span class="sd">            The first `num_samples&quot; output by the sampler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_last_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="n">save_last_index</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Type : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Current iteration number : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Number of indices : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Probability weights : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">repres</span>
+
+<div class="viewcode-block" id="Sampler.sequential">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.sequential">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sequential</span><span class="p">(</span><span class="n">num_indices</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a sampler that outputs sequential indices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sampler</span>
+<span class="sd">            An instance of the Sampler class that will generate indices sequentially.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.sequential(10)</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">        &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">        0</span>
+<span class="sd">        [0 1 2 3 4]</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">%</span> <span class="n">num_indices</span>
+
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span> <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span>
+                          <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;sequential&#39;</span>
+                          <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sampler</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_staggered_function</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">iter_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that takes in an iteration number and outputs an index number based on the staggered ordering.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">        stride: int</span>
+<span class="sd">            The stride between returned indices. The stride should be less than the num_indices.</span>
+
+<span class="sd">        iter_number: int</span>
+<span class="sd">            The current iteration number of the sampler.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The index to be outputted by the sampler corresponding to the `iter_number`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`num_indices` should be an integer. &#39;</span><span class="p">)</span>
+
+        <span class="n">iter_number_mod</span> <span class="o">=</span> <span class="n">iter_number</span> <span class="o">%</span> <span class="n">num_indices</span>
+        <span class="n">floor</span> <span class="o">=</span> <span class="n">num_indices</span> <span class="o">//</span> <span class="n">stride</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">num_indices</span> <span class="o">%</span> <span class="n">stride</span>
+
+        <span class="k">if</span> <span class="n">iter_number_mod</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">floor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">mod</span><span class="p">:</span>
+            <span class="n">row_number</span> <span class="o">=</span> <span class="n">iter_number_mod</span> <span class="o">//</span> <span class="p">(</span><span class="n">floor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">column_number</span> <span class="o">=</span> <span class="p">(</span><span class="n">iter_number_mod</span> <span class="o">%</span> <span class="p">(</span><span class="n">floor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">row_number</span> <span class="o">=</span> <span class="n">mod</span> <span class="o">+</span> <span class="p">(</span><span class="n">iter_number_mod</span> <span class="o">-</span> <span class="p">(</span><span class="n">floor</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">mod</span><span class="p">)</span> <span class="o">//</span> <span class="n">floor</span>
+            <span class="n">column_number</span> <span class="o">=</span> <span class="p">(</span><span class="n">iter_number_mod</span> <span class="o">-</span> <span class="p">(</span><span class="n">floor</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">mod</span><span class="p">)</span> <span class="o">%</span> <span class="n">floor</span>
+
+        <span class="k">return</span> <span class="n">row_number</span> <span class="o">+</span> <span class="n">stride</span><span class="o">*</span><span class="n">column_number</span>
+
+<div class="viewcode-block" id="Sampler.staggered">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.staggered">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">staggered</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a sampler which outputs in a staggered order.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">        stride: int</span>
+<span class="sd">            The stride between returned indices. The stride should be less than the num_indices.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sampler</span>
+<span class="sd">            An instance of the Sampler class that will generate indices in a staggered pattern.</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.staggered(num_indices=21, stride=4)</span>
+<span class="sd">        &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">        4</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">        [ 0  4  8 12 16]</span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.staggered(num_indices=17, stride=8)</span>
+<span class="sd">        &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">        8</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(10))</span>
+<span class="sd">        [ 0  8  16 1 9 2 10 3 11 4]</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">stride</span> <span class="o">&gt;=</span> <span class="n">num_indices</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The stride should be less than the number of indices&#39;</span><span class="p">))</span>
+
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">Sampler</span><span class="o">.</span><span class="n">_staggered_function</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">,</span> <span class="n">stride</span><span class="p">),</span>
+                          <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;staggered&#39;</span>
+                          <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sampler</span></div>
+
+
+<div class="viewcode-block" id="Sampler.random_with_replacement">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.random_with_replacement">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">random_with_replacement</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a sampler which outputs an index between 0 - num_indices with a given probability.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices</span>
+
+<span class="sd">        prob: list of floats, optional</span>
+<span class="sd">            The probability for each index to be selected by the &#39;next&#39; operation. If not provided, the indices will be sampled uniformly. The list should have a length equal to num_indices, and the values should sum to 1</span>
+
+<span class="sd">        seed:int, optional</span>
+<span class="sd">            Used to initialise the random number generator where repeatability is required.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `RandomSampler`</span>
+<span class="sd">            An instance of the `RandomSampler` class that will generate indices randomly with replacement</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.random_with_replacement(5)</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(10))</span>
+<span class="sd">        [3 4 0 0 2 3 3 2 2 1]</span>
+<span class="sd">        &gt;&gt;&gt; print(next(sampler))</span>
+<span class="sd">        3</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">        4</span>
+
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.random_with_replacement(num_indices=4, prob=[0.7,0.1,0.1,0.1])</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(10))</span>
+<span class="sd">        [0 1 3 0 0 3 0 0 0 0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">SamplerRandom</span><span class="p">(</span>
+            <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span>
+            <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;random_with_replacement&#39;</span><span class="p">,</span>
+            <span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sampler</span></div>
+
+
+<div class="viewcode-block" id="Sampler.random_without_replacement">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.random_without_replacement">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">random_without_replacement</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a sampler which outputs an index between 0 - num_indices. Once sampled the index will not be sampled again until all indices have been returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">        seed: int, optional</span>
+<span class="sd">            Used to initialise the random number generator where repeatability is required.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `RandomSampler`</span>
+<span class="sd">            An instance of the `RandomSampler` class that will generate indices randomly without replacement</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(16))</span>
+<span class="sd">        [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">SamplerRandom</span><span class="p">(</span>
+            <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span>
+            <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;random_without_replacement&#39;</span><span class="p">,</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sampler</span></div>
+
+
+<div class="viewcode-block" id="Sampler.from_function">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.from_function">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate a sampler that wraps a function for index selection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">    function : callable</span>
+<span class="sd">        A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -&gt; int</span>
+
+<span class="sd">        prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices</span>
+<span class="sd">            Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sampler</span>
+<span class="sd">            An instance of the Sampler class which samples from a function.</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        --------</span>
+<span class="sd">        This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.</span>
+
+<span class="sd">        &gt;&gt;&gt; num_indices=3</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; def my_sampling_function(iteration_number):</span>
+<span class="sd">        &gt;&gt;&gt;     return 2</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0, 0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; print(list(sampler.get_samples(12)))</span>
+<span class="sd">        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        --------</span>
+<span class="sd">        This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.</span>
+
+<span class="sd">        &gt;&gt;&gt; num_indices=10</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; def my_sampling_function(iteration_number):</span>
+<span class="sd">        &gt;&gt;&gt;     return (iteration_number+1)%10</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)</span>
+<span class="sd">        &gt;&gt;&gt; print(list(sampler.get_samples(25)))</span>
+<span class="sd">        [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
+
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        This example creates a sampler that samples in order from a custom list. The num_indices  is 6, although note that the index 5 is never output by the sampler. The number of indices must be at least one greater than any of the elements in the custom_list.</span>
+<span class="sd">        The probability weights are passed to the sampler as they are not uniform.</span>
+
+<span class="sd">        &gt;&gt;&gt; custom_list = [0,0,0,0,0,0,3,2,1,4]</span>
+<span class="sd">        &gt;&gt;&gt; num_indices = 6</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; def my_sampling_function(iteration_number, custom_list=custom_list]):</span>
+<span class="sd">        &gt;&gt;&gt;    return(custom_list[iteration_number%len(custom_list)])</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0.6, 0.1, 0.1, 0.1, 0.1, 0.0])</span>
+<span class="sd">        &gt;&gt;&gt; print(list(sampler.get_samples(25)))</span>
+<span class="sd">        [0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler)</span>
+<span class="sd">        Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.</span>
+<span class="sd">        Type : from_function</span>
+<span class="sd">        Current iteration number : 0</span>
+<span class="sd">        number of indices : 6</span>
+<span class="sd">        Probability weights : [0.6, 0.1, 0.1, 0.1, 0.1, 0.0]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="p">(</span>
+            <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span>
+            <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;from_function&#39;</span><span class="p">,</span>
+            <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+            <span class="n">prob_weights</span><span class="o">=</span><span class="n">prob_weights</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sampler</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_prime_factorisation</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        n: int</span>
+<span class="sd">            The number to be factorised.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of ints</span>
+<span class="sd">            The prime factors of n.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">//=</span> <span class="mi">2</span>
+            <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">while</span> <span class="n">i</span><span class="o">*</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">//=</span> <span class="n">i</span>
+                <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">factors</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_herman_meyer_function</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span>  <span class="n">addition_arr</span><span class="p">,</span> <span class="n">repeat_length_arr</span><span class="p">,</span> <span class="n">iteration_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The number of indices to be sampled from.</span>
+
+<span class="sd">        addition_arr: list of ints</span>
+<span class="sd">            The product of all factors at indices greater than the current factor.</span>
+
+<span class="sd">        repeat_length_arr: list of ints</span>
+<span class="sd">            The product of all factors at indices less than the current factor.</span>
+
+<span class="sd">        iteration_number: int</span>
+<span class="sd">            The current iteration number.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The index to be sampled from.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">addition_arr</span><span class="p">)):</span>
+            <span class="n">addition</span> <span class="o">=</span> <span class="n">addition_arr</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">repeat_length</span> <span class="o">=</span> <span class="n">repeat_length_arr</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+            <span class="n">length</span> <span class="o">=</span> <span class="n">num_indices</span> <span class="o">//</span> <span class="p">(</span><span class="n">addition</span><span class="o">*</span><span class="n">repeat_length</span><span class="p">)</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">length</span><span class="p">)</span> <span class="o">*</span> <span class="n">addition</span>
+
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">iteration_number</span><span class="o">/</span><span class="n">repeat_length</span><span class="p">)</span> <span class="o">%</span> <span class="n">length</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="n">arr</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">index</span>
+
+<div class="viewcode-block" id="Sampler.herman_meyer">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.herman_meyer">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">herman_meyer</span><span class="p">(</span><span class="n">num_indices</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Instantiates a sampler which outputs in a Herman Meyer order.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_indices: int</span>
+<span class="sd">            The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sampler</span>
+<span class="sd">            An instance of the Sampler class which outputs in a Herman Meyer order.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">            </span>
+<span class="sd">        Reference</span>
+<span class="sd">        ----------</span>
+<span class="sd">        With thanks to Imraj Singh and Zeljko Kereta for their help with the initial implementation of the Herman Meyer sampling. Their implementation was used in:</span>
+
+<span class="sd">        Singh I, et al. Deep Image Prior PET Reconstruction using a SIRF-Based Objective - IEEE MIC, NSS &amp; RTSD 2022. https://discovery.ucl.ac.uk/id/eprint/10176077/1/MIC_Conference_Record.pdf</span>
+
+<span class="sd">        The sampling method was introduced in:</span>
+
+<span class="sd">        Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; sampler=Sampler.herman_meyer(12)</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(16))</span>
+<span class="sd">        [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`num_indices` should be an integer. &#39;</span><span class="p">)</span>
+
+        <span class="n">factors</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">_prime_factorisation</span><span class="p">(</span><span class="n">num_indices</span><span class="p">)</span>
+
+        <span class="n">n_factors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_factors</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Herman Meyer sampling defaults to sequential ordering if the number of indices is prime. Please use an alternative sampling method or change the number of indices. &#39;</span><span class="p">)</span>
+
+        <span class="n">addition_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">repeat_length_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+        <span class="n">repeat_length</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">addition</span> <span class="o">=</span> <span class="n">num_indices</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_factors</span><span class="p">):</span>
+            <span class="n">addition</span> <span class="o">//=</span> <span class="n">factors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">addition_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">addition</span>
+
+            <span class="n">repeat_length_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_length</span>
+            <span class="n">repeat_length</span> <span class="o">*=</span> <span class="n">factors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">hmf_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">Sampler</span><span class="o">.</span><span class="n">_herman_meyer_function</span><span class="p">,</span>
+                           <span class="n">num_indices</span><span class="p">,</span> <span class="n">addition_arr</span><span class="p">,</span> <span class="n">repeat_length_arr</span><span class="p">)</span>
+
+        <span class="c1"># define the sampler</span>
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">hmf_call</span><span class="p">,</span>
+                          <span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span>
+                          <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;herman_meyer&#39;</span><span class="p">,</span>
+                          <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="n">num_indices</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_indices</span>
+                          <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sampler</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SamplerRandom">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.SamplerRandom">[docs]</a>
+<span class="k">class</span> <span class="nc">SamplerRandom</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The user is recommended to not instantiate this class  directly but instead use one of the static methods  in the parent Sampler class that will return instances of different samplers.</span>
+
+<span class="sd">    This class produces Samplers that output random samples with and without replacement from the set {0, 1, …, N-1} where N=num_indices.</span>
+
+<span class="sd">    Custom random samplers can be created by subclassing this sampler class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    num_indices: int</span>
+<span class="sd">        The sampler will select from a range of indices 0 to num_indices.</span>
+
+<span class="sd">    sampling_type:str, optional,  default = &#39;random_with_replacement&quot;</span>
+<span class="sd">        The sampling type used. This is recorded for reference and printed when `print` is called.</span>
+
+<span class="sd">    prob_weights: list of floats of length num_indices that sum to 1.  Default is [1 / num_indices] * num_indices</span>
+<span class="sd">        Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</span>
+
+<span class="sd">    replace: bool, default is True</span>
+<span class="sd">        If True, sample with replace, otherwise sample without replacement</span>
+
+<span class="sd">    seed:int, optional</span>
+<span class="sd">        Used to initialise the random number generator where repeatability is required.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sampler</span>
+<span class="sd">        An instance of the Sampler class representing the desired configuration.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sampler = Sampler.random_with_replacement(5)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(20))</span>
+<span class="sd">    [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(16))</span>
+<span class="sd">    [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">,</span>  <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="n">sampling_type</span><span class="o">=</span><span class="s1">&#39;random_with_replacement&#39;</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_replace</span> <span class="o">=</span> <span class="n">replace</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">SamplerRandom</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">,</span>
+                                            <span class="n">sampling_type</span><span class="o">=</span><span class="n">sampling_type</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="n">prob</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace</span>
+
+    <span class="k">def</span> <span class="nf">_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; For each iteration number this function samples from a randomly generated list in order. Every num_indices the list is re-created. &quot;&quot;&quot;</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">iteration_number</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_replace</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span><span class="p">[</span><span class="n">location</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="SamplerRandom.get_samples">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.SamplerRandom.get_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">num_samples</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_samples: int</span>
+<span class="sd">            The number of samples to return.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            The first `num_samples` produced by the sampler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_last_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">save_generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+        <span class="n">save_sampling_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="n">save_last_index</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">save_generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span> <span class="o">=</span> <span class="n">save_sampling_list</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">repres</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Seed : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">repres</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

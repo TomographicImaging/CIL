@@ -95,7 +95,8 @@ class FluxNormaliser(Processor):
                     'roi' : roi,
                     'roi_slice' : None,
                     'roi_axes' : None,
-                    'target' : target
+                    'target' : target,
+                    'target_value' : None,
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
@@ -174,7 +175,7 @@ class FluxNormaliser(Processor):
         flux_size = (numpy.shape(self.flux))
         if len(flux_size) > 0:
             # check this
-            data_size = numpy.shape(dataset.geometry.angles)*numpy.shape(dataset.geometry.channels)
+            data_size = numpy.shape(dataset.geometry.angles) # make this also account for channels
             if data_size != flux_size:
                 raise ValueError("Flux must be a scalar or array with length \
                                     \n = number of projections, found {} and {}"
@@ -189,13 +190,25 @@ class FluxNormaliser(Processor):
             
         self.flux = numpy.float32(self.flux)
             
-        if self.norm_value is None:
-            self.norm_value = numpy.mean(self.flux)
+    def _calculate_target(self):
+        if isinstance(self.target, float):
+            self.target_value = self.target
+        elif isinstance(self.target, str):
+            if self.target == 'first':
+                if len(numpy.shape(self.flux)) > 0 :
+                    self.target_value = self.flux[0]
+                else:
+                    self.target_value = self.flux
+            elif self.target == 'mean':
+                self.target_value = numpy.mean(self.flux)
+            else:
+                raise ValueError("Target string not recognised, found {}, expected 'first' or 'mean'"
+                                 .format(self.target))
+        else:
+            raise TypeError("Target must be string or float, found {}"
+                            .format(type(self.target)))
             
-    # def _calculate_target():
-        # if isinstance(self.target, float):
             
-
 
     def preview_configuration(self, angle=None, channel=None, log=False):
         '''
@@ -335,6 +348,7 @@ class FluxNormaliser(Processor):
 
     def process(self, out=None):
         self._calculate_flux()
+        self._calculate_target()
         data = self.get_input()
 
         if out is None:
@@ -352,8 +366,8 @@ class FluxNormaliser(Processor):
                 if len(flux_size) > 0:
                     f = self.flux[i]
                 slice_proj[proj_axis] = i
-                out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.norm_value/f
+                out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.target_value/f
         else:
-            out.array = data.array*self.norm_value/f 
+            out.array = data.array*self.target_value/f 
 
         return out

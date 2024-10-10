@@ -560,6 +560,9 @@ class Sampler():
         -------
         Sampler
             An instance of the Sampler class which outputs in a Herman Meyer order.
+        
+        
+        
             
         Reference
         ----------

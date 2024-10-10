@@ -17,7 +17,8 @@
     - Internal refactor: Separate framework into multiple files (#1692)
     - Allow the SIRT algorithm to take `initial=None` (#1906)
     - Add checks on equality method of `AcquisitionData` and `ImageData` for equality of data type and geometry (#1919)
-    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)    
+    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)
+    - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
     - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)

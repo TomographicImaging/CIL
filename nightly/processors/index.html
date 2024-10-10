@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 24.1.1.dev116+g0181b3fd documentation</title>
+    <title>Processors &#8212; CIL 24.1.1.dev117+g2962b920 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
 
-    <script src="../_static/documentation_options.js?v=43cef8ff"></script>
+    <script src="../_static/documentation_options.js?v=47389ba2"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev116+g0181b3fd';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.1.1.dev117+g2962b920';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -61,7 +61,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.1.1.dev116+g0181b3fd" />
+  <meta name="docsearch:version" content="24.1.1.dev117+g2962b920" />
   </head>
   
   
@@ -711,13 +711,13 @@ ImageData, AcquisitionData, DataContainer, ImageGeometry, AcquisitionGeometry</p
 </dl>
 <p class="rubric">Notes</p>
 <dl class="simple">
-<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<dt><cite>pad_width</cite>  behaviour (number of pixels):</dt><dd><ul class="simple">
 <li><p>int: Each axis will be padded with a border of this size</p></li>
 <li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
 <li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
 </ul>
 </dd>
-<dt><cite>pad_values</cite> behaviour:</dt><dd><ul class="simple">
+<dt><cite>pad_values</cite>  behaviour:</dt><dd><ul class="simple">
 <li><p>float: Each border will use this value</p></li>
 <li><p>tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)</p></li>
 <li><p>dict: Specified axes and values: e.g. {‘horizontal’:(8, 23), ‘channel’:5}</p></li>
@@ -774,13 +774,13 @@ dimensions unless a dictionary is passed to either <cite>pad_width</cite> or <ci
 </dl>
 <p class="rubric">Notes</p>
 <dl class="simple">
-<dt><cite>pad_width</cite> behaviour (number of pixels):</dt><dd><ul class="simple">
+<dt><cite>pad_width</cite>  behaviour (number of pixels):</dt><dd><ul class="simple">
 <li><p>int: Each axis will be padded with a border of this size</p></li>
 <li><p>tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)</p></li>
 <li><p>dict: Specified axes will be padded: e.g. {‘horizontal’:(8, 23), ‘vertical’: 10}</p></li>
 </ul>
 </dd>
-<dt><cite>constant_values</cite> behaviour (value of pixels):</dt><dd><ul class="simple">
+<dt><cite>constant_values</cite>  behaviour (value of pixels):</dt><dd><ul class="simple">
 <li><p>float: Each border will be set to this value</p></li>
 <li><p>tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)</p></li>
 <li><p>dict: Specified axes and values: e.g. {‘horizontal’:(8, 23), ‘channel’:5}</p></li>

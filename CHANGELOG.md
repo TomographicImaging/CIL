@@ -1,6 +1,3 @@
-* X.X.X
-
-
 * 24.2.0
   - New Features:
     - Added SVRG and LSVRG stochastic functions (#1625)

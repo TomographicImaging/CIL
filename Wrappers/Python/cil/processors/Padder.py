@@ -40,12 +40,12 @@ class Padder(DataProcessor):
 
     Notes
     -----
-    `pad_width` behaviour (number of pixels):
+    `pad_width`  behaviour (number of pixels):
         - int: Each axis will be padded with a border of this size
         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
-    `pad_values` behaviour:
+    `pad_values`  behaviour:
         - float: Each border will use this value
         - tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)
         - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
@@ -106,12 +106,12 @@ class Padder(DataProcessor):
 
         Notes
         -----
-        `pad_width` behaviour (number of pixels):
+        `pad_width`  behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
          - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
-        `constant_values` behaviour (value of pixels):
+        `constant_values`  behaviour (value of pixels):
          - float: Each border will be set to this value
          - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)
          - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}

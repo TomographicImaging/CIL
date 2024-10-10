@@ -77,6 +77,13 @@ class ArmijoStepSizeRule(StepSizeRule):
 
     The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.
 
+    Reference
+    ---------
+    - Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
+    
+    - https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+    
+    
     Parameters
     ----------
     alpha: float, optional, default=1e6
@@ -88,12 +95,6 @@ class ArmijoStepSizeRule(StepSizeRule):
     warmstart: Boolean, default is True
         If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`. 
         In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial. 
-
-    Reference
-    ------------
-    - Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf)
-    
-    - https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
 
     """
 

@@ -549,14 +549,18 @@ class Sampler():
 
     @staticmethod
     def herman_meyer(num_indices):
-        """
-        Instantiates a sampler which outputs in a Herman Meyer order.
+        r"""Instantiates a sampler which outputs in a Herman Meyer order.
 
         Parameters
         ----------
         num_indices: int
             The sampler will select from a range of indices 0 to num_indices. For Herman-Meyer sampling this number should not be prime.
-
+        
+        Returns
+        -------
+        Sampler
+            An instance of the Sampler class which outputs in a Herman Meyer order.
+            
         Reference
         ----------
         With thanks to Imraj Singh and Zeljko Kereta for their help with the initial implementation of the Herman Meyer sampling. Their implementation was used in:
@@ -566,11 +570,6 @@ class Sampler():
         The sampling method was introduced in:
 
         Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.
-
-        Returns
-        -------
-        Sampler
-            An instance of the Sampler class which outputs in a Herman Meyer order.
 
         Example
         -------

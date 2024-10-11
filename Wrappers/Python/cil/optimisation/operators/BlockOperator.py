@@ -191,54 +191,56 @@ class BlockOperator(Operator):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape)        
-
+        shape = self.get_output_shape(x_b.shape)  
+        
+        if (1 == shape[0]) and (1 == shape[1]):
+            flag_single_element = True      
+        else:
+            flag_single_element = False
+        return_data_container = False
+        
         if out is None:
-            res = []
-            for row in range(self.shape[0]):
-                for col in range(self.shape[1]):
-                    if col == 0:
-                        prod = self.get_item(row, col).direct(
-                            x_b.get_item(col))
-                    else:
-                        prod += self.get_item(row,
-                                              col).direct(x_b.get_item(col))
-                res.append(prod)
-            if (1 == shape[0]) and (1 == shape[1]):
-                # the output is a single DataContainer, so we can take it out 
-                return res[0] 
-            else: 
-                return BlockDataContainer(*res, shape=shape) 
-            
-
+            res = BlockDataContainer(*[self.get_item(row, 0).range_geometry().allocate(0) for row in range(self.shape[0])], shape=shape)
+            if flag_single_element:
+                return_data_container = True
         else:
             if not isinstance(out, BlockDataContainer):
-                if (1 == shape[0]) and (1 == shape[1]):
-                    out = BlockDataContainer(out)
-                    flag_single_element = True
+                if flag_single_element:
+                    res = BlockDataContainer(out)
+                    return_data_container = True
                 else:
                     raise ValueError(f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
             else:
-                flag_single_element = False
-            tmp = self.range_geometry().allocate()
-            if not isinstance(tmp, BlockDataContainer):
-                tmp = BlockDataContainer(tmp)
-            for row in range(self.shape[0]):
-                for col in range(self.shape[1]):
-                    if col == 0:
-                        self.get_item(row,col).direct(
-                                                      x_b.get_item(col),
-                                                      out=out.get_item(row))
-                    else:
-                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to
-                        self.get_item(row,col).direct(
-                                                      x_b.get_item(col),
-                                                      out=tmp.get_item(row))
-                        temp_out_row += tmp.get_item(row)
-            if flag_single_element:
-                return out.get_item(0)
-            else:
-                return out
+                res = out
+            
+            
+        
+        if  flag_single_element:
+            tmp = BlockDataContainer(self.range_geometry().allocate(0))
+        else:
+            tmp = self.range_geometry().allocate(0)
+        
+
+        for row in range(self.shape[0]):
+            for col in range(self.shape[1]):
+                if col == 0:
+                    self.get_item(row,col).direct(
+                                                    x_b.get_item(col),
+                                                    out=res.get_item(row))
+                else:
+                    temp_out_row = res.get_item(row) # temp_out_row points to the element in out that we are adding to
+                    self.get_item(row,col).direct(
+                                                    x_b.get_item(col),
+                                                    out=tmp.get_item(row))
+                    temp_out_row += tmp.get_item(row)
+                        
+                        
+        if return_data_container:
+            out = res.get_item(0)
+            return out
+        else:
+            return res
+        
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -261,59 +263,56 @@ class BlockOperator(Operator):
         else:
             x_b = x
         shape = self.get_output_shape(x_b.shape, adjoint=True)
+        if (1 == shape[0]) and (1 == shape[1]):
+            flag_single_element = True      
+        else:
+            flag_single_element = False
+        return_data_container = False
+        
         if out is None:
-            res = []
-            for col in range(self.shape[1]):
-                for row in range(self.shape[0]):
-                    if row == 0:
-                        prod = self.get_item(row, col).adjoint(
-                            x_b.get_item(row))
-                    else:
-                        prod += self.get_item(row,
-                                              col).adjoint(x_b.get_item(row))
-                res.append(prod)
-            if self.shape[1] == 1:
-                # the output is a single DataContainer, so we can take it out
-                return res[0]
-            else:
-                return BlockDataContainer(*res, shape=shape)
+            res = BlockDataContainer(*[self.get_item(0, col).range_geometry().allocate(0) for col in range(self.shape[1])], shape=shape)
+            if flag_single_element:
+                return_data_container = True
         else:
             if not isinstance(out, BlockDataContainer):
-                if (1 == shape[0]) and (1 == shape[1]):
-                    out = BlockDataContainer(out)
-                    flag_single_element = True
+                if flag_single_element:
+                    res = BlockDataContainer(out)
+                    return_data_container = True
                 else:
                     raise ValueError(f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
             else:
-                flag_single_element = False
-            for col in range(self.shape[1]):
-                for row in range(self.shape[0]):
-                    if row == 0:
-                        if issubclass(out.__class__, DataContainer) or \
-                                (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                            self.get_item(row, col).adjoint(
-                                x_b.get_item(row),
-                                out=out)
-                        else:
-                            op = self.get_item(row, col)
-                            self.get_item(row, col).adjoint(
-                                x_b.get_item(row),
-                                out=out.get_item(col))
-                    else:
-                        if issubclass(out.__class__, DataContainer) or \
-                                (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                            out += self.get_item(row, col).adjoint(
-                                x_b.get_item(row))
-                        else:
+                res = out
+                
+        
 
-                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating
-                            temp_out_col += self.get_item(row,col).adjoint(
-                                                        x_b.get_item(row),
-                                                        )
-            if flag_single_element:
-                return out.get_item(0)
-            else:
-                return out
+        for col in range(self.shape[1]):
+            for row in range(self.shape[0]):
+                if row == 0:
+                    if issubclass(out.__class__, DataContainer) or  #TODO check SIRF issues 
+                            (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
+                        self.get_item(row, col).adjoint(
+                            x_b.get_item(row),
+                            out=res)
+                    else:
+                        op = self.get_item(row, col)
+                        self.get_item(row, col).adjoint(
+                            x_b.get_item(row),
+                            out=out.get_item(col))
+                else:
+                    if issubclass(out.__class__, DataContainer) or \
+                            (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
+                        out += self.get_item(row, col).adjoint(
+                            x_b.get_item(row))
+                    else:
+
+                        temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating
+                        temp_out_col += self.get_item(row,col).adjoint(
+                                                    x_b.get_item(row),
+                                                    )
+        if flag_single_element:
+            return out.get_item(0)
+        else:
+            return out
 
     def is_linear(self):
         '''Returns whether all the elements of the BlockOperator are linear'''

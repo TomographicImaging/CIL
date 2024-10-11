@@ -2892,7 +2892,7 @@ class TestBadPixelCorrector(unittest.TestCase):
         proj2_expected = [[5.0,5.0,5.0], [5,5,5], [5,5,5]]
 
         a = numpy.array([proj1, proj2])
-        mask = numpy.array([[[True, True, True], [True, False, True], [True, True, True]]])
+        mask = numpy.array([[True, True, True], [True, False, True], [True, True, True]])
 
         ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0,1])
         ad = AcquisitionData(array=a, geometry=ag)

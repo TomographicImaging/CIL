@@ -24,6 +24,21 @@ import numpy
 from cil.utilities.display import show2D
 import numpy as np
 import time
+import math
+
+def xy_to_index(matrix, x, y):
+    """
+    Transform (x, y) coordinates in a 2D array to their corresponding index in the flattened array.
+
+    Args:
+        matrix (list): The input 2D array.
+        x (int): The row index of the element.
+        y (int): The column index of the element.
+
+    Returns:
+        int: The index of the element in the flattened array.
+    """
+    return x * matrix.shape[1] + y
 
 class BadPixelCorrector(DataProcessor):
     r'''
@@ -69,10 +84,7 @@ class BadPixelCorrector(DataProcessor):
                 raise ValueError('Vertical dimension must be the second last dimension')
             
 
-        # Check that the shapes match:
 
-        channel = True if 'channel' in data.dimension_labels else None
-        angle = True if 'angle' in data.dimension_labels else None
 
         if isinstance(self.mask, DataContainer):
             mask_labels = self.mask.geometry.dimension_labels
@@ -87,19 +99,27 @@ class BadPixelCorrector(DataProcessor):
             if 'vertical' in mask_labels:
                 if mask_labels[-2] != 'vertical':
                     raise ValueError('Vertical dimension must be the second last dimension')
-            
         
+        # Check that the shapes match:
+        proj_shape = self._get_proj_shape(data)
+   
+        if proj_shape != self.mask.shape:
+            raise ValueError(f"Projection and Mask shapes do not match: {proj_shape} != {self.mask.shape}")
+
+        return True
+    
+    def _get_proj_shape(self, data):
+        channel = True if 'channel' in data.dimension_labels else None
+        angle = True if 'angle' in data.dimension_labels else None
+
         try:
             proj_shape = data.get_slice(channel=channel, angle=angle).shape
         except Exception:
             # if we have only one angle and one channel, we can't use get_slice  
             proj_shape = data.shape
 
-   
-        if proj_shape != self.mask.shape:
-            raise ValueError(f"Projection and Mask shapes do not match: {proj_shape} != {self.mask.shape}")
+        return proj_shape
         
-        return True
 
     def process(self, out=None):
         
@@ -120,39 +140,36 @@ class BadPixelCorrector(DataProcessor):
         # Coordinates of all masked pixels:
         masked_pixels = numpy.transpose((mask_invert).nonzero())
 
+        
+        
+        proj_size = math.prod(self._get_proj_shape(data))
+
+        num_proj = int(data.size / proj_size) # product of remaining dimensions
+
+        # flat view of full array
+        out_flat = out.array.ravel()
 
         try:
-            angles = data.geometry.angles
+
+            masked_pixels = [x * mask_arr.shape[1] + y for (x,y) in masked_pixels]
         except:
-            angles = [0]
-
-        channels = data.geometry.channels
+            masked_pixels = [x for (x,) in masked_pixels]
         
-        # need to check order of input array
 
-        for j in range(channels):
-            try: 
-                projections = data.get_slice(channel=j)
-            except:
-                projections = data
+
+        #%%
+        for k in range(num_proj):
+
+            # this will create a copy the data
+            projection_out = out_flat[k*proj_size:(k+1)*proj_size]
+        
+            projection_temp = projection_out.copy()
+                
+            # Stores coordinates of all bad pixels and whether they have been corrected:
+            masked_pixels_status = {}
             
-            channel_out = projections.copy()
-            # print("First channel: ", channel_out)
-            for i in range(len(angles)):
-                # If only have one angle, can't use get_slice
-                try:
-                    projection = projections.get_slice(angle=i)
-                except:
-                    projection = projections
-
-                projection_out = projection.copy()
-                projection_temp = projection.copy()
-                
-                # Stores coordinates of all bad pixels and whether they have been corrected:
-                masked_pixels_status = {}
-                
-                for coords in masked_pixels:
-                    masked_pixels_status[tuple(coords)] = False
+            for coord in masked_pixels:
+                masked_pixels_status[coord] = False
 
                 masked_pixels_status_temp = masked_pixels_status.copy()
 
@@ -160,39 +177,48 @@ class BadPixelCorrector(DataProcessor):
                 x = 0
                 while not all (masked_pixels_status.values()): # later have len >0
                     x+=1
-                    for coords, corrected in masked_pixels_status.items():
-                        if not corrected: 
+                    for coord, corrected in masked_pixels_status.items():
+                        if not corrected:
                             # Get all neighbours
                             neighbours = []
                             diag_neighbours = []
                             weights = []
-                            if len(list(coords))== 1:
-                                if list(coords)[0] > 0:
-                                    neighbours.append(coords[0]-1)
-                                if list(coords)[0] < mask_arr.shape[0]-1:
-                                    neighbours.append(coords[0]+1)
+                            if len(mask_arr.shape)== 1:
+                                if coord > 0:
+                                    neighbours.append(coord-1)
+                                if coord < mask_arr.shape[0]-1:
+                                    neighbours.append(coord+1)
                             else:
-                                if coords[0]>0 and coords[1]>0:
-                                    diag_neighbours.append(tuple([coords[0]-1, coords[1]-1]))
-                                if coords[0]>0:
-                                    neighbours.append(tuple([coords[0]-1, coords[1]]))
-                                if coords[1]>0:
-                                    neighbours.append(tuple([coords[0], coords[1]-1]))
-                                if coords[0]<mask_arr.shape[0]-1 and coords[1]<mask_arr.shape[1]-1:
-                                    diag_neighbours.append(tuple([coords[0]+1, coords[1]+1]))
-                                if coords[0]<mask_arr.shape[0]-1:
-                                    neighbours.append(tuple([coords[0]+1, coords[1]]))
-                                if coords[1]<mask_arr.shape[1]-1:
-                                    neighbours.append(tuple([coords[0], coords[1]+1]))
-                                if coords[0]<mask_arr.shape[0]-1 and coords[1]>0:
-                                    diag_neighbours.append(tuple([coords[0]+1, coords[1]-1]))
-                                if coords[0]>0 and coords[1]<mask_arr.shape[1]-1:
-                                    diag_neighbours.append(tuple([coords[0]-1, coords[1]+1]))
+            
+                                if coord % mask_arr.shape[1]>0:
+                                    # Left neighbour
+                                    neighbours.append(coord - 1)
+                                if coord > (mask_arr.shape[1]-1):
+                                    # Upper neighbour
+                                    neighbours.append(coord - mask_arr.shape[1])
+                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]):
+                                    # Lower neighbour
+                                    neighbours.append(coord + mask_arr.shape[1])
+                                if (coord + 1) % mask_arr.shape[1] >0:
+                                    # Right neighbour
+                                    neighbours.append(coord + 1)
+                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) + coord % mask_arr.shape[1]>0:
+                                    # Diagonal lower left neighbour
+                                    diag_neighbours.append(coord + mask_arr.shape[1] - 1)
+                                if coord > (mask_arr.shape[1]-1) and (coord + 1) % mask_arr.shape[1] >0:
+                                    # Diagonal Upper right neighbour
+                                    diag_neighbours.append(coord - mask_arr.shape[1]+1)
+                                if coord > mask_arr.shape[1] and coord % mask_arr.shape[1]>0:
+                                    #Diagonal upper left neighbour
+                                    diag_neighbours.append(coord - mask_arr.shape[1] -1)
+                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and (coord + 1) % mask_arr.shape[1] >0:
+                                    # Diagonal lower right neighbour
+                                    diag_neighbours.append(coord + mask_arr.shape[1] + 1)
 
-                            # Save coords of unmasked neighbours, should include neighbours and diag_neighbours:
+                            # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
                             neighbour_values = []
                             weights = []
-                            projection_array = projection_out.as_array()
+                            projection_array = projection_out
                             diag_weight = 1/np.sqrt(2)
                             for neighbour in neighbours + diag_neighbours:
                                 if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
@@ -201,28 +227,24 @@ class BadPixelCorrector(DataProcessor):
                                 weights.append(1 if neighbour in neighbours else diag_weight)
 
                             if len(neighbour_values) > 0:
-                                projection_temp.array[coords] = numpy.average(neighbour_values, weights=weights)
-                                masked_pixels_status_temp[coords] = True
-                    
+                                projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
+                                masked_pixels_status_temp[coord] = True
+
+                    # Update projection_out now that all masked pixels have been addressed in this iteration:
                     projection_out = projection_temp.copy()
                     masked_pixels_status = masked_pixels_status_temp.copy()
 
                     print("Result after " + str(x) + " iterations: ")
-                    print(projection_out.array)
+                    print(projection_out)
 
-                # If data is a single projection, this will be the entire output:
-                try:
-                    channel_out.array[i] = projection_out.array
-                except:
-                    channel_out.array = projection_out.array
+                # Update the projection:
+                # #fill the data back
+                out_flat[k*proj_size:(k+1)*proj_size] = projection_out
 
-            try:
-                out.array[j] = channel_out.array
-            except:
-                out.array = channel_out.array
 
         if return_arr is True:
             return out
+
         
 
 # # THE FOLLOWING ARE FOR QUICK TESTING ONLY - WILL LATER BE MOVED TO UNIT TESTS
@@ -478,14 +500,14 @@ class BadPixelCorrector(DataProcessor):
 
 # # print(data.array[:, 2,4])
 
-# mask_coords = [(2,4), (6,8), (0,0)]
+# mask_coord = [(2,4), (6,8), (0,0)]
 
 # #%%
 # print(data.array[:].shape)
 
-# for coords in mask_coords:
-#     data.array[0][coords] = np.inf
-#     data.array[1][coords] = np.inf
+# for coord in mask_coord:
+#     data.array[0][coord] = np.inf
+#     data.array[1][coord] = np.inf
 
 # print(data.array)
 
@@ -494,8 +516,8 @@ class BadPixelCorrector(DataProcessor):
 # mask.fill(True)
 # mask = mask.array[0]
 
-# for coords in mask_coords:
-#     mask[coords] = False
+# for coord in mask_coord:
+#     mask[coord] = False
 
 # # convert to bool:
 # # mask = np.array(mask, dtype=bool)

@@ -151,22 +151,24 @@ class SPDHG(Algorithm):
             raise TypeError("operator should be a BlockOperator")
 
         self._ndual_subsets = len(self.operator)
-        self._sampler = sampler
+        
 
         # Set up sampler and prob weights from deprecated "prob" argument
         self._deprecated_set_prob(deprecated_kwargs, prob_weights, sampler) 
         
         
-        self._prob_weights = getattr(self._sampler, 'prob_weights', prob_weights) 
+        self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
         if self._prob_weights is None: 
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
         
         if  prob_weights is not None and self._prob_weights != prob_weights:
                     raise ValueError(' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
 
-        if self._sampler is None:
+        if sampler is None:
             self._sampler = Sampler.random_with_replacement(
                 len(operator), prob=self._prob_weights)
+        else:
+            self._sampler = sampler
 
         #Set the norms of the operators
         self._deprecated_set_norms(deprecated_kwargs) 

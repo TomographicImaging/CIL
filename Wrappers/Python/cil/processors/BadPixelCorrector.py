@@ -82,8 +82,6 @@ class BadPixelCorrector(DataProcessor):
         if 'vertical' in labels:
             if labels[-2] != 'vertical':
                 raise ValueError('Vertical dimension must be the second last dimension')
-            
-
 
 
         if isinstance(self.mask, DataContainer):
@@ -154,6 +152,7 @@ class BadPixelCorrector(DataProcessor):
         
         #%%
         for k in range(num_proj):
+            print("Processing projection %d of %d" %(k+1, num_proj))
             # this will create a copy the data
             projection_out = out_flat[k*proj_size:(k+1)*proj_size]
         
@@ -168,9 +167,7 @@ class BadPixelCorrector(DataProcessor):
             masked_pixels_status_temp = masked_pixels_status.copy()
 
             # Loop through masked pixel coordinates until all have been corrected:
-            x = 0
             while not all (masked_pixels_status.values()): # later have len >0
-                x+=1
                 for coord, corrected in masked_pixels_status.items():
                     if not corrected:
                         # Get all neighbours
@@ -227,9 +224,6 @@ class BadPixelCorrector(DataProcessor):
                 # Update projection_out now that all masked pixels have been addressed in this iteration:
                 projection_out = projection_temp.copy()
                 masked_pixels_status = masked_pixels_status_temp.copy()
-
-                print("Result after " + str(x) + " iterations: ")
-                print(projection_out)
 
             # Update the projection:
             # #fill the data back

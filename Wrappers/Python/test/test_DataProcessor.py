@@ -3101,7 +3101,7 @@ class TestFluxNormaliser(unittest.TestCase):
         self.data_multichannel = ag.allocate('random')
         self.data_slice = self.data_parallel.get_slice(vertical=1)
         self.data_reorder = self.data_cone.copy()
-        self.data_reorder.reorder(['horizontal','angle','vertical'])
+        self.data_reorder.reorder(['angle','horizontal','vertical'])
         self.data_single_angle = self.data_cone.get_slice(angle=1)
 
     def error_message(self,processor, test_parameter):
@@ -3110,8 +3110,8 @@ class TestFluxNormaliser(unittest.TestCase):
     def test_init(self):
         # test default values are initialised
         processor = FluxNormaliser()
-        test_parameter = ['flux','roi','norm_value']
-        test_value = [None, None, None]
+        test_parameter = ['flux','roi','target']
+        test_value = [None, None, 'mean']
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
@@ -3129,30 +3129,36 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
 
+    def test_calculate_flux(self):
         # check there is an error if flux array size is not equal to the number of angles in data
         processor = FluxNormaliser(flux = [1,2,3])
+        processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor.check_input(self.data_cone)
+            processor._calculate_flux()
         
         # check there is an error if roi is not specified as a dictionary
         processor = FluxNormaliser(roi='string')
+        processor.set_input(self.data_cone)
         with self.assertRaises(TypeError):
-            processor.check_input(self.data_cone)
+            processor._calculate_flux()
 
         # check there is an error if roi is specified with float values
         processor = FluxNormaliser(roi={'horizontal':(1.5, 6.5)})
+        processor.set_input(self.data_cone)
         with self.assertRaises(TypeError):
-            processor.check_input(self.data_cone)
+            processor._calculate_flux()
 
         # check there is an error if roi stop is greater than start
         processor = FluxNormaliser(roi={'horizontal':(10, 5)})
+        processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor.check_input(self.data_cone)
+            processor._calculate_flux()
 
         # check there is an error if roi stop is greater than the size of the axis
         processor = FluxNormaliser(roi={'horizontal':(0, self.data_cone.get_dimension_size('horizontal')+1)})
+        processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor.check_input(self.data_cone)
+            processor._calculate_flux()
 
     @patch("matplotlib.pyplot.figure")
     def test_preview_configuration(self, mock_plot):
@@ -3165,7 +3171,8 @@ class TestFluxNormaliser(unittest.TestCase):
         # Test error in preview configuration if set_input not called
         roi = {'horizontal':(25,40)}
         processor = FluxNormaliser(roi=roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
+
             processor.preview_configuration()
 
         # Test no error with preview_configuration with different data shapes
@@ -3194,19 +3201,19 @@ class TestFluxNormaliser(unittest.TestCase):
                     processor.preview_configuration(channel=1)
 
     def test_FluxNormaliser(self):
-        #Test flux with no norm_value
-        processor = FluxNormaliser(flux=10)
+        #Test flux with no target
+        processor = FluxNormaliser(flux=1)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
         
-        #Test flux with norm_value
-        processor = FluxNormaliser(flux=10, norm_value=5)
+        #Test flux with target
+        processor = FluxNormaliser(flux=10, target=5.0)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
         
-        #Test flux array with no norm_value
+        #Test flux array with no target
         flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
         processor = FluxNormaliser(flux=flux)
         processor.set_input(self.data_cone)
@@ -3214,13 +3221,13 @@ class TestFluxNormaliser(unittest.TestCase):
         data_norm_test = self.data_cone.copy()
         for a in range(data_norm_test.get_dimension_size('angle')):
             data_norm_test.array[a,:,:] /= flux[a]
-            data_norm_test.array[a,:,:]*= numpy.mean(flux)
+            data_norm_test.array[a,:,:]*= numpy.mean(flux.ravel())
         numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6)
 
-        # #Test flux array with norm_value
+        # #Test flux array with target
         flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
-        norm_value = 5
-        processor = FluxNormaliser(flux=flux, norm_value=norm_value)
+        norm_value = 5.0
+        processor = FluxNormaliser(flux=flux, target=norm_value)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         data_norm_test = self.data_cone.copy()

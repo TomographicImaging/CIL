@@ -154,7 +154,7 @@ class SPDHG(Algorithm):
         
 
         # Set up sampler and prob weights from deprecated "prob" argument
-        self._deprecated_set_prob(deprecated_kwargs, prob_weights, sampler) 
+        sampler = self._deprecated_set_prob(deprecated_kwargs, prob_weights, sampler) 
         
         
         self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
@@ -224,14 +224,14 @@ class SPDHG(Algorithm):
             if (prob_weights is None) and (sampler is None):
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
                 self._prob_weights = prob
-                self._sampler = Sampler.random_with_replacement(
+                sampler = Sampler.random_with_replacement(
                     len(self.operator), prob=prob)
             else:
 
                 raise ValueError(
                     '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.')
 
-
+        return sampler 
 
     def _deprecated_set_norms(self, deprecated_kwargs):
         """

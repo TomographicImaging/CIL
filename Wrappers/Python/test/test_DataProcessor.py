@@ -2947,14 +2947,6 @@ class TestBadPixelCorrector(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(corrected_data.as_array(), expected_out_array, decimal=6)
         
 
-    
-
-
-
-
-
-      
-
 
 class TestPaganinProcessor(unittest.TestCase):
 

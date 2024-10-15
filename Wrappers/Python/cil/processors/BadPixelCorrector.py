@@ -139,8 +139,6 @@ class BadPixelCorrector(DataProcessor):
 
         # Coordinates of all masked pixels:
         masked_pixels = numpy.transpose((mask_invert).nonzero())
-
-        
         
         proj_size = math.prod(self._get_proj_shape(data))
 
@@ -150,16 +148,12 @@ class BadPixelCorrector(DataProcessor):
         out_flat = out.array.ravel()
 
         try:
-
             masked_pixels = [x * mask_arr.shape[1] + y for (x,y) in masked_pixels]
         except:
             masked_pixels = [x for (x,) in masked_pixels]
         
-
-
         #%%
         for k in range(num_proj):
-
             # this will create a copy the data
             projection_out = out_flat[k*proj_size:(k+1)*proj_size]
         
@@ -171,75 +165,75 @@ class BadPixelCorrector(DataProcessor):
             for coord in masked_pixels:
                 masked_pixels_status[coord] = False
 
-                masked_pixels_status_temp = masked_pixels_status.copy()
+            masked_pixels_status_temp = masked_pixels_status.copy()
 
-                # Loop through masked pixel coordinates until all have been corrected:
-                x = 0
-                while not all (masked_pixels_status.values()): # later have len >0
-                    x+=1
-                    for coord, corrected in masked_pixels_status.items():
-                        if not corrected:
-                            # Get all neighbours
-                            neighbours = []
-                            diag_neighbours = []
-                            weights = []
-                            if len(mask_arr.shape)== 1:
-                                if coord > 0:
-                                    neighbours.append(coord-1)
-                                if coord < mask_arr.shape[0]-1:
-                                    neighbours.append(coord+1)
-                            else:
-            
-                                if coord % mask_arr.shape[1]>0:
-                                    # Left neighbour
-                                    neighbours.append(coord - 1)
-                                if coord > (mask_arr.shape[1]-1):
-                                    # Upper neighbour
-                                    neighbours.append(coord - mask_arr.shape[1])
-                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]):
-                                    # Lower neighbour
-                                    neighbours.append(coord + mask_arr.shape[1])
-                                if (coord + 1) % mask_arr.shape[1] >0:
-                                    # Right neighbour
-                                    neighbours.append(coord + 1)
-                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) + coord % mask_arr.shape[1]>0:
-                                    # Diagonal lower left neighbour
-                                    diag_neighbours.append(coord + mask_arr.shape[1] - 1)
-                                if coord > (mask_arr.shape[1]-1) and (coord + 1) % mask_arr.shape[1] >0:
-                                    # Diagonal Upper right neighbour
-                                    diag_neighbours.append(coord - mask_arr.shape[1]+1)
-                                if coord > mask_arr.shape[1] and coord % mask_arr.shape[1]>0:
-                                    #Diagonal upper left neighbour
-                                    diag_neighbours.append(coord - mask_arr.shape[1] -1)
-                                if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and (coord + 1) % mask_arr.shape[1] >0:
-                                    # Diagonal lower right neighbour
-                                    diag_neighbours.append(coord + mask_arr.shape[1] + 1)
+            # Loop through masked pixel coordinates until all have been corrected:
+            x = 0
+            while not all (masked_pixels_status.values()): # later have len >0
+                x+=1
+                for coord, corrected in masked_pixels_status.items():
+                    if not corrected:
+                        # Get all neighbours
+                        neighbours = []
+                        diag_neighbours = []
+                        weights = []
+                        if len(mask_arr.shape)== 1:
+                            if coord > 0:
+                                neighbours.append(coord-1)
+                            if coord < mask_arr.shape[0]-1:
+                                neighbours.append(coord+1)
+                        else:
+        
+                            if coord % mask_arr.shape[1]>0:
+                                # Left neighbour
+                                neighbours.append(coord - 1)
+                            if coord > (mask_arr.shape[1]-1):
+                                # Upper neighbour
+                                neighbours.append(coord - mask_arr.shape[1])
+                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]):
+                                # Lower neighbour
+                                neighbours.append(coord + mask_arr.shape[1])
+                            if (coord + 1) % mask_arr.shape[1] >0:
+                                # Right neighbour
+                                neighbours.append(coord + 1)
+                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and coord % mask_arr.shape[1]>0:
+                                # Diagonal lower left neighbour
+                                diag_neighbours.append(coord + mask_arr.shape[1] - 1)
+                            if coord > (mask_arr.shape[1]-1) and (coord + 1) % mask_arr.shape[1] >0:
+                                # Diagonal Upper right neighbour
+                                diag_neighbours.append(coord - mask_arr.shape[1]+1)
+                            if coord > mask_arr.shape[1] and coord % mask_arr.shape[1]>0:
+                                #Diagonal upper left neighbour
+                                diag_neighbours.append(coord - mask_arr.shape[1] -1)
+                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and (coord + 1) % mask_arr.shape[1] >0:
+                                # Diagonal lower right neighbour
+                                diag_neighbours.append(coord + mask_arr.shape[1] + 1)
 
-                            # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
-                            neighbour_values = []
-                            weights = []
-                            projection_array = projection_out
-                            diag_weight = 1/np.sqrt(2)
-                            for neighbour in neighbours + diag_neighbours:
-                                if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
-                                    continue
-                                neighbour_values.append(projection_array[neighbour])
-                                weights.append(1 if neighbour in neighbours else diag_weight)
+                        # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
+                        neighbour_values = []
+                        weights = []
+                        projection_array = projection_out
+                        diag_weight = 1/np.sqrt(2)
+                        for neighbour in neighbours + diag_neighbours:
+                            if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
+                                continue
+                            neighbour_values.append(projection_array[neighbour])
+                            weights.append(1 if neighbour in neighbours else diag_weight)
 
-                            if len(neighbour_values) > 0:
-                                projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
-                                masked_pixels_status_temp[coord] = True
+                        if len(neighbour_values) > 0:
+                            projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
+                            masked_pixels_status_temp[coord] = True
 
-                    # Update projection_out now that all masked pixels have been addressed in this iteration:
-                    projection_out = projection_temp.copy()
-                    masked_pixels_status = masked_pixels_status_temp.copy()
+                # Update projection_out now that all masked pixels have been addressed in this iteration:
+                projection_out = projection_temp.copy()
+                masked_pixels_status = masked_pixels_status_temp.copy()
 
-                    print("Result after " + str(x) + " iterations: ")
-                    print(projection_out)
+                print("Result after " + str(x) + " iterations: ")
+                print(projection_out)
 
-                # Update the projection:
-                # #fill the data back
-                out_flat[k*proj_size:(k+1)*proj_size] = projection_out
+            # Update the projection:
+            # #fill the data back
+            out_flat[k*proj_size:(k+1)*proj_size] = projection_out
 
 
         if return_arr is True:

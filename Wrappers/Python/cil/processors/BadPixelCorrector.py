@@ -87,7 +87,7 @@ class BadPixelCorrector(DataProcessor):
 
 
         if isinstance(self.mask, DataContainer):
-            mask_labels = self.mask.geometry.dimension_labels
+            mask_labels = self.mask.dimension_labels
             # do not allow anything but horizontal and vertical:
             for mask_label in mask_labels:
                 if mask_label not in ['horizontal', 'vertical']:

@@ -2777,6 +2777,7 @@ class TestBadPixelCorrector(unittest.TestCase):
     # Test todos:
     # check of inputs and errors
     # test when shapes dont match
+    # test with a mask that is a data container (not just np array)
     def test_mask_is_none(self):
         with self.assertRaises(ValueError):
             BadPixelCorrector(None)(self.data_3D)

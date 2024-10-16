@@ -24,6 +24,7 @@ class Masker(DataProcessor):
     r'''
     Processor to fill missing values provided by mask.
     Please use the desired method to configure a processor for your needs.
+    
 
     Parameters
     ----------
@@ -37,7 +38,8 @@ class Masker(DataProcessor):
         Substitute all outliers with a specific value if method='value', otherwise discarded.
     axis : str or int
         Specify axis as int or from 'dimension_labels' to calculate mean, median or interpolation
-        (depending on mode) along that axis
+        (depending on mode) along that axis. If you specify an axis, values are collected to calculate 
+        the missing pixel by varying the index of that axis, leaving all other indices fixed.
     method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
         Interpolation method to use.
 
@@ -67,7 +69,7 @@ class Masker(DataProcessor):
 
     @staticmethod
     def mean(mask=None, axis=None):
-        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or along the specified axis.
 
         Parameters
         ----------
@@ -76,7 +78,9 @@ class Masker(DataProcessor):
             Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
             Mask can be generated using 'MaskGenerator' processor to identify outliers.
         axis : str, int
-            Specify axis as int or from 'dimension_labels' to calculate mean.
+            Axis along which the means are computed. Specified by an int or from 'dimension_labels'.
+            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis, 
+            leaving all other indices fixed.
 
         Returns
         -------
@@ -89,7 +93,7 @@ class Masker(DataProcessor):
 
     @staticmethod
     def median(mask=None, axis=None):
-        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or along the specified axis.
 
         Parameters
         ----------
@@ -98,7 +102,9 @@ class Masker(DataProcessor):
             Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
             Mask can be generated using 'MaskGenerator' processor to identify outliers.
         axis : str, int
-            Specify axis as int or from 'dimension_labels' to calculate median.
+            Axis along which the medians are computed. Specified by an int or from 'dimension_labels'.
+            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis,
+        	leaving all other indices fixed.
 
         Returns
         -------
@@ -151,7 +157,10 @@ class Masker(DataProcessor):
     def check_input(self, data):
 
         if self.mask is None:
-            raise ValueError('Please, provide a mask.')
+            raise ValueError('Please provide a mask.')
+        
+        if not isinstance(self.mask, DataContainer) and not isinstance(self.mask, numpy.ndarray):
+            raise ValueError('Mask must be a DataContainer or numpy.ndarray')
 
         if not (data.shape == self.mask.shape):
             raise Exception("Mask and Data must have the same shape." +
@@ -177,8 +186,6 @@ class Masker(DataProcessor):
         else:
             out.fill(data.as_array())
             arr = out.as_array()
-
-        #assumes mask has 'as_array' method, i.e. is a DataContainer or is a numpy array
         try:
             mask_arr = self.mask.as_array()
         except:
@@ -202,41 +209,45 @@ class Masker(DataProcessor):
 
         elif self.mode == 'mean' or self.mode == 'median':
 
+            if self.mode == 'mean':
+                average_function = numpy.mean
+            else:
+                average_function = numpy.median
+            
             if axis_index is not None:
-
                 ndim = data.number_of_dimensions
 
                 slice_obj = [slice(None, None, 1)] * ndim
 
                 for i in range(arr.shape[axis_index]):
-                    current_slice_obj = slice_obj[:]
+                    current_slice_obj = slice_obj.copy()
                     current_slice_obj[axis_index] = i
                     current_slice_obj = tuple(current_slice_obj)
+                    # This is the slice that we are modifying (in the locations where the mask is present):
                     slice_data = arr[current_slice_obj]
-                    if self.mode == 'mean':
-                        slice_data[mask_invert[current_slice_obj]] = numpy.mean(slice_data[mask_arr[current_slice_obj]])
-                    else:
-                        slice_data[mask_invert[current_slice_obj]] = numpy.median(slice_data[mask_arr[current_slice_obj]])
+                    # This is the remaining data on the axis that we are averaging, excluding the current
+                    # slice (as masked values are not included in the average):
+                    remaining_data_on_axis = numpy.delete(arr, i, axis=axis_index)
+                    # the mask on the slice that we are modifying:
+                    mask_slice = mask_invert[current_slice_obj]
+
+                    slice_data[mask_slice] = average_function(remaining_data_on_axis, axis=axis_index)[mask_slice]
                     arr[current_slice_obj] = slice_data
 
             else:
-
-                if self.mode == 'mean':
-                    arr[mask_invert] = numpy.mean(arr[mask_arr])
-                else:
-                    arr[mask_invert] = numpy.median(arr[mask_arr])
+                arr[mask_invert] = average_function(arr[mask_arr]) 
 
         elif self.mode == 'interpolate':
             if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
                                         'quadratic', 'cubic', 'previous', 'next']:
-                raise TypeError("Wrong interpolation method, one of the following is expected:\n" +
+                raise TypeError("Wrong interpolation method, one of the following is expected:\n" + 
                                 "linear, nearest, zeros, linear, quadratic, cubic, previous, next")
 
             ndim = data.number_of_dimensions
             shape = arr.shape
 
             if axis_index is None:
-                raise NotImplementedError ('Currently Only 1D interpolation is available. Please specify an axis to interpolate over.')
+                raise NotImplementedError('Currently Only 1D interpolation is available. Please specify an axis to interpolate over.')
 
             res_dim = 1
             for i in range(ndim):

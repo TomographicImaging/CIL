@@ -1,3 +1,7 @@
+* 24.x.x
+- Bug fixes:
+  - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
+
 * 24.2.0
   - New Features:
     - Added SVRG and LSVRG stochastic functions (#1625)

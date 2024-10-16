@@ -58,7 +58,7 @@ class GD(Algorithm):
 
 
         if self.rtol!=0 or self.atol!=0: # to be deprecated
-            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks) instead', DeprecationWarning, stacklevel=2)
+            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks) instead for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
         else:
             logging.info('In a break with backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
             

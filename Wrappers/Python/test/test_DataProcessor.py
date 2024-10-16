@@ -3160,6 +3160,59 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor._calculate_flux()
 
+    def test_calculate_target(self):
+
+        # check target calculated with default method 'mean'
+        processor = FluxNormaliser(flux=1)
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)))
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 2)
+
+        # check target calculated with method 'first'
+        processor = FluxNormaliser(flux=1, target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)),
+                                   target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        # check target calculated with float
+        processor = FluxNormaliser(flux=1,
+                                   target=55.0)
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 55.0)
+
+        # check error if target is an unrecognised string
+        processor = FluxNormaliser(flux=1,
+                                   target='string')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        with self.assertRaises(ValueError):
+            processor._calculate_target()
+
+        # check error if target is not a string or floar
+        processor = FluxNormaliser(flux=1,
+                                   target={'string': 10})
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        with self.assertRaises(TypeError):
+            processor._calculate_target()
+        
     @patch("matplotlib.pyplot.figure")
     def test_preview_configuration(self, mock_plot):
         # Test error in preview configuration if there is no roi
@@ -3236,67 +3289,69 @@ class TestFluxNormaliser(unittest.TestCase):
             data_norm_test.array[a,:,:]*= norm_value
         numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6)
 
-        # #Test roi with no norm_value
-        # roi = {'vertical':(0,10), 'horizontal':(0,10)}
-        # processor = FluxNormaliser(roi=roi)
-        # processor.set_input(self.data_cone)
-        # data_norm = processor.get_output()
-        # numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+        # #Test roi with no target
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
         # #Test roi with norm_value
-        # roi = {'vertical':(0,10), 'horizontal':(0,10)}
-        # processor = FluxNormaliser(roi=roi, norm_value=5)
-        # processor.set_input(self.data_cone)
-        # data_norm = processor.get_output()
-        # numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi, target=5.0)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
 
         # # Test roi with just one dimension
-        # roi = {'vertical':(0,2)}
-        # processor = FluxNormaliser(roi=roi, norm_value=5)
-        # processor.set_input(self.data_cone)
-        # data_norm = processor.get_output()
-        # numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+        roi = {'vertical':(0,2)}
+        processor = FluxNormaliser(roi=roi, target=5)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
 
         # test roi with different data shapes and different flux values per projection
-        # for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
-        #              self.data_slice, self.data_reorder]:
-        #     roi = {'horizontal':(25,40)}
-        #     processor = FluxNormaliser(roi=roi, norm_value=5)
-        #     processor.set_input(data)
-        #     data_norm = processor.get_output()
+        for data in [ self.data_cone, self.data_parallel, self.data_multichannel,
+                      self.data_slice, self.data_reorder]:
+            roi = {'horizontal':(25,40)}
+            processor = FluxNormaliser(roi=roi, target=5)
+            processor.set_input(data)
+            data_norm = processor.get_output()
 
-        #     ax = data.get_dimension_axis('horizontal')
-        #     slc = [slice(None)]*len(data.shape)
-        #     slc[ax] = slice(25,40)
-        #     axes=[ax]
-        #     if 'vertical' in data.dimension_labels:
-        #         axes.append(data.get_dimension_axis('vertical'))
-        #     if 'channel' in data.dimension_labels:
-        #         axes.append(data.get_dimension_axis('channel'))
-        #     flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
-        #     slice_proj = [slice(None)]*len(data.shape)
-        #     proj_axis = data.get_dimension_axis('angle')
-        #     data_norm_test = data.copy()
-        #     for i in range(len(data.geometry.angles)):
-        #         f = flux[i]
-        #         slice_proj[proj_axis] = i
-        #         with numpy.errstate(divide='ignore', invalid='ignore'):
-        #             data_norm_test.array[tuple(slice_proj)] = 5/f*data.array[tuple(slice_proj)]
-        #     numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6, 
-        #     err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+            ax = data.get_dimension_axis('horizontal')
+            slc = [slice(None)]*len(data.shape)
+            slc[ax] = slice(25,40)
+            axes=[ax]
+            if 'vertical' in data.dimension_labels:
+                axes.append(data.get_dimension_axis('vertical'))
+            flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+            slice_proj = [slice(None)]*len(data.shape)
+            proj_axis = data.get_dimension_axis('angle')
+            data_norm_test = data.copy()
+            h_size = data.get_dimension_size('horizontal')
+            if 'vertical' in data.dimension_labels:
+                v_size = data.get_dimension_size('vertical')
+            else:
+                v_size = 1
+            proj_size = h_size*v_size
+            for i in range(len(data.geometry.angles)*data.geometry.channels):
+                data_norm_test.array.flat[i*proj_size:(i+1)*proj_size] /=flux.flat[i]
+                data_norm_test.array.flat[i*proj_size:(i+1)*proj_size] *=5
+            numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6, 
+            err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
 
-        # data = self.data_single_angle
-        # processor = FluxNormaliser(roi=roi, norm_value=5)
-        # processor.set_input(data)
-        # data_norm = processor.get_output()
-        # ax = data.get_dimension_axis('horizontal')
-        # slc = [slice(None)]*len(data.shape)
-        # slc[ax] = slice(25,40)
-        # axes=[ax,data.get_dimension_axis('vertical')]
-        # flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+        data = self.data_single_angle
+        processor = FluxNormaliser(roi=roi, target=5)
+        processor.set_input(data)
+        data_norm = processor.get_output()
+        ax = data.get_dimension_axis('horizontal')
+        slc = [slice(None)]*len(data.shape)
+        slc[ax] = slice(25,40)
+        axes=[ax,data.get_dimension_axis('vertical')]
+        flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
 
-        # numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
-        # err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+        numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
+        err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
 
 if __name__ == "__main__":
 

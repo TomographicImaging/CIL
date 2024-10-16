@@ -128,7 +128,6 @@ class FluxNormaliser(Processor):
 
         return True
 
-
     def _calculate_flux(self):
         '''
         Function to calculate flux from a region of interest in the data. If the 
@@ -216,13 +215,16 @@ class FluxNormaliser(Processor):
         if 0 in self.flux:
             raise ValueError('Flux value can\'t be 0, provide a different flux\
                                 or region of interest with non-zero values')
-    
-            
+          
     def _calculate_target(self):
         '''
         Calculate the target value for the normalisation
         '''
-        if isinstance(self.target, float):
+
+        if self.flux is None:
+            raise ValueError('Flux not found')
+            
+        if isinstance(self.target, (int,float)):
             self.target_value = self.target
         elif isinstance(self.target, str):
             if self.target == 'first':
@@ -236,11 +238,9 @@ class FluxNormaliser(Processor):
                 raise ValueError("Target string not recognised, found {}, expected 'first' or 'mean'"
                                  .format(self.target))
         else:
-            raise TypeError("Target must be string or float, found {}"
+            raise TypeError("Target must be string or a number, found {}"
                             .format(type(self.target)))
             
-            
-
     def preview_configuration(self, angle=None, channel=None, log=False):
         '''
         Preview the FluxNormalisation processor configuration for roi mode.
@@ -405,19 +405,5 @@ class FluxNormaliser(Processor):
                 f = self.flux.flat[i] 
             arr_proj *= self.target_value/f
             out.array.flat[i*proj_size:(i+1)*proj_size] = arr_proj
-
-        
-        # if 'angle' in data.dimension_labels:
-        #     proj_axis = data.get_dimension_axis('angle')
-        #     slice_proj = [slice(None)]*len(data.shape)
-        #     slice_proj[proj_axis] = 0
-        
-        #     for i in range(len(data.geometry.angles)):
-        #         if len(flux_size) > 0:
-        #             f = self.flux[i]
-        #         slice_proj[proj_axis] = i
-        #         out.array[tuple(slice_proj)] = data.array[tuple(slice_proj)]*self.target_value/f
-        # else:
-        #     out.array = data.array*self.target_value/f 
 
         return out

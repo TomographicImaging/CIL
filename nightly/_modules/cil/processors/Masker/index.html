@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Masker &#8212; CIL 24.2.1.dev1+g83894302 documentation</title>
+    <title>cil.processors.Masker &#8212; CIL 24.2.1.dev2+ga4759748 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
 
-    <script src="../../../../_static/documentation_options.js?v=e0479393"></script>
+    <script src="../../../../_static/documentation_options.js?v=aa252d58"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,14 +49,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev1+g83894302';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev2+ga4759748';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev1+g83894302" />
+  <meta name="docsearch:version" content="24.2.1.dev2+ga4759748" />
   </head>
   
   
@@ -491,6 +491,7 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Processor to fill missing values provided by mask.</span>
 <span class="sd">    Please use the desired method to configure a processor for your needs.</span>
+<span class="sd">    </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -504,7 +505,8 @@
 <span class="sd">        Substitute all outliers with a specific value if method=&#39;value&#39;, otherwise discarded.</span>
 <span class="sd">    axis : str or int</span>
 <span class="sd">        Specify axis as int or from &#39;dimension_labels&#39; to calculate mean, median or interpolation</span>
-<span class="sd">        (depending on mode) along that axis</span>
+<span class="sd">        (depending on mode) along that axis. If you specify an axis, values are collected to calculate </span>
+<span class="sd">        the missing pixel by varying the index of that axis, leaving all other indices fixed.</span>
 <span class="sd">    method : {&#39;linear&#39;, &#39;nearest&#39;, &#39;zeros&#39;, &#39;linear&#39;, &#39;quadratic&#39;, &#39;cubic&#39;, &#39;previous&#39;, &#39;next&#39;}, default=&#39;linear&#39;</span>
 <span class="sd">        Interpolation method to use.</span>
 
@@ -539,7 +541,7 @@
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.mean">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or along the specified axis.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -548,7 +550,9 @@
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
 <span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        axis : str, int</span>
-<span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate mean.</span>
+<span class="sd">            Axis along which the means are computed. Specified by an int or from &#39;dimension_labels&#39;.</span>
+<span class="sd">            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis, </span>
+<span class="sd">            leaving all other indices fixed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -564,7 +568,7 @@
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Masker.median">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or along the specified axis.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -573,7 +577,9 @@
 <span class="sd">            Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.</span>
 <span class="sd">            Mask can be generated using &#39;MaskGenerator&#39; processor to identify outliers.</span>
 <span class="sd">        axis : str, int</span>
-<span class="sd">            Specify axis as int or from &#39;dimension_labels&#39; to calculate median.</span>
+<span class="sd">            Axis along which the medians are computed. Specified by an int or from &#39;dimension_labels&#39;.</span>
+<span class="sd">            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis,</span>
+<span class="sd">        	leaving all other indices fixed.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -630,7 +636,10 @@
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, provide a mask.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please provide a mask.&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mask must be a DataContainer or numpy.ndarray&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mask and Data must have the same shape.&quot;</span> <span class="o">+</span>
@@ -656,8 +665,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
             <span class="n">arr</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-
-        <span class="c1">#assumes mask has &#39;as_array&#39; method, i.e. is a DataContainer or is a numpy array</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mask_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
@@ -681,41 +688,45 @@
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+                <span class="n">average_function</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">average_function</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span>
+            
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
                 <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>
 
                 <span class="n">slice_obj</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="n">ndim</span>
 
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]):</span>
-                    <span class="n">current_slice_obj</span> <span class="o">=</span> <span class="n">slice_obj</span><span class="p">[:]</span>
+                    <span class="n">current_slice_obj</span> <span class="o">=</span> <span class="n">slice_obj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="n">current_slice_obj</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="n">current_slice_obj</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">current_slice_obj</span><span class="p">)</span>
+                    <span class="c1"># This is the slice that we are modifying (in the locations where the mask is present):</span>
                     <span class="n">slice_data</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-                        <span class="n">slice_data</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">slice_data</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]])</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">slice_data</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">slice_data</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]])</span>
+                    <span class="c1"># This is the remaining data on the axis that we are averaging, excluding the current</span>
+                    <span class="c1"># slice (as masked values are not included in the average):</span>
+                    <span class="n">remaining_data_on_axis</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">)</span>
+                    <span class="c1"># the mask on the slice that we are modifying:</span>
+                    <span class="n">mask_slice</span> <span class="o">=</span> <span class="n">mask_invert</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]</span>
+
+                    <span class="n">slice_data</span><span class="p">[</span><span class="n">mask_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">average_function</span><span class="p">(</span><span class="n">remaining_data_on_axis</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis_index</span><span class="p">)[</span><span class="n">mask_slice</span><span class="p">]</span>
                     <span class="n">arr</span><span class="p">[</span><span class="n">current_slice_obj</span><span class="p">]</span> <span class="o">=</span> <span class="n">slice_data</span>
 
             <span class="k">else</span><span class="p">:</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span>
+                <span class="n">arr</span><span class="p">[</span><span class="n">mask_invert</span><span class="p">]</span> <span class="o">=</span> <span class="n">average_function</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask_arr</span><span class="p">])</span> 
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;interpolate&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span> \
                                         <span class="s1">&#39;quadratic&#39;</span><span class="p">,</span> <span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="s1">&#39;previous&#39;</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong interpolation method, one of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
                                 <span class="s2">&quot;linear, nearest, zeros, linear, quadratic, cubic, previous, next&quot;</span><span class="p">)</span>
 
             <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
 
             <span class="k">if</span> <span class="n">axis_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span> <span class="p">(</span><span class="s1">&#39;Currently Only 1D interpolation is available. Please specify an axis to interpolate over.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Currently Only 1D interpolation is available. Please specify an axis to interpolate over.&#39;</span><span class="p">)</span>
 
             <span class="n">res_dim</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">):</span>

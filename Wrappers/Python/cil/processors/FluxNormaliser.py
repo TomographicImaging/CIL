@@ -17,7 +17,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.utilities.display import show2D
 import numpy
 import logging
 import matplotlib.pyplot as plt

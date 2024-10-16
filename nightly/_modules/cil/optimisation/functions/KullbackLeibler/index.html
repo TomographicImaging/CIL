@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.KullbackLeibler &#8212; CIL 24.2.1.dev2+ga4759748 documentation</title>
+    <title>cil.optimisation.functions.KullbackLeibler &#8212; CIL 24.2.1.dev3+g64852595 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
 
-    <script src="../../../../../_static/documentation_options.js?v=aa252d58"></script>
+    <script src="../../../../../_static/documentation_options.js?v=e8c81ddc"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,14 +49,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev2+ga4759748';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev3+g64852595';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev2+ga4759748" />
+  <meta name="docsearch:version" content="24.2.1.dev3+g64852595" />
   </head>
   
   
@@ -811,25 +811,9 @@
     <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">kl_div</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
         <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">has_inf</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
-                <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
-            <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c1"># out.flat[i] = Y</span>
-                <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">Y</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># out.flat[i] = numpy.inf</span>
-                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
-    
-    <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">kl_div_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">has_inf</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -840,7 +824,29 @@
                     <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">Y</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># out.flat[i] = numpy.inf</span>
-                    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+                    <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+                    <span class="n">has_inf</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
+    
+    <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_div_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">get_num_threads</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">has_inf</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">has_inf</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
+                        <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+                    <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># out.flat[i] = Y</span>
+                        <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">+=</span> <span class="n">Y</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># out.flat[i] = numpy.inf</span>
+                        <span class="n">accumulator</span><span class="p">[</span><span class="n">get_thread_id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+                        <span class="n">has_inf</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">accumulator</span><span class="p">)</span>
 
     <span class="c1"># convex conjugate</span>

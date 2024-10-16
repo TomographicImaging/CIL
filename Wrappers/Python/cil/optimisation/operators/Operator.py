@@ -609,7 +609,7 @@ class CompositionOperator(Operator):
 
     Parameters
     ----------
-    args: `Operator`s
+    args: `Operator` s
         Operators to be composed. As in mathematical notation, the operators will be applied right to left
 
     """

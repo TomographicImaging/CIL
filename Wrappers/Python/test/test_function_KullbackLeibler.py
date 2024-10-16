@@ -173,6 +173,22 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
 
         numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
 
+    def test_KullbackLeibler_numba_kl_div_has_inf(self):
+        x = self.u1 * self.mask
+        x *= -1
+        
+        from cil.optimisation.functions.KullbackLeibler import kl_div
+
+        numpy.testing.assert_equal(kl_div(x.array, self.b1.array, self.eta.array), numpy.inf)
+
+    def test_KullbackLeibler_numba_kl_div_mask_has_inf(self):
+        x = self.u1 * self.mask
+        x *= -1
+        
+        from cil.optimisation.functions.KullbackLeibler import kl_div_mask
+
+        numpy.testing.assert_equal(kl_div_mask(x.array, self.b1.array, self.eta.array, self.mask.array), numpy.inf)
+
     def test_KullbackLeibler_numba_call_mask(self):
         f = self.f
         f_np = self.f_np

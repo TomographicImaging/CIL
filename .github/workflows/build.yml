@@ -122,7 +122,7 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
+        mamba-version: "1.5"
         channels: conda-forge
     - name: conda build & test
       working-directory: recipe
@@ -155,7 +155,7 @@ jobs:
         echo '${{ secrets.STFC_SSH_KEY }}' > ./key
         chmod 600 ./key
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
-          'conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}'
+          'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
     defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-latest
@@ -243,7 +243,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: docker/build-push-action@v5
+    - uses: docker/build-push-action@v6
       with:
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -254,7 +254,7 @@ jobs:
       run: >
         docker run --rm -v .:/CIL tomographicimaging/cil:test /bin/bash -c
         'python -m unittest discover -v /CIL/Wrappers/Python/test'
-    - uses: docker/build-push-action@v5
+    - uses: docker/build-push-action@v6
       with:
         cache-from: type=gha
         cache-to: type=gha,mode=max

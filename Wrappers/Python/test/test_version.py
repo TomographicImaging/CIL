@@ -46,4 +46,7 @@ class TestModuleBase(unittest.TestCase):
     def test_version_commit_hash(self):
         from cil import version
         self.assertTrue(isinstance(version.commit_hash, str))
-        self.assertEqual(version.commit_hash[0], 'g')
+        try: # tagged release
+            self.assertEqual((version.commit_hash, version.num_commit), ('None', 0))
+        except AssertionError: # dev build
+            self.assertEqual(version.commit_hash[0], 'g')

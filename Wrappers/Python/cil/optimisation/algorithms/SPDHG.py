@@ -45,19 +45,28 @@ class SPDHG(Algorithm):
         A convex function with a "simple" proximal
     operator : BlockOperator
         BlockOperator must contain Linear Operators
-    tau : positive float, optional, default=None
-        Step size parameter for primal problem. If `None` see note.
-    sigma : list of positive float, optional, default=None
-        List of Step size parameters for dual problem. If `None` see note.
-    initial : DataContainer, optional, the default value is a zero DataContainer in the range of the `operator`.
-        Initial point for the SPDHG algorithm
+    tau : positive float, optional
+        Step size parameter for the primal problem. If `None` will be computed by algorithm, see note for details. 
+    sigma : list of positive float, optional
+        List of Step size parameters for dual problem.  If `None` will be computed by algorithm, see note for details. 
+    initial : DataContainer, optional
+        Initial point for the SPDHG algorithm. The default value is a zero DataContainer in the range of the `operator`.
     gamma : float, optional
             Parameter controlling the trade-off between the primal and dual step sizes
-    sampler: optional, an instance of a `cil.optimisation.utilities.Sampler` class or another class with the function __next__(self) implemented outputting an integer from {1,...,len(operator)}. 
-            Method of selecting the next index for the SPDHG update. If None, a sampler will be created for random sampling with replacement and each index will have `probability = 1/len(operator)`
-    prob_weights: optional, list of floats of length `num_indices` that sum to 1. Defaults to `[1/len(operator)]*len(operator)`
-            Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute: if the sampler has a `prob_weight` attribute it will take precedence on this parameter. 
+    sampler: `cil.optimisation.utilities.Sampler`, optional 
+            A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.  
 
+    prob_weights: list of floats, optional,  
+             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute: if the sampler has a `prob_weight` attribute it will take precedence on this parameter. Should be a list of floats of length `num_indices` that sum to 1. If no sampler with `prob_weights` is passed, it defaults to `[1/len(operator)]*len(operator)`.
+
+
+    Note  
+    -----  
+    The `sampler` can be an instance of the `cil.optimisation.utilities.Sampler` class or a custom class with the `__next__(self)` method implemented, which outputs an integer index from {1, ..., len(operator)}. 
+
+    Note  
+    -----  
+    "Random sampling with replacement" will select the next index with equal probability from  `1 - len(operator)`.  
 
 
     Example
@@ -152,12 +161,10 @@ class SPDHG(Algorithm):
 
         self._ndual_subsets = len(self.operator)
         
-
-        # Set up sampler and prob weights from deprecated "prob" argument
-        sampler = self._deprecated_set_prob(deprecated_kwargs, prob_weights, sampler) 
-        
-        
         self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
+        
+        self._deprecated_set_prob(deprecated_kwargs, sampler) 
+        
         if self._prob_weights is None: 
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
         
@@ -169,12 +176,13 @@ class SPDHG(Algorithm):
                 len(operator), prob=self._prob_weights)
         else:
             self._sampler = sampler
-
+        
         #Set the norms of the operators
         self._deprecated_set_norms(deprecated_kwargs) 
         self._norms = operator.get_norms_as_list()
         #Check for other kwargs
-        self._deprecated_else(deprecated_kwargs)
+        if deprecated_kwargs:
+            raise ValueError("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
@@ -200,7 +208,7 @@ class SPDHG(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-    def _deprecated_set_prob(self, deprecated_kwargs, prob_weights, sampler):
+    def _deprecated_set_prob(self, deprecated_kwargs, sampler):
         """
         Handle deprecated keyword arguments for backward compatibility.
 
@@ -208,8 +216,6 @@ class SPDHG(Algorithm):
         ----------
         deprecated_kwargs : dict
             Dictionary of keyword arguments.
-        prob_weights : list of floats
-            List of probabilities for each operator.
         sampler : Sampler           
             Sampler class for selecting the next index for the SPDHG update.
 
@@ -221,17 +227,15 @@ class SPDHG(Algorithm):
         prob = deprecated_kwargs.pop('prob', None)
 
         if prob is not None:
-            if (prob_weights is None) and (sampler is None):
+            if (self._prob_weights is None) and (sampler is None):
                 warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
                 self._prob_weights = prob
-                sampler = Sampler.random_with_replacement(
-                    len(self.operator), prob=prob)
             else:
 
                 raise ValueError(
                     '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.')
 
-        return sampler 
+
 
     def _deprecated_set_norms(self, deprecated_kwargs):
         """
@@ -253,22 +257,7 @@ class SPDHG(Algorithm):
             warnings.warn(
                 ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`', DeprecationWarning, stacklevel=2)
 
-    def _deprecated_else(self, deprecated_kwargs):
-        """
-        Handle deprecated keyword arguments for backward compatibility.
 
-        Parameters
-        ----------
-        deprecated_kwargs : dict
-            Dictionary of keyword arguments.
-
-        Notes
-        -----
-        This method is called by the set_up method.
-        """
-        if deprecated_kwargs:
-            raise ValueError("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
-        
         
     @property
     def sigma(self):

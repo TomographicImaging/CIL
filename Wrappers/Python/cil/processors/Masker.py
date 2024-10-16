@@ -24,6 +24,7 @@ class Masker(DataProcessor):
     r'''
     Processor to fill missing values provided by mask.
     Please use the desired method to configure a processor for your needs.
+    
 
     Parameters
     ----------
@@ -37,7 +38,8 @@ class Masker(DataProcessor):
         Substitute all outliers with a specific value if method='value', otherwise discarded.
     axis : str or int
         Specify axis as int or from 'dimension_labels' to calculate mean, median or interpolation
-        (depending on mode) along that axis
+        (depending on mode) along that axis. If you specify an axis, values are collected to calculate 
+        the missing pixel by varying the index of that axis, leaving all other indices fixed.
     method : {'linear', 'nearest', 'zeros', 'linear', 'quadratic', 'cubic', 'previous', 'next'}, default='linear'
         Interpolation method to use.
 
@@ -67,7 +69,7 @@ class Masker(DataProcessor):
 
     @staticmethod
     def mean(mask=None, axis=None):
-        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the mean of the unmasked values across the array or along the specified axis.
 
         Parameters
         ----------
@@ -76,7 +78,9 @@ class Masker(DataProcessor):
             Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
             Mask can be generated using 'MaskGenerator' processor to identify outliers.
         axis : str, int
-            Specify axis as int or from 'dimension_labels' to calculate mean.
+            Axis along which the means are computed. Specified by an int or from 'dimension_labels'.
+            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis, 
+            leaving all other indices fixed.
 
         Returns
         -------
@@ -89,7 +93,7 @@ class Masker(DataProcessor):
 
     @staticmethod
     def median(mask=None, axis=None):
-        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        r'''Returns a Masker that sets the masked values of the input data to the median of the unmasked values across the array or along the specified axis.
 
         Parameters
         ----------
@@ -98,7 +102,9 @@ class Masker(DataProcessor):
             Alternatively an integer array where 0 represents masked values, and any other value represents unmasked values.
             Mask can be generated using 'MaskGenerator' processor to identify outliers.
         axis : str, int
-            Specify axis as int or from 'dimension_labels' to calculate median.
+            Axis along which the medians are computed. Specified by an int or from 'dimension_labels'.
+            If you specify an axis, values are collected to calculate the missing pixel by varying the index of that axis,
+        	leaving all other indices fixed.
 
         Returns
         -------

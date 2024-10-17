@@ -141,6 +141,7 @@ class SIRT(Algorithm):
 
     @property
     def relaxation_parameter(self):
+        """Get the relaxation parameter :math:`\omega`"""
         return self._relaxation_parameter
 
     @property
@@ -165,6 +166,7 @@ class SIRT(Algorithm):
 
 
     def _set_up_weights(self):
+        """Set up the preconditioning arrays M and D"""
         self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))
         self._Dscaled = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 

@@ -3,6 +3,9 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+- Dependencies:
+  - Added tomopy to `requirements-test.yml` as this is needed for new Pagain CIL-Demo.
+  - Added tomopy and scikit-image to CIL-Demos conda install command as needed for new Paganin and Callbacks notebooks.
 
 * 24.2.0
   - New Features:

@@ -201,7 +201,7 @@ class SIRT(Algorithm):
 
         r""" Performs a single iteration of the SIRT algorithm
 
-        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )
+        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M *(b - Ax) ) ) )
 
         """
 

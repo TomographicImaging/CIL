@@ -40,7 +40,7 @@ class SIRT(Algorithm):
     .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),
 
     where,
-    :math:`M = \frac{1}{A*\mathbb{1}}`,
+    :math:`M = \frac{1}{A\mathbb{1}}`,
     :math:`D = \frac{1}{A^{T}\mathbb{1}}`,
     :math:`\mathbb{1}` is a :code:`DataContainer` of ones,
     :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
@@ -77,14 +77,14 @@ class SIRT(Algorithm):
 
     The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as
 
-    .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
+    .. math:: M = \frac{1}{A\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
 
-    .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
+    .. math:: D = \frac{1}{A^T\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
 
 
     Examples
     --------
-    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}
+    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| Ax - d\|^{2}
 
     >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5)
 
@@ -92,6 +92,7 @@ class SIRT(Algorithm):
 
 
     def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
+        """Constructor of SIRT algorithm"""
 
         super(SIRT, self).__init__(**kwargs)
 

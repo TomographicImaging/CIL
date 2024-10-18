@@ -85,8 +85,10 @@ class IdentityOperator(LinearOperator):
     
     def is_orthogonal(self):
         '''Returns if the operator is orthogonal
+        
         Returns
         -------
         `Bool`
+            Always returns `True` for `IdentityOperator`
         '''
         return True 

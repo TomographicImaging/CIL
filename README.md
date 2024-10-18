@@ -27,7 +27,7 @@ conda create --name cil -c conda-forge -c https://software.repos.intel.com/pytho
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
 ```
 
 where:

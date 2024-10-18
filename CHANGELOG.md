@@ -3,6 +3,8 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+- Dependencies:
+  - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
 
 * 24.2.0
   - New Features:

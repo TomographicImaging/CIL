@@ -23,7 +23,7 @@ import numpy as np
 
 class IdentityOperator(LinearOperator):
 
-    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarray Y`,  :math:`\mathrm{Id}(x) = x`
+    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarrow Y`,  :math:`\mathrm{Id}(x) = x`
 
                    :math:`X` : domain
                    :math:`Y` : range ( Default: :math:`Y = X` )
@@ -42,7 +42,7 @@ class IdentityOperator(LinearOperator):
 
     def direct(self,x,out=None):
 
-        '''Returns :math:`Id(x)` '''
+        r'''Returns :math:`\mathrm{Id}(x)` '''
 
         if out is None:
             return x.copy()
@@ -52,7 +52,7 @@ class IdentityOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
 
-        '''Returns :math:`\mathrm{Id}(x)=x ` '''
+        r'''Returns :math:`\mathrm{Id}(x)=x` '''
 
 
         if out is None:
@@ -63,7 +63,7 @@ class IdentityOperator(LinearOperator):
 
     def calculate_norm(self, **kwargs):
 
-        '''Evaluates operator norm of IdentityOperator'''
+        '''Evaluates operator norm of  `IdentityOperator`'''
 
         return 1.0
 

@@ -35,7 +35,7 @@ class ZeroOperator(LinearOperator):
         -----
 
         .. math::
-                O^{*}: Y^{*} -> X^{*} \text{(Adjoint)}
+                O^{*}: Y^{*} -> X^{*} \text{(Adjoint)} \quad \text{such that} \quad
                 \langle O(x), y \rangle = \langle x, O^{*}(y) \rangle
      '''
     def __init__(self, domain_geometry, range_geometry=None):

@@ -22,12 +22,12 @@ from cil.framework import VectorGeometry
 from cil.optimisation.operators import LinearOperator
 
 class MatrixOperator(LinearOperator):
-    r""" Matrix wrapped into a LinearOperator
+    r""" Matrix wrapped in a CIL Operator to be used in optimisation algorithms. 
 
-    Parameters
+    Parameters      
     ----------
     A: a numpy matrix
-        The matrix to be wrapped into a LinearOperator
+        The matrix to be wrapped into a CIL Operator
 
     """
 
@@ -37,12 +37,11 @@ class MatrixOperator(LinearOperator):
         M_A, N_A = self.A.shape
         domain_geometry = VectorGeometry(N_A, dtype=A.dtype)
         range_geometry = VectorGeometry(M_A, dtype=A.dtype)
-        self.s1 = None   # Largest singular value, initially unknown
         super(MatrixOperator, self).__init__(domain_geometry=domain_geometry,
                                                    range_geometry=range_geometry)
 
     def direct(self,x, out=None):
-        r"""Returns :math:`A*x`
+        r"""Returns :math:`Ax`
         
         Parameters
         ----------
@@ -53,7 +52,7 @@ class MatrixOperator(LinearOperator):
         Returns
         -------
         DataContainer
-            :math:`A*x`
+            :math:`Ax`
         """
         
         if out is None:
@@ -68,7 +67,7 @@ class MatrixOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-        r"""Returns :math:`A^{T}*x`
+        r"""Returns :math:`A^{T}x`
         
         Parameters
         ----------
@@ -80,7 +79,7 @@ class MatrixOperator(LinearOperator):
         Returns
         -------
         DataContainer
-            :math:`A^{T}*x`
+            :math:`A^{T}x`
         """
         
         if out is None:

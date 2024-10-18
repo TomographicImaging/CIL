@@ -49,4 +49,3 @@ dependencies:
   - numba
   - tqdm
   - zenodo_get >=1.6
-  - tomopy

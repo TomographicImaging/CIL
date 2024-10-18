@@ -48,7 +48,7 @@ class MatrixOperator(LinearOperator):
         x : DataContainer
             Input data
         out : DataContainer, optional
-            Output data, default is None
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
         Returns
         -------
         DataContainer
@@ -74,7 +74,7 @@ class MatrixOperator(LinearOperator):
         x : DataContainer
             Input data
         out : DataContainer, optional
-            Output data, default is None
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
             
         Returns
         -------

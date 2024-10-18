@@ -48,7 +48,21 @@ class IdentityOperator(LinearOperator):
 
     def direct(self,x,out=None):
 
-        r'''Returns :math:`\mathrm{Id}(x)` '''
+        r'''Returns :math:`\mathrm{Id}(x)`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+        
+        Returns
+        -------
+        DataContainer or BlockDataContainer
+            :math:`\mathrm{Id}(x) = x`
+            
+        '''
 
         if out is None:
             return x.copy()
@@ -57,8 +71,21 @@ class IdentityOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-
-        r'''Returns :math:`\mathrm{Id}(x)=x` '''
+        r'''Returns :math:`\mathrm{Id}^*(x)=x`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+            
+        Returns
+        -------
+        DataContainer or BlockDataContainer
+            :math:`\mathrm{Id}^*(x)=x`
+        
+        '''
 
 
         if out is None:

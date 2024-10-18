@@ -23,10 +23,10 @@ import numpy as np
 
 class IdentityOperator(LinearOperator):
 
-    '''IdentityOperator:  Id: X -> Y,  Id(x) = x\in Y
+    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarray Y`,  :math:`\mathrm{Id}(x) = x`
 
-                   X : gm_domain
-                   Y : gm_range ( Default: Y = X )
+                   :math:`X` : domain
+                   :math:`Y` : range ( Default: :math:`Y = X` )
 
     '''
 
@@ -42,7 +42,7 @@ class IdentityOperator(LinearOperator):
 
     def direct(self,x,out=None):
 
-        '''Returns Id(x)'''
+        '''Returns :math:`Id(x)` '''
 
         if out is None:
             return x.copy()
@@ -52,7 +52,7 @@ class IdentityOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
 
-        '''Returns Id(x)'''
+        '''Returns :math:`\mathrm{Id}(x)=x ` '''
 
 
         if out is None:

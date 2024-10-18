@@ -22,17 +22,17 @@ from cil.framework import VectorGeometry
 from cil.optimisation.operators import LinearOperator
 
 class MatrixOperator(LinearOperator):
-    """ Matrix wrapped into a LinearOperator
+    r""" Matrix wrapped into a LinearOperator
 
-    :param: a numpy matrix
+    Parameters
+    ----------
+    A: a numpy matrix
+        The matrix to be wrapped into a LinearOperator
 
     """
 
     def __init__(self,A):
-        '''creator
-
-        :param A: numpy ndarray representing a matrix
-        '''
+        """Constructor"""
         self.A = A
         M_A, N_A = self.A.shape
         domain_geometry = VectorGeometry(N_A, dtype=A.dtype)
@@ -42,7 +42,20 @@ class MatrixOperator(LinearOperator):
                                                    range_geometry=range_geometry)
 
     def direct(self,x, out=None):
-
+        r"""Returns :math:`A*x`
+        
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            Output data, default is None
+        Returns
+        -------
+        DataContainer
+            :math:`A*x`
+        """
+        
         if out is None:
             tmp = self.range_geometry().allocate()
             tmp.fill(numpy.dot(self.A,x.as_array()))
@@ -55,6 +68,21 @@ class MatrixOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
+        r"""Returns :math:`A^{T}*x`
+        
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            Output data, default is None
+            
+        Returns
+        -------
+        DataContainer
+            :math:`A^{T}*x`
+        """
+        
         if out is None:
             tmp = self.domain_geometry().allocate()
             tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
@@ -64,4 +92,6 @@ class MatrixOperator(LinearOperator):
             return out
 
     def size(self):
+        r"""Returns the size of the matrix
+        """
         return self.A.shape

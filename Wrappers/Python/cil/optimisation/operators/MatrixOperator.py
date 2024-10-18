@@ -91,6 +91,6 @@ class MatrixOperator(LinearOperator):
             return out
 
     def size(self):
-        r"""Returns the size of the matrix
+        r"""Returns the shape of the matrix
         """
         return self.A.shape

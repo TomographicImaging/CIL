@@ -28,6 +28,12 @@ class IdentityOperator(LinearOperator):
                    :math:`X` : domain
                    :math:`Y` : range ( Default: :math:`Y = X` )
 
+    Parameters
+    ----------
+    domain_geometry: CIL Geometry
+        domain of the operator
+    range_geometry: CIL Geometry, optional
+        range of the operator, default: same as domain
     '''
 
 

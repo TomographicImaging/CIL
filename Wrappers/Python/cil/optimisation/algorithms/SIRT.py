@@ -27,7 +27,6 @@ log = logging.getLogger(__name__)
 
 
 class SIRT(Algorithm):
-
     r"""Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.
 
     Simultaneous Iterative Reconstruction Technique (SIRT) solves
@@ -86,7 +85,7 @@ class SIRT(Algorithm):
     --------
     .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| Ax - d\|^{2}
 
-    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5)
+    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d)
 
     """
 
@@ -146,6 +145,7 @@ class SIRT(Algorithm):
 
     @property
     def D(self):
+        """Get the preconditioning array :math:`D`"""
         return self._Dscaled / self._relaxation_parameter
 
     def set_relaxation_parameter(self, value=1.0):
@@ -201,7 +201,7 @@ class SIRT(Algorithm):
 
         r""" Performs a single iteration of the SIRT algorithm
 
-        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax) ) ) )
+        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )
 
         """
 
@@ -221,7 +221,7 @@ class SIRT(Algorithm):
                 self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
-        r"""Returns the objective
+        r""" Appends the current objective value to the list of previous objective values
 
         .. math:: \frac{1}{2}\|A x - b\|^{2}
 

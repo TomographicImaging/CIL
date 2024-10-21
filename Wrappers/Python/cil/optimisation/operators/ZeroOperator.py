@@ -45,7 +45,20 @@ class ZeroOperator(LinearOperator):
                                            range_geometry=range_geometry)
 
     def direct(self,x,out=None):
-        r'''Returns :math:`\mathrm{O}(x)`'''
+        r'''Returns :math:`\mathrm{O}(x)`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+        
+        Returns
+        -------
+        DataContainer
+            :math:`\mathrm{O}(x)`
+        '''
         if out is None:
             return self.range_geometry().allocate(value=0)
         else:
@@ -53,7 +66,21 @@ class ZeroOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-        r'''Returns :math:`\mathrm{O}^{*}(y)` '''
+        r'''Returns :math:`\mathrm{O}^{*}(y)`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+        
+        Returns
+        -------
+        DataContainer
+            :math:`\mathrm{O}^{*}(y)`
+        
+        '''
         if out is None:
             return self.domain_geometry().allocate(value=0)
         else:

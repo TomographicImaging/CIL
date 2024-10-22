@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.MatrixOperator &#8212; CIL 24.2.1.dev3+g64852595 documentation</title>
+    <title>cil.optimisation.operators.MatrixOperator &#8212; CIL 24.2.1.dev5+g23187c9e documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=fd05d3ddc9a6e3fa7c66" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=fd05d3ddc9a6e3fa7c66" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../../_static/scripts/fontawesome.js?digest=fd05d3ddc9a6e3fa7c66"></script>
+  <script src="../../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../../_static/documentation_options.js?v=e8c81ddc"></script>
+    <script src="../../../../../_static/documentation_options.js?v=da845b79"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,14 +49,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev3+g64852595';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev5+g23187c9e';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev3+g64852595" />
+  <meta name="docsearch:version" content="24.2.1.dev5+g23187c9e" />
   </head>
   
   
@@ -489,29 +489,41 @@
 <div class="viewcode-block" id="MatrixOperator">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator">[docs]</a>
 <span class="k">class</span> <span class="nc">MatrixOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Matrix wrapped into a LinearOperator</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Matrix wrapped in a CIL Operator to be used in optimisation algorithms. </span>
 
-<span class="sd">    :param: a numpy matrix</span>
+<span class="sd">    Parameters      </span>
+<span class="sd">    ----------</span>
+<span class="sd">    A: a numpy matrix</span>
+<span class="sd">        The matrix to be wrapped into a CIL Operator</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">A</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
-
-<span class="sd">        :param A: numpy ndarray representing a matrix</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
         <span class="n">M_A</span><span class="p">,</span> <span class="n">N_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">N_A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">M_A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s1</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># Largest singular value, initially unknown</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatrixOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                                    <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MatrixOperator.direct">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.direct">[docs]</a>
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the matrix vector product :math:`Ax`</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : DataContainer</span>
+<span class="sd">            Input data</span>
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            :math:`Ax`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
@@ -527,6 +539,21 @@
 <div class="viewcode-block" id="MatrixOperator.adjoint">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.adjoint">[docs]</a>
     <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the matrix vector product :math:`A^{T}x`</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : DataContainer</span>
+<span class="sd">            Input data</span>
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            :math:`A^{T}x`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
@@ -536,8 +563,13 @@
             <span class="k">return</span> <span class="n">out</span></div>
 
 
+<div class="viewcode-block" id="MatrixOperator.size">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.MatrixOperator.size">[docs]</a>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the shape of the matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span></div>
+</div>
 
 </pre></div>
 
@@ -568,8 +600,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=fd05d3ddc9a6e3fa7c66"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=fd05d3ddc9a6e3fa7c66"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

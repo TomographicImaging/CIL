@@ -48,7 +48,7 @@ class IdentityOperator(LinearOperator):
 
     def direct(self,x,out=None):
 
-        r'''Returns :math:`\mathrm{Id}(x)`
+        r'''Returns the input data :math:`x`
         
         Parameters
         ----------
@@ -71,7 +71,7 @@ class IdentityOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-        r'''Returns :math:`\mathrm{Id}^*(x)=x`
+        r'''Returns the input data, :math:`x`
         
         Parameters
         ----------

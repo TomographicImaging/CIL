@@ -41,7 +41,7 @@ class MatrixOperator(LinearOperator):
                                                    range_geometry=range_geometry)
 
     def direct(self,x, out=None):
-        r"""Returns :math:`Ax`
+        r"""Returns the matrix vector product :math:`Ax`
         
         Parameters
         ----------
@@ -67,7 +67,7 @@ class MatrixOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-        r"""Returns :math:`A^{T}x`
+        r"""Returns the matrix vector product :math:`A^{T}x`
         
         Parameters
         ----------

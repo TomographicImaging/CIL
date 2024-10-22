@@ -45,7 +45,7 @@ class ZeroOperator(LinearOperator):
                                            range_geometry=range_geometry)
 
     def direct(self,x,out=None):
-        r'''Returns :math:`\mathrm{O}(x)`
+        r'''Returns an element of the range space filled with zeros
         
         Parameters
         ----------
@@ -66,7 +66,7 @@ class ZeroOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-        r'''Returns :math:`\mathrm{O}^{*}(y)`
+        r'''Returns an element of the domain space filled with zeros
         
         Parameters
         ----------

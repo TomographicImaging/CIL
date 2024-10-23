@@ -27,7 +27,6 @@ log = logging.getLogger(__name__)
 
 
 class SIRT(Algorithm):
-
     r"""Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.
 
     Simultaneous Iterative Reconstruction Technique (SIRT) solves
@@ -35,15 +34,15 @@ class SIRT(Algorithm):
 
     .. math:: A x = b
 
-    The SIRT algorithm is
+    The SIRT update step for iteration :math:`k` is given by
 
-    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),
+    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M  (b - Ax^{k}) ) ) ),
 
     where,
-    :math:`M = \frac{1}{A*\mathbb{1}}`,
+    :math:`M = \frac{1}{A\mathbb{1}}`,
     :math:`D = \frac{1}{A^{T}\mathbb{1}}`,
     :math:`\mathbb{1}` is a :code:`DataContainer` of ones,
-    :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
+    :math:`\mathrm{proj}_{C}` is the projection over a set :math:`C`,
     and :math:`\omega` is the relaxation parameter.
 
     Parameters
@@ -63,9 +62,6 @@ class SIRT(Algorithm):
         A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,
         or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
 
-    kwargs:
-        Keyword arguments used from the base class :class:`.Algorithm`.
-
     Note
     ----
     If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.
@@ -77,21 +73,22 @@ class SIRT(Algorithm):
 
     The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as
 
-    .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
-
-    .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
+    .. math:: M = \frac{1}{A\mathbb{1}}
+    
+    .. math:: D = \frac{1}{A^T\mathbb{1}} 
 
 
     Examples
     --------
-    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}
+    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| Ax - d\|^{2}
 
-    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5)
+    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data = d)
 
     """
 
 
     def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
+        """Constructor of SIRT algorithm"""
 
         super(SIRT, self).__init__(**kwargs)
 
@@ -140,10 +137,12 @@ class SIRT(Algorithm):
 
     @property
     def relaxation_parameter(self):
+        """Get the relaxation parameter :math:`\omega`"""
         return self._relaxation_parameter
 
     @property
     def D(self):
+        """Get the preconditioning array :math:`D`"""
         return self._Dscaled / self._relaxation_parameter
 
     def set_relaxation_parameter(self, value=1.0):
@@ -164,6 +163,7 @@ class SIRT(Algorithm):
 
 
     def _set_up_weights(self):
+        """Set up the preconditioning arrays M and D"""
         self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))
         self._Dscaled = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
@@ -196,9 +196,9 @@ class SIRT(Algorithm):
 
     def update(self):
 
-        r""" Performs a single iteration of the SIRT algorithm
+        r""" Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by
 
-        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )
+        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )
 
         """
 
@@ -218,7 +218,7 @@ class SIRT(Algorithm):
                 self.x=self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
-        r"""Returns the objective
+        r""" Appends the current objective value to the list of previous objective values
 
         .. math:: \frac{1}{2}\|A x - b\|^{2}
 

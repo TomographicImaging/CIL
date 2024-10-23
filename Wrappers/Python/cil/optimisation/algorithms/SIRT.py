@@ -34,7 +34,7 @@ class SIRT(Algorithm):
 
     .. math:: A x = b
 
-    The SIRT algorithm is
+    The SIRT update step for iteration :math:`k` is given by
 
     .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M  (b - Ax^{k}) ) ) ),
 
@@ -42,7 +42,7 @@ class SIRT(Algorithm):
     :math:`M = \frac{1}{A\mathbb{1}}`,
     :math:`D = \frac{1}{A^{T}\mathbb{1}}`,
     :math:`\mathbb{1}` is a :code:`DataContainer` of ones,
-    :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,
+    :math:`\mathrm{proj}_{C}` is the projection over a set :math:`C`,
     and :math:`\omega` is the relaxation parameter.
 
     Parameters
@@ -62,9 +62,6 @@ class SIRT(Algorithm):
         A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,
         or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
 
-    kwargs:
-        Keyword arguments used from the base class :class:`.Algorithm`.
-
     Note
     ----
     If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.
@@ -76,9 +73,9 @@ class SIRT(Algorithm):
 
     The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as
 
-    .. math:: M = \frac{1}{A\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
-
-    .. math:: D = \frac{1}{A^T\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
+    .. math:: M = \frac{1}{A\mathbb{1}}
+    
+    .. math:: D = \frac{1}{A^T\mathbb{1}} 
 
 
     Examples
@@ -199,7 +196,7 @@ class SIRT(Algorithm):
 
     def update(self):
 
-        r""" Performs a single iteration of the SIRT algorithm
+        r""" Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by
 
         .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )
 

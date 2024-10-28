@@ -47,9 +47,9 @@ requirements:
     - openmp        # [osx]
     - vc 14         # [win]
     - cil-data
-    - ipp-include >=2021.10
-    - ipp-devel >=2021.10
-    - ipp >=2021.10
+    - ipp-include {{ ipp_version }} 
+    - ipp-devel {{ ipp_version }} 
+    - ipp {{ ipp_version }} 
 
   run:
     - python
@@ -67,7 +67,7 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data >=21.3.0
-    - ipp >=2021.10
+    - {{ pin_subpackage('ipp') }}
     - tqdm
     - numba
     - zenodo_get >=1.6

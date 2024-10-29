@@ -32,9 +32,9 @@ dependencies:
   - packaging
   - cmake >=3.16
   - setuptools <71
-  - ipp-include >=2021.10
-  - ipp-devel >=2021.10
-  - ipp >=2021.10
+  - ipp-include=2021.12
+  - ipp-devel=2021.12
+  - ipp=2021.12
   - ipywidgets
   - scipy
   - matplotlib

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev6+g69391bb8 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev7+g5d569dc0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5bdc4d852cc7e18db152" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5bdc4d852cc7e18db152" />
 
-    <script src="../_static/documentation_options.js?v=66ff1c35"></script>
+    <script src="../_static/documentation_options.js?v=9f721a93"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev6+g69391bb8';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev7+g5d569dc0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex/" />
@@ -61,7 +61,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev6+g69391bb8" />
+  <meta name="docsearch:version" content="24.2.1.dev7+g5d569dc0" />
   </head>
   
   
@@ -1214,14 +1214,14 @@ print to screen of the status of the optimisation.</p>
 the following problem</p>
 <div class="math notranslate nohighlight">
 \[A x = b\]</div>
-<p>The SIRT algorithm is</p>
+<p>The SIRT update step for iteration <span class="math notranslate nohighlight">\(k\)</span> is given by</p>
 <div class="math notranslate nohighlight">
-\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),\]</div>
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M  (b - Ax^{k}) ) ) ),\]</div>
 <p>where,
-<span class="math notranslate nohighlight">\(M = \frac{1}{A*\mathbb{1}}\)</span>,
+<span class="math notranslate nohighlight">\(M = \frac{1}{A\mathbb{1}}\)</span>,
 <span class="math notranslate nohighlight">\(D = \frac{1}{A^{T}\mathbb{1}}\)</span>,
 <span class="math notranslate nohighlight">\(\mathbb{1}\)</span> is a <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> of ones,
-<span class="math notranslate nohighlight">\(\mathrm{prox}_{C}\)</span> is the projection over a set <span class="math notranslate nohighlight">\(C\)</span>,
+<span class="math notranslate nohighlight">\(\mathrm{proj}_{C}\)</span> is the projection over a set <span class="math notranslate nohighlight">\(C\)</span>,
 and <span class="math notranslate nohighlight">\(\omega\)</span> is the relaxation parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1233,7 +1233,6 @@ and <span class="math notranslate nohighlight">\(\omega\)</span> is the relaxati
 <li><p><strong>upper</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, default = None) – Upper bound constraint</p></li>
 <li><p><strong>constraint</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a><em>, </em><em>default = None</em>) – A function with <code class="code docutils literal notranslate"><span class="pre">proximal</span></code> method, e.g., <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox" title="cil.optimisation.functions.IndicatorBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndicatorBox</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.IndicatorBox.proximal" title="cil.optimisation.functions.IndicatorBox.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">IndicatorBox.proximal()</span></code></a>,
 or <a class="reference internal" href="#cil.optimisation.functions.TotalVariation" title="cil.optimisation.functions.TotalVariation"><code class="xref py py-class docutils literal notranslate"><span class="pre">TotalVariation</span></code></a> function and <a class="reference internal" href="#cil.optimisation.functions.TotalVariation.proximal" title="cil.optimisation.functions.TotalVariation.proximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TotalVariation.proximal()</span></code></a>.</p></li>
-<li><p><strong>kwargs</strong> – Keyword arguments used from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1246,20 +1245,32 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <p class="admonition-title">Note</p>
 <p>The preconditioning arrays (weights) <code class="code docutils literal notranslate"><span class="pre">M</span></code> and <code class="code docutils literal notranslate"><span class="pre">D</span></code> used in SIRT are defined as</p>
 <div class="math notranslate nohighlight">
-\[M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}\]</div>
+\[M = \frac{1}{A\mathbb{1}}\]</div>
 <div class="math notranslate nohighlight">
-\[D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}\]</div>
+\[D = \frac{1}{A^T\mathbb{1}}\]</div>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
-\[\underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}\]</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">operator</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+\[\underset{x}{\mathrm{argmin}} \frac{1}{2}\| Ax - d\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">operator</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.set_up" title="Link to this definition">#</a></dt>
 <dd><p>Initialisation of the algorithm</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.relaxation_parameter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">relaxation_parameter</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.relaxation_parameter" title="Link to this definition">#</a></dt>
+<dd><p>Get the relaxation parameter <span class="math notranslate nohighlight">\(\omega\)</span></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.D">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">D</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.D" title="Link to this definition">#</a></dt>
+<dd><p>Get the preconditioning array <span class="math notranslate nohighlight">\(D\)</span></p>
 </dd></dl>
 
 <dl class="py method">
@@ -1276,15 +1287,15 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update" title="Link to this definition">#</a></dt>
-<dd><p>Performs a single iteration of the SIRT algorithm</p>
+<dd><p>Performs a single iteration of the SIRT algorithm. The update step for iteration <span class="math notranslate nohighlight">\(k\)</span> is given by</p>
 <div class="math notranslate nohighlight">
-\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )\]</div>
+\[x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT.update_objective">
 <span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT.update_objective" title="Link to this definition">#</a></dt>
-<dd><p>Returns the objective</p>
+<dd><p>Appends the current objective value to the list of previous objective values</p>
 <div class="math notranslate nohighlight">
 \[\frac{1}{2}\|A x - b\|^{2}\]</div>
 </dd></dl>

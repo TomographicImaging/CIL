@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 24.2.1.dev6+g69391bb8 documentation</title>
+    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 24.2.1.dev7+g5d569dc0 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=5bdc4d852cc7e18db152" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=5bdc4d852cc7e18db152" />
 
-    <script src="../../../../../_static/documentation_options.js?v=66ff1c35"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9f721a93"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,14 +49,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev6+g69391bb8';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev7+g5d569dc0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../../../genindex/" />
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev6+g69391bb8" />
+  <meta name="docsearch:version" content="24.2.1.dev7+g5d569dc0" />
   </head>
   
   
@@ -494,7 +494,6 @@
 <div class="viewcode-block" id="SIRT">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT">[docs]</a>
 <span class="k">class</span> <span class="nc">SIRT</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.</span>
 
 <span class="sd">    Simultaneous Iterative Reconstruction Technique (SIRT) solves</span>
@@ -502,15 +501,15 @@
 
 <span class="sd">    .. math:: A x = b</span>
 
-<span class="sd">    The SIRT algorithm is</span>
+<span class="sd">    The SIRT update step for iteration :math:`k` is given by</span>
 
-<span class="sd">    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax^{k}) ) ) ),</span>
+<span class="sd">    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M  (b - Ax^{k}) ) ) ),</span>
 
 <span class="sd">    where,</span>
-<span class="sd">    :math:`M = \frac{1}{A*\mathbb{1}}`,</span>
+<span class="sd">    :math:`M = \frac{1}{A\mathbb{1}}`,</span>
 <span class="sd">    :math:`D = \frac{1}{A^{T}\mathbb{1}}`,</span>
 <span class="sd">    :math:`\mathbb{1}` is a :code:`DataContainer` of ones,</span>
-<span class="sd">    :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`,</span>
+<span class="sd">    :math:`\mathrm{proj}_{C}` is the projection over a set :math:`C`,</span>
 <span class="sd">    and :math:`\omega` is the relaxation parameter.</span>
 
 <span class="sd">    Parameters</span>
@@ -530,9 +529,6 @@
 <span class="sd">        A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,</span>
 <span class="sd">        or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.</span>
 
-<span class="sd">    kwargs:</span>
-<span class="sd">        Keyword arguments used from the base class :class:`.Algorithm`.</span>
-
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    If :code:`constraint` is not passed, :code:`lower` and :code:`upper` are used to create an :class:`.IndicatorBox` and apply its :code:`proximal`.</span>
@@ -544,21 +540,22 @@
 
 <span class="sd">    The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as</span>
 
-<span class="sd">    .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}</span>
-
-<span class="sd">    .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}</span>
+<span class="sd">    .. math:: M = \frac{1}{A\mathbb{1}}</span>
+<span class="sd">    </span>
+<span class="sd">    .. math:: D = \frac{1}{A^T\mathbb{1}} </span>
 
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| x - d\|^{2}</span>
+<span class="sd">    .. math:: \underset{x}{\mathrm{argmin}} \frac{1}{2}\| Ax - d\|^{2}</span>
 
-<span class="sd">    &gt;&gt;&gt; sirt = SIRT(initial = ig.allocate(0), operator = A, data = d, max_iteration = 5)</span>
+<span class="sd">    &gt;&gt;&gt; sirt = SIRT(initial = ig.allocate(0), operator = A, data = d)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of SIRT algorithm&quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">SIRT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -610,10 +607,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">relaxation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the relaxation parameter :math:`\omega`&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the preconditioning array :math:`D`&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
 
 <div class="viewcode-block" id="SIRT.set_relaxation_parameter">
@@ -637,6 +636,7 @@
 
 
     <span class="k">def</span> <span class="nf">_set_up_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the preconditioning arrays M and D&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
 
@@ -671,9 +671,9 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.update">[docs]</a>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by</span>
 
-<span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega * D ( A^{T} ( M * (b - Ax) ) ) )</span>
+<span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -696,7 +696,7 @@
 <div class="viewcode-block" id="SIRT.update_objective">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.update_objective">[docs]</a>
     <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the objective</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Appends the current objective value to the list of previous objective values</span>
 
 <span class="sd">        .. math:: \frac{1}{2}\|A x - b\|^{2}</span>
 

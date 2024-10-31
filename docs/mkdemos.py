@@ -15,7 +15,8 @@ NOTEBOOKS = (
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/demos/1_Introduction/00_CIL_geometry.ipynb",
     "https://github.com/TomographicImaging/CIL-User-Showcase/raw/main/003_1D_integral_inverse_problem/deriv2_cgls.ipynb",
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/misc/callback_demonstration.ipynb",
-    "https://cil.stfc.ac.uk/manila/files/stfc.ac.uk/tomography/how-tos/NikonDataReader.ipynb"
+    "https://github.com/TomographicImaging/CIL-Demos/raw/main/how-to/1_Read_and_visualise/ZeissDataReader.ipynb",
+    "https://github.com/TomographicImaging/CIL-Demos/raw/main/how-to/1_Read_and_visualise/NikonDataReader.ipynb"
 )
 SOURCE = Path(__file__).parent / "source" # sphinx documentation dir
 NBDIR = "demos" # notebook subdir to create

@@ -63,19 +63,31 @@ jobs:
         conda env remove -n "${{ steps.reqs.outputs.envname }}"
   test:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
         include:
         - python-version: '3.10'
           numpy-version: 1.23
+          os: ubuntu
         - python-version: 3.12
           numpy-version: 1.26
+          os: ubuntu
+        - python-version: 3.12
+          numpy-version: 1.26
+          os: macos
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
     - name: set requirements
-      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
+      run: |
+        case ${{ matrix.os }} in
+        ubuntu)
+          sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml ;;
+        macos)
+          sed -ri '' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e '/not arm64/d' -e '/linux/d' scripts/requirements-test.yml ;
+          echo -e "  - astra-toolbox=2.2.0\n  - llvm-openmp" >> scripts/requirements-test.yml ;;
+        esac
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

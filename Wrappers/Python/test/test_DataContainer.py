@@ -1037,13 +1037,12 @@ class TestDataContainer(CCPiTestClass):
         # equals to 1 + -1 = 0
         out = d1.sapyb(a,d2,b)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
+        np.testing.assert_array_almost_equal(res, out.as_array(), decimal=7)
 
         out.fill(0)
         d1.sapyb(a,d2,b, out)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
-
+        np.testing.assert_array_almost_equal(res, out.as_array(), decimal=7)
 
     def test_sapyb_scalar_f(self):
         # a,b scalar

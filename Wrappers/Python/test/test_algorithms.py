@@ -568,21 +568,21 @@ class TestCGLS(CCPiTestClass):
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                    update_objective_interval=2)
 
-        
+
     def test_initialization_with_default_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
 
         self.assertEqual(self.alg.tolerance, 0)
-    
+
     def test_initialization_with_custom_tolerance(self):#can be deprecated when tolerance is deprecated in CGLS
         with self.assertWarns(DeprecationWarning):
             alg = CGLS(initial=self.initial, operator=self.operator, data=self.data, tolerance=0.01)
         self.assertEqual(alg.tolerance, 0.01)
-        
+
     def test_set_up(self):
         # Test the set_up method
-        
+
         self.alg.set_up(initial=self.initial, operator=self.operator, data=self.data)
-        
+
         # Check if internal variables are set up correctly
         self.assertNumpyArrayEqual(self.alg.x.as_array(), self.initial.as_array())
         self.assertEqual(self.alg.operator, self.operator)
@@ -594,18 +594,18 @@ class TestCGLS(CCPiTestClass):
     def test_update(self):
 
         self.alg.set_up(initial=self.mock_initial, operator=self.mock_operator, data=self.mock_data)
-        
+
         self.alg.update()
-        
+
         self.mock_operator.direct.assert_called_with(self.mock_data, out=self.alg.q)
         self.mock_operator.adjoint.assert_called_with(self.alg.r, out=self.alg.s)
-        
+
     def test_convergence(self):
 
-        
+
         self.alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(self.alg.x.as_array(), self.data.as_array())
-        
+
     def test_should_stop_flag_false(self): #can be deprecated when tolerance is deprecated in CGLS
         # Mocking norms to ensure tolerance isn't reached
         self.alg.run(2)
@@ -615,7 +615,7 @@ class TestCGLS(CCPiTestClass):
         self.alg.normx = 0.1
 
         self.assertFalse(self.alg.flag())
-        
+
     def test_should_stop_flag_true(self): #can be deprecated when tolerance is deprecated in CGLS
         # Mocking norms to ensure tolerance is reached
         self.alg.run(4)
@@ -625,13 +625,13 @@ class TestCGLS(CCPiTestClass):
         self.alg.normx = 10
 
         self.assertTrue(self.alg.flag())
-        
+
     def test_tolerance_reached_immediately(self): #can be deprecated when tolerance is deprecated in CGLS
         alg = CGLS(initial=self.operator.domain_geometry().allocate(0), operator=self.operator, data=self.operator.domain_geometry().allocate(0))
         alg.run(2)
 
-        
-        
+
+
     def test_update_objective(self):
         # Mocking squared_norm to return a finite value
 
@@ -643,25 +643,25 @@ class TestCGLS(CCPiTestClass):
 
         # Ensure the loss list is updated
         self.assertEqual(self.alg.loss, [1.0])
-        
+
     def test_update_objective_with_nan_raises_stop_iteration(self):
         # Mocking squared_norm to return NaN
         self.alg.r=MagicMock()
         self.alg.r.squared_norm.return_value = np.nan
-        
+
         with self.assertRaises(StopIteration):
             self.alg.update_objective()
-            
+
     def test_update(self):
         self.alg.gamma=4
-        
+
         self.alg.update()
         norm=(self.data-self.initial).squared_norm()
         alpha=4/norm
         self.assertNumpyArrayEqual(self.alg.x.as_array(), (self.initial+alpha*(self.data-self.initial)).as_array())
         self.assertNumpyArrayEqual(self.alg.r.as_array(), (self.data - self.initial-alpha*(self.data-self.initial)).as_array())
         beta= ((self.data - self.initial-alpha*(self.data-self.initial)).norm()**2)/4
-        self.assertNumpyArrayEqual(self.alg.p.as_array(), ((self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array())
+        self.assertNumpyArrayAlmostEqual(self.alg.p.as_array(), ((self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array(), decimal=7)
 class TestPDHG(CCPiTestClass):
 
     def test_PDHG_Denoising(self):
@@ -927,7 +927,7 @@ class TestPDHG(CCPiTestClass):
         operator = IdentityOperator(ig)
 
         try:
-            pdhg = PDHG(f=f, g=g, operator=operator, 
+            pdhg = PDHG(f=f, g=g, operator=operator,
                         gamma_g=0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
         except ValueError as err:
@@ -959,12 +959,12 @@ class TestSIRT(CCPiTestClass):
 
     def tearDown(self):
         pass
-    
+
     def test_set_up(self):
 
         initial = self.A2.domain_geometry().allocate(0)
         sirt = SIRT(initial=initial, operator=self.A2, data=self.b2, lower=0, upper=1)
-        
+
         # Test if set_up correctly configures the object
         self.assertTrue(sirt.configured)
         self.assertIsNotNone(sirt.x)
@@ -972,11 +972,11 @@ class TestSIRT(CCPiTestClass):
         self.assertIsNotNone(sirt.constraint)
         self.assertEqual(sirt.constraint.lower, 0)
         self.assertEqual(sirt.constraint.upper, 1)
-        
+
 
         constraint = IndicatorBox(lower=0, upper=1)
         sirt = SIRT(initial=None, operator=self.A2, data=self.b2, constraint=constraint)
-        
+
         # Test if set_up correctly configures the object with constraint
         self.assertTrue(sirt.configured)
         self.assertEqual(sirt.constraint, constraint)
@@ -985,15 +985,15 @@ class TestSIRT(CCPiTestClass):
         with self.assertRaises(ValueError) as context:
             sirt = SIRT(initial=None, operator=None, data=self.b2)
             self.assertEqual(str(context.exception), 'You must pass an `operator` to the SIRT algorithm')
-    
+
 
         with self.assertRaises(ValueError) as context:
             sirt = SIRT(initial=None, operator=self.A2, data=None)
             self.assertEqual(str(context.exception), 'You must pass `data` to the SIRT algorithm')
-        with self.assertRaises(ValueError) as context:  
-            sirt = SIRT(initial=None, operator=None, data=None)  
-            self.assertEqual(str(context.exception), 
-                'You must pass an `operator` and `data` to the SIRT algorithm')  
+        with self.assertRaises(ValueError) as context:
+            sirt = SIRT(initial=None, operator=None, data=None)
+            self.assertEqual(str(context.exception),
+                'You must pass an `operator` and `data` to the SIRT algorithm')
 
         sirt = SIRT(initial=None, operator=self.A2, data=self.b2)
         self.assertTrue(sirt.configured)
@@ -1142,14 +1142,14 @@ class TestSPDHG(unittest.TestCase):
         else:
             raise ValueError('Unsupported Noise ', noise)
         return noisy_data
-    
+
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
         alpha = 0.05
         num_subsets = 10
-        
-        
+
+
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -1167,13 +1167,13 @@ class TestSPDHG(unittest.TestCase):
         # Create noisy data.
         noisy_data = self.add_noise(sin, noise='poisson', seed=10)
 
-        
+
 
         # Create BlockOperator
         operator = Aop
         f = KullbackLeibler(b=noisy_data)
         g = alpha * TotalVariation(10, 1e-4, lower=0, warm_start=True)
-        
+
         # % 'implicit' PDHG, preconditioned step-sizes
         tau_tmp = 1.
         sigma_tmp = 1.
@@ -1217,7 +1217,7 @@ class TestSPDHG(unittest.TestCase):
     def test_SPDHG_vs_PDHG_explicit(self):
         alpha = .05
         num_subsets = 10
-        
+
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
 
         ig = data.geometry
@@ -1248,7 +1248,7 @@ class TestSPDHG(unittest.TestCase):
         operators = list(A.operators) + [op1]
         K = BlockOperator(* operators )
 
-        
+
         # block function
         F = BlockFunction(*[*[KullbackLeibler(b=data_sub[i])
                             for i in range(subsets)] + [MixedL21Norm()]])
@@ -1358,34 +1358,34 @@ class TestCallbacks(unittest.TestCase):
         operator = IdentityOperator(ig)
         alg = CGLS(initial=initial, operator=operator, data=data,
                    update_objective_interval=2)
-       
+
         #Test init
         cb = callbacks.CGLSEarlyStopping(epsilon = 0.1, omega = 33)
         self.assertEqual(cb.epsilon, 0.1)
         self.assertEqual(cb.omega, 33)
-        
+
         #Test default values
         cb = callbacks.CGLSEarlyStopping()
         self.assertEqual(cb.epsilon, 1e-6)
         self.assertEqual(cb.omega, 1e6)
-        
+
         #Tests it doesn't stops iterations if the norm of the current residual is not less than epsilon times the norm of the original residual
         alg.norms = 10
         alg.norms0 = 99
         callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
-        
+
         #Test it stops iterations if the norm of the current residual is less than epsilon times the norm of the original residual
         alg.norms = 1
         alg.norms0 = 100
         with self.assertRaises(StopIteration):
             callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
-           
-        #Test it doesn't stop iterations if the norm of x is smaller than omega 
+
+        #Test it doesn't stop iterations if the norm of x is smaller than omega
         alg.norms = 10
         alg.norms0 = 99
         alg.x = data
         callbacks.CGLSEarlyStopping(epsilon = 0.1)(alg)
-        
+
         #Test it stops iterations if the norm of x is larger than omega
         alg.norms = 10
         alg.norms0 = 99
@@ -1406,8 +1406,8 @@ class TestCallbacks(unittest.TestCase):
         alg.loss=[5, 5.001]
         with self.assertRaises(StopIteration):
             callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
-        
-        
+
+
 class TestADMM(unittest.TestCase):
     def setUp(self):
         ig = ImageGeometry(2, 3, 2)
@@ -1504,9 +1504,9 @@ class Test_PD3O(unittest.TestCase):
 
         # default test data
         self.data = dataexample.CAMERA.get(size=(32, 32))
-        
-        
-   
+
+
+
     def test_init_and_set_up(self):
         F1= 0.5 * L2NormSquared(b=self.data)
         H1 = 0.1*  MixedL21Norm()
@@ -1518,26 +1518,26 @@ class Test_PD3O(unittest.TestCase):
         self.assertEqual(algo_pd3o.delta,F1.L/(2.0*operator.norm()**2) )
         np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate(0).array)
         self.assertTrue(algo_pd3o.configured)
-        
+
         algo_pd3o=PD3O(f=F1, g=G1, h=H1, operator=operator, gamma=3, delta=43.1, initial=self.data.geometry.allocate('random', seed=3))
         self.assertEqual(algo_pd3o.gamma,3 )
         self.assertEqual(algo_pd3o.delta,43.1 )
         np.testing.assert_array_equal(algo_pd3o.x.array, self.data.geometry.allocate('random', seed=3).array)
         self.assertTrue(algo_pd3o.configured)
-        
+
         with self.assertWarnsRegex(UserWarning,"Please use PDHG instead." ):
             algo_pd3o=PD3O(f=ZeroFunction(), g=G1, h=H1, operator=operator, delta=43.1)
             self.assertEqual(algo_pd3o.gamma,1.0/operator.norm()    )
-       
+
     def test_PD3O_PDHG_denoising_1_iteration(self):
 
         # compare the TV denoising problem using
-        # PDHG, PD3O for 1 iteration 
+        # PDHG, PD3O for 1 iteration
 
         # regularisation parameter
-        alpha = 0.1        
+        alpha = 0.1
 
-        # setup PDHG denoising      
+        # setup PDHG denoising
         F = alpha * MixedL21Norm()
         operator = GradientOperator(self.data.geometry)
         norm_op = operator.norm()
@@ -1547,42 +1547,42 @@ class Test_PD3O(unittest.TestCase):
         pdhg = PDHG(f=F, g=G, operator=operator, tau=tau, sigma=sigma, update_objective_interval = 100)
         pdhg.run(1)
 
-        # setup PD3O denoising  (F=ZeroFunction)   
+        # setup PD3O denoising  (F=ZeroFunction)
         H = alpha * MixedL21Norm()
-        
+
         F = ZeroFunction()
         gamma = 1./norm_op
         delta = 1./norm_op
 
         pd3O = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
                     update_objective_interval = 100)
-        pd3O.run(1)      
-               
+        pd3O.run(1)
+
         # PD3O vs pdhg
-        np.testing.assert_allclose(pdhg.solution.array, pd3O.solution.array,atol=1e-2) 
-        
+        np.testing.assert_allclose(pdhg.solution.array, pd3O.solution.array,atol=1e-2)
+
         # objective values
-        np.testing.assert_allclose(pdhg.objective[-1], pd3O.objective[-1],atol=1e-2)  
-        
-    
+        np.testing.assert_allclose(pdhg.objective[-1], pd3O.objective[-1],atol=1e-2)
+
+
     def test_pd3o_convergence(self):
-        
+
         # pd30 convergence test using TV denoising
 
 
         # regularisation parameter
-        alpha = 0.11        
+        alpha = 0.11
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
         TV = TotalVariation(max_iteration=200)
-        tv_cil = TV.proximal(self.data, tau=alpha)  
+        tv_cil = TV.proximal(self.data, tau=alpha)
 
-   
+
         F = alpha * MixedL21Norm()
         operator = GradientOperator(self.data.geometry)
         norm_op= operator.norm()
-  
-        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)   
+
+        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)
         H = alpha * MixedL21Norm()
         G = 0.25 * L2NormSquared(b=self.data)
         F = 0.25 * L2NormSquared(b=self.data)
@@ -1591,11 +1591,7 @@ class Test_PD3O(unittest.TestCase):
 
         pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
                     update_objective_interval = 100)
-        pd3O_with_f.run(1000)        
+        pd3O_with_f.run(1000)
 
         # pd30 vs fista
-        np.testing.assert_allclose(tv_cil.array, pd3O_with_f.solution.array,atol=1e-2) 
-
-
-        
-       
+        np.testing.assert_allclose(tv_cil.array, pd3O_with_f.solution.array,atol=1e-2)

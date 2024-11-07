@@ -9,13 +9,14 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # CUDA-specific packages
-ARG CIL_EXTRA_PACKAGES="astra-toolbox=2.2.0"
+ARG CIL_EXCLUDE_PACKAGES="cuda"
+ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox=2.1.0=cuda*"
 # build & runtime dependencies
 # TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/requirements-test.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
 # vis. https://github.com/TomographicImaging/CIL/pull/1590
 COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 # channel_priority: https://stackoverflow.com/q/58555389
-RUN sed -ri '/ccpi-regulariser|astra|ipp|tigre|tomophantom| python /d' environment.yml \
+RUN sed -ri "/$CIL_EXCLUDE_PACKAGES| python /d" environment.yml \
   && for pkg in 'jupyter-server-proxy>4.1.0' $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
   && for ch in defaults nvidia ccpi https://software.repos.intel.com/python/conda conda-forge; do conda config --env --add channels $ch; done \

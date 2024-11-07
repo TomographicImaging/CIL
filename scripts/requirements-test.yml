@@ -14,35 +14,25 @@
 name: cil_dev
 channels:
   - conda-forge
-  - nvidia
-  - https://software.repos.intel.com/python/conda
   - defaults
 dependencies:
   # base (vis. recipe/conda_build_config.yaml)
   - python >=3.10
   - numpy >=1.23
   - ccpi::cil-data
-  - ccpi::tigre=2.6
-  - ccpi::ccpi-regulariser=24.0.1
-  - ccpi::tomophantom=2.0.0
-  - astra-toolbox=2.1=cuda*
+  - astra-toolbox=2.2.0
+  - llvm-openmp
   - cvxpy
   - python-wget
   - scikit-image
   - packaging
   - cmake >=3.16
   - setuptools <71
-  - ipp-include=2021.12
-  - ipp-devel=2021.12
-  - ipp=2021.12
   - ipywidgets
   - scipy
   - matplotlib
   - h5py
   - pillow
-  - libgcc-ng     # [linux]
-  - libstdcxx-ng  # [linux]
-  - _openmp_mutex # [linux]
   - dxchange
   - olefile
   - pywavelets

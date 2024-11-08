@@ -22,29 +22,22 @@ import numpy as np
 
 
 class IdentityOperator(LinearOperator):
+    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarrow X`,  :math:`\mathrm{Id}(x) = x`
 
-    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarrow Y`,  :math:`\mathrm{Id}(x) = x`
-
-                   :math:`X` : domain
-                   :math:`Y` : range ( Default: :math:`Y = X` )
+                   :math:`X` : domain and range
 
     Parameters
     ----------
     domain_geometry: CIL Geometry
-        domain of the operator
-    range_geometry: CIL Geometry, optional
-        range of the operator, default: same as domain
+        domain and range of the operator
     '''
 
 
-    def __init__(self, domain_geometry, range_geometry=None):
 
-
-        if range_geometry is None:
-            range_geometry = domain_geometry
+    def __init__(self, domain_geometry):
 
         super(IdentityOperator, self).__init__(domain_geometry=domain_geometry,
-                                       range_geometry=range_geometry)
+                                       range_geometry=domain_geometry)
 
     def direct(self,x,out=None):
 

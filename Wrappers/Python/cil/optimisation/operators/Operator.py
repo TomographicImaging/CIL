@@ -221,7 +221,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-8,  return_all=False, method='auto'):
         r"""Power method or Power iteration algorithm
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
@@ -235,8 +235,9 @@ class LinearOperator(Operator):
             Number of iterations for the Power method algorithm.
         initial: DataContainer, default = None
             Starting point for the Power method.
-        tolerance: positive:`float`, default = 1e-5
+        tolerance: positive:`float`, default = 1e-8
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.
+            Also used to determine if the calculated norm is close to zero.
         return_all: `boolean`, default = False
             Toggles the verbosity of the return
         method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"`
@@ -338,6 +339,10 @@ class LinearOperator(Operator):
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm = x0.norm()
             if x0_norm < tolerance:
+                log.warning(
+                    "The operator's norm is very small (< {:.0e}). Consider using a smaller tolerance.".format(tolerance))
+                eig_new = x0_norm
+                break
                 log.warning(
                     "The operator has at least one zero eigenvector and is likely to be nilpotent")
                 eig_new = 0.

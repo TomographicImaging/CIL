@@ -331,6 +331,30 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
+        # Test with small tolerance
+        res3 = M1op.PowerMethod(M1op,100, tolerance=1e-12)
+        numpy.testing.assert_almost_equal(res3,2., decimal=8)
+
+        # Test with very small matrix
+        M2 = numpy.array([[1e-10,0],[0,2e-10]], dtype=float)
+        M2op = MatrixOperator(M2)
+        res4 = M2op.PowerMethod(M2op,100, tolerance=1e-12)
+        numpy.testing.assert_almost_equal(res4,2e-10, decimal=12)
+        numpy.random.seed(2)
+        # 2x2 real matrix, dominant eigenvalue = 2
+        M1 = numpy.array([[1,0],[1,2]], dtype=float)
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,2., decimal=4)
+
+        res_scipy = scipy.linalg.eig(M1)
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
+
+        # Test with the norm
+        res2 = M1op.norm()
+        res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
+        numpy.testing.assert_almost_equal(res1,res2, decimal=4)
+
 
         # 2x3 real matrix, dominant eigenvalue = 4.711479432297657
         M1 = numpy.array([[1.,0.,3],[1,2.,3]])

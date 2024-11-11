@@ -254,10 +254,6 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out=None):
         r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""
 
-        if id(x)==id(out):
-            raise InPlaceError(message="TotalVariation.proximal cannot be used in place")
-
-
         if self.strong_convexity_constant > 0:
 
             strongly_convex_factor = (1 + tau * self.strong_convexity_constant)
@@ -266,7 +262,8 @@ class TotalVariation(Function):
         solution = self._fista_on_dual_rof(x, tau, out=out)
 
         if self.strong_convexity_constant > 0:
-            x *= strongly_convex_factor
+            if id(x) != id(solution):
+                x *= strongly_convex_factor
             tau *= strongly_convex_factor
 
         return solution
@@ -306,12 +303,16 @@ class TotalVariation(Function):
 
         if out is None:
             out = self.gradient_operator.domain_geometry().allocate(0)
+        if id(x) == id(out):
+            x_eval= x.copy()
+        else:
+            x_eval = x
 
         for k in range(self.iterations):
 
             t0 = t
             self.gradient_operator.adjoint(tmp_q, out=out)
-            out.sapyb(tau_reg_neg, x, 1.0, out=out)
+            out.sapyb(tau_reg_neg, x_eval, 1.0, out=out)
             self.projection_C(out, tau=None, out=out)
 
             self.gradient_operator.direct(out, out=p1)

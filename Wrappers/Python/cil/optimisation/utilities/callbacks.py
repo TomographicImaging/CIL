@@ -196,7 +196,8 @@ class CGLSEarlyStopping(Callback):
         
 class SqliteCallback(Callback):
     """
-    Callback which evaluates user-defined functions art user-defined times during evaluation
+    Callback which evaluates user-defined functions at user-defined times during evaluation. Also saves calculation
+    state if you want.
     Parameters
     ----------
     db_address : Union[str, Path]
@@ -207,7 +208,8 @@ class SqliteCallback(Callback):
         Rules which tells us when to report calculation progress using the functions in to_store. Note that
         this is in union with grab_soln's reports.
     grab_soln : Callable[[Algorithm], bool]
-        Rule which tells us when to bother saving solution state.
+        Rule which tells us when to bother saving solution state. Put it a function which is always false
+        if you don't want it to do that ever.
     to_store : List[Callable[[Algorithm], Union[str, int, float]]]
         List of functions to get evaluated and stored.
     types : List[str]

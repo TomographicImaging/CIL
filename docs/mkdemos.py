@@ -11,19 +11,19 @@ from urllib.request import urlopen
 from tqdm import tqdm
 
 # URLS of the notebooks to render
-NOTEBOOKS_load = (
+NOTEBOOKS_load = [
     "https://tomography.stfc.ac.uk/how-tos/ZeissDataReader.ipynb",
     "https://tomography.stfc.ac.uk/how-tos/NikonDataReader.ipynb"
-)
+]
 
-NOTEBOOKS_geometry = (
+NOTEBOOKS_geometry = [
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/demos/1_Introduction/00_CIL_geometry.ipynb"
-)
+]
 
-NOTEBOOKS_advanced = (
+NOTEBOOKS_advanced = [
     "https://github.com/TomographicImaging/CIL-User-Showcase/raw/main/003_1D_integral_inverse_problem/deriv2_cgls.ipynb",
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/misc/callback_demonstration.ipynb"
-)
+]
 
 SOURCE = Path(__file__).parent / "source" # sphinx documentation dir
 NBDIR = "demos" # notebook subdir to create
@@ -32,10 +32,11 @@ NBDIR = "demos" # notebook subdir to create
 # download the notebooks
 def download_notebooks(urls):
     notebooks = []
-    with tqdm(urls, unit="ipynb") as urls:
-        for url in urls:
+    with tqdm(urls, unit="ipynb") as nb_urls:
+        for url in nb_urls :
             notebook = Path(urlparse(url).path)
-            urls.set_description(notebook.stem)
+            print(notebook)
+            nb_urls.set_description(notebook.stem)
             with urlopen(url) as response:
                 (SOURCE / NBDIR / notebook.name).write_bytes(response.read())
             notebooks.append(f"    {NBDIR}/{notebook.stem}")

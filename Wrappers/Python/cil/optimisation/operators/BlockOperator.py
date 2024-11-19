@@ -87,6 +87,10 @@ class BlockOperator(Operator):
             raise ValueError(
                 'Dimension and size do not match: expected {} got {}'
                 .format(n_elements, len(args)))
+        
+        self._range_block_shape = (shape[0], 1)
+        self._domain_block_shape = (shape[1], 1)    
+        
         # TODO
         # until a decent way to check equality of Acquisition/Image geometries
         # required to fullfil "Operators in a Block are required to have the same
@@ -191,62 +195,46 @@ class BlockOperator(Operator):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape)
-
-        if (1 == shape[0]) and (1 == shape[1]):
-            flag_single_element = True
-        else:
-            flag_single_element = False
             
+        if x_b.shape != self._domain_block_shape:
+            raise ValueError(
+                'We expect the input to be a block data container of shape {}'.format(  self._domain_block_shape))
+        
         return_data_container = False
+        
+        if self._range_block_shape[0]==1:
+            return_data_container = True ##TODO: Does this default make sense?
 
         if out is None:
-            res = BlockDataContainer(*[self.get_item(row, 0).range_geometry().allocate(0)
-                                     for row in range(self.shape[0])], shape=shape)
-            
-            if flag_single_element:
-                return_data_container = True
-                
-        else:
-            if (not issubclass(out.__class__, BlockDataContainer) )  or \
-                    (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                        
-                if flag_single_element:
+            # allocate the output blockdatacontainer of the correct shape
+            res = BlockDataContainer(*[self.get_item(row, 0).range_geometry().allocate(None)
+                                     for row in range(self.shape[0])], shape=self._range_block_shape)
+        elif not isinstance(out, BlockDataContainer):
+                # Handle datacontainers or sirf datacontainers
+                if self._range_block_shape[0]==1:
                     res = BlockDataContainer(out)
-                    return_data_container = True
                 else:
                     raise ValueError(
-                        f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
-                    
-            else:
-                res = out
-
-        if flag_single_element:
-            tmp = BlockDataContainer(self.range_geometry().allocate(0))
+                        f'Expected `out` to be `None` or a `BlockDataContainer` of shape {self._range_block_shape}')             
         else:
-            tmp = self.range_geometry().allocate(0)
+            res = out
+            return_data_container = False
 
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
                 
                 if col == 0:
-                    self.get_item(row, col).direct(
-                        x_b.get_item(col),
-                        out=res.get_item(row))
-                    
+                    self.get_item(row, col).direct(x_b.get_item(col), out=res.get_item(row))
                 else:
-                    # temp_out_row points to the element in out that we are adding to
+                    # temp_out_row points to the element in res that we are adding to
                     temp_out_row = res.get_item(row)
-                    self.get_item(row, col).direct(
-                        x_b.get_item(col),
-                        out=tmp.get_item(row))
-                    temp_out_row += tmp.get_item(row)
+                    temp_out_row += self.get_item(row, col).direct(x_b.get_item(col))
 
         if return_data_container:
-            out = res.get_item(0)
-            return out
+            return res.get_item(0)
         else:
             return res
+
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
@@ -265,41 +253,41 @@ class BlockOperator(Operator):
         if not self.is_linear():
             raise ValueError('Not all operators in Block are linear.')
 
+        
         if not isinstance(x, BlockDataContainer):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-
-        shape = self.get_output_shape(x_b.shape, adjoint=True)
-
-        if (1 == shape[0]) and (1 == shape[1]):
-            flag_single_element = True
-        else:
-            flag_single_element = False
             
-
+        if x_b.shape != self._range_block_shape:
+            raise ValueError(
+                'We expect the input to be a block data container of shape {}'.format(  self._range_block_shape))
+        
         return_data_container = False
+        
+        if self._domain_block_shape[0]==1:
+            return_data_container = True ##TODO: Does this default make sense?
+        
 
         if out is None:
+            # allocate the output blockdatacontainer of the correct shape
             res = BlockDataContainer(*[self.get_item(0, col).domain_geometry().allocate(0)
-                                     for col in range(self.shape[1])], shape=shape)
+                                     for col in range(self.shape[1])], shape=self._domain_block_shape)
             
-            if flag_single_element:
-                return_data_container = True
 
-        else:
-            if (not issubclass(out.__class__, BlockDataContainer) ) or \
-                    (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                        
-                if flag_single_element:
+        elif not isinstance(out, BlockDataContainer):
+            # Handle datacontainers or sirf datacontainers
+            if self._domain_block_shape[0]==1:
                     res = BlockDataContainer(out)
-                    return_data_container = True
-                else:
-                    raise ValueError(
-                        f'You passed to `out` a `DataContainer`. You needed to pass a `BlockDataContainer` of shape {shape}')
-                    
+                        
+
             else:
-                res = out
+                raise ValueError(
+                    f'Expected `out` to be `None` or a `BlockDataContainer` of shape {self._domain_block_shape}')    
+                    
+        else:
+            res = out
+            return_data_container = False
 
         for col in range(self.shape[1]):
             for row in range(self.shape[0]):
@@ -315,9 +303,8 @@ class BlockOperator(Operator):
                         x_b.get_item(row),
                     )
                     
-        if flag_single_element:
-            out = res.get_item(0)
-            return out
+        if return_data_container:
+            return res.get_item(0)
         else:
             return res
 

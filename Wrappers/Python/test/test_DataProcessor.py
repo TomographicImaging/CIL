@@ -3205,6 +3205,27 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor._calculate_flux()
 
+        # check error raised with 0 flux
+        processor = FluxNormaliser(flux = 0)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux = 0.0)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles)))
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles), dtype=numpy.uint16))
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
     def test_calculate_target(self):
 
         # check target calculated with default method 'mean'

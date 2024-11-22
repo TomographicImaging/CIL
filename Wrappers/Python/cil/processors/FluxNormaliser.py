@@ -32,22 +32,22 @@ class FluxNormaliser(Processor):
 
     Parameters:
     -----------
-    flux: float or list of floats (optional)
+    flux: float or list of floats, optional
         The value to divide the image by. If flux is a list it must have length 
         equal to the number of projections in the dataset. If flux=None, calculate
-        flux from the roi, default is None.
+        flux from the roi.
     
-    roi: dict (optional)
+    roi: dict, optional
         Dictionary describing the region of interest containing the background
         in the image. The roi is specified as `{'axis_name1':(start,stop), 
         'axis_name2':(start,stop)}`, where the key is the axis name 'vertical'
         and/ or 'horizontal'. If an axis is not specified in the roi dictionary, 
-        the full range will be used, default is None.
+        the full range will be used.
 
-    target: string or float
+    target: {'mean', 'first'} or float, default='mean'
         The value to scale the normalised data with. If float, the data is scaled 
         to the float value. If string 'mean' the data is scaled to the mean value 
-        of the input flux or flux across all rois, if 'first' the data is scaled to 
+        of the input flux or flux across all rois. If 'first' the data is scaled to 
         the first input flux value or the flux in the roi of the first projection.
         Default is 'mean'
 
@@ -72,7 +72,7 @@ class FluxNormaliser(Processor):
     Example
     -------
     >>> from cil.processors import FluxNormaliser
-    >>> processor = FluxNormaliser(roi=(roi={'horizontal':(5, 15))
+    >>> processor = FluxNormaliser(roi={'horizontal':(5, 15)})
     >>> processor.set_input(data)
     >>> data_norm = processor.get_output()
 
@@ -121,7 +121,7 @@ class FluxNormaliser(Processor):
             self.h_size = dataset.get_dimension_size('horizontal')
             image_axes += 1
 
-        if (( self.h_axis is not None)  and (self. h_axis < (len(dataset.shape)-image_axes))) or \
+        if (( self.h_axis is not None)  and (self.h_axis < (len(dataset.shape)-image_axes))) or \
             ((self.v_axis is not None) and self.v_axis < (len(dataset.shape)-image_axes)):
             raise ValueError('Projections must be the last two axes of the dataset')
 
@@ -248,17 +248,17 @@ class FluxNormaliser(Processor):
         
         Parameters:
         -----------
-        angle: float or str (optional)
+        angle: float, optional
             Angle to plot, default=None displays the data with the minimum
             and maximum pixel values in the roi, otherwise the angle to display 
             can be specified as a float and the closest angle will be displayed.
             For 2D data, the roi is plotted on the sinogram.
 
-        channel: int (optional)
+        channel: int, optional
             The channel to plot, default=None displays the central channel if
             the data has channels
 
-        log: bool (optional)
+        log: bool, default=False
             If True, plot the image with a log scale, default is False
         '''
         self._calculate_flux()

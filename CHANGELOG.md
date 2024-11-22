@@ -3,6 +3,7 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+  - Add FluxNormaliser processor (#1878)
 - Dependencies:
   - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
 
@@ -16,7 +17,6 @@
     - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
     - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
     - Added `labels` module with `ImageDimension`, `AcquisitionDimension`, `AcquisitionType`, `AngleUnit`, `FillType` (#1692)
-    - Add FluxNormaliser processor (#1878)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)

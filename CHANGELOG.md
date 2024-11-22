@@ -3,8 +3,12 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+- Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes (#1644) 
 - Dependencies:
   - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
+- Changes that break backwards compatibility:
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
+
 
 * 24.2.0
   - New Features:
@@ -58,7 +62,6 @@
     - Added documentation for the Partitioner to `framework.rst` (#1828)
     - Added CIL vs SIRF tests comparing preconditioned ISTA in CIL and MLEM in SIRF (#1823)
     - Update to CCPi-Regularisation toolkit v24.0.1 (#1868)
-    - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes (#1644) 
   - Bug fixes:
     - gradient descent `update_objective` called twice on the initial point.(#1789)
     - ProjectionMap operator bug fix in adjoint and added documentation (#1743)
@@ -68,7 +71,6 @@
     - Update dataexample remote data download to work with windows and use zenodo_get for data download (#1774)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
-    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).
 
 * 24.0.0

@@ -70,7 +70,6 @@ from cil.utilities.quality_measures import mae, mse, psnr
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 
-from cil.plugins.ccpi_regularisation.functions import FGP_TV
 import logging
 from testclass import CCPiTestClass
 from utils import has_astra
@@ -1178,9 +1177,10 @@ class TestSPDHG(CCPiTestClass):
         self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
                                  for i in range(self.subsets)])
         alpha = 0.025
-        self.G = alpha * FGP_TV()
+        self.G = alpha * IndicatorBox(lower=0)
 
     def test_SPDHG_defaults_and_setters(self):
+        #Test SPDHG init with default values
         gamma = 1.
         rho = .99
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
@@ -1198,6 +1198,7 @@ class TestSPDHG(CCPiTestClass):
             spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
         self.assertEqual(spdhg.update_objective_interval, 1)
 
+        #Test SPDHG setters - "from ratio"
         gamma = 3.7
         rho = 5.6
         spdhg.set_step_sizes_from_ratio(gamma, rho)
@@ -1206,6 +1207,7 @@ class TestSPDHG(CCPiTestClass):
         self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
                                          si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
 
+        #Test SPDHG setters - set_step_sizes default values for sigma and tau
         gamma = 1.
         rho = .99
         spdhg.set_step_sizes()
@@ -1214,21 +1216,25 @@ class TestSPDHG(CCPiTestClass):
         self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
                                          si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
 
+        #Test SPDHG setters - set_step_sizes with sigma and tau
         spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, 100)
 
+        #Test SPDHG setters - set_step_sizes with sigma 
         spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
                                          si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
 
+        #Test SPDHG setters - set_step_sizes with tau
         spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertListEqual(spdhg.sigma, [
                              gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
         self.assertEqual(spdhg.tau, 100)
 
     def test_spdhg_non_default_init(self):
+        #Test SPDHG init with non-default values
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)),
                       initial=self.A.domain_geometry().allocate(1), update_objective_interval=10)
 
@@ -1237,8 +1243,9 @@ class TestSPDHG(CCPiTestClass):
             spdhg.x.as_array(), self.A.domain_geometry().allocate(1).as_array())
         self.assertEqual(spdhg.update_objective_interval, 10)
         
+        #Test SPDHG setters - prob_weights and a sampler gives an error
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob_weights=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
             
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
@@ -1266,17 +1273,16 @@ class TestSPDHG(CCPiTestClass):
                              1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
             
             
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, _norms=[1]*len(self.A), prob=[1/(self.subsets-1)]*(
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,  prob=[1/(self.subsets-1)]*(
                 self.subsets-1)+[0], prob_weights= [1/(self.subsets-1)]*(self.subsets-1)+[0])
 
         with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  _norms=[
-                          1]*len(self.A), sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
 
 
     def test_spdhg_set_norms(self):
@@ -1309,6 +1315,8 @@ class TestSPDHG(CCPiTestClass):
         spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertTrue(spdhg.check_convergence())
 
+    @unittest.skipUnless(has_astra, "cil-astra not available")
+    
     def test_SPDHG_num_subsets_1(self): 
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
 
@@ -1340,7 +1348,7 @@ class TestSPDHG(CCPiTestClass):
         A_pdhg = IdentityOperator(partitioned_data[0].geometry) 
                             
         alpha = 0.025
-        G = alpha * FGP_TV()
+        G = alpha * IndicatorBox(lower=0)
         
         spdhg = SPDHG(f=F, g=G, operator=A,  update_objective_interval=10)
         
@@ -1477,7 +1485,7 @@ class TestSPDHG(CCPiTestClass):
         prob = [1/(2*subsets)]*(len(K)-1) + [1/2]
         spdhg = SPDHG(f=F, g=G, operator=K,
                         update_objective_interval=200, prob=prob)
-        spdhg.run(20 * subsets)
+        spdhg.run(25 * subsets)
 
         # %% 'explicit' PDHG, scalar step-sizes
         op1 = alpha * GradientOperator(ig)

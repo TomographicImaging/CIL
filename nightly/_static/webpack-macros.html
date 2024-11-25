@@ -5,20 +5,20 @@
 
 {% macro head_pre_assets() %}
   <!-- Loaded before other Sphinx assets -->
-  <link href="{{ pathto('_static/styles/theme.css', 1) }}?digest=5bdc4d852cc7e18db152" rel="stylesheet" />
-<link href="{{ pathto('_static/styles/pydata-sphinx-theme.css', 1) }}?digest=5bdc4d852cc7e18db152" rel="stylesheet" />
+  <link href="{{ pathto('_static/styles/theme.css', 1) }}?digest=13727846976c128b17c7" rel="stylesheet" />
+<link href="{{ pathto('_static/styles/pydata-sphinx-theme.css', 1) }}?digest=13727846976c128b17c7" rel="stylesheet" />
 {% endmacro %}
 
 {% macro head_js_preload() %}
   <!-- So that users can add custom icons -->
-  <script src="{{ pathto('_static/scripts/fontawesome.js', 1) }}?digest=5bdc4d852cc7e18db152"></script>
+  <script src="{{ pathto('_static/scripts/fontawesome.js', 1) }}?digest=13727846976c128b17c7"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="{{ pathto('_static/scripts/bootstrap.js', 1) }}?digest=5bdc4d852cc7e18db152" />
-<link rel="preload" as="script" href="{{ pathto('_static/scripts/pydata-sphinx-theme.js', 1) }}?digest=5bdc4d852cc7e18db152" />
+  <link rel="preload" as="script" href="{{ pathto('_static/scripts/bootstrap.js', 1) }}?digest=13727846976c128b17c7" />
+<link rel="preload" as="script" href="{{ pathto('_static/scripts/pydata-sphinx-theme.js', 1) }}?digest=13727846976c128b17c7" />
 {% endmacro %}
 
 {% macro body_post() %}
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="{{ pathto('_static/scripts/bootstrap.js', 1) }}?digest=5bdc4d852cc7e18db152"></script>
-<script defer src="{{ pathto('_static/scripts/pydata-sphinx-theme.js', 1) }}?digest=5bdc4d852cc7e18db152"></script>
+  <script defer src="{{ pathto('_static/scripts/bootstrap.js', 1) }}?digest=13727846976c128b17c7"></script>
+<script defer src="{{ pathto('_static/scripts/pydata-sphinx-theme.js', 1) }}?digest=13727846976c128b17c7"></script>
 {% endmacro %}

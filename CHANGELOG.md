@@ -1,6 +1,7 @@
 * 24.x.x
 - Bug fixes:
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
+  - `SPDHG` `gamma` parameter is now applied correctly, so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644) 
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
 - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes (#1644) 

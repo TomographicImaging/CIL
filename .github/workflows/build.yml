@@ -155,7 +155,7 @@ jobs:
         echo '${{ secrets.STFC_SSH_KEY }}' > ./key
         chmod 600 ./key
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
-          'conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}'
+          'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
     defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-latest

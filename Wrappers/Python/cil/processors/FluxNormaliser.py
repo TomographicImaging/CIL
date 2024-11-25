@@ -39,9 +39,8 @@ class FluxNormaliser(Processor):
     
     roi: dict, optional
         Dictionary describing the region of interest containing the background
-        in the image. The roi is specified as `{'axis_name1':(start,stop), 
-        'axis_name2':(start,stop)}`, where the key is the axis name 'vertical'
-        and/ or 'horizontal'. If an axis is not specified in the roi dictionary, 
+        in the image. The roi is specified as `{'horizontal':(start,stop), 
+        'vertical':(start,stop)}`. If an axis is not specified in the roi dictionary, 
         the full range will be used.
 
     target: {'mean', 'first'} or float, default='mean'

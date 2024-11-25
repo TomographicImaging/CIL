@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev9+g42e55952 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev10+g411c679b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=13727846976c128b17c7" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=13727846976c128b17c7" />
 
-    <script src="../_static/documentation_options.js?v=e048dc7a"></script>
+    <script src="../_static/documentation_options.js?v=0fe152da"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev9+g42e55952';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev10+g411c679b';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev9+g42e55952" />
+  <meta name="docsearch:version" content="24.2.1.dev10+g411c679b" />
   </head>
   
   
@@ -3038,87 +3038,183 @@ This is an area of continued development for CIL and, depending on  the properti
 Each iteration considers just one index of the sum, potentially reducing computational cost. For more examples see our [user notebooks]( <a class="github reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">vais-ral/CIL-Demos</a>).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SPDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG" title="Link to this definition">#</a></dt>
-<dd><p>Stochastic Primal Dual Hybrid Gradient</p>
-<p>Problem:</p>
-<div class="math notranslate nohighlight">
-\[\min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)\]</div>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SPDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG" title="Link to this definition">#</a></dt>
+<dd><p>Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type:
+.. math:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\<span class="n">min_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> <span class="n">f</span><span class="p">(</span><span class="n">Kx</span><span class="p">)</span> <span class="o">+</span> <span class="n">g</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">=</span> \<span class="n">min_</span><span class="p">{</span><span class="n">x</span><span class="p">}</span> \<span class="nb">sum</span> <span class="n">f_i</span><span class="p">(</span><span class="n">K_i</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">g</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <span class="math notranslate nohighlight">\(f_i\)</span> and the regulariser <span class="math notranslate nohighlight">\(g\)</span> need to be proper, convex and lower semi-continuous.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.BlockFunction" title="cil.optimisation.functions.BlockFunction"><em>BlockFunction</em></a>) – Each must be a convex function with a “simple” proximal method of its conjugate</p></li>
 <li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal</p></li>
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.BlockOperator" title="cil.optimisation.operators.BlockOperator"><em>BlockOperator</em></a>) – BlockOperator must contain Linear Operators</p></li>
-<li><p><strong>tau</strong> (<em>positive float</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Step size parameter for Primal problem</p></li>
-<li><p><strong>sigma</strong> (<em>list</em><em> of </em><em>positive float</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – List of Step size parameters for Dual problem</p></li>
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Initial point for the SPDHG algorithm</p></li>
-<li><p><strong>prob</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – List of probabilities. If None each subset will have probability = 1/number of subsets</p></li>
-<li><p><strong>gamma</strong> (<em>float</em>) – parameter controlling the trade-off between the primal and dual step sizes</p></li>
-<li><p><strong>**kwargs</strong></p></li>
-<li><p><strong>norms</strong> (<em>list</em><em> of </em><em>floats</em>) – precalculated list of norms of the operators</p></li>
+<li><p><strong>tau</strong> (<em>positive float</em><em>, </em><em>optional</em>) – Step size parameter for the primal problem. If <cite>None</cite> will be computed by algorithm, see note for details.</p></li>
+<li><p><strong>sigma</strong> (<em>list</em><em> of </em><em>positive float</em><em>, </em><em>optional</em>) – List of Step size parameters for dual problem.  If <cite>None</cite> will be computed by algorithm, see note for details.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Initial point for the SPDHG algorithm. The default value is a zero DataContainer in the range of the <cite>operator</cite>.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em><em>, </em><em>optional</em>) – Parameter controlling the trade-off between the primal and dual step sizes</p></li>
+<li><p><strong>sampler</strong> (<cite>cil.optimisation.utilities.Sampler</cite>, optional) – A <cite>Sampler</cite> controllingthe selection of the next index for the SPDHG update. If <cite>None</cite>, a sampler will be created for uniform random sampling with replacement. See notes.</p></li>
+<li><p><strong>prob_weights</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>optional</em><em>,</em>) – Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute: if the sampler has a <cite>prob_weight</cite> attribute it will take precedence on this parameter. Should be a list of floats of length <cite>num_indices</cite> that sum to 1. If no sampler with <cite>prob_weights</cite> is passed, it defaults to <cite>[1/len(operator)]*len(operator)</cite>.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <cite>sampler</cite> can be an instance of the <cite>cil.optimisation.utilities.Sampler</cite> class or a custom class with the <cite>__next__(self)</cite> method implemented, which outputs an integer index from {1, …, len(operator)}.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>“Random sampling with replacement” will select the next index with equal probability from  <cite>1 - len(operator)</cite>.</p>
+</div>
 <p class="rubric">Example</p>
-<p>Example of usage: See <a class="github reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">vais-ral/CIL-Demos</a></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;staggered&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">data_partitioned</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="go">                        for i in range(10)])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.025</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spdhg</span> <span class="o">=</span> <span class="n">SPDHG</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">A_partitioned</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)),</span>
+<span class="go">                  initial=A.domain_geometry().allocate(1), update_objective_interval=10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spdhg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<p>Further examples of usage see the [CIL demos.](<a class="github reference external" href="https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py">vais-ral/CIL-Demos</a>)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When setting <cite>sigma</cite> and <cite>tau</cite>, there are 4 possible cases considered by setup function. In all cases the probabilities <span class="math notranslate nohighlight">\(p_i\)</span> are set by a default or user defined sampler:</p>
+<ul class="simple">
+<li><p>Case 1: If neither <cite>sigma</cite> or <cite>tau</cite> are provided then <cite>sigma</cite> is set using the formula:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma_i= \frac{0.99}{\|K_i\|^2}\]</div>
+<p>and <cite>tau</cite> is set as per case 2</p>
+<ul class="simple">
+<li><p>Case 2: If <cite>sigma</cite> is provided but not <cite>tau</cite> then <cite>tau</cite> is calculated using the formula</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })\]</div>
+<ul class="simple">
+<li><p>Case 3: If <cite>tau</cite> is provided but not <cite>sigma</cite> then <cite>sigma</cite> is calculated using the formula</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma_i= \frac{0.99 p_i}{\tau\|K_i\|^2}\]</div>
+<ul class="simple">
+<li><p>Case 4: Both <cite>sigma</cite> and <cite>tau</cite> are provided.</p></li>
+</ul>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Convergence is guaranteed provided that [2, eq. (12)]:</p>
 <div class="math notranslate nohighlight">
-\[\]</div>
-<p>|sigma[i]^{1/2} * K[i] * tau^{1/2} |^2  &lt; p_i for all i</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<dl class="simple">
-<dt>Notation for primal and dual step-sizes are reversed with comparison</dt><dd><p>to PDHG.py</p>
-</dd>
-</dl>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<dl class="simple">
-<dt>this code implements serial sampling only, as presented in [2]</dt><dd><p>(to be extended to more general case of [1] as future work)</p>
-</dd>
-</dl>
+\[\|\sigma[i]^{1/2}  K[i]  \tau^{1/2} \|^2  &lt; p_i \text{ for all } i\]</div>
 </div>
 <p class="rubric">References</p>
 <p>[1]”Stochastic primal-dual hybrid gradient algorithm with arbitrary
 sampling and imaging applications”,
 Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
-SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.</p>
+SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   <a class="reference external" href="https://doi.org/10.1137/17M1134834">https://doi.org/10.1137/17M1134834</a></p>
 <p>[2]”Faster PET reconstruction with non-smooth priors by randomization and preconditioning”,
 Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
-Physics in Medicine &amp; Biology, Volume 64, Number 22, 2019.</p>
+Physics in Medicine &amp; Biology, Volume 64, Number 22, 2019. <a class="reference external" href="https://doi.org/10.1088/1361-6560/ab3d07">https://doi.org/10.1088/1361-6560/ab3d07</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.set_up">
-<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.set_up" title="Link to this definition">#</a></dt>
-<dd><p>set-up of the algorithm
-:param f: Each must be a convex function with a “simple” proximal method of its conjugate
-:type f: BlockFunction
-:param g: A convex function with a “simple” proximal
-:type g: Function
-:param operator: BlockOperator must contain Linear Operators
-:type operator: BlockOperator
-:param tau: Step size parameter for Primal problem
-:type tau: positive float, optional, default=None
-:param sigma: List of Step size parameters for Dual problem
-:type sigma: list of positive float, optional, default=None
-:param initial: Initial point for the SPDHG algorithm
-:type initial: DataContainer, optional, default=None
-:param prob: List of probabilities. If None each subset will have probability = 1/number of subsets
-:type prob: list of floats, optional, default=None
-:param gamma: parameter controlling the trade-off between the primal and dual step sizes
-:type gamma: float
-:param **kwargs:
-:param norms: precalculated list of norms of the operators
-:type norms: list of floats</p>
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.set_up" title="Link to this definition">#</a></dt>
+<dd><p>set-up of the algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.set_step_sizes_from_ratio">
+<span class="sig-name descname"><span class="pre">set_step_sizes_from_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.set_step_sizes_from_ratio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.set_step_sizes_from_ratio" title="Link to this definition">#</a></dt>
+<dd><p>Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.</p>
+<p>The step sizes <cite>sigma</cite> and <cite>tau</cite> are set using the equations:</p>
+<div class="math notranslate nohighlight">
+\[\sigma_i= \frac{\gamma\rho }{\|K_i\|^2}\]</div>
+<div class="math notranslate nohighlight">
+\[\tau = \rho\min_i([ \frac{p_i }{\sigma_i  \|K_i\|^2})\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gamma</strong> (<em>Positive float</em>) – parameter controlling the trade-off between the primal and dual step sizes</p></li>
+<li><p><strong>rho</strong> (<em>Positive float</em>) – parameter controlling the size of the product :math: sigmatau :math:</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.set_step_sizes">
+<span class="sig-name descname"><span class="pre">set_step_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.set_step_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.set_step_sizes" title="Link to this definition">#</a></dt>
+<dd><p>Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.</p>
+<p>When setting <cite>sigma</cite> and <cite>tau</cite>, there are 4 possible cases considered by setup function:</p>
+<ul class="simple">
+<li><p>Case 1: If neither <cite>sigma</cite> or <cite>tau</cite> are provided then <cite>sigma</cite> is set using the formula:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma_i= \frac{0.99}{\|K_i\|^2}\]</div>
+<p>and <cite>tau</cite> is set as per case 2</p>
+<ul class="simple">
+<li><p>Case 2: If <cite>sigma</cite> is provided but not <cite>tau</cite> then <cite>tau</cite> is calculated using the formula</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })\]</div>
+<ul class="simple">
+<li><p>Case 3: If <cite>tau</cite> is provided but not <cite>sigma</cite> then <cite>sigma</cite> is calculated using the formula</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma_i= \frac{0.99 p_i}{\tau\|K_i\|^2}\]</div>
+<ul class="simple">
+<li><p>Case 4: Both <cite>sigma</cite> and <cite>tau</cite> are provided.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<em>list</em><em> of </em><em>positive float</em><em>, </em><em>optional</em><em>, </em><em>default= see docstring</em>) – List of Step size parameters for dual problem</p></li>
+<li><p><strong>tau</strong> (<em>positive float</em><em>, </em><em>optional</em><em>, </em><em>default= see docstring</em>) – Step size parameter for primal problem</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.check_convergence">
+<span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.check_convergence" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether convergence criterion for SPDHG is satisfied with the current scalar values of tau and sigma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Convergence criterion currently can only be checked for scalar values of tau.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge.
+Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SPDHG/#SPDHG.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.update" title="Link to this definition">#</a></dt>
-<dd><p>A single iteration of the algorithm</p>
+<dd><p>Runs one iteration of SPDHG</p>
 </dd></dl>
 
 <dl class="py method">
@@ -3130,7 +3226,43 @@ Physics in Medicine &amp; Biology, Volume 64, Number 22, 2019.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.objective">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.objective" title="Link to this definition">#</a></dt>
-<dd><p>alias of loss</p>
+<dd><p>The saved primal objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The saved primal objectives from <cite>update_objective</cite>. The number of saved values depends on the <cite>update_objective_interval</cite> kwarg.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.dual_objective">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dual_objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.dual_objective" title="Link to this definition">#</a></dt>
+<dd><p>The saved dual objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The saved dual objectives from <cite>update_objective</cite>. The number of saved values depends on the <cite>update_objective_interval</cite> kwarg.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.SPDHG.primal_dual_gap">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">primal_dual_gap</span></span><a class="headerlink" href="#cil.optimisation.algorithms.SPDHG.primal_dual_gap" title="Link to this definition">#</a></dt>
+<dd><p>The saved primal-dual gap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The saved primal dual gap from <cite>update_objective</cite>. The number of saved values depends on the <cite>update_objective_interval</cite> kwarg.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

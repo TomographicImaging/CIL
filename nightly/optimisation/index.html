@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev10+g411c679b documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev11+gab65d759 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=13727846976c128b17c7" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=13727846976c128b17c7" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=2f381b4a12beced9164b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=2f381b4a12beced9164b" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=13727846976c128b17c7"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=2f381b4a12beced9164b"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=13727846976c128b17c7" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=13727846976c128b17c7" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=2f381b4a12beced9164b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=2f381b4a12beced9164b" />
 
-    <script src="../_static/documentation_options.js?v=0fe152da"></script>
+    <script src="../_static/documentation_options.js?v=b0b7a87b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev10+g411c679b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev11+gab65d759';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev10+g411c679b" />
+  <meta name="docsearch:version" content="24.2.1.dev11+gab65d759" />
   </head>
   
   
@@ -746,7 +746,7 @@ print to screen of the status of the optimisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -960,7 +960,7 @@ print to screen of the status of the optimisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -1170,7 +1170,7 @@ print to screen of the status of the optimisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -1415,7 +1415,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -1815,7 +1815,7 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -2195,7 +2195,7 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -2586,7 +2586,7 @@ The case where both functions are strongly convex is not available at the moment
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -2777,7 +2777,7 @@ where in the PDHG a proximal and proximal conjugate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -2975,7 +2975,7 @@ of Three Functions with a Linear Operator”.  This is a primal dual algorithm f
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -3372,7 +3372,7 @@ Alternatively, step sizes outside the convergence criterion may still allow (fas
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If not set the algorithm will run until <code class="code docutils literal notranslate"><span class="pre">should_stop()</span></code> is reached</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
 <li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
 </ul>
@@ -10353,8 +10353,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=13727846976c128b17c7"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=13727846976c128b17c7"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=2f381b4a12beced9164b"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=2f381b4a12beced9164b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

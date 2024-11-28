@@ -24,9 +24,20 @@ from tempfile import NamedTemporaryFile
 import numpy as np
 import logging
 
+
+from cil.framework import VectorData
+from cil.framework import ImageData
+from cil.framework import AcquisitionData
+from cil.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry
+from cil.framework import BlockDataContainer
+from cil.framework import BlockGeometry
+from cil.optimisation.utilities import Sampler
+
 from cil.framework import (ImageGeometry, ImageData, AcquisitionData, AcquisitionGeometry,
                            BlockDataContainer, BlockGeometry, VectorData)
 from cil.framework.labels import FillType
+
 
 from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize
 from cil.optimisation.operators import IdentityOperator
@@ -58,16 +69,19 @@ from cil.utilities.quality_measures import mae, mse, psnr
 
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
+
+import logging
 from testclass import CCPiTestClass
-from utils import has_astra, initialise_tests
+from utils import has_astra
 
 from unittest.mock import MagicMock
 
 log = logging.getLogger(__name__)
-initialise_tests()
+
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
+
 
 
 if has_cvxpy:
@@ -101,12 +115,14 @@ class TestGD(CCPiTestClass):
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
+
         step_size = norm2sq.L / 3.
 
         alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6)
         alg.run(1000,verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
         alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
@@ -235,6 +251,27 @@ class TestGD(CCPiTestClass):
             gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
         np.testing.assert_allclose(
             gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
+        
+    def test_gd_run_no_iterations(self):
+        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        with self.assertRaises(ValueError):
+            gd.run()
+        
+    def test_gd_run_infinite(self):
+        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        with self.assertRaises(ValueError):
+            gd.run(np.inf)
+        
+        class StopCallback(callbacks.Callback):
+            def __init__(self):
+                self.count = 0
+            def __call__(self, algorithm):
+                self.count += 1
+                if self.count == 10:
+                    raise StopIteration
+        with self.assertWarns(UserWarning):
+            gd.run(np.inf, callbacks=[StopCallback()])
+        self.assertEqual(gd.iteration, 9)
 
 
 class TestFISTA(CCPiTestClass):
@@ -1013,7 +1050,6 @@ class TestSIRT(CCPiTestClass):
         sirt = SIRT(initial=tmp_initial, operator=self.Aop,
                     data=self.bop)
         sirt.run(5)
-
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
@@ -1131,7 +1167,219 @@ class TestSIRT(CCPiTestClass):
             sirt.x.as_array(), ig.allocate(0.25).as_array(), 3)
 
 
-class TestSPDHG(unittest.TestCase):
+class TestSPDHG(CCPiTestClass):
+    def setUp(self):
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
+        self.subsets = 10
+        
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
+
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 90)
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
+            angles, angle_unit='radian').set_panel(detectors, 0.1)
+        # Select device
+        dev = 'cpu'
+
+        Aop = ProjectionOperator(ig, ag, dev)
+
+        sin = Aop.direct(data)
+        partitioned_data = sin.partition(self.subsets, 'sequential')
+        self.A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+        self.A2 = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                 for i in range(self.subsets)])
+        alpha = 0.025
+        self.G = alpha * IndicatorBox(lower=0)
+
+    def test_SPDHG_defaults_and_setters(self):
+        #Test SPDHG init with default values
+        gamma = 1.
+        rho = .99
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+
+        self.assertListEqual(spdhg._norms, [self.A.get_item(i, 0).norm()
+                                           for i in range(self.subsets)])
+        self.assertListEqual(spdhg._prob_weights, [
+                             1/self.subsets] * self.subsets)
+        self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
+        self.assertListEqual(
+            spdhg.sigma, [rho / ni for ni in spdhg._norms])
+        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+        self.assertNumpyArrayEqual(
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
+        self.assertEqual(spdhg.update_objective_interval, 1)
+
+        #Test SPDHG setters - "from ratio"
+        gamma = 3.7
+        rho = 5.6
+        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        self.assertListEqual(
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
+        self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+        #Test SPDHG setters - set_step_sizes default values for sigma and tau
+        gamma = 1.
+        rho = .99
+        spdhg.set_step_sizes()
+        self.assertListEqual(
+            spdhg.sigma, [rho / ni for ni in spdhg._norms])
+        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+        #Test SPDHG setters - set_step_sizes with sigma and tau
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, 100)
+
+        #Test SPDHG setters - set_step_sizes with sigma 
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+        #Test SPDHG setters - set_step_sizes with tau
+        spdhg.set_step_sizes(sigma=None, tau=100)
+        self.assertListEqual(spdhg.sigma, [
+                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
+        self.assertEqual(spdhg.tau, 100)
+
+    def test_spdhg_non_default_init(self):
+        #Test SPDHG init with non-default values
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)),
+                      initial=self.A.domain_geometry().allocate(1), update_objective_interval=10)
+
+        self.assertListEqual(spdhg._prob_weights,  list(np.arange(1, 11)/55.))
+        self.assertNumpyArrayEqual(
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(1).as_array())
+        self.assertEqual(spdhg.update_objective_interval, 10)
+        
+        #Test SPDHG setters - prob_weights and a sampler gives an error
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+            
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob_weights=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0],  initial=self.A.domain_geometry().allocate(1), update_objective_interval=10)
+        
+        self.assertListEqual(spdhg._prob_weights,  [1/(self.subsets-1)]*(self.subsets-1)+[0])     
+        self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
+        
+        
+    def test_spdhg_sampler_gives_too_large_index(self):
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sampler=Sampler.sequential(20),
+                      initial=self.A.domain_geometry().allocate(1), update_objective_interval=10)
+        with self.assertRaises(IndexError):
+            spdhg.run(12)   
+
+    def test_spdhg_deprecated_vargs(self):
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[
+                      1]*len(self.A), prob=[1/(self.subsets-1)]*(self.subsets-1)+[0])
+
+        self.assertListEqual(self.A.get_norms_as_list(), [1]*len(self.A))
+        self.assertListEqual(spdhg._norms, [1]*len(self.A))
+        self.assertListEqual(spdhg._sampler.prob_weights, [
+                             1/(self.subsets-1)]*(self.subsets-1)+[0])
+        self.assertListEqual(spdhg._prob_weights, [
+                             1/(self.subsets-1)]*(self.subsets-1)+[0])
+
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+            
+            
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,  prob=[1/(self.subsets-1)]*(
+                self.subsets-1)+[0], prob_weights= [1/(self.subsets-1)]*(self.subsets-1)+[0])
+
+        with self.assertRaises(ValueError):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,  sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
+
+
+    def test_spdhg_set_norms(self):
+
+        self.A2.set_norms([1]*len(self.A2))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A2)
+        self.assertListEqual(spdhg._norms, [1]*len(self.A2))
+
+    def test_spdhg_check_convergence(self):
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+
+        self.assertTrue(spdhg.check_convergence())
+
+        gamma = 3.7
+        rho = 0.9
+        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        self.assertTrue(spdhg.check_convergence())
+
+        gamma = 3.7
+        rho = 100
+        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        self.assertFalse(spdhg.check_convergence())
+
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
+        self.assertFalse(spdhg.check_convergence())
+
+        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
+        self.assertTrue(spdhg.check_convergence())
+
+        spdhg.set_step_sizes(sigma=None, tau=100)
+        self.assertTrue(spdhg.check_convergence())
+
+    @unittest.skipUnless(has_astra, "cil-astra not available")
+    
+    def test_SPDHG_num_subsets_1(self): 
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
+
+        subsets = 1
+
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 90)
+        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
+            angles, angle_unit='radian').set_panel(detectors, 0.1)
+        # Select device
+        dev = 'cpu'
+
+        Aop = ProjectionOperator(ig, ag, dev)
+
+        sin = Aop.direct(data)
+        partitioned_data = sin.partition(subsets, 'sequential')
+        A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(subsets)])
+       
+        # block function
+        F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                 for i in range(subsets)])
+        
+        F_phdhg=L2NormSquared(b=partitioned_data[0])
+        A_pdhg = IdentityOperator(partitioned_data[0].geometry) 
+                            
+        alpha = 0.025
+        G = alpha * IndicatorBox(lower=0)
+        
+        spdhg = SPDHG(f=F, g=G, operator=A,  update_objective_interval=10)
+        
+        spdhg.run(7)   
+        
+        pdhg = PDHG(f=F_phdhg, g=G, operator=A_pdhg, update_objective_interval=10)
+        
+        pdhg.run(7) 
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.solution.as_array(), spdhg.solution.as_array(), decimal=3)
 
     def add_noise(self, sino, noise='gaussian', seed=10):
         if noise == 'poisson':
@@ -1206,6 +1454,7 @@ class TestSPDHG(unittest.TestCase):
               mse(spdhg.get_output(), pdhg.get_output()),
               psnr(spdhg.get_output(), pdhg.get_output())
               )
+
         log.info("Quality measures %r", qm)
 
         np.testing.assert_almost_equal(mae(spdhg.get_output(), pdhg.get_output()),
@@ -1257,7 +1506,7 @@ class TestSPDHG(unittest.TestCase):
         prob = [1/(2*subsets)]*(len(K)-1) + [1/2]
         spdhg = SPDHG(f=F, g=G, operator=K,
                         update_objective_interval=200, prob=prob)
-        spdhg.run(20 * subsets)
+        spdhg.run(25 * subsets)
 
         # %% 'explicit' PDHG, scalar step-sizes
         op1 = alpha * GradientOperator(ig)
@@ -1281,11 +1530,13 @@ class TestSPDHG(unittest.TestCase):
               mse(spdhg.get_output(), pdhg.get_output()),
               psnr(spdhg.get_output(), pdhg.get_output())
               )
+
         log.info("Quality measures: %r", qm)
         np.testing.assert_almost_equal(mae(spdhg.get_output(), pdhg.get_output()),
                                        0.0031962995, decimal=3)
         np.testing.assert_almost_equal(mse(spdhg.get_output(), pdhg.get_output()),
                                        4.242368e-05, decimal=3)
+
 
 
 class TestCallbacks(unittest.TestCase):
@@ -1349,6 +1600,7 @@ class TestCallbacks(unittest.TestCase):
         algo = self.PrintAlgo()
         algo.run(20, callbacks=[EarlyStopping()])
         self.assertEqual(algo.iteration, 15)
+
 
     def test_CGLSEarlyStopping(self):
         ig = ImageGeometry(10, 2)
@@ -1456,6 +1708,7 @@ class TestADMM(unittest.TestCase):
         admm_noaxpby = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
                              update_objective_interval=10)
         admm_noaxpby.run(1, verbose=0)
+
         np.testing.assert_array_almost_equal(
             admm.solution.as_array(), admm_noaxpby.solution.as_array())
 

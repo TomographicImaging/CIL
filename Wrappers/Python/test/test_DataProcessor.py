@@ -2415,7 +2415,8 @@ class TestMaskGenerator(unittest.TestCase):
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check threshold
-                data = IG.allocate('random')
+                data.as_array()[2,3] = numpy.random.rand()
+                data.as_array()[4,5] = numpy.random.rand()
                 data.as_array()[6,8] = 100
                 data.as_array()[1,3] = 80
 
@@ -2439,7 +2440,6 @@ class TestMaskGenerator(unittest.TestCase):
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check quantile
-                data = IG.allocate('random')
                 data.as_array()[6,8] = 100
                 data.as_array()[1,3] = 80
 
@@ -2462,16 +2462,25 @@ class TestMaskGenerator(unittest.TestCase):
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-                # check mean
-                IG = ImageGeometry(voxel_num_x=200,
-                                    voxel_num_y=200)
-                #data = IG.allocate('random', seed=10)
-                data = IG.allocate()
-                numpy.random.seed(10)
-                data.fill(numpy.random.rand(200,200))
-                data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
-                m = MaskGenerator.mean(axis='horizontal_x')
+        # Tests on larger data
+
+        # check mean
+        IG = ImageGeometry(voxel_num_x=200,
+                            voxel_num_y=200)
+        data = IG.allocate()
+        numpy.random.seed(10)
+        data.fill(numpy.random.rand(200,200))
+        data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
+
+        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_image_data = data
+        data_objects = [data_as_image_data, data_as_data_container]
+
+        for i, data in enumerate(data_objects):
+            with self.subTest(data_type=data_type_name[i]):
+
+                m = MaskGenerator.mean(axis=1) # this gives horizontal_x for ImageData, or 'dimension_01' for DataContainer
                 m.set_input(data)
                 mask = m.process()
 
@@ -2490,7 +2499,7 @@ class TestMaskGenerator(unittest.TestCase):
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check median
-                m = MaskGenerator.median(axis='horizontal_x')
+                m = MaskGenerator.median(axis=1)
                 m.set_input(data)
                 mask = m.process()
 
@@ -2517,7 +2526,7 @@ class TestMaskGenerator(unittest.TestCase):
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 #
-                m = MaskGenerator.mean(window=20, axis='horizontal_y')
+                m = MaskGenerator.mean(window=20, axis=0) # this gives horizontal_y for ImageData, or 'dimension_00' for DataContainer
                 m.set_input(data)
                 mask = m.process()
 

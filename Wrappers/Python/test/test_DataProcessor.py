@@ -1008,7 +1008,7 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
+                {'vertical':(32,64,2)},
 
                 # slice to single dimension
                 {'vertical':(32,34,2)},

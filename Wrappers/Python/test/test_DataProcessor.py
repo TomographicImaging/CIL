@@ -2368,7 +2368,7 @@ class TestMaskGenerator(unittest.TestCase):
 
         IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
-        AG = AcquisitionGeometry.create_Parallel2D().set_panel((10,10)).set_angles(1)
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
 
         data = IG.allocate('random')
 
@@ -2470,7 +2470,7 @@ class TestMaskGenerator(unittest.TestCase):
         IG = ImageGeometry(voxel_num_x=200,
                             voxel_num_y=200)
 
-        AG = AcquisitionGeometry.create_Parallel2D().set_panel((200,200)).set_angles(1)
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
         data = IG.allocate()
         numpy.random.seed(10)
         data.fill(numpy.random.rand(200,200))

@@ -2368,17 +2368,20 @@ class TestMaskGenerator(unittest.TestCase):
 
         IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
+        AG = AcquisitionGeometry.create_Parallel2D().set_panel((10,10)).set_angles(1)
 
         data = IG.allocate('random')
 
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
 
+   
         data_as_image_data = data
         data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_acq_data = AcquisitionData(array=data.copy(), geometry=AG)
 
-        data_objects = [data_as_image_data, data_as_data_container]
-        data_type_name = ['ImageData', 'DataContainer']
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
+        data_type_name = ['ImageData', 'DataContainer', 'AcquisitionData']
 
         for i, data in enumerate(data_objects):
             with self.subTest(data_type=data_type_name[i]):
@@ -2463,11 +2466,11 @@ class TestMaskGenerator(unittest.TestCase):
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 
-        # Tests on larger data
-
-        # check mean
+        # Tests on larger data for checking mean and median
         IG = ImageGeometry(voxel_num_x=200,
                             voxel_num_y=200)
+
+        AG = AcquisitionGeometry.create_Parallel2D().set_panel((200,200)).set_angles(1)
         data = IG.allocate()
         numpy.random.seed(10)
         data.fill(numpy.random.rand(200,200))
@@ -2475,7 +2478,8 @@ class TestMaskGenerator(unittest.TestCase):
 
         data_as_data_container = DataContainer(data.as_array().copy())
         data_as_image_data = data
-        data_objects = [data_as_image_data, data_as_data_container]
+        data_as_acq_data = AcquisitionData(array=data.copy(), geometry=AG)
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
 
         for i, data in enumerate(data_objects):
             with self.subTest(data_type=data_type_name[i]):

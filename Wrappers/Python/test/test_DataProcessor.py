@@ -2378,7 +2378,7 @@ class TestMaskGenerator(unittest.TestCase):
    
         data_as_image_data = data
         data_as_data_container = DataContainer(data.as_array().copy())
-        data_as_acq_data = AcquisitionData(array=data.copy(), geometry=AG)
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
 
         data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
         data_type_name = ['ImageData', 'DataContainer', 'AcquisitionData']
@@ -2478,7 +2478,7 @@ class TestMaskGenerator(unittest.TestCase):
 
         data_as_data_container = DataContainer(data.as_array().copy())
         data_as_image_data = data
-        data_as_acq_data = AcquisitionData(array=data.copy(), geometry=AG)
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
         data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
 
         for i, data in enumerate(data_objects):

@@ -374,7 +374,11 @@ class MaskGenerator(DataProcessor):
 
         if out is None:
             mask = numpy.asarray(mask, dtype=bool)
-            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry.copy(), suppress_warning=True, dimension_labels=data.dimension_labels)
+            if data.geometry is not None:
+                geometry = data.geometry.copy()
+            else:
+                geometry = None
+            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
         else:
             out.fill(mask)
         

@@ -1,15 +1,17 @@
 * 24.x.x
 - Bug fixes:
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
-  - `SPDHG` `gamma` parameter is now applied correctly, so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644) 
+  - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+  - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
+  - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
   - Add FluxNormaliser processor (#1878)
-  - Updated the `SPDHG` algorithm to take a stochastic `Sampler` and to more easily set step sizes (#1644) 
 - Dependencies:
   - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
 - Changes that break backwards compatibility:
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
+    - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
 
 
 * 24.2.0

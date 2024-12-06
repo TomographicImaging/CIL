@@ -34,6 +34,10 @@ from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissi
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
 
+from utils import has_numba
+if has_numba:
+    import numba
+
 from scipy import constants
 from scipy.fft import ifftshift
 
@@ -3319,22 +3323,22 @@ class TestFluxNormaliser(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     processor.preview_configuration(channel=1)
 
-    def test_FluxNormaliser(self):
+    def test_FluxNormaliser(self, accelerated=False):
         #Test flux with no target
-        processor = FluxNormaliser(flux=1)
+        processor = FluxNormaliser(flux=1, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
         
         #Test flux with target
-        processor = FluxNormaliser(flux=10, target=5.0)
+        processor = FluxNormaliser(flux=10, target=5.0, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
         
         #Test flux array with no target
         flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
-        processor = FluxNormaliser(flux=flux)
+        processor = FluxNormaliser(flux=flux, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         data_norm_test = self.data_cone.copy()
@@ -3346,7 +3350,7 @@ class TestFluxNormaliser(unittest.TestCase):
         # #Test flux array with target
         flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
         norm_value = 5.0
-        processor = FluxNormaliser(flux=flux, target=norm_value)
+        processor = FluxNormaliser(flux=flux, target=norm_value, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         data_norm_test = self.data_cone.copy()
@@ -3357,21 +3361,21 @@ class TestFluxNormaliser(unittest.TestCase):
 
         # #Test roi with no target
         roi = {'vertical':(0,10), 'horizontal':(0,10)}
-        processor = FluxNormaliser(roi=roi)
+        processor = FluxNormaliser(roi=roi, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
 
         # #Test roi with norm_value
         roi = {'vertical':(0,10), 'horizontal':(0,10)}
-        processor = FluxNormaliser(roi=roi, target=5.0)
+        processor = FluxNormaliser(roi=roi, target=5.0, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
 
         # # Test roi with just one dimension
         roi = {'vertical':(0,2)}
-        processor = FluxNormaliser(roi=roi, target=5)
+        processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
         processor.set_input(self.data_cone)
         data_norm = processor.get_output()
         numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
@@ -3380,7 +3384,7 @@ class TestFluxNormaliser(unittest.TestCase):
         for data in [ self.data_cone, self.data_parallel, self.data_multichannel,
                       self.data_slice, self.data_reorder]:
             roi = {'horizontal':(25,40)}
-            processor = FluxNormaliser(roi=roi, target=5)
+            processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
             processor.set_input(data)
             data_norm = processor.get_output()
 
@@ -3407,7 +3411,7 @@ class TestFluxNormaliser(unittest.TestCase):
             err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
 
         data = self.data_single_angle
-        processor = FluxNormaliser(roi=roi, target=5)
+        processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
         processor.set_input(data)
         data_norm = processor.get_output()
         ax = data.get_dimension_axis('horizontal')
@@ -3418,6 +3422,26 @@ class TestFluxNormaliser(unittest.TestCase):
 
         numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
         err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+    
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_FluxNormaliser_accelerated(self):
+        self.test_FluxNormaliser(accelerated=True)
+
+    def test_FluxNormaliser_preserves_input(self):
+        processor = FluxNormaliser(flux=10, target=5.0)
+        data = self.data_cone.copy()
+        processor.set_input(data)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        numpy.testing.assert_allclose(data.array, self.data_cone.array)
+
+        processor = FluxNormaliser(flux=10, target=5.0)
+        data = self.data_cone.copy()
+        data_norm = self.data_cone.copy()
+        processor.set_input(data)
+        processor.get_output(out=data_norm)
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        numpy.testing.assert_allclose(data.array, self.data_cone.array)
 
 if __name__ == "__main__":
 

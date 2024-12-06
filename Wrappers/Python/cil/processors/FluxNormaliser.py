@@ -17,9 +17,12 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
+from cil.utilities import multiprocessing as cil_mp
+
 import numpy
 import logging
 import matplotlib.pyplot as plt
+import numba
 
 log = logging.getLogger(__name__)
 
@@ -82,7 +85,7 @@ class FluxNormaliser(Processor):
     in the roi dictionary
     '''
 
-    def __init__(self, flux=None, roi=None, target='mean'):
+    def __init__(self, flux=None, roi=None, target='mean', accelerated=True):
             
             kwargs = {
                     'flux'  : flux,
@@ -94,7 +97,9 @@ class FluxNormaliser(Processor):
                     'v_size' : 1,
                     'v_axis' : None,
                     'h_size' : 1,
-                    'h_axis' : None
+                    'h_axis' : None,
+                    '_accelerated' : accelerated,
+                    '_num_threads' : None
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
@@ -111,7 +116,7 @@ class FluxNormaliser(Processor):
         
         image_axes = 0
         if 'vertical' in dataset.dimension_labels:
-            v_axis = dataset.get_dimension_axis('vertical')
+            self.v_axis = dataset.get_dimension_axis('vertical')
             self.v_size = dataset.get_dimension_size('vertical')
             image_axes += 1
 
@@ -385,23 +390,61 @@ class FluxNormaliser(Processor):
         ax1.set_xlabel(h)
         ax1.set_ylabel(v)
 
+    @property
+    def num_threads(self):
+        '''Get the optional number of threads parameter to use for the accelerated version.
+
+        Defaults to the value set in the CIL multiprocessing module.'''
+        return cil_mp.NUM_THREADS if self._num_threads is None else self._num_threads
+
+    def set_num_threads(self, value):
+        '''Set the optional number of threads parameter to use for the accelerated version.
+
+        This is discarded if ``accelerated=False``.'''
+        self._num_threads = value
+
+
+        
     def process(self, out=None):
         self._calculate_flux()
         self._calculate_target()
-        data = self.get_input()
 
+        data = self.get_input()
         if out is None:
             out = data.copy()
 
         proj_size = self.v_size*self.h_size
         num_proj = int(data.array.size / proj_size)
-        
-        f = self.flux
-        for i in range(num_proj):
-            arr_proj = data.array.flat[i*proj_size:(i+1)*proj_size]
-            if len(self.flux.flat) > 1:
-                f = self.flux.flat[i] 
-            arr_proj *= self.target_value/f
-            out.array.flat[i*proj_size:(i+1)*proj_size] = arr_proj
+        if self._accelerated:
+            num_threads = numba.get_num_threads()
+            numba.set_num_threads(self.num_threads)
+            numba_loop(data.array.ravel(), self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
+            # reset the number of threads to the original value
+            numba.set_num_threads(num_threads)
+        else:
+            serial_loop(data.array.ravel(), self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
 
         return out
+
+@numba.njit(parallel=True)
+def numba_loop(arr_flat, flux, target, num_proj, proj_size, out_flat):
+    if len(flux) == 1:
+        norm = target/flux[0]
+        for i in numba.prange(num_proj):
+            proj = arr_flat[i*proj_size:(i+1)*proj_size]*norm
+            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+    else:
+        for i in numba.prange(num_proj):
+            proj = arr_flat[i*proj_size:(i+1)*proj_size]*target/flux[i]
+            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+
+def serial_loop(arr_flat, flux, target, num_proj, proj_size, out_flat):
+    if len(flux) == 1:
+        norm = target/flux[0]
+        for i in range(num_proj):
+            proj = arr_flat[i*proj_size:(i+1)*proj_size]*norm
+            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+    else:
+        for i in range(num_proj):
+            proj = arr_flat[i*proj_size:(i+1)*proj_size]*(target/flux[i])
+            out_flat[i*proj_size:(i+1)*proj_size] =  proj

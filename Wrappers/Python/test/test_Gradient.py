@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+from unittest.mock import Mock, patch
 import logging
 import numpy
 from cil.framework import ImageGeometry
@@ -454,3 +455,30 @@ class TestGradientOperator(unittest.TestCase):
         # check dot_test
         for sd in [5, 10, 15]:
             self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))
+
+
+    def test_GradientOperator_cpp_failure_direct(self):
+        # Simulate the failure by setting the status to non-zero
+            ig = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3, voxel_num_z=4)
+            data = ig.allocate('random')
+
+            Grad = GradientOperator(ig, backend='c')
+        
+            # with the call to status = self.fd(args) returning a non-zero value
+            Grad.operator.fd = Mock(return_value=-1)
+            with self.assertRaises(RuntimeError):
+                Grad.direct(data)
+
+
+    def test_GradientOperator_cpp_failure_adjoint(self):
+        # Simulate the failure by setting the status to non-zero
+            ig = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3, voxel_num_z=4)
+            data = ig.allocate('random')
+
+            Grad = GradientOperator(ig, backend='c')
+            res_direct = Grad.direct(data)
+        
+            # with the call to status = self.fd(args) returning a non-zero value
+            Grad.operator.fd = Mock(return_value=-1)
+            with self.assertRaises(RuntimeError):
+                Grad.adjoint(res_direct)

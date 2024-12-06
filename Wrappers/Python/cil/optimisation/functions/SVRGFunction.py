@@ -33,8 +33,8 @@ class SVRGFunction(ApproximateGradientSumFunction):
     r"""
     The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `snapshot_update_interval` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`s at the current iterate and the snapshot, updating the approximate gradient to be:
 
-        .. math ::
-            n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),
+    .. math ::
+        n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),
 
     where :math:`\tilde{x}` is the latest "snapshot" point and :math:`x_k` is the value at the current iteration. 
 
@@ -86,7 +86,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
         self.snapshot = None
 
     def gradient(self, x, out=None):
-        """ Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update frequency
+        r""" Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update frequency
 
         Parameters
         ----------
@@ -115,9 +115,10 @@ class SVRGFunction(ApproximateGradientSumFunction):
             return self.approximate_gradient(x, self.function_num, out=out)
 
     def approximate_gradient(self, x, function_num, out=None):
-        """ Calculates the stochastic gradient at the point :math:`x` by using the gradient of the selected function, indexed by :math:`i_k`, the `function_number` in {0,...,len(functions)-1}, and the full gradient at the snapshot :math:`\tilde{x}`
-            .. math ::
-                n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
+        r""" Calculates the stochastic gradient at the point :math:`x` by using the gradient of the selected function, indexed by :math:`i_k`, the `function_number` in {0,...,len(functions)-1}, and the full gradient at the snapshot :math:`\tilde{x}`
+        
+        .. math ::
+            n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x})
 
         Note
         -----

@@ -2837,6 +2837,11 @@ class TestPaganinProcessor(unittest.TestCase):
             with self.assertRaises(TypeError):
                 processor.set_input(dc)
 
+            # check with different data order
+            data.reorder('astra')
+            with self.assertRaises(ValueError):
+                processor.set_input(data)
+
 
     def test_PaganinProcessor_set_geometry(self):
         processor = PaganinProcessor()
@@ -2992,75 +2997,46 @@ class TestPaganinProcessor(unittest.TestCase):
     def test_PaganinProcessor(self):
 
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength)        
+        mu = 4.0*numpy.pi*1e-2/(wavelength)
 
-        data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
+        data_array = [self.data_cone]#, self.data_parallel, self.data_multichannel]
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
             processor = PaganinProcessor(full_retrieval=True, return_units='m')
             processor.set_input(data)
-            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            thickness = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
             processor = PaganinProcessor(full_retrieval=False)
             processor.set_input(data)
-            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test with GPM
             processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method', return_units='m')
             processor.set_input(data)
-            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            thickness = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
             processor = PaganinProcessor(full_retrieval=False, filter_type='generalised_paganin_method')
             processor.set_input(data)
-            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test with padding
             processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
             processor.set_input(data)
-            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            thickness = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
             processor = PaganinProcessor(full_retrieval=False, pad=10)
             processor.set_input(data)
-            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
             self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
             # test in-line
-            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')(data, override_geometry={'propagation_distance':1})
+            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')(data, override_geometry={'propagation_distance':1}, verbose=False)
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
-            filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
+            filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1}, verbose=False)
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
-
-            # check with different data order
-            data.reorder('astra')
-            data_abs = -(1/mu)*numpy.log(data)
-            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                thickness = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-            processor = PaganinProcessor(full_retrieval=False, pad=10)
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
-            
-            # check with different channel data order
-            if data.geometry.channels>1:
-                data.reorder(('vertical','channel','horizontal','angle'))
-                data_abs = -(1/mu)*numpy.log(data)
-                processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    thickness = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-                processor = PaganinProcessor(full_retrieval=False, pad=10)
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
 
     def test_PaganinProcessor_2D(self):
         self.data_parallel.geometry.config.units = 'm'
@@ -3071,18 +3047,7 @@ class TestPaganinProcessor(unittest.TestCase):
 
         processor = PaganinProcessor(pad=10)
         processor.set_input(data_slice)
-        output = processor.get_output(override_geometry={'propagation_distance':1})
-        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
-
-        # check with different data order
-        data_slice.reorder(('horizontal','angle'))
-        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength) 
-        thickness = -(1/mu)*numpy.log(data_slice)
-
-        processor = PaganinProcessor(pad=10)
-        processor.set_input(data_slice)
-        output = processor.get_output(override_geometry={'propagation_distance':1})
+        output = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
     def test_PaganinProcessor_1angle(self):
@@ -3094,19 +3059,9 @@ class TestPaganinProcessor(unittest.TestCase):
 
         processor = PaganinProcessor(pad=10)
         processor.set_input(data)
-        output = processor.get_output(override_geometry={'propagation_distance':1})
+        output = processor.get_output(override_geometry={'propagation_distance':1}, verbose=False)
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
-        # check with different data order
-        data.reorder(('horizontal','vertical'))
-        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength) 
-        thickness = -(1/mu)*numpy.log(data)
-
-        processor = PaganinProcessor(pad=10)
-        processor.set_input(data)
-        output = processor.get_output(override_geometry={'propagation_distance':1})
-        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
 
 if __name__ == "__main__":

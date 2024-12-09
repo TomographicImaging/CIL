@@ -253,10 +253,9 @@ class FluxNormaliser(Processor):
         Parameters:
         -----------
         angle: float, optional
-            Angle to plot, default=None displays the data with the minimum
-            and maximum pixel values in the roi, otherwise the angle to display 
-            can be specified as a float and the closest angle will be displayed.
-            For 2D data, the roi is plotted on the sinogram.
+            Index of the angle to plot, default=None displays the data with the 
+            minimum and maximum pixel values in the roi. For 2D data, the roi is 
+            plotted on the sinogram.
 
         channel: int, optional
             The channel to plot, default=None displays the central channel if
@@ -297,8 +296,7 @@ class FluxNormaliser(Processor):
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                 else:
                     if 'angle' in data.dimension_labels:
-                        angle_index = numpy.argmin(numpy.abs(angle-data.geometry.angles))
-                        self._plot_slice_roi(angle_index=angle_index, channel_index=channel, log=log, ax=211)
+                        self._plot_slice_roi(angle_index=angle, channel_index=channel, log=log, ax=211)
                     else:
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                         
@@ -311,18 +309,28 @@ class FluxNormaliser(Processor):
             
             plt.subplot(212)
             if len(data.geometry.angles)==1:
-                plt.plot(data.geometry.angles, flux_array, '.r', label='Mean')
-                plt.plot(data.geometry.angles, min,'.k', label='Minimum')
-                plt.plot(data.geometry.angles, max,'.k', label='Maximum')
+                plt.plot(0, flux_array, '.r', label='Mean')
+                plt.plot(0, min,'.k', label='Minimum')
+                plt.plot(0, max,'.k', label='Maximum')
             else:
-                plt.plot(data.geometry.angles, flux_array, 'r', label='Mean')
-                plt.plot(data.geometry.angles, min,'--k', label='Minimum')
-                plt.plot(data.geometry.angles, max,'--k', label='Maximum')
+                indices = range(data.get_dimension_size('angle'))
+                plt.plot(indices, flux_array, 'r', label='Mean')
+                plt.plot(indices, min,'--k', label='Minimum')
+                plt.plot(indices, max,'--k', label='Maximum')
 
             plt.legend()
-            plt.xlabel('angle')
+            plt.xlabel('angle index')
             plt.ylabel('Intensity in roi')
             plt.grid()
+
+            ax1 = plt.gca()
+            ax2 = ax1.twiny()
+            valid_ticks = [int(tick) for tick in ax1.get_xticks() if 0 <= tick < len(data.geometry.angles)]
+            ax2.set_xticks(valid_ticks)
+            ax2.set_xbound(ax1.get_xbound())
+            ax2.set_xticklabels([data.geometry.angles[tick] for tick in valid_ticks])
+            ax2.set_xlabel('angle')
+            
             plt.tight_layout()
             plt.show()
             

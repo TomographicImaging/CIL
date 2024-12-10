@@ -222,24 +222,30 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
 
-        # create an empty axis if the data is 2D
-        if data.geometry.dimension == '2D':
-            data.array = np.expand_dims(data.array, axis=-1)
-            if len(out.shape) == 2:
-                out.array = np.expand_dims(out.array, axis=-1)
-        # expand dimensions for single channels
-        if data.geometry.channels == 1:
-            data.array = np.expand_dims(data.array, axis=0)
-            if out.array.ndim < data.array.ndim:
-                out.array = np.expand_dims(out.array, axis=0)
-        # expand dimensions for single angles
-        if len(data.geometry.angles) == 1:
-            data.array = np.expand_dims(data.array, axis=1) 
-            if out.array.ndim < data.array.ndim:
-                out.array = np.expand_dims(out.array, axis=1)
+        # # create an empty axis if the data is 2D
+        # if data.geometry.dimension == '2D':
+        #     data.array = np.expand_dims(data.array, axis=-1)
+        #     if len(out.shape) == 2:
+        #         out.array = np.expand_dims(out.array, axis=-1)
+        # # expand dimensions for single channels
+        # if data.geometry.channels == 1:
+        #     data.array = np.expand_dims(data.array, axis=0)
+        #     if out.array.ndim < data.array.ndim:
+        #         out.array = np.expand_dims(out.array, axis=0)
+        # # expand dimensions for single angles
+        # if len(data.geometry.angles) == 1:
+        #     data.array = np.expand_dims(data.array, axis=1) 
+        #     if out.array.ndim < data.array.ndim:
+        #         out.array = np.expand_dims(out.array, axis=1)
 
-        if data.array.ndim != 4:
-            raise(ValueError('Data must be 2D or 3D per channel'))
+        target_shape = (
+            1 if data.geometry.channels == 1 else data.array.shape[0],  # channels
+            1 if len(data.geometry.angles) == 1 else data.array.shape[1],  # angles
+            1 if data.dimension_labels.contains('horizontal') else data.get_dimension_size('horizontal'), # horizontal
+            1 if data.dimension_labels.contains('vertical') else data.get_dimension_size('vertical') # vertical
+            )
+        data.array = np.reshape(data.array, target_shape)
+        out.array = np.reshape(out.array, target_shape)
         
         # create a filter based on the shape of the data
         proj_shape = data.array.shape[-2:]
@@ -259,7 +265,7 @@ class PaganinProcessor(Processor):
         # loop over the channels
         for j in range(data.geometry.channels):
             # loop over the angles
-            for i in tqdm(range(len(data.geometry.angles)), disable = not self.verbose):
+            for i in tqdm(range(target_shape[1]), disable = not self.verbose):
                 padded_buffer[:] = 0
                 padded_buffer[buffer_slice] = data.array[j, i, :, :]
 
@@ -268,8 +274,8 @@ class PaganinProcessor(Processor):
                     padded_buffer*=mag2
                     fI = fft2(padded_buffer)
                     iffI = ifft2(fI*self.filter).real
-                    padded_buffer[:] = scaling_factor*np.log(iffI)
-                    # (scaling_factor, padded_buffer, out=padded_buffer)
+                    np.log(iffI, out=padded_buffer)
+                    np.multiply(scaling_factor, padded_buffer, out=padded_buffer)
                 else:
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)

@@ -410,8 +410,6 @@ class FluxNormaliser(Processor):
 
         This is discarded if ``accelerated=False``.'''
         self._num_threads = value
-
-
         
     def process(self, out=None):
         self._calculate_flux()
@@ -420,39 +418,37 @@ class FluxNormaliser(Processor):
         data = self.get_input()
         if out is None:
             out = data.copy()
+        elif id(out) != id(data):
+            numpy.copyto(out.array, data.array)
 
         proj_size = self.v_size*self.h_size
         num_proj = int(data.array.size / proj_size)
         if self._accelerated:
             num_threads = numba.get_num_threads()
             numba.set_num_threads(self.num_threads)
-            numba_loop(data.array.ravel(), self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
+            numba_loop(self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
             # reset the number of threads to the original value
             numba.set_num_threads(num_threads)
         else:
-            serial_loop(data.array.ravel(), self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
+            serial_loop(self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
 
         return out
 
 @numba.njit(parallel=True)
-def numba_loop(arr_flat, flux, target, num_proj, proj_size, out_flat):
+def numba_loop(flux, target, num_proj, proj_size, out_flat):
     if len(flux) == 1:
         norm = target/flux[0]
         for i in numba.prange(num_proj):
-            proj = arr_flat[i*proj_size:(i+1)*proj_size]*norm
-            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+            out_flat[i*proj_size:(i+1)*proj_size] *= norm
     else:
         for i in numba.prange(num_proj):
-            proj = arr_flat[i*proj_size:(i+1)*proj_size]*target/flux[i]
-            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux[i])
 
-def serial_loop(arr_flat, flux, target, num_proj, proj_size, out_flat):
+def serial_loop(flux, target, num_proj, proj_size, out_flat):
     if len(flux) == 1:
         norm = target/flux[0]
         for i in range(num_proj):
-            proj = arr_flat[i*proj_size:(i+1)*proj_size]*norm
-            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+            out_flat[i*proj_size:(i+1)*proj_size] *= norm
     else:
         for i in range(num_proj):
-            proj = arr_flat[i*proj_size:(i+1)*proj_size]*(target/flux[i])
-            out_flat[i*proj_size:(i+1)*proj_size] =  proj
+            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux[i])

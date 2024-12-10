@@ -222,22 +222,6 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
 
-        # # create an empty axis if the data is 2D
-        # if data.geometry.dimension == '2D':
-        #     data.array = np.expand_dims(data.array, axis=-1)
-        #     if len(out.shape) == 2:
-        #         out.array = np.expand_dims(out.array, axis=-1)
-        # # expand dimensions for single channels
-        # if data.geometry.channels == 1:
-        #     data.array = np.expand_dims(data.array, axis=0)
-        #     if out.array.ndim < data.array.ndim:
-        #         out.array = np.expand_dims(out.array, axis=0)
-        # # expand dimensions for single angles
-        # if len(data.geometry.angles) == 1:
-        #     data.array = np.expand_dims(data.array, axis=1) 
-        #     if out.array.ndim < data.array.ndim:
-        #         out.array = np.expand_dims(out.array, axis=1)
-
         target_shape = (
             data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
             data.get_dimension_size('angle') if 'angle' in data.dimension_labels else 1,

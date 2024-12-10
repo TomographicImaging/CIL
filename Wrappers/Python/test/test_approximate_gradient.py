@@ -159,7 +159,7 @@ class approx_gradient_child_class_testing():
         stochastic_objective = self.stochastic_estimator(functions, sampler)
 
         alg_stochastic = GD(initial=initial,
-                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            f=stochastic_objective, update_objective_interval=1000,
                             step_size=0.05)
         alg_stochastic.run(600, verbose=0)
 
@@ -246,7 +246,7 @@ class TestSAG(CCPiTestClass, approx_gradient_child_class_testing):
         stochastic_objective.warm_start_approximate_gradients(initial)
 
         alg_stochastic = GD(initial=initial,
-                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              f=stochastic_objective, update_objective_interval=1000,
                               step_size=0.05, max_iteration =5000)
         alg_stochastic.run( 80, verbose=0)
         np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
@@ -307,7 +307,7 @@ class TestSAGA(CCPiTestClass,approx_gradient_child_class_testing):
         stochastic_objective.warm_start_approximate_gradients(initial)
 
         alg_stochastic = GD(initial=initial,
-                              objective_function=stochastic_objective, update_objective_interval=1000,
+                              f=stochastic_objective, update_objective_interval=1000,
                               step_size=0.05, max_iteration =5000)
         alg_stochastic.run( 100, verbose=0)
         np.testing.assert_allclose(p.value ,stochastic_objective(alg_stochastic.x) , atol=1e-1)
@@ -343,7 +343,7 @@ class TestSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         sampler = Sampler.random_with_replacement(self.n_subsets)
         objective = SVRGFunction(self.f_subsets, sampler)
         alg_stochastic = GD(initial=self.initial,
-                            objective_function=objective, update_objective_interval=500,
+                            f=objective, update_objective_interval=500,
                             step_size=5e-8, max_iteration=5000)
         alg_stochastic.run(2, verbose=0)
         self.assertNumpyArrayAlmostEqual(
@@ -366,7 +366,7 @@ class TestSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         objective = SVRGFunction(
             self.f_subsets, self.sampler, snapshot_update_interval=3)
         alg_stochastic = GD(initial=self.initial,
-                            objective_function=objective, update_objective_interval=500,
+                            f=objective, update_objective_interval=500,
                             step_size=5e-8, max_iteration=5000)
         alg_stochastic.run(2, verbose=0)
         self.assertNumpyArrayAlmostEqual(
@@ -418,7 +418,7 @@ class TestSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         stochastic_objective = SVRGFunction(functions, sampler, store_gradients=True)
 
         alg_stochastic = GD(initial=initial,
-                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            f=stochastic_objective, update_objective_interval=1000,
                             step_size=1/stochastic_objective.L)
 
         alg_stochastic.run(10, verbose=0)
@@ -463,7 +463,7 @@ class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
     def test_LSVRG_data_passes_and_snapshot_update_probability_and_seed(self):
         objective = LSVRGFunction(self.f_subsets, self.sampler, snapshot_update_probability=1)
         alg_stochastic = GD(initial=self.initial,  update_objective_interval=500,
-                            objective_function=objective,                               step_size=5e-8, max_iteration=5000)
+                            f=objective,                               step_size=5e-8, max_iteration=5000)
         alg_stochastic.run(2, verbose=0)
         self.assertNumpyArrayAlmostEqual(
             np.array(objective.data_passes), np.array([1., 2,]))
@@ -474,7 +474,7 @@ class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes_indices[-1]), np.array(list(range(self.n_subsets))))
         objective = LSVRGFunction(self.f_subsets, self.sampler, seed=3)
         alg_stochastic = GD(initial=self.initial,
-                            objective_function=objective, update_objective_interval=500,
+                            f=objective, update_objective_interval=500,
                             step_size=5e-8, max_iteration=5000)
         alg_stochastic.run(10, verbose=0)
         self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), 
@@ -522,7 +522,7 @@ class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         stochastic_objective = LSVRGFunction(functions, sampler, store_gradients=True)
 
         alg_stochastic = GD(initial=initial,
-                            objective_function=stochastic_objective, update_objective_interval=1000,
+                            f=stochastic_objective, update_objective_interval=1000,
                             step_size=1/stochastic_objective.L)
 
 

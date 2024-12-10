@@ -239,11 +239,11 @@ class PaganinProcessor(Processor):
         #         out.array = np.expand_dims(out.array, axis=1)
 
         target_shape = (
-            1 if data.geometry.channels == 1 else data.array.shape[0],  # channels
-            1 if len(data.geometry.angles) == 1 else data.array.shape[1],  # angles
-            1 if data.dimension_labels.contains('horizontal') else data.get_dimension_size('horizontal'), # horizontal
-            1 if data.dimension_labels.contains('vertical') else data.get_dimension_size('vertical') # vertical
-            )
+            data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
+            data.get_dimension_size('angle') if 'angle' in data.dimension_labels else 1,
+            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
+            data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
+            
         data.array = np.reshape(data.array, target_shape)
         out.array = np.reshape(out.array, target_shape)
         

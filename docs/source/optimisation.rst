@@ -92,19 +92,27 @@ SIRT
    :members: update, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
-ISTA
+ISTA/PGD
 ----
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
    :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-FISTA
------
-.. autoclass:: cil.optimisation.algorithms.FISTA
+.. autoclass:: cil.optimisation.algorithms.PGD
    :members:
    :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
+
+FISTA/APGD
+-----
+.. autoclass:: cil.optimisation.algorithms.FISTA
+   :members:
+
+
+.. autoclass:: cil.optimisation.algorithms.APGD
+   :members:
+
 
 PDHG
 ----

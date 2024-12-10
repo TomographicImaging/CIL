@@ -365,3 +365,14 @@ if __name__ == "__main__":
 
     gd = GD(initial=initial, objective=f, step_size=1023123)
     print(gd.is_provably_convergent())
+
+
+class PGD(ISTA):
+    """Proximal Gradient Descent Algorithm. In CIL this is equivalent to ISTA, see :class:`.ISTA`
+    """
+    pass
+
+class APGD(FISTA):
+    """Accelerated Proximal Gradient Descent Algorithm. In CIL this is equivalent to FISTA, see :class:`.FISTA`
+    """
+    pass

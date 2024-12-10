@@ -56,6 +56,8 @@ from cil.optimisation.algorithms import CGLS
 from cil.optimisation.algorithms import SIRT
 from cil.optimisation.algorithms import FISTA
 from cil.optimisation.algorithms import ISTA
+from cil.optimisation.algorithms import PGD
+from cil.optimisation.algorithms import APGD
 from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 from cil.optimisation.algorithms import LADMM
@@ -376,6 +378,59 @@ class TestFISTA(CCPiTestClass):
         fista1 = FISTA(initial=tmp_initial, f=f, g=g,
                         step_size=30.0)
         self.assertFalse(fista1.is_provably_convergent())
+        
+    def test_FISTA_APGD(self):
+        # setup linear system to solve
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+
+        ig = Aop.domain
+
+        initial = ig.allocate()
+
+        # ista run 10 iteration
+        tmp_initial = ig.allocate()
+        fista = APGD(initial=tmp_initial, f=f, g=g)
+        fista.run(1)
+
+        # fista update method
+        t_old = 1
+
+        step_size = 1.0/f.L
+        x_old = ig.allocate()
+        y_old = ig.allocate()
+
+        for _ in range(1):
+
+            x = g.proximal(y_old - step_size *
+                           f.gradient(y_old), tau=step_size)
+            t = 0.5*(1 + np.sqrt(1 + 4*(t_old**2)))
+            y = x + ((t_old-1)/t) * (x - x_old)
+
+            x_old.fill(x)
+            y_old.fill(y)
+            t_old = t
+
+        np.testing.assert_allclose(fista.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = fista.objective[-1]
+        res2 = f(x) + g(x)
+        self.assertTrue(res1 == res2)
+
+
+        
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
@@ -500,9 +555,30 @@ class testISTA(CCPiTestClass):
 
     def test_update(self):
 
-        # ista run 10 iteration
+        
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=self.g)
+        ista.run(1)
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):
+            x = ista.g.proximal(x_old - (0.99*2/ista.f.L)
+                                * ista.f.gradient(x_old), (1./ista.f.L))
+            x_old.fill(x)
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue(res1 == res2)
+        
+    def test_update_pgd(self):
+        
+        tmp_initial = self.ig.allocate()
+        ista = PGD(initial=tmp_initial, f=self.f, g=self.g)
         ista.run(1)
 
         x = tmp_initial.copy()
@@ -522,7 +598,7 @@ class testISTA(CCPiTestClass):
 
     def test_update_g_none(self):
 
-        # ista run 10 iteration
+        
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=None)
         ista.run(1)

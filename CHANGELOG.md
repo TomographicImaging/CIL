@@ -3,6 +3,7 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
   - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
   - Allow MaskGenerator to be run on DataContainers (#2001)
+  - Make Paganin Processor work with AcquistionData with one angle (#1920)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
@@ -47,7 +48,6 @@
     - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
-     
 
 * 24.1.0
   - New Features:

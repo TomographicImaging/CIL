@@ -283,7 +283,7 @@ class BlockDataContainer(object):
         '''
         return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 
-    def sapyb(self, a, y, b, out, num_threads = NUM_THREADS):
+    def sapyb(self, a, y, b, out=None, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
 
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -307,9 +307,9 @@ class BlockDataContainer(object):
         >>> out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
-            raise ValueError("out container cannot be None")
+            out=0*y
         kwargs = {'a':a, 'b':b, 'out':out, 'num_threads': NUM_THREADS}
-        self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
+        return self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
 
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):

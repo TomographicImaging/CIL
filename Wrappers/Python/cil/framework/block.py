@@ -307,7 +307,7 @@ class BlockDataContainer(object):
         >>> out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
-            out=0*y
+            out=self*0
         kwargs = {'a':a, 'b':b, 'out':out, 'num_threads': NUM_THREADS}
         return self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
 

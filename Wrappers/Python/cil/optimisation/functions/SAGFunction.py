@@ -134,7 +134,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         return out 
     
     def warm_start_approximate_gradients(self, initial):
-        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. 
+        r"""A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. 
         
         Parameters
         ----------

@@ -48,16 +48,14 @@ class PDHG(Algorithm):
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
     gamma_fconj : positive :obj:`float`, optional, default=None
         Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
+    theta :  Float between 0 and 1, default 1.0
+        Relaxation parameter for the over-relaxation of the primal variable.
 
     **kwargs:
         Keyward arguments used from the base class :class:`Algorithm`.
-
-        max_iteration : :obj:`int`, optional, default=0
-            Maximum number of iterations of the PDHG.
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
-        check_convergence : :obj:`boolean`, default=True
-            Checks scalar sigma and tau values satisfy convergence criterion
+        
 
     Example
     -------
@@ -221,7 +219,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, **kwargs):
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, theta=1.0, check_convergence=True, **kwargs):
         super().__init__(**kwargs)
         self._tau = None
         self._sigma = None
@@ -232,7 +230,7 @@ class PDHG(Algorithm):
         self.set_gamma_g(gamma_g)
         self.set_gamma_fconj(gamma_fconj)
 
-        self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
+        self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, theta=theta, check_convergence=check_convergence)
 
     @property
     def tau(self):
@@ -290,7 +288,7 @@ class PDHG(Algorithm):
         else:
             raise ValueError("Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))
 
-    def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
+    def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, theta=1.0, check_convergence=True):
         """Initialisation of the algorithm
 
         Parameters
@@ -307,7 +305,8 @@ class PDHG(Algorithm):
             Step size for the primal problem.
         initial : DataContainer, optional, default=None
             Initial point for the PDHG algorithm.
-        theta : Relaxation parameter, Number, default 1.0
+        theta :  Float between 0 and 1, default 1.0
+            Relaxation parameter for the over-relaxation of the primal variable. 
         """
         log.info("%s setting up", self.__class__.__name__)
         # Triplet (f, g, K)
@@ -317,8 +316,6 @@ class PDHG(Algorithm):
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
-        if kwargs.get('check_convergence', True):
-            self.check_convergence()
 
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
@@ -330,8 +327,12 @@ class PDHG(Algorithm):
         self.y = self.operator.range_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
 
-        # relaxation parameter, default value is 1.0
-        self.theta = kwargs.get('theta',1.0)
+        if theta>1 or theta<0:
+            raise ValueError("The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(theta))  
+        self.theta = theta
+        
+        if check_convergence:
+            self.check_convergence()
 
         if self.gamma_g is not None:
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))

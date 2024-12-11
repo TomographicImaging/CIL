@@ -87,7 +87,7 @@ if has_astra:
 if has_cvxpy:
     import cvxpy
 
-
+import warnings 
 class TestGD(CCPiTestClass):
     def setUp(self):
 
@@ -700,6 +700,10 @@ class TestCGLS(CCPiTestClass):
         beta= ((self.data - self.initial-alpha*(self.data-self.initial)).norm()**2)/4
         self.assertNumpyArrayEqual(self.alg.p.as_array(), ((self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array())
 class TestPDHG(CCPiTestClass):
+    
+    
+    
+    
 
     def test_PDHG_Denoising(self):
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
@@ -876,13 +880,32 @@ class TestPDHG(CCPiTestClass):
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator,
                         tau="tau")
+            
+            
 
         # check warning message if condition is not satisfied
-        sigma = 4
+        sigma = 4/operator.norm()
         tau = 1/3
         with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
             pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
                         sigma=sigma)
+            
+        # check no warning message if check convergence is false 
+        sigma = 4/operator.norm()
+        tau = 1/3
+        with warnings.catch_warnings(record=True) as warnings_log:
+            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
+                        sigma=sigma, check_convergence=False)
+        self.assertEqual(warnings_log, [])
+        
+        # check no warning message if condition is satisfied 
+        sigma = 1/operator.norm()
+        tau = 1/3
+        with warnings.catch_warnings(record=True) as warnings_log:
+            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
+                        sigma=sigma)
+        self.assertEqual(warnings_log, [])
+
 
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
@@ -970,7 +993,27 @@ class TestPDHG(CCPiTestClass):
         except ValueError as err:
             log.info(str(err))
 
+    def test_pdhg_theta(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random')
 
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+        
+        pdhg = PDHG(f=f, g=g, operator=operator)
+        self.assertEqual(pdhg.theta, 1.0)
+        
+        pdhg = PDHG(f=f, g=g, operator=operator,theta=0.5)
+        self.assertEqual(pdhg.theta, 0.5)
+        
+        with self.assertRaises(ValueError):
+            PDHG( f=f, g=g, operator=operator, theta=-0.5)
+            
+        with self.assertRaises(ValueError):
+            PDHG( f=f, g=g, operator=operator, theta=5)
+
+    
 class TestSIRT(CCPiTestClass):
 
     def setUp(self):

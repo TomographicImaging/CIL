@@ -29,11 +29,9 @@ log = logging.getLogger(__name__)
 
 class ISTA(Algorithm):
 
-    r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
+    r"""Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
-    Iterative Shrinkage-Thresholding Algorithm (ISTA)
-
-    .. math:: x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))
+    .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))
 
     is used to solve
 
@@ -45,7 +43,7 @@ class ISTA(Algorithm):
     Note
     ----
 
-    For a constant step size, i.e., :math:`a^{k}=a` for :math:`k\geq1`, convergence of ISTA
+    For a constant step size, :math:`\alpha`, convergence of ISTA
     is guaranteed if
 
     .. math:: \alpha\in(0, \frac{2}{L}),
@@ -56,7 +54,7 @@ class ISTA(Algorithm):
     ----------
 
     initial : DataContainer
-              Initial guess of ISTA.
+              Initial guess of ISTA. :math:`x_{0}`
     f : Function
         Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
@@ -236,10 +234,9 @@ class FISTA(ISTA):
     .. math::
 
         \begin{cases}
-            y_{k} = x_{k} - \alpha\nabla f(x_{k})  \\
-            x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k})\\
-            t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
-            y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
+                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+                t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
+                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
         \end{cases}
 
     is used to solve
@@ -248,6 +245,8 @@ class FISTA(ISTA):
 
     where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
     is the :code:`step_size` per iteration.
+
+    Note that the above applies for k>0. :math:`x_{0}` and :math:`y_{0}` are initialised to `initial` and :math:t_{1}=1
 
 
     Parameters
@@ -319,14 +318,14 @@ class FISTA(ISTA):
                                     step_size=step_size,  preconditioner=preconditioner, **kwargs)
 
     def update(self):
-        r"""Performs a single iteration of FISTA
+        r"""Performs a single iteration of FISTA. For k>=1:
 
         .. math::
 
             \begin{cases}
-                x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
                 t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
-                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
+                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
             \end{cases}
 
         """
@@ -349,19 +348,3 @@ class FISTA(ISTA):
 
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y)
-
-
-if __name__ == "__main__":
-
-    from cil.optimisation.functions import L2NormSquared
-    from cil.optimisation.algorithms import GD
-    from cil.framework import ImageGeometry
-    f = L2NormSquared()
-    g = L2NormSquared()
-    ig = ImageGeometry(3, 4, 4)
-    initial = ig.allocate()
-    fista = FISTA(initial, f, g, step_size=1443432)
-    print(fista.is_provably_convergent())
-
-    gd = GD(initial=initial, objective=f, step_size=1023123)
-    print(gd.is_provably_convergent())

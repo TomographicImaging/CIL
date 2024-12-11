@@ -1,4 +1,20 @@
 * 24.x.x
+- Bug fixes:
+  - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
+  - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
+  - Allow MaskGenerator to be run on DataContainers (#2001)
+- Enhancements:
+  - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+  - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
+  - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
+- Dependencies:
+  - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
+- Changes that break backwards compatibility:
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
+    - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
+
+
+* 24.2.0
   - New Features:
     - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
@@ -17,7 +33,7 @@
     - Internal refactor: Separate framework into multiple files (#1692)
     - Allow the SIRT algorithm to take `initial=None` (#1906)
     - Add checks on equality method of `AcquisitionData` and `ImageData` for equality of data type and geometry (#1919)
-    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)    
+    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)
   - Testing:
     - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
     - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)
@@ -28,8 +44,10 @@
     - Make Binner accept accelerated=False (#1887)
     - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
     - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
+    - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
+     
 
 * 24.1.0
   - New Features:

@@ -29,10 +29,10 @@ import numpy as np
 class SAGFunction(ApproximateGradientSumFunction):
 
     r"""
-    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
+    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as
     
     .. math ::
-                \sum_{i=1}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}
+                \sum_{i=0}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}
                                                                             \nabla f_i(x_k), \text{ if } i=i_k\\
                                                                             g_i^{k-1},\text{ otherwise }
                                                                             \end{cases}
@@ -167,10 +167,10 @@ class SAGFunction(ApproximateGradientSumFunction):
 class SAGAFunction(SAGFunction):
 
     r"""
-    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as
+    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as
     
     .. math ::
-                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=1}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}
+                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=0}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}
                                                                             \nabla f_i(x_k), \text{ if } i=i_k\\
                                                                             g_i^{k-1},\text{ otherwise}
                                                                             \end{cases}

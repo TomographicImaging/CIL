@@ -50,7 +50,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     ----------
     Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. 
 
-    Parameters:
+    Parameters
     -----------
     functions : `list`  of functions
         A list of functions: :math:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list `n`) must be strictly greater than 1. 
@@ -62,7 +62,7 @@ class SAGFunction(ApproximateGradientSumFunction):
     
     The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. 
 
-    Note:  
+    Note
     ------  
 
     This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.
@@ -134,7 +134,7 @@ class SAGFunction(ApproximateGradientSumFunction):
         return out 
     
     def warm_start_approximate_gradients(self, initial):
-        """A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nablaf_i(x_0)` for initial point :math:`x_0`. 
+        r"""A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0 = \nabla f_i(x_0)` for initial point :math:`x_0`. 
         
         Parameters
         ----------
@@ -142,8 +142,9 @@ class SAGFunction(ApproximateGradientSumFunction):
             The initial point to warmstart the calculation
             
         Note
-        ----
+        ------
         When using SAG or SAGA with a deterministic algorithm, you should warm start the SAG-SAGA Function with the same initial point that you initialise the algorithm
+        
         
         """
         self._list_stored_gradients = [
@@ -182,17 +183,19 @@ class SAGAFunction(SAGFunction):
     ------
     Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
 
-    Note:  
+
+    Note  
     ------  
 
     This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.
+    
     
     Reference
     ----------
     Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf
    
 
-    Parameters:
+    Parameters
     -----------
     functions : `list`  of functions
                 A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. 

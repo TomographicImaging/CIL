@@ -24,42 +24,58 @@ log = logging.getLogger(__name__)
 
 class LADMM(Algorithm):
     r"""
-    LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)
+    LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM).
 
     The general form of ADMM is given by the following optimization problem: 
     
     .. math::
     
-        min_{x} f(x) + g(y), subject to Ax + By = b
+        \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b
 
     In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  becomes 
     
-    .. math::`
+    .. math::
         
-        min_x f(Kx) + g(x)`.
+        \min_x f(Kx) + g(x)`.
         
     The algorithm is given by the following iteration:
     
     .. math::
 
         \begin{cases}
-            x_{k} = prox_{\tau f} \left(x_{k-1} - \frac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
-            z_{k} = prox_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
+            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \frac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+            z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
             u_{k} = u_{k-1} + Ax_{k} - z_{k}
         \end{cases}
         
-    where :math:`prox_{\tau f}` is the proximal operator of :math:`f` and :math:`prox_{\sigma g}` is the proximal operator of :math:`g`.
+    where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.
     
+    
+    Pararmeters
+    ------------
+    operator:  CIL Linear Operator
+    f: CIL Function
+        Convex function with "simple" proximal
+    g: CIL Function
+        Convex function with "simple" proximal
+    sigma: float, positive, defaults to 1.
+        Positive step size parameter
+    tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`
+        Positive step size parameter
+    initial: DataContainer, defaults to DataContainer filled with zeros
+        Initial guess 
+            
     
     Note
     ----
-    This is the same form as PDHG but the main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
-    where in the PDHG this is a proximal conjugate and proximal.
+    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
+    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
+    where in the PDHG this is a proximal-conjugate and proximal.
     
     
     Note
     -----
-    Reference (Section 8) : https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf
+    Reference (Section 8) : O’Connor, D., Vandenberghe, L. On the equivalence of the primal-dual hybrid gradient method and Douglas–Rachford splitting. Math. Program. 179, 85–108 (2020). https://doi.org/10.1007/s10107-018-1321-1
 
     """
 
@@ -67,22 +83,7 @@ class LADMM(Algorithm):
                        tau = None, sigma = 1.,
                        initial = None, **kwargs):
 
-        r"""Initialisation of the algorithm
-
-        Pararmeters
-        ------------
-        operator:  CIL Linear Operator
-        f: CIL Function
-            Convex function with "simple" proximal
-        g: CIL Function
-            Convex function with "simple" proximal
-        sigma: float, positive
-            Positive step size parameter
-        tau: float, positive
-            Positive step size parameter
-        initial: DataContainer, defaults to DataContainer filled with zeros
-            Initial guess 
-    """
+        """Initialisation of the algorithm."""
 
         super(LADMM, self).__init__(**kwargs)
 
@@ -90,11 +91,8 @@ class LADMM(Algorithm):
              sigma = sigma, initial=initial)
 
     def set_up(self, f, g, operator, tau = None, sigma=1., initial=None):
-        """Set up of the algorithm"""
+        """Set up of the algorithm."""
         log.info("%s setting up", self.__class__.__name__)
-
-        if sigma is None and tau is None:
-            raise ValueError('Need tau <= sigma / ||K||_2')
 
         self.f = f
         self.g = g
@@ -108,16 +106,16 @@ class LADMM(Algorithm):
             self.tau = self.sigma / normK ** 2
 
         if initial is None:
-            self.x = self.operator.domain_geometry().allocate()
+            self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = initial.copy()
 
         # allocate space for operator direct & adjoint
-        self.tmp_dir = self.operator.range_geometry().allocate()
-        self.tmp_adj = self.operator.domain_geometry().allocate()
+        self.tmp_dir = self.operator.range_geometry().allocate(0)
+        self.tmp_adj = self.operator.domain_geometry().allocate(0)
 
-        self.z = self.operator.range_geometry().allocate()
-        self.u = self.operator.range_geometry().allocate()
+        self.z = self.operator.range_geometry().allocate(0)
+        self.u = self.operator.range_geometry().allocate(0)
 
         self.configured = True
 

@@ -225,7 +225,7 @@ class PDHG(Algorithm):
         
         self._theta = kwargs.pop('theta', 1.0)
         if self.theta>1 or self.theta<0:
-            raise ValueError("The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(theta))  
+            raise ValueError("The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(self.theta))  
 
         self._check_convergence = kwargs.pop('check_convergence', True)
         

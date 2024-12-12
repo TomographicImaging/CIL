@@ -193,8 +193,7 @@ class PaganinProcessor(Processor):
             'pad' : pad,
             'override_geometry' : None,
             'override_filter' : None,
-            'return_units' : return_units,
-            'verbose' : True
+            'return_units' : return_units
             }
 
         super(PaganinProcessor, self).__init__(**kwargs)
@@ -249,7 +248,7 @@ class PaganinProcessor(Processor):
         # loop over the channels
         for j in range(data.geometry.channels):
             # loop over the angles
-            for i in tqdm(range(target_shape[1]), disable = not self.verbose):
+            for i in tqdm(range(target_shape[1])):
                 padded_buffer[:] = 0
                 padded_buffer[buffer_slice] = data.array[j, i, :, :]
 
@@ -283,7 +282,7 @@ class PaganinProcessor(Processor):
         return super().set_input(dataset)
 
     def get_output(self, out=None, override_geometry=None,
-                   override_filter=None, verbose=True):
+                   override_filter=None):
         r'''
         Function to get output from the PaganinProcessor
 
@@ -345,24 +344,21 @@ class PaganinProcessor(Processor):
         it will be calculated :math:`\frac{\Delta\delta\lambda}{4\pi\beta}`
 
         '''
-        self.verbose = verbose
         self.override_geometry = override_geometry
         self.override_filter = override_filter
 
         return super().get_output(out)
 
     def __call__(self, x, out=None, override_geometry=None,
-                 override_filter=None, verbose=True):
+                 override_filter=None):
         self.set_input(x)
 
         if out is None:
             out = self.get_output(override_geometry=override_geometry,
-                                  override_filter=override_filter,
-                                  verbose=verbose)
+                                  override_filter=override_filter)
         else:
             self.get_output(out=out, override_geometry=override_geometry,
-                            override_filter=override_filter,
-                            verbose=verbose)
+                            override_filter=override_filter)
 
         return out
 

@@ -83,7 +83,7 @@ class ISTA(Algorithm):
     >>> f = LeastSquares(A, b=b, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
-    >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)
+    >>> ista = ISTA(initial = ig.allocate(), f = f, g = g)
     >>> ista.run()
 
 
@@ -282,7 +282,7 @@ class FISTA(ISTA):
     >>> f = LeastSquares(A, b=b, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
-    >>> fista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)
+    >>> fista = FISTA(initial = ig.allocate(), f = f, g = g)
     >>> fista.run()
 
     See also

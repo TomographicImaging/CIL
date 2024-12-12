@@ -23,41 +23,66 @@ log = logging.getLogger(__name__)
 
 
 class LADMM(Algorithm):
+    r"""
+    LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)
 
-    '''
-        LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)
+    The general form of ADMM is given by the following optimization problem: 
+    
+    .. math::
+    
+        min_{x} f(x) + g(y), subject to Ax + By = b
 
-        General form of ADMM : min_{x} f(x) + g(y), subject to Ax + By = b
+    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  becomes 
+    
+    .. math::`
+        
+        min_x f(Kx) + g(x)`.
+        
+    The algorithm is given by the following iteration:
+    
+    .. math::
 
-        Case: A = Id, B = -K, b = 0   ==> min_x f(Kx) + g(x)
+        \begin{cases}
+            x_{k} = prox_{\tau f} \left(x_{k-1} - \frac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+            z_{k} = prox_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
+            u_{k} = u_{k-1} + Ax_{k} - z_{k}
+        \end{cases}
+        
+    where :math:`prox_{\tau f}` is the proximal operator of :math:`f` and :math:`prox_{\sigma g}` is the proximal operator of :math:`g`.
+    
+    
+    Note
+    ----
+    This is the same form as PDHG but the main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
+    where in the PDHG this is a proximal conjugate and proximal.
+    
+    
+    Note
+    -----
+    Reference (Section 8) : https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf
 
-        The quadratic term in the augmented Lagrangian is linearized for the x-update.
-
-        Main algorithmic difference is that in ADMM we compute two proximal subproblems,
-        where in the PDHG a proximal and proximal conjugate.
-
-        Reference (Section 8) : https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf
-
-            x^{k} = prox_{\tau f } (x^{k-1} - tau/sigma A^{T}(Ax^{k-1} - z^{k-1} + u^{k-1} )
-
-            z^{k} = prox_{\sigma g} (Ax^{k} + u^{k-1})
-
-            u^{k} = u^{k-1} + Ax^{k} - z^{k}
-
-    '''
+    """
 
     def __init__(self, f=None, g=None, operator=None, \
                        tau = None, sigma = 1.,
                        initial = None, **kwargs):
 
-        '''Initialisation of the algorithm
+        r"""Initialisation of the algorithm
 
-        :param operator: a Linear Operator
-        :param f: Convex function with "simple" proximal
-        :param g: Convex function with "simple" proximal
-        :param sigma: Positive step size parameter
-        :param tau: Positive step size parameter
-        :param initial: Initial guess ( Default initial_guess = 0)'''
+        Pararmeters
+        ------------
+        operator:  CIL Linear Operator
+        f: CIL Function
+            Convex function with "simple" proximal
+        g: CIL Function
+            Convex function with "simple" proximal
+        sigma: float, positive
+            Positive step size parameter
+        tau: float, positive
+            Positive step size parameter
+        initial: DataContainer, defaults to DataContainer filled with zeros
+            Initial guess 
+    """
 
         super(LADMM, self).__init__(**kwargs)
 
@@ -65,10 +90,11 @@ class LADMM(Algorithm):
              sigma = sigma, initial=initial)
 
     def set_up(self, f, g, operator, tau = None, sigma=1., initial=None):
+        """Set up of the algorithm"""
         log.info("%s setting up", self.__class__.__name__)
 
         if sigma is None and tau is None:
-            raise ValueError('Need tau <= sigma / ||K||^2')
+            raise ValueError('Need tau <= sigma / ||K||_2')
 
         self.f = f
         self.g = g
@@ -98,7 +124,7 @@ class LADMM(Algorithm):
         log.info("%s configured", self.__class__.__name__)
 
     def update(self):
-
+        """Performs a single iteration of the LADMM algorithm"""
         self.tmp_dir += self.u
         self.tmp_dir -= self.z
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
@@ -121,5 +147,5 @@ class LADMM(Algorithm):
         self.u -= self.z
 
     def update_objective(self):
-
+        """Update the objective function value"""
         self.loss.append(self.f(self.x) +  self.g(self.operator.direct(self.x)) )

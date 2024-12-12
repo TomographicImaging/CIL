@@ -36,14 +36,14 @@ class LADMM(Algorithm):
     
     .. math::
         
-        \min_x f(Kx) + g(x)`.
+        \min_x f(Kx) + g(x).
         
     The algorithm is given by the following iteration:
     
     .. math::
 
         \begin{cases}
-            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \frac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
             z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
             u_{k} = u_{k-1} + Ax_{k} - z_{k}
         \end{cases}
@@ -51,9 +51,10 @@ class LADMM(Algorithm):
     where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.
     
     
-    Pararmeters
+    Parameters
     ------------
     operator:  CIL Linear Operator
+        Operator :math:`K` in the objective function
     f: CIL Function
         Convex function with "simple" proximal
     g: CIL Function

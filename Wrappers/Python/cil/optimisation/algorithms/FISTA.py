@@ -38,7 +38,7 @@ class ISTA(Algorithm):
     .. math:: \min_{x} f(x) + g(x)
 
     where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
-    is the :code:`step_size` per iteration.
+    is the :code:`step_size`.
 
     Note
     ----
@@ -227,9 +227,7 @@ class ISTA(Algorithm):
 
 class FISTA(ISTA):
 
-    r"""Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
-
-    Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)
+    r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
     .. math::
 

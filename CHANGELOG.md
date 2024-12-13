@@ -3,6 +3,7 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
   - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
   - Allow MaskGenerator to be run on DataContainers (#2001)
+  - Make Paganin Processor work with AcquistionData with one angle (#1920)
   - Fix bug passing `kwargs` to PDHG (#2010)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
@@ -13,6 +14,7 @@
 - Changes that break backwards compatibility:
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
+    - Paganin processor now requires the CIL data order (#1920)
 
 
 * 24.2.0
@@ -48,7 +50,6 @@
     - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
   - Changes that break backwards compatibility:
     - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
-     
 
 * 24.1.0
   - New Features:

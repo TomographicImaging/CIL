@@ -467,7 +467,7 @@ class PDHG(Algorithm):
         """
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            self._theta = 1.0 / ushnp.sqrt(1 + 2 * self.gamma_g * self.tau)
+            self._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * self.tau)
             self._tau *= self.theta
             self._sigma /= self.theta
 

@@ -89,7 +89,7 @@ if has_astra:
 if has_cvxpy:
     import cvxpy
 
-
+from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):
     def setUp(self):
 
@@ -379,58 +379,7 @@ class TestFISTA(CCPiTestClass):
                         step_size=30.0)
         self.assertFalse(fista1.is_provably_convergent())
         
-    def test_FISTA_APGD(self):
-        # setup linear system to solve
-        np.random.seed(10)
-        n = 50
-        m = 500
-
-        A = np.random.uniform(0, 1, (m, n)).astype('float32')
-        b = (A.dot(np.random.randn(n)) + 0.1 *
-             np.random.randn(m)).astype('float32')
-
-        Aop = MatrixOperator(A)
-        bop = VectorData(b)
-
-        f = LeastSquares(Aop, b=bop, c=0.5)
-        g = ZeroFunction()
-
-        ig = Aop.domain
-
-        initial = ig.allocate()
-
-        # ista run 10 iteration
-        tmp_initial = ig.allocate()
-        fista = APGD(initial=tmp_initial, f=f, g=g)
-        fista.run(1)
-
-        # fista update method
-        t_old = 1
-
-        step_size = 1.0/f.L
-        x_old = ig.allocate()
-        y_old = ig.allocate()
-
-        for _ in range(1):
-
-            x = g.proximal(y_old - step_size *
-                           f.gradient(y_old), tau=step_size)
-            t = 0.5*(1 + np.sqrt(1 + 4*(t_old**2)))
-            y = x + ((t_old-1)/t) * (x - x_old)
-
-            x_old.fill(x)
-            y_old.fill(y)
-            t_old = t
-
-        np.testing.assert_allclose(fista.solution.array, x.array, atol=1e-2)
-
-        # check objective
-        res1 = fista.objective[-1]
-        res2 = f(x) + g(x)
-        self.assertTrue(res1 == res2)
-
-
-        
+            
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
@@ -499,6 +448,26 @@ class TestFISTA(CCPiTestClass):
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 4.2e-4)
+
+ 
+    def test_FISTA_APGD_alias(self):
+        n = 50
+        m = 500
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+        ig = Aop.domain
+        initial = ig.allocate()
+         
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = APGD(initial=initial, f=f, g=g, step_size=4)
+            self.assertEqual(alg.t, 1)
+            self.assertNumpyArrayEqual(alg.y.array, initial.array)
+            mock_method.assert_called_once_with(initial=initial, f=f, g=g, step_size=4, preconditioner=None)
 
 
 class testISTA(CCPiTestClass):
@@ -669,6 +638,16 @@ class testISTA(CCPiTestClass):
         np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
         np.testing.assert_allclose(
             u_cvxpy.value, ista.solution.array, atol=1e-3)
+
+ 
+    def test_ISTA_PGD_alias(self):
+
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = PGD(initial=self.initial, f=self.f, g=self.g, step_size=4)
+            self.assertEqual(alg._step_size, 4)
+            mock_method.assert_called_once_with(initial=self.initial, f=self.f, g=self.g, step_size=4, preconditioner=None)
+
 
 
 class TestCGLS(CCPiTestClass):

@@ -33,7 +33,7 @@ class GD(Algorithm):
     ----------
     initial: DataContainer (e.g. ImageData)
         The initial point for the optimisation 
-    objective_function: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
+    f: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
         The function to be minimised. 
     step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
         If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
@@ -47,12 +47,19 @@ class GD(Algorithm):
 
     """
 
-    def __init__(self, initial=None, objective_function=None, step_size=None, rtol=1e-5, atol=1e-8,  preconditioner=None, **kwargs):
+    def __init__(self, initial=None, f=None, step_size=None, rtol=1e-5, atol=1e-8,  preconditioner=None, **kwargs):
         '''GD algorithm creator
         '''
 
         self.alpha = kwargs.pop('alpha', None)
         self.beta = kwargs.pop('beta', None)
+        
+        if kwargs.get('objective_function') is not None:
+            warn('The argument `objective_function` will be deprecated in the future. Please use `f` instead.', DeprecationWarning, stacklevel=2)
+            if f is not None:
+                raise ValueError('The argument `objective_function` is being deprecated, replaced by `f`. Please use just `f` not both')
+            f = kwargs.pop('objective_function')
+            
 
         super().__init__(**kwargs)
 
@@ -61,18 +68,18 @@ class GD(Algorithm):
 
         self.rtol = rtol
         self.atol = atol
-        if initial is not None and objective_function is not None:
-            self.set_up(initial=initial, objective_function=objective_function,
+        if initial is not None and f is not None:
+            self.set_up(initial=initial, f=f,
                         step_size=step_size,  preconditioner=preconditioner)
 
-    def set_up(self, initial, objective_function, step_size, preconditioner):
+    def set_up(self, initial, f, step_size, preconditioner):
         '''initialisation of the algorithm
 
         Parameters
         ----------
         initial: DataContainer (e.g. ImageData)
             The initial point for the optimisation 
-        objective_function: CIL function with a defined gradient 
+        f: CIL function with a defined gradient 
             The function to be minimised. 
         step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
             If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
@@ -84,7 +91,7 @@ class GD(Algorithm):
         log.info("%s setting up", self.__class__.__name__)
 
         self.x = initial.copy()
-        self._objective_function = objective_function
+        self._objective_function = f
 
         if step_size is None:
             self.step_size_rule = ArmijoStepSizeRule(

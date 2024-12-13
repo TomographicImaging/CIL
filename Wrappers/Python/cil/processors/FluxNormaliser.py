@@ -426,29 +426,35 @@ class FluxNormaliser(Processor):
         if self._accelerated:
             num_threads = numba.get_num_threads()
             numba.set_num_threads(self.num_threads)
-            numba_loop(self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
+            numba_loop(self.flux, self.target_value, num_proj, proj_size, out.array)
             # reset the number of threads to the original value
             numba.set_num_threads(num_threads)
         else:
-            serial_loop(self.flux.ravel(), self.target_value, num_proj, proj_size, out.array.ravel())
+            serial_loop(self.flux, self.target_value, num_proj, proj_size, out.array)
 
         return out
 
 @numba.njit(parallel=True)
-def numba_loop(flux, target, num_proj, proj_size, out_flat):
+def numba_loop(flux, target, num_proj, proj_size, out):
+    out_flat = out.ravel()
+    flux_flat = flux.ravel()
     if len(flux) == 1:
-        norm = target/flux[0]
+        norm = target/flux_flat[0]
         for i in numba.prange(num_proj):
-            out_flat[i*proj_size:(i+1)*proj_size] *= norm
+            for ij in range(proj_size):
+                out_flat[i*proj_size+ij] *= norm
     else:
         for i in numba.prange(num_proj):
-            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux[i])
+            for ij in range(proj_size):
+                out_flat[i*proj_size+ij] *= (target/flux_flat[i])
 
-def serial_loop(flux, target, num_proj, proj_size, out_flat):
-    if len(flux) == 1:
-        norm = target/flux[0]
+def serial_loop(flux, target, num_proj, proj_size, out):
+    out_flat = out.ravel()
+    flux_flat = flux.ravel()
+    if len(flux_flat) == 1:
+        norm = target/flux_flat[0]
         for i in range(num_proj):
             out_flat[i*proj_size:(i+1)*proj_size] *= norm
     else:
         for i in range(num_proj):
-            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux[i])
+            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux_flat[i])

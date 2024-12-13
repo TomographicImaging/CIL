@@ -41,7 +41,7 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
     WeightedL2NormSquared, MixedL11Norm, ZeroFunction
 
 from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
-RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor
+RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
 
 import numpy
 from utils import has_tigre, has_nvidia
@@ -457,7 +457,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 processor_list = [
                     TransmissionAbsorptionConverter(min_intensity=0.01),
                     AbsorptionTransmissionConverter(),
-                    RingRemover(),
+                    RingRemover(info=False),
                     Slicer(roi={'horizontal':(None,None,None),'angle':(None,None,None)}), 
                     Slicer(roi={'horizontal':(1,3,2),'angle':(None,4,2)}), 
                     Binner(roi={'horizontal':(None,None,None),'angle':(None,None,None)}),
@@ -467,7 +467,8 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     Normaliser(flat_field=data.get_slice(angle=0).as_array()*1, dark_field=data.get_slice(angle=0).as_array()*1e-5),
                     MaskGenerator.median(threshold_factor=3, window=7),
                     Masker.median(mask=data.copy()),
-                    PaganinProcessor()
+                    PaganinProcessor(),
+                    FluxNormaliser(flux=1)
                     ]
                 
                 for processor in processor_list:

@@ -244,7 +244,7 @@ class FISTA(ISTA):
     where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
     is the :code:`step_size`.
 
-    Note that the above applies for :math:`k>0`. :math:`x_{0}` and :math:`y_{0}` are initialised to `initial` and :math:`t_{1}=1`
+    Note that the above applies for :math:`k\geq 1`. :math:`x_{0}` and :math:`y_{0}` are initialised to `initial` and :math:`t_{1}=1`
 
 
     Parameters
@@ -316,7 +316,7 @@ class FISTA(ISTA):
                                     step_size=step_size,  preconditioner=preconditioner, **kwargs)
 
     def update(self):
-        r"""Performs a single iteration of FISTA. For :math:`k>0`:
+        r"""Performs a single iteration of FISTA. For :math:`k\geq 1`:
 
         .. math::
 

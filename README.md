@@ -85,6 +85,9 @@ docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:lates
 
 ## Getting Started with CIL
 
+### CIL Training
+We typically run training courses at least twice a year - check https://ccpi.ac.uk/training/ for our upcoming events!
+
 ### CIL on binder
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)

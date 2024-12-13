@@ -3,6 +3,7 @@
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
   - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
   - Allow MaskGenerator to be run on DataContainers (#2001)
+  - Fix bug passing `kwargs` to PDHG (#2010)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)

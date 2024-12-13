@@ -32,13 +32,13 @@ class LADMM(Algorithm):
     
         \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b
 
-    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  becomes 
+    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives 
     
     .. math::
         
         \min_x f(Kx) + g(x).
         
-    The algorithm is given by the following iteration:
+    The algorithm is given by the following iteration, for :math:`k\geq 1`:
     
     .. math::
 

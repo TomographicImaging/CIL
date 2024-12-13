@@ -218,7 +218,7 @@ class PDHG(Algorithm):
         """Initialisation of the PDHG algorithm"""
 
         self._theta = kwargs.pop('theta', 1.0)
-        if self.theta > 1 or self.theta < 0:
+        if self._theta > 1 or self._theta < 0:
             raise ValueError(
                 "The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(self.theta))
 
@@ -467,7 +467,7 @@ class PDHG(Algorithm):
         """
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            self._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * self.tau)
+            self._theta = 1.0 / ushnp.sqrt(1 + 2 * self.gamma_g * self.tau)
             self._tau *= self.theta
             self._sigma /= self.theta
 

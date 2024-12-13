@@ -4,6 +4,7 @@
   - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
   - Allow MaskGenerator to be run on DataContainers (#2001)
   - Make Paganin Processor work with AcquistionData with one angle (#1920)
+  - Fix bug passing `kwargs` to PDHG (#2010)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
   - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
@@ -13,6 +14,7 @@
 - Changes that break backwards compatibility:
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
+    - Paganin processor now requires the CIL data order (#1920)
 
 
 * 24.2.0

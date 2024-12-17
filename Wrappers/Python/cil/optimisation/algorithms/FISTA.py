@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 class ISTA(Algorithm):
 
-    r"""Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a` is used to solve:
+    r"""Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:
 
     .. math:: \min_{x} f(x) + g(x)
 
@@ -228,7 +228,7 @@ class ISTA(Algorithm):
 
 class FISTA(ISTA):
 
-    r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a` is used to solve:
+    r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:
 
     .. math:: \min_{x} f(x) + g(x)
 
@@ -247,7 +247,7 @@ class FISTA(ISTA):
 
     where :math:`\alpha` is the :code:`step_size`.
 
-    Note that the above applies for :math:`k\geq 1`. For :math:`k=0` :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`
+    Note that the above applies for :math:`k\geq 1`. For :math:`k=0`, :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`.
 
 
     Parameters

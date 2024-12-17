@@ -455,10 +455,9 @@ class TestBlockDataContainer(BDCUnittest):
         self.assertBlockDataContainerEqual(out, nested)
 
 
+    def test_sapyb_a_b_scalar(self):
+        # test axpby between BlockDataContainers, with a as a blockdatacontainer
 
-
-    def test_sapyb(self):
-        # test axpby between BlockDataContainers
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
 
@@ -468,103 +467,183 @@ class TestBlockDataContainer(BDCUnittest):
         data1 = ig0.allocate(2)
         data3 = ig0.allocate(3)
 
+
+
         cp0 = BlockDataContainer(data0,data2)
         cp1 = BlockDataContainer(data1,data3)
+    
 
         out = cp0 * 0. - 10
 
-        cp0.sapyb(3,cp1, -2,out, num_threads=4)
+        # cp0.axpby(a,-2,cp1,out, num_threads=4)
+        cp0.sapyb(3, cp1,-2,out, num_threads=1)
 
         # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ]
-        # output should be [ -7 , -3 ]
+        # output should be [ -7 , -4 ]
         res0 = ig0.allocate(-7)
         res2 = ig0.allocate(-3)
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(3,cp1,-2, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
 
-    def test_sapyb2(self):
-        # test axpby with BlockDataContainer and DataContainer
+    def test_sapyb_a_blockdc(self):
+        # test axpby between BlockDataContainers, with a as a blockdatacontainer
+
         ig0 = ImageGeometry(2,3,4)
-        # ig1 = ImageGeometry(2,3,5)
+        ig1 = ImageGeometry(2,3,5)
 
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
         data1 = ig0.allocate(2)
-        # data3 = ig1.allocate(3)
+        data3 = ig0.allocate(3)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
 
         cp0 = BlockDataContainer(data0,data2)
-        # cp1 = BlockDataContainer(data1,data3)
+        cp1 = BlockDataContainer(data1,data3)
+        a = BlockDataContainer(a1,a2)
 
         out = cp0 * 0. - 10
 
-        cp0.sapyb(3,data1,-2,out)
+        # cp0.axpby(a,-2,cp1,out, num_threads=4)
+        cp0.sapyb(a, cp1,-2,out, num_threads=1)
 
-        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 2 ]
-        # output should be [ -7 , -1 ]
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-2) * 3 ]
+        # output should be [ -7 , -4 ]
         res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-1)
+        res2 = ig0.allocate(-4)
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,cp1,-2, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
 
 
-    def test_sapyb3(self):
-        # test axpby with nested BlockDataContainer
+    def test_sapyb_b_blockdc(self):
+        # test axpby between BlockDataContainers, with b as a blockdatacontainer
+
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
 
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
-        # data1 = ig0.allocate(2)
-        data3 = ig1.allocate(3)
+        data1 = ig0.allocate(2)
+        data3 = ig0.allocate(3)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
 
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(cp0 *0. +  [2, -2], data3)
+        cp1 = BlockDataContainer(data1,data3)
+        b = BlockDataContainer(b1,b2)
 
-        out = cp1 * 0.
-        cp2 = out + [1,3]
+        out = cp0 * 0. - 10
 
-        cp2.sapyb(3,cp1, -2 ,out)
+        cp0.sapyb(3,cp1, b,out, num_threads=4)
 
-        # output should be [ [ -1 , 7 ] , 3]
-        res0 = ig0.allocate(-1)
-        res2 = ig0.allocate(7)
-        res3 = ig1.allocate(3)
-        res = BlockDataContainer(BlockDataContainer(res0, res2), res3)
+        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-3) * 3 ]
+        # output should be [ -7 , -3 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-6)
+        res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(3,cp1, b, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
 
-    def test_sapyb4(self):
-        # test axpby with nested BlockDataContainer
+    def test_sapyb_ab_blockdc(self):
+        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer
+
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
 
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
-        # data1 = ig0.allocate(2)
-        data3 = ig1.allocate(3)
+        data1 = ig0.allocate(2)
+        data3 = ig0.allocate(3)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
 
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(cp0 *0. +  [2, -2], data3)
+        cp1 = BlockDataContainer(data1,data3)
+        a = BlockDataContainer(a1,a2)
+        b = BlockDataContainer(b1,b2)
 
-        out = cp1 * 0.
-        cp2 = out + [1,3]
+        out = cp0 * 0. - 10
 
-        cp2.sapyb(3, cp1, -2, out, num_threads=4)
+        cp0.sapyb(a,cp1,b,out, num_threads=4)
 
-        # output should be [ [ -1 , 7 ] , 3]
-        res0 = ig0.allocate(-1)
-        res2 = ig0.allocate(7)
-        res3 = ig1.allocate(3)
-        res = BlockDataContainer(BlockDataContainer(res0, res2), res3)
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 3 ]
+        # output should be [ -7 , -7 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-7)
+        res = BlockDataContainer(res0, res2)
 
+        self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,cp1,b, num_threads=4)
+        
         self.assertBlockDataContainerEqual(out, res)
 
 
+    def test_sapyb_ab_blockdc_y_dc(self):
+        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer, and y as a dc
+
+        ig0 = ImageGeometry(2,3,4)
+
+        data0 = ig0.allocate(-1)
+        data2 = ig0.allocate(1)
+
+        data1 = ig0.allocate(2)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
+
+        cp0 = BlockDataContainer(data0,data2)
+
+        a = BlockDataContainer(a1,a2)
+        b = BlockDataContainer(b1,b2)
+
+        out = cp0 * 0. - 10
+
+        cp0.sapyb(a,data1,b,out, num_threads=4)
+
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 2 ]
+        # output should be [ -7 , -4 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-4)
+        res = BlockDataContainer(res0, res2)
+
+        self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,data1,b, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
+        
 class TestOutParameter(BDCUnittest):
     def setUp(self):
         ig0 = ImageGeometry(2,3,4)
@@ -717,138 +796,6 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
 
-    def test_sapyb_a_blockdc(self):
-        # test axpby between BlockDataContainers, with a as a blockdatacontainer
-
-        ig0 = ImageGeometry(2,3,4)
-        ig1 = ImageGeometry(2,3,5)
-
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
-
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
-        cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        a = BlockDataContainer(a1,a2)
-
-        out = cp0 * 0. - 10
-
-        # cp0.axpby(a,-2,cp1,out, num_threads=4)
-        cp0.sapyb(a, cp1,-2,out, num_threads=1)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-2) * 3 ]
-        # output should be [ -7 , -4 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-4)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
-
-
-    def test_sapyb_b_blockdc(self):
-        # test axpby between BlockDataContainers, with b as a blockdatacontainer
-
-        ig0 = ImageGeometry(2,3,4)
-        ig1 = ImageGeometry(2,3,5)
-
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
-
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
-
-        cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        b = BlockDataContainer(b1,b2)
-
-        out = cp0 * 0. - 10
-
-        cp0.sapyb(3,cp1, b,out, num_threads=4)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-3) * 3 ]
-        # output should be [ -7 , -3 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-6)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
-
-    def test_sapyb_ab_blockdc(self):
-        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer
-
-        ig0 = ImageGeometry(2,3,4)
-        ig1 = ImageGeometry(2,3,5)
-
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
-
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
-
-        cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        a = BlockDataContainer(a1,a2)
-        b = BlockDataContainer(b1,b2)
-
-        out = cp0 * 0. - 10
-
-        cp0.sapyb(a,cp1,b,out, num_threads=4)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 3 ]
-        # output should be [ -7 , -7 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-7)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
-
-
-    def test_sapyb_ab_blockdc_y_dc(self):
-        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer, and y as a dc
-
-        ig0 = ImageGeometry(2,3,4)
-
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
-
-        data1 = ig0.allocate(2)
-
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
-
-        cp0 = BlockDataContainer(data0,data2)
-
-        a = BlockDataContainer(a1,a2)
-        b = BlockDataContainer(b1,b2)
-
-        out = cp0 * 0. - 10
-
-        cp0.sapyb(a,data1,b,out, num_threads=4)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 2 ]
-        # output should be [ -7 , -4 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-4)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
 
     def test_iterator(self):
         ig0 = VectorGeometry(5)

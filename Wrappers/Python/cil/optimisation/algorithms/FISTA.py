@@ -29,16 +29,16 @@ log = logging.getLogger(__name__)
 
 class ISTA(Algorithm):
 
-    r"""Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
-
-    .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))
-
-    is used to solve
+    r"""Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a` is used to solve:
 
     .. math:: \min_{x} f(x) + g(x)
 
     where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
     is the :code:`step_size`.
+
+    In each update, the algorithm computes:
+
+    .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))
 
     Note
     ----
@@ -227,7 +227,15 @@ class ISTA(Algorithm):
 
 class FISTA(ISTA):
 
-    r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
+    r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a` is used to solve:
+
+        .. math:: \min_{x} f(x) + g(x)
+
+    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
+    is the :code:`step_size`.
+
+
+    In each update the algorithm completes the following steps:
 
     .. math::
 
@@ -237,14 +245,7 @@ class FISTA(ISTA):
                 y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
         \end{cases}
 
-    is used to solve
-
-    .. math:: \min_{x} f(x) + g(x)
-
-    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
-    is the :code:`step_size`.
-
-    Note that the above applies for :math:`k\geq 1`. :math:`x_{0}` and :math:`y_{0}` are initialised to `initial` and :math:`t_{1}=1`
+    Note that the above applies for :math:`k\geq 1`. For :math:`k\eq 0` :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`
 
 
     Parameters

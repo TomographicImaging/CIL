@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.FISTA &#8212; CIL 24.2.1.dev16+gb4d178ad documentation</title>
+    <title>cil.optimisation.algorithms.FISTA &#8212; CIL 24.2.1.dev17+ga47cb152 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=111793e4"></script>
+    <script src="../../../../../_static/documentation_options.js?v=ade2c4df"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev16+gb4d178ad';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev17+ga47cb152';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev16+gb4d178ad" />
+  <meta name="docsearch:version" content="24.2.1.dev17+ga47cb152" />
   </head>
   
   
@@ -497,23 +497,22 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.ISTA">[docs]</a>
 <span class="k">class</span> <span class="nc">ISTA</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
-
-<span class="sd">    Iterative Shrinkage-Thresholding Algorithm (ISTA)</span>
-
-<span class="sd">    .. math:: x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))</span>
-
-<span class="sd">    is used to solve</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterative Shrinkage-Thresholding Algorithm (ISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:</span>
 
 <span class="sd">    .. math:: \min_{x} f(x) + g(x)</span>
 
-<span class="sd">    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`</span>
-<span class="sd">    is the :code:`step_size` per iteration.</span>
+<span class="sd">    where :math:`f` is differentiable, and :math:`g` has a *simple* proximal operator.</span>
+
+<span class="sd">    In each update, the algorithm computes:</span>
+
+<span class="sd">    .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))</span>
+
+<span class="sd">    where :math:`\alpha` is the :code:`step_size`.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 
-<span class="sd">    For a constant step size, i.e., :math:`a^{k}=a` for :math:`k\geq1`, convergence of ISTA</span>
+<span class="sd">    For a constant step size, :math:`\alpha`, convergence of ISTA</span>
 <span class="sd">    is guaranteed if</span>
 
 <span class="sd">    .. math:: \alpha\in(0, \frac{2}{L}),</span>
@@ -524,16 +523,16 @@
 <span class="sd">    ----------</span>
 
 <span class="sd">    initial : DataContainer</span>
-<span class="sd">              Initial guess of ISTA.</span>
+<span class="sd">              Initial guess of ISTA. :math:`x_{0}`</span>
 <span class="sd">    f : Function</span>
 <span class="sd">        Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.</span>
 <span class="sd">    g : Function or `None`</span>
 <span class="sd">        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.</span>
 <span class="sd">    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`&#39;,  default = None</span>
-<span class="sd">                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`&#39; is passed then it&#39;s method `get_step_size` is called for each update. </span>
+<span class="sd">                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then its method :meth:`get_step_size` is called for each update. </span>
 <span class="sd">                The default :code:`step_size` is a constant :math:`\frac{0.99*2}{L}` or 1 if `f=None`.</span>
-<span class="sd">     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.</span>
-<span class="sd">            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. </span>
+<span class="sd">    preconditioner: class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.</span>
+<span class="sd">            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. </span>
 
 
 <span class="sd">    kwargs: Keyword arguments</span>
@@ -553,7 +552,7 @@
 <span class="sd">    &gt;&gt;&gt; f = LeastSquares(A, b=b, c=0.5)</span>
 <span class="sd">    &gt;&gt;&gt; g = ZeroFunction()</span>
 <span class="sd">    &gt;&gt;&gt; ig = Aop.domain</span>
-<span class="sd">    &gt;&gt;&gt; ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)</span>
+<span class="sd">    &gt;&gt;&gt; ista = ISTA(initial = ig.allocate(), f = f, g = g)</span>
 <span class="sd">    &gt;&gt;&gt; ista.run()</span>
 
 
@@ -597,15 +596,12 @@
 
         
 
-<div class="viewcode-block" id="ISTA.__init__">
-<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.ISTA.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">preconditioner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">ISTA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">=</span> <span class="n">step_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
-                    <span class="n">preconditioner</span><span class="o">=</span><span class="n">preconditioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
+                    <span class="n">preconditioner</span><span class="o">=</span><span class="n">preconditioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ISTA.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.ISTA.set_up">[docs]</a>
@@ -718,25 +714,26 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.FISTA">[docs]</a>
 <span class="k">class</span> <span class="nc">FISTA</span><span class="p">(</span><span class="n">ISTA</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:</span>
 
-<span class="sd">    Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</span>
+<span class="sd">    .. math:: \min_{x} f(x) + g(x)</span>
+
+<span class="sd">    where :math:`f` is differentiable and :math:`g` has a *simple* proximal operator.</span>
+
+
+<span class="sd">    In each update the algorithm completes the following steps:</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \begin{cases}</span>
-<span class="sd">            y_{k} = x_{k} - \alpha\nabla f(x_{k})  \\</span>
-<span class="sd">            x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k})\\</span>
-<span class="sd">            t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\</span>
-<span class="sd">            y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})</span>
+<span class="sd">                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\</span>
+<span class="sd">                t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\</span>
+<span class="sd">                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})</span>
 <span class="sd">        \end{cases}</span>
 
-<span class="sd">    is used to solve</span>
+<span class="sd">    where :math:`\alpha` is the :code:`step_size`.</span>
 
-<span class="sd">    .. math:: \min_{x} f(x) + g(x)</span>
-
-<span class="sd">    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`</span>
-<span class="sd">    is the :code:`step_size` per iteration.</span>
+<span class="sd">    Note that the above applies for :math:`k\geq 1`. For :math:`k=0`, :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`.</span>
 
 
 <span class="sd">    Parameters</span>
@@ -749,9 +746,9 @@
 <span class="sd">    g : Function or `None`</span>
 <span class="sd">        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.</span>
 <span class="sd">    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`&#39;,  default = None</span>
-<span class="sd">                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`&#39; is passed then it&#39;s method `get_step_size` is called for each update. </span>
+<span class="sd">                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then it&#39;s method :meth:`get_step_size` is called for each update. </span>
 <span class="sd">                The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.</span>
-<span class="sd">    preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.</span>
+<span class="sd">    preconditioner : class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.</span>
 <span class="sd">            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. </span>
 
 <span class="sd">    kwargs: Keyword arguments</span>
@@ -772,7 +769,7 @@
 <span class="sd">    &gt;&gt;&gt; f = LeastSquares(A, b=b, c=0.5)</span>
 <span class="sd">    &gt;&gt;&gt; g = ZeroFunction()</span>
 <span class="sd">    &gt;&gt;&gt; ig = Aop.domain</span>
-<span class="sd">    &gt;&gt;&gt; fista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)</span>
+<span class="sd">    &gt;&gt;&gt; fista = FISTA(initial = ig.allocate(), f = f, g = g)</span>
 <span class="sd">    &gt;&gt;&gt; fista.run()</span>
 
 <span class="sd">    See also</span>
@@ -800,27 +797,24 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Can&#39;t check convergence criterion for non-constant step size&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FISTA.__init__">
-<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.FISTA.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="n">preconditioner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FISTA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span>
-                                    <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>  <span class="n">preconditioner</span><span class="o">=</span><span class="n">preconditioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
+                                    <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>  <span class="n">preconditioner</span><span class="o">=</span><span class="n">preconditioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FISTA.update">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.FISTA.update">[docs]</a>
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of FISTA</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single iteration of FISTA. For :math:`k\geq 1`:</span>
 
 <span class="sd">        .. math::</span>
 
 <span class="sd">            \begin{cases}</span>
-<span class="sd">                x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\</span>
+<span class="sd">                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\</span>
 <span class="sd">                t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\</span>
-<span class="sd">                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})</span>
+<span class="sd">                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})</span>
 <span class="sd">            \end{cases}</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -845,22 +839,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">t_old</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
 </div>
 
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-
-    <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span>
-    <span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">GD</span>
-    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
-    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-    <span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-    <span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">1443432</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">fista</span><span class="o">.</span><span class="n">is_provably_convergent</span><span class="p">())</span>
-
-    <span class="n">gd</span> <span class="o">=</span> <span class="n">GD</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">objective</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">1023123</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">is_provably_convergent</span><span class="p">())</span>
 </pre></div>
 
                 </article>

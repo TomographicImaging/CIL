@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev16+gb4d178ad documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev17+ga47cb152 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=111793e4"></script>
+    <script src="../_static/documentation_options.js?v=ade2c4df"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev16+gb4d178ad';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev17+ga47cb152';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev16+gb4d178ad" />
+  <meta name="docsearch:version" content="24.2.1.dev17+ga47cb152" />
   </head>
   
   
@@ -1462,18 +1462,17 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">ISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Link to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm, see <span id="id2">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
-<p>Iterative Shrinkage-Thresholding Algorithm (ISTA)</p>
-<div class="math notranslate nohighlight">
-\[x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))\]</div>
-<p>is used to solve</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
-<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator and <span class="math notranslate nohighlight">\(\alpha^{k}\)</span>
-is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> per iteration.</p>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
+<p>In each update, the algorithm computes:</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For a constant step size, i.e., <span class="math notranslate nohighlight">\(a^{k}=a\)</span> for <span class="math notranslate nohighlight">\(k\geq1\)</span>, convergence of ISTA
+<p>For a constant step size, <span class="math notranslate nohighlight">\(\alpha\)</span>, convergence of ISTA
 is guaranteed if</p>
 <div class="math notranslate nohighlight">
 \[\alpha\in(0, \frac{2}{L}),\]</div>
@@ -1482,16 +1481,12 @@ is guaranteed if</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess of ISTA.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess of ISTA. <span class="math notranslate nohighlight">\(x_{0}\)</span></p></li>
 <li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
 <li><p><strong>g</strong> (Function or <cite>None</cite>) – Convex function with <em>simple</em> proximal operator. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
-<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> or child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’,  default = None) – <dl class="simple">
-<dt>Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’ is passed then it’s method <cite>get_step_size</cite> is called for each update.</dt><dd><p>The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is a constant <span class="math notranslate nohighlight">\(\frac{0.99*2}{L}\)</span> or 1 if <cite>f=None</cite>.</p>
-</dd>
-<dt>preconditioner: class with a <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.</dt><dd><p>This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditoner()</span></code>. If None is passed  then <cite>self.gradient_update</cite> will remain unmodified.</p>
-</dd>
-</dl>
-</p></li>
+<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> or child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’,  default = None) – Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code> is passed then its method <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_step_size()</span></code> is called for each update.
+The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is a constant <span class="math notranslate nohighlight">\(\frac{0.99*2}{L}\)</span> or 1 if <cite>f=None</cite>.</p></li>
+<li><p><strong>preconditioner</strong> (class with an <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditoner()</span></code>. If None is passed then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1510,7 +1505,7 @@ is guaranteed if</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ista</span> <span class="o">=</span> <span class="n">ISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ista</span> <span class="o">=</span> <span class="n">ISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ista</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1518,11 +1513,6 @@ is guaranteed if</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#cil.optimisation.algorithms.FISTA" title="cil.optimisation.algorithms.FISTA"><code class="xref py py-class docutils literal notranslate"><span class="pre">FISTA</span></code></a>, <a class="reference internal" href="#cil.optimisation.algorithms.GD" title="cil.optimisation.algorithms.GD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GD</span></code></a></p>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__init__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.set_up" title="Link to this definition">#</a></dt>
@@ -1562,157 +1552,6 @@ is guaranteed if</p>
 <dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__delattr__">
-<span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__delattr__" title="Link to this definition">#</a></dt>
-<dd><p>Implement delattr(self, name).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__dir__">
-<span class="sig-name descname"><span class="pre">__dir__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__dir__" title="Link to this definition">#</a></dt>
-<dd><p>Default dir() implementation.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__eq__" title="Link to this definition">#</a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__format__">
-<span class="sig-name descname"><span class="pre">__format__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_spec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__format__" title="Link to this definition">#</a></dt>
-<dd><p>Default object formatter.</p>
-<p>Return str(self) if format_spec is empty. Raise TypeError otherwise.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__ge__">
-<span class="sig-name descname"><span class="pre">__ge__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__ge__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&gt;=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__getattribute__">
-<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__getattribute__" title="Link to this definition">#</a></dt>
-<dd><p>Return getattr(self, name).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__getstate__">
-<span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__getstate__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__gt__">
-<span class="sig-name descname"><span class="pre">__gt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__gt__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&gt;value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__hash__">
-<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__hash__" title="Link to this definition">#</a></dt>
-<dd><p>Return hash(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__init_subclass__">
-<span class="sig-name descname"><span class="pre">__init_subclass__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__init_subclass__" title="Link to this definition">#</a></dt>
-<dd><p>This method is called when a class is subclassed.</p>
-<p>The default implementation does nothing. It may be
-overridden to extend subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__iter__">
-<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__iter__" title="Link to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__le__">
-<span class="sig-name descname"><span class="pre">__le__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__le__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&lt;=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__lt__">
-<span class="sig-name descname"><span class="pre">__lt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__lt__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&lt;value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__ne__">
-<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__ne__" title="Link to this definition">#</a></dt>
-<dd><p>Return self!=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__new__">
-<span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__new__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__next__">
-<span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__next__" title="Link to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
-<p>This method triggers <code class="code docutils literal notranslate"><span class="pre">update()</span></code> and <code class="code docutils literal notranslate"><span class="pre">update_objective()</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__reduce__">
-<span class="sig-name descname"><span class="pre">__reduce__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__reduce__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__reduce_ex__">
-<span class="sig-name descname"><span class="pre">__reduce_ex__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__reduce_ex__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__repr__" title="Link to this definition">#</a></dt>
-<dd><p>Return repr(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__setattr__">
-<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__setattr__" title="Link to this definition">#</a></dt>
-<dd><p>Implement setattr(self, name, value).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__sizeof__">
-<span class="sig-name descname"><span class="pre">__sizeof__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__sizeof__" title="Link to this definition">#</a></dt>
-<dd><p>Size of object in memory, in bytes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__str__" title="Link to this definition">#</a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__subclasshook__">
-<span class="sig-name descname"><span class="pre">__subclasshook__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__subclasshook__" title="Link to this definition">#</a></dt>
-<dd><p>Abstract classes can override this to customize issubclass().</p>
-<p>This is invoked early on by abc.ABCMeta.__subclasscheck__().
-It should return True, False or NotImplemented.  If it returns
-NotImplemented, the normal algorithm is used.  Otherwise, it
-overrides the normal algorithm (and the outcome is cached).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.__weakref__">
-<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.__weakref__" title="Link to this definition">#</a></dt>
-<dd><p>list of weak references to the object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1862,29 +1701,28 @@ overrides the normal algorithm (and the outcome is cached).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">FISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Link to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm, see <span id="id5">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>.</p>
-<p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA)</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{cases}
-    y_{k} = x_{k} - \alpha\nabla f(x_{k})  \\
-    x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k})\\
-    t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
-    y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
-\end{cases}\end{split}\]</div>
-<p>is used to solve</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id5">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
-<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator and <span class="math notranslate nohighlight">\(\alpha^{k}\)</span>
-is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> per iteration.</p>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
+<p>In each update the algorithm completes the following steps:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+        x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+        t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
+        y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code>.</p>
+<p>Note that the above applies for <span class="math notranslate nohighlight">\(k\geq 1\)</span>. For <span class="math notranslate nohighlight">\(k=0\)</span>, <span class="math notranslate nohighlight">\(x_{0}\)</span> and <span class="math notranslate nohighlight">\(y_{0}\)</span> are initialised to <cite>initial</cite>, and <span class="math notranslate nohighlight">\(t_{1}=1\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Starting point of the algorithm</p></li>
 <li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function.  If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
 <li><p><strong>g</strong> (Function or <cite>None</cite>) – Convex function with <em>simple</em> proximal operator. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
-<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> or child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’,  default = None) – Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’ is passed then it’s method <cite>get_step_size</cite> is called for each update.
+<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> or child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’,  default = None) – Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code> is passed then it’s method <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_step_size()</span></code> is called for each update.
 The default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is a constant <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span> or 1 if <cite>f=None</cite>.</p></li>
-<li><p><strong>preconditioner</strong> (class with a <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditoner()</span></code>. If None is passed  then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
+<li><p><strong>preconditioner</strong> (class with an <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditoner()</span></code>. If None is passed  then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
 <li><p><strong>kwargs</strong> (<em>Keyword arguments</em>) – Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p></li>
 </ul>
 </dd>
@@ -1900,7 +1738,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">Aop</span><span class="o">.</span><span class="n">domain</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fista</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1909,171 +1747,15 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <p><a class="reference internal" href="#cil.optimisation.algorithms.FISTA" title="cil.optimisation.algorithms.FISTA.FISTA"><code class="xref py py-class docutils literal notranslate"><span class="pre">FISTA</span></code></a>, <a class="reference internal" href="#cil.optimisation.algorithms.GD" title="cil.optimisation.algorithms.GD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GD</span></code></a></p>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__init__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update" title="Link to this definition">#</a></dt>
-<dd><p>Performs a single iteration of FISTA</p>
+<dd><p>Performs a single iteration of FISTA. For <span class="math notranslate nohighlight">\(k\geq 1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
-    x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+    x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
     t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
-    y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k-1}}(x_{k} - x_{k-1})
+    y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
 \end{cases}\end{split}\]</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__delattr__">
-<span class="sig-name descname"><span class="pre">__delattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__delattr__" title="Link to this definition">#</a></dt>
-<dd><p>Implement delattr(self, name).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__dir__">
-<span class="sig-name descname"><span class="pre">__dir__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__dir__" title="Link to this definition">#</a></dt>
-<dd><p>Default dir() implementation.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__eq__" title="Link to this definition">#</a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__format__">
-<span class="sig-name descname"><span class="pre">__format__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_spec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__format__" title="Link to this definition">#</a></dt>
-<dd><p>Default object formatter.</p>
-<p>Return str(self) if format_spec is empty. Raise TypeError otherwise.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__ge__">
-<span class="sig-name descname"><span class="pre">__ge__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__ge__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&gt;=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__getattribute__">
-<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__getattribute__" title="Link to this definition">#</a></dt>
-<dd><p>Return getattr(self, name).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__getstate__">
-<span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__getstate__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__gt__">
-<span class="sig-name descname"><span class="pre">__gt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__gt__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&gt;value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__hash__">
-<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__hash__" title="Link to this definition">#</a></dt>
-<dd><p>Return hash(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__init_subclass__">
-<span class="sig-name descname"><span class="pre">__init_subclass__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__init_subclass__" title="Link to this definition">#</a></dt>
-<dd><p>This method is called when a class is subclassed.</p>
-<p>The default implementation does nothing. It may be
-overridden to extend subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__iter__">
-<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__iter__" title="Link to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__le__">
-<span class="sig-name descname"><span class="pre">__le__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__le__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&lt;=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__lt__">
-<span class="sig-name descname"><span class="pre">__lt__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__lt__" title="Link to this definition">#</a></dt>
-<dd><p>Return self&lt;value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__ne__">
-<span class="sig-name descname"><span class="pre">__ne__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__ne__" title="Link to this definition">#</a></dt>
-<dd><p>Return self!=value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__new__">
-<span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__new__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__next__">
-<span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__next__" title="Link to this definition">#</a></dt>
-<dd><p>Algorithm is an iterable</p>
-<p>This method triggers <code class="code docutils literal notranslate"><span class="pre">update()</span></code> and <code class="code docutils literal notranslate"><span class="pre">update_objective()</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__reduce__">
-<span class="sig-name descname"><span class="pre">__reduce__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__reduce__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__reduce_ex__">
-<span class="sig-name descname"><span class="pre">__reduce_ex__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__reduce_ex__" title="Link to this definition">#</a></dt>
-<dd><p>Helper for pickle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__repr__" title="Link to this definition">#</a></dt>
-<dd><p>Return repr(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__setattr__">
-<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__setattr__" title="Link to this definition">#</a></dt>
-<dd><p>Implement setattr(self, name, value).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__sizeof__">
-<span class="sig-name descname"><span class="pre">__sizeof__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__sizeof__" title="Link to this definition">#</a></dt>
-<dd><p>Size of object in memory, in bytes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__str__" title="Link to this definition">#</a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__subclasshook__">
-<span class="sig-name descname"><span class="pre">__subclasshook__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__subclasshook__" title="Link to this definition">#</a></dt>
-<dd><p>Abstract classes can override this to customize issubclass().</p>
-<p>This is invoked early on by abc.ABCMeta.__subclasscheck__().
-It should return True, False or NotImplemented.  If it returns
-NotImplemented, the normal algorithm is used.  Otherwise, it
-overrides the normal algorithm (and the outcome is cached).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.__weakref__">
-<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.__weakref__" title="Link to this definition">#</a></dt>
-<dd><p>list of weak references to the object</p>
 </dd></dl>
 
 <dl class="py method">

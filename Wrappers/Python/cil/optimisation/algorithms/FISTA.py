@@ -61,10 +61,10 @@ class ISTA(Algorithm):
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
-                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then its method :meth:`get_step_size` is called for each update. 
                 The default :code:`step_size` is a constant :math:`\frac{0.99*2}{L}` or 1 if `f=None`.
-     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
-            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
+    preconditioner: class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. 
 
 
     kwargs: Keyword arguments
@@ -260,9 +260,9 @@ class FISTA(ISTA):
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
     step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
-                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then it's method :meth:`get_step_size` is called for each update. 
                 The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
-    preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+    preconditioner : class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
     kwargs: Keyword arguments

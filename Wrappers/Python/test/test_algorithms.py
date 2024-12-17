@@ -20,7 +20,7 @@ from utils import has_cvxpy
 import unittest
 from os import unlink
 from tempfile import NamedTemporaryFile
-
+import os, glob
 import numpy as np
 import logging
 
@@ -75,6 +75,8 @@ from testclass import CCPiTestClass
 from utils import has_astra
 
 from unittest.mock import MagicMock
+
+from cil.io import TIFFStackReader
 
 log = logging.getLogger(__name__)
 
@@ -1703,6 +1705,92 @@ class TestCallbacks(unittest.TestCase):
             callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
         
         
+
+class TestSaveIteratesCallback(unittest.TestCase):
+
+    class MockAlgo(Algorithm):
+        def __init__(self, initial, update_objective_interval=10, **kwargs):
+            super().__init__(update_objective_interval=update_objective_interval, **kwargs)
+            self.configured = True
+            self.x=initial
+
+        def update(self):
+            self.x -= 1
+
+        def update_objective(self):
+            self.loss.append(2 ** getattr(self, 'x', np.nan))
+            
+            
+    def setUp(self):
+        # Mock the algorithm object
+        
+        self.image_geometry = ImageGeometry(10, 2)
+        self.data = self.image_geometry.allocate(10)
+        self.mock_algorithm = self.MockAlgo(self.data)
+        self.file_name= 'myfile'
+        self.cwd = os.getcwd()
+        self.dir_path=os.path.join(self.cwd, 'test_tiff' )
+        
+    def test_save_iterates_no_writer_no_roi(self):
+        # Test saving iterates to a list with no writer and no ROI
+        callback = callbacks.SaveIterates(interval=1, file_name= self.file_name, dir_path=self.dir_path)
+        
+        # Call the callback multiple times and increment iteration
+        self.mock_algorithm.run(5, callbacks=[callback])
+        
+        # Check if iterates are saved correctly
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        assert len(files) == 6
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        for i in range(6):
+            np.testing.assert_array_equal(read[i], (10-i)*np.ones((2,10)))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
+
+
+    def test_save_iterates_with_roi(self):
+        # Test saving iterates with an ROI applied
+        roi = {'horizontal_x': (0, 2, 1)}
+
+        callback = callbacks.SaveIterates(interval=1, file_name= self.file_name, dir_path=self.dir_path, roi=roi)
+
+        # Call the callback and check if slicer was used
+        callback(self.mock_algorithm)
+        # Check if iterates are saved correctly
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        assert len(files) == 1
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        np.testing.assert_array_equal(read, 10*np.ones([2, 2]))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
+
+    def test_save_iterates_with_interval(self):
+        # Test saving iterates with a specified interval
+        callback = callbacks.SaveIterates(interval=2, file_name= self.file_name, dir_path=self.dir_path)
+
+        # Call the callback multiple times and increment iteration
+        self.mock_algorithm.run(5, callbacks=[callback])
+
+        # Check if iterates are saved correctly
+        files = glob.glob(os.path.join(glob.escape(self.dir_path), '*'))
+        print(files)
+        self.assertEqual( len(files), 3)
+        reader = TIFFStackReader(file_name = self.dir_path)
+        read = reader.read()
+        np.testing.assert_array_equal(read[0], (10-0)*np.ones((2,10)))
+        np.testing.assert_array_equal(read[1], (10-2)*np.ones((2,10)))
+        np.testing.assert_array_equal(read[2], (10-4)*np.ones((2,10)))
+        [os.remove(file) for file in files]
+        os.rmdir(self.dir_path)
+
+
+
+
+
+
+
 class TestADMM(unittest.TestCase):
     def setUp(self):
         ig = ImageGeometry(2, 3, 2)

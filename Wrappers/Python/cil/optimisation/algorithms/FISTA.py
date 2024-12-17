@@ -33,12 +33,13 @@ class ISTA(Algorithm):
 
     .. math:: \min_{x} f(x) + g(x)
 
-    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
-    is the :code:`step_size`.
+    where :math:`f` is differentiable, and :math:`g` has a *simple* proximal operator.
 
     In each update, the algorithm computes:
 
     .. math:: x_{k+1} = \mathrm{prox}_{\alpha g}(x_{k} - \alpha\nabla f(x_{k}))
+
+    where :math:`\alpha` is the :code:`step_size`.
 
     Note
     ----
@@ -229,10 +230,9 @@ class FISTA(ISTA):
 
     r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a` is used to solve:
 
-        .. math:: \min_{x} f(x) + g(x)
+    .. math:: \min_{x} f(x) + g(x)
 
-    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
-    is the :code:`step_size`.
+    where :math:`f` is differentiable and :math:`g` has a *simple* proximal operator.
 
 
     In each update the algorithm completes the following steps:
@@ -245,7 +245,9 @@ class FISTA(ISTA):
                 y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
         \end{cases}
 
-    Note that the above applies for :math:`k\geq 1`. For :math:`k\eq 0` :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`
+    where :math:`\alpha` is the :code:`step_size`.
+
+    Note that the above applies for :math:`k\geq 1`. For :math:`k=0` :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`
 
 
     Parameters

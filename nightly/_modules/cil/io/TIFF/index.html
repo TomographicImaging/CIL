@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.TIFF &#8212; CIL 24.2.1.dev17+ga47cb152 documentation</title>
+    <title>cil.io.TIFF &#8212; CIL 24.2.1.dev18+gd58c330b documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../../../../_static/scripts/fontawesome.js?digest=339683332df9d0077417"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=ade2c4df"></script>
+    <script src="../../../../_static/documentation_options.js?v=9763db14"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev17+ga47cb152';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev18+gd58c330b';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev17+ga47cb152" />
+  <meta name="docsearch:version" content="24.2.1.dev18+gd58c330b" />
   </head>
   
   
@@ -665,7 +665,7 @@
 
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Basic TIFF reader which loops through all tiff files in a specific</span>
-<span class="sd">        folder and loads them in alphabetic order</span>
+<span class="sd">        folder and loads them in alphabetical order</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -676,8 +676,8 @@
 <span class="sd">        roi : dictionary, default `None`</span>
 <span class="sd">            dictionary with roi to load:</span>
 <span class="sd">            ``{&#39;axis_0&#39;: (start, end, step),</span>
-<span class="sd">               &#39;axis_1&#39;: (start, end, step),</span>
-<span class="sd">               &#39;axis_2&#39;: (start, end, step)}``</span>
+<span class="sd">            &#39;axis_1&#39;: (start, end, step),</span>
+<span class="sd">            &#39;axis_2&#39;: (start, end, step)}``</span>
 <span class="sd">            roi is specified for axes before transpose.</span>
 
 <span class="sd">        transpose : bool, default False</span>
@@ -730,8 +730,8 @@
 <span class="sd">        Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the</span>
 <span class="sd">        read data to approximately the original data with the following code:</span>
 
-<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, compression=&#39;uint8&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; writer.write(original_data)</span>
+<span class="sd">        &gt;&gt;&gt; writer = TIFFWriter(file_name = &#39;/path/to/folder&#39;, data=original_data, compression=&#39;uint8&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; writer.write()</span>
 <span class="sd">        &gt;&gt;&gt; reader = TIFFStackReader(file_name = &#39;/path/to/folder&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; about_original_data = reader.read_rescaled()</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -1123,8 +1123,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

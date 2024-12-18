@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 24.2.1.dev17+ga47cb152 documentation</title>
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 24.2.1.dev18+gd58c330b documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=339683332df9d0077417"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../_static/documentation_options.js?v=ade2c4df"></script>
+    <script src="../_static/documentation_options.js?v=9763db14"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev17+ga47cb152';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev18+gd58c330b';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -60,7 +60,7 @@
     <link rel="prev" title="Framework" href="../framework/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev17+ga47cb152" />
+  <meta name="docsearch:version" content="24.2.1.dev18+gd58c330b" />
   </head>
   
   
@@ -837,19 +837,16 @@ and will load 200 files.</p>
 <dt class="sig sig-object py" id="cil.io.TIFFStackReader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">TIFFStackReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode='bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Link to this definition">#</a></dt>
 <dd><p>Basic TIFF reader which loops through all tiff files in a specific
-folder and loads them in alphabetic order</p>
+folder and loads them in alphabetical order</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – Path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
-<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – <p>dictionary with roi to load:
-<a href="#id1"><span class="problematic" id="id2">``</span></a>{‘axis_0’: (start, end, step),</p>
-<blockquote>
-<div><p>’axis_1’: (start, end, step),
-‘axis_2’: (start, end, step)}``</p>
-</div></blockquote>
-<p>roi is specified for axes before transpose.</p>
-</p></li>
+<li><p><strong>roi</strong> (dictionary, default <cite>None</cite>) – dictionary with roi to load:
+<code class="docutils literal notranslate"><span class="pre">{'axis_0':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),</span>
+<span class="pre">'axis_1':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),</span>
+<span class="pre">'axis_2':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)}</span></code>
+roi is specified for axes before transpose.</p></li>
 <li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – Whether to transpose loaded images</p></li>
 <li><p><strong>mode</strong> (<em>str</em><em>, </em><em>{'bin'</em><em>, </em><em>'slice'}</em><em>, </em><em>default 'bin'.</em>) – <p>Defines the ‘step’ in the roi parameter:</p>
 <p>In bin mode, ‘step’ number of pixels
@@ -887,8 +884,8 @@ to <code class="docutils literal notranslate"><span class="pre">start</span> <sp
 </div>
 <p>Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
 read data to approximately the original data with the following code:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">original_data</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">original_data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">about_original_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">()</span>
 </pre></div>
@@ -944,8 +941,8 @@ leads to sensible data.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h4>Returns:<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<section id="id1">
+<h4>Returns:<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
 <p>numpy.ndarray in float32</p>
 </section>
 </dd></dl>
@@ -1220,8 +1217,8 @@ in the <code class="docutils literal notranslate"><span class="pre">ini</span></
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=339683332df9d0077417"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

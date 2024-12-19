@@ -1476,19 +1476,27 @@ class TestSPDHG(CCPiTestClass):
         alg_stochastic.run(1)
         y_bar_0=operator.range_geometry().allocate(0)
         y_0=operator.range_geometry().allocate(0)
-        x_0=g.proximal(initial-alg_stochastic.tau*operator.adjoint(y_bar_0), tau=alg_stochastic.tau)
+        x_1=g.proximal(initial-alg_stochastic.tau*operator.adjoint(y_bar_0), tau=alg_stochastic.tau)
+        y_1=operator.range_geometry().allocate(0)
+        functions[0].proximal_conjugate(y_0[0]+alg_stochastic.sigma[0]*operators[0].direct(x_1), tau=alg_stochastic.sigma[0], out=y_1[0])
+        y_bar_1=y_1+alg_stochastic._theta*5*(y_1-y_0)
         
-        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_0.as_array(), 3)
+        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_1.as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_1[0].as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_1[1].as_array())
         
         #Test second iteration
         alg_stochastic.run(1)
-        y_1=operator.range_geometry().allocate(0)
-        functions[0].proximal_conjugate(y_0[0]+alg_stochastic.sigma[0]*operators[0].direct(x_0), tau=alg_stochastic.sigma[0], out=y_1[0])
-        y_bar_1=y_1+alg_stochastic._theta*5*(y_1-y_0)
-        x_1=g.proximal(x_0-alg_stochastic.tau*operator.adjoint(y_bar_1), tau=alg_stochastic.tau)
 
-        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_1.as_array(), 3)
+        x_2=g.proximal(x_1-alg_stochastic.tau*operator.adjoint(y_bar_1), tau=alg_stochastic.tau)
+        y_2=y_1.copy()
+        functions[1].proximal_conjugate(y_1[1]+alg_stochastic.sigma[1]*operators[1].direct(x_2), tau=alg_stochastic.sigma[1], out=y_2[1])
+        y_bar_2=y_2+alg_stochastic._theta*5*(y_2-y_1)
 
+        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_2.as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_2[0].as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_2[1].as_array())
+        
 class TestCallbacks(unittest.TestCase):
     class PrintAlgo(Algorithm):
         def __init__(self, update_objective_interval=10, **kwargs):

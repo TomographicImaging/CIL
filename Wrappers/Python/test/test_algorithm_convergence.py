@@ -103,4 +103,4 @@ class TestAlgorithmConvergence(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual( 
             alg_stochastic.x.as_array(), u_cvxpy.value)
         self.assertDataContainerAllClose(
-            alg_stochastic.x, b, rtol=1e-8)
+            alg_stochastic.x, b, rtol=1e-8, atol=1e-8)

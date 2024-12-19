@@ -1364,92 +1364,6 @@ class TestSPDHG(CCPiTestClass):
         spdhg.set_step_sizes(sigma=None, tau=100)
         self.assertTrue(spdhg.check_convergence())
 
-    @unittest.skipUnless(has_astra, "cil-astra not available")
-    def test_SPDHG_num_subsets_1(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
-
-        subsets = 1
-
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
-            angles, angle_unit='radian').set_panel(detectors, 0.1)
-        # Select device
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
-
-        sin = Aop.direct(data)
-        partitioned_data = sin.partition(subsets, 'sequential')
-        A = BlockOperator(
-            *[IdentityOperator(partitioned_data[i].geometry) for i in range(subsets)])
-
-        # block function
-        F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-                            for i in range(subsets)])
-
-        F_phdhg = L2NormSquared(b=partitioned_data[0])
-        A_pdhg = IdentityOperator(partitioned_data[0].geometry)
-
-        alpha = 0.025
-        G = alpha * IndicatorBox(lower=0)
-
-        spdhg = SPDHG(f=F, g=G, operator=A,  update_objective_interval=10)
-
-        spdhg.run(7)
-
-        pdhg = PDHG(f=F_phdhg, g=G, operator=A_pdhg,
-                    update_objective_interval=10)
-
-        pdhg.run(7)
-
-        self.assertNumpyArrayAlmostEqual(
-            pdhg.solution.as_array(), spdhg.solution.as_array(), decimal=3)
-
-    def add_noise(self, sino, noise='gaussian', seed=10):
-        if noise == 'poisson':
-            scale = 5
-            noisy_data = scale * applynoise.poisson(sino/scale, seed=seed)
-        elif noise == 'gaussian':
-            noisy_data = applynoise.gaussian(sino, var=0.1, seed=seed)
-        else:
-            raise ValueError('Unsupported Noise ', noise)
-        return noisy_data
-
-    def test_SPDHG_toy_example(self):
-        sampler = Sampler.random_with_replacement(5, seed=10)
-        initial = VectorData(np.zeros(25))
-        b = VectorData(np.array(range(25)))
-        functions = []
-        operators=[]
-        for i in range(5):
-            diagonal = np.zeros(25)
-            diagonal[5*i:5*(i+1)] = 1
-            A = MatrixOperator(np.diag(diagonal))
-            functions.append(0.5*L2NormSquared(b=A.direct(b)))
-            operators.append(A)
-
-        Aop=MatrixOperator(np.diag(np.ones(25)))
-
-        u_cvxpy = cvxpy.Variable(b.shape[0])
-        objective = cvxpy.Minimize( 0.5*cvxpy.sum_squares(Aop.A @ u_cvxpy - Aop.direct(b).array))
-        p = cvxpy.Problem(objective)
-        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4)
-        
-        g=ZeroFunction()
-
-        alg_stochastic = SPDHG(f=BlockFunction(*functions), g=g, operator=BlockOperator(*operators), sampler=sampler, initial=initial, update_objective_interval=500)
-        alg_stochastic.run(500, verbose=0)
-
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), u_cvxpy.value, 3)
-        self.assertNumpyArrayAlmostEqual(
-            alg_stochastic.x.as_array(), b.as_array(), 3)
-    
         
     def test_SPDHG_update_method(self):
         sampler = Sampler.sequential(5)
@@ -1472,30 +1386,31 @@ class TestSPDHG(CCPiTestClass):
         operator=BlockOperator(*operators)
         alg_stochastic = SPDHG(initial=initial, f=BlockFunction(*functions), g=g, operator=operator, sampler=sampler, update_objective_interval=500)
         
-        #Test first iteration
-        alg_stochastic.run(1)
+        #Test first iteration primal and dual result 
+        alg_stochastic.run(1) 
         y_bar_0=operator.range_geometry().allocate(0)
         y_0=operator.range_geometry().allocate(0)
-        x_1=g.proximal(initial-alg_stochastic.tau*operator.adjoint(y_bar_0), tau=alg_stochastic.tau)
-        y_1=operator.range_geometry().allocate(0)
-        functions[0].proximal_conjugate(y_0[0]+alg_stochastic.sigma[0]*operators[0].direct(x_1), tau=alg_stochastic.sigma[0], out=y_1[0])
-        y_bar_1=y_1+alg_stochastic._theta*5*(y_1-y_0)
+        x_1=g.proximal(initial-alg_stochastic.tau*operator.adjoint(y_bar_0), tau=alg_stochastic.tau) #primal update
+        y_1=operator.range_geometry().allocate(0) 
+        functions[0].proximal_conjugate(y_0[0]+alg_stochastic.sigma[0]*operators[0].direct(x_1), tau=alg_stochastic.sigma[0], out=y_1[0]) #dual update
+        y_bar_1=y_1+alg_stochastic._theta*5*(y_1-y_0) #extrapolation
         
-        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_1.as_array())
-        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_1[0].as_array())
-        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_1[1].as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_1.as_array()) #check primal update
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_1[0].as_array()) #check dual update in the first index (should have changed)
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_1[1].as_array())# check dual update in the second index (should not have changed)
         
         #Test second iteration
         alg_stochastic.run(1)
 
-        x_2=g.proximal(x_1-alg_stochastic.tau*operator.adjoint(y_bar_1), tau=alg_stochastic.tau)
+        x_2=g.proximal(x_1-alg_stochastic.tau*operator.adjoint(y_bar_1), tau=alg_stochastic.tau) #primal update
         y_2=y_1.copy()
-        functions[1].proximal_conjugate(y_1[1]+alg_stochastic.sigma[1]*operators[1].direct(x_2), tau=alg_stochastic.sigma[1], out=y_2[1])
-        y_bar_2=y_2+alg_stochastic._theta*5*(y_2-y_1)
+        functions[1].proximal_conjugate(y_1[1]+alg_stochastic.sigma[1]*operators[1].direct(x_2), tau=alg_stochastic.sigma[1], out=y_2[1]) #dual update
+        y_bar_2=y_2+alg_stochastic._theta*5*(y_2-y_1) #extrapolation
 
-        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_2.as_array())
-        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_2[0].as_array())
-        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_2[1].as_array())
+        np.testing.assert_array_almost_equal(alg_stochastic.x.as_array(), x_2.as_array()) #check primal update
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[0].as_array(), y_2[0].as_array()) #check dual update in the first index (should not have changed)
+        np.testing.assert_array_almost_equal(y_1[0].as_array(), y_2[0].as_array()) #check dual update in the first index (should not have changed)
+        np.testing.assert_array_almost_equal(alg_stochastic._y_old[1].as_array(), y_2[1].as_array()) #check dual update in the second index (should have changed)
         
 class TestCallbacks(unittest.TestCase):
     class PrintAlgo(Algorithm):

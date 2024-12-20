@@ -208,13 +208,13 @@ class show1D(show_base):
                 if sl[0] in labels:
                     ind = labels.index(sl[0])
                 else:
-                    raise ValueError(f"Invalid axis label {sl[0]}")
+                    raise ValueError(f"Invalid axis label: {sl[0]}")
             axis_indices.append(ind)
             
 
         # check axis are unique
         if len(set([index for index in axis_indices])) != items_per_slice:
-            raise ValueError("slice_list constains duplicate axes. Each axis must be unique.")
+            raise ValueError("slice_list contains duplicate axes. Each axis must be unique.")
 
         slice_ndim = [slice(None)]*ndim 
         
@@ -241,7 +241,7 @@ class show1D(show_base):
 
             for i in range(1, num_data):
                 if data_list[i].shape != data_list[0].shape:
-                    raise ValueError("All images must have the same shape")
+                    raise ValueError("All datasets must have the same shape")
                 
         data_ndim = data_list[0].ndim
         data_shape = data_list[0].shape
@@ -351,9 +351,11 @@ class show1D(show_base):
                 if isinstance(axis_labels, tuple):
                     ax.flat[i].set_xlabel(axis_labels[0])
                     ax.flat[i].set_ylabel(axis_labels[1])
-                else:
+                elif isinstance(axis_labels, list) and len(axis_labels) == num_sub_plots:
                     ax.flat[i].set_xlabel(axis_labels[i][0])
                     ax.flat[i].set_ylabel(axis_labels[i][1])
+                else:
+                    raise ValueError("axis_labels must be a tuple or a list of tuples equal to the number of plots")
             else:
                 ax.flat[i].set_xlabel(x_label)
                 ax.flat[i].set_ylabel("Value")

@@ -209,7 +209,66 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertEqual(K.domain_geometry(), ig)
 
+    def test_blockoperator_out_datacontainer(self):
+        
+        #test direct
+        M, N ,W = 3, 4, 5
+        ig = ImageGeometry(M, N, W)
+        operator0=IdentityOperator(ig)
+        operator1=-IdentityOperator(ig)
+        K = BlockOperator(operator0, operator1, shape = (1,2))
+        bg=BlockGeometry(ig, ig)
+        data=bg.allocate('random', seed=2)
+        out=K.range.allocate(0)
+        assert not isinstance(out, BlockDataContainer)
+        ans = K.direct(data)  
+        K.direct(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.array) 
+        
+        #test direct out is BlockDataContainer 
+        out = BlockDataContainer(out)
+        assert isinstance(out, BlockDataContainer)
+        ans = K.direct(data)  
+        K.direct(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.get_item(0).array) 
+        
+        #test adjoint wrong dimension 
+        out=ig.allocate(0) 
+        data = ig.allocate('random')
+        print(K.range_geometry)
+        with self.assertRaises(ValueError):
+            K.adjoint(data, out)
+        
+        
+        #test adjoint out not BlockDataContainer 
+        M, N ,W = 3, 4, 5
+        operator0=IdentityOperator(ig)
+        operator1=-IdentityOperator(ig)
+        K = BlockOperator(operator0, operator1, shape = (2,1))
+        bg=BlockGeometry(ig, ig)
+        data=bg.allocate('random', seed=2)
+        out=K.domain.allocate(0)
+        assert not isinstance(out, BlockDataContainer)
+        ans = K.adjoint(data)  
+        K.adjoint(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.array) 
+        
+        #test adjoint out is BlockDataContainer 
+        out = BlockDataContainer(out)
+        assert isinstance(out, BlockDataContainer)
+        ans = K.adjoint(data)  
+        K.adjoint(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.get_item(0).array) 
+        
+        #test direct wrong dimension 
+        out=ig.allocate(0) 
+        data = ig.allocate('random')
+        print(K.range_geometry)
+        with self.assertRaises(ValueError):
+            K.direct(data, out)
 
+        
+        
 
     @unittest.skipIf(True, 'Skipping time tests')
     def test_timedifference(self):

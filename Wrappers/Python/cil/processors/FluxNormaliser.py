@@ -443,12 +443,7 @@ def numba_loop(flux, target, num_proj, proj_size, out):
                 out_flat[i*proj_size+ij] *= (target/flux_flat[i])
 
 def serial_loop(flux, target, num_proj, proj_size, out):
-    out_flat = out.ravel()
-    flux_flat = flux.ravel()
-    if len(flux_flat) == 1:
-        norm = target/flux_flat[0]
-        for i in range(num_proj):
-            out_flat[i*proj_size:(i+1)*proj_size] *= norm
-    else:
-        for i in range(num_proj):
-            out_flat[i*proj_size:(i+1)*proj_size] *= (target/flux_flat[i])
+    out_reshaped = out.reshape(num_proj, proj_size)
+    flux_flat = flux.ravel() 
+    norm = target / flux_flat[:, numpy.newaxis]  # shape: (num_proj, 1) 
+    numpy.multiply(out_reshaped, norm, out=out_reshaped)

@@ -228,7 +228,7 @@ class show1D(show_base):
         return slice_list_out
 
     def _show1d(self, data, slice_list=None, dataset_labels='default', title=None, line_colours=None,
-                line_styles=None, axis_labels='default', plot_size=(8,3)):
+                line_styles=None, axis_labels='default', size=(8,3)):
         """
         Internal function to display 1D plots of pixel flux from multi-dimensional data and slicing information.
         """
@@ -295,7 +295,7 @@ class show1D(show_base):
             line_styles = None
         
         num_sub_plots = len(_slice_list)
-        fig_size = (plot_size[0], plot_size[1] * num_sub_plots)
+        fig_size = (size[0], size[1] * num_sub_plots)
         fig, (ax) = plt.subplots(num_sub_plots, figsize=fig_size)
 
         if num_sub_plots == 1:

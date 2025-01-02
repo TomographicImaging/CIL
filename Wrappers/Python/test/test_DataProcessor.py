@@ -21,7 +21,7 @@ import numpy
 
 import sys
 import os
-
+from unittest.mock import patch
 
 from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 
@@ -3299,7 +3299,7 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(TypeError):
             processor._calculate_target()
         
-    @unittest.mock.patch("matplotlib.pyplot.figure")
+    @patch("matplotlib.pyplot.figure")
     def test_preview_configuration(self, mock_plot):
         # Test error in preview configuration if there is no roi
         processor = FluxNormaliser(flux=10)

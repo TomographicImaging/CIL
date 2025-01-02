@@ -1,10 +1,14 @@
 * 24.x.x
 - Bug fixes:
   - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
+  - Show1D correctly applies slices to N-dimensional data (#2022)
 - Enhancements:
   - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
 - Dependencies:
   - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
+- Changes that break backwards compatibility:
+  - show1D argument renamed `label`->`dataset_labels`, default plot size has changed.
+  - show1D Default behaviour for displaying and labeling multiple plots has changed. Each slice requested will be displayed on a new subplot comparing all datasets at that position.
 
 * 24.2.0
   - New Features:

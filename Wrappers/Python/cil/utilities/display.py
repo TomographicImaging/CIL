@@ -119,7 +119,7 @@ class show1D(show_base):
         To plot multiple slices, pass a list of slices.        
     dataset_labels : list of str, optional
         Overides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.
-    title_list: list of str, optional
+    title: list of str, optional
         Overides the default title for each plot. Must be a list of strings equal to the number of plots.
     line_colours : str, list of str, default=None
         Overides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.
@@ -127,8 +127,10 @@ class show1D(show_base):
         Overides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.
     axis_labels : tuple of str, list of tuples, optional
         Overides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.
-    plot_size : tuple, default=(8,5)
-        The size of the figure.
+    size : tuple, default=(8,3)
+        The size of each sub-plot in the figure.
+
+
     Returns
     -------
     matplotlib.figure.Figure
@@ -181,13 +183,13 @@ class show1D(show_base):
     >>> show1D(data, slice_list=[(0, 3),(2, 5)])
     """
 
-    def __init__(self, data, slice_list=None, dataset_labels=None, title_list=None,
+    def __init__(self, data, slice_list=None, dataset_labels=None, title=None,
                  line_colours=None, line_styles=None, axis_labels=None,
                  size=(8,3)):
 
-        self.figure = self._show1d(data, slice_list, dataset_labels=dataset_labels, title_list=title_list,
+        self.figure = self._show1d(data, slice_list, dataset_labels=dataset_labels, title=title,
                                    line_colours=line_colours, line_styles=line_styles,
-                                   axis_labels=axis_labels, plot_size=size)
+                                   axis_labels=axis_labels, size=size)
 
 
     def _parse_slice(self, slice_list_in, items_per_slice, ndim, labels):
@@ -225,7 +227,7 @@ class show1D(show_base):
         
         return slice_list_out
 
-    def _show1d(self, data, slice_list=None, dataset_labels='default', title_list=None, line_colours=None,
+    def _show1d(self, data, slice_list=None, dataset_labels='default', title=None, line_colours=None,
                 line_styles=None, axis_labels='default', plot_size=(8,3)):
         """
         Internal function to display 1D plots of pixel flux from multi-dimensional data and slicing information.
@@ -327,25 +329,25 @@ class show1D(show_base):
                 ax.flat[i].plot(data_line, color=_cl, linestyle=_ls, label=_lbl)
 
             # get the unsliced index
-            title = f"Slice at "
+            subplot_title = f"Slice at "
             for j, sl in enumerate(_slice_list[i]):
                 if sl == slice(None):
                     x_label = f"{labels[j]} index"
                 else:
-                    title += f"{labels[j]}:{sl.start}, "
+                    subplot_title += f"{labels[j]}:{sl.start}, "
 
             # remove last two characters
-            title = title[:-2]
+            subplot_title = subplot_title[:-2]
 
-            if title_list is not None:
-                if isinstance(title_list, list) and len(title_list) == num_sub_plots:
-                    title = title_list[i]
-                elif isinstance(title_list, str):
-                    title = title_list
+            if title is not None:
+                if isinstance(title, list) and len(title) == num_sub_plots:
+                    subplot_title = title[i]
+                elif isinstance(title, str):
+                    subplot_title = title
                 else:
-                    raise ValueError("title_list must be a list of strings equal to the number of plots")
+                    raise ValueError("title must be a list of strings equal to the number of plots")
 
-            ax.flat[i].set_title(title)
+            ax.flat[i].set_title(subplot_title)
 
             if axis_labels is not None:
                 if isinstance(axis_labels, tuple):

@@ -18,6 +18,9 @@
 
 import unittest
 import numpy
+import sys
+import os
+
 from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import quality_measures
@@ -351,7 +354,7 @@ class TestBinner(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
+                {'vertical':(32,64,2)},
 
                 # bin to single dimension
                 {'vertical':(31,33,2)},
@@ -1008,7 +1011,7 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
+                {'vertical':(32,64,2)},
 
                 # slice to single dimension
                 {'vertical':(32,34,2)},
@@ -2368,178 +2371,200 @@ class TestMaskGenerator(unittest.TestCase):
 
         IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
 
         data = IG.allocate('random')
 
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
 
-        # check special values - default
-        m = MaskGenerator.special_values()
-        m.set_input(data)
-        mask = m.process()
+   
+        data_as_image_data = data
+        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
-        mask_manual[4,5] = 0
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
+        data_type_name = ['ImageData', 'DataContainer', 'AcquisitionData']
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+        for i, data in enumerate(data_objects):
+            with self.subTest(data_type=data_type_name[i]):
 
-        # check nan
-        m = MaskGenerator.special_values(inf=False)
-        m.set_input(data)
-        mask = m.process()
+                # check special values - default
+                m = MaskGenerator.special_values()
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[4,5] = 0
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[2,3] = 0
+                mask_manual[4,5] = 0
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check inf
-        m = MaskGenerator.special_values(nan=False)
-        m.set_input(data)
-        mask = m.process()
+                # check nan
+                m = MaskGenerator.special_values(inf=False)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[4,5] = 0
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check threshold
-        data = IG.allocate('random')
-        data.as_array()[6,8] = 100
-        data.as_array()[1,3] = 80
+                # check inf
+                m = MaskGenerator.special_values(nan=False)
+                m.set_input(data)
+                mask = m.process()
 
-        m = MaskGenerator.threshold(None, 70)
-        m.set_input(data)
-        mask = m.process()
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[2,3] = 0
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        mask_manual[1,3] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                # check threshold
+                data.as_array()[2,3] = numpy.random.rand()
+                data.as_array()[4,5] = numpy.random.rand()
+                data.as_array()[6,8] = 100
+                data.as_array()[1,3] = 80
 
-        m = MaskGenerator.threshold(None, 80)
-        m.set_input(data)
-        mask = m.process()
+                m = MaskGenerator.threshold(None, 70)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+                mask_manual[1,3] = 0
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check quantile
-        data = IG.allocate('random')
-        data.as_array()[6,8] = 100
-        data.as_array()[1,3] = 80
+                m = MaskGenerator.threshold(None, 80)
+                m.set_input(data)
+                mask = m.process()
 
-        m = MaskGenerator.quantile(None, 0.98)
-        m.set_input(data)
-        mask = m.process()
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        mask_manual[1,3] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                # check quantile
+                data.as_array()[6,8] = 100
+                data.as_array()[1,3] = 80
 
-        m = MaskGenerator.quantile(None, 0.99)
-        m.set_input(data)
-        mask = m.process()
+                m = MaskGenerator.quantile(None, 0.98)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+                mask_manual[1,3] = 0
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check mean
+                m = MaskGenerator.quantile(None, 0.99)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+
+        # Tests on larger data for checking mean and median
         IG = ImageGeometry(voxel_num_x=200,
                             voxel_num_y=200)
-        #data = IG.allocate('random', seed=10)
+
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
         data = IG.allocate()
         numpy.random.seed(10)
         data.fill(numpy.random.rand(200,200))
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
-        m = MaskGenerator.mean(axis='horizontal_x')
-        m.set_input(data)
-        mask = m.process()
+        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_image_data = data
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
+        for i, data in enumerate(data_objects):
+            with self.subTest(data_type=data_type_name[i]):
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                m = MaskGenerator.mean(axis=1) # this gives horizontal_x for ImageData, or 'dimension_01' for DataContainer
+                m.set_input(data)
+                mask = m.process()
 
-        m = MaskGenerator.mean(window=5)
-        m.set_input(data)
-        mask = m.process()
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                m = MaskGenerator.mean(window=5)
+                m.set_input(data)
+                mask = m.process()
 
-        # check median
-        m = MaskGenerator.median(axis='horizontal_x')
-        m.set_input(data)
-        mask = m.process()
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                # check median
+                m = MaskGenerator.median(axis=1)
+                m.set_input(data)
+                mask = m.process()
 
-        m = MaskGenerator.median()
-        m.set_input(data)
-        mask = m.process()
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check movmean
-        m = MaskGenerator.mean(window=10)
-        m.set_input(data)
-        mask = m.process()
+                m = MaskGenerator.median()
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        #
-        m = MaskGenerator.mean(window=20, axis='horizontal_y')
-        m.set_input(data)
-        mask = m.process()
+                # check movmean
+                m = MaskGenerator.mean(window=10)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        m = MaskGenerator.mean(window=10, threshold_factor=10)
-        m.set_input(data)
-        mask = m.process()
+                #
+                m = MaskGenerator.mean(window=20, axis=0) # this gives horizontal_y for ImageData, or 'dimension_00' for DataContainer
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check movmedian
-        m = MaskGenerator.median(window=20)
-        m.set_input(data)
-        mask = m.process()
+                m = MaskGenerator.mean(window=10, threshold_factor=10)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
-        # check movmedian
-        m = MaskGenerator.median(window=40)
-        m.set_input(data)
-        mask = m.process()
+                # check movmedian
+                m = MaskGenerator.median(window=20)
+                m.set_input(data)
+                mask = m.process()
 
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check movmedian
+                m = MaskGenerator.median(window=40)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
@@ -2882,6 +2907,11 @@ class TestPaganinProcessor(unittest.TestCase):
             with self.assertRaises(TypeError):
                 processor.set_input(dc)
 
+            # check with different data order
+            data.reorder('astra')
+            with self.assertRaises(ValueError):
+                processor.set_input(data)
+
 
     def test_PaganinProcessor_set_geometry(self):
         processor = PaganinProcessor()
@@ -3037,9 +3067,11 @@ class TestPaganinProcessor(unittest.TestCase):
     def test_PaganinProcessor(self):
 
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength)        
+        mu = 4.0*numpy.pi*1e-2/(wavelength)
 
         data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
@@ -3077,37 +3109,12 @@ class TestPaganinProcessor(unittest.TestCase):
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
             filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
-
-            # check with different data order
-            data.reorder('astra')
-            data_abs = -(1/mu)*numpy.log(data)
-            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                thickness = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-            processor = PaganinProcessor(full_retrieval=False, pad=10)
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
-            
-            # check with different channel data order
-            if data.geometry.channels>1:
-                data.reorder(('vertical','channel','horizontal','angle'))
-                data_abs = -(1/mu)*numpy.log(data)
-                processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    thickness = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-                processor = PaganinProcessor(full_retrieval=False, pad=10)
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+        
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
     def test_PaganinProcessor_2D(self):
+
         self.data_parallel.geometry.config.units = 'm'
         data_slice = self.data_parallel.get_slice(vertical=10)
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
@@ -3116,19 +3123,29 @@ class TestPaganinProcessor(unittest.TestCase):
 
         processor = PaganinProcessor(pad=10)
         processor.set_input(data_slice)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
-        # check with different data order
-        data_slice.reorder(('horizontal','angle'))
+    def test_PaganinProcessor_1angle(self):
+        data = self.data_cone.get_slice(angle=1)
+        data.geometry.config.units = 'm'
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
-        thickness = -(1/mu)*numpy.log(data_slice)
+        thickness = -(1/mu)*numpy.log(data)
 
         processor = PaganinProcessor(pad=10)
-        processor.set_input(data_slice)
+        processor.set_input(data)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
 
 
 if __name__ == "__main__":

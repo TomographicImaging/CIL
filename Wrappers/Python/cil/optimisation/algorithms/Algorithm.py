@@ -235,18 +235,29 @@ class Algorithm:
         Parameters
         -----------
         iterations: int, default is None
-            Number of iterations to run. If not set the algorithm will run until :code:`should_stop()` is reached
+            Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises `StopIteration`.
         callbacks: list of callables, default is Defaults to :code:`[ProgressCallback(verbose)]`
             List of callables which are passed the current Algorithm object each iteration. Defaults to :code:`[ProgressCallback(verbose)]`.
         verbose: 0=quiet, 1=info, 2=debug
             Passed to the default callback to determine the verbosity of the printed output. 
         """
         
+        if iterations is None:
+            raise ValueError("`run()` missing number of `iterations`")
+        
         if 'print_interval' in kwargs:
             warn("use `TextProgressCallback(miniters)` instead of `run(print_interval)`",
                  DeprecationWarning, stacklevel=2)
+        if np.isposinf(iterations):
+            if callbacks is None:
+                raise ValueError("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`")
+            else:
+                warn("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`", UserWarning, stacklevel=2)
+        
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
+            
+        
         # transform old-style callbacks into new
         callback = kwargs.get('callback', None)
         if callback is not None:
@@ -256,9 +267,7 @@ class Algorithm:
 
         if self.should_stop():
             print("Stop criterion has been reached.")
-        if iterations is None:
-            warn("`run()` missing `iterations`", DeprecationWarning, stacklevel=2)
-            iterations = self.max_iteration
+        
 
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1

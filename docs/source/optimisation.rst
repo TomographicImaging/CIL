@@ -96,14 +96,12 @@ ISTA
 ----
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 FISTA
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 PDHG
@@ -152,7 +150,7 @@ Each iteration considers just one index of the sum, potentially reducing computa
 
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
-   :members:
+   :members: update, set_step_sizes, set_step_sizes_from_ratio, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
 

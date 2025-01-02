@@ -21,13 +21,13 @@ We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda
 Install a new environment using:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0 ipp=2021.12
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.2.0 ipp=2021.12 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
 ```
 
 where:
@@ -84,6 +84,9 @@ docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:lates
 > See [jupyter-docker-stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html) for more information.
 
 ## Getting Started with CIL
+
+### CIL Training
+We typically run training courses at least twice a year - check https://ccpi.ac.uk/training/ for our upcoming events!
 
 ### CIL on binder
 

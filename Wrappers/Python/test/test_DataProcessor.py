@@ -18,7 +18,10 @@
 
 import unittest
 import numpy
-from unittest.mock import patch
+
+import sys
+import os
+
 
 from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 
@@ -2911,6 +2914,11 @@ class TestPaganinProcessor(unittest.TestCase):
             with self.assertRaises(TypeError):
                 processor.set_input(dc)
 
+            # check with different data order
+            data.reorder('astra')
+            with self.assertRaises(ValueError):
+                processor.set_input(data)
+
 
     def test_PaganinProcessor_set_geometry(self):
         processor = PaganinProcessor()
@@ -3066,9 +3074,11 @@ class TestPaganinProcessor(unittest.TestCase):
     def test_PaganinProcessor(self):
 
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
-        mu = 4.0*numpy.pi*1e-2/(wavelength)        
+        mu = 4.0*numpy.pi*1e-2/(wavelength)
 
         data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         for data in data_array:
             data.geometry.config.units = 'm'
             data_abs = -(1/mu)*numpy.log(data)
@@ -3106,37 +3116,12 @@ class TestPaganinProcessor(unittest.TestCase):
             numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
             filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
             numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
-
-            # check with different data order
-            data.reorder('astra')
-            data_abs = -(1/mu)*numpy.log(data)
-            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                thickness = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-            processor = PaganinProcessor(full_retrieval=False, pad=10)
-            processor.set_input(data)
-            with self.assertLogs(level='WARN') as log:
-                filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
-            
-            # check with different channel data order
-            if data.geometry.channels>1:
-                data.reorder(('vertical','channel','horizontal','angle'))
-                data_abs = -(1/mu)*numpy.log(data)
-                processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    thickness = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
-                processor = PaganinProcessor(full_retrieval=False, pad=10)
-                processor.set_input(data)
-                with self.assertLogs(level='WARN') as log:
-                    filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
-                self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+        
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
     def test_PaganinProcessor_2D(self):
+
         self.data_parallel.geometry.config.units = 'm'
         data_slice = self.data_parallel.get_slice(vertical=10)
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
@@ -3145,18 +3130,27 @@ class TestPaganinProcessor(unittest.TestCase):
 
         processor = PaganinProcessor(pad=10)
         processor.set_input(data_slice)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
-        # check with different data order
-        data_slice.reorder(('horizontal','angle'))
+    def test_PaganinProcessor_1angle(self):
+        data = self.data_cone.get_slice(angle=1)
+        data.geometry.config.units = 'm'
         wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
         mu = 4.0*numpy.pi*1e-2/(wavelength) 
-        thickness = -(1/mu)*numpy.log(data_slice)
+        thickness = -(1/mu)*numpy.log(data)
 
         processor = PaganinProcessor(pad=10)
-        processor.set_input(data_slice)
+        processor.set_input(data)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
         output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
 class TestFluxNormaliser(unittest.TestCase):
@@ -3305,7 +3299,7 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(TypeError):
             processor._calculate_target()
         
-    @patch("matplotlib.pyplot.figure")
+    @unittest.mock.patch("matplotlib.pyplot.figure")
     def test_preview_configuration(self, mock_plot):
         # Test error in preview configuration if there is no roi
         processor = FluxNormaliser(flux=10)
@@ -3464,6 +3458,7 @@ class TestFluxNormaliser(unittest.TestCase):
         processor.get_output(out=data_norm)
         numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
         numpy.testing.assert_allclose(data.array, self.data_cone.array)
+
 
 if __name__ == "__main__":
 

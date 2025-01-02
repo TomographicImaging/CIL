@@ -228,23 +228,23 @@ class TestShow1D(unittest.TestCase):
 
 
     @patch('matplotlib.pyplot.show')
-    def test_show1D_input_title_list(self, mock_show):
+    def test_show1D_input_title(self, mock_show):
 
-        # Test with title_list as wrong length
+        # Test with title as wrong length
         with self.assertRaises(ValueError) as cm:
-            show1D(self.data, slice_list=None, title_list=["Title1"])
-        self.assertEqual(str(cm.exception), "title_list must be a list of strings equal to the number of plots")
+            show1D(self.data, slice_list=None, title=["Title1"])
+        self.assertEqual(str(cm.exception), "title must be a list of strings equal to the number of plots")
 
         with self.assertRaises(ValueError) as cm:
-            show1D(self.data, slice_list=[(0, 30), (1, 40)], title_list=["Title1", "Title2"])
-        self.assertEqual(str(cm.exception), "title_list must be a list of strings equal to the number of plots")
+            show1D(self.data, slice_list=[(0, 30), (1, 40)], title=["Title1", "Title2"])
+        self.assertEqual(str(cm.exception), "title must be a list of strings equal to the number of plots")
 
 
         try:
             fig = show1D(self.data, slice_list=None)
             mock_show.assert_called_once()
         except Exception as e:
-            self.fail(f"show1D raised an exception with default title_list: {e}")
+            self.fail(f"show1D raised an exception with default title: {e}")
 
         self.assertEqual(fig.figure.axes[0].get_title(), 'Slice at horizontal_y:64, horizontal_x:64')
         self.assertEqual(fig.figure.axes[1].get_title(), 'Slice at vertical:64, horizontal_x:64')
@@ -252,10 +252,10 @@ class TestShow1D(unittest.TestCase):
         mock_show.reset_mock()
 
         try:
-            fig = show1D(self.data, slice_list=None, title_list=["Title1", "Title2", "Title3"])
+            fig = show1D(self.data, slice_list=None, title=["Title1", "Title2", "Title3"])
             mock_show.assert_called_once()
         except Exception as e:
-            self.fail(f"show1D raised an exception with passed title_list: {e}")
+            self.fail(f"show1D raised an exception with passed title: {e}")
 
         self.assertEqual(fig.figure.axes[0].get_title(), 'Title1')
         self.assertEqual(fig.figure.axes[1].get_title(), 'Title2')
@@ -265,7 +265,7 @@ class TestShow1D(unittest.TestCase):
     @patch('matplotlib.pyplot.show')
     def test_show1D_input_axis_labels(self, mock_show):
 
-        # Test with title_list as wrong length
+        # Test with title as wrong length
         with self.assertRaises(ValueError) as cm:
             show1D(self.data, slice_list=None, axis_labels=[("X", "Y")])
         self.assertEqual(str(cm.exception), "axis_labels must be a tuple or a list of tuples equal to the number of plots")

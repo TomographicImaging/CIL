@@ -404,12 +404,6 @@ class FluxNormaliser(Processor):
 
         Defaults to the value set in the CIL multiprocessing module.'''
         return cil_mp.NUM_THREADS if self._num_threads is None else self._num_threads
-
-    def set_num_threads(self, value):
-        '''Set the optional number of threads parameter to use for the accelerated version.
-
-        This is discarded if ``accelerated=False``.'''
-        self._num_threads = value
         
     def process(self, out=None):
         self._calculate_flux()

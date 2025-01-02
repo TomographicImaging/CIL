@@ -124,7 +124,7 @@ class show1D(show_base):
     line_colours : str, list of str, default=None
         Overides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.
     line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
-        Overides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.
+        Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.
     axis_labels : tuple of str, list of tuples, optional
         Overides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.
     plot_size : tuple, default=(8,5)

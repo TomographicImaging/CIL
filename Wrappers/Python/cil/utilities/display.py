@@ -118,7 +118,7 @@ class show1D(show_base):
         Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.
         To plot multiple slices, pass a list of slices.        
     dataset_labels : list of str, optional
-        Overides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.
+        Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.
     title: list of str, optional
         Overides the default title for each plot. Must be a list of strings equal to the number of plots.
     line_colours : str, list of str, default=None

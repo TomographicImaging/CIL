@@ -3162,12 +3162,18 @@ class TestFluxNormaliser(unittest.TestCase):
             .set_angles(numpy.linspace(0,360,360,endpoint=False))\
             .set_panel([128,128],0.1)\
             .set_channels(4)
-
         self.data_multichannel = ag.allocate('random')
         self.data_slice = self.data_parallel.get_slice(vertical=1)
         self.data_reorder = self.data_cone.copy()
         self.data_reorder.reorder(['angle','horizontal','vertical'])
         self.data_single_angle = self.data_cone.get_slice(angle=1)
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,3,3,endpoint=False))\
+            .set_panel([3,3])
+        arr = numpy.array([[[1,2,3],[1,2,3],[1,2,3]],
+                        [[4,5,6],[4,5,6],[4,5,6]], 
+                        [[7,8,9],[7,8,9],[7,8,9]]])
+        self.data_simple = AcquisitionData(arr, geometry=ag)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3299,14 +3305,14 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertRaises(TypeError):
             processor._calculate_target()
         
-    @patch("matplotlib.pyplot.figure")
-    def test_preview_configuration(self, mock_plot):
+    @patch('matplotlib.pyplot.show')
+    def test_preview_configuration(self, mock_show):
         # Test error in preview configuration if there is no roi
         processor = FluxNormaliser(flux=10)
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
             processor.preview_configuration()
-
+        
         # Test error in preview configuration if set_input not called
         roi = {'horizontal':(25,40)}
         processor = FluxNormaliser(roi=roi)
@@ -3314,13 +3320,62 @@ class TestFluxNormaliser(unittest.TestCase):
 
             processor.preview_configuration()
 
+        # Test correct data is plotted
+        roi = {'horizontal':(0,3),'vertical':(0,1)}
+        processor = FluxNormaliser(roi=roi)
+        processor.set_input(self.data_simple)
+        fig = processor.preview_configuration()
+        
+        # Check slice plots
+        slice_plot1 = fig.axes[0].images[0].get_array().data
+        slice_plot2 = fig.axes[2].images[0].get_array().data
+        numpy.testing.assert_allclose(self.data_simple.array[0], slice_plot1)
+        numpy.testing.assert_allclose(self.data_simple.array[2], slice_plot2)
+
+        # Check ROI plots
+        for f in [fig.axes[0], fig.axes[2]]:
+            roi_x_lower = f.lines[0].get_xdata()
+            roi_x_upper = f.lines[1].get_xdata()
+            roi_y_lower = f.lines[0].get_ydata()
+            roi_y_upper = f.lines[1].get_ydata()
+            numpy.testing.assert_allclose(roi_x_lower, [0,3])
+            numpy.testing.assert_allclose(roi_x_upper, [0,3])
+            numpy.testing.assert_allclose(roi_y_lower, [0,0])
+            numpy.testing.assert_allclose(roi_y_upper, [1,1])
+
+            roi_x_left = f.lines[2].get_xdata()
+            roi_x_right = f.lines[3].get_xdata()
+            roi_y_left = f.lines[2].get_ydata()
+            roi_y_right = f.lines[3].get_ydata()
+            numpy.testing.assert_allclose(roi_x_left, [0,0])
+            numpy.testing.assert_allclose(roi_x_right, [3,3])
+            numpy.testing.assert_allclose(roi_y_left, [0,1])
+            numpy.testing.assert_allclose(roi_y_right, [0,1])
+
+        # Check line data
+        data_mean = self.data_simple.get_slice(vertical=1).array.mean(axis=1)
+        plot_mean = fig.axes[4].lines[0].get_ydata()
+        numpy.testing.assert_allclose(data_mean, plot_mean)
+
+        data_min = self.data_simple.get_slice(vertical=1).array.min(axis=1)
+        plot_min = fig.axes[4].lines[1].get_ydata()
+        numpy.testing.assert_allclose(data_min, plot_min)
+
+        data_max = self.data_simple.get_slice(vertical=1).array.max(axis=1)
+        plot_max = fig.axes[4].lines[2].get_ydata()
+        numpy.testing.assert_allclose(data_max, plot_max)
+
         # Test no error with preview_configuration with different data shapes
         for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
                      self.data_slice, self.data_reorder, self.data_single_angle]:
+            mock_show.reset_mock()
+
             roi = {'horizontal':(25,40)}
             processor = FluxNormaliser(roi=roi)
             processor.set_input(data)
-            processor.preview_configuration()
+            fig = processor.preview_configuration()
+            
+            mock_show.assert_called_once()
 
             # for 3D, check no error specifying a single angle to plot
             if data.geometry.dimension == '3D':

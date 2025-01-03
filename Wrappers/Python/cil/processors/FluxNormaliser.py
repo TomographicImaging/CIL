@@ -32,26 +32,31 @@ class FluxNormaliser(Processor):
 
     This processor reads in an AcquisitionData and normalises it by flux from
     a float or array of float values, or the mean flux in a region of interest.
+    Each projection is divided by its flux value and multiplied by the target.
 
     Parameters:
     -----------
     flux: float or list of floats, optional
-        The value to divide the image by. If flux is a list it must have length 
-        equal to the number of projections in the dataset. If flux=None, calculate
+        Array of floats that describe the variation in brightness of the unobstructed 
+        beam between projections. Must have length equal to the number of projections 
+        in the dataset, or be a single float. If flux=None, calculate
         flux from the roi.
     
     roi: dict, optional
         Dictionary describing the region of interest containing the background
-        in the image. The roi is specified as `{'horizontal':(start,stop), 
-        'vertical':(start,stop)}`. If an axis is not specified in the roi dictionary, 
-        the full range will be used.
+        in the image from which to extract the flux. The roi is specified as 
+        `{'horizontal':(start,stop), 'vertical':(start,stop)}`. If an axis is 
+        not specified in the roi dictionary, the full range will be used.
 
-    target: {'mean', 'first'} or float, default='mean'
-        The value to scale the normalised data with. If float, the data is scaled 
-        to the float value. If string 'mean' the data is scaled to the mean value 
-        of the input flux or flux across all rois. If 'first' the data is scaled to 
-        the first input flux value or the flux in the roi of the first projection.
+    target: {'mean', 'first', 'last'} or float, default='mean'
+        The target of the normalised data. If string the data is scaled by the 
+        'mean', 'first' or 'last' flux value. If float, the data is scaled 
+        by the float value.
         Default is 'mean'
+
+    accelerated: bool, optional
+        Specify whether to use multi-threading using numba. 
+        Default is True
 
     Returns:
     --------
@@ -59,22 +64,20 @@ class FluxNormaliser(Processor):
 
     Example
     -------
+    This example passes the flux as a list the same size as the data, and 
+    specifies the target='first' which scales all projections to the first flux
+    value 0.9
     >>> from cil.processors import FluxNormaliser
-    >>> processor = FluxNormaliser(flux=10)
+    >>> processor = FluxNormaliser(flux=[0.9, 1.0, 1.1, 0.8], target='first')
     >>> processor.set_input(data)
     >>> data_norm = processor.get_output()
 
     Example
     -------
+    This example calculates the flux from a region of interest for each projection
+    and scales all projections to the mean flux
     >>> from cil.processors import FluxNormaliser
-    >>> processor = FluxNormaliser(flux=np.arange(1,2,(2-1)/(data.get_dimension_size('angle'))))
-    >>> processor.set_input(data)
-    >>> data_norm = processor.get_output()
-
-    Example
-    -------
-    >>> from cil.processors import FluxNormaliser
-    >>> processor = FluxNormaliser(roi={'horizontal':(5, 15)})
+    >>> processor = FluxNormaliser(roi={'horizontal':(5, 15)}, target='mean')
     >>> processor.set_input(data)
     >>> data_norm = processor.get_output()
 
@@ -98,8 +101,7 @@ class FluxNormaliser(Processor):
                     'v_axis' : None,
                     'h_size' : 1,
                     'h_axis' : None,
-                    '_accelerated' : accelerated,
-                    '_num_threads' : None
+                    '_accelerated' : accelerated
                     }
             super(FluxNormaliser, self).__init__(**kwargs)
             
@@ -200,8 +202,6 @@ class FluxNormaliser(Processor):
                 raise TypeError("roi must be a dictionary, found {}"
                 .format(str(type(self.roi))))
         
-        
-
         # convert flux array to float32
         self.flux = numpy.array(self.flux, dtype=numpy.float32, ndmin=1)
 
@@ -235,6 +235,11 @@ class FluxNormaliser(Processor):
                     self.target_value = self.flux.flat[0]
                 else:
                     self.target_value = self.flux
+            elif self.target == 'last':
+                if len(numpy.shape(self.flux)) > 0 :
+                    self.target_value = self.flux.flat[-1]
+                else:
+                    self.target_value = self.flux
             elif self.target == 'mean':
                 self.target_value = numpy.mean(self.flux.ravel())
             else:
@@ -263,6 +268,11 @@ class FluxNormaliser(Processor):
 
         log: bool, default=False
             If True, plot the image with a log scale, default is False
+
+        Returns:
+        --------
+        matplotlib.figure.Figure
+            The figure object created to plot the configuration
         '''
         self._calculate_flux()
         if self.roi_slice is None:
@@ -332,10 +342,16 @@ class FluxNormaliser(Processor):
             ax2.set_xlabel('angle')
             
             plt.tight_layout()
+            
+            fig = plt.gcf()
             plt.show()
+
+            return fig
             
     def _plot_slice_roi(self, angle_index=None, channel_index=None, log=False, ax=111):
+        '''
         
+        '''
         data = self.get_input()
         if angle_index is not None and 'angle' in data.dimension_labels:
             data_slice = data.get_slice(angle=angle_index)
@@ -397,13 +413,6 @@ class FluxNormaliser(Processor):
 
         ax1.set_xlabel(h)
         ax1.set_ylabel(v)
-
-    @property
-    def num_threads(self):
-        '''Get the optional number of threads parameter to use for the accelerated version.
-
-        Defaults to the value set in the CIL multiprocessing module.'''
-        return cil_mp.NUM_THREADS if self._num_threads is None else self._num_threads
         
     def process(self, out=None):
         self._calculate_flux()
@@ -418,11 +427,11 @@ class FluxNormaliser(Processor):
         proj_size = self.v_size*self.h_size
         num_proj = int(data.array.size / proj_size)
         if self._accelerated:
-            num_threads = numba.get_num_threads()
-            numba.set_num_threads(self.num_threads)
+            num_threads_original = numba.get_num_threads()
+            numba.set_num_threads(cil_mp.NUM_THREADS)
             numba_loop(self.flux, self.target_value, num_proj, proj_size, out.array)
             # reset the number of threads to the original value
-            numba.set_num_threads(num_threads)
+            numba.set_num_threads(num_threads_original)
         else:
             serial_loop(self.flux, self.target_value, num_proj, proj_size, out.array)
 

@@ -3281,6 +3281,20 @@ class TestFluxNormaliser(unittest.TestCase):
         processor._calculate_target()
         self.assertAlmostEqual(processor.target_value, 1)
 
+        # check target calculated with method 'last'
+        processor = FluxNormaliser(flux=1, target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)),
+                                   target='last')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 3)
+
         # check target calculated with float
         processor = FluxNormaliser(flux=1,
                                    target=55.0)

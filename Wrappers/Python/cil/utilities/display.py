@@ -120,9 +120,9 @@ class show1D(show_base):
     dataset_labels : list of str, optional
         Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.
     title: list of str, optional
-        Overides the default title for each plot. Must be a list of strings equal to the number of plots.
+        Overrides the default title for each plot. Must be a list of strings equal to the number of plots.
     line_colours : str, list of str, default=None
-        Overides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.
+        Overrides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.
     line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
         Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.
     axis_labels : tuple of str, list of tuples, optional

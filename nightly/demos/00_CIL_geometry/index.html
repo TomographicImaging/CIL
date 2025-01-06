@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A detailed look at CIL geometry &#8212; CIL 24.2.1.dev18+gd58c330b documentation</title>
+    <title>A detailed look at CIL geometry &#8212; CIL 24.2.1.dev19+g5d9ced72 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../_static/documentation_options.js?v=9763db14"></script>
+    <script src="../../_static/documentation_options.js?v=5b49db93"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev18+gd58c330b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev19+g5d9ced72';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Tutorials" href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev18+gd58c330b" />
+  <meta name="docsearch:version" content="24.2.1.dev19+g5d9ced72" />
   </head>
   
   
@@ -533,7 +533,13 @@
 <p>The data-readers provided by CIL (Nikon, Zeiss and diamond nexus readers) will read in your data and return you a fully configured acquisition data with the acquisition geometry already configured, however if you read in a stack of tiffs or want to tweak the parameters this is simple to create by hand.</p>
 <section id="The-structure-of-an-AcquisitionGeometry">
 <h2>The structure of an AcquisitionGeometry<a class="headerlink" href="#The-structure-of-an-AcquisitionGeometry" title="Link to this heading">#</a></h2>
-<p>An instance of an <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="docutils literal notranslate"><span class="pre">ag</span></code>, holds the configuration of the system, in <code class="docutils literal notranslate"><span class="pre">config</span></code> which is subdivided in to: - <code class="docutils literal notranslate"><span class="pre">ag.config.system</span></code> - The position and orientations of the <code class="docutils literal notranslate"><span class="pre">source</span></code>/<code class="docutils literal notranslate"><span class="pre">ray</span></code>, <code class="docutils literal notranslate"><span class="pre">rotation_axis</span></code> and <code class="docutils literal notranslate"><span class="pre">detector</span></code> - <code class="docutils literal notranslate"><span class="pre">ag.config.panel</span></code> - The number of pixels, the size of pixels, and the position of pixel 0 - <code class="docutils literal notranslate"><span class="pre">ag.config.angles</span></code> - The number of angles, the unit of the angles (default is degrees) - <code class="docutils literal notranslate"><span class="pre">ag.config.channels</span></code> - The number of channels</p>
+<p>An instance of an <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="docutils literal notranslate"><span class="pre">ag</span></code>, holds the configuration of the system, in <code class="docutils literal notranslate"><span class="pre">config</span></code> which is subdivided in to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.system</span></code> - The position and orientations of the <code class="docutils literal notranslate"><span class="pre">source</span></code>/<code class="docutils literal notranslate"><span class="pre">ray</span></code>, <code class="docutils literal notranslate"><span class="pre">rotation_axis</span></code> and <code class="docutils literal notranslate"><span class="pre">detector</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.panel</span></code> - The number of pixels, the size of pixels, and the position of pixel 0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.angles</span></code> - The number of angles, the unit of the angles (default is degrees)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.channels</span></code> - The number of channels</p></li>
+</ul>
 </section>
 <section id="Create-a-simple-AcquisitionGeometry">
 <h2>Create a simple AcquisitionGeometry<a class="headerlink" href="#Create-a-simple-AcquisitionGeometry" title="Link to this heading">#</a></h2>
@@ -545,9 +551,19 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">ag</span> <span class="pre">=</span> <span class="pre">AcquisitionGeometry.create_Cone3D(source_position,</span> <span class="pre">detector_position)</span></code></p></li>
 </ul>
 <p>This notebook will step though each in turn and show you how to describe both simple and complex geometries with offsets and rotations.</p>
-<p>No matter which type of geometry you create you will also need to describe the panel and projection angles. - <code class="docutils literal notranslate"><span class="pre">ag.set_panel(num_pixels,</span> <span class="pre">pixel_size)</span></code> - <code class="docutils literal notranslate"><span class="pre">ag.set_angles(angles,</span> <span class="pre">angle_unit)</span></code></p>
-<p>For multi-channel data you need to add the number of channels. - <code class="docutils literal notranslate"><span class="pre">ag.set_channels(num_channels)</span></code></p>
-<p>And you will also need to describe the order your data is stored in using the relavent labels from the CIL default labels: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal</span></code> - <code class="docutils literal notranslate"><span class="pre">ag.set_labels(['angle','vertical','horizontal'])</span></code></p>
+<p>No matter which type of geometry you create you will also need to describe the panel and projection angles.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_panel(num_pixels,</span> <span class="pre">pixel_size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_angles(angles,</span> <span class="pre">angle_unit)</span></code></p></li>
+</ul>
+<p>For multi-channel data you need to add the number of channels.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_channels(num_channels)</span></code></p></li>
+</ul>
+<p>And you will also need to describe the order your data is stored in using the relavent labels from the CIL default labels: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_labels(['angle','vertical','horizontal'])</span></code></p></li>
+</ul>
 <section id="A-Note-on-CIL-AcquisitionGeometry:">
 <h3>A Note on CIL AcquisitionGeometry:<a class="headerlink" href="#A-Note-on-CIL-AcquisitionGeometry:" title="Link to this heading">#</a></h3>
 <ul class="simple">
@@ -651,7 +667,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fba0c19fbc0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f9188316ae0&gt;
 </pre></div></div>
 </div>
 </section>
@@ -692,7 +708,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e4707c80&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915fb99730&gt;
 </pre></div></div>
 </div>
 </section>
@@ -733,7 +749,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e4b85f10&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915f73a1e0&gt;
 </pre></div></div>
 </div>
 </section>
@@ -770,7 +786,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e420ed80&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915f2406b0&gt;
 </pre></div></div>
 </div>
 </section>
@@ -805,7 +821,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e45dcfe0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915f241e20&gt;
 </pre></div></div>
 </div>
 <p>You can set <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code>, <code class="docutils literal notranslate"><span class="pre">detector_direction_x</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_direction_y</span></code> by specifying a 3D directional vector <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code>.</p>
@@ -837,7 +853,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e45dc590&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f91881182c0&gt;
 </pre></div></div>
 </div>
 <p>In 3D datasets we can tilt the rotation axis to describe laminograpy geometry by changing <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code></p>
@@ -866,7 +882,7 @@ Distances in units: units distance
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fba0c0cf1a0&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915f59ff50&gt;
 </pre></div></div>
 </div>
 </section>
@@ -879,12 +895,21 @@ Distances in units: units distance
 <li><p>The offset of the volume from the rotation axis in voxels: <code class="docutils literal notranslate"><span class="pre">center_x</span></code>, <code class="docutils literal notranslate"><span class="pre">center_y</span></code>, <code class="docutils literal notranslate"><span class="pre">center_z</span></code></p></li>
 <li><p>The number of channels for multi-channel data</p></li>
 </ul>
-<p>You will also need to describe the order your data is stored in using the relevent labels from the CIL. The default labels are: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code>, <code class="docutils literal notranslate"><span class="pre">horizontal_y</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal_x</span></code> - <code class="docutils literal notranslate"><span class="pre">ig.set_labels(['vertical','horizontal_y','horizontal_x'])</span></code></p>
+<p>You will also need to describe the order your data is stored in using the relevent labels from the CIL. The default labels are: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code>, <code class="docutils literal notranslate"><span class="pre">horizontal_y</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal_x</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ig.set_labels(['vertical','horizontal_y','horizontal_x'])</span></code></p></li>
+</ul>
 </section>
 <section id="Create-a-simple-ImageGeometry">
 <h2>Create a simple ImageGeometry<a class="headerlink" href="#Create-a-simple-ImageGeometry" title="Link to this heading">#</a></h2>
 <p>To create a default ImageGeometry you can use: <code class="docutils literal notranslate"><span class="pre">ig</span> <span class="pre">=</span> <span class="pre">ag.get_ImageGeometry()</span></code></p>
-<p>This creates an ImageGeometry with: - <code class="docutils literal notranslate"><span class="pre">voxel_num_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_num_y</span></code> equal to the number of horizontal pixels of the panel - <code class="docutils literal notranslate"><span class="pre">voxel_num_z</span></code> equal to the number of vertical pixels of the panel - <code class="docutils literal notranslate"><span class="pre">voxel_size_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_size_y</span></code> is given by the horizontal pixel size divided by magnification - <code class="docutils literal notranslate"><span class="pre">voxel_size_z</span></code> is given by the vertical pixel size divided by magnification</p>
+<p>This creates an ImageGeometry with:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_num_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_num_y</span></code> equal to the number of horizontal pixels of the panel</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_num_z</span></code> equal to the number of vertical pixels of the panel</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_size_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_size_y</span></code> is given by the horizontal pixel size divided by magnification</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_size_z</span></code> is given by the vertical pixel size divided by magnification</p></li>
+</ul>
 <p>You can pass a resolution argument: <code class="docutils literal notranslate"><span class="pre">ig</span> <span class="pre">=</span> <span class="pre">ag.get_ImageGeometry(resolution)</span></code></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">resolution=0.5</span></code> double the size of your voxels, and half the number of voxels in each dimension</p></li>
@@ -1027,7 +1052,7 @@ ImageGeometry - Offset RoI
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;cil.utilities.display.show_geometry at 0x7fb9e4f82c00&gt;
+&lt;cil.utilities.display.show_geometry at 0x7f915fdc6c90&gt;
 </pre></div></div>
 </div>
 <p>We can also create an <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> directly.</p>

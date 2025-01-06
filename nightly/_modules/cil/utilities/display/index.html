@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.display &#8212; CIL 24.2.1.dev19+g5d9ced72 documentation</title>
+    <title>cil.utilities.display &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=5b49db93"></script>
+    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev19+g5d9ced72';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev19+g5d9ced72" />
+  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
   </head>
   
   
@@ -497,10 +497,10 @@
 <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">proj3d</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">CB_PALETTE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#377eb8&#39;</span><span class="p">,</span> <span class="s1">&#39;#ff7f00&#39;</span><span class="p">,</span> <span class="s1">&#39;#4daf4a&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;#f781bf&#39;</span><span class="p">,</span> <span class="s1">&#39;#a65628&#39;</span><span class="p">,</span> <span class="s1">&#39;#984ea3&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;#999999&#39;</span><span class="p">,</span> <span class="s1">&#39;#e41a1c&#39;</span><span class="p">,</span> <span class="s1">&#39;#dede00&#39;</span><span class="p">]</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">_PlotData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">axis_labels</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
@@ -537,6 +537,12 @@
 
 <span class="sd">        matplotlib kwargs can be passed, refer to documentation</span>
 <span class="sd">        https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            returns a matplotlib.pyplot figure object</span>
+<span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">file</span><span class="p">,</span><span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">extension</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
@@ -571,277 +577,285 @@
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.display.show1D">[docs]</a>
 <span class="k">class</span> <span class="nc">show1D</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This creates and displays 1D plots of pixel values by slicing</span>
-<span class="sd">    multi-dimensional data.</span>
+<span class="sd">    Displays the 1D line profile of a N-dimensional dataset along a specified axis.</span>
 
-<span class="sd">    The behaviour is as follows: if provided multiple datasets and a single</span>
-<span class="sd">    slice set (see first example below), one line plot will be generated</span>
-<span class="sd">    per dataset; if provided a single dataset and multiple sets of slices</span>
-<span class="sd">    (see second example below), one line plot will be generated per slice</span>
-<span class="sd">    set;  if provided multiple datasets and multiple slice sets, the</span>
-<span class="sd">    :math:`i`-th set of slices will apply to the :math:`i`-th dataset, with</span>
-<span class="sd">    a line plot generated in each case.</span>
+<span class="sd">    If multiple slices are provided, a plot will be generated for each slice.</span>
+
+<span class="sd">    If multiple datasets are provided, the same slice will be applied to each dataset.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data : DataContainer, list of DataContainer, tuple of DataContainer</span>
-<span class="sd">        Multi-dimensional data to be reduced to 1D.</span>
-<span class="sd">    slice_list : tuple, list of tuple or list of list of tuple, default=None</span>
-<span class="sd">        A tuple of (dimension, coordinate) pair, or a list, or nested list, of</span>
-<span class="sd">        such pairs for slicing `data` (default is None, which is only valid when 1D</span>
-<span class="sd">        data is passed)</span>
-<span class="sd">    label : &#39;default&#39;, str, list of str, None, default=&#39;default&#39;</span>
-<span class="sd">        Label(s) to use in the plot&#39;s legend. Use `None` to suppress legend.</span>
-<span class="sd">    title : str, default None</span>
-<span class="sd">        A title for the plot</span>
+<span class="sd">    data : ndarray i.e. DataContainer, numpy.ndarray or a list of ndarrays</span>
+<span class="sd">        The data to be sliced and plotted. If a list of DataContainers is passed, they must all have the same shape.</span>
+<span class="sd">    slice_list : list of tuples, or list of list of tuple, optional.</span>
+<span class="sd">        Describes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.</span>
+<span class="sd">        Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.</span>
+<span class="sd">        To plot multiple slices, pass a list of slices.        </span>
+<span class="sd">    dataset_labels : list of str, optional</span>
+<span class="sd">        Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.</span>
+<span class="sd">    title: list of str, optional</span>
+<span class="sd">        Overrides the default title for each plot. Must be a list of strings equal to the number of plots.</span>
 <span class="sd">    line_colours : str, list of str, default=None</span>
-<span class="sd">        Colour(s) for each line plot</span>
+<span class="sd">        Overrides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.</span>
 <span class="sd">    line_styles : {&quot;-&quot;,&quot;--&quot;,&quot;-.&quot;,&quot;:&quot;}, list of {&quot;-&quot;,&quot;--&quot;,&quot;-.&quot;,&quot;:&quot;}, default=None</span>
-<span class="sd">        Linestyle(s) for each line plot</span>
-<span class="sd">    axis_labels : tuple of str, list of str, default=(&#39;Index&#39;,&#39;Value&#39;)</span>
-<span class="sd">        Axis labels in the form (x_axis_label,y_axis_label)</span>
-<span class="sd">    size : tuple, default=(8,6)</span>
-<span class="sd">        The size of the figure</span>
+<span class="sd">        Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.</span>
+<span class="sd">    axis_labels : tuple of str, list of tuples, optional</span>
+<span class="sd">        Overrides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.</span>
+<span class="sd">    size : tuple, default=(8,3)</span>
+<span class="sd">        The size of each sub-plot in the figure.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    figure : matplotlib.figure.Figure</span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
 
+<span class="sd">    The figure can be saved using the `save` method . i.e.</span>
+<span class="sd">    &gt;&gt;&gt; fig = show2D(data, title=&#39;My Plot&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.save(&#39;/path/to/output.png&#39;)</span>
+<span class="sd">    </span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    This example creates two 2D datasets (images), and uses the provided</span>
-<span class="sd">    slicing information to generate two plots on the same axis,</span>
-<span class="sd">    corresponding to the two datasets.</span>
+<span class="sd">    This example uses a 3D dataset with no slicing information provided. The function</span>
+<span class="sd">    displays 3 subplots with the centre line profile shown along each axis.</span>
 
 <span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
-<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import PEPPERS</span>
-<span class="sd">    &gt;&gt;&gt; data = PEPPERS.get()</span>
-<span class="sd">    &gt;&gt;&gt; data_channel0 = data.get_slice(channel=0)</span>
-<span class="sd">    &gt;&gt;&gt; data_channel1 = data.get_slice(channel=1)</span>
-<span class="sd">    &gt;&gt;&gt; show1D([data_channel0, data_channel1], slice_list=[(&#39;horizontal_x&#39;, 256)],</span>
-<span class="sd">    ...        label=[&#39;Channel 0&#39;, &#39;Channel 1&#39;], line_styles=[&quot;--&quot;, &quot;-&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities import dataexample</span>
+<span class="sd">    &gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()</span>
+<span class="sd">    &gt;&gt;&gt; show1D(data, slice_list=None)</span>
 
-<span class="sd">    The following example uses two sets of slicing information applied to a</span>
-<span class="sd">    single dataset, resulting in two separate plots.</span>
+
+<span class="sd">    The following example shows a single line profile from a 3D dataset along the vertical axis.</span>
 
 <span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
-<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import PEPPERS</span>
-<span class="sd">    &gt;&gt;&gt; data = PEPPERS.get()</span>
-<span class="sd">    &gt;&gt;&gt; slices = [[(&#39;channel&#39;, 0), (&#39;horizontal_x&#39;, 256)], [(&#39;channel&#39;, 1), (&#39;horizontal_y&#39;, 256)]]</span>
-<span class="sd">    &gt;&gt;&gt; show1D(data, slice_list=slices, title=[&#39;Channel 0&#39;, &#39;Channel 1&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities import dataexample</span>
+<span class="sd">    &gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()</span>
+<span class="sd">    &gt;&gt;&gt; show1D(data, slice_list=[(&quot;Horizontal_x&quot;, 30),(&quot;Horizontal_y&quot;, 40)])</span>
+
+
+<span class="sd">    The following example shows multiple line profiles from a 3D dataset along the vertical axis.</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities import dataexample</span>
+<span class="sd">    &gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()</span>
+<span class="sd">    &gt;&gt;&gt; show1D(data, slice_list=[[(&quot;Vertical&quot;,62),(&quot;Horizontal_y&quot;,70)],[(&quot;Vertical&quot;,61),(&quot;Horizontal_y&quot;,70)],[(&quot;Vertical&quot;,67),(&quot;Horizontal_x&quot;,70)]])</span>
+
+
+<span class="sd">    The following example plots the same line profile from two datasets on the same plot.</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities import dataexample</span>
+<span class="sd">    &gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()</span>
+<span class="sd">    &gt;&gt;&gt; data2 = data*0.9</span>
+<span class="sd">    &gt;&gt;&gt; show1D([data, data2], slice_list=[(&quot;Horizontal_x&quot;, 30),(&quot;Horizontal_y&quot;, 40)])</span>
+
+<span class="sd">    </span>
+<span class="sd">    The following example shows the case where the input data is a numpy array.</span>
+<span class="sd">    The slice_list can be provided as (axis, index), where axis is an integer.</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; data = np.random.rand(10,10,10)</span>
+<span class="sd">    &gt;&gt;&gt; show1D(data, slice_list=[(0, 3),(2, 5)])</span>
+
+
+<span class="sd">    To save the figure, use the `save` method.</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities.display import show1D</span>
+<span class="sd">    &gt;&gt;&gt; from cil.utilities import dataexample</span>
+<span class="sd">    &gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()</span>
+<span class="sd">    &gt;&gt;&gt; fig = show1D(data, slice_list=None)</span>
+<span class="sd">    &gt;&gt;&gt; fig.save(&#39;/path/to/output.png&#39;)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">line_colours</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Index&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">),</span>
-                 <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">line_colours</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="p">,</span> <span class="n">dataset_labels</span><span class="o">=</span><span class="n">dataset_labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                                    <span class="n">line_colours</span><span class="o">=</span><span class="n">line_colours</span><span class="p">,</span> <span class="n">line_styles</span><span class="o">=</span><span class="n">line_styles</span><span class="p">,</span>
-                                   <span class="n">axis_labels</span><span class="o">=</span><span class="n">axis_labels</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+                                   <span class="n">axis_labels</span><span class="o">=</span><span class="n">axis_labels</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_extract_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_parse_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_list_in</span><span class="p">,</span> <span class="n">items_per_slice</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts a 1D vector by slicing multi-dimensional data using the</span>
-<span class="sd">        coordinates provided.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data : DataContainer or numpy.ndarray</span>
-<span class="sd">            Multi-dimensional data to be reduced to 1D.</span>
-<span class="sd">        coords : dict</span>
-<span class="sd">            The dimensions and coordinates used for slicing. If `data` is a</span>
-<span class="sd">            DataContainer, this should comprise dimensions from</span>
-<span class="sd">            `data.dimension_labels`. If `data` is a numpy.ndarray, integers</span>
-<span class="sd">            representing the axes should be used instead.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
-<span class="sd">            The 1-dimensional pixel flux data extracted from `data`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">vector</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">possible_dimensions</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">possible_dimensions</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_dimensions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
-            <span class="n">possible_dimensions</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_dimensions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Must provide slicing coordinates for multi-dimensional data&#39;</span><span class="p">)</span>
-
-        <span class="n">remaining_dimensions</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">possible_dimensions</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">remaining_dimensions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;One remaining dimension required, &#39;</span> \
-                            <span class="sa">f</span><span class="s1">&#39;found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_dimensions</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">remaining_dimensions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="n">data</span>
-            <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_dimensions</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected key &quot;</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">&quot;, not in &#39;</span> \
-                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">possible_dimensions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-
-            <span class="n">vector</span> <span class="o">=</span> <span class="n">s</span>
-
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
-            <span class="n">sliceme</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_dimensions</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected key &quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;, not in &#39;</span> \
-                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">possible_dimensions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">sliceme</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">):</span>
-                <span class="n">sliceme</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-
-            <span class="n">vector</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">sliceme</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">vector</span>
-
-    <span class="k">def</span> <span class="nf">_plot_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_colour</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates 1D plots of pixel flux from multi-dimensional data and slicing information.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        ax : matplotlib.axes.Axes</span>
-<span class="sd">            The axis to draw on</span>
-<span class="sd">        data : DataContainer</span>
-<span class="sd">            The data to be sliced and plotted</span>
-<span class="sd">        slice_list : tuple or list of tuples, optional</span>
-<span class="sd">            (dimension, coordinate) pairs for slicing `data` (default is</span>
-<span class="sd">            None, which is only valid when 1D data is passed)</span>
-<span class="sd">        label : str, default=None</span>
-<span class="sd">            Label to use in the plot&#39;s legend</span>
-<span class="sd">        line_colour : str, default=None</span>
-<span class="sd">            Colour of the line plot</span>
-<span class="sd">        line_style : {&quot;-&quot;,&quot;--&quot;,&quot;-.&quot;,&quot;:&quot;}, default=None</span>
-<span class="sd">            Linestyle to pass to `matplotlib.axes.Axes.plot`</span>
+<span class="sd">        Internal function to parse the slice_list input and convert it to a slice object to be applied to the data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">is_1d</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">is_1d</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">slice_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">slice_list</span><span class="p">]</span>
-
-        <span class="n">dims</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_1d</span><span class="p">:</span>
+        <span class="c1"># check enough slices are provided to output a single vector</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slice_list_in</span><span class="p">)</span> <span class="o">!=</span> <span class="n">items_per_slice</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;slice_list must provide a slice for ndim - 1 axes&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># convert axis labels to indices</span>
+        <span class="n">axis_indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">slice_list_in</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">slice_list</span><span class="p">:</span>
-                    <span class="n">dims</span><span class="p">[</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected tuple or list of tuples for slicing, &#39;</span> \
-                                <span class="sa">f</span><span class="s1">&#39;received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_vector</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">line_colour</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="n">line_style</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
-
-
-    <span class="k">def</span> <span class="nf">_show1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_colours</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">line_styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Pixel&#39;</span><span class="p">,</span> <span class="s1">&#39;Pixel value&#39;</span><span class="p">),</span> <span class="n">plot_size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Displays 1D plots of pixel flux from multi-dimensional data and</span>
-<span class="sd">        slicing information.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data : DataContainer, list of DataContainer or tuple of</span>
-<span class="sd">        DataContainer</span>
-<span class="sd">            The data to be sliced and plotted</span>
-<span class="sd">        slice_list : tuple, list of tuple, or list of list of tuple, optional</span>
-<span class="sd">            A (dimension, coordinate) pair or a list, or nested list, of such</span>
-<span class="sd">            pairs for slicing `data` (default is None, which is only valid when 1D</span>
-<span class="sd">            data is passed)</span>
-<span class="sd">        labels : &#39;default&#39;, str, list of str, None, default=&#39;default&#39;</span>
-<span class="sd">            Label(s) to use in the plot&#39;s legend. Use `None` to suppress legend.</span>
-<span class="sd">        titles : str, default=None</span>
-<span class="sd">            A title for the plot</span>
-<span class="sd">        line_colours : str, list of str, default=None</span>
-<span class="sd">            Colour(s) for each line plot</span>
-<span class="sd">        line_styles : {&quot;-&quot;,&quot;--&quot;,&quot;-.&quot;,&quot;:&quot;}, list of {&quot;-&quot;,&quot;--&quot;,&quot;-.&quot;,&quot;:&quot;}, default=None</span>
-<span class="sd">            Linestyle(s) for each line plot</span>
-<span class="sd">        axis_labels : tuple of str, list of str, default=(&#39;Index&#39;,&#39;Value&#39;)</span>
-<span class="sd">            Axis labels in the form (x_axis_label,y_axis_label)</span>
-<span class="sd">        num_cols : int, default=3</span>
-<span class="sd">            The number of columns in the grid of subplots produced in the</span>
-<span class="sd">            case of multiple plots</span>
-<span class="sd">        plot_size : tuple, default=(8,6)</span>
-<span class="sd">            The size of the figure</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        matplotlib.figure.Figure</span>
-<span class="sd">            The figure created to plot the 1D data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plot_size</span><span class="p">)</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">colour_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">CB_PALETTE</span><span class="p">)</span>
-        <span class="n">ls_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;--&quot;</span><span class="p">,</span><span class="s2">&quot;-.&quot;</span><span class="p">,</span><span class="s2">&quot;:&quot;</span><span class="p">])</span>
-        <span class="n">_lbls</span> <span class="o">=</span> <span class="n">labels</span>
-
-        <span class="k">if</span> <span class="n">slice_list</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
-
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_data</span><span class="p">):</span>
-                <span class="n">_data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">_cl</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colour_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_colours</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_colours</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">_ls</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ls_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">_lbl</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">elif</span> <span class="n">labels</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
-                    <span class="n">_lbl</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Dataset </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">_lbl</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">_data</span><span class="p">,</span> <span class="n">slice_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">_lbl</span><span class="p">,</span>
-                                <span class="n">line_colour</span><span class="o">=</span><span class="n">_cl</span><span class="p">,</span> <span class="n">line_style</span><span class="o">=</span><span class="n">_ls</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid axis label: </span><span class="si">{</span><span class="n">sl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">axis_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            
 
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># check axis are unique</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">axis_indices</span><span class="p">]))</span> <span class="o">!=</span> <span class="n">items_per_slice</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;slice_list contains duplicate axes. Each axis must be unique.&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">labels</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span> <span class="ow">or</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_lbls</span> <span class="o">=</span>  <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span><span class="o">*</span><span class="n">num_data</span><span class="p">)</span>
+        <span class="n">slice_ndim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span><span class="o">*</span><span class="n">ndim</span> 
+        
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">slice_list_in</span><span class="p">):</span>
+            <span class="n">slice_ndim</span><span class="p">[</span><span class="n">axis_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">slice_list_out</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">slice_ndim</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">slice_list_out</span>
 
-            <span class="k">if</span> <span class="n">num_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">slice_list</span><span class="p">):</span>
-                    <span class="n">_cl</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colour_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_colours</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_colours</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="n">_ls</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ls_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">labels</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
-                        <span class="n">_lbls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">_lbls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">line_colour</span><span class="o">=</span><span class="n">_cl</span><span class="p">,</span>
-                                     <span class="n">line_style</span><span class="o">=</span><span class="n">_ls</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">slice_list</span><span class="p">):</span>
-                    <span class="n">_cl</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colour_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_colours</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_colours</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="n">_ls</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ls_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">labels</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
-                        <span class="n">_lbls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Dataset </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">, &#39;</span> <span class="o">+</span> \
-                                   <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sl</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">_lbls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">line_colour</span><span class="o">=</span><span class="n">_cl</span><span class="p">,</span>
-                                     <span class="n">line_style</span><span class="o">=</span><span class="n">_ls</span><span class="p">)</span>
-
+    <span class="k">def</span> <span class="nf">_show1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset_labels</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line_colours</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">line_styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal function to display 1D plots of pixel flux from multi-dimensional data and slicing information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+       
+        <span class="c1"># check datasets</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ndim&#39;</span><span class="p">):</span>
+            <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+            <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected type for slice_list: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span><span class="si">}</span><span class="s1">, expected: (tuple, list of tuples, list of list of tuples)&#39;</span><span class="p">)</span>
+            <span class="n">data_list</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">num_data</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_data</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">data_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All datasets must have the same shape&quot;</span><span class="p">)</span>
+                
+        <span class="n">data_ndim</span> <span class="o">=</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="n">data_shape</span> <span class="o">=</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">items_per_slice</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dimension_labels</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Axis </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_ndim</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">slice_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># show the centre slice of each axes</span>
+            <span class="n">_slice_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">data_ndim</span> 
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_ndim</span><span class="p">):</span>
+                <span class="n">slice_ndim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span><span class="o">*</span><span class="n">data_ndim</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_ndim</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="n">slice_ndim</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">data_shape</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="n">_slice_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">slice_ndim</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="c1"># single slice only</span>
+                <span class="n">_slice_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span>
+                <span class="n">_slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_slice</span><span class="p">(</span><span class="n">slice_list</span><span class="p">,</span> <span class="n">items_per_slice</span><span class="p">,</span> <span class="n">data_ndim</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># multiple slices</span>
+                <span class="n">_slice_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slice_list</span><span class="p">)):</span>
+                    <span class="n">_slice_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_slice</span><span class="p">(</span><span class="n">slice_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">items_per_slice</span><span class="p">,</span> <span class="n">data_ndim</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;slice_list must contain a valid list of slices to generate 1D plots&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># set up plots</span>
+        <span class="n">CB_PALETTE</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#377eb8&#39;</span><span class="p">,</span> <span class="s1">&#39;#ff7f00&#39;</span><span class="p">,</span> <span class="s1">&#39;#4daf4a&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;#f781bf&#39;</span><span class="p">,</span> <span class="s1">&#39;#a65628&#39;</span><span class="p">,</span> <span class="s1">&#39;#984ea3&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;#999999&#39;</span><span class="p">,</span> <span class="s1">&#39;#e41a1c&#39;</span><span class="p">,</span> <span class="s1">&#39;#dede00&#39;</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">line_colours</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_colours</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_data</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span> <span class="p">(</span><span class="s2">&quot;line_colours must be a list of colours at least as long as the number of datasets, using default colour palette&quot;</span><span class="p">)</span>
+            <span class="n">line_colours</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">line_styles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_styles</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_data</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span> <span class="p">(</span><span class="s2">&quot;line_styles must be a list of styles at least as long as the number of datasets, using default line styles&quot;</span><span class="p">)</span>
+            <span class="n">line_styles</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="n">num_sub_plots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_slice_list</span><span class="p">)</span>
+        <span class="n">fig_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_sub_plots</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_sub_plots</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">fig_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_sub_plots</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sub_plots</span><span class="p">):</span>
+
+            <span class="c1">#reset the colour and line style</span>
+            <span class="n">colour_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">CB_PALETTE</span><span class="p">)</span>
+            <span class="n">ls_cyc</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;--&quot;</span><span class="p">,</span><span class="s2">&quot;-.&quot;</span><span class="p">,</span><span class="s2">&quot;:&quot;</span><span class="p">])</span>
+
+            <span class="c1"># extract the vectors</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_list</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="n">_cl</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colour_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_colours</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_colours</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">_ls</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ls_cyc</span><span class="p">)</span> <span class="k">if</span> <span class="n">line_styles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">line_styles</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+             
+                <span class="n">data_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">_slice_list</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+
+                <span class="k">if</span> <span class="n">dataset_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">_lbl</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Dataset </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset_labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_data</span><span class="p">:</span>
+                    <span class="n">_lbl</span> <span class="o">=</span> <span class="n">dataset_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dataset_labels must be a list of strings equal to the number of datasets&quot;</span><span class="p">)</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_line</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_cl</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">_ls</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">_lbl</span><span class="p">)</span>
+
+            <span class="c1"># get the unsliced index</span>
+            <span class="n">subplot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Slice at &quot;</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_slice_list</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">sl</span> <span class="o">==</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="n">x_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2"> index&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">subplot_title</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">sl</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2">, &quot;</span>
+
+            <span class="c1"># remove last two characters</span>
+            <span class="n">subplot_title</span> <span class="o">=</span> <span class="n">subplot_title</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">title</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_sub_plots</span><span class="p">:</span>
+                    <span class="n">subplot_title</span> <span class="o">=</span> <span class="n">title</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">subplot_title</span> <span class="o">=</span> <span class="n">title</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;title must be a list of strings equal to the number of plots&quot;</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">subplot_title</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">axis_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_sub_plots</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">axis_labels</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;axis_labels must be a tuple or a list of tuples equal to the number of plots&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_line</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_data</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_tight_layout</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+        <span class="c1">#plt.show() creates a new figure so we save a copy to return</span>
         <span class="n">fig2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fig2</span></div>
 
 
@@ -879,11 +893,14 @@
 <span class="sd">    size: tuple</span>
 <span class="sd">        Figure size in inches</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    matplotlib.figure.Figure</span>
-<span class="sd">        returns a matplotlib.pyplot figure object</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    The figure can be saved using the `save` method . i.e.</span>
+<span class="sd">    &gt;&gt;&gt; fig = show2D(data, title=&#39;My Plot&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.save(&#39;/path/to/output.png&#39;)</span>
+<span class="sd">   &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)):</span>
 
@@ -1513,10 +1530,13 @@
 <span class="sd">    fontsize: int</span>
 <span class="sd">        Set fontsize, default 10</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    matplotlib.figure.Figure</span>
-<span class="sd">        returns a matplotlib.pyplot figure object</span>
+<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    The figure can be saved using the `save` method . i.e.</span>
+<span class="sd">    &gt;&gt;&gt; fig = show2D(data, title=&#39;My Plot&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.save(&#39;/path/to/output.png&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 

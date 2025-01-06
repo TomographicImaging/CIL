@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utilities &#8212; CIL 24.2.1.dev19+g5d9ced72 documentation</title>
+    <title>Utilities &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
   
   
   
@@ -40,19 +40,17 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../_static/documentation_options.js?v=5b49db93"></script>
+    <script src="../_static/documentation_options.js?v=53a619f2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'utilities';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev19+g5d9ced72';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +60,7 @@
     <link rel="prev" title="Recon" href="../recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev19+g5d9ced72" />
+  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
   </head>
   
   
@@ -1054,19 +1052,27 @@ length of datacontainers, allows to set a different color map for each dataconta
 <li><p><strong>size</strong> (<em>tuple</em>) – Figure size in inches</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a matplotlib.pyplot figure object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.figure.Figure</p>
-</dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e.
+&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
+&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show2D.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show2D.save" title="Link to this definition">#</a></dt>
 <dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1076,70 +1082,91 @@ length of datacontainers, allows to set a different color map for each dataconta
 <h3>show1D - Display 1D slices<a class="headerlink" href="#show1d-display-1d-slices" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.utilities.display.show1D">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.display.</span></span><span class="sig-name descname"><span class="pre">show1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_styles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('Index',</span> <span class="pre">'Value')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">6)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/display/#show1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.display.show1D" title="Link to this definition">#</a></dt>
-<dd><p>This creates and displays 1D plots of pixel values by slicing
-multi-dimensional data.</p>
-<p>The behaviour is as follows: if provided multiple datasets and a single
-slice set (see first example below), one line plot will be generated
-per dataset; if provided a single dataset and multiple sets of slices
-(see second example below), one line plot will be generated per slice
-set;  if provided multiple datasets and multiple slice sets, the
-<span class="math notranslate nohighlight">\(i\)</span>-th set of slices will apply to the <span class="math notranslate nohighlight">\(i\)</span>-th dataset, with
-a line plot generated in each case.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.display.</span></span><span class="sig-name descname"><span class="pre">show1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_styles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">3)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/display/#show1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.display.show1D" title="Link to this definition">#</a></dt>
+<dd><p>Displays the 1D line profile of a N-dimensional dataset along a specified axis.</p>
+<p>If multiple slices are provided, a plot will be generated for each slice.</p>
+<p>If multiple datasets are provided, the same slice will be applied to each dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>list</em><em> of </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>tuple</em><em> of </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Multi-dimensional data to be reduced to 1D.</p></li>
-<li><p><strong>slice_list</strong> (<em>tuple</em><em>, </em><em>list</em><em> of </em><em>tuple</em><em> or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>tuple</em><em>, </em><em>default=None</em>) – A tuple of (dimension, coordinate) pair, or a list, or nested list, of
-such pairs for slicing <cite>data</cite> (default is None, which is only valid when 1D
-data is passed)</p></li>
-<li><p><strong>label</strong> (<em>'default'</em><em>, </em><em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em>, </em><em>None</em><em>, </em><em>default='default'</em>) – Label(s) to use in the plot’s legend. Use <cite>None</cite> to suppress legend.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>default None</em>) – A title for the plot</p></li>
-<li><p><strong>line_colours</strong> (<em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default=None</em>) – Colour(s) for each line plot</p></li>
-<li><p><strong>line_styles</strong> (<em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>list</em><em> of </em><em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>default=None</em>) – Linestyle(s) for each line plot</p></li>
-<li><p><strong>axis_labels</strong> (<em>tuple</em><em> of </em><em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default=</em><em>(</em><em>'Index'</em><em>,</em><em>'Value'</em><em>)</em>) – Axis labels in the form (x_axis_label,y_axis_label)</p></li>
-<li><p><strong>size</strong> (<em>tuple</em><em>, </em><em>default=</em><em>(</em><em>8</em><em>,</em><em>6</em><em>)</em>) – The size of the figure</p></li>
+<li><p><strong>data</strong> (<em>ndarray i.e. DataContainer</em><em>, </em><em>numpy.ndarray</em><em> or </em><em>a list</em><em> of </em><em>ndarrays</em>) – The data to be sliced and plotted. If a list of DataContainers is passed, they must all have the same shape.</p></li>
+<li><p><strong>slice_list</strong> (<em>list</em><em> of </em><em>tuples</em><em>, or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>tuple</em><em>, </em><em>optional.</em>) – Describes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.
+Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.
+To plot multiple slices, pass a list of slices.</p></li>
+<li><p><strong>dataset_labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.</p></li>
+<li><p><strong>title</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Overrides the default title for each plot. Must be a list of strings equal to the number of plots.</p></li>
+<li><p><strong>line_colours</strong> (<em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default=None</em>) – Overrides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.</p></li>
+<li><p><strong>line_styles</strong> (<em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>list</em><em> of </em><em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>default=None</em>) – Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.</p></li>
+<li><p><strong>axis_labels</strong> (<em>tuple</em><em> of </em><em>str</em><em>, </em><em>list</em><em> of </em><em>tuples</em><em>, </em><em>optional</em>) – Overrides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.</p></li>
+<li><p><strong>size</strong> (<em>tuple</em><em>, </em><em>default=</em><em>(</em><em>8</em><em>,</em><em>3</em><em>)</em>) – The size of each sub-plot in the figure.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cil.utilities.display.show1D.figure">
-<span class="sig-name descname"><span class="pre">figure</span></span><a class="headerlink" href="#cil.utilities.display.show1D.figure" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e.
+&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
+&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+</div>
 <p class="rubric">Examples</p>
-<p>This example creates two 2D datasets (images), and uses the provided
-slicing information to generate two plots on the same axis,
-corresponding to the two datasets.</p>
+<p>This example uses a 3D dataset with no slicing information provided. The function
+displays 3 subplots with the centre line profile shown along each axis.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show1D</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">PEPPERS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">PEPPERS</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data_channel0</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data_channel1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">([</span><span class="n">data_channel0</span><span class="p">,</span> <span class="n">data_channel1</span><span class="p">],</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">256</span><span class="p">)],</span>
-<span class="gp">... </span>       <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Channel 0&#39;</span><span class="p">,</span> <span class="s1">&#39;Channel 1&#39;</span><span class="p">],</span> <span class="n">line_styles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The following example uses two sets of slicing information applied to a
-single dataset, resulting in two separate plots.</p>
+<p>The following example shows a single line profile from a 3D dataset along the vertical axis.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show1D</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">PEPPERS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">PEPPERS</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slices</span> <span class="o">=</span> <span class="p">[[(</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">256</span><span class="p">)],</span> <span class="p">[(</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span> <span class="mi">256</span><span class="p">)]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Channel 0&#39;</span><span class="p">,</span> <span class="s1">&#39;Channel 1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
 </pre></div>
 </div>
+<p>The following example shows multiple line profiles from a 3D dataset along the vertical axis.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">62</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">61</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">67</span><span class="p">),(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)]])</span>
+</pre></div>
+</div>
+<p>The following example plots the same line profile from two datasets on the same plot.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data2</span> <span class="o">=</span> <span class="n">data</span><span class="o">*</span><span class="mf">0.9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">],</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The following example shows the case where the input data is a numpy array.
+The slice_list can be provided as (axis, index), where axis is an integer.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>To save the figure, use the <cite>save</cite> method.
+&gt;&gt;&gt; from cil.utilities.display import show1D
+&gt;&gt;&gt; from cil.utilities import dataexample
+&gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+&gt;&gt;&gt; fig = show1D(data, slice_list=None)
+&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show1D.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show1D.save" title="Link to this definition">#</a></dt>
 <dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1165,19 +1192,27 @@ for 2D geometries elevation and azimuthal cannot be changed</p>
 <li><p><strong>fontsize</strong> (<em>int</em>) – Set fontsize, default 10</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a matplotlib.pyplot figure object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>matplotlib.figure.Figure</p>
-</dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e.
+&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
+&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show_geometry.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show_geometry.save" title="Link to this definition">#</a></dt>
 <dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

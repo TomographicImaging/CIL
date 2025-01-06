@@ -114,7 +114,7 @@ class show1D(show_base):
     data : ndarray i.e. DataContainer, numpy.ndarray or a list of ndarrays
         The data to be sliced and plotted. If a list of DataContainers is passed, they must all have the same shape.
     slice_list : list of tuples, or list of list of tuple, optional.
-        Descibes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.
+        Describes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.
         Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.
         To plot multiple slices, pass a list of slices.        
     dataset_labels : list of str, optional

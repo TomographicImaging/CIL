@@ -18,6 +18,8 @@
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
+- Testing
+    - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
 
 
 * 24.2.0

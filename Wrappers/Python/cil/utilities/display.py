@@ -71,6 +71,12 @@ class show_base(object):
 
         matplotlib kwargs can be passed, refer to documentation
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            returns a matplotlib.pyplot figure object
+        
         '''
         file,extension = os.path.splitext(os.path.abspath(filename))
         extension = extension.strip('.')
@@ -130,12 +136,12 @@ class show1D(show_base):
     size : tuple, default=(8,3)
         The size of each sub-plot in the figure.
 
+    Note
+    ----
 
-    Returns
-    -------
-    matplotlib.figure.Figure
-        The figure created to plot the 1D data
-
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
     
     Examples
     --------
@@ -181,6 +187,15 @@ class show1D(show_base):
     >>> import numpy as np
     >>> data = np.random.rand(10,10,10)
     >>> show1D(data, slice_list=[(0, 3),(2, 5)])
+
+
+    To save the figure, use the `save` method.
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> fig = show1D(data, slice_list=None)
+    >>> fig.save('/path/to/output.png')
+
     """
 
     def __init__(self, data, slice_list=None, dataset_labels=None, title=None,
@@ -407,11 +422,14 @@ class show2D(show_base):
     size: tuple
         Figure size in inches
 
-    Returns
-    -------
-    matplotlib.figure.Figure
-        returns a matplotlib.pyplot figure object
-    '''
+        
+    Note
+    ----
+
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
+   '''
 
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
 
@@ -1038,10 +1056,13 @@ class show_geometry(show_base):
     fontsize: int
         Set fontsize, default 10
 
-    Returns
-    -------
-    matplotlib.figure.Figure
-        returns a matplotlib.pyplot figure object
+        
+    Note
+    ----
+
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
     '''
 
 

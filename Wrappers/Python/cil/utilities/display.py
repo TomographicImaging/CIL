@@ -31,10 +31,10 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from itertools import cycle
+import logging
 
-CB_PALETTE = ['#377eb8', '#ff7f00', '#4daf4a',
-              '#f781bf', '#a65628', '#984ea3',
-              '#999999', '#e41a1c', '#dede00']
+log = logging.getLogger(__name__)
+
 
 class _PlotData(object):
     def __init__(self, data, title, axis_labels, origin):
@@ -71,6 +71,12 @@ class show_base(object):
 
         matplotlib kwargs can be passed, refer to documentation
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            returns a matplotlib.pyplot figure object
+        
         '''
         file,extension = os.path.splitext(os.path.abspath(filename))
         extension = extension.strip('.')
@@ -103,277 +109,285 @@ class show_base(object):
 
 class show1D(show_base):
     """
-    This creates and displays 1D plots of pixel values by slicing
-    multi-dimensional data.
+    Displays the 1D line profile of a N-dimensional dataset along a specified axis.
 
-    The behaviour is as follows: if provided multiple datasets and a single
-    slice set (see first example below), one line plot will be generated
-    per dataset; if provided a single dataset and multiple sets of slices
-    (see second example below), one line plot will be generated per slice
-    set;  if provided multiple datasets and multiple slice sets, the
-    :math:`i`-th set of slices will apply to the :math:`i`-th dataset, with
-    a line plot generated in each case.
+    If multiple slices are provided, a plot will be generated for each slice.
+
+    If multiple datasets are provided, the same slice will be applied to each dataset.
 
     Parameters
     ----------
-    data : DataContainer, list of DataContainer, tuple of DataContainer
-        Multi-dimensional data to be reduced to 1D.
-    slice_list : tuple, list of tuple or list of list of tuple, default=None
-        A tuple of (dimension, coordinate) pair, or a list, or nested list, of
-        such pairs for slicing `data` (default is None, which is only valid when 1D
-        data is passed)
-    label : 'default', str, list of str, None, default='default'
-        Label(s) to use in the plot's legend. Use `None` to suppress legend.
-    title : str, default None
-        A title for the plot
+    data : ndarray i.e. DataContainer, numpy.ndarray or a list of ndarrays
+        The data to be sliced and plotted. If a list of DataContainers is passed, they must all have the same shape.
+    slice_list : list of tuples, or list of list of tuple, optional.
+        Describes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.
+        Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.
+        To plot multiple slices, pass a list of slices.        
+    dataset_labels : list of str, optional
+        Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.
+    title: list of str, optional
+        Overrides the default title for each plot. Must be a list of strings equal to the number of plots.
     line_colours : str, list of str, default=None
-        Colour(s) for each line plot
+        Overrides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.
     line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
-        Linestyle(s) for each line plot
-    axis_labels : tuple of str, list of str, default=('Index','Value')
-        Axis labels in the form (x_axis_label,y_axis_label)
-    size : tuple, default=(8,6)
-        The size of the figure
+        Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.
+    axis_labels : tuple of str, list of tuples, optional
+        Overrides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.
+    size : tuple, default=(8,3)
+        The size of each sub-plot in the figure.
 
-    Attributes
-    ----------
-    figure : matplotlib.figure.Figure
+    Note
+    ----
 
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
+    
     Examples
     --------
 
-    This example creates two 2D datasets (images), and uses the provided
-    slicing information to generate two plots on the same axis,
-    corresponding to the two datasets.
+    This example uses a 3D dataset with no slicing information provided. The function
+    displays 3 subplots with the centre line profile shown along each axis.
 
     >>> from cil.utilities.display import show1D
-    >>> from cil.utilities.dataexample import PEPPERS
-    >>> data = PEPPERS.get()
-    >>> data_channel0 = data.get_slice(channel=0)
-    >>> data_channel1 = data.get_slice(channel=1)
-    >>> show1D([data_channel0, data_channel1], slice_list=[('horizontal_x', 256)],
-    ...        label=['Channel 0', 'Channel 1'], line_styles=["--", "-"])
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> show1D(data, slice_list=None)
 
-    The following example uses two sets of slicing information applied to a
-    single dataset, resulting in two separate plots.
+
+    The following example shows a single line profile from a 3D dataset along the vertical axis.
 
     >>> from cil.utilities.display import show1D
-    >>> from cil.utilities.dataexample import PEPPERS
-    >>> data = PEPPERS.get()
-    >>> slices = [[('channel', 0), ('horizontal_x', 256)], [('channel', 1), ('horizontal_y', 256)]]
-    >>> show1D(data, slice_list=slices, title=['Channel 0', 'Channel 1'])
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> show1D(data, slice_list=[("Horizontal_x", 30),("Horizontal_y", 40)])
+
+
+    The following example shows multiple line profiles from a 3D dataset along the vertical axis.
+
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> show1D(data, slice_list=[[("Vertical",62),("Horizontal_y",70)],[("Vertical",61),("Horizontal_y",70)],[("Vertical",67),("Horizontal_x",70)]])
+
+
+    The following example plots the same line profile from two datasets on the same plot.
+
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> data2 = data*0.9
+    >>> show1D([data, data2], slice_list=[("Horizontal_x", 30),("Horizontal_y", 40)])
+
+    
+    The following example shows the case where the input data is a numpy array.
+    The slice_list can be provided as (axis, index), where axis is an integer.
+    
+    >>> from cil.utilities.display import show1D
+    >>> import numpy as np
+    >>> data = np.random.rand(10,10,10)
+    >>> show1D(data, slice_list=[(0, 3),(2, 5)])
+
+
+    To save the figure, use the `save` method.
+    >>> from cil.utilities.display import show1D
+    >>> from cil.utilities import dataexample
+    >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+    >>> fig = show1D(data, slice_list=None)
+    >>> fig.save('/path/to/output.png')
+
     """
 
-    def __init__(self, data, slice_list=None, label='default', title=None,
-                 line_colours=None, line_styles=None, axis_labels=('Index', 'Value'),
-                 size=(8,6)):
+    def __init__(self, data, slice_list=None, dataset_labels=None, title=None,
+                 line_colours=None, line_styles=None, axis_labels=None,
+                 size=(8,3)):
 
-        self.figure = self._show1d(data, slice_list, labels=label, title=title,
+        self.figure = self._show1d(data, slice_list, dataset_labels=dataset_labels, title=title,
                                    line_colours=line_colours, line_styles=line_styles,
-                                   axis_labels=axis_labels, plot_size=size)
+                                   axis_labels=axis_labels, size=size)
 
-    def _extract_vector(self, data, coords):
+
+    def _parse_slice(self, slice_list_in, items_per_slice, ndim, labels):
         """
-        Extracts a 1D vector by slicing multi-dimensional data using the
-        coordinates provided.
-
-        Parameters
-        ----------
-        data : DataContainer or numpy.ndarray
-            Multi-dimensional data to be reduced to 1D.
-        coords : dict
-            The dimensions and coordinates used for slicing. If `data` is a
-            DataContainer, this should comprise dimensions from
-            `data.dimension_labels`. If `data` is a numpy.ndarray, integers
-            representing the axes should be used instead.
-
-        Returns
-        -------
-        numpy.ndarray
-            The 1-dimensional pixel flux data extracted from `data`.
-        """
-        vector = None
-        possible_dimensions = None
-
-        if isinstance(data, np.ndarray):
-            possible_dimensions = [i for i in range(len(data.shape))]
-            if len(possible_dimensions) == 1:
-                return data
-        elif isinstance(data, DataContainer):
-            possible_dimensions = data.dimension_labels
-            if len(possible_dimensions) == 1:
-                return data.as_array()
-
-        if coords is None:
-            raise TypeError(f'Must provide slicing coordinates for multi-dimensional data')
-
-        remaining_dimensions = set(possible_dimensions) - set(coords.keys())
-        if len(remaining_dimensions) > 1:
-            raise ValueError(f'One remaining dimension required, ' \
-                            f'found {len(remaining_dimensions)}: {remaining_dimensions}')
-
-        if isinstance(data, np.ndarray):
-            s = data
-            for d, i in coords.items():
-                if d not in possible_dimensions:
-                    raise ValueError(f'Unexpected key "{d}", not in ' \
-                                    f'{possible_dimensions}')
-                else:
-                    s = s.take(indices=i, axis=d)
-
-            vector = s
-
-        elif isinstance(data, DataContainer):
-            sliceme = {}
-            for k,v in coords.items():
-                if k not in possible_dimensions:
-                    raise ValueError(f'Unexpected key "{k}", not in ' \
-                                    f'{possible_dimensions}')
-                else:
-                    sliceme[k] = v
-
-            if isinstance(data, AcquisitionData) or isinstance(data, ImageData):
-                sliceme['force'] = True
-
-            vector = data.get_slice(**sliceme).as_array()
-
-        return vector
-
-    def _plot_slice(self, ax, data, slice_list=None,
-                   label=None, line_colour=None, line_style=None):
-        """
-        Creates 1D plots of pixel flux from multi-dimensional data and slicing information.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes.Axes
-            The axis to draw on
-        data : DataContainer
-            The data to be sliced and plotted
-        slice_list : tuple or list of tuples, optional
-            (dimension, coordinate) pairs for slicing `data` (default is
-            None, which is only valid when 1D data is passed)
-        label : str, default=None
-            Label to use in the plot's legend
-        line_colour : str, default=None
-            Colour of the line plot
-        line_style : {"-","--","-.",":"}, default=None
-            Linestyle to pass to `matplotlib.axes.Axes.plot`
+        Internal function to parse the slice_list input and convert it to a slice object to be applied to the data.
         """
 
-        is_1d = False
-        if len(data.shape) == 1:
-            is_1d = True
-
-        if isinstance(slice_list, tuple):
-            slice_list = [slice_list]
-
-        dims = {}
-        if not is_1d:
+        # check enough slices are provided to output a single vector
+        if len(slice_list_in) != items_per_slice:
+            raise ValueError("slice_list must provide a slice for ndim - 1 axes")
+        
+        # convert axis labels to indices
+        axis_indices = []
+        for sl in slice_list_in:
             try:
-                for el in slice_list:
-                    dims[el[0]] = el[1]
-            except TypeError:
-                raise TypeError(f'Expected tuple or list of tuples for slicing, ' \
-                                f'received {type(slice_list)}')
-
-        arr = self._extract_vector(data, dims)
-        ax.plot(arr, color=line_colour, ls=line_style, label=label)
-
-
-    def _show1d(self, data, slice_list=None, labels='default', title=None, line_colours=None,
-                line_styles=None, axis_labels=('Pixel', 'Pixel value'), plot_size=(8,6)):
-        """
-        Displays 1D plots of pixel flux from multi-dimensional data and
-        slicing information.
-
-        Parameters
-        ----------
-        data : DataContainer, list of DataContainer or tuple of
-        DataContainer
-            The data to be sliced and plotted
-        slice_list : tuple, list of tuple, or list of list of tuple, optional
-            A (dimension, coordinate) pair or a list, or nested list, of such
-            pairs for slicing `data` (default is None, which is only valid when 1D
-            data is passed)
-        labels : 'default', str, list of str, None, default='default'
-            Label(s) to use in the plot's legend. Use `None` to suppress legend.
-        titles : str, default=None
-            A title for the plot
-        line_colours : str, list of str, default=None
-            Colour(s) for each line plot
-        line_styles : {"-","--","-.",":"}, list of {"-","--","-.",":"}, default=None
-            Linestyle(s) for each line plot
-        axis_labels : tuple of str, list of str, default=('Index','Value')
-            Axis labels in the form (x_axis_label,y_axis_label)
-        num_cols : int, default=3
-            The number of columns in the grid of subplots produced in the
-            case of multiple plots
-        plot_size : tuple, default=(8,6)
-            The size of the figure
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            The figure created to plot the 1D data
-        """
-
-        fig = plt.figure(figsize=plot_size)
-        ax = fig.add_subplot(1, 1, 1)
-
-        num_data = 1 if isinstance(data, DataContainer) else len(data)
-        colour_cyc = cycle(CB_PALETTE)
-        ls_cyc = cycle(["-","--","-.",":"])
-        _lbls = labels
-
-        if slice_list is None or isinstance(slice_list, tuple) or isinstance(slice_list[0], tuple):
-
-            for i in range(num_data):
-                _data = data if isinstance(data, DataContainer) else data[i]
-                _cl = next(colour_cyc) if line_colours is None else line_colours[i]
-                _ls = next(ls_cyc) if line_styles is None else line_styles[i]
-                if labels is None:
-                    _lbl = None
-                elif labels == 'default':
-                    _lbl = f'Dataset {i}'
+                ind = int(sl[0])
+            except:
+                if sl[0] in labels:
+                    ind = labels.index(sl[0])
                 else:
-                    _lbl = labels[i]
-                self._plot_slice(ax, _data, slice_list, label=_lbl,
-                                line_colour=_cl, line_style=_ls)
+                    raise ValueError(f"Invalid axis label: {sl[0]}")
+            axis_indices.append(ind)
+            
 
-        elif isinstance(slice_list[0], list):
+        # check axis are unique
+        if len(set([index for index in axis_indices])) != items_per_slice:
+            raise ValueError("slice_list contains duplicate axes. Each axis must be unique.")
 
-            if labels == 'default' or labels is None:
-                _lbls =  [None]*(len(slice_list)*num_data)
+        slice_ndim = [slice(None)]*ndim 
+        
+        for i, sl in enumerate(slice_list_in):
+            slice_ndim[axis_indices[i]] = slice(sl[1], sl[1] + 1)
+        
+        slice_list_out = tuple(slice_ndim)
+        
+        return slice_list_out
 
-            if num_data == 1:
-                for i, sl in enumerate(slice_list):
-                    _cl = next(colour_cyc) if line_colours is None else line_colours[i]
-                    _ls = next(ls_cyc) if line_styles is None else line_styles[i]
-                    if labels == 'default':
-                        _lbls[i] = ', '.join(f'{c[0]}={c[1]}' for c in sl)
-                    self._plot_slice(ax, data, sl, label=_lbls[i], line_colour=_cl,
-                                     line_style=_ls)
-            else:
-                for i, sl in enumerate(slice_list):
-                    _cl = next(colour_cyc) if line_colours is None else line_colours[i]
-                    _ls = next(ls_cyc) if line_styles is None else line_styles[i]
-                    if labels == 'default':
-                        _lbls[i] = f'Dataset {i}, ' + \
-                                   ', '.join(f'{c[0]}={c[1]}' for c in sl)
-                    self._plot_slice(ax, data[i], sl, label=_lbls[i], line_colour=_cl,
-                                     line_style=_ls)
-
+    def _show1d(self, data, slice_list=None, dataset_labels='default', title=None, line_colours=None,
+                line_styles=None, axis_labels='default', size=(8,3)):
+        """
+        Internal function to display 1D plots of pixel flux from multi-dimensional data and slicing information.
+        """
+       
+        # check datasets
+        if hasattr(data, 'ndim'):
+            data_list = [data]
+            num_data = 1
         else:
-            raise TypeError(f'Unexpected type for slice_list: {type(slice_list)}, expected: (tuple, list of tuples, list of list of tuples)')
+            data_list = data
+            num_data = len(data)
 
-        ax.set_title(title)
-        ax.set_xlabel(axis_labels[0])
-        ax.set_ylabel(axis_labels[1])
-        if labels is not None:
-            fig.legend(loc='upper left', bbox_to_anchor=(1., 0., 1., 1.))
-        plt.tight_layout()
+            for i in range(1, num_data):
+                if data_list[i].shape != data_list[0].shape:
+                    raise ValueError("All datasets must have the same shape")
+                
+        data_ndim = data_list[0].ndim
+        data_shape = data_list[0].shape
+        items_per_slice = len(data_shape) - 1
+
+        try:
+            labels = data_list[0].dimension_labels
+        except:
+            labels = [f"Axis {i}" for i in range(data_ndim)]
+
+        if slice_list is None:
+            # show the centre slice of each axes
+            _slice_list = [None]*data_ndim 
+
+            for i in range(data_ndim):
+                slice_ndim = [slice(None)]*data_ndim
+                for j in range(data_ndim):
+                    if i != j:
+                        slice_ndim[j] = slice(data_shape[j]//2, data_shape[j]//2 + 1)
+
+                _slice_list[i] = tuple(slice_ndim)
+        
+        elif isinstance(slice_list, list):
+            if isinstance(slice_list[0], tuple):
+                # single slice only
+                _slice_list = [None]*1
+                _slice_list[0] = self._parse_slice(slice_list, items_per_slice, data_ndim, labels)
+
+            elif isinstance(slice_list[0], list):
+                # multiple slices
+                _slice_list = [None]*len(slice_list)
+
+                for i in range(len(slice_list)):
+                    _slice_list[i]  = self._parse_slice(slice_list[i], items_per_slice, data_ndim, labels)
+            else:
+                raise ValueError("slice_list must contain a valid list of slices to generate 1D plots")
+        
+        # set up plots
+        CB_PALETTE = ['#377eb8', '#ff7f00', '#4daf4a',
+                    '#f781bf', '#a65628', '#984ea3',
+                    '#999999', '#e41a1c', '#dede00']
+        
+        if line_colours is not None and len(line_colours) < num_data:
+            log.warning ("line_colours must be a list of colours at least as long as the number of datasets, using default colour palette")
+            line_colours = None
+
+        if line_styles is not None and len(line_styles) < num_data:
+            log.warning ("line_styles must be a list of styles at least as long as the number of datasets, using default line styles")
+            line_styles = None
+        
+        num_sub_plots = len(_slice_list)
+        fig_size = (size[0], size[1] * num_sub_plots)
+        fig, (ax) = plt.subplots(num_sub_plots, figsize=fig_size)
+
+        if num_sub_plots == 1:
+            ax = np.array(ax)
+
+        for i in range(num_sub_plots):
+
+            #reset the colour and line style
+            colour_cyc = cycle(CB_PALETTE)
+            ls_cyc = cycle(["-","--","-.",":"])
+
+            # extract the vectors
+            for j, x in enumerate(data_list):
+                try:
+                    x = x.as_array()
+                except:
+                    pass
+
+                _cl = next(colour_cyc) if line_colours is None else line_colours[j]
+                _ls = next(ls_cyc) if line_styles is None else line_styles[j]
+             
+                data_line = np.squeeze(x[_slice_list[i]])
+
+                if dataset_labels is None:
+                    _lbl = f'Dataset {j}'
+                elif isinstance(dataset_labels, list) and len(dataset_labels) == num_data:
+                    _lbl = dataset_labels[j]
+                else:
+                    raise ValueError("dataset_labels must be a list of strings equal to the number of datasets")
+
+                ax.flat[i].plot(data_line, color=_cl, linestyle=_ls, label=_lbl)
+
+            # get the unsliced index
+            subplot_title = f"Slice at "
+            for j, sl in enumerate(_slice_list[i]):
+                if sl == slice(None):
+                    x_label = f"{labels[j]} index"
+                else:
+                    subplot_title += f"{labels[j]}:{sl.start}, "
+
+            # remove last two characters
+            subplot_title = subplot_title[:-2]
+
+            if title is not None:
+                if isinstance(title, list) and len(title) == num_sub_plots:
+                    subplot_title = title[i]
+                elif isinstance(title, str):
+                    subplot_title = title
+                else:
+                    raise ValueError("title must be a list of strings equal to the number of plots")
+
+            ax.flat[i].set_title(subplot_title)
+
+            if axis_labels is not None:
+                if isinstance(axis_labels, tuple):
+                    ax.flat[i].set_xlabel(axis_labels[0])
+                    ax.flat[i].set_ylabel(axis_labels[1])
+                elif isinstance(axis_labels, list) and len(axis_labels) == num_sub_plots:
+                    ax.flat[i].set_xlabel(axis_labels[i][0])
+                    ax.flat[i].set_ylabel(axis_labels[i][1])
+                else:
+                    raise ValueError("axis_labels must be a tuple or a list of tuples equal to the number of plots")
+            else:
+                ax.flat[i].set_xlabel(x_label)
+                ax.flat[i].set_ylabel("Value")
+
+            ax.flat[i].set_xlim(0, len(data_line)-1)
+
+            if num_data > 1:
+                ax.flat[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+        fig.set_tight_layout(True)
+        fig.set_facecolor('w')
+
+        #plt.show() creates a new figure so we save a copy to return
         fig2 = plt.gcf()
+        plt.show()
         return fig2
 
 
@@ -408,11 +422,14 @@ class show2D(show_base):
     size: tuple
         Figure size in inches
 
-    Returns
-    -------
-    matplotlib.figure.Figure
-        returns a matplotlib.pyplot figure object
-    '''
+        
+    Note
+    ----
+
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
+   '''
 
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
 
@@ -1039,10 +1056,13 @@ class show_geometry(show_base):
     fontsize: int
         Set fontsize, default 10
 
-    Returns
-    -------
-    matplotlib.figure.Figure
-        returns a matplotlib.pyplot figure object
+        
+    Note
+    ----
+
+    The figure can be saved using the `save` method . i.e.
+    >>> fig = show2D(data, title='My Plot')
+    >>> fig.save('/path/to/output.png')
     '''
 
 

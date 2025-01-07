@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.utilities &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.io.utilities &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,13 +482,13 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
 
-<span class="k">def</span> <span class="nf">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether the data needs to be compressed and to which numpy type</span>
 
 <span class="sd">    Parameters:</span>
@@ -520,7 +520,7 @@
 
     <span class="k">return</span> <span class="n">compress</span>
 
-<span class="k">def</span> <span class="nf">get_compressed_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_compressed_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether the data needs to be compressed and to which numpy type</span>
 
 <span class="sd">    Given the data and the compression level, returns the numpy type to be used for compression.</span>
@@ -549,7 +549,7 @@
 
     <span class="k">return</span> <span class="n">dtype</span>
 
-<span class="k">def</span> <span class="nf">get_compression_scale_offset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_compression_scale_offset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns the scale and offset to be applied to the data to compress it</span>
 
 <span class="sd">    Parameters:</span>
@@ -586,7 +586,7 @@
         <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span>
 
-<span class="k">def</span> <span class="nf">save_dict_to_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_dict_to_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Save scale and offset to file</span>
 
 <span class="sd">    Parameters</span>
@@ -599,7 +599,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">configfile</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">configfile</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Compress data to dtype using scale and offset</span>
 
 <span class="sd">    Parameters</span>
@@ -624,17 +624,17 @@
 
 <div class="viewcode-block" id="HDF5_utilities">
 <a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities">[docs]</a>
-<span class="k">class</span> <span class="nc">HDF5_utilities</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HDF5_utilities</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility methods to read in from a generic HDF5 file and extract the relevant data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_descend_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_descend_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -658,7 +658,7 @@
 <div class="viewcode-block" id="HDF5_utilities.print_metadata">
 <a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities.print_metadata">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">print_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints the file metadata</span>
 
@@ -679,7 +679,7 @@
 <div class="viewcode-block" id="HDF5_utilities.get_dataset_metadata">
 <a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities.get_dataset_metadata">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_dataset_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the dataset metadata as a dictionary</span>
 
@@ -721,7 +721,7 @@
 <div class="viewcode-block" id="HDF5_utilities.read">
 <a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities.read">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">,</span> <span class="n">source_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">,</span> <span class="n">source_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a dataset entry and returns a numpy array with the requested data</span>
 
@@ -768,7 +768,7 @@
 <div class="viewcode-block" id="HDF5_utilities.read_to">
 <a class="viewcode-back" href="../../../../io/#cil.io.utilities.HDF5_utilities.read_to">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">read_to</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">source_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dest_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_to</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dset_path</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">source_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dest_sel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a dataset entry and directly fills a numpy array with the requested data</span>
 

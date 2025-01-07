@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.dataexample &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.utilities.dataexample &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,44 +482,44 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
-<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">ImageDimension</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
-<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
-<span class="kn">from</span> <span class="nn">cil.io</span> <span class="kn">import</span> <span class="n">NEXUSDataReader</span><span class="p">,</span> <span class="n">NikonDataReader</span><span class="p">,</span> <span class="n">ZEISSDataReader</span>
-<span class="kn">from</span> <span class="nn">zenodo_get</span> <span class="kn">import</span> <span class="n">zenodo_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageDimension</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zipfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">loadmat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEXUSDataReader</span><span class="p">,</span> <span class="n">NikonDataReader</span><span class="p">,</span> <span class="n">ZEISSDataReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zenodo_get</span><span class="w"> </span><span class="kn">import</span> <span class="n">zenodo_get</span>
 
-<span class="k">class</span> <span class="nc">DATA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DATA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-<span class="k">class</span> <span class="nc">CILDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CILDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
     <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;share&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">))</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">TestData</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">ddir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">dfile</span><span class="p">(),</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">REMOTEDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">REMOTEDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
 
     <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Download a dataset from a remote repository</span>
 
@@ -545,41 +545,41 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;md5sums.txt&#39;</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-<span class="k">class</span> <span class="nc">BOAT</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BOAT</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">BOAT</span>
-<span class="k">class</span> <span class="nc">CAMERA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CAMERA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">CAMERA</span>
-<span class="k">class</span> <span class="nc">PEPPERS</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PEPPERS</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">PEPPERS</span>
-<span class="k">class</span> <span class="nc">RESOLUTION_CHART</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RESOLUTION_CHART</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RESOLUTION_CHART</span>
-<span class="k">class</span> <span class="nc">SIMPLE_PHANTOM_2D</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SIMPLE_PHANTOM_2D</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SIMPLE_PHANTOM_2D</span>
-<span class="k">class</span> <span class="nc">SHAPES</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SHAPES</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SHAPES</span>
-<span class="k">class</span> <span class="nc">RAINBOW</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RAINBOW</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RAINBOW</span>
 <div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">[docs]</a>
-<span class="k">class</span> <span class="nc">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SYNCHROTRON_PARALLEL_BEAM_DATA.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A DLS dataset</span>
 
@@ -602,11 +602,11 @@
 
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">[docs]</a>
-<span class="k">class</span> <span class="nc">SIMULATED_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SIMULATED_PARALLEL_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_PARALLEL_BEAM_DATA.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
@@ -629,11 +629,11 @@
 
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">[docs]</a>
-<span class="k">class</span> <span class="nc">SIMULATED_CONE_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SIMULATED_CONE_BEAM_DATA</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
 <div class="viewcode-block" id="SIMULATED_CONE_BEAM_DATA.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
@@ -654,9 +654,9 @@
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 </div>
 
-<span class="k">class</span> <span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A simulated volume of spheres</span>
 
@@ -677,7 +677,7 @@
 
 <div class="viewcode-block" id="WALNUT">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.WALNUT">[docs]</a>
-<span class="k">class</span> <span class="nc">WALNUT</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WALNUT</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516</span>
 
@@ -694,7 +694,7 @@
 <div class="viewcode-block" id="WALNUT.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.WALNUT.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
@@ -721,7 +721,7 @@
 
 <div class="viewcode-block" id="USB">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.USB">[docs]</a>
-<span class="k">class</span> <span class="nc">USB</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">USB</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516</span>
 
@@ -738,7 +738,7 @@
 <div class="viewcode-block" id="USB.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.USB.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
@@ -765,7 +765,7 @@
 
 <div class="viewcode-block" id="KORN">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.KORN">[docs]</a>
-<span class="k">class</span> <span class="nc">KORN</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KORN</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
 
@@ -782,7 +782,7 @@
 <div class="viewcode-block" id="KORN.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.KORN.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
 <span class="sd">        This function returns the raw projection data from the .xtekct file</span>
@@ -811,7 +811,7 @@
 
 <div class="viewcode-block" id="SANDSTONE">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SANDSTONE">[docs]</a>
-<span class="k">class</span> <span class="nc">SANDSTONE</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SANDSTONE</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
 <span class="sd">    A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
@@ -829,7 +829,7 @@
 <div class="viewcode-block" id="SANDSTONE.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SANDSTONE.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
 <span class="sd">        A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
@@ -856,7 +856,7 @@
 
 <div class="viewcode-block" id="TestData">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData">[docs]</a>
-<span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to return test data</span>
 
 <span class="sd">    provides 6 dataset:</span>
@@ -876,12 +876,12 @@
     <span class="n">SHAPES</span> <span class="o">=</span>  <span class="s1">&#39;shapes.png&#39;</span>
     <span class="n">RAINBOW</span> <span class="o">=</span>  <span class="s1">&#39;rainbow.png&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
 
 <div class="viewcode-block" id="TestData.load">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.load">[docs]</a>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a test data of the requested image</span>
 
@@ -979,7 +979,7 @@
 <div class="viewcode-block" id="TestData.random_noise">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.random_noise">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Function to add noise to input image</span>
 
 <span class="sd">        :param image: input dataset, DataContainer of numpy.ndarray</span>
@@ -1003,7 +1003,7 @@
 <div class="viewcode-block" id="TestData.scikit_random_noise">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.scikit_random_noise">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to add random noise of various types to a floating-point image.</span>
 <span class="sd">        Parameters</span>

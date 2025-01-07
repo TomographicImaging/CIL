@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.TomoPhantom &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.plugins.TomoPhantom &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,15 +482,15 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageData</span>
-<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">ImageDimension</span>
-<span class="kn">import</span> <span class="nn">tomophantom</span>
-<span class="kn">from</span> <span class="nn">tomophantom</span> <span class="kn">import</span> <span class="n">TomoP2D</span><span class="p">,</span> <span class="n">TomoP3D</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageDimension</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tomophantom</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tomophantom</span><span class="w"> </span><span class="kn">import</span> <span class="n">TomoP2D</span><span class="p">,</span> <span class="n">TomoP3D</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ctypes</span><span class="o">,</span> <span class="nn">platform</span>
-<span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span><span class="o">,</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ctypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span>
 <span class="c1"># check for the extension</span>
 <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
     <span class="n">dll</span> <span class="o">=</span> <span class="s1">&#39;libctomophantom.so&#39;</span>
@@ -510,7 +510,7 @@
 <span class="n">path_library2D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Phantom2DLibrary.dat&quot;</span><span class="p">)</span>
 <span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Phantom3DLibrary.dat&quot;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether a model in the TomoPhantom library is temporal</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
@@ -523,7 +523,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
-<span class="k">def</span> <span class="nf">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns number of temporal steps (channels) the model has</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
@@ -540,7 +540,7 @@
 
     <span class="k">return</span> <span class="n">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns params_switch array from the C TomoPhantom library in function checkParams2D or checkParams3D</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
@@ -581,7 +581,7 @@
 
 <div class="viewcode-block" id="get_ImageData">
 <a class="viewcode-back" href="../../../../plugins/#cil.plugins.TomoPhantom.get_ImageData">[docs]</a>
-<span class="k">def</span> <span class="nf">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns an ImageData relative to geometry with the model num_model from tomophantom</span>
 
 <span class="sd">    :param num_model: model number</span>

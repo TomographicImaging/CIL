@@ -1,0 +1,1001 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.processors.FluxNormaliser &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=339683332df9d0077417"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
+
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/processors/FluxNormaliser';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <link rel="index" title="Index" href="../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos/">Tutorials</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">cil.processors.FluxNormaliser</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for cil.processors.FluxNormaliser</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2024 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">AcquisitionData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiprocessing</span> <span class="k">as</span> <span class="n">cil_mp</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FluxNormaliser">
+<a class="viewcode-back" href="../../../../processors/#cil.processors.FluxNormaliser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FluxNormaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Flux normalisation based on float or region of interest</span>
+
+<span class="sd">    This processor reads in an AcquisitionData and normalises it by flux from</span>
+<span class="sd">    a float or array of float values, or the mean flux in a region of interest.</span>
+<span class="sd">    Each projection is divided by its flux value and multiplied by the target.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    flux: float or list of floats, optional</span>
+<span class="sd">        Array of floats that describe the variation in brightness of the unobstructed </span>
+<span class="sd">        beam between projections. Must have length equal to the number of projections </span>
+<span class="sd">        in the dataset, or be a single float. If flux=None, calculate</span>
+<span class="sd">        flux from the roi.</span>
+<span class="sd">    </span>
+<span class="sd">    roi: dict, optional</span>
+<span class="sd">        Dictionary describing the region of interest containing the background</span>
+<span class="sd">        in the image from which to extract the flux. The roi is specified as </span>
+<span class="sd">        `{&#39;horizontal&#39;:(start,stop), &#39;vertical&#39;:(start,stop)}`. If an axis is </span>
+<span class="sd">        not specified in the roi dictionary, the full range will be used.</span>
+
+<span class="sd">    target: {&#39;mean&#39;, &#39;first&#39;, &#39;last&#39;} or float, default=&#39;mean&#39;</span>
+<span class="sd">        The target of the normalised data. If string the data is scaled by the </span>
+<span class="sd">        &#39;mean&#39;, &#39;first&#39; or &#39;last&#39; flux value. If float, the data is scaled </span>
+<span class="sd">        by the float value.</span>
+<span class="sd">        Default is &#39;mean&#39;</span>
+
+<span class="sd">    accelerated: bool, optional</span>
+<span class="sd">        Specify whether to use multi-threading using numba. </span>
+<span class="sd">        Default is True</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    Output: AcquisitionData normalised by flux</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    This example passes the flux as a list the same size as the data, and </span>
+<span class="sd">    specifies the target=&#39;first&#39; which scales all projections to the first flux</span>
+<span class="sd">    value 0.9</span>
+<span class="sd">    &gt;&gt;&gt; from cil.processors import FluxNormaliser</span>
+<span class="sd">    &gt;&gt;&gt; processor = FluxNormaliser(flux=[0.9, 1.0, 1.1, 0.8], target=&#39;first&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; data_norm = processor.get_output()</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    This example calculates the flux from a region of interest for each projection</span>
+<span class="sd">    and scales all projections to the mean flux</span>
+<span class="sd">    &gt;&gt;&gt; from cil.processors import FluxNormaliser</span>
+<span class="sd">    &gt;&gt;&gt; processor = FluxNormaliser(roi={&#39;horizontal&#39;:(5, 15)}, target=&#39;mean&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; processor.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; data_norm = processor.get_output()</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The roi indices provided are start inclusive, stop exclusive.</span>
+<span class="sd">    All elements along a dimension will be included if the axis does not appear </span>
+<span class="sd">    in the roi dictionary</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;flux&#39;</span>  <span class="p">:</span> <span class="n">flux</span><span class="p">,</span>
+                    <span class="s1">&#39;roi&#39;</span> <span class="p">:</span> <span class="n">roi</span><span class="p">,</span>
+                    <span class="s1">&#39;roi_slice&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;roi_axes&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;target&#39;</span> <span class="p">:</span> <span class="n">target</span><span class="p">,</span>
+                    <span class="s1">&#39;target_value&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;v_size&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;v_axis&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;h_size&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;h_axis&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;_accelerated&#39;</span> <span class="p">:</span> <span class="n">accelerated</span>
+                    <span class="p">}</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">FluxNormaliser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please specify either flux or roi, not both&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please specify either flux or roi, found None&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">AcquisitionData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected AcquistionData, found </span><span class="si">{}</span><span class="s2">&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)))</span>
+        
+        <span class="n">image_axes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v_axis</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v_size</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+            <span class="n">image_axes</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="s1">&#39;horizontal&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h_axis</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h_size</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+            <span class="n">image_axes</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="p">((</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>  <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_axis</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">-</span><span class="n">image_axes</span><span class="p">)))</span> <span class="ow">or</span> \
+            <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">v_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_axis</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">-</span><span class="n">image_axes</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Projections must be the last two axes of the dataset&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Function to calculate flux from a region of interest in the data. If the </span>
+<span class="sd">        flux is already provided as an array, convert the array to float 32 and</span>
+<span class="sd">        check the size matches the number of projections </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data not found, please run `set_input(data)`&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Calculate the flux from the roi in the data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span> <span class="p">(</span><span class="n">r</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;roi labels must be in the dataset dimension_labels, found </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">)))</span>
+
+                <span class="n">slc</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">axes</span><span class="o">=</span><span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">:</span>
+                    <span class="c1"># only allow roi to be specified in horizontal and vertical</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">!=</span> <span class="s1">&#39;horizontal&#39;</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">!=</span> <span class="s1">&#39;vertical&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;roi must be &#39;horizontal&#39; or &#39;vertical&#39;, found &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
+                    
+                <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">:</span>
+                        <span class="c1"># check indices are ints</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">]):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;roi values must be int, found </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">])),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">]))))</span>
+                        <span class="c1"># check indices are in range</span>
+                        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;roi values must be start &gt; stop and between 0 and </span><span class="si">{}</span><span class="s2">, found start=</span><span class="si">{}</span><span class="s2"> and stop=</span><span class="si">{}</span><span class="s2"> for direction &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">d</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">d</span> <span class="p">))</span>
+                        <span class="c1"># create slice</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ax</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                            <span class="n">slc</span><span class="p">[</span><span class="n">ax</span><span class="p">]</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+                    <span class="c1"># if a projection dimension isn&#39;t in the roi, use the whole axis</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                            <span class="n">ax</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                            <span class="n">axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">d</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span><span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">d</span><span class="p">))})</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slc</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">axes</span><span class="p">))</span>
+                
+                <span class="c1"># Warn if the flux is more than 10% of the dataset range</span>
+                <span class="n">dataset_range</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">axes</span><span class="p">))</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">axes</span><span class="p">))</span> 
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">dataset</span><span class="o">.</span><span class="n">mean</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">/</span><span class="n">dataset_range</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.9</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">/</span><span class="n">dataset_range</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning: mean value in selected roi is more than 10 percent of data range - may not represent the background&#39;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">roi_slice</span> <span class="o">=</span> <span class="n">slc</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">roi_axes</span> <span class="o">=</span> <span class="n">axes</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;roi must be a dictionary, found </span><span class="si">{}</span><span class="s2">&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">))))</span>
+        
+        <span class="c1"># convert flux array to float32</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># check flux array is the right size</span>
+        <span class="n">flux_size_flat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">flux_size_flat</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data_size_flat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span><span class="o">*</span><span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span>
+            <span class="k">if</span> <span class="n">data_size_flat</span> <span class="o">!=</span> <span class="n">flux_size_flat</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Flux must be a scalar or array with length </span><span class="se">\</span>
+<span class="s2">                                    </span><span class="se">\n</span><span class="s2"> = number of projections, found </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">flux_size_flat</span><span class="p">,</span> <span class="n">data_size_flat</span><span class="p">))</span>
+            
+        <span class="c1"># check if flux array contains 0s</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flux value can</span><span class="se">\&#39;</span><span class="s1">t be 0, provide a different flux</span><span class="se">\</span>
+<span class="s1">                                or region of interest with non-zero values&#39;</span><span class="p">)</span>
+          
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calculate the target value for the normalisation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flux not found&#39;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">float</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;first&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;last&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Target string not recognised, found </span><span class="si">{}</span><span class="s2">, expected &#39;first&#39; or &#39;mean&#39;&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Target must be string or a number, found </span><span class="si">{}</span><span class="s2">&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)))</span>
+            
+<div class="viewcode-block" id="FluxNormaliser.preview_configuration">
+<a class="viewcode-back" href="../../../../processors/#cil.processors.FluxNormaliser.preview_configuration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preview_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Preview the FluxNormalisation processor configuration for roi mode.</span>
+<span class="sd">        Plots the region of interest on the image and the mean, maximum and </span>
+<span class="sd">        minimum intensity in the roi.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        angle: float, optional</span>
+<span class="sd">            Index of the angle to plot, default=None displays the data with the </span>
+<span class="sd">            minimum and maximum pixel values in the roi. For 2D data, the roi is </span>
+<span class="sd">            plotted on the sinogram.</span>
+
+<span class="sd">        channel: int, optional</span>
+<span class="sd">            The channel to plot, default=None displays the central channel if</span>
+<span class="sd">            the data has channels</span>
+
+<span class="sd">        log: bool, default=False</span>
+<span class="sd">            If True, plot the image with a log scale, default is False</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            The figure object created to plot the configuration</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_flux</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_slice</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
+
+            <span class="nb">min</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_slice</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_axes</span><span class="p">))</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_slice</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_axes</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">channel</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">channel_axis</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
+                <span class="n">flux_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">channel_axis</span><span class="p">)</span>
+                <span class="nb">min</span> <span class="o">=</span> <span class="nb">min</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">channel_axis</span><span class="p">)</span>
+                <span class="nb">max</span> <span class="o">=</span> <span class="nb">max</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">channel_axis</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel not found&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">flux_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+        
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;3D&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="nb">min</span><span class="p">),</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">221</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">max</span><span class="p">),</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">222</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
+                        
+            <span class="c1"># if data is 2D plot roi on all angles</span>
+            <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram&quot;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">flux_array</span><span class="p">,</span> <span class="s1">&#39;.r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Maximum&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">flux_array</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span><span class="s1">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span><span class="s1">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Maximum&#39;</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;angle index&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Intensity in roi&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+            <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
+            <span class="n">valid_ticks</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">tick</span><span class="p">)</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">tick</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)]</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">valid_ticks</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xbound</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_xbound</span><span class="p">())</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">tick</span><span class="p">]</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">valid_ticks</span><span class="p">])</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">fig</span></div>
+
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_slice_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">111</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Plot the region of interest on a data slice</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        angle_index: int, optional</span>
+<span class="sd">            Index of the angle to plot</span>
+<span class="sd">        channel_index: int, optional</span>
+<span class="sd">            Index of the channel to plot</span>
+<span class="sd">        log: bool, optional</span>
+<span class="sd">            Plot the log of the slice intensity to highlight small variations</span>
+<span class="sd">        ax: int, default=111</span>
+<span class="sd">            The subplot axis to display the slice on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="n">angle_index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data shape not compatible with preview_configuration(), data must have at least two of &#39;horizontal&#39;, &#39;vertical&#39; and &#39;angle&#39;&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># if horizontal and vertical are not specified in the roi, get the</span>
+        <span class="c1"># min and max extent from the full size of the dimension</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="n">min_angle</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">max_angle</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+                    <span class="n">extent</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">min_angle</span>
+                    <span class="n">extent</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">max_angle</span>
+
+        <span class="c1"># plot the specified data slice</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data_slice</span><span class="o">.</span><span class="n">array</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_slice</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># get the box to plot from the roi</span>
+        <span class="k">if</span> <span class="n">h</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+            <span class="n">h_min</span> <span class="o">=</span> <span class="n">min_angle</span>
+            <span class="n">h_max</span> <span class="o">=</span> <span class="n">max_angle</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">h_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">h_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+            <span class="n">v_min</span> <span class="o">=</span> <span class="n">min_angle</span>
+            <span class="n">v_max</span> <span class="o">=</span> <span class="n">max_angle</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">v_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># plot the roi box</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">h_min</span><span class="p">,</span> <span class="n">h_max</span><span class="p">],[</span><span class="n">v_min</span><span class="p">,</span> <span class="n">v_min</span><span class="p">],</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">h_min</span><span class="p">,</span> <span class="n">h_max</span><span class="p">],[</span><span class="n">v_max</span><span class="p">,</span> <span class="n">v_max</span><span class="p">],</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">h_min</span><span class="p">,</span> <span class="n">h_min</span><span class="p">],[</span><span class="n">v_min</span><span class="p">,</span> <span class="n">v_max</span><span class="p">],</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">h_max</span><span class="p">,</span> <span class="n">h_max</span><span class="p">],[</span><span class="n">v_min</span><span class="p">,</span> <span class="n">v_max</span><span class="p">],</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+        
+        <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;ROI&#39;</span>
+        <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39; angle = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">angle_index</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">channel_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39; channel = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">channel_index</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_flux</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_target</span><span class="p">()</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">id</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">id</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="n">proj_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">h_size</span>
+        <span class="n">num_proj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">proj_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span><span class="p">:</span>
+            <span class="n">num_threads_original</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+            <span class="n">numba</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">cil_mp</span><span class="o">.</span><span class="n">NUM_THREADS</span><span class="p">)</span>
+            <span class="n">numba_loop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">,</span> <span class="n">num_proj</span><span class="p">,</span> <span class="n">proj_size</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+            <span class="c1"># reset the number of threads to the original value</span>
+            <span class="n">numba</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads_original</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">serial_loop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span><span class="p">,</span> <span class="n">num_proj</span><span class="p">,</span> <span class="n">proj_size</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">numba_loop</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">num_proj</span><span class="p">,</span> <span class="n">proj_size</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">out_flat</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">flux_flat</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">target</span><span class="o">/</span><span class="n">flux_flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">num_proj</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">proj_size</span><span class="p">):</span>
+                <span class="n">out_flat</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">proj_size</span><span class="o">+</span><span class="n">ij</span><span class="p">]</span> <span class="o">*=</span> <span class="n">norm</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">num_proj</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ij</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">proj_size</span><span class="p">):</span>
+                <span class="n">out_flat</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">proj_size</span><span class="o">+</span><span class="n">ij</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span><span class="n">target</span><span class="o">/</span><span class="n">flux_flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">serial_loop</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">num_proj</span><span class="p">,</span> <span class="n">proj_size</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">out_reshaped</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_proj</span><span class="p">,</span> <span class="n">proj_size</span><span class="p">)</span>
+    <span class="n">flux_flat</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> 
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="n">flux_flat</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>  <span class="c1"># shape: (num_proj, 1) </span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">out_reshaped</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out_reshaped</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

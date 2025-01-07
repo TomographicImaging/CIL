@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.ZEISSDataReader &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.io.ZEISSDataReader &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -484,22 +484,22 @@
 <span class="c1"># Andrew Shartis (UES, Inc.)</span>
 
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
-<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">AngleUnit</span><span class="p">,</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">ImageDimension</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">olefile</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">AngleUnit</span><span class="p">,</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">ImageDimension</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">olefile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="n">dxchange_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;dxchange&#39;</span><span class="p">)</span>
 <span class="n">dxchange_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">dxchange</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dxchange</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 
 <div class="viewcode-block" id="ZEISSDataReader">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader">[docs]</a>
-<span class="k">class</span> <span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZEISSDataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Create a reader for ZEISS files</span>
@@ -526,7 +526,7 @@
 <span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
 
@@ -541,7 +541,7 @@
 
 <div class="viewcode-block" id="ZEISSDataReader.set_up">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.set_up">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">file_name</span><span class="p">,</span>
                <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Set up the reader</span>
@@ -632,7 +632,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_image_geometry</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">read_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Read one image to get the metadata</span>
         <span class="n">_</span><span class="p">,</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">dxchange</span><span class="o">.</span><span class="n">read_txrm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="kc">None</span><span class="p">),(</span><span class="kc">None</span><span class="p">)))</span>
 
@@ -673,7 +673,7 @@
 
 <div class="viewcode-block" id="ZEISSDataReader.slice_metadata">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.slice_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">slice_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">metadata</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Slices metadata to configure geometry before reading data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -696,7 +696,7 @@
         <span class="k">return</span> <span class="n">metadata</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_setup_acq_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_acq_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup AcquisitionData container</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -713,7 +713,7 @@
                     <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">[</span><span class="s1">&#39;thetas&#39;</span><span class="p">],</span><span class="n">angle_unit</span><span class="o">=</span><span class="n">AngleUnit</span><span class="o">.</span><span class="n">RADIAN</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_setup_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Setup ImageData container</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -730,7 +730,7 @@
 
 <div class="viewcode-block" id="ZEISSDataReader.read">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.read">[docs]</a>
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reads projections and return Acquisition (TXRM) or Image (TXM) Data container</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -759,7 +759,7 @@
 
 <div class="viewcode-block" id="ZEISSDataReader.get_geometry">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.get_geometry">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return Acquisition (TXRM) or Image (TXM) Geometry object</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -768,7 +768,7 @@
 
 <div class="viewcode-block" id="ZEISSDataReader.get_metadata">
 <a class="viewcode-back" href="../../../../io/#cil.io.ZEISSDataReader.get_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;return the metadata of the file&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span></div>
 </div>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -488,13 +488,13 @@
 <span class="c1"># - Evgueni Ovtchinnikov (STFC - UKRI)</span>
 <span class="c1"># - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)</span>
 
-<span class="kn">from</span> <span class="nn">.ApproximateGradientSumFunction</span> <span class="kn">import</span> <span class="n">ApproximateGradientSumFunction</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ApproximateGradientSumFunction</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApproximateGradientSumFunction</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <div class="viewcode-block" id="SAGFunction">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction">[docs]</a>
-<span class="k">class</span> <span class="nc">SAGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SAGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as</span>
@@ -538,7 +538,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_warm_start_just_done</span> <span class="o">=</span> <span class="kc">False</span>
@@ -551,7 +551,7 @@
 
 <div class="viewcode-block" id="SAGFunction.approximate_gradient">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.approximate_gradient">[docs]</a>
-    <span class="k">def</span> <span class="nf">approximate_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">function_num</span><span class="p">,</span>  <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">approximate_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">function_num</span><span class="p">,</span>  <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; SAG approximate gradient, calculated at the point :math:`x` and updated using the function index given by `function_num`.  </span>
 
 <span class="sd">        Parameters</span>
@@ -597,7 +597,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
     
-    <span class="k">def</span> <span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>  
                 <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
@@ -606,7 +606,7 @@
     
 <div class="viewcode-block" id="SAGFunction.warm_start_approximate_gradients">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.warm_start_approximate_gradients">[docs]</a>
-    <span class="k">def</span> <span class="nf">warm_start_approximate_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warm_start_approximate_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -628,7 +628,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  </span>
 <span class="sd">        This is overwritten from the base class to first check to see if the approximate gradient was warm started and, if it was, ensure that the first element of `data_passes_indices` contains each index used to warm start and the index used in the first call to `gradient`. Thus the length of `data_passes_indices` is always equal to the number of calls to `gradient`. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -641,7 +641,7 @@
     
 <div class="viewcode-block" id="SAGAFunction">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGAFunction">[docs]</a>
-<span class="k">class</span> <span class="nc">SAGAFunction</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SAGAFunction</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as</span>
@@ -683,11 +683,11 @@
 <span class="sd">  </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SAGAFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: &quot;&quot;&quot;</span>
 
         <span class="c1"># Due to the convention that we follow: without the 1/n factor</span>

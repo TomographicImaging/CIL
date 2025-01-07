@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CIL Callbacks How To &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>CIL Callbacks How To &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
   <link href="../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -533,16 +533,16 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show2D</span>
-<span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FDK</span>
-<span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="n">Slicer</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">FISTA</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span>  <span class="n">TotalVariation</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.utilities</span> <span class="kn">import</span> <span class="n">callbacks</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDK</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="n">Slicer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.tigre</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">FISTA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span>  <span class="n">TotalVariation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">callbacks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContainer</span>
 
 
 <span class="c1"># set up default colour map for visualisation</span>
@@ -561,7 +561,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
 <span class="c1"># Load data</span>
 <span class="n">ground_truth</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
@@ -639,9 +639,9 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EarlyStoppingObjective</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EarlyStoppingObjective</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 
-         <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+         <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
                <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">objective</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">2e-1</span><span class="p">:</span>  <span class="c1"># arbitrary stopping criterion</span>
                   <span class="k">raise</span> <span class="ne">StopIteration</span>
 
@@ -656,7 +656,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EarlyStoppingReference</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EarlyStoppingReference</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      Terminates the algorithm when the mean square difference between the current solution and a provided reference image is equal to or less than a provided tolerance.</span>
 
@@ -669,10 +669,10 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="sd">            A small value which determines the sensitivity of this stopping criterion. The algorithm will terminate if the current solution satisfies :math:`\frac{1}{N}||x-ref_img||_2^2&lt;tol`, where :math:`N` is the number of pixels in the image.</span>
 <span class="sd">      &quot;&quot;&quot;</span>
 
-      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_img</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+      <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_img</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="o">=</span><span class="n">ref_img</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="o">=</span><span class="n">tolerance</span>
-      <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+      <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">array</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">array</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
                   <span class="k">raise</span> <span class="ne">StopIteration</span>
 
@@ -691,7 +691,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LeastSquaresCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LeastSquaresCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -708,11 +708,11 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">=</span><span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()))</span>
 
 <span class="n">mycallback_FISTA_lower_bound</span><span class="o">=</span> <span class="n">LeastSquaresCallback</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">absorption</span><span class="p">)</span>
@@ -745,9 +745,9 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">skimage</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">skimage</span>
 
-<span class="k">class</span> <span class="nc">SigmaEstimateCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SigmaEstimateCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Properties</span>
 <span class="sd">    ----------</span>
@@ -756,11 +756,11 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">=</span><span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skimage</span><span class="o">.</span><span class="n">restoration</span><span class="o">.</span><span class="n">estimate_sigma</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
 
 <span class="n">mycallback_FISTA_TV_alpha_01</span><span class="o">=</span> <span class="n">SigmaEstimateCallback</span><span class="p">()</span>
@@ -792,7 +792,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="k">class</span> <span class="nc">MetricsDiagnostics</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MetricsDiagnostics</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -812,7 +812,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">,</span> <span class="n">print_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">,</span> <span class="n">print_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span> <span class="o">=</span> <span class="n">reference_image</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">metrics_dict</span>
@@ -821,7 +821,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
         <span class="nb">super</span><span class="p">(</span><span class="n">MetricsDiagnostics</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">):</span>
 
 
         <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric_func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -842,10 +842,10 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
         <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback_iteration</span><span class="p">())</span>
 
 
-    <span class="k">def</span> <span class="nf">callback_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&gt;20}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">callback_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callback_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="c1"># Handle list of metrics</span>
             <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&gt;20.5e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="p">):])</span>
@@ -854,7 +854,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
             <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{:&gt;20.5e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">)</span>
 
 
-<span class="kn">from</span> <span class="nn">cil.utilities.quality_measures</span> <span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.quality_measures</span><span class="w"> </span><span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
 <span class="n">metric_callback</span><span class="o">=</span> <span class="n">MetricsDiagnostics</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;MSE&#39;</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span> <span class="s1">&#39;MAE&#39;</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span> <span class="s1">&#39;PSNR&#39;</span><span class="p">:</span><span class="n">psnr</span><span class="p">})</span>
 <span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">metric_callback</span><span class="p">])</span>
@@ -869,7 +869,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ImageQualityCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ImageQualityCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -907,7 +907,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="sd">      &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span>
                  <span class="n">roi_mask_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">metrics_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">statistics_dict</span><span class="o">=</span><span class="kc">None</span>
@@ -937,7 +937,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
                 <span class="k">for</span> <span class="n">roi_name</span> <span class="ow">in</span> <span class="n">roi_mask_dict</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">ans</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
@@ -990,7 +990,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.utilities.quality_measures</span> <span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.quality_measures</span><span class="w"> </span><span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
 <span class="n">img_qual_callback</span> <span class="o">=</span> <span class="n">ImageQualityCallback</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span>
                                               <span class="n">roi_mask_dict</span> <span class="o">=</span> <span class="n">roi_image_dict</span><span class="p">,</span>
                                               <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MSE&#39;</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span>

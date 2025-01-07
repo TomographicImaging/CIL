@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../_static/documentation_options.js?v=05511f35"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -583,9 +583,9 @@ The user is required to implement only 4 methods: set_up, __init__, update and u
 </ul>
 <p>For example, the implementation of the update of the Gradient Descent
 algorithm to minimise a Function will only be:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -3144,11 +3144,11 @@ For example, when <span class="math notranslate nohighlight">\(g(x)=0\)</span>, 
 <section id="stochastic-gradient-descent-example">
 <h3>Stochastic Gradient Descent Example<a class="headerlink" href="#stochastic-gradient-descent-example" title="Link to this heading">#</a></h3>
 <p>The below is an example of Stochastic Gradient Descent built of the SGFunction and Gradient Descent algorithm:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.utilities</span> <span class="kn">import</span> <span class="n">Sampler</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">GD</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">SGFunction</span>
-<span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
-<span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sampler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GD</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">SGFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
 
 <span class="c1"># get the data</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -4448,8 +4448,8 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
 \[F(x) = \|x\|^{2} + \frac{1}{2}\|x - 1\|^{2}\]</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">L2NormSquared</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f1</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
@@ -5606,8 +5606,8 @@ definition that is used in PET reconstruction in the <a class="reference externa
 The methods of the <a class="reference internal" href="#cil.optimisation.functions.KullbackLeibler" title="cil.optimisation.functions.KullbackLeibler.KullbackLeibler"><code class="xref py py-class docutils literal notranslate"><span class="pre">KullbackLeibler</span></code></a> are accelerated provided that <a class="reference external" href="https://numba.pydata.org/">numba</a> library is installed.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">KullbackLeibler</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">KullbackLeibler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
@@ -8308,7 +8308,7 @@ The <code class="code docutils literal notranslate"><span class="pre">cil.optimi
 <p>This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">3</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -8319,7 +8319,7 @@ The <code class="code docutils literal notranslate"><span class="pre">cil.optimi
 <p>This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
@@ -8332,7 +8332,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">custom_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span><span class="p">(</span><span class="n">custom_list</span><span class="p">[</span><span class="n">iteration_number</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_list</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
@@ -8571,7 +8571,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <p>This example creates a sampler that outputs sequential indices, starting from 1.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
@@ -8759,7 +8759,7 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 <p>This example creates a sampler that always outputs 2.  The probability weights are passed to the sampler as they are not uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">3</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -8770,7 +8770,7 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 <p>This example creates a sampler that outputs sequential indices, starting from 1.  The probability weights are not passed to the sampler as they are uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span><span class="o">=</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
@@ -8783,7 +8783,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">custom_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_indices</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_sampling_function</span><span class="p">(</span><span class="n">iteration_number</span><span class="p">,</span> <span class="n">custom_list</span><span class="o">=</span><span class="n">custom_list</span><span class="p">]):</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span><span class="p">(</span><span class="n">custom_list</span><span class="p">[</span><span class="n">iteration_number</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_list</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
@@ -8892,7 +8892,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <section id="callbacks">
 <h3>Callbacks<a class="headerlink" href="#callbacks" title="Link to this heading">#</a></h3>
 <p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id80"><span class="problematic" id="id81">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.utilities.callbacks</span> <span class="kn">import</span> <span class="n">LogfileCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
 <span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
 </pre></div>
@@ -8951,23 +8951,23 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <p>Users can also write custom callbacks.</p>
 <p>Below is an example of a custom callback implementing early stopping.
 In each iteration of the <code class="code docutils literal notranslate"><span class="pre">TestAlgo</span></code>, the objective <span class="math notranslate nohighlight">\(x\)</span> is reduced by <span class="math notranslate nohighlight">\(5\)</span>. The <code class="code docutils literal notranslate"><span class="pre">EarlyStopping</span></code> callback terminates the algorithm when <span class="math notranslate nohighlight">\(x \le -15\)</span>. The algorithm thus terminates after <span class="math notranslate nohighlight">\(3\)</span> iterations.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cil.optimisation.algorithms</span> <span class="kn">import</span> <span class="n">Algorithm</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.utilities</span> <span class="kn">import</span> <span class="n">callbacks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">callbacks</span>
 
-<span class="k">class</span> <span class="nc">TestAlgo</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestAlgo</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-=</span> <span class="mi">5</span>
 
-    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">15</span><span class="p">:</span>  <span class="c1"># arbitrary stopping criterion</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span>
 

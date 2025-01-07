@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.jupyter &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.utilities.jupyter &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -484,23 +484,23 @@
 <span class="c1"># Kyle Pidgeon (UKRI-STFC)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interactive_output</span>
-    <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interactive_output</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;please conda/pip install ipywidgets&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ie</span>
+    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;please conda/pip install ipywidgets&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ie</span>
 <span class="kn">import</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">gridspec</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">gridspec</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">set_origin</span>
-
-
-<span class="k">def</span> <span class="nf">display_slice</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">axis_labels</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_origin</span>
 
 
-    <span class="k">def</span> <span class="nf">get_slice_3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">minmax</span><span class="p">,</span> <span class="n">roi_hdir</span><span class="p">,</span> <span class="n">roi_vdir</span><span class="p">,</span> <span class="n">equal_aspect</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">display_slice</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">clim</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">axis_labels</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_slice_3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">minmax</span><span class="p">,</span> <span class="n">roi_hdir</span><span class="p">,</span> <span class="n">roi_vdir</span><span class="p">,</span> <span class="n">equal_aspect</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">img</span> <span class="o">=</span> <span class="n">container</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
@@ -562,7 +562,7 @@
 
 <div class="viewcode-block" id="islicer">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.jupyter.islicer">[docs]</a>
-<span class="k">def</span> <span class="nf">islicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">islicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
             <span class="n">minmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">,</span>
             <span class="n">play_interval</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -763,7 +763,7 @@
 
 <div class="viewcode-block" id="link_islicer">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.jupyter.link_islicer">[docs]</a>
-<span class="k">def</span> <span class="nf">link_islicer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">link_islicer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Links islicer&#39;s slice-selection widgets</span>
 
 <span class="sd">    Parameters</span>
@@ -787,7 +787,7 @@
 
 <span class="c1"># https://stackoverflow.com/questions/31517194/how-to-hide-one-specific-cell-input-or-output-in-ipython-notebook/52664156</span>
 
-<span class="k">def</span> <span class="nf">hide_toggle</span><span class="p">(</span><span class="n">for_next</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hide_toggle</span><span class="p">(</span><span class="n">for_next</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">this_cell</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;$(&#39;div.cell.code_cell.rendered.selected&#39;)&quot;&quot;&quot;</span>
     <span class="n">next_cell</span> <span class="o">=</span> <span class="n">this_cell</span> <span class="o">+</span> <span class="s1">&#39;.next()&#39;</span>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.ccpi_regularisation.functions.regularisers &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.plugins.ccpi_regularisation.functions.regularisers &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -483,21 +483,21 @@
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ccpi.filters</span> <span class="kn">import</span> <span class="n">regularisers</span>
-    <span class="kn">from</span> <span class="nn">ccpi.filters.TV</span> <span class="kn">import</span> <span class="n">TV_ENERGY</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ccpi.filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">regularisers</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ccpi.filters.TV</span><span class="w"> </span><span class="kn">import</span> <span class="n">TV_ENERGY</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Please `conda install &quot;ccpi::ccpi-regulariser&gt;=24.0.1&quot;`&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Please `conda install &quot;ccpi::ccpi-regulariser&gt;=24.0.1&quot;`&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
-<span class="kn">from</span> <span class="nn">cil.framework.labels</span> <span class="kn">import</span> <span class="n">ImageDimension</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageDimension</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Function</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
 
-<span class="k">class</span> <span class="nc">RegulariserFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RegulariserFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Generic proximal method for a RegulariserFunction</span>
 
@@ -548,13 +548,13 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">out</span>
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xarr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xarr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Please implement proximal_numpy&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<span class="k">class</span> <span class="nc">TV_Base</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TV_Base</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total Variation regulariser</span>
 
@@ -577,11 +577,11 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span> <span class="o">=</span> <span class="n">strong_convexity_constant</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">in_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
         <span class="n">EnergyValTV</span> <span class="o">=</span> <span class="n">TV_ENERGY</span><span class="p">(</span><span class="n">in_arr</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
@@ -589,13 +589,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">EnergyValTV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
 
 <div class="viewcode-block" id="FGP_TV">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_TV">[docs]</a>
-<span class="k">class</span> <span class="nc">FGP_TV</span><span class="p">(</span><span class="n">TV_Base</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FGP_TV</span><span class="p">(</span><span class="n">TV_Base</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Fast Gradient Projection Total Variation (FGP_TV)</span>
 
@@ -673,7 +673,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">strong_convexity_constant</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">isotropic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">methodTV</span> <span class="o">=</span> <span class="mi">0</span>
@@ -696,7 +696,7 @@
 
         <span class="nb">super</span><span class="p">(</span><span class="n">FGP_TV</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">strong_convexity_constant</span><span class="o">=</span><span class="n">strong_convexity_constant</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fista_on_dual_rof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Implements the Fast Gradient Projection algorithm on the dual problem</span>
 <span class="sd">        of the Total Variation Denoising problem (ROF).</span>
@@ -717,7 +717,7 @@
 
         <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">info</span>
 
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strong_convexity_constant</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
 
@@ -733,7 +733,7 @@
 
         <span class="k">return</span> <span class="n">solution</span>
 
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
@@ -742,18 +742,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*=</span> <span class="n">scalar</span>
             <span class="k">return</span> <span class="bp">self</span>
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> cannot work on more than 3D. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="TGV">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TGV">[docs]</a>
-<span class="k">class</span> <span class="nc">TGV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TGV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TGV.__init__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span> <span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span> <span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Creator of Total Generalised Variation Function</span>
 
 <span class="sd">        :param alpha: regularisation parameter</span>
@@ -782,25 +782,25 @@
 
 <div class="viewcode-block" id="TGV.__call__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__call__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the __call__ method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gamma</span>
     <span class="nd">@gamma</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__gamma</span> <span class="o">=</span> <span class="n">value</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">alpha2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alpha2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">alpha1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alpha1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">1.</span>
 
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
@@ -821,14 +821,14 @@
 
 <div class="viewcode-block" id="TGV.convex_conjugate">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate">[docs]</a>
-    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the convex_conjugate method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 
 <div class="viewcode-block" id="TGV.__rmul__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
@@ -842,7 +842,7 @@
         <span class="c1"># f = TGV()</span>
         <span class="c1"># f = alpha * f</span>
 
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">LipshitzConstant</span> <span class="o">=</span> <span class="mi">12</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -854,7 +854,7 @@
 
 <div class="viewcode-block" id="FGP_dTV">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV">[docs]</a>
-<span class="k">class</span> <span class="nc">FGP_dTV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FGP_dTV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Creator of FGP_dTV Function</span>
 
 <span class="sd">        :param reference: reference image</span>
@@ -876,7 +876,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="FGP_dTV.__init__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                  <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">isotropic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
@@ -899,12 +899,12 @@
 
 <div class="viewcode-block" id="FGP_dTV.__call__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the __call__ method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
@@ -923,14 +923,14 @@
 
 <div class="viewcode-block" id="FGP_dTV.convex_conjugate">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate">[docs]</a>
-    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the convex_conjugate method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 
 <div class="viewcode-block" id="FGP_dTV.__rmul__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
@@ -941,18 +941,18 @@
             <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> cannot work on more than 3D. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="TNV">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV">[docs]</a>
-<span class="k">class</span> <span class="nc">TNV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TNV</span><span class="p">(</span><span class="n">RegulariserFunction</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TNV.__init__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Creator of TNV Function</span>
 
 <span class="sd">        :param alpha: regularisation parameter</span>
@@ -970,12 +970,12 @@
 
 <div class="viewcode-block" id="TNV.__call__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__call__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the __call__ method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 
-    <span class="k">def</span> <span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_arr</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
         <span class="c1"># remove any dimension of size 1</span>
         <span class="n">in_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">in_arr</span><span class="p">)</span>
 
@@ -987,14 +987,14 @@
 
 <div class="viewcode-block" id="TNV.convex_conjugate">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate">[docs]</a>
-    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: the convex_conjugate method is not implemented. Returning NaN.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
 
 
 <div class="viewcode-block" id="TNV.__rmul__">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Define the multiplication with a scalar</span>
 
 <span class="sd">        this changes the regularisation parameter in the plugin&#39;&#39;&#39;</span>
@@ -1007,7 +1007,7 @@
 
 <div class="viewcode-block" id="TNV.check_input">
 <a class="viewcode-back" href="../../../../../../plugins/#cil.plugins.ccpi_regularisation.functions.TNV.check_input">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;TNV requires 2D+channel data with the first dimension as the channel dimension&#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="n">ImageDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>

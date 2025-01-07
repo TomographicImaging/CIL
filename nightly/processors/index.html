@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>Processors &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../_static/documentation_options.js?v=05511f35"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -420,6 +420,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#pre-processors">Pre-processors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#centre-of-rotation-corrector">Centre Of Rotation Corrector</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#data-normaliser">Data Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flux-normaliser">Flux Normaliser</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ring-remover">Ring Remover</a></li>
@@ -522,7 +523,7 @@ Step: Number of pixels to average together. Must be an integer or <cite>None</ci
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Slicer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Slicer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -530,7 +531,7 @@ Step: Number of pixels to average together. Must be an integer or <cite>None</ci
 </pre></div>
 </div>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Slicer</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Slicer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
@@ -619,7 +620,7 @@ Step: Number of pixels to average together. Must be an integer or <cite>None</ci
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Binner</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binner</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -627,7 +628,7 @@ Step: Number of pixels to average together. Must be an integer or <cite>None</ci
 </pre></div>
 </div>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">Binner</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binner</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">2</span><span class="p">)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
@@ -1336,22 +1337,22 @@ Or a list/tuple of ints specifying the two indices to be used for cross correlat
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">xcorrelation</span><span class="p">(</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_centred</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_ouput</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">get_ouput</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.processors</span> <span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">logging</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cil.processors&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
@@ -1483,6 +1484,123 @@ Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="flux-normaliser">
+<h3>Flux Normaliser<a class="headerlink" href="#flux-normaliser" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.processors.FluxNormaliser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">FluxNormaliser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/FluxNormaliser/#FluxNormaliser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.FluxNormaliser" title="Link to this definition">#</a></dt>
+<dd><p>Flux normalisation based on float or region of interest</p>
+<p>This processor reads in an AcquisitionData and normalises it by flux from
+a float or array of float values, or the mean flux in a region of interest.
+Each projection is divided by its flux value and multiplied by the target.</p>
+<section id="parameters">
+<h4>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>flux: float or list of floats, optional</dt><dd><p>Array of floats that describe the variation in brightness of the unobstructed
+beam between projections. Must have length equal to the number of projections
+in the dataset, or be a single float. If flux=None, calculate
+flux from the roi.</p>
+</dd>
+<dt>roi: dict, optional</dt><dd><p>Dictionary describing the region of interest containing the background
+in the image from which to extract the flux. The roi is specified as
+<cite>{‘horizontal’:(start,stop), ‘vertical’:(start,stop)}</cite>. If an axis is
+not specified in the roi dictionary, the full range will be used.</p>
+</dd>
+<dt>target: {‘mean’, ‘first’, ‘last’} or float, default=’mean’</dt><dd><p>The target of the normalised data. If string the data is scaled by the
+‘mean’, ‘first’ or ‘last’ flux value. If float, the data is scaled
+by the float value.
+Default is ‘mean’</p>
+</dd>
+<dt>accelerated: bool, optional</dt><dd><p>Specify whether to use multi-threading using numba.
+Default is True</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h4>Returns:<a class="headerlink" href="#returns" title="Link to this heading">#</a></h4>
+<p>Output: AcquisitionData normalised by flux</p>
+<p class="rubric">Example</p>
+<p>This example passes the flux as a list the same size as the data, and
+specifies the target=’first’ which scales all projections to the first flux
+value 0.9
+&gt;&gt;&gt; from cil.processors import FluxNormaliser
+&gt;&gt;&gt; processor = FluxNormaliser(flux=[0.9, 1.0, 1.1, 0.8], target=’first’)
+&gt;&gt;&gt; processor.set_input(data)
+&gt;&gt;&gt; data_norm = processor.get_output()</p>
+<p class="rubric">Example</p>
+<p>This example calculates the flux from a region of interest for each projection
+and scales all projections to the mean flux
+&gt;&gt;&gt; from cil.processors import FluxNormaliser
+&gt;&gt;&gt; processor = FluxNormaliser(roi={‘horizontal’:(5, 15)}, target=’mean’)
+&gt;&gt;&gt; processor.set_input(data)
+&gt;&gt;&gt; data_norm = processor.get_output()</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The roi indices provided are start inclusive, stop exclusive.
+All elements along a dimension will be included if the axis does not appear
+in the roi dictionary</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.FluxNormaliser.preview_configuration">
+<span class="sig-name descname"><span class="pre">preview_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/FluxNormaliser/#FluxNormaliser.preview_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.FluxNormaliser.preview_configuration" title="Link to this definition">#</a></dt>
+<dd><p>Preview the FluxNormalisation processor configuration for roi mode.
+Plots the region of interest on the image and the mean, maximum and
+minimum intensity in the roi.</p>
+<section id="id1">
+<h5>Parameters:<a class="headerlink" href="#id1" title="Link to this heading">#</a></h5>
+<dl class="simple">
+<dt>angle: float, optional</dt><dd><p>Index of the angle to plot, default=None displays the data with the
+minimum and maximum pixel values in the roi. For 2D data, the roi is
+plotted on the sinogram.</p>
+</dd>
+<dt>channel: int, optional</dt><dd><p>The channel to plot, default=None displays the central channel if
+the data has channels</p>
+</dd>
+<dt>log: bool, default=False</dt><dd><p>If True, plot the image with a log scale, default is False</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h5>Returns:<a class="headerlink" href="#id2" title="Link to this heading">#</a></h5>
+<dl class="simple">
+<dt>matplotlib.figure.Figure</dt><dd><p>The figure object created to plot the configuration</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.FluxNormaliser.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.FluxNormaliser.get_output" title="Link to this definition">#</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.FluxNormaliser.set_input">
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.FluxNormaliser.set_input" title="Link to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>

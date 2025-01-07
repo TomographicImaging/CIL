@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Normaliser &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.processors.Normaliser &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,13 +482,13 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span>\
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span>\
  <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">ImageData</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
 <div class="viewcode-block" id="Normaliser">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser">[docs]</a>
-<span class="k">class</span> <span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
 
 <span class="sd">    This processor read in a AcquisitionData and normalises it based on</span>
@@ -500,7 +500,7 @@
 <span class="sd">    Output: AcquisitionDataSet</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
                   <span class="s1">&#39;flat_field&#39;</span>  <span class="p">:</span> <span class="n">flat_field</span><span class="p">,</span>
                   <span class="s1">&#39;dark_field&#39;</span>  <span class="p">:</span> <span class="n">dark_field</span><span class="p">,</span>
@@ -515,7 +515,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_dark_field</span><span class="p">(</span><span class="n">dark_field</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span>\
            <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                <span class="k">return</span> <span class="kc">True</span>
@@ -523,7 +523,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">set_dark_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_dark_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dark Field should be 2D&#39;</span><span class="p">)</span>
@@ -532,7 +532,7 @@
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_dark_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">set_flat_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_flat_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flat Field should be 2D&#39;</span><span class="p">)</span>
@@ -542,7 +542,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_flat_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">Normalise_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Normalise_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">numpy</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
@@ -553,7 +553,7 @@
 <div class="viewcode-block" id="Normaliser.estimate_normalised_error">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser.estimate_normalised_error">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">estimate_normalised_error</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">delta_flat</span><span class="p">,</span> <span class="n">delta_dark</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_normalised_error</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">delta_flat</span><span class="p">,</span> <span class="n">delta_dark</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the estimated relative error of the normalised projection</span>
 
 <span class="sd">        n = (projection - dark) / (flat - dark)</span>
@@ -567,7 +567,7 @@
         <span class="k">return</span> <span class="n">rel_norm_error</span></div>
 
 
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">projections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="n">dark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span>

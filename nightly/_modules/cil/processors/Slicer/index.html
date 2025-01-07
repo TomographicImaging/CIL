@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Slicer &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.processors.Slicer &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,11 +482,11 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">VectorGeometry</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">VectorGeometry</span><span class="p">,</span>
                            <span class="n">AcquisitionGeometry</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">weakref</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -497,7 +497,7 @@
 <span class="c1"># dictate the style of slicer</span>
 <div class="viewcode-block" id="Slicer">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Slicer">[docs]</a>
-<span class="k">class</span> <span class="nc">Slicer</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Slicer</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This creates a Slicer processor.</span>
 
@@ -553,7 +553,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -576,7 +576,7 @@
 
 <div class="viewcode-block" id="Slicer.set_input">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Slicer.set_input">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the input data or geometry to the processor</span>
 
@@ -599,7 +599,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">ImageData</span><span class="p">,</span><span class="n">AcquisitionData</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_data_array</span> <span class="o">=</span> <span class="kc">True</span>
@@ -631,7 +631,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
 
-    <span class="k">def</span> <span class="nf">_set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This parses the input roi generically and then configures the processor according to its class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -645,7 +645,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out_full</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels_out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_in</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out_full</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_parse_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Process the input roi</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -719,7 +719,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span> <span class="o">=</span> <span class="n">range_list</span>
 
 
-    <span class="k">def</span> <span class="nf">_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Once the ROI has been parsed this configure the input specifically for use with Slicer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -727,20 +727,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_indices</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
 
 
-    <span class="k">def</span> <span class="nf">_get_slice_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_slice_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the vertical position to extract a single slice for sliced geometry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span>
 
 
-    <span class="k">def</span> <span class="nf">_get_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the sliced angles according to the roi</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_process_acquisition_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_acquisition_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the new acquisition geometry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -797,7 +797,7 @@
         <span class="k">return</span> <span class="n">geometry_new</span>
 
 
-    <span class="k">def</span> <span class="nf">_process_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_image_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the new image geometry</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -843,7 +843,7 @@
         <span class="k">return</span> <span class="n">geometry_new</span>
 
 
-    <span class="k">def</span> <span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_in</span><span class="p">,</span> <span class="n">dc_out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_in</span><span class="p">,</span> <span class="n">dc_out</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Slice the data array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -853,7 +853,7 @@
 
 <div class="viewcode-block" id="Slicer.process">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Slicer.process">[docs]</a>
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Processes the input data</span>
 

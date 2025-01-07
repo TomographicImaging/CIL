@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.BlockOperator &#8212; CIL 24.2.1.dev20+g10d2cbb1 documentation</title>
+    <title>cil.optimisation.operators.BlockOperator &#8212; CIL 24.2.1.dev21+g8adf4f51 documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 <link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
 
-    <script src="../../../../../_static/documentation_options.js?v=53a619f2"></script>
+    <script src="../../../../../_static/documentation_options.js?v=05511f35"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev20+g10d2cbb1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev21+g8adf4f51';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev20+g10d2cbb1" />
+  <meta name="docsearch:version" content="24.2.1.dev21+g8adf4f51" />
   </head>
   
   
@@ -482,15 +482,15 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">,</span> <span class="n">DataContainer</span>
-<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">Operator</span><span class="p">,</span> <span class="n">LinearOperator</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">Operator</span><span class="p">,</span> <span class="n">LinearOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGeometry</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sirf</span> <span class="kn">import</span> <span class="n">SIRF</span>
-    <span class="kn">from</span> <span class="nn">sirf.SIRF</span> <span class="kn">import</span> <span class="n">DataContainer</span> <span class="k">as</span> <span class="n">SIRFDataContainer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sirf</span><span class="w"> </span><span class="kn">import</span> <span class="n">SIRF</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sirf.SIRF</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContainer</span> <span class="k">as</span> <span class="n">SIRFDataContainer</span>
     <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
     <span class="n">has_sirf</span> <span class="o">=</span> <span class="kc">False</span>
@@ -498,7 +498,7 @@
 
 <div class="viewcode-block" id="BlockOperator">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator">[docs]</a>
-<span class="k">class</span> <span class="nc">BlockOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockOperator</span><span class="p">(</span><span class="n">Operator</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;A Block matrix containing Operators</span>
 
 <span class="sd">    Parameters</span>
@@ -545,7 +545,7 @@
 
 <div class="viewcode-block" id="BlockOperator.__init__">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">operators</span> <span class="o">=</span> <span class="n">args</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -573,7 +573,7 @@
 
 <div class="viewcode-block" id="BlockOperator.column_wise_compatible">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.column_wise_compatible">[docs]</a>
-    <span class="k">def</span> <span class="nf">column_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">column_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same domain per column&#39;&#39;&#39;</span>
         <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
@@ -592,7 +592,7 @@
 
 <div class="viewcode-block" id="BlockOperator.row_wise_compatible">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.row_wise_compatible">[docs]</a>
-    <span class="k">def</span> <span class="nf">row_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">row_wise_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Operators in a Block should have the same range per row&#39;&#39;&#39;</span>
         <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">compatible</span> <span class="o">=</span> <span class="kc">True</span>
@@ -613,7 +613,7 @@
 
 <div class="viewcode-block" id="BlockOperator.get_item">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_item">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Operator at specified row and col</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -635,14 +635,14 @@
 
 <div class="viewcode-block" id="BlockOperator.norm">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.norm">[docs]</a>
-    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the Euclidean norm of the norms of the individual operators in the BlockOperators &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_norms_as_list</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.get_norms_as_list">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_norms_as_list">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_norms_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_norms_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a list of the individual norms of the Operators in the BlockOperator</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">]</span></div>
@@ -650,7 +650,7 @@
 
 <div class="viewcode-block" id="BlockOperator.set_norms">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.set_norms">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norms</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norms</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values.</span>
 
 <span class="sd">        Parameters</span>
@@ -669,7 +669,7 @@
 
 <div class="viewcode-block" id="BlockOperator.direct">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.direct">[docs]</a>
-    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Direct operation for the BlockOperator</span>
 
 <span class="sd">        Note</span>
@@ -721,7 +721,7 @@
 
 <div class="viewcode-block" id="BlockOperator.adjoint">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.adjoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Adjoint operation for the BlockOperator</span>
 
 <span class="sd">        Note</span>
@@ -788,14 +788,14 @@
 
 <div class="viewcode-block" id="BlockOperator.is_linear">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.is_linear">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns whether all the elements of the BlockOperator are linear&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">is_linear</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.get_output_shape">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_output_shape">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xshape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xshape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the shape of the output BlockDataContainer</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -827,7 +827,7 @@
 
 <div class="viewcode-block" id="BlockOperator.__rmul__">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__rmul__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines the left multiplication with a scalar. Returns a block operator with Scaled Operators inside.</span>
 
 <span class="sd">        Parameters</span>
@@ -851,7 +851,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the transposed of self.</span>
 
 <span class="sd">        Recall the input list is shaped in a row-by-row fashion&#39;&#39;&#39;</span>
@@ -864,7 +864,7 @@
 
 <div class="viewcode-block" id="BlockOperator.domain_geometry">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.domain_geometry">[docs]</a>
-    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the domain of the BlockOperator</span>
 
 <span class="sd">        If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.</span>
@@ -891,7 +891,7 @@
 
 <div class="viewcode-block" id="BlockOperator.range_geometry">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.range_geometry">[docs]</a>
-    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the range of the BlockOperator&#39;&#39;&#39;</span>
 
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
@@ -902,7 +902,7 @@
         <span class="k">return</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="n">tmp</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum_abs_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -920,7 +920,7 @@
 
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum_abs_col</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -933,23 +933,23 @@
 
         <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BlockOperator.__getitem__">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.__getitem__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the index-th operator in the block irrespectively of it&#39;s shape&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.get_as_list">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.BlockOperator.get_as_list">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns the list of operators&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operators</span></div>
 </div>

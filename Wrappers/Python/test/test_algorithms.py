@@ -53,8 +53,6 @@ from unittest.mock import MagicMock
 
 log = logging.getLogger(__name__)
 
-if has_astra:
-    from cil.plugins.astra import ProjectionOperator
 
 if has_cvxpy:
     import cvxpy
@@ -1198,26 +1196,11 @@ class TestSIRT(CCPiTestClass):
 
 class TestSPDHG(CCPiTestClass):
     def setUp(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
         self.subsets = 10
 
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(16, 16))
 
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
-            angles, angle_unit='radian').set_panel(detectors, 0.1)
-        # Select device
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
-
-        sin = Aop.direct(data)
-        partitioned_data = sin.partition(self.subsets, 'sequential')
+        partitioned_data = data.partition(self.subsets, 'sequential')
         self.A = BlockOperator(
             *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
         self.A2 = BlockOperator(
@@ -1225,9 +1208,11 @@ class TestSPDHG(CCPiTestClass):
 
         # block function
         self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-                                 for i in range(self.subsets)])
+                                for i in range(self.subsets)])
         alpha = 0.025
         self.G = alpha * IndicatorBox(lower=0)
+
+
 
     def test_SPDHG_defaults_and_setters(self):
         # Test SPDHG init with default values

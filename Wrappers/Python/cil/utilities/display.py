@@ -136,7 +136,7 @@ class show1D(show_base):
 
     The figure can be saved using the `save` method . i.e:
 
-    >>> fig = show2D(data, title='My Plot')
+    >>> fig = show1D(data, title='My Plot')
     >>> fig.save('/path/to/output.png')
     
 

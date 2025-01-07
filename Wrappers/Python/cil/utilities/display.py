@@ -67,17 +67,12 @@ def set_origin(data, origin):
 class show_base(object):
     def save(self,filename, **kwargs):
         '''
-        Saves the image as a `.png` using matplotlib.figure.savefig()
+        Saves the image as using matplotlib.figure.savefig(). Default format is png if no extension is provided.
 
         matplotlib kwargs can be passed, refer to documentation
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            returns a matplotlib.pyplot figure object
-        
         '''
+
         file,extension = os.path.splitext(os.path.abspath(filename))
         extension = extension.strip('.')
 
@@ -139,10 +134,12 @@ class show1D(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
+    The figure can be saved using the `save` method . i.e:
+
     >>> fig = show2D(data, title='My Plot')
     >>> fig.save('/path/to/output.png')
     
+
     Examples
     --------
 
@@ -190,6 +187,7 @@ class show1D(show_base):
 
 
     To save the figure, use the `save` method.
+
     >>> from cil.utilities.display import show1D
     >>> from cil.utilities import dataexample
     >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()

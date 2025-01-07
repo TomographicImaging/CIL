@@ -350,7 +350,17 @@ class FluxNormaliser(Processor):
             
     def _plot_slice_roi(self, angle_index=None, channel_index=None, log=False, ax=111):
         '''
-        
+        Plot the region of interest on a data slice
+        Parameters:
+        -----------
+        angle_index: int, optional
+            Index of the angle to plot
+        channel_index: int, optional
+            Index of the channel to plot
+        log: bool, optional
+            Plot the log of the slice intensity to highlight small variations
+        ax: int, default=111
+            The subplot axis to display the slice on
         '''
         data = self.get_input()
         if angle_index is not None and 'angle' in data.dimension_labels:
@@ -363,7 +373,9 @@ class FluxNormaliser(Processor):
 
         if len(data_slice.shape) != 2:
             raise ValueError("Data shape not compatible with preview_configuration(), data must have at least two of 'horizontal', 'vertical' and 'angle'")
-
+        
+        # if horizontal and vertical are not specified in the roi, get the
+        # min and max extent from the full size of the dimension
         extent = [0, data_slice.shape[1], 0, data_slice.shape[0]]
         if 'angle' in data_slice.dimension_labels:
             min_angle = data_slice.geometry.angles[0]
@@ -373,6 +385,7 @@ class FluxNormaliser(Processor):
                     extent[i*2]=min_angle
                     extent[i*2+1]=max_angle
 
+        # plot the specified data slice
         ax1 = plt.subplot(ax)
         if log:
             im = ax1.imshow(numpy.log(data_slice.array), cmap='gray',aspect='equal', origin='lower', extent=extent)
@@ -384,6 +397,7 @@ class FluxNormaliser(Processor):
         h = data_slice.dimension_labels[1]
         v = data_slice.dimension_labels[0]
 
+        # get the box to plot from the roi
         if h == 'angle':
             h_min = min_angle
             h_max = max_angle
@@ -398,6 +412,7 @@ class FluxNormaliser(Processor):
             v_min = self.roi[v][0]
             v_max = self.roi[v][1]
 
+        # plot the roi box
         ax1.plot([h_min, h_max],[v_min, v_min],'--r')
         ax1.plot([h_min, h_max],[v_max, v_max],'--r')
 

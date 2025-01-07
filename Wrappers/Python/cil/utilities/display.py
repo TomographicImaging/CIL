@@ -424,9 +424,11 @@ class show2D(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
+    The figure can be saved using the `save` method . i.e:
+
     >>> fig = show2D(data, title='My Plot')
     >>> fig.save('/path/to/output.png')
+
    '''
 
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
@@ -1058,9 +1060,11 @@ class show_geometry(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
-    >>> fig = show2D(data, title='My Plot')
+    The figure can be saved using the `save` method . i.e:
+
+    >>> fig = show_geometry(geometry)
     >>> fig.save('/path/to/output.png')
+    
     '''
 
 

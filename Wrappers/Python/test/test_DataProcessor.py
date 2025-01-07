@@ -22,6 +22,7 @@ import numpy
 import sys
 import os
 from unittest.mock import patch
+import logging
 
 from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
 
@@ -3321,6 +3322,10 @@ class TestFluxNormaliser(unittest.TestCase):
         
     @patch('matplotlib.pyplot.show')
     def test_preview_configuration(self, mock_show):
+        
+        # Suppress backround range warning
+        logging.disable(logging.CRITICAL)
+
         # Test error in preview configuration if there is no roi
         processor = FluxNormaliser(flux=10)
         processor.set_input(self.data_cone)
@@ -3331,13 +3336,13 @@ class TestFluxNormaliser(unittest.TestCase):
         roi = {'horizontal':(25,40)}
         processor = FluxNormaliser(roi=roi)
         with self.assertRaises(TypeError):
-
             processor.preview_configuration()
 
         # Test correct data is plotted
         roi = {'horizontal':(0,3),'vertical':(0,1)}
         processor = FluxNormaliser(roi=roi)
         processor.set_input(self.data_simple)
+        
         fig = processor.preview_configuration()
         
         # Check slice plots
@@ -3408,7 +3413,14 @@ class TestFluxNormaliser(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     processor.preview_configuration(channel=1)
 
+        # Re-enable logging
+        logging.disable(logging.NOTSET)
+
     def test_FluxNormaliser(self, accelerated=False):
+
+        # Suppress backround range warning
+        logging.disable(logging.CRITICAL)
+
         #Test flux with no target
         processor = FluxNormaliser(flux=1, accelerated=accelerated)
         processor.set_input(self.data_cone)
@@ -3507,6 +3519,9 @@ class TestFluxNormaliser(unittest.TestCase):
 
         numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
         err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+
+        # Re-enable logging
+        logging.disable(logging.NOTSET)
     
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_FluxNormaliser_accelerated(self):

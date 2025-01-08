@@ -10,6 +10,7 @@
     - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
     - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
     - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
+    - Add FluxNormaliser processor (#1878)
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
   - Changes that break backwards compatibility:

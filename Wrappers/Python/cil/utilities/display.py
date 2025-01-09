@@ -67,7 +67,7 @@ def set_origin(data, origin):
 class show_base(object):
     def save(self,filename, **kwargs):
         '''
-        Saves the image as using matplotlib.figure.savefig(). Default format is png if no extension is provided.
+        Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.
 
         matplotlib kwargs can be passed, refer to documentation
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html

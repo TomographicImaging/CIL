@@ -127,7 +127,8 @@ jobs:
     - name: conda build & test
       working-directory: recipe
       run: |
-        conda build . -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
+        conda install boa
+        conda mambabuild . -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
     - uses: actions/upload-artifact@v4
       with:
         name: cil-package-py${{ matrix.python-version }}-np${{ matrix.numpy-version }}

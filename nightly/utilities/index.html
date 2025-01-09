@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utilities &#8212; CIL 24.2.1.dev22+gc79eda4c documentation</title>
+    <title>Utilities &#8212; CIL 24.2.1.dev23+gf0f97a44 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=339683332df9d0077417" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=339683332df9d0077417" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=233e30ee0c820e057811" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=233e30ee0c820e057811" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=339683332df9d0077417"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=233e30ee0c820e057811"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=339683332df9d0077417" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../_static/documentation_options.js?v=e51d800b"></script>
+    <script src="../_static/documentation_options.js?v=f2a81717"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev22+gc79eda4c';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev23+gf0f97a44';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -60,7 +60,7 @@
     <link rel="prev" title="Recon" href="../recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev22+gc79eda4c" />
+  <meta name="docsearch:version" content="24.2.1.dev23+gf0f97a44" />
   </head>
   
   
@@ -1055,24 +1055,18 @@ length of datacontainers, allows to set a different color map for each dataconta
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The figure can be saved using the <cite>save</cite> method . i.e.
-&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
-&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show2D.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show2D.save" title="Link to this definition">#</a></dt>
-<dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1104,9 +1098,11 @@ To plot multiple slices, pass a list of slices.</p></li>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The figure can be saved using the <cite>save</cite> method . i.e.
-&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
-&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <p class="rubric">Examples</p>
 <p>This example uses a 3D dataset with no slicing information provided. The function
@@ -1147,26 +1143,20 @@ The slice_list can be provided as (axis, index), where axis is an integer.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
 </pre></div>
 </div>
-<p>To save the figure, use the <cite>save</cite> method.
-&gt;&gt;&gt; from cil.utilities.display import show1D
-&gt;&gt;&gt; from cil.utilities import dataexample
-&gt;&gt;&gt; data = dataexample.SIMULATED_SPHERE_VOLUME.get()
-&gt;&gt;&gt; fig = show1D(data, slice_list=None)
-&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+<p>To save the figure, use the <cite>save</cite> method.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show1D.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show1D.save" title="Link to this definition">#</a></dt>
-<dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1195,24 +1185,18 @@ for 2D geometries elevation and azimuthal cannot be changed</p>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The figure can be saved using the <cite>save</cite> method . i.e.
-&gt;&gt;&gt; fig = show2D(data, title=’My Plot’)
-&gt;&gt;&gt; fig.save(‘/path/to/output.png’)</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show_geometry</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.display.show_geometry.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show_geometry.save" title="Link to this definition">#</a></dt>
-<dd><p>Saves the image as a <cite>.png</cite> using matplotlib.figure.savefig()</p>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
 <p>matplotlib kwargs can be passed, refer to documentation
 <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>returns a matplotlib.pyplot figure object</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1323,8 +1307,8 @@ selection sliders will be extracted and linked.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=339683332df9d0077417"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=339683332df9d0077417"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -67,17 +67,12 @@ def set_origin(data, origin):
 class show_base(object):
     def save(self,filename, **kwargs):
         '''
-        Saves the image as a `.png` using matplotlib.figure.savefig()
+        Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.
 
         matplotlib kwargs can be passed, refer to documentation
         https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            returns a matplotlib.pyplot figure object
-        
         '''
+
         file,extension = os.path.splitext(os.path.abspath(filename))
         extension = extension.strip('.')
 
@@ -139,10 +134,12 @@ class show1D(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
-    >>> fig = show2D(data, title='My Plot')
+    The figure can be saved using the `save` method . i.e:
+
+    >>> fig = show1D(data, title='My Plot')
     >>> fig.save('/path/to/output.png')
     
+
     Examples
     --------
 
@@ -190,6 +187,7 @@ class show1D(show_base):
 
 
     To save the figure, use the `save` method.
+
     >>> from cil.utilities.display import show1D
     >>> from cil.utilities import dataexample
     >>> data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -426,9 +424,11 @@ class show2D(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
+    The figure can be saved using the `save` method . i.e:
+
     >>> fig = show2D(data, title='My Plot')
     >>> fig.save('/path/to/output.png')
+
    '''
 
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
@@ -1060,9 +1060,11 @@ class show_geometry(show_base):
     Note
     ----
 
-    The figure can be saved using the `save` method . i.e.
-    >>> fig = show2D(data, title='My Plot')
+    The figure can be saved using the `save` method . i.e:
+
+    >>> fig = show_geometry(geometry)
     >>> fig.save('/path/to/output.png')
+    
     '''
 
 

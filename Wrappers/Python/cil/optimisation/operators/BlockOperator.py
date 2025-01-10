@@ -185,6 +185,13 @@ class BlockOperator(Operator):
     def direct(self, x, out=None):
         '''Direct operation for the BlockOperator
 
+        Parameters
+        ----------
+        x: BlockDataContainer
+            The input BlockDataContainer to apply the BlockOperator on. Can be a DataContainer if the domain geometry permits.  
+        out: BlockDataContainer, optional
+            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the range geometry permits.
+
         Note
         -----
         BlockOperators work on BlockDataContainers, but they will also work on DataContainers
@@ -240,6 +247,12 @@ class BlockOperator(Operator):
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
 
+        Parameters
+        ----------
+        x: BlockDataContainer
+            The input BlockDataContainer to apply the BlockOperator adjoint on. Can be a DataContainer if the range geometry permits.
+        out: BlockDataContainer, optional
+            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the domain geometry permits.
         Note
         -----
         BlockOperator may contain both LinearOperator and Operator

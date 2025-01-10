@@ -200,10 +200,10 @@ class BlockOperator(Operator):
             raise ValueError(
                 'We expect the input to be a block data container of shape {}'.format(  self._domain_block_shape))
         
-        return_data_container = False
+        unwrap_data_container_on_return = False
         
-        if self._range_block_shape[0]==1:
-            return_data_container = True ##TODO: Does this default make sense?
+        if self._range_block_shape == (1,1):
+            unwrap_data_container_on_return = True 
 
         if out is None:
             # allocate the output blockdatacontainer of the correct shape
@@ -211,14 +211,14 @@ class BlockOperator(Operator):
                                      for row in range(self.shape[0])], shape=self._range_block_shape)
         elif not isinstance(out, BlockDataContainer):
                 # Handle datacontainers or sirf datacontainers
-                if self._range_block_shape[0]==1:
+                if unwrap_data_container_on_return: 
                     res = BlockDataContainer(out)
                 else:
                     raise ValueError(
-                        f'Expected `out` to be `None` or a `BlockDataContainer` of shape {self._range_block_shape}')             
+                        f'The range of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape {self._range_block_shape}')             
         else:
             res = out
-            return_data_container = False
+            unwrap_data_container_on_return = False
 
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
@@ -230,7 +230,8 @@ class BlockOperator(Operator):
                     temp_out_row = res.get_item(row)
                     temp_out_row += self.get_item(row, col).direct(x_b.get_item(col))
 
-        if return_data_container:
+        if unwrap_data_container_on_return:
+            # Return the out as the user passed it in case the range shape is (1,1)
             return res.get_item(0)
         else:
             return res
@@ -263,10 +264,10 @@ class BlockOperator(Operator):
             raise ValueError(
                 'We expect the input to be a block data container of shape {}'.format(  self._range_block_shape))
         
-        return_data_container = False
+        unwrap_data_container_on_return = False
         
-        if self._domain_block_shape[0]==1:
-            return_data_container = True ##TODO: Does this default make sense?
+        if self._domain_block_shape == (1,1):
+            unwrap_data_container_on_return = True 
         
 
         if out is None:
@@ -277,17 +278,17 @@ class BlockOperator(Operator):
 
         elif not isinstance(out, BlockDataContainer):
             # Handle datacontainers or sirf datacontainers
-            if self._domain_block_shape[0]==1:
+            if unwrap_data_container_on_return:
                     res = BlockDataContainer(out)
                         
 
             else:
                 raise ValueError(
-                    f'Expected `out` to be `None` or a `BlockDataContainer` of shape {self._domain_block_shape}')    
+                    f'The domain of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape {self._domain_block_shape}')    
                     
         else:
             res = out
-            return_data_container = False
+            unwrap_data_container_on_return = False
 
         for col in range(self.shape[1]):
             for row in range(self.shape[0]):
@@ -303,7 +304,8 @@ class BlockOperator(Operator):
                         x_b.get_item(row),
                     )
                     
-        if return_data_container:
+        if unwrap_data_container_on_return:
+            # Return the out as the user passed it in case the range shape is (1,1)
             return res.get_item(0)
         else:
             return res

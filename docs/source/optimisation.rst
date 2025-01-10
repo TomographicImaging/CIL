@@ -96,14 +96,12 @@ ISTA
 ----
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 FISTA
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 PDHG

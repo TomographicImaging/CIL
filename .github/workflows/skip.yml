@@ -12,5 +12,5 @@ on:
     - 'README.md'
 jobs:
   pass:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps: [{run: echo success}]

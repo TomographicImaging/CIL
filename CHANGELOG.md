@@ -12,6 +12,7 @@
     - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
     - Add FluxNormaliser processor (#1878)
     - SAPBY for the BlockDataContainer now does not require an `out` to be passed (#2008)
+    - Fixed the rendering of the SAG/SAGA documentation (#2011)
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
   - Changes that break backwards compatibility:
@@ -21,7 +22,7 @@
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
     - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
-- Testing
+  - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
 
 

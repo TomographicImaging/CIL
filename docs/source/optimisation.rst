@@ -94,7 +94,7 @@ SIRT
 
 ISTA/PGD
 --------
-The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, :ref:`PGD<ISTA>`` is an alias of 'ISTA'. 
+The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, :ref:`PGD<ISTA>` is an alias of `ISTA`. 
 
 .. _ISTA:
 .. autoclass:: cil.optimisation.algorithms.ISTA
@@ -104,7 +104,7 @@ The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradi
 
 FISTA/APGD
 -----
-The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, :ref:`APGD<FISTA>` is an alias of 'FISTA'.
+The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, :ref:`APGD<FISTA>` is an alias of `FISTA`.
 
 .. _FISTA:
 .. autoclass:: cil.optimisation.algorithms.FISTA

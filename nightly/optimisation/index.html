@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev23+gf0f97a44 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev24+gb2f1c62f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../_static/documentation_options.js?v=f2a81717"></script>
+    <script src="../_static/documentation_options.js?v=12b2fba4"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev23+gf0f97a44';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev24+gb2f1c62f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev23+gf0f97a44" />
+  <meta name="docsearch:version" content="24.2.1.dev24+gb2f1c62f" />
   </head>
   
   
@@ -1210,7 +1210,7 @@ print to screen of the status of the optimisation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SIRT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Link to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id71" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id70" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1462,7 +1462,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">ISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Link to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
@@ -1476,7 +1476,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 is guaranteed if</p>
 <div class="math notranslate nohighlight">
 \[\alpha\in(0, \frac{2}{L}),\]</div>
-<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id73" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id72" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1701,7 +1701,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">FISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Link to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id5">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id5">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
@@ -1729,8 +1729,8 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id63" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
-<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id62" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id62" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id61" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1938,7 +1938,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">PDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_fconj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/PDHG/#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Link to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id64" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id65" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id63" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id64" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1964,7 +1964,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <p class="rubric">Example</p>
 <p>In our CIL-Demos repository (<a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos">TomographicImaging/CIL-Demos</a>) you can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpainting
-and Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id67" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id66" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
+and Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id66" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id65" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -3422,7 +3422,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id74"><span class="problematic" id="id75">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id73"><span class="problematic" id="id74">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -6536,7 +6536,7 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 <dt class="sig sig-object py" id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/MixedL21Norm/#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Link to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id76"><span class="problematic" id="id77">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id75"><span class="problematic" id="id76">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py property">
@@ -6757,7 +6757,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id78"><span class="problematic" id="id79">problem_</span></a> of the above problem, see <span id="id17">[<a class="reference internal" href="#id69" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id18">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id19">[<a class="reference internal" href="#id72" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
+applied to the _dual <a href="#id77"><span class="problematic" id="id78">problem_</span></a> of the above problem, see <span id="id17">[<a class="reference internal" href="#id68" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id18">[<a class="reference internal" href="#id67" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id19">[<a class="reference internal" href="#id71" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -6805,7 +6805,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id20">[<a class="reference internal" href="#id70" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id21">[<a class="reference internal" href="#id64" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id20">[<a class="reference internal" href="#id69" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id21">[<a class="reference internal" href="#id63" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -8891,7 +8891,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </section>
 <section id="callbacks">
 <h3>Callbacks<a class="headerlink" href="#callbacks" title="Link to this heading">#</a></h3>
-<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id80"><span class="problematic" id="id81">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
+<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id79"><span class="problematic" id="id80">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
 <span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
@@ -9350,11 +9350,11 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.add" title="Link to this definition">#</a></dt>
 <dd><p>Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placehold for the resul.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9364,11 +9364,11 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <span class="sig-name descname"><span class="pre">subtract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.subtract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.subtract" title="Link to this definition">#</a></dt>
 <dd><p>Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9378,11 +9378,11 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <span class="sig-name descname"><span class="pre">multiply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.multiply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.multiply" title="Link to this definition">#</a></dt>
 <dd><p>Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9392,11 +9392,11 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <span class="sig-name descname"><span class="pre">divide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.divide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.divide" title="Link to this definition">#</a></dt>
 <dd><p>Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9406,11 +9406,11 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <span class="sig-name descname"><span class="pre">power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.power" title="Link to this definition">#</a></dt>
 <dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9418,13 +9418,13 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer.maximum">
 <span class="sig-name descname"><span class="pre">maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.maximum" title="Link to this definition">#</a></dt>
-<dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
+<dd><p>Algebra: maximum method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -9432,45 +9432,47 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer.minimum">
 <span class="sig-name descname"><span class="pre">minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.minimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.minimum" title="Link to this definition">#</a></dt>
-<dd><p>Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
+<dd><p>Algebra: minimum method of BlockDataContainer with number/DataContainer or BlockDataContainer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Param<span class="colon">:</span></dt>
-<dd class="field-odd"><p>other (number, DataContainer or subclasses or BlockDataContainer)</p>
-</dd>
-<dt class="field-even">Param<span class="colon">:</span></dt>
-<dd class="field-even"><p>out (optional): provides a placeholder for the result.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<em>number</em><em>, </em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer.sapyb">
-<span class="sig-name descname"><span class="pre">sapyb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sapyb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Link to this definition">#</a></dt>
 <dd><p>performs axpby element-wise on the BlockDataContainer containers</p>
 <p>Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> – scalar</p></li>
-<li><p><strong>b</strong> – scalar</p></li>
-<li><p><strong>y</strong> – compatible (Block)DataContainer</p></li>
-<li><p><strong>out</strong> – (Block)DataContainer to store the result</p></li>
+<li><p><strong>a</strong> (<em>scalar</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>b</strong> (<em>scalar</em><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
+<li><p><strong>y</strong> (<em>compatible</em><em> (</em><em>Block</em><em>)</em><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
+<li><p><strong>Example</strong></p></li>
+<li><p><strong>--------</strong></p></li>
+<li><p><strong>2</strong> (<em>&gt;&gt;&gt; a =</em>)</p></li>
+<li><p><strong>3</strong> (<em>&gt;&gt;&gt; b =</em>)</p></li>
+<li><p><strong>ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>&gt;&gt;&gt; ig =</em>)</p></li>
+<li><p><strong>11</strong><strong>)</strong></p></li>
+<li><p><strong>ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>&gt;&gt;&gt; x =</em>)</p></li>
+<li><p><strong>ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>&gt;&gt;&gt; y =</em>)</p></li>
+<li><p><strong>BlockDataContainer</strong><strong>(</strong><strong>2*x</strong> (<em>&gt;&gt;&gt; bdc1 =</em>)</p></li>
+<li><p><strong>y</strong><strong>)</strong></p></li>
+<li><p><strong>BlockDataContainer</strong><strong>(</strong><strong>x</strong> (<em>&gt;&gt;&gt; bdc2 =</em>)</p></li>
+<li><p><strong>2*y</strong><strong>)</strong></p></li>
+<li><p><strong>bdc1.sapyb</strong><strong>(</strong><strong>a</strong> (<em>&gt;&gt;&gt; out =</em>)</p></li>
+<li><p><strong>bdc2</strong></p></li>
+<li><p><strong>b</strong><strong>)</strong></p></li>
 </ul>
 </dd>
 </dl>
-<section id="id59">
-<h3>Example:<a class="headerlink" href="#id59" title="Link to this heading">#</a></h3>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc2</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">bdc1</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">bdc2</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
 </dd></dl>
 
 <dl class="py method">
@@ -9955,56 +9957,56 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <section id="references">
 <h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
-<div class="docutils container" id="id61">
+<div class="docutils container" id="id60">
 <div role="list" class="citation-list">
-<div class="citation" id="id69" role="doc-biblioentry">
+<div class="citation" id="id68" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id17">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
 </div>
-<div class="citation" id="id68" role="doc-biblioentry">
+<div class="citation" id="id67" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id18">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
 </div>
-<div class="citation" id="id64" role="doc-biblioentry">
+<div class="citation" id="id63" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id21">2</a>)</span>
 <p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </div>
-<div class="citation" id="id73" role="doc-biblioentry">
+<div class="citation" id="id72" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. <em>Multiscale Modeling &amp; Simulation</em>, 4(4):1168–1200, 2005. URL: <a class="reference external" href="https://doi.org/10.1137/050626090">https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/050626090">arXiv:https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://doi.org/10.1137/050626090">doi:10.1137/050626090</a>.</p>
 </div>
-<div class="citation" id="id65" role="doc-biblioentry">
+<div class="citation" id="id64" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">5</a><span class="fn-bracket">]</span></span>
 <p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </div>
-<div class="citation" id="id62" role="doc-biblioentry">
+<div class="citation" id="id61" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">6</a><span class="fn-bracket">]</span></span>
 <p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
 </div>
-<div class="citation" id="id67" role="doc-biblioentry">
+<div class="citation" id="id66" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">7</a><span class="fn-bracket">]</span></span>
 <p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </div>
-<div class="citation" id="id71" role="doc-biblioentry">
+<div class="citation" id="id70" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">8</a><span class="fn-bracket">]</span></span>
 <p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </div>
-<div class="citation" id="id63" role="doc-biblioentry">
+<div class="citation" id="id62" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">9</a><span class="fn-bracket">]</span></span>
 <p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
 </div>
-<div class="citation" id="id66" role="doc-biblioentry">
+<div class="citation" id="id65" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">10</a><span class="fn-bracket">]</span></span>
 <p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </div>
-<div class="citation" id="id70" role="doc-biblioentry">
+<div class="citation" id="id69" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">11</a><span class="fn-bracket">]</span></span>
 <p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </div>
-<div class="citation" id="id72" role="doc-biblioentry">
+<div class="citation" id="id71" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">12</a><span class="fn-bracket">]</span></span>
 <p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </div>

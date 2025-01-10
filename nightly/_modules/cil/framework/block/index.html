@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.block &#8212; CIL 24.2.1.dev23+gf0f97a44 documentation</title>
+    <title>cil.framework.block &#8212; CIL 24.2.1.dev24+gb2f1c62f documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../../../../_static/documentation_options.js?v=f2a81717"></script>
+    <script src="../../../../_static/documentation_options.js?v=12b2fba4"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev23+gf0f97a44';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev24+gb2f1c62f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev23+gf0f97a44" />
+  <meta name="docsearch:version" content="24.2.1.dev24+gb2f1c62f" />
   </head>
   
   
@@ -724,8 +724,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placehold for the resul.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -734,8 +737,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SUBTRACT</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -744,8 +750,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MULTIPLY</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -754,8 +763,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">DIVIDE</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -764,44 +777,56 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">POWER</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.maximum">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.maximum">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: maximum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MAXIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.minimum">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.minimum">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: minimum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
-<span class="sd">        :param: other (number, DataContainer or subclasses or BlockDataContainer)</span>
-<span class="sd">        :param: out (optional): provides a placeholder for the result.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
+<span class="sd">            </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.sapyb">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.sapyb">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
 
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
 
-<span class="sd">        :param a: scalar</span>
-<span class="sd">        :param b: scalar</span>
-<span class="sd">        :param y: compatible (Block)DataContainer</span>
-<span class="sd">        :param out: (Block)DataContainer to store the result</span>
-
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : scalar or BlockDataContainer</span>
+<span class="sd">        b : scalar or BlockDataContainer</span>
+<span class="sd">        y : compatible (Block)DataContainer</span>
+<span class="sd">        out : BlockDataContainer, optional</span>
+<span class="sd">            Provides a placeholder for the result</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">        --------</span>
@@ -816,9 +841,9 @@
 <span class="sd">        &gt;&gt;&gt; out = bdc1.sapyb(a,bdc2,b)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;out container cannot be None&quot;</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mi">0</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev27+gecce765f documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev28+ga54c498a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../_static/documentation_options.js?v=ea71da9d"></script>
+    <script src="../_static/documentation_options.js?v=fac7d41b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev27+gecce765f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev28+ga54c498a';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev27+gecce765f" />
+  <meta name="docsearch:version" content="24.2.1.dev28+ga54c498a" />
   </head>
   
   
@@ -9874,6 +9874,14 @@ same range row-wise.</p>
 <dt class="sig sig-object py" id="cil.optimisation.operators.BlockOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/BlockOperator/#BlockOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.direct" title="Link to this definition">#</a></dt>
 <dd><p>Direct operation for the BlockOperator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – The input BlockDataContainer to apply the BlockOperator on. Can be a DataContainer if the domain geometry permits.</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the range geometry permits.</p></li>
+</ul>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>BlockOperators work on BlockDataContainers, but they will also work on DataContainers
@@ -9885,6 +9893,14 @@ and inherited classes by simple wrapping the input in a BlockDataContainer of sh
 <dt class="sig sig-object py" id="cil.optimisation.operators.BlockOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/BlockOperator/#BlockOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.BlockOperator.adjoint" title="Link to this definition">#</a></dt>
 <dd><p>Adjoint operation for the BlockOperator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – The input BlockDataContainer to apply the BlockOperator adjoint on. Can be a DataContainer if the range geometry permits.</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the domain geometry permits.</p></li>
+</ul>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>BlockOperator may contain both LinearOperator and Operator

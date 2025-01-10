@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.BlockOperator &#8212; CIL 24.2.1.dev27+gecce765f documentation</title>
+    <title>cil.optimisation.operators.BlockOperator &#8212; CIL 24.2.1.dev28+ga54c498a documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../../../../../_static/documentation_options.js?v=ea71da9d"></script>
+    <script src="../../../../../_static/documentation_options.js?v=fac7d41b"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev27+gecce765f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev28+ga54c498a';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev27+gecce765f" />
+  <meta name="docsearch:version" content="24.2.1.dev28+ga54c498a" />
   </head>
   
   
@@ -556,8 +556,12 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_elements</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span></div>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>    </div>
 
+        
         <span class="c1"># TODO</span>
         <span class="c1"># until a decent way to check equality of Acquisition/Image geometries</span>
         <span class="c1"># required to fullfil &quot;Operators in a Block are required to have the same</span>
@@ -672,6 +676,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Direct operation for the BlockOperator</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x: BlockDataContainer</span>
+<span class="sd">            The input BlockDataContainer to apply the BlockOperator on. Can be a DataContainer if the domain geometry permits.  </span>
+<span class="sd">        out: BlockDataContainer, optional</span>
+<span class="sd">            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the range geometry permits.</span>
+
 <span class="sd">        Note</span>
 <span class="sd">        -----</span>
 <span class="sd">        BlockOperators work on BlockDataContainers, but they will also work on DataContainers</span>
@@ -682,41 +693,47 @@
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_shape</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>        
+            
+        <span class="k">if</span> <span class="n">x_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;We expect the input to be a block data container of shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span><span class="p">))</span>
+        
+        <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">True</span> 
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
-                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
-            <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="c1"># the output is a single DataContainer, so we can take it out </span>
-                <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
-            <span class="k">else</span><span class="p">:</span> 
-                <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span> 
-            
-
+            <span class="c1"># allocate the output blockdatacontainer of the correct shape</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                                     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+                <span class="c1"># Handle datacontainers or sirf datacontainers</span>
+                <span class="k">if</span> <span class="n">unwrap_data_container_on_return</span><span class="p">:</span> 
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;The range of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>             
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
-                                                      <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">temp_out_row</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="c1"># temp_out_row points to the element in out that we are adding to</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
-                                                      <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span>
-                                                      <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                        <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">out</span></div>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">out</span>
+            <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                
+                <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># temp_out_row points to the element in res that we are adding to</span>
+                    <span class="n">temp_out_row</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                    <span class="n">temp_out_row</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">unwrap_data_container_on_return</span><span class="p">:</span>
+            <span class="c1"># Return the out as the user passed it in case the range shape is (1,1)</span>
+            <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span></div>
+
 
 
 <div class="viewcode-block" id="BlockOperator.adjoint">
@@ -724,6 +741,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Adjoint operation for the BlockOperator</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x: BlockDataContainer</span>
+<span class="sd">            The input BlockDataContainer to apply the BlockOperator adjoint on. Can be a DataContainer if the range geometry permits.</span>
+<span class="sd">        out: BlockDataContainer, optional</span>
+<span class="sd">            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the domain geometry permits.</span>
 <span class="sd">        Note</span>
 <span class="sd">        -----</span>
 <span class="sd">        BlockOperator may contain both LinearOperator and Operator</span>
@@ -737,53 +760,62 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not all operators in Block are linear.&#39;</span><span class="p">)</span>
+
+        
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_b</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_shape</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">adjoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                            <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">prod</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
-                                              <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c1"># the output is a single DataContainer, so we can take it out</span>
-                <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
-                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span> <span class="ow">or</span> \
-                                <span class="p">(</span><span class="n">has_sirf</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">SIRFDataContainer</span><span class="p">)):</span>
-                            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
-                        <span class="k">else</span><span class="p">:</span>
+            
+        <span class="k">if</span> <span class="n">x_b</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;We expect the input to be a block data container of shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_range_block_shape</span><span class="p">))</span>
+        
+        <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">True</span> 
+        
 
-                            <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># out_col_operator points to the column in out that we are updating</span>
-                            <span class="n">temp_out_col</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
-                                                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
-                                                        <span class="p">)</span>
-            <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># allocate the output blockdatacontainer of the correct shape</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                                     <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span><span class="p">)</span>
+            
+
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+            <span class="c1"># Handle datacontainers or sirf datacontainers</span>
+            <span class="k">if</span> <span class="n">unwrap_data_container_on_return</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+                        
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;The domain of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain_block_shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>    
+                    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">out</span>
+            <span class="n">unwrap_data_container_on_return</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                
+                <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                        <span class="n">out</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># out_col_operator points to the column in res that we are updating</span>
+                    <span class="n">temp_out_col</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                    <span class="n">temp_out_col</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
+                        <span class="n">x_b</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">row</span><span class="p">),</span>
+                    <span class="p">)</span>
+                    
+        <span class="k">if</span> <span class="n">unwrap_data_container_on_return</span><span class="p">:</span>
+            <span class="c1"># Return the out as the user passed it in case the range shape is (1,1)</span>
+            <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span></div>
 
 
 <div class="viewcode-block" id="BlockOperator.is_linear">

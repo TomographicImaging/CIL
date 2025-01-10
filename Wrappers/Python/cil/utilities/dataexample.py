@@ -75,6 +75,8 @@ class REMOTEDATA(DATA):
             with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
                 zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
             os.remove(os.path.join(data_dir, cls.ZIP_FILE))
+            if os.path.exists(os.path.join(data_dir, 'md5sums.txt')):
+                os.remove(os.path.join(data_dir, 'md5sums.txt'))
             return True
 
 class BOAT(CILDATA):

@@ -204,17 +204,16 @@ class PaganinProcessor(Processor):
         
         if data.dtype!=np.float32:
             raise TypeError('Processor only support dtype=float32')
+        
+        cil_order = tuple(AcquisitionDimension.get_order_for_engine('cil',data.geometry))
+        if data.dimension_labels != cil_order:
+            raise ValueError("This processor requires CIL data order, consider using `data.reorder('cil')`")
     
         return True
 
     def process(self, out=None):
 
-        data  = self.get_input()
-        cil_order = tuple(AcquisitionDimension.get_order_for_engine('cil',data.geometry))
-        if data.dimension_labels != cil_order:
-            log.warning(msg="This processor will work most efficiently using\
-                        \nCIL data order, consider using `data.reorder('cil')`")
-
+        data  = self.get_input()            
         # set the geometry parameters to use from data.geometry unless the
         # geometry is overridden with an override_geometry
         self._set_geometry(data.geometry, self.override_geometry)
@@ -222,83 +221,51 @@ class PaganinProcessor(Processor):
         if out is None:
             out = data.geometry.allocate(None)
 
-        # make slice indices to get the projection
-        slice_proj = [slice(None)]*len(data.shape)
-        angle_axis = data.get_dimension_axis('angle')
-        slice_proj[angle_axis] = 0
-
-        if data.geometry.channels>1:
-            channel_axis = data.get_dimension_axis('channel')
-            slice_proj[channel_axis] = 0
-        else:
-            channel_axis = None
-
-        data_proj = data.as_array()[tuple(slice_proj)]
-
-        # create an empty axis if the data is 2D
-        if len(data.shape) == 2:
-            data.array = np.expand_dims(data.array, len(data.shape))
-            slice_proj.append(slice(None))
-            data_proj = data.as_array()[tuple(slice_proj)]
-
-        elif len(data_proj.shape) == 2:
-            pass
-        else:
-            raise(ValueError('Data must be 2D or 3D per channel'))
-        
-        if len(out.shape) == 2:
-            out.array = np.expand_dims(out.array, len(out.shape))
+        target_shape = (
+            data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
+            data.get_dimension_size('angle') if 'angle' in data.dimension_labels else 1,
+            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
+            data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
+            
+        data.array = np.reshape(data.array, target_shape)
+        out.array = np.reshape(out.array, target_shape)
         
         # create a filter based on the shape of the data
-        filter_shape = np.shape(data_proj)
-        self.filter_Nx = filter_shape[0]+self.pad*2
-        self.filter_Ny = filter_shape[1]+self.pad*2
+        proj_shape = data.array.shape[-2:]
+        self.filter_Nx = proj_shape[0]+self.pad*2
+        self.filter_Ny = proj_shape[1]+self.pad*2
         self._create_filter(self.override_filter)
 
+        # allocate padded buffer
+        padded_buffer = np.zeros((self.filter_Nx, self.filter_Ny), dtype=data.dtype)
+        buffer_slice = (slice(self.pad, self.pad + proj_shape[0]), 
+                    slice(self.pad, self.pad + proj_shape[1]))
+        
         # pre-calculate the scaling factor
         scaling_factor = -(1/self.mu)
-
-        # allocate padded buffer
-        padded_buffer = np.zeros(tuple(x+self.pad*2 for x in data_proj.shape), dtype=data.dtype)
+        mag2 = self.magnification ** 2
         
-        # make slice indices to unpad the data
-        if self.pad>0:
-            slice_pad = tuple([slice(self.pad,-self.pad)]
-                                *len(padded_buffer.shape))
-        else:
-            slice_pad = tuple([slice(None)]*len(padded_buffer.shape))
         # loop over the channels
-        mag2 = self.magnification**2
         for j in range(data.geometry.channels):
-            if channel_axis is not None:
-                slice_proj[channel_axis] = j
-            # loop over the projections
-            for i in tqdm(range(len(data.geometry.angles))):
-                
-                slice_proj[angle_axis] = i
-                padded_buffer.fill(0)
-                padded_buffer[slice_pad] = data.array[(tuple(slice_proj))]
+            # loop over the angles
+            for i in tqdm(range(target_shape[1])):
+                padded_buffer[:] = 0
+                padded_buffer[buffer_slice] = data.array[j, i, :, :]
 
                 if self.full_retrieval==True:
                     # apply the filter in fourier space, apply log and scale
-                    # by magnification
                     padded_buffer*=mag2
                     fI = fft2(padded_buffer)
                     iffI = ifft2(fI*self.filter).real
                     np.log(iffI, out=padded_buffer)
-                    # apply scaling factor
                     np.multiply(scaling_factor, padded_buffer, out=padded_buffer)
                 else:
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)
                     padded_buffer[:] = ifft2(fI*self.filter).real
-
-                if data.geometry.channels>1:
-                    out.fill(padded_buffer[slice_pad], angle = i, 
-                             channel=j)
-                else:
-                    out.fill(padded_buffer[slice_pad], angle = i)
-                    
+                
+                out.array[j, i, :, :] = padded_buffer[buffer_slice]
+                        
         data.array = np.squeeze(data.array)
         out.array = np.squeeze(out.array)
         return out

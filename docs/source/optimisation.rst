@@ -96,7 +96,6 @@ ISTA/PGD
 ----
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 .. autoclass:: cil.optimisation.algorithms.PGD
@@ -107,7 +106,6 @@ FISTA/APGD
 -----
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 .. autoclass:: cil.optimisation.algorithms.APGD

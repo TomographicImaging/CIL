@@ -227,7 +227,9 @@ class ApproximateGradientSumFunction(SumFunction, ABC):
 
     @property
     def data_passes(self):
-        """ The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.   """
+        """ The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. 
+        This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). 
+        Note that if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights` function for this to be accurate.   """
         data_passes = []
         for el in self.data_passes_indices:
             try:

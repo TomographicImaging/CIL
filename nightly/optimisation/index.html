@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev26+g1ee275d0 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev27+gecce765f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../_static/documentation_options.js?v=79db971e"></script>
+    <script src="../_static/documentation_options.js?v=ea71da9d"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev26+g1ee275d0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev27+gecce765f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev26+g1ee275d0" />
+  <meta name="docsearch:version" content="24.2.1.dev27+gecce765f" />
   </head>
   
   
@@ -412,8 +412,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#gd">GD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgls">CGLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sirt">SIRT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ista">ISTA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fista">FISTA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ista-pgd">ISTA/PGD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fista-apgd">FISTA/APGD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pdhg">PDHG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ladmm">LADMM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pd3o">PD3O</a></li>
@@ -1457,9 +1457,10 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 </dd></dl>
 
 </section>
-<section id="ista">
-<h3>ISTA<a class="headerlink" href="#ista" title="Link to this heading">#</a></h3>
-<dl class="py class">
+<section id="ista-pgd">
+<h3>ISTA/PGD<a class="headerlink" href="#ista-pgd" title="Link to this heading">#</a></h3>
+<p>The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, <a class="reference internal" href="#ista"><span class="std std-ref">PGD</span></a> is an alias of <cite>ISTA</cite>.</p>
+<dl class="py class" id="ista">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">ISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Link to this definition">#</a></dt>
 <dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id55" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id54" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
@@ -1498,6 +1499,10 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <p class="admonition-title">Note</p>
 <p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the ISTA algorithm is equivalent to Gradient Descent.</p>
 <p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the ISTA algorithm is equivalent to a Proximal Point Algorithm.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ISTA algorithm is equivalent to the Proximal Gradient Descent (PGD) algorithm. In CIL, the PGD algorithm is an alias for the ISTA algorithm.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1696,9 +1701,10 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dd></dl>
 
 </section>
-<section id="fista">
-<h3>FISTA<a class="headerlink" href="#fista" title="Link to this heading">#</a></h3>
-<dl class="py class">
+<section id="fista-apgd">
+<h3>FISTA/APGD<a class="headerlink" href="#fista-apgd" title="Link to this heading">#</a></h3>
+<p>The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, <a class="reference internal" href="#fista"><span class="std std-ref">APGD</span></a> is an alias of <cite>FISTA</cite>.</p>
+<dl class="py class" id="fista">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">FISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Link to this definition">#</a></dt>
 <dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id5">[<a class="reference internal" href="#id55" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id54" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
@@ -1731,6 +1737,10 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <p class="admonition-title">Note</p>
 <p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id49" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
 <p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id48" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, ‘APGD’ is an alias of ‘FISTA’.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">

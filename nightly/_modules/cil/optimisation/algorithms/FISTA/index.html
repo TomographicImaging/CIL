@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.FISTA &#8212; CIL 24.2.1.dev26+g1ee275d0 documentation</title>
+    <title>cil.optimisation.algorithms.FISTA &#8212; CIL 24.2.1.dev27+gecce765f documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../../../../../_static/documentation_options.js?v=79db971e"></script>
+    <script src="../../../../../_static/documentation_options.js?v=ea71da9d"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev26+g1ee275d0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev27+gecce765f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev26+g1ee275d0" />
+  <meta name="docsearch:version" content="24.2.1.dev27+gecce765f" />
   </head>
   
   
@@ -544,6 +544,10 @@
 
 <span class="sd">    If the function `f` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to a Proximal Point Algorithm.</span>
 
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The ISTA algorithm is equivalent to the Proximal Gradient Descent (PGD) algorithm. In CIL, the PGD algorithm is an alias for the ISTA algorithm.</span>
+<span class="sd">    </span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
@@ -760,6 +764,11 @@
 
 <span class="sd">    If the function `f` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Guler&#39;s First Accelerated Proximal Point Method  (:cite:`guler1992new` sec 2).</span>
 
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, &#39;APGD&#39; is an alias of &#39;FISTA&#39;.</span>
+
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
@@ -838,6 +847,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">t_old</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div>
 </div>
+
 
 </pre></div>
 

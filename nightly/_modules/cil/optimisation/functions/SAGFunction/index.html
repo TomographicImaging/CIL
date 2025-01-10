@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 24.2.1.dev25+gc6ca51df documentation</title>
+    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 24.2.1.dev26+g1ee275d0 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../../../../../_static/documentation_options.js?v=96eaa4d8"></script>
+    <script src="../../../../../_static/documentation_options.js?v=79db971e"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev25+gc6ca51df';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev26+g1ee275d0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -57,7 +57,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev25+gc6ca51df" />
+  <meta name="docsearch:version" content="24.2.1.dev26+g1ee275d0" />
   </head>
   
   
@@ -497,10 +497,10 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SAGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as</span>
+<span class="sd">    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
 <span class="sd">    </span>
 <span class="sd">    .. math ::</span>
-<span class="sd">                \sum_{i=1}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
+<span class="sd">                \sum_{i=0}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
 <span class="sd">                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\</span>
 <span class="sd">                                                                            g_i^{k-1},\text{ otherwise }</span>
 <span class="sd">                                                                            \end{cases}</span>
@@ -514,14 +514,14 @@
 <span class="sd">    -----</span>
 <span class="sd">    Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</span>
 
-<span class="sd">    Reference</span>
+<span class="sd">    Note</span>
 <span class="sd">    ----------</span>
-<span class="sd">    Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. </span>
+<span class="sd">    Reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. </span>
 
-<span class="sd">    Parameters:</span>
+<span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    functions : `list`  of functions</span>
-<span class="sd">        A list of functions: :math:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list `n`) must be strictly greater than 1. </span>
+<span class="sd">        A list of functions: :math:`f_{0}, f_{1}, ..., f_{n-1}`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list `n`) must be strictly greater than 1. </span>
 <span class="sd">    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in :math:`{0,...,n-1}`.</span>
 <span class="sd">        This sampler is called each time `gradient` is called and sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. </span>
 <span class="sd">    </span>
@@ -530,7 +530,7 @@
 <span class="sd">    </span>
 <span class="sd">    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. </span>
 
-<span class="sd">    Note:  </span>
+<span class="sd">    Note</span>
 <span class="sd">    ------  </span>
 
 <span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
@@ -607,7 +607,7 @@
 <div class="viewcode-block" id="SAGFunction.warm_start_approximate_gradients">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.warm_start_approximate_gradients">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">warm_start_approximate_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0 = \nabla f_i(x_0)` for initial point :math:`x_0`. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -615,8 +615,9 @@
 <span class="sd">            The initial point to warmstart the calculation</span>
 <span class="sd">            </span>
 <span class="sd">        Note</span>
-<span class="sd">        ----</span>
+<span class="sd">        ------</span>
 <span class="sd">        When using SAG or SAGA with a deterministic algorithm, you should warm start the SAG-SAGA Function with the same initial point that you initialise the algorithm</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="p">[</span>
@@ -644,10 +645,10 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SAGAFunction</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i` at iteration :math:`x_k` as</span>
+<span class="sd">    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
 <span class="sd">    </span>
 <span class="sd">    .. math ::</span>
-<span class="sd">                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=1}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
+<span class="sd">                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=0}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
 <span class="sd">                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\</span>
 <span class="sd">                                                                            g_i^{k-1},\text{ otherwise}</span>
 <span class="sd">                                                                            \end{cases}</span>
@@ -659,17 +660,19 @@
 <span class="sd">    ------</span>
 <span class="sd">    Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</span>
 
-<span class="sd">    Note:  </span>
+
+<span class="sd">    Note  </span>
 <span class="sd">    ------  </span>
 
 <span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
 <span class="sd">    </span>
-<span class="sd">    Reference</span>
-<span class="sd">    ----------</span>
-<span class="sd">    Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ------</span>
+<span class="sd">    Reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf</span>
 <span class="sd">   </span>
 
-<span class="sd">    Parameters:</span>
+<span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    functions : `list`  of functions</span>
 <span class="sd">                A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. </span>

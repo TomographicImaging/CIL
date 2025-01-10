@@ -13,6 +13,7 @@
     - Add FluxNormaliser processor (#1878)
     - SAPBY for the BlockDataContainer now does not require an `out` to be passed (#2008)
     - Fixed the rendering of the SAG/SAGA documentation (#2011)
+    - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
   - Changes that break backwards compatibility:

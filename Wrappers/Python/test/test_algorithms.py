@@ -36,7 +36,8 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
+
 
 from scipy.optimize import minimize, rosen
 
@@ -57,7 +58,7 @@ log = logging.getLogger(__name__)
 if has_cvxpy:
     import cvxpy
 
-
+from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):
     def setUp(self):
 
@@ -354,6 +355,8 @@ class TestFISTA(CCPiTestClass):
         fista1 = FISTA(initial=tmp_initial, f=f, g=g,
                        step_size=30.0)
         self.assertFalse(fista1.is_provably_convergent())
+        
+            
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
@@ -423,6 +426,26 @@ class TestFISTA(CCPiTestClass):
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 4.2e-4)
 
+ 
+    def test_FISTA_APGD_alias(self):
+        n = 50
+        m = 500
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+        ig = Aop.domain
+        initial = ig.allocate()
+         
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = APGD(initial=initial, f=f, g=g, step_size=4)
+            self.assertEqual(alg.t, 1)
+            self.assertNumpyArrayEqual(alg.y.array, initial.array)
+            mock_method.assert_called_once_with(initial=initial, f=f, g=g, step_size=4, preconditioner=None)
+
 
 class testISTA(CCPiTestClass):
 
@@ -478,7 +501,6 @@ class testISTA(CCPiTestClass):
 
     def test_update(self):
 
-        # ista run 10 iteration
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=self.g)
         ista.run(1)
@@ -497,10 +519,31 @@ class testISTA(CCPiTestClass):
         res1 = ista.objective[-1]
         res2 = self.f(x) + self.g(x)
         self.assertTrue(res1 == res2)
+        
+    def test_update_pgd(self):
+        
+        tmp_initial = self.ig.allocate()
+        pgd = PGD(initial=tmp_initial, f=self.f, g=self.g)
+        pgd.run(1)
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):
+            x = pgd.g.proximal(x_old - (0.99*2/pgd.f.L)
+                                * pgd.f.gradient(x_old), (1./pgd.f.L))
+            x_old.fill(x)
+
+        np.testing.assert_allclose(pgd.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = pgd.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue(res1 == res2)
 
     def test_update_g_none(self):
 
-        # ista run 10 iteration
+        
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=None)
         ista.run(1)
@@ -510,9 +553,12 @@ class testISTA(CCPiTestClass):
 
         x = ista.g.proximal(x_old - (0.99*2/ista.f.L) *
                             ista.f.gradient(x_old), (1./ista.f.L))
-        x_old.fill(x)
+        
+        #Check if g is None, the proximal operator is the identity and thus GD = ISTA when g is None
+        x2 = x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old)
 
         np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+        np.testing.assert_allclose(x.array, x2.array, atol=1e-2)
 
         # check objective
         res1 = ista.objective[-1]
@@ -571,6 +617,16 @@ class testISTA(CCPiTestClass):
         np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
         np.testing.assert_allclose(
             u_cvxpy.value, ista.solution.array, atol=1e-3)
+
+ 
+    def test_ISTA_PGD_alias(self):
+
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = PGD(initial=self.initial, f=self.f, g=self.g, step_size=4)
+            self.assertEqual(alg._step_size, 4)
+            mock_method.assert_called_once_with(initial=self.initial, f=self.f, g=self.g, step_size=4, preconditioner=None)
+
 
 
 class TestCGLS(CCPiTestClass):

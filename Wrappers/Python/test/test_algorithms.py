@@ -88,12 +88,12 @@ class TestGD(CCPiTestClass):
 
         step_size = norm2sq.L / 3.
 
-        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6)
         alg.run(1000, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
@@ -114,7 +114,7 @@ class TestGD(CCPiTestClass):
         identity = IdentityOperator(ig)
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
-                 objective_function=norm2sq,
+                 f=norm2sq,
                  update_objective_interval=0,
                  atol=1e-9, rtol=1e-6)
         self.assertTrue(alg.update_objective_interval == 0)
@@ -124,11 +124,11 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_step_size_init(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         self.assertEqual(gd.step_size_rule.step_size, 0.002)
         self.assertEqual(gd.step_size, 0.002)
 
-        gd = GD(initial=self.initial, objective_function=self.f)
+        gd = GD(initial=self.initial, f=self.f)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
@@ -137,27 +137,27 @@ class TestGD(CCPiTestClass):
             gd.step_size
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, alpha=1e2, beta=0.25)
+                f=self.f, alpha=1e2, beta=0.25)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
         self.assertEqual(gd.step_size_rule.beta, 0.25)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e2) / np.log10(2)))
 
         with self.assertRaises(TypeError):
-            gd = GD(initial=self.initial, objective_function=self.f,
+            gd = GD(initial=self.initial, f=self.f,
                     step_size=0.1, step_size_rule=ConstantStepSize(0.5))
 
     def test_gd_constant_step_size_init(self):
         rule = ConstantStepSize(0.4)
         self.assertEqual(rule.step_size, 0.4)
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.step_size, 0.4)
         self.assertEqual(gd.step_size, 0.4)
 
     def test_gd_fixed_step_size_rosen(self):
 
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002,
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002,
                 update_objective_interval=500)
         gd.run(3000, verbose=0)
         np.testing.assert_allclose(
@@ -174,7 +174,7 @@ class TestGD(CCPiTestClass):
             2 * np.log10(1e6) / np.log10(2)))
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
@@ -186,7 +186,7 @@ class TestGD(CCPiTestClass):
         self.assertEqual(rule.max_iterations, 5)
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 5e5)
         self.assertEqual(gd.step_size_rule.beta, 0.2)
         self.assertEqual(gd.step_size_rule.max_iterations, 5)
@@ -205,18 +205,22 @@ class TestGD(CCPiTestClass):
 
         norm2sq = LeastSquares(identity, b)
 
-        alg = GD(initial=initial, objective_function=norm2sq)
+        alg = GD(initial=initial, f=norm2sq)
         alg.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, objective_function=norm2sq,
+        alg = GD(initial=initial, f=norm2sq, update_objective_interval=2)
+        self.assertTrue(alg.update_objective_interval==2)
+
+        alg = GD(initial=initial, f=norm2sq,
                  update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
+
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
         armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
+        gd = GD(initial=self.initial, f=self.f, step_size=armj,
                 update_objective_interval=500)
         gd.run(3500, verbose=0)
         np.testing.assert_allclose(
@@ -225,12 +229,12 @@ class TestGD(CCPiTestClass):
             gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
 
     def test_gd_run_no_iterations(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         with self.assertRaises(ValueError):
             gd.run()
 
     def test_gd_run_infinite(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         with self.assertRaises(ValueError):
             gd.run(np.inf)
 

@@ -191,7 +191,7 @@ class TIFFStackReader(object):
 
     '''
         Basic TIFF reader which loops through all tiff files in a specific
-        folder and loads them in alphabetic order
+        folder and loads them in alphabetical order
 
         Parameters
         ----------
@@ -202,8 +202,8 @@ class TIFFStackReader(object):
         roi : dictionary, default `None`
             dictionary with roi to load:
             ``{'axis_0': (start, end, step),
-               'axis_1': (start, end, step),
-               'axis_2': (start, end, step)}``
+            'axis_1': (start, end, step),
+            'axis_2': (start, end, step)}``
             roi is specified for axes before transpose.
 
         transpose : bool, default False
@@ -256,8 +256,8 @@ class TIFFStackReader(object):
         Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
         read data to approximately the original data with the following code:
 
-        >>> writer = TIFFWriter(file_name = '/path/to/folder', compression='uint8')
-        >>> writer.write(original_data)
+        >>> writer = TIFFWriter(file_name = '/path/to/folder', data=original_data, compression='uint8')
+        >>> writer.write()
         >>> reader = TIFFStackReader(file_name = '/path/to/folder')
         >>> about_original_data = reader.read_rescaled()
     '''

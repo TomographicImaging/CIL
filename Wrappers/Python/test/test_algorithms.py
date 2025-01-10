@@ -501,7 +501,6 @@ class testISTA(CCPiTestClass):
 
     def test_update(self):
 
-        
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=self.g)
         ista.run(1)
@@ -524,21 +523,21 @@ class testISTA(CCPiTestClass):
     def test_update_pgd(self):
         
         tmp_initial = self.ig.allocate()
-        ista = PGD(initial=tmp_initial, f=self.f, g=self.g)
-        ista.run(1)
+        pgd = PGD(initial=tmp_initial, f=self.f, g=self.g)
+        pgd.run(1)
 
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
         for _ in range(1):
-            x = ista.g.proximal(x_old - (0.99*2/ista.f.L)
-                                * ista.f.gradient(x_old), (1./ista.f.L))
+            x = pgd.g.proximal(x_old - (0.99*2/pgd.f.L)
+                                * pgd.f.gradient(x_old), (1./pgd.f.L))
             x_old.fill(x)
 
-        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+        np.testing.assert_allclose(pgd.solution.array, x.array, atol=1e-2)
 
         # check objective
-        res1 = ista.objective[-1]
+        res1 = pgd.objective[-1]
         res2 = self.f(x) + self.g(x)
         self.assertTrue(res1 == res2)
 
@@ -554,9 +553,12 @@ class testISTA(CCPiTestClass):
 
         x = ista.g.proximal(x_old - (0.99*2/ista.f.L) *
                             ista.f.gradient(x_old), (1./ista.f.L))
-        x_old.fill(x)
+        
+        #Check if g is None, the proximal operator is the identity and thus GD = ISTA when g is None
+        x2 = x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old)
 
         np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+        np.testing.assert_allclose(x.array, x2.array, atol=1e-2)
 
         # check objective
         res1 = ista.objective[-1]

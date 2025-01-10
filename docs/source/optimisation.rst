@@ -93,24 +93,20 @@ SIRT
    :inherited-members: run, update_objective_interval, max_iteration
 
 ISTA/PGD
+The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, 'PGD' is an alias of 'ISTA'. 
 ----
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-.. autoclass:: cil.optimisation.algorithms.PGD
-   :members:
-
 
 FISTA/APGD
 -----
+The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' is an alias of 'FISTA'.
+
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
-
-.. autoclass:: cil.optimisation.algorithms.APGD
-   :members:
-
 
 PDHG
 ----

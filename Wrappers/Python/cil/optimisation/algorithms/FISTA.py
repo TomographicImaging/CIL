@@ -76,6 +76,10 @@ class ISTA(Algorithm):
 
     If the function `f` is set to `None` or to the `ZeroFunction` then the ISTA algorithm is equivalent to a Proximal Point Algorithm.
 
+    Note
+    ----
+    The ISTA algorithm is equivalent to the Proximal Gradient Descent (PGD) algorithm. In CIL, the PGD algorithm is an alias for the ISTA algorithm.
+    
     Examples
     --------
 
@@ -274,6 +278,11 @@ class FISTA(ISTA):
 
     If the function `f` is set to `None` or to the `ZeroFunction` then the FISTA algorithm is equivalent to Guler's First Accelerated Proximal Point Method  (:cite:`guler1992new` sec 2).
 
+    Note
+    -----
+    FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' is an alias of 'FISTA'.
+
+
     Examples
     --------
 
@@ -350,13 +359,3 @@ class FISTA(ISTA):
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y)
 
-
-class PGD(ISTA):
-    """Proximal Gradient Descent Algorithm. In CIL this is equivalent to ISTA, see :class:`.ISTA`
-    """
-    pass
-
-class APGD(FISTA):
-    """Accelerated Proximal Gradient Descent Algorithm. In CIL this is equivalent to FISTA, see :class:`.FISTA`
-    """
-    pass

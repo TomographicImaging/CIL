@@ -19,31 +19,46 @@
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
 import warnings
 import numpy
-
+import numba
+from cil.utilities import multiprocessing as cil_mp
 
 class TransmissionAbsorptionConverter(DataProcessor):
 
     r'''Processor to convert from transmission measurements to absorption
     based on the Beer-Lambert law
 
-    :param white_level: A float defining incidence intensity in the Beer-Lambert law.
-    :type white_level: float, optional
-    :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
-    :type min_intensity: float, optional
-    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if 'out' is passed
-    :rtype: AcquisitionData, ImageData or DataContainer
+    Parameters:
+    -----------
 
+    white_level: float, optional
+        A float defining incidence intensity in the Beer-Lambert law.
+
+    min_intensity: float, optional
+        A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
+    
+    accelerated: bool, optional
+        Specify whether to use multi-threading using numba. 
+        Default is True
+
+    Returns:
+    --------
+    AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if 'out' is passed
+
+    Notes:
+    ------
     Processor first divides by white_level (default=1) and then take negative logarithm.
     Elements below threshold (after division by white_level) are set to threshold.
     '''
 
     def __init__(self,
                  min_intensity = 0.0,
-                 white_level = 1.0
+                 white_level = 1.0,
+                 accelerated = True,
                  ):
 
         kwargs = {'min_intensity': min_intensity,
-                  'white_level': white_level}
+                  'white_level': white_level,
+                  '_accelerated': accelerated}
 
         super(TransmissionAbsorptionConverter, self).__init__(**kwargs)
 
@@ -80,9 +95,42 @@ class TransmissionAbsorptionConverter(DataProcessor):
             arr_in = arr_out
 
         #beer-lambert
-        numpy.log(arr_in,out=arr_out)
-        numpy.negative(arr_out,out=arr_out)
+        if self.accelerated:
+            if 'horizontal' in data.dimension_labels:
+                h_size = data.get_dimension_size('horizontal')
+            else:
+                h_size = 1
+
+            if 'vertical' in data.dimension_labels:
+                v_size = data.get_dimension_size('vertical')
+            else:
+                v_size = 1
+            proj_size = h_size*v_size
+            num_proj = int(data.array.size / proj_size)
+            num_threads_original = numba.get_num_threads()
+            numba.set_num_threads(cil_mp.NUM_THREADS)
+            numba_loop(arr_in, num_proj, proj_size, arr_out)
+            # reset the number of threads to the original value
+            numba.set_num_threads(num_threads_original)
+
+        else:
+            numpy.log(arr_in,out=arr_out)
+            numpy.negative(arr_out,out=arr_out)
 
         out.fill(arr_out)
 
         return out
+    
+@numba.njit(parallel=True)
+def numba_loop(arr_in, num_proj, proj_size, arr_out):
+    in_flat = arr_in.ravel()
+    out_flat = arr_out.ravel()
+    # total_size = arr_in.size
+    for i in numba.prange(num_proj):
+        start = i * proj_size
+        end = start + proj_size
+        # if end > total_size:
+        #     end = total_size
+        out_flat[start:end] = -numpy.log(in_flat[start:end])
+
+

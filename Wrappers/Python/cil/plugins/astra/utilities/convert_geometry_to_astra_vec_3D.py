@@ -152,8 +152,8 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
-    vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_x,
-                                    volume_geometry_temp.voxel_num_y,
+    vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
+                                    volume_geometry_temp.voxel_num_x,
                                     volume_geometry_temp.voxel_num_z,
                                     volume_geometry_temp.get_min_x() + translation[0],
                                     volume_geometry_temp.get_max_x() + translation[0],

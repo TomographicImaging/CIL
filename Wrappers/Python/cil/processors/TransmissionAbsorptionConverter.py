@@ -95,7 +95,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
             arr_in = arr_out
 
         #beer-lambert
-        if self.accelerated:
+        if self._accelerated:
             if 'horizontal' in data.dimension_labels:
                 h_size = data.get_dimension_size('horizontal')
             else:

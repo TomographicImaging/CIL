@@ -276,24 +276,24 @@ class ImageGeometry:
             out.array.fill(value)
         elif value in FillType:
             if value == FillType.RANDOM:
+                stream = numpy.random.PCG64DXSM
                 seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
+                rng = numpy.random.Generator(stream(seed))
                 if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
+                    r = rng.random(size=self.shape, dtype=self.dtype) + 1j * rng.random(size=self.shape, dtype=self.dtype)
                     out.fill(r)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(rng.random(size=self.shape, dtype=self.dtype))
 
             elif value == FillType.RANDOM_INT:
+                stream = numpy.random.PCG64DXSM
                 seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
+                rng = numpy.random.Generator(stream(seed))
                 max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
-                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                    out.fill(rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32))
                 else:
-                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
+                    out.fill(rng.integers(max_value, size=self.shape, dtype=numpy.int32))
         elif value is None:
             pass
         else:

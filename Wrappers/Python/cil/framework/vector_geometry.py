@@ -114,9 +114,10 @@ class VectorGeometry:
                 rng = numpy.random.Generator(stream(seed))
                 max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
-                    out.fill(rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32))
+                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 else:
-                    out.fill(rng.integers(max_value, size=self.shape, dtype=numpy.int32))
+                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=dtype))
         elif value is None:
             pass
         else:

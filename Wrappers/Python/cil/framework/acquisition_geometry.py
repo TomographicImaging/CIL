@@ -2204,7 +2204,7 @@ class AcquisitionGeometry(object):
                     r = rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 else:
                     r = rng.integers(max_value, size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r))
+                out.fill(numpy.asarray(r, dtype=dtype))
         elif value is None:
             pass
         else:

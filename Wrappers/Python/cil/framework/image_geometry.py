@@ -280,10 +280,11 @@ class ImageGeometry:
                 seed = kwargs.get('seed', None)
                 rng = numpy.random.Generator(stream(seed))
                 if numpy.iscomplexobj(out.array):
-                    r = rng.random(size=self.shape, dtype=self.dtype) + 1j * rng.random(size=self.shape, dtype=self.dtype)
+                    half_dtype = numpy.dtype('f' + str(out.dtype.itemsize // 2))
+                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
                     out.fill(r)
                 else:
-                    out.fill(rng.random(size=self.shape, dtype=self.dtype))
+                    out.fill(rng.random(size=self.shape, dtype=out.dtype))
 
             elif value == FillType.RANDOM_INT:
                 stream = numpy.random.PCG64DXSM

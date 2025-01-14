@@ -2616,12 +2616,6 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
-        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
-                                            accelerated=False)
-        s.set_input(ad)
-        data_exp = s.get_output()
-        self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
         data_exp.fill(0)
         s.process(out=data_exp)

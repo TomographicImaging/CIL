@@ -532,8 +532,6 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         test7 = AG.allocate(11)
         np.testing.assert_array_almost_equal(test7.array, np.ones([2,5,3,4])*11)        
-        
- 
 
     def test_get_ImageGeometry(self):
 

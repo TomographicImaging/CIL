@@ -55,7 +55,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     
     # Translation vector that will modify the centre of the reconstructed volume
     # (by defalut, no translation)
-    translation = [0.0, 0.0, 0.0];
+    translation = [0.0, 0.0, 0.0]
 
     if sinogram_geometry.dimension == '2D':
         #create a 3D astra geom from 2D CIL geometry
@@ -121,7 +121,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         ]);
 
         # Compute a translation vector that will modify the centre of the reconstructed volume
-        translation = np.array(system.volume_centre_position) - current_centre;
+        translation = np.array(system.volume_centre.position) - current_centre
 
         projector = 'cone_vec'
 
@@ -143,12 +143,12 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     else:
         vectors = np.zeros((system.num_positions, 12))
 
-        for i, (src, det, row, col) in enumerate(zip(system.source.position_set, system.detector.position_set, system.detector.direction_x_set, system.detector.direction_y_set)):
-
-            vectors[i, :3]  = src.reshape(3)
-            vectors[i, 3:6] = det.reshape(3)
-            vectors[i, 6:9] = row.reshape(3)
-            vectors[i, 9:]  = col.reshape(3)
+        #for i, (src, det, row, col) in enumerate(zip(system.source.position_set, system.detector.position_set, system.detector.direction_x_set, system.detector.direction_y_set)):
+        for i in range(system.num_positions):
+            vectors[i, :3] = system.source[i].position
+            vectors[i, 3:6]  = system.detector[i].position
+            vectors[i, 6:9] = system.detector[i].direction_x * panel.pixel_size[0]
+            vectors[i, 9:]  = system.detector[i].direction_y * panel.pixel_size[1]
 
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)

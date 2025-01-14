@@ -198,21 +198,28 @@ class SystemConfiguration:
     def acquisition_type(self, val):
         self._acquisition_type = AcquisitionType(val).validate()
 
-    def __init__(self, dof: int, geometry, units='units'):
+    def __init__(self, dof: int, geometry, units='units', number_vectors=1):
         self.acquisition_type = AcquisitionType(f"{dof}D") | AcquisitionType(geometry)
+        self._num_vectors = number_vectors
         self.units = units
 
-        if AcquisitionType.PARALLEL & self.geometry:
-            self.ray = DirectionVector(dof)
-        else:
-            self.source = PositionVector(dof)
+        if AcquisitionType.CONE_SOUV & self.geometry:
+            self.source = [PositionVector(dof) for _ in range(number_vectors)]
+            self.detector = [Detector2D(dof) for _ in range(number_vectors)]
+            self.volume_centre = PositionVector(dof)
 
-        if AcquisitionType.DIM2 & self.dimension:
-            self.detector = Detector1D(dof)
-            self.rotation_axis = PositionVector(dof)
         else:
-            self.detector = Detector2D(dof)
-            self.rotation_axis = PositionDirectionVector(dof)
+            if AcquisitionType.PARALLEL & self.geometry:
+                self.ray = DirectionVector(dof)
+            else:
+                self.source = PositionVector(dof)
+
+            if AcquisitionType.DIM2 & self.dimension:
+                self.detector = Detector1D(dof)
+                self.rotation_axis = PositionVector(dof)
+            else:
+                self.detector = Detector2D(dof)
+                self.rotation_axis = PositionDirectionVector(dof)
 
     def __str__(self):
         """Implements the string representation of the system configuration
@@ -273,21 +280,30 @@ class SystemConfiguration:
         return axis_rotation
 
     def update_reference_frame(self):
-        r'''Transforms the system origin to the rotation_axis position
+        r'''Transforms the system origin to the rotation_axis position, or the volume centre for per-projection geometry
         '''
-        self.set_origin(self.rotation_axis.position)
+        if self.acquisition_type & AcquisitionType.CONE_SOUV:
+            self.set_origin(self.volume_centre.position)
+        else:
+            self.set_origin(self.rotation_axis.position)
 
 
     def set_origin(self, origin):
         r'''Transforms the system origin to the input origin
         '''
         translation = origin.copy()
-        if hasattr(self,'source'):
-            self.source.position -= translation
 
-        self.detector.position -= translation
-        self.rotation_axis.position -= translation
+        if self.acquisition_type & AcquisitionType.CONE_SOUV:
+            for i in range(self._num_vectors):
+                self.source[i].position -= translation
+                self.detector[i].position -= translation
+            self.volume_centre.position -= translation
+        else:
+            if hasattr(self,'source'):
+                self.source.position -= translation
 
+            self.detector.position -= translation
+            self.rotation_axis.position -= translation
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corresponding to the centre slice
@@ -1219,46 +1235,62 @@ class Cone3D(SystemConfiguration):
 class Cone3D_SOUV(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
 
-    :param source_position_set: N 3D vectors describing the position of the source (x,y,z)
-    :type source_position_set: list, tuple, ndarray
-    :param detector_position_set: N 3D vectors describing the position of the centre of the detector (x,y,z)
-    :type detector_position_set: list, tuple, ndarray
-    :param detector_direction_x_set: N 3D vectors describing the direction of the detector_x (x,y,z)
-    :type detector_direction_x_set: list, tuple, ndarray
-    :param detector_direction_y_set: N 3D vectors describing the direction of the detector_y (x,y,z)
-    :type detector_direction_y_set: list, tuple, ndarray
-    :param volume_centre_position: A 3D vector describing the position of the centre of the reconstructed volume (x,y,z)
-    :type volume_centre_position: list, tuple, ndarray
-    :param units: Label the units of distance used for the configuration
-    :type units: string
+    Parameters
+    ----------
+    source_position_set : array_like
+        N 3D vectors describing the position of the source (x,y,z)
+    detector_position_set : array_like
+        N 3D vectors describing the position of the centre of the detector (x,y,z)
+    detector_direction_x_set : array_like
+        N 3D vectors describing the direction of the detector_x (x,y,z)
+    detector_direction_y_set : array_like
+        N 3D vectors describing the direction of the detector_y (x,y,z)
+    volume_centre_position : array_like, optional
+        A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). If
+        not provided, the volume centre will be estimated as the mean of the midpoints of the
+        lines connecting the source and detector positions.
+    units : str
+        Label the units of distance used for the configuration
+
     '''
 
+    def _validate_and_convert(self, array, name, num_positions, normalise=False):
+        try:
+            array = numpy.array(array,dtype=numpy.float64).reshape(num_positions,3)
+        except:
+            raise ValueError(f"{name} expected a list of {num_positions} 3D vectors")
+
+        if normalise:
+            for i in range(num_positions):
+                array[i] = array[i] / numpy.linalg.norm(array[i])
+
+        return array
+
+
+
     def __init__ (self, source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units='units'):
-        """Constructor method
-        """
-        super(Cone3D_SOUV, self).__init__(dof=3, geometry = 'cone_souv', units=units);
 
-        # All the sets must have the same number of parameters
-        if len(source_position_set) != len(detector_position_set) or \
-                len(source_position_set) != len(detector_direction_x_set) or \
-                len(source_position_set) != len(detector_direction_y_set):
-            
-            raise ValueError("Make sure all the sets have the same number of parameters");
+        self.num_positions = len(source_position_set)
+        super(Cone3D_SOUV, self).__init__(dof=3, geometry = 'cone_souv', units=units, number_vectors= self.num_positions)
 
-        # Number of projections
-        self.num_positions = len(source_position_set);
-
-        #source
-        self.source.position_set = source_position_set;
-
-        #detector
-        self.detector.position_set = detector_position_set;
-        self.detector.direction_x_set = detector_direction_x_set;
-        self.detector.direction_y_set = detector_direction_y_set;
+        # Check that all input sets have the same length
+        if not (len(detector_position_set) == self.num_positions and
+                len(detector_direction_x_set) == self.num_positions and
+                len(detector_direction_y_set) == self.num_positions):
+            raise ValueError(f"All input sets must have the same length. Got {self.num_positions} source positions, \
+                            {len(detector_position_set)} detector positions, {len(detector_direction_x_set)} detector direction x vectors, \
+                            and {len(detector_direction_y_set)} detector direction y vectors.")
+    
+        # Validate and convert the input arrays
+        for i in range(self.num_positions):
+            self.source[i].position = source_position_set[i]
+            self.detector[i].position = detector_position_set[i]
+            self.detector[i].set_direction(detector_direction_x_set[i], detector_direction_y_set[i])
 
         #reconstructed volume centre
         if volume_centre_position is not None:
-            self.volume_centre_position = numpy.array(volume_centre_position);
+            self.volume_centre.position = volume_centre_position
+
         # Estimate the position
         else:
             def clamp(n, smallest, largest):
@@ -1299,21 +1331,21 @@ class Cone3D_SOUV(SystemConfiguration):
 
                 return a + S*u, b + T*v
 
-            points = numpy.zeros(((len(source_position_set) - 1) * 2, 3));
+            points = numpy.zeros(((len(source_position_set) - 1) * 2, 3))
 
             for i in range(len(source_position_set) - 1):
-                a = source_position_set[i + 0]
-                b = source_position_set[i + 1]
+                a = self.source[i+0].position
+                b = self.source[i+1].position
 
-                u = detector_position_set[i + 0] - source_position_set[i + 0]
-                v = detector_position_set[i + 1] - source_position_set[i + 1]
+                u = self.detector[i + 0].position - self.source[i + 0].position
+                v = self.detector[i + 1].position - self.source[i + 1].position
                 
                 A, B = lineSegClosestPoints(a, u, b, v)
                 
                 points[i * 2 + 0] = A
                 points[i * 2 + 1] = B
 
-            self.volume_centre_position = numpy.array([points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]);
+            self.volume_centre.position = [points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]
 
 
 
@@ -1404,16 +1436,19 @@ class Cone3D_SOUV(SystemConfiguration):
 
     def __str__(self):
         def csv(val):
-            return numpy.array2string(val, separator=', ')
+            return numpy.array2string(numpy.array(val), separator=',')
 
         repres = "Per-projection 3D Cone-beam tomography\n"
         repres += "System configuration:\n"
-        repres += "\tSource positions 0-9: {0}\n".format(numpy.array2string(self.source.position_set[0:10], separator=', '))
-        repres += "\tDetector positions 0-9: {0}\n".format(numpy.array2string(self.detector.position_set[0:10], separator=', '))
-        repres += "\tDetector directions x 0-9: {0}\n".format(numpy.array2string(self.detector.direction_x_set[0:10], separator=', '))
-        repres += "\tDetector directions y 0-9: {0}\n".format(numpy.array2string(self.detector.direction_y_set[0:10], separator=', '))
-        repres += "Reconstructed volume:\n"
-        repres += "\tCentre position: {0}\n".format(csv(self.volume_centre_position))
+        repres += f"\tNumber of projections: {self.num_positions}\n"
+
+        num_show = min(10, self.num_positions)
+        repres += f"\tSource positions 0-{num_show-1}: {csv([self.source[i].position for i in range(num_show)])}\n"
+        repres += f"\tDetector positions 0-{num_show-1}: {csv([self.detector[i].position for i in range(num_show)])}\n"
+        repres += f"\tDetector directions x 0-{num_show-1}: {csv([self.detector[i].direction_x for i in range(num_show)])}\n"
+        repres += f"\tDetector directions y 0-{num_show-1}: {csv([self.detector[i].direction_y for i in range(num_show)])}\n"
+        repres += f"\tVolume centre position: {csv(self.volume_centre.position)}\n"
+        repres += f"\tAverage system magnification: {numpy.mean(self.calculate_magnification()[2])}\n"
         return repres
 
     def __eq__(self, other):
@@ -1425,34 +1460,51 @@ class Cone3D_SOUV(SystemConfiguration):
         and numpy.allclose(self.detector.position_set, other.detector.position_set)\
         and numpy.allclose(self.detector.direction_x_set, other.detector.direction_x_set)\
         and numpy.allclose(self.detector.direction_y_set, other.detector.direction_y_set)\
-        and numpy.allclose(self.volume_centre_position, other.volume_centre_position):
+        and numpy.allclose(self.volume_centre.position, other.volume_centre.position):
 
             return True
 
         return False
 
-    def calculate_magnification(self, projection_ID:int=0):
+    def calculate_magnification(self):
+        """
+        Calculate the magnification for each position.
 
-        if projection_ID < self.num_positions:
-            idx = projection_ID;
-        else:
-            raise IndexError("The requested projection index is greater than or equal to the total number of projections in the SOUV geometry.");
+        This method calculates the magnification of the volume_centre point for each projection in 
+        the acquisition geometry. 
 
-        ab = (self.volume_centre_position - self.source.position_set[idx])
-        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+        It computes the distances from the source to the volume_centre and from the volume_centre to the detector, 
+        and then uses these distances to determine the magnification.
 
-        ab_unit = ab / numpy.sqrt(ab.dot(ab))
+        Returns
+        -------
+        list of numpy.ndarray
+            A list containing three numpy arrays:
+            - dist_source_center: The distances from the source to the center for each position.
+            - dist_center_detector: The distances from the center to the detector for each position.
+            - magnification: The magnification factors for each position.
+        """
 
-        # Compute the normal vector of the detector
-        n = numpy.cross(self.detector.direction_x_set[idx], self.detector.direction_y_set[idx])
+        dist_center_detector = numpy.empty(self.num_positions)
+        dist_source_center = numpy.empty(self.num_positions)
+        magnification = numpy.empty(self.num_positions)
 
-        #perpendicular distance between source and detector centre
-        sd = float((self.detector.position_set[idx] - self.source.position_set[idx]).dot(n))
-        ratio = float(ab_unit.dot(n))
+        for idx in range(self.num_positions):
+            ab = (self.volume_centre.position - self.source[idx].position)
+            dist_source_center[idx]  = float(numpy.sqrt(ab.dot(ab)))
 
-        source_to_detector = sd / ratio
-        dist_center_detector = source_to_detector - dist_source_center
-        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+            ab_unit = ab / numpy.sqrt(ab.dot(ab))
+
+            n = self.detector[idx].normal
+
+            #perpendicular distance between source and detector centre
+            sd = float((self.detector[idx].position - self.source[idx].position).dot(n))
+            ratio = float(ab_unit.dot(n))
+
+            source_to_detector= sd / ratio
+            dist_center_detector[idx] = source_to_detector - dist_source_center[idx] 
+            magnification[idx] = (dist_center_detector[idx] + dist_source_center[idx] ) / dist_source_center[idx] 
+
 
         return [dist_source_center, dist_center_detector, magnification]
 
@@ -2008,16 +2060,46 @@ class AcquisitionGeometry(object):
 
     @property
     def dist_source_center(self):
+        """
+        Calculate and return the distance from the source to the center of the volume.
+
+        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        for each position. For other geometries, it returns a single float value.
+
+        Returns:
+            numpy.ndarray: The distance from the source to the center for `cone3d_souv` geometry.
+            float: The distance from the source to the center for other geometries.
+        """
         out = self.config.system.calculate_magnification()
         return out[0]
-
+ 
     @property
     def dist_center_detector(self):
+        """
+        Calculate and return the distance from the center of the volume to the detector.
+
+        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        for each position. For other geometries, it returns a single float value.
+
+        Returns:
+            numpy.ndarray: The distance from the source to the center for `cone3d_souv` geometry.
+            float: The distance from the source to the center for other geometries.
+        """
         out = self.config.system.calculate_magnification()
         return out[1]
 
     @property
     def magnification(self):
+        """
+        Calculate and return the magnification of the system.
+
+        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        for each position. For other geometries, it returns a single float value.
+
+        Returns:
+            numpy.ndarray: The magnification factor for `CONE3D_SOUV` geometry.
+            float: The magnification factor for other geometries.
+        """
         out = self.config.system.calculate_magnification()
         return out[2]
 
@@ -2316,21 +2398,42 @@ class AcquisitionGeometry(object):
 
     @staticmethod
     def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_x=[1, 0], rotation_axis_position=[0, 0], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
+        """
+        Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.
 
-        :param ray_direction: A 2D vector describing the x-ray direction (x,y)
-        :type ray_direction: list, tuple, ndarray, optional
-        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
-        :type detector_position: list, tuple, ndarray, optional
-        :param detector_direction_x: A 2D vector describing the direction of the detector_x (x,y)
-        :type detector_direction_x: list, tuple, ndarray
-        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
-        :type rotation_axis_position: list, tuple, ndarray, optional
-        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
-        :type units: string
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
-        '''
+        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
+        In addition,`set_channel()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+
+        See notes for default directions.
+
+        Parameters
+        ----------
+        ray_direction : array_like, optional
+            A 2D vector describing the x-ray direction (x,y). Default is [0,1].
+        detector_position : array_like, optional
+            A 2D vector describing the position of the centre of the detector (x,y). Default is [0,0].
+        detector_direction_x : array_like, optional
+            A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].
+        rotation_axis_position : array_like, optional
+            A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].
+        units : str
+            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            An AcquisitionGeometry object.
+
+        Note
+        ----
+        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
+
+        The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.
+
+        The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.
+
+        If these values are left as default then the source and detector should lie along the y-axis.
+        """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position, units)
@@ -2338,21 +2441,42 @@ class AcquisitionGeometry(object):
 
     @staticmethod
     def create_Cone2D(source_position, detector_position, detector_direction_x=[1,0], rotation_axis_position=[0,0], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system
+        """
+        Creates the AcquisitionGeometry for a cone beam 2D tomographic system.
 
-        :param source_position: A 2D vector describing the position of the source (x,y)
-        :type source_position: list, tuple, ndarray
-        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
-        :type detector_position: list, tuple, ndarray
-        :param detector_direction_x: A 2D vector describing the direction of the detector_x (x,y)
-        :type detector_direction_x: list, tuple, ndarray
-        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
-        :type rotation_axis_position: list, tuple, ndarray, optional
-        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
-        :type units: string
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
-     '''
+        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
+        In addition,`set_channel()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+
+        See notes for default directions.
+
+        Parameters
+        ----------
+        source_position : array_like
+            A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis.
+        detector_position : array_like
+            A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis.
+        detector_direction_x : array_like, optional
+            A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].
+        rotation_axis_position : array_like, optional
+            A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].
+        units : str
+            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            An AcquisitionGeometry object.
+
+        Note
+        ----
+        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
+
+        The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.
+
+        The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.
+
+        If these values are left as default then the source and detector should lie along the y-axis.
+        """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position, units)
@@ -2360,25 +2484,46 @@ class AcquisitionGeometry(object):
 
     @staticmethod
     def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
+        """
+        Creates the AcquisitionGeometry for a parallel beam 3D tomographic system.
 
-        :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)
-        :type ray_direction: list, tuple, ndarray, optional
-        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
-        :type detector_position: list, tuple, ndarray, optional
-        :param detector_direction_x: A 3D vector describing the direction of the detector_x (x,y,z)
-        :type detector_direction_x: list, tuple, ndarray
-        :param detector_direction_y: A 3D vector describing the direction of the detector_y (x,y,z)
-        :type detector_direction_y: list, tuple, ndarray
-        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
-        :type rotation_axis_position: list, tuple, ndarray, optional
-        :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)
-        :type rotation_axis_direction: list, tuple, ndarray, optional
-        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
-        :type units: string
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
-     '''
+        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
+        In addition,`set_channel()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+
+        Parameters
+        ----------
+        ray_direction : array_like, optional
+            A 3D vector describing the x-ray direction (x,y,z). Default is [0,1,0].
+        detector_position : array_like, optional
+            A 3D vector describing the position of the centre of the detector (x,y,z). Default is [0,0,0].
+        detector_direction_x : array_like, optional
+            A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].
+        detector_direction_y : array_like, optional
+            A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].
+        rotation_axis_position : array_like, optional
+            A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].
+        rotation_axis_direction : array_like, optional
+            A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].
+        units : str
+            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            An AcquisitionGeometry object.
+
+        Notes
+        -----
+        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
+
+        The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector 
+        is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.
+
+        The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin. 
+        The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.
+
+        The default direction of the ray is [0,1,0] which means that the ray is assumed to be pointing in the y direction.
+        """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction, units)
@@ -2386,49 +2531,81 @@ class AcquisitionGeometry(object):
 
     @staticmethod
     def create_Cone3D(source_position, detector_position, detector_direction_x=[1,0,0], detector_direction_y=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
+        """
+        Creates the AcquisitionGeometry for a cone beam 3D tomographic system.
 
-        :param source_position: A 3D vector describing the position of the source (x,y,z)
-        :type source_position: list, tuple, ndarray, optional
-        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
-        :type detector_position: list, tuple, ndarray, optional
-        :param detector_direction_x: A 3D vector describing the direction of the detector_x (x,y,z)
-        :type detector_direction_x: list, tuple, ndarray
-        :param detector_direction_y: A 3D vector describing the direction of the detector_y (x,y,z)
-        :type detector_direction_y: list, tuple, ndarray
-        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
-        :type rotation_axis_position: list, tuple, ndarray, optional
-        :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)
-        :type rotation_axis_direction: list, tuple, ndarray, optional
-        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
-        :type units: string
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
-        '''
+        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
+        In addition,`set_channel()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+
+        Parameters
+        ----------
+        source_position : array_like
+            A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis.
+        detector_position : array_like
+            A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis.
+        detector_direction_x : array_like, optional
+            A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].
+        detector_direction_y : array_like, optional
+            A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].
+        rotation_axis_position : array_like, optional
+            A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].
+        rotation_axis_direction : array_like, optional
+            A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].
+        units : str
+            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            An AcquisitionGeometry object.
+
+        Note
+        ----
+        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
+
+        The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector 
+        is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.
+
+        The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin. 
+        The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.
+
+        If these values are left as default then the source and detector should lie along the y-axis.
+        """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Cone3D(source_position, detector_position, detector_direction_x, detector_direction_y, rotation_axis_position, rotation_axis_direction, units)
         return AG
 
     @staticmethod
-    def create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=[0,0,0], units='units distance'):
-        r'''This creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system
+    def create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=None, units='units distance'):
+        """
+        Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.
 
-        :param source_position_set: N 3D vectors describing the position of the source (x,y,z)
-        :type source_position_set: list, tuple, ndarray, optional
-        :param detector_position_set: N 3D vectors describing the position of the centre of the detector (x,y,z)
-        :type detector_position_set: list, tuple, ndarray, optional
-        :param detector_direction_x_set: N 3D vectors describing the direction of the detector_x (x,y,z)
-        :type detector_direction_x_set: list, tuple, ndarray
-        :param detector_direction_y_set: N 3D vectors describing the direction of the detector_y (x,y,z)
-        :type detector_direction_y_set: list, tuple, ndarray
-        :param volume_centre_position: A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). If no position givenm it will be computed automatically.
-        :type volume_centre_position: list, tuple, ndarray, optional
-        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel
-        :type units: string
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
-        '''
+        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method.
+        In addition,`set_channel()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+
+        Parameters
+        ----------
+        source_position_set : array_like
+            N 3D vectors describing the position of the source (x,y,z).
+        detector_position_set : array_like
+            N 3D vectors describing the position of the centre of the detector (x,y,z).
+        detector_direction_x_set : array_like
+            N 3D vectors describing the direction of the detector_x (x,y,z).
+        detector_direction_y_set : array_like
+            N 3D vectors describing the direction of the detector_y (x,y,z).
+        volume_centre_position : array_like, optional
+            A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). 
+            If no position is given, it will be computed automatically.
+        units : str
+            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            An AcquisitionGeometry object.
+
+        """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units)
@@ -2473,14 +2650,36 @@ class AcquisitionGeometry(object):
         return AG_2D
 
     def get_ImageGeometry(self, resolution=1.0):
-        '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
+        """
+        Returns an ImageGeometry object that corresponds to the AcquisitionGeometry object. The voxel numbers are calculated from 
+        the resolution and the pixel sizes of the panel. The voxel sizes are calculated from the resolution and the magnification of the system.
+        
+        Parameters
+        ----------
+        resolution : float, optional
+            The resolution of the ImageGeometry object. Defaults to 1.0.
+
+        Returns
+        -------
+        ImageGeometry
+            The ImageGeometry object that corresponds to the AcquisitionGeometry object.
+
+        Note
+        ----
+        For CONE3d_SOUV geometries, the magnification of the volume centre is calculated for each projection and the mean is used.
+        """
+
+        if self.config.system.geometry == "cone_souv":
+            mag = self.magnification.mean()
+        else:
+            mag = self.magnification
 
         num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
-        voxel_size_xy = self.config.panel.pixel_size[0] / (resolution * self.magnification)
+        voxel_size_xy = self.config.panel.pixel_size[0] / (resolution * mag)
 
         if AcquisitionType.DIM3 & self.dimension:
             num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
-            voxel_size_z = self.config.panel.pixel_size[1] / (resolution * self.magnification)
+            voxel_size_z = self.config.panel.pixel_size[1] / (resolution * mag)
         else:
             num_voxel_z = 0
             voxel_size_z = 1
@@ -2561,3 +2760,4 @@ class AcquisitionGeometry(object):
             out.fill(value, **kwargs)
 
         return out
+

@@ -54,7 +54,7 @@ conda_args=(create --name="$name"
   ipp-include'>=2021.10'
   libgcc-ng
   libstdcxx-ng
-  matplotlib
+  matplotlib-base
   numba
   olefile'>=0.46'
   packaging

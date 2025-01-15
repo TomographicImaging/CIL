@@ -2482,9 +2482,8 @@ class TestMaskGenerator(unittest.TestCase):
                             voxel_num_y=200)
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
-        data = IG.allocate()
-        numpy.random.seed(10)
-        data.fill(numpy.random.rand(200,200))
+
+        data = IG.allocate('random', seed=10)
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
         data_as_data_container = DataContainer(data.as_array().copy())

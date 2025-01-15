@@ -243,19 +243,18 @@ class TestOperator(CCPiTestClass):
 
     def test_FiniteDifference(self):
         N, M = 2, 3
-        numpy.random.seed(1)
         ig = ImageGeometry(N, M)
         Id = IdentityOperator(ig)
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
-        u = FD.domain_geometry().allocate('random')
-        res = FD.domain_geometry().allocate(FillType["RANDOM"])
+        u = FD.domain_geometry().allocate('random', seed=1)
+        res = FD.domain_geometry().allocate(FillType["RANDOM"], seed=1)
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(FillType["RANDOM"])
+        res = Id.domain_geometry().allocate(FillType["RANDOM"], seed=1)
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -264,14 +263,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(FillType["RANDOM"])
+        u = G.range_geometry().allocate(FillType["RANDOM"], seed=1)
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(FillType["RANDOM"])
+        u = G.domain_geometry().allocate(FillType["RANDOM"], seed=1)
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -280,7 +279,7 @@ class TestOperator(CCPiTestClass):
         # 2D
         M, N = 2, 3
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
-        x = ig.allocate('random')
+        x = ig.allocate('random', seed=1)
 
         labels = ["horizontal_y", "horizontal_x"]
 
@@ -299,7 +298,7 @@ class TestOperator(CCPiTestClass):
         # 2D  + chan
         M, N, K = 2,3,4
         ig1 = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=K, voxel_size_x=0.1, voxel_size_y=0.4)
-        x = ig1.allocate('random')
+        x = ig1.allocate('random', seed=1)
 
         labels = ["channel","horizontal_y", "horizontal_x"]
 
@@ -356,7 +355,7 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,150)
         numpy.testing.assert_almost_equal(res1, 3.1624439599276974, decimal=3)
         res_scipy = scipy.linalg.eig(M1)
-        print(numpy.abs(res_scipy[0]).max())
+        print(res1,numpy.abs(res_scipy[0]).max())
         numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
 
         # 2x2 non-diagonalisable nilpotent matrix
@@ -416,7 +415,6 @@ class TestOperator(CCPiTestClass):
 
 
     def test_Norm(self):
-        numpy.random.seed(1)
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
@@ -566,9 +564,8 @@ class TestGradients(CCPiTestClass):
         Grad = GradientOperator(self.ig)
 
         E1 = SymmetrisedGradientOperator(Grad.range_geometry())
-        numpy.random.seed(1)
-        u1 = E1.domain_geometry().allocate('random')
-        w1 = E1.range_geometry().allocate('random', symmetry = True)
+        u1 = E1.domain_geometry().allocate('random', seed=1)
+        w1 = E1.range_geometry().allocate('random', symmetry = True, seed=1)
 
         lhs = E1.direct(u1).dot(w1)
         rhs = u1.dot(E1.adjoint(w1))
@@ -583,10 +580,9 @@ class TestGradients(CCPiTestClass):
         Grad2 = GradientOperator(self.ig2, correlation = 'Space', backend='numpy')
 
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
-        numpy.random.seed(1)
-        u2 = E2.domain_geometry().allocate('random')
-        w2 = E2.range_geometry().allocate('random', symmetry = True)
-    #
+        u2 = E2.domain_geometry().allocate('random', seed=1)
+        w2 = E2.range_geometry().allocate('random', symmetry = True, seed=1)
+    
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
 
@@ -624,13 +620,11 @@ class TestGradients(CCPiTestClass):
         Grad3 = GradientOperator(self.ig3, correlation = 'Space')
 
         E3 = SymmetrisedGradientOperator(Grad3.range_geometry())
-        numpy.random.seed(1)
-        u3 = E3.domain_geometry().allocate('random')
-        w3 = E3.range_geometry().allocate('random', symmetry = True)
+        u3 = E3.domain_geometry().allocate('random', seed=1)
+        w3 = E3.range_geometry().allocate('random', symmetry = True, seed=1)
     #
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
-
         numpy.testing.assert_almost_equal(lhs3, rhs3, decimal=3)
         self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3, decimal=3) )
 
@@ -658,7 +652,6 @@ class TestOperatorCompositionSum(unittest.TestCase):
 
 
     def test_SumOperator(self):
-        # numpy.random.seed(1)
         ig = self.ig
         data = self.data
 

@@ -6,11 +6,15 @@
     - Make Paganin Processor work with AcquistionData with one angle (#1920)
     - Fix bug passing `kwargs` to PDHG (#2010)
     - Show1D correctly applies slices to N-dimensional data (#2022)
+    - BlockOperator direct and adjoint methods: can pass out as a DataContainer instead of a (1,1) BlockDataContainer where geometry permits (#1926)
   - Enhancements:
     - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
     - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
     - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
     - Add FluxNormaliser processor (#1878)
+    - SAPBY for the BlockDataContainer now does not require an `out` to be passed (#2008)
+    - Fixed the rendering of the SAG/SAGA documentation (#2011)
+    - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
     - Replaced matplotlib dependency with matplotlib-base (#2031)
@@ -20,7 +24,8 @@
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
-- Testing
+    - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
+  - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
 
 

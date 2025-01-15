@@ -48,7 +48,9 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         
         sinogram_geometry.config.system.align_reference_frame('cil')
         angles = sinogram_geometry.config.angles
-        degrees = angles.angle_unit == sinogram_geometry.DEGREE
+
+        #get units
+        degrees = angles.angle_unit == AngleUnit.DEGREE
 
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel

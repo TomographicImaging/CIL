@@ -1253,21 +1253,6 @@ class Cone3D_SOUV(SystemConfiguration):
         Label the units of distance used for the configuration
 
     '''
-
-    def _validate_and_convert(self, array, name, num_positions, normalise=False):
-        try:
-            array = numpy.array(array,dtype=numpy.float64).reshape(num_positions,3)
-        except:
-            raise ValueError(f"{name} expected a list of {num_positions} 3D vectors")
-
-        if normalise:
-            for i in range(num_positions):
-                array[i] = array[i] / numpy.linalg.norm(array[i])
-
-        return array
-
-
-
     def __init__ (self, source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units='units'):
 
         self.num_positions = len(source_position_set)
@@ -2005,6 +1990,37 @@ class AcquisitionGeometry(object):
 
 
     #for backwards compatibility
+    #for backwards compatibility
+    @property
+    def ANGLE(self):
+        warnings.warn("use AcquisitionDimension.Angle instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.ANGLE
+
+    @property
+    def CHANNEL(self):
+        warnings.warn("use AcquisitionDimension.Channel instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.CHANNEL
+
+    @property
+    def DEGREE(self):
+        warnings.warn("use AngleUnit.DEGREE", DeprecationWarning, stacklevel=2)
+        return AngleUnit.DEGREE
+
+    @property
+    def HORIZONTAL(self):
+        warnings.warn("use AcquisitionDimension.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.HORIZONTAL
+
+    @property
+    def RADIAN(self):
+        warnings.warn("use AngleUnit.RADIAN instead", DeprecationWarning, stacklevel=2)
+        return AngleUnit.RADIAN
+
+    @property
+    def VERTICAL(self):
+        warnings.warn("use AcquisitionDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.VERTICAL
+    
     @property
     def geom_type(self):
         return self.config.system.geometry
@@ -2109,11 +2125,19 @@ class AcquisitionGeometry(object):
 
     @property
     def shape(self):
+        if self.config.system.geometry != "cone_souv":
+            shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
+                        AcquisitionDimension.ANGLE: self.config.angles.num_positions,
+                        AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
+                        AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
+        # We are using per-projection geometry, not angles
+        else:
+            shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
+                        AcquisitionDimension.ANGLE: self.config.system.num_positions,
+                        AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
+                        AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
 
-        shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
-                      AcquisitionDimension.ANGLE: self.config.angles.num_positions,
-                      AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
-                      AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
+        
         return tuple(shape_dict[label] for label in self.dimension_labels)
 
     @property

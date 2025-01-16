@@ -70,8 +70,7 @@ class GD(Algorithm):
             logging.info('In a break with backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
             
         if initial is not None and objective_function is not None:
-            self.set_up(initial=initial, objective_function=objective_function,
-                        step_size=step_size,  preconditioner=preconditioner)
+            self.set_up(initial=initial, f=f, step_size=step_size,  preconditioner=preconditioner)
 
     def set_up(self, initial, f, step_size, preconditioner):
         '''initialisation of the algorithm

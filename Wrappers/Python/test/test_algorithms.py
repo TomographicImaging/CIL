@@ -36,7 +36,8 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
+
 
 from scipy.optimize import minimize, rosen
 
@@ -53,13 +54,11 @@ from unittest.mock import MagicMock
 
 log = logging.getLogger(__name__)
 
-if has_astra:
-    from cil.plugins.astra import ProjectionOperator
 
 if has_cvxpy:
     import cvxpy
 
-
+from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):
     def setUp(self):
 
@@ -90,12 +89,12 @@ class TestGD(CCPiTestClass):
 
         step_size = norm2sq.L / 3.
 
-        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6)
         alg.run(1000, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = GD(initial=initial, objective_function=norm2sq, step_size=step_size,
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
                  atol=1e-9, rtol=1e-6, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
@@ -116,7 +115,7 @@ class TestGD(CCPiTestClass):
         identity = IdentityOperator(ig)
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
-                 objective_function=norm2sq,
+                 f=norm2sq,
                  update_objective_interval=0,
                  atol=1e-9, rtol=1e-6)
         self.assertTrue(alg.update_objective_interval == 0)
@@ -126,11 +125,11 @@ class TestGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_step_size_init(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         self.assertEqual(gd.step_size_rule.step_size, 0.002)
         self.assertEqual(gd.step_size, 0.002)
 
-        gd = GD(initial=self.initial, objective_function=self.f)
+        gd = GD(initial=self.initial, f=self.f)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
@@ -139,27 +138,27 @@ class TestGD(CCPiTestClass):
             gd.step_size
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, alpha=1e2, beta=0.25)
+                f=self.f, alpha=1e2, beta=0.25)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
         self.assertEqual(gd.step_size_rule.beta, 0.25)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e2) / np.log10(2)))
 
         with self.assertRaises(TypeError):
-            gd = GD(initial=self.initial, objective_function=self.f,
+            gd = GD(initial=self.initial, f=self.f,
                     step_size=0.1, step_size_rule=ConstantStepSize(0.5))
 
     def test_gd_constant_step_size_init(self):
         rule = ConstantStepSize(0.4)
         self.assertEqual(rule.step_size, 0.4)
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.step_size, 0.4)
         self.assertEqual(gd.step_size, 0.4)
 
     def test_gd_fixed_step_size_rosen(self):
 
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002,
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002,
                 update_objective_interval=500)
         gd.run(3000, verbose=0)
         np.testing.assert_allclose(
@@ -176,7 +175,7 @@ class TestGD(CCPiTestClass):
             2 * np.log10(1e6) / np.log10(2)))
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 1e6)
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
@@ -188,7 +187,7 @@ class TestGD(CCPiTestClass):
         self.assertEqual(rule.max_iterations, 5)
 
         gd = GD(initial=self.initial,
-                objective_function=self.f, step_size=rule)
+                f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.alpha_orig, 5e5)
         self.assertEqual(gd.step_size_rule.beta, 0.2)
         self.assertEqual(gd.step_size_rule.max_iterations, 5)
@@ -207,18 +206,22 @@ class TestGD(CCPiTestClass):
 
         norm2sq = LeastSquares(identity, b)
 
-        alg = GD(initial=initial, objective_function=norm2sq)
+        alg = GD(initial=initial, f=norm2sq)
         alg.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, objective_function=norm2sq,
+        alg = GD(initial=initial, f=norm2sq, update_objective_interval=2)
+        self.assertTrue(alg.update_objective_interval==2)
+
+        alg = GD(initial=initial, f=norm2sq,
                  update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
+
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
     def test_gd_armijo_rosen(self):
         armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=armj,
+        gd = GD(initial=self.initial, f=self.f, step_size=armj,
                 update_objective_interval=500)
         gd.run(3500, verbose=0)
         np.testing.assert_allclose(
@@ -227,12 +230,12 @@ class TestGD(CCPiTestClass):
             gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
 
     def test_gd_run_no_iterations(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         with self.assertRaises(ValueError):
             gd.run()
 
     def test_gd_run_infinite(self):
-        gd = GD(initial=self.initial, objective_function=self.f, step_size=0.002)
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002)
         with self.assertRaises(ValueError):
             gd.run(np.inf)
 
@@ -352,6 +355,8 @@ class TestFISTA(CCPiTestClass):
         fista1 = FISTA(initial=tmp_initial, f=f, g=g,
                        step_size=30.0)
         self.assertFalse(fista1.is_provably_convergent())
+        
+            
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
@@ -421,6 +426,26 @@ class TestFISTA(CCPiTestClass):
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 4.2e-4)
 
+ 
+    def test_FISTA_APGD_alias(self):
+        n = 50
+        m = 500
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+        ig = Aop.domain
+        initial = ig.allocate()
+         
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = APGD(initial=initial, f=f, g=g, step_size=4)
+            self.assertEqual(alg.t, 1)
+            self.assertNumpyArrayEqual(alg.y.array, initial.array)
+            mock_method.assert_called_once_with(initial=initial, f=f, g=g, step_size=4, preconditioner=None)
+
 
 class testISTA(CCPiTestClass):
 
@@ -476,7 +501,6 @@ class testISTA(CCPiTestClass):
 
     def test_update(self):
 
-        # ista run 10 iteration
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=self.g)
         ista.run(1)
@@ -495,10 +519,31 @@ class testISTA(CCPiTestClass):
         res1 = ista.objective[-1]
         res2 = self.f(x) + self.g(x)
         self.assertTrue(res1 == res2)
+        
+    def test_update_pgd(self):
+        
+        tmp_initial = self.ig.allocate()
+        pgd = PGD(initial=tmp_initial, f=self.f, g=self.g)
+        pgd.run(1)
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(1):
+            x = pgd.g.proximal(x_old - (0.99*2/pgd.f.L)
+                                * pgd.f.gradient(x_old), (1./pgd.f.L))
+            x_old.fill(x)
+
+        np.testing.assert_allclose(pgd.solution.array, x.array, atol=1e-2)
+
+        # check objective
+        res1 = pgd.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue(res1 == res2)
 
     def test_update_g_none(self):
 
-        # ista run 10 iteration
+        
         tmp_initial = self.ig.allocate()
         ista = ISTA(initial=tmp_initial, f=self.f, g=None)
         ista.run(1)
@@ -508,9 +553,12 @@ class testISTA(CCPiTestClass):
 
         x = ista.g.proximal(x_old - (0.99*2/ista.f.L) *
                             ista.f.gradient(x_old), (1./ista.f.L))
-        x_old.fill(x)
+        
+        #Check if g is None, the proximal operator is the identity and thus GD = ISTA when g is None
+        x2 = x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old)
 
         np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)
+        np.testing.assert_allclose(x.array, x2.array, atol=1e-2)
 
         # check objective
         res1 = ista.objective[-1]
@@ -569,6 +617,16 @@ class testISTA(CCPiTestClass):
         np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
         np.testing.assert_allclose(
             u_cvxpy.value, ista.solution.array, atol=1e-3)
+
+ 
+    def test_ISTA_PGD_alias(self):
+
+        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+
+            alg = PGD(initial=self.initial, f=self.f, g=self.g, step_size=4)
+            self.assertEqual(alg._step_size, 4)
+            mock_method.assert_called_once_with(initial=self.initial, f=self.f, g=self.g, step_size=4, preconditioner=None)
+
 
 
 class TestCGLS(CCPiTestClass):
@@ -1198,26 +1256,11 @@ class TestSIRT(CCPiTestClass):
 
 class TestSPDHG(CCPiTestClass):
     def setUp(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(20, 20))
         self.subsets = 10
 
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(16, 16))
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(16, 16))
 
-        ig = data.geometry
-        ig.voxel_size_x = 0.1
-        ig.voxel_size_y = 0.1
-
-        detectors = ig.shape[0]
-        angles = np.linspace(0, np.pi, 90)
-        ag = AcquisitionGeometry.create_Parallel2D().set_angles(
-            angles, angle_unit='radian').set_panel(detectors, 0.1)
-        # Select device
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
-
-        sin = Aop.direct(data)
-        partitioned_data = sin.partition(self.subsets, 'sequential')
+        partitioned_data = data.partition(self.subsets, 'sequential')
         self.A = BlockOperator(
             *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
         self.A2 = BlockOperator(
@@ -1225,9 +1268,11 @@ class TestSPDHG(CCPiTestClass):
 
         # block function
         self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
-                                 for i in range(self.subsets)])
+                                for i in range(self.subsets)])
         alpha = 0.025
         self.G = alpha * IndicatorBox(lower=0)
+
+
 
     def test_SPDHG_defaults_and_setters(self):
         # Test SPDHG init with default values

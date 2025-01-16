@@ -2186,23 +2186,24 @@ class AcquisitionGeometry(object):
             out.array.fill(value)
         elif value in FillType:
             if value == FillType.RANDOM:
+                stream = numpy.random.PCG64DXSM
                 seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
+                rng = numpy.random.Generator(stream(seed))
                 if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
+                    half_dtype = numpy.dtype('f' + str(out.dtype.itemsize // 2))
+                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
                     out.fill(r)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(rng.random(size=self.shape, dtype=out.dtype))
             elif value == FillType.RANDOM_INT:
+                stream = numpy.random.PCG64DXSM
                 seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
+                rng = numpy.random.Generator(stream(seed))
                 max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 else:
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=dtype))
         elif value is None:
             pass

@@ -69,6 +69,8 @@ class GD(Algorithm):
         else:
             logging.info('In a break with backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
             
+        super().__init__(**kwargs)
+        
         if initial is not None and f is not None:
             self.set_up(initial=initial, f=f, step_size=step_size,  preconditioner=preconditioner)
 

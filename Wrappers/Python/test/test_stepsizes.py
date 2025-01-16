@@ -279,11 +279,10 @@ class TestStepSizeBB(CCPiTestClass):
         initial = ig.allocate(0)
         f = LeastSquares(Aop, b=bop, c=2)
         
+        alg_true = GD(initial=initial, f=f, step_size=1/f.L)
+        alg_true.run(220, verbose=0)    
 
-        ss_rule=ArmijoStepSizeRule(max_iterations=40, warmstart=False)
-        alg_true = GD(initial=initial, f=f, step_size=ss_rule)
-        alg_true.run(300, verbose=0)      
-   
+
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
         alg = GD(initial=initial, f=f, step_size=ss_rule)
         alg.run(80, verbose=0)

@@ -16,7 +16,6 @@
     - Fixed the rendering of the SAG/SAGA documentation (#2011)
     - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
     - Add accelerated version to TransmissionAbsorption processor (#2032)
-
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
     - Replaced matplotlib dependency with matplotlib-base (#2031)

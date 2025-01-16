@@ -48,8 +48,8 @@ class GD(Algorithm):
 
         self.alpha = kwargs.pop('alpha', None)
         self.beta = kwargs.pop('beta', None)
-        self.rtol = kwargs.pop('rtol', 0) # to be deprecated
-        self.atol = kwargs.pop('atol', 0) # to be deprecated
+        self.rtol = kwargs.pop('rtol', None) # to be deprecated
+        self.atol = kwargs.pop('atol', None) # to be deprecated
         
         super().__init__(**kwargs)
 
@@ -58,7 +58,7 @@ class GD(Algorithm):
 
 
         if self.rtol!=0 or self.atol!=0: # to be deprecated
-            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks) instead for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
+            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks),  for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
         else:
             logging.info('In a break with backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
             
@@ -122,9 +122,12 @@ class GD(Algorithm):
 
     def should_stop(self): # to be deprecated 
         '''Stopping criterion for the gradient descent algorithm '''
-        return super().should_stop() or \
-            numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
+        check_should_stop = False 
+        if self.rtol  is not None or self.atol is not None:
+            check_should_stop = numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
                           atol=self.atol, equal_nan=False)
+        return super().should_stop() or  check_should_stop
+            
 
     @property
     def step_size(self):

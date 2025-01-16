@@ -24,7 +24,6 @@ from scipy.fft import fftfreq
 import numpy as np
 import ctypes
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -266,11 +265,17 @@ class GenericFilteredBackProjection(Reconstructor):
         matplotlib.pyplot
             A plot of the filter
         """
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("matplotlib not found. Please install matplotlib to use this method")   
+
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order
         freq = fftfreq(filter_length)
         freq *= 2
         ind_sorted = np.argsort(freq)
+        plt.figure()
         plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
         plt.xlabel('Frequency (rads/pixel)')
         plt.ylabel('Magnitude')

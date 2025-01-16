@@ -20,7 +20,7 @@ class TestPreconditioners(CCPiTestClass):
         A = IdentityOperator(ig)
         test_precon = MagicMock(None)
         f = LeastSquares(A=A, b=data, c=0.5)
-        alg = GD(initial=ig.allocate('random', seed=10), objective_function=f, preconditioner=test_precon,
+        alg = GD(initial=ig.allocate('random', seed=10), f=f, preconditioner=test_precon,
                  max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
@@ -63,7 +63,7 @@ class TestPreconditioners(CCPiTestClass):
                                    2., 2., 2., 2., 0, 0, 0, 0, 0, 0]))
 
         f = LeastSquares(A, data)
-        alg = GD(initial=ig.allocate(0), objective_function=f,
+        alg = GD(initial=ig.allocate(0), f=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(2)
         preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
@@ -84,17 +84,17 @@ class TestPreconditioners(CCPiTestClass):
         step_size = 1.
         preconditioner = Sensitivity(A)
 
-        alg = GD(initial=ig.allocate(0), objective_function=f,
+        alg = GD(initial=ig.allocate(0), f=f,
                  max_iteration=100, update_objective_interval=1, step_size=step_size)
         self.assertEqual(alg.preconditioner, None)
 
-        precond_pwls = GD(initial=ig.allocate(0), objective_function=f,   preconditioner=preconditioner,
+        precond_pwls = GD(initial=ig.allocate(0), f=f,   preconditioner=preconditioner,
                           max_iteration=100, update_objective_interval=1, step_size=step_size)
 
         def correct_update_objective(alg):
             # SIRT computes |Ax_{k} - b|_2^2
             # GD with weighted LeastSquares computes the objective included the weight, so we remove the weight
-            return 0.5*(alg.objective_function.A.direct(alg.x) - alg.objective_function.b).squared_norm()
+            return 0.5*(alg._objective_function.A.direct(alg.x) - alg._objective_function.b).squared_norm()
 
         precond_pwls.run(10)
         np.testing.assert_allclose(
@@ -122,13 +122,13 @@ class TestPreconditioners(CCPiTestClass):
                    max_iteration=100, update_objective_interval=1, step_size=step_size)
         self.assertEqual(alg.preconditioner, None)
 
-        precond_pwls = GD(initial=ig.allocate(0), objective_function=f,   preconditioner=preconditioner,
+        precond_pwls = GD(initial=ig.allocate(0), f=f,   preconditioner=preconditioner,
                           max_iteration=100, update_objective_interval=1, step_size=step_size)
 
         def correct_update_objective(alg):
             # SIRT computes |Ax_{k} - b|_2^2
             # GD with weighted LeastSquares computes the objective included the weight, so we remove the weight
-            return 0.5*(alg.objective_function.A.direct(alg.x) - alg.objective_function.b).squared_norm()
+            return 0.5*(alg._objective_function.A.direct(alg.x) - alg._objective_function.b).squared_norm()
 
         precond_pwls.run(10)
         np.testing.assert_allclose(
@@ -185,7 +185,7 @@ class TestPreconditioners(CCPiTestClass):
                                    2., 2., 2., 2., 0, 0, 0, 0, 0, 0]))
 
         f = LeastSquares(A, data)
-        alg = GD(initial=ig.allocate(0), objective_function=f,
+        alg = GD(initial=ig.allocate(0), f=f,
                  max_iteration=100, update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(1)
         preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
@@ -242,7 +242,7 @@ class TestPreconditioners(CCPiTestClass):
         step_size = 1.
         preconditioner = AdaptiveSensitivity(A, max_iterations=3000, delta=1e-8)
 
-        precond_pwls = GD(initial=initial, objective_function=f,
+        precond_pwls = GD(initial=initial, f=f,
                           preconditioner=preconditioner, update_objective_interval=1, step_size=step_size)
 
         precond_pwls.run(3000)

@@ -96,20 +96,12 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
         #beer-lambert
         if self._accelerated:
-            if 'horizontal' in data.dimension_labels:
-                h_size = data.get_dimension_size('horizontal')
-            else:
-                h_size = 1
-
-            if 'vertical' in data.dimension_labels:
-                v_size = data.get_dimension_size('vertical')
-            else:
-                v_size = 1
-            proj_size = h_size*v_size
-            num_proj = int(data.array.size / proj_size)
+            chunk_size = 64000
+            num_chunks = int(numpy.ceil(data.size/chunk_size))
+            chunk_size = int(numpy.ceil(data.size/num_chunks))
             num_threads_original = numba.get_num_threads()
             numba.set_num_threads(cil_mp.NUM_THREADS)
-            numba_loop(arr_in, num_proj, proj_size, arr_out)
+            numba_loop(arr_in, num_chunks, chunk_size, arr_out)
             # reset the number of threads to the original value
             numba.set_num_threads(num_threads_original)
 
@@ -125,12 +117,12 @@ class TransmissionAbsorptionConverter(DataProcessor):
 def numba_loop(arr_in, num_proj, proj_size, arr_out):
     in_flat = arr_in.ravel()
     out_flat = arr_out.ravel()
-    # total_size = arr_in.size
+    total_size = arr_in.size
     for i in numba.prange(num_proj):
         start = i * proj_size
         end = start + proj_size
-        # if end > total_size:
-        #     end = total_size
+        if end > total_size:
+            end = total_size
         out_flat[start:end] = -numpy.log(in_flat[start:end])
 
 

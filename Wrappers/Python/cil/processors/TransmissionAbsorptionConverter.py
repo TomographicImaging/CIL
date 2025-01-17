@@ -95,13 +95,14 @@ class TransmissionAbsorptionConverter(DataProcessor):
             arr_in = arr_out
 
         #beer-lambert
-        if self._accelerated:
-            chunk_size = 64000
-            num_chunks = int(numpy.ceil(data.size/chunk_size))
-            chunk_size = int(numpy.ceil(data.size/num_chunks))
+        chunk_size = 6400
+        num_chunks = data.size // chunk_size
+
+        if (self._accelerated) & (num_chunks > 5):
+            remainder = data.size % chunk_size
             num_threads_original = numba.get_num_threads()
             numba.set_num_threads(cil_mp.NUM_THREADS)
-            numba_loop(arr_in, num_chunks, chunk_size, arr_out)
+            numba_loop(arr_in, num_chunks, chunk_size, remainder, arr_out)
             # reset the number of threads to the original value
             numba.set_num_threads(num_threads_original)
 
@@ -114,15 +115,17 @@ class TransmissionAbsorptionConverter(DataProcessor):
         return out
     
 @numba.njit(parallel=True)
-def numba_loop(arr_in, num_proj, proj_size, arr_out):
+def numba_loop(arr_in, num_chunks, chunk_size, remainder, arr_out):
     in_flat = arr_in.ravel()
     out_flat = arr_out.ravel()
-    total_size = arr_in.size
-    for i in numba.prange(num_proj):
-        start = i * proj_size
-        end = start + proj_size
-        if end > total_size:
-            end = total_size
+    for i in numba.prange(num_chunks):
+        start = i * chunk_size
+        end = start + chunk_size
+        out_flat[start:end] = -numpy.log(in_flat[start:end])
+
+    if remainder > 0:
+        start = num_chunks * chunk_size
+        end = start + remainder
         out_flat[start:end] = -numpy.log(in_flat[start:end])
 
 

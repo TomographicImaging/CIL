@@ -59,7 +59,7 @@ Logging and warning
 =======================
 We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html. In particular:
 
-.. list-table:: The best tool for the task
+.. list-table:: Logging and warning guidelines
    :header-rows: 1
    :widths: 40 60
 
@@ -72,7 +72,8 @@ We follow pythons convention on logging (see e.g. https://docs.python.org/3/howt
      - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
    * - Issue a warning regarding a particular runtime event
      - ``warnings.warn()``  if the issue is avoidable and the user's code
-       should be modified to eliminate the warning  
+       should be modified to eliminate the warning. 
+       
        A logger’s ``warning()`` method if there is nothing the user can do about 
        the situation, but the event should still be noted
    * - Report an error regarding a particular runtime event

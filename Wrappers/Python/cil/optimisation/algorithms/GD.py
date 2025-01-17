@@ -145,7 +145,7 @@ class GD(Algorithm):
     def calculate_objective_function_at_point(self, x):
         """ Calculates the objective at a given point x
 
-        .. math:: f(x) + g(x)
+        .. math:: f(x)
         
         Parameters
         ----------

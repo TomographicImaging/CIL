@@ -45,13 +45,10 @@ class GD(Algorithm):
 
     def __init__(self, initial=None, f=None, step_size=None,   preconditioner=None, **kwargs):
 
-        '''GD algorithm creator
-        '''
-
-        self.alpha = kwargs.pop('alpha', None)
-        self.beta = kwargs.pop('beta', None)
-        self.rtol = kwargs.pop('rtol', None) # to be deprecated
-        self.atol = kwargs.pop('atol', None) # to be deprecated
+        self.alpha = kwargs.pop('alpha', None) # to be deprecated
+        self.beta = kwargs.pop('beta', None) # to be deprecated
+        self.rtol = kwargs.pop('rtol', None) # to be deprecated (released in 25.0)
+        self.atol = kwargs.pop('atol', None) # to be deprecated (released in 25.0)
         
 
         if kwargs.get('objective_function') is not None: # to be deprecated
@@ -64,10 +61,10 @@ class GD(Algorithm):
         if self.alpha is not None or self.beta is not None: # to be deprecated
             warn('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ', DeprecationWarning, stacklevel=2)
 
-        if self.rtol!=0 or self.atol!=0: # to be deprecated
+        if self.rtol!=0 or self.atol!=0: # to be deprecated (released in 25.0)
             warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks),  for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
         else:
-            logging.info('In a break with backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
+            log.warn('Breaking backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
             
         super().__init__(**kwargs)
         
@@ -128,7 +125,7 @@ class GD(Algorithm):
     def update_objective(self):
         self.loss.append(self._objective_function(self.solution))
 
-    def should_stop(self): # to be deprecated 
+    def should_stop(self): # to be deprecated (released in 25.0)
         '''Stopping criterion for the gradient descent algorithm '''
         check_should_stop = False 
         if self.rtol  is not None or self.atol is not None:

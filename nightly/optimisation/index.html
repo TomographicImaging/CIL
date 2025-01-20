@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.2.1.dev29+g72d147cd documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.2.1.dev30+g6a65e801 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=233e30ee0c820e057811" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=233e30ee0c820e057811" />
 
-    <script src="../_static/documentation_options.js?v=a6dd6d4d"></script>
+    <script src="../_static/documentation_options.js?v=dc20ea70"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev29+g72d147cd';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev30+g6a65e801';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev29+g72d147cd" />
+  <meta name="docsearch:version" content="24.2.1.dev30+g6a65e801" />
   </head>
   
   
@@ -785,7 +785,7 @@ print to screen of the status of the optimisation.</p>
 <h3>GD<a class="headerlink" href="#gd" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">GD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/GD/#GD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">GD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/GD/#GD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD" title="Link to this definition">#</a></dt>
 <dd><p>Gradient Descent algorithm</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -794,8 +794,6 @@ print to screen of the status of the optimisation.</p>
 <li><p><strong>f</strong> (CIL function (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Function()</span></code></a>. ) with a defined gradient method) – The function to be minimised.</p></li>
 <li><p><strong>step_size</strong> (positive real float or subclass of <code class="xref py py-meth docutils literal notranslate"><span class="pre">StepSizeRule()</span></code>, default = None) – If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’ is passed then it’s method <cite>get_step_size</cite> is called for each update.</p></li>
 <li><p><strong>preconditioner</strong> (class with a <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditioner()</span></code>. If None is passed  then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
-<li><p><strong>rtol</strong> (<em>positive float</em><em>, </em><em>default 1e-5</em>) – optional parameter defining the relative tolerance comparing the current objective function to 0, default 1e-5, see numpy.isclose</p></li>
-<li><p><strong>atol</strong> (<em>positive float</em><em>, </em><em>default 1e-8</em>) – optional parameter defining the absolute tolerance comparing the current objective function to 0, default 1e-8, see numpy.isclose</p></li>
 </ul>
 </dd>
 </dl>
@@ -838,7 +836,7 @@ print to screen of the status of the optimisation.</p>
 <span class="sig-name descname"><span class="pre">calculate_objective_function_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/GD/#GD.calculate_objective_function_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD.calculate_objective_function_at_point" title="Link to this definition">#</a></dt>
 <dd><p>Calculates the objective at a given point x</p>
 <div class="math notranslate nohighlight">
-\[f(x) + g(x)\]</div>
+\[f(x)\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>

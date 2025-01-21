@@ -1,6 +1,6 @@
-from cil.optimisation.algorithms import SPDHG, PDHG
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction
-from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator
+from cil.optimisation.algorithms import SPDHG, PDHG, PD3O
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, TotalVariation, MixedL21Norm
+from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler 
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData
 
@@ -106,7 +106,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
             alg_stochastic.x.as_array(), b.as_array(), decimal=6)
         
     def test_pd3o_convergence(self):
-
+        data = dataexample.CAMERA.get(size=(32, 32))
         # pd30 convergence test using TV denoising
 
         # regularisation parameter
@@ -114,16 +114,16 @@ class TestAlgorithmConvergence(CCPiTestClass):
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
         TV = TotalVariation(max_iteration=200)
-        tv_cil = TV.proximal(self.data, tau=alpha)
+        tv_cil = TV.proximal(data, tau=alpha)
 
         F = alpha * MixedL21Norm()
-        operator = GradientOperator(self.data.geometry)
+        operator = GradientOperator(data.geometry)
         norm_op = operator.norm()
 
         # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)
         H = alpha * MixedL21Norm()
-        G = 0.25 * L2NormSquared(b=self.data)
-        F = 0.25 * L2NormSquared(b=self.data)
+        G = 0.25 * L2NormSquared(b=data)
+        F = 0.25 * L2NormSquared(b=data)
         gamma = 2./F.L
         delta = 1./(gamma*norm_op**2)
 

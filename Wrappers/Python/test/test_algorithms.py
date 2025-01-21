@@ -1764,18 +1764,32 @@ class Test_PD3O(unittest.TestCase):
             A=MatrixOperator(np.diag(diagonal))
             functions.append( LeastSquares(A, A.direct(b)))
         
-        f=SVRGFunction(functions, sampler)
         H1 = 0.1 * L1Norm()
         operator = IdentityOperator(initial.geometry)
         G1 = IndicatorBox(lower=0)
-        with self.assertRaises(NotImplementedError):
-            algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
-            algo_pd3o.run(1)
+
+
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=3)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 8/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [0,1,2]])
         
+        sampler=Sampler.sequential(3)
         f=LSVRGFunction(functions, sampler)
-        with self.assertRaises(NotImplementedError):
-            algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
-            algo_pd3o.run(1)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
             
         sampler=Sampler.sequential(3)
         f=SGFunction(functions, sampler)

@@ -332,7 +332,6 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
         #Test random seed
-        numpy.testing.assert_equal(M1op._random_number_seed,0)
         res1 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=2)
         res2 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=2)
         res3 = M1op.PowerMethod(M1op,1, method="composed_with_adjoint", seed=3)

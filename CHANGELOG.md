@@ -7,6 +7,7 @@
     - Fix bug passing `kwargs` to PDHG (#2010)
     - Show1D correctly applies slices to N-dimensional data (#2022)
     - BlockOperator direct and adjoint methods: can pass out as a DataContainer instead of a (1,1) BlockDataContainer where geometry permits (#1926)
+    - Add path to python executable to cmake commands to fix issue with cmake retrieving wrong python (#2044)
   - Enhancements:
     - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
     - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)

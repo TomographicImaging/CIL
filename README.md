@@ -156,7 +156,7 @@ cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DPython_EXECUTABLE
 ```
 #### Windows
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX% -DPython_EXECUTABLE=%CONDA_PREFIX%/python
+cmake -S . -B .\build -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX% -DPython_EXECUTABLE=%CONDA_PREFIX%\python
 ```
 
 If not installing to a conda environment then the user will also need to set the locations of the IPP library and includes, and the path to CIL.

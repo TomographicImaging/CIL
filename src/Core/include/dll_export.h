@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2019 United Kingdom Research and Innovation
 //  Copyright 2019 The University of Manchester
 //
@@ -22,13 +21,13 @@
 #define DLLEXPORT_H
 
 #if defined(_WIN32) || defined(__WIN32__)
-#if defined(dll_EXPORTS)  // add by CMake 
+#if defined(dll_EXPORTS)  // add by CMake
 #define  DLL_EXPORT __declspec(dllexport)
 #define EXPIMP_TEMPLATE
 #else
 #define  DLL_EXPORT __declspec(dllexport)
 #define EXPIMP_TEMPLATE extern
-#endif 
+#endif
 #elif defined(linux) || defined(__linux) || defined(__APPLE__)
 #define DLL_EXPORT
 #ifndef __cdecl

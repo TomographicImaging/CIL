@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -23,45 +22,75 @@ from cil.framework import VectorGeometry
 from cil.optimisation.operators import LinearOperator
 
 class MatrixOperator(LinearOperator):
-    """ Matrix wrapped into a LinearOperator
-    
-    :param: a numpy matrix 
-    
-    """
-    
-    def __init__(self,A):
-        '''creator
+    r""" Matrix wrapped in a CIL Operator to be used in optimisation algorithms. 
 
-        :param A: numpy ndarray representing a matrix
-        '''
+    Parameters      
+    ----------
+    A: a numpy matrix
+        The matrix to be wrapped into a CIL Operator
+
+    """
+
+    def __init__(self,A):
+        """Constructor"""
         self.A = A
         M_A, N_A = self.A.shape
         domain_geometry = VectorGeometry(N_A, dtype=A.dtype)
         range_geometry = VectorGeometry(M_A, dtype=A.dtype)
-        self.s1 = None   # Largest singular value, initially unknown
         super(MatrixOperator, self).__init__(domain_geometry=domain_geometry,
                                                    range_geometry=range_geometry)
+
+    def direct(self,x, out=None):
+        r"""Returns the matrix vector product :math:`Ax`
         
-    def direct(self,x, out=None):        
-                
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+        Returns
+        -------
+        DataContainer
+            :math:`Ax`
+        """
+        
         if out is None:
             tmp = self.range_geometry().allocate()
             tmp.fill(numpy.dot(self.A,x.as_array()))
             return tmp
         else:
             # Below use of out is not working, see
-            # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html            
-            # numpy.dot(self.A, x.as_array(), out = out.as_array())            
+            # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html
+            # numpy.dot(self.A, x.as_array(), out = out.as_array())
             out.fill(numpy.dot(self.A, x.as_array()))
+            return out
 
     def adjoint(self,x, out=None):
+        r"""Returns the matrix vector product :math:`A^{T}x`
+        
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+            
+        Returns
+        -------
+        DataContainer
+            :math:`A^{T}x`
+        """
+        
         if out is None:
             tmp = self.domain_geometry().allocate()
-            tmp.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            tmp.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
             return tmp
-        else:            
-            out.fill(numpy.dot(self.A.transpose(),x.as_array()))
+        else:
+            out.fill(numpy.dot(self.A.transpose().conjugate(),x.as_array()))
+            return out
 
     def size(self):
+        r"""Returns the shape of the matrix
+        """
         return self.A.shape
-    

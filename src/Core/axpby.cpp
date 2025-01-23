@@ -1,4 +1,3 @@
-// -*- coding: utf-8 -*-
 //  Copyright 2019 United Kingdom Research and Innovation
 //  Copyright 2019 The University of Manchester
 //
@@ -30,7 +29,7 @@ int saxpby_asbs(const float * x, const float * y, float * out, float a, float b,
 #pragma omp for
     for (i=0; i < size; i++)
     {
-        *(out + i ) = a * *(x + i) + b * *(y + i); 
+        *(out + i ) = a * *(x + i) + b * *(y + i);
     }
 }
     return 0;
@@ -45,10 +44,10 @@ int saxpby_avbv(const float * x, const float * y, float * out, const float * a, 
 #pragma omp for
     for (i=0; i < size; i++)
     {
-        *(out + i ) = *(a + i) * *(x + i) + *(b + i) * *(y + i); 
+        *(out + i ) = *(a + i) * *(x + i) + *(b + i) * *(y + i);
     }
 }
-    return 0;    
+    return 0;
 }
 
 int saxpby_asbv(const float * x, const float * y, float * out, float a, const float * b, int64 size, int nThreads)
@@ -60,10 +59,10 @@ int saxpby_asbv(const float * x, const float * y, float * out, float a, const fl
 #pragma omp for
     for (i=0; i < size; i++)
     {
-        *(out + i ) = a * *(x + i) + *(b + i) * *(y + i); 
+        *(out + i ) = a * *(x + i) + *(b + i) * *(y + i);
     }
 }
-    return 0; 
+    return 0;
 }
 
 int daxpby_asbs(const double * x, const double * y, double * out, double a, double b, int64 size, int nThreads)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -20,8 +19,7 @@
 import unittest
 import numpy
 import numpy as np
-from cil.framework import ImageData
-from cil.framework import ImageGeometry
+from cil.framework import ImageData, ImageGeometry
 
 import numpy.testing
 
@@ -45,8 +43,8 @@ def dt(steps):
 
 
 class TestFunction(CCPiTestClass):
-    
-        
+
+
     def create_simple_ImageData(self):
         N = 64
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
@@ -64,7 +62,7 @@ class TestFunction(CCPiTestClass):
     def _test_Norm2(self):
         ig, Phantom = self.create_simple_ImageData()
         x = Phantom.as_array()
-        
+
         norm2 = cvxpy.Norm2()
         v1 = norm2(x)
         v2 = norm2(Phantom)
@@ -104,4 +102,3 @@ class TestFunction(CCPiTestClass):
 
 if __name__ == '__main__':
     unittest.main()
-    

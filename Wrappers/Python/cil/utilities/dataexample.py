@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -17,64 +16,98 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageGeometry
+from cil.framework.labels import ImageDimension
 import numpy
 import numpy as np
 from PIL import Image
 import os
-import os.path 
+import os.path
 import sys
-from cil.io import NEXUSDataReader
-
-data_dir = os.path.abspath(os.path.join(
-        os.path.dirname(__file__),
-        '../data/')
-)
-
-# this is the default location after a conda install
-data_dir = os.path.abspath(
-    os.path.join(sys.prefix, 'share','cil')
-)
+from zipfile import ZipFile
+from scipy.io import loadmat
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
+from zenodo_get import zenodo_get
 
 class DATA(object):
     @classmethod
     def dfile(cls):
         return None
+
+class CILDATA(DATA):
+    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
 
-class BOAT(DATA):
+class REMOTEDATA(DATA):
+
+    FOLDER = ''
+    ZENODO_RECORD = ''
+    ZIP_FILE = ''
+
+    @classmethod
+    def get(cls, data_dir):
+        return None
+
+    @classmethod
+    def download_data(cls, data_dir, prompt=True):
+        '''
+        Download a dataset from a remote repository
+
+        Parameters
+        ----------
+        data_dir: str, optional
+           The path to the data directory where the downloaded data should be stored
+
+        '''
+        if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
+            print("Dataset folder already exists in " + data_dir)
+        else:
+            user_input = input("Are you sure you want to download {cls.ZIP_FILE} dataset from Zenodo record {cls.ZENODO_RECORD}? [Y/n]: ") if prompt else 'y'
+            if user_input.lower() not in ('y', 'yes'):
+                print('Download cancelled')
+                return False
+
+            zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
+            with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
+            os.remove(os.path.join(data_dir, cls.ZIP_FILE))
+            if os.path.exists(os.path.join(data_dir, 'md5sums.txt')):
+                os.remove(os.path.join(data_dir, 'md5sums.txt'))
+            return True
+
+class BOAT(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.BOAT
-class CAMERA(DATA):
+class CAMERA(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.CAMERA
-class PEPPERS(DATA):
+class PEPPERS(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.PEPPERS
-class RESOLUTION_CHART(DATA):
+class RESOLUTION_CHART(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.RESOLUTION_CHART
-class SIMPLE_PHANTOM_2D(DATA):
+class SIMPLE_PHANTOM_2D(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.SIMPLE_PHANTOM_2D
-class SHAPES(DATA):
+class SHAPES(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
-class RAINBOW(DATA):
+class RAINBOW(CILDATA):
     @classmethod
     def dfile(cls):
         return TestData.RAINBOW
-class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
+class SYNCHROTRON_PARALLEL_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -91,15 +124,15 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
             The DLS dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
         return loader.read()
-class SIMULATED_PARALLEL_BEAM_DATA(DATA):
+class SIMULATED_PARALLEL_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
-        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME
 
         Parameters
         ----------
@@ -112,15 +145,15 @@ class SIMULATED_PARALLEL_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_parallel_beam.nxs'))
         return loader.read()
-class SIMULATED_CONE_BEAM_DATA(DATA):
+class SIMULATED_CONE_BEAM_DATA(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
-        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME
 
         Parameters
         ----------
@@ -133,11 +166,11 @@ class SIMULATED_CONE_BEAM_DATA(DATA):
             The simulated spheres dataset
         '''
 
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_cone_beam.nxs'))
         return loader.read()
-class SIMULATED_SPHERE_VOLUME(DATA):
+class SIMULATED_SPHERE_VOLUME(CILDATA):
     @classmethod
     def get(cls, **kwargs):
         '''
@@ -153,15 +186,169 @@ class SIMULATED_SPHERE_VOLUME(DATA):
         ImageData
             The simulated spheres volume
         '''
-        
-        ddir = kwargs.get('data_dir', data_dir)
+        ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
 
+class WALNUT(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.WALNUT.download_data(data_dir) # download the data
+    >>> dataexample.WALNUT.get(data_dir) # load the data
+    '''
+    FOLDER = 'walnut'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'walnut.zip'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
+        This function returns the raw projection data from the .txrm file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The walnut dataset
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
+        try:
+            loader = ZEISSDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .txrm file not found in specifed data_dir: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+
+class USB(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.USB.download_data(data_dir) # download the data
+    >>> dataexample.USB.get(data_dir) # load the data
+    '''
+    FOLDER = 'USB'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'usb.zip'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
+        This function returns the raw projection data from the .txrm file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The usb dataset
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
+        try:
+            loader = ZEISSDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .txrm file not found in: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+
+class KORN(REMOTEDATA):
+    '''
+    A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.KORN.download_data(data_dir) # download the data
+    >>> dataexample.KORN.get(data_dir) # load the data
+    '''
+    FOLDER = 'korn'
+    ZENODO_RECORD = '6874123'
+    ZIP_FILE = 'korn.zip'
+
+    @classmethod
+    def get(cls, data_dir):
+        '''
+        Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+        This function returns the raw projection data from the .xtekct file
+
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)
+
+        Returns
+        -------
+        ImageData
+            The korn dataset
+
+        '''
+        filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
+        try:
+            loader = NikonDataReader(file_name=filepath)
+            return loader.read()
+        except(FileNotFoundError):
+            raise(FileNotFoundError("Dataset .xtekct file not found in: {} \n \
+                                    Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
+
+
+class SANDSTONE(REMOTEDATA):
+    '''
+    A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
+    A small subset of the data containing selected projections and 4 slices of the reconstruction
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.SANDSTONE.download_data(data_dir) # download the data
+    >>> dataexample.SANDSTONE.get(data_dir) # load the data
+    '''
+    FOLDER = 'sandstone'
+    ZENODO_RECORD = '4912435'
+    ZIP_FILE = 'small.zip'
+
+    @classmethod
+    def get(cls, data_dir, filename):
+        '''
+        Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
+        A small subset of the data containing selected projections and 4 slices of the reconstruction
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.SANDSTONE.download_data(data_dir)
+
+        file: str
+            The slices or projections to return, specify the path to the file within the data_dir
+
+        Returns
+        -------
+        ImageData
+            The selected sandstone dataset
+        '''
+        extension = os.path.splitext(filename)[1]
+        if extension == '.mat':
+            return loadmat(os.path.join(data_dir,filename))
+        raise KeyError(f"Unknown extension: {extension}")
+        
+
 class TestData(object):
     '''Class to return test data
-    
+
     provides 6 dataset:
     BOAT = 'boat.tiff'
     CAMERA = 'camera.png'
@@ -178,10 +365,10 @@ class TestData(object):
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
     RAINBOW =  'rainbow.png'
-    
-    def __init__(self, **kwargs):
-        self.data_dir = kwargs.get('data_dir', data_dir)
-        
+
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''
         Return a test data of the requested image
@@ -200,7 +387,7 @@ class TestData(object):
         ImageData
             The simulated spheres volume
         '''
-        if which not in [TestData.BOAT, TestData.CAMERA, 
+        if which not in [TestData.BOAT, TestData.CAMERA,
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
                          TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES,
                          TestData.RAINBOW]:
@@ -216,7 +403,7 @@ class TestData(object):
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
             sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(sdata)
 
@@ -230,12 +417,12 @@ class TestData(object):
                 else:
                     N = size[0]
                     M = size[1]
-                
-                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+
+                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                 data = ig.allocate()
                 tmp = numpy.array(f.convert('L').resize((M,N)))
                 data.fill(tmp/numpy.max(tmp))
-            
+
         else:
             with Image.open(os.path.join(self.data_dir, which)) as tmp:
 
@@ -252,14 +439,14 @@ class TestData(object):
                         tmp = tmp.convert('RGB')
                         bands = tmp.getbands()
 
-                    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands), 
-                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
+                    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands),
+                    dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X,ImageDimension.CHANNEL])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
-                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.reorder([ImageDimension.CHANNEL,ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data.geometry.channel_labels = bands
                 else:
-                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
 
@@ -294,7 +481,7 @@ class TestData(object):
             out.fill(arr)
             return out
         elif issubclass(type(image), numpy.ndarray):
-            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip, 
+            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip,
                    **kwargs)
 
     @staticmethod
@@ -368,8 +555,8 @@ class TestData(object):
         To generate Poisson noise against a signed image, the signed image is
         temporarily converted to an unsigned image in the floating point domain,
         Poisson noise is generated, then it is returned to the original range.
-        
-        This function is adapted from scikit-image. 
+
+        This function is adapted from scikit-image.
         https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py
 
         Copyright (C) 2019, the scikit-image team
@@ -400,7 +587,7 @@ class TestData(object):
         STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
         IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
         POSSIBILITY OF SUCH DAMAGE.
-        
+
         """
         mode = mode.lower()
 

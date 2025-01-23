@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -19,19 +18,32 @@
 
 import unittest
 import numpy
-from cil.framework import DataContainer
-from cil.framework import ImageGeometry, VectorGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
+
+import sys
+import os
+from unittest.mock import patch
+import logging
+
+from cil.framework import DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData, AcquisitionGeometry
+
 from cil.utilities import dataexample
-from timeit import default_timer as timer
+from cil.utilities import quality_measures
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
+from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
+
+from utils import has_numba
+if has_numba:
+    import numba
+
+from scipy import constants
+from scipy.fft import ifftshift
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
 
@@ -50,9 +62,8 @@ if has_ipp:
     from cil.processors.cilacc_binner import Binner_IPP
 
 
+@unittest.skipUnless(has_ipp, "Requires IPP libraries")
 class TestBinner_cillacc(unittest.TestCase):
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp(self):
 
         shape_in = [4,12,16,32]
@@ -74,8 +85,6 @@ class TestBinner_cillacc(unittest.TestCase):
         with self.assertRaises(ValueError):
             binner_cpp = Binner_IPP(shape_in,shape_out,start_index,binning)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D_data(self):
 
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -105,8 +114,6 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_4D(self):
 
         shape_in = [9,21,40,92]
@@ -138,10 +145,8 @@ class TestBinner_cillacc(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr,atol=1e-6)
 
-
-    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_binning_cpp_2D(self):
-        
+
         shape_in = [1,1,3,3]
         shape_out = [1,1,1,1]
         start_index = [0,0,0,0]
@@ -173,9 +178,7 @@ class TestBinner_cillacc(unittest.TestCase):
 
 
 class TestBinner(unittest.TestCase):
-
     def test_set_up_processor(self):
-
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
 
@@ -185,8 +188,14 @@ class TestBinner(unittest.TestCase):
         horizontal_x = range(0,4,4)
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
+        
+        # check init non-default values
+        proc = Binner(roi=roi,accelerated=False)
+        self.assertTrue(proc._accelerated==False)
+        
         proc = Binner(roi,accelerated=True)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -197,7 +206,7 @@ class TestBinner(unittest.TestCase):
         (horizontal_x.stop - horizontal_x.start)//horizontal_x.step
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -246,13 +255,13 @@ class TestBinner(unittest.TestCase):
 
                 # bin all
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
-                
+
                 # bin to single dimension
                 {'vertical':(31,33,2)},
 
-        
+
                 # crop  asymmetrically
-                {'vertical':(10,None,None),'horizontal':(None,-20,None)}                
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}
         ]
 
         #calculate offsets for geometry4
@@ -287,13 +296,13 @@ class TestBinner(unittest.TestCase):
 
                 # bin all
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
-                
+
                 # bin to single dimension
                 {'vertical':(31,33,2)},
 
-        
+
                 # crop  asymmetrically
-                {'vertical':(10,None,None),'horizontal':(None,-20,None)}                
+                {'vertical':(10,None,None),'horizontal':(None,-20,None)}
         ]
 
         #calculate offsets for geometry4
@@ -353,8 +362,8 @@ class TestBinner(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
-                
+                {'vertical':(32,64,2)},
+
                 # bin to single dimension
                 {'vertical':(31,33,2)},
 
@@ -364,7 +373,7 @@ class TestBinner(unittest.TestCase):
                 ag.copy(),
                 AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0.5,360.5,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
                 AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,32*0.2/2]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,16],[0.1,0.4]).set_channels(4),
-                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),
         ]
 
         for i, roi in enumerate(rois):
@@ -388,7 +397,7 @@ class TestBinner(unittest.TestCase):
 
                 # crop and bin
                 {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
-                
+
                 # bin to vector
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,4),'horizontal_y':(None,None,16)},
 
@@ -402,7 +411,7 @@ class TestBinner(unittest.TestCase):
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_y=-0.4, center_z=-0.6, channels=1),
                     VectorGeometry(2, dimension_labels='horizontal_x'),
                     None
-        ]   
+        ]
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3
@@ -508,16 +517,16 @@ class TestBinner(unittest.TestCase):
                 k_out +=1
             l_out+=1
 
-        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003)
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
 
 
         #test with `out`
         binned_data.fill(0)
         proc.get_output(out=binned_data)
-        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003)
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
-   
+
 
 
     def test_bin_acquisition_data(self):
@@ -554,16 +563,16 @@ class TestBinner(unittest.TestCase):
                 k_out +=1
             l_out+=1
 
-        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003)
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
 
 
         #test with `out`
         binned_data.fill(0)
         proc.get_output(out=binned_data)
-        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(binned_data.array, binned_by_hand.array,atol=0.003)
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
-   
+
 
 
     def test_process_acquisition(self):
@@ -575,28 +584,28 @@ class TestBinner(unittest.TestCase):
         roi = {'vertical':(None,None,2),'angle':(None,None,2),'horizontal':(None,None,2)}
         proc = Binner(roi)
 
-        geometry_gold = AcquisitionGeometry.create_Parallel2D().set_angles([45]).set_panel(2,2)      
+        geometry_gold = AcquisitionGeometry.create_Parallel2D().set_angles([45]).set_panel(2,2)
         el1 = (0+1+4+5+12+13+16+17)/8
         el2 = (2+3+6+7+14+15+18+19)/8
         data_gold = numpy.array([el1,el2],dtype=numpy.float32)
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -609,28 +618,28 @@ class TestBinner(unittest.TestCase):
         roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
         proc = Binner(roi)
 
-        geometry_gold = VectorGeometry(2,dimension_labels='horizontal_x')        
+        geometry_gold = VectorGeometry(2,dimension_labels='horizontal_x')
         el1 = (0+1+4+5+12+13+16+17)/8
         el2 = (2+3+6+7+14+15+18+19)/8
         data_gold = numpy.array([el1,el2],dtype=numpy.float32)
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -667,7 +676,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test bins a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -698,7 +707,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -733,7 +742,7 @@ class TestBinner(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test bins a sinogram. It then uses that geometry for the forward projection.
 
@@ -742,7 +751,7 @@ class TestBinner(unittest.TestCase):
         ag = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().geometry
         ag.set_labels(['vertical','angle','horizontal'])
         ag.config.panel.origin='top-right'
-    
+
         phantom = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         PO = AstraProjectionOperator(phantom.geometry, ag)
@@ -813,7 +822,8 @@ class TestSlicer(unittest.TestCase):
 
         roi = {'horizontal_y':horizontal_y,'horizontal_x':horizontal_x,'vertical':vertical,'channel':channel}
         proc = Slicer(roi)
-        proc._set_up_processor(data)
+        proc.set_input(data)
+        proc._set_up()
 
         # check set values
         self.assertTrue(proc._shape_in == list(data.shape))
@@ -825,7 +835,7 @@ class TestSlicer(unittest.TestCase):
             len(horizontal_x),
         ]
 
-        self.assertTrue(proc._shape_out == shape_out)
+        self.assertTrue(proc._shape_out_full == shape_out)
         self.assertTrue(proc._labels_in == ['channel','vertical','horizontal_y','horizontal_x'])
         numpy.testing.assert_array_equal(proc._processed_dims,[True,True,False,True])
 
@@ -879,10 +889,10 @@ class TestSlicer(unittest.TestCase):
 
                 # slice all
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
-                
+
                 # slice to single dimension
                 {'vertical':(31,33,2)},
-        
+
                 # slice  asymmetrically
                 {'vertical':(10,None,None),'horizontal':(None,-20,None)}
         ]
@@ -905,7 +915,7 @@ class TestSlicer(unittest.TestCase):
         ag_gold = [
                 ag.copy(),
                 AcquisitionGeometry.create_Parallel3D(detector_position=[ag2_offset_h, 0, ag2_offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
-                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),
                 AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2]).set_channels(4)
         ]
 
@@ -929,10 +939,10 @@ class TestSlicer(unittest.TestCase):
 
                 # slice all
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
-                
+
                 # slice to single dimension
                 {'vertical':(31,33,2)},
-        
+
                 # slice  asymmetrically
                 {'vertical':(10,None,None),'horizontal':(None,-20,None)}
         ]
@@ -955,7 +965,7 @@ class TestSlicer(unittest.TestCase):
         ag_gold = [
                 ag.copy(),
                 AcquisitionGeometry.create_Parallel3D(detector_position=[ag2_offset_h, 0, ag2_offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6], origin='top-right').set_channels(1),
-                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4], origin='top-right').set_channels(4),        
+                AcquisitionGeometry.create_Parallel2D().set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4], origin='top-right').set_channels(4),
                 AcquisitionGeometry.create_Parallel3D(detector_position=[ag4_offset_h, 0, ag4_offset_v]).set_angles(angles_full).set_panel([108,54],[0.1,0.2], origin='top-right').set_channels(4)
         ]
 
@@ -983,7 +993,7 @@ class TestSlicer(unittest.TestCase):
         pix_start2 = 0
         pix_end2 = 7 * 16 # last pixel index sliced multiplied by step size
         offset = ag.pixel_size_h*((pix_start2)-(pix_end1-pix_end2) )/2
-        
+
         ag_gold = [
                 ag.copy(),
                 AcquisitionGeometry.create_Cone2D([0,-50],[offset,50]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel(8,[1.6,0.1]).set_channels(1),
@@ -1009,8 +1019,8 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(None,None,4),'angle':(None,None,2),'vertical':(None,None,8),'horizontal':(None,None,16)},
 
                 # shift detector with crop
-                {'vertical':(32,65,2)},
-                
+                {'vertical':(32,64,2)},
+
                 # slice to single dimension
                 {'vertical':(32,34,2)},
 
@@ -1038,7 +1048,7 @@ class TestSlicer(unittest.TestCase):
                 ag.copy(),
                 AcquisitionGeometry.create_Cone3D([0,-50,0],[offset_h,50,offset_v]).set_angles(numpy.linspace(0,360,180,endpoint=False)).set_panel([8,8],[1.6,1.6]).set_channels(1),
                 AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,offset_v2]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel([128,16],[0.1,0.4]).set_channels(4),
-                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),        
+                AcquisitionGeometry.create_Cone2D([0,-50],[0,50]).set_angles(numpy.linspace(0,360,360,endpoint=False)).set_panel(128,[0.1,0.4]).set_channels(4),
         ]
 
         for i, roi in enumerate(rois):
@@ -1062,15 +1072,13 @@ class TestSlicer(unittest.TestCase):
 
                 # crop and slice
                 {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
-                
+
                 # slice to single dimension
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,4),'horizontal_y':(None,None,16)},
 
                  # slice to single element
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
-
         ]
-
 
         offset_x =0.1*(8-1-1*4)/2
         offset_y =0.2*(16-1-3 * 5)/2
@@ -1081,7 +1089,7 @@ class TestSlicer(unittest.TestCase):
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_x=-0.05,center_y=-0.5,center_z=-1.05,channels=2),
                     VectorGeometry(2, dimension_labels='horizontal_x'),
                     None
-        ]   
+        ]
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3
@@ -1142,16 +1150,16 @@ class TestSlicer(unittest.TestCase):
             slice(horizontal_x.start,horizontal_x.stop,horizontal_x.step))]
             )
 
-        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003)
         self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry)
 
 
         #test with `out`
         sliced_data.fill(0)
         proc.get_output(out=sliced_data)
-        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003)
         self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry)
-   
+
 
 
     def test_slice_acquisition_data(self):
@@ -1189,19 +1197,19 @@ class TestSlicer(unittest.TestCase):
             slice(horizontal.start,horizontal.stop,horizontal.step))]
             )
 
-        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003)
         self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry,msg="Expected:\n{0}\nGot\n{1}".format(sliced_by_hand.geometry, sliced_data.geometry))
 
 
         #test with `out`
         sliced_data.fill(0)
         proc.get_output(out=sliced_data)
-        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003) 
+        numpy.testing.assert_allclose(sliced_data.array, sliced_by_hand.array,atol=0.003)
         self.assertEqual(sliced_data.geometry, sliced_by_hand.geometry,msg="Expected:\n{0}\nGot\n{1}".format(sliced_by_hand.geometry, sliced_data.geometry))
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_imagedata_full(self):
+    def test_imagedata_full_tigre(self):
         """
         This test slices a reconstructed volume. It then uses that geometry as the reconstruction window and reconstructs again.
 
@@ -1231,7 +1239,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full(self):
+    def test_aqdata_full_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1267,7 +1275,7 @@ class TestSlicer(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_aqdata_full_origin(self):
+    def test_aqdata_full_origin_astra(self):
         """
         This test slices a sinogram. It then uses that geometry for the forward projection.
 
@@ -1348,26 +1356,26 @@ class TestSlicer(unittest.TestCase):
         roi = {'vertical':(None,None,2),'angle':(None,None,2),'horizontal':(None,None,2)}
         proc = Slicer(roi)
 
-        geometry_gold = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.5,  0. ,  0. ]).set_angles([0]).set_panel([2,2],[2,2])      
+        geometry_gold = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.5,  0. ,  0. ]).set_angles([0]).set_panel([2,2],[2,2])
         data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1380,26 +1388,26 @@ class TestSlicer(unittest.TestCase):
         roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
         proc = Slicer(roi)
 
-        geometry_gold = ImageGeometry(2,2,1, 2,2,2, -0.5,0, -0.5)        
+        geometry_gold = ImageGeometry(2,2,1, 2,2,2, -0.5,0, -0.5)
         data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, geometry_gold,
+        self.assertEqual(geometry_out, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, geometry_gold))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-        self.assertEquals(data_out.geometry, geometry_gold,
+        self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
 
@@ -1431,33 +1439,159 @@ class TestSlicer(unittest.TestCase):
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
 
-
-class TestCentreOfRotation_parallel(unittest.TestCase):
-    
+class TestCofR_xcorrelation(unittest.TestCase):
     def setUp(self):
         data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_CofR_xcorrelation(self):       
+        self.angles_list = [numpy.array([590, 0, 2, -310.5, 1]),
+                       numpy.array([0.5, 10, 20, 180, 1]),
+                       numpy.array([-360,-300, -240, -180.5, 0]),
+                       numpy.array([-0.5, -90, -100, -179.5, 1])]
+        
+        ag = AcquisitionGeometry.create_Parallel3D().set_angles(self.angles_list[0]).set_panel((2,2))
+        ad = ag.allocate()
+        ad.fill(numpy.ones([len(self.angles_list[0]), 2, 2]))
+        self.data_test = ad
+
+    def test_CofR_xcorrelation_init(self):
+        # test default values are set
+        processor = CofR_xcorrelation()
+        self.assertEqual(processor.slice_index, 'centre')
+        self.assertEqual(processor.projection_index, 0)
+        self.assertEqual(processor.ang_tol, 0.1)
+
+        # test non-default values are set
+        processor = CofR_xcorrelation(11, 12, 13)
+        self.assertEqual(processor.slice_index, 11)
+        self.assertEqual(processor.projection_index, 12)
+        self.assertEqual(processor.ang_tol, 13)
+
+    def test_CofR_xcorrelation_check_input(self):
+        
+        # test default values
+        processor = CofR_xcorrelation()
+        processor.set_input(self.data_DLS)
+        
+        # test there is no error when slice_index is specified with different values in range
+        slice_indices = [0, self.data_DLS.get_dimension_size('vertical')-1]
+        for slice_index in slice_indices:
+            processor = CofR_xcorrelation(slice_index=slice_index)
+            processor.check_input(self.data_DLS)
+
+        # test there is an error when slice index is specified with an un-recognised string, numbers out of range, or list
+        slice_indices = ['a', -10, self.data_DLS.get_dimension_size('vertical'), [0,1]]
+        for slice_index in slice_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(slice_index=slice_index)
+                processor.check_input(self.data_DLS)
+        
+        # test an error is raised passing string or out of range indices to projection index 
+        projection_indices = ['a', [0, 'b'], -1, [self.data_DLS.get_dimension_size('angle'), 0]]
+        for projection_index in projection_indices:
+            with self.assertRaises(ValueError):
+                processor = CofR_xcorrelation(projection_index=projection_index)
+                processor.check_input(self.data_DLS)
+
+        # test there is no error when an angle can be found 180 degrees +/- tolerance from the projection_index,
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+        
+        # test there is an error when no angle can be found 180 degrees +/- tolerance from the projection_index  
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=0.1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is no error when projection indices are specified as list 180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,3], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+
+        # test there is no error when projection indices are specified as tuple 180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=(0,3), ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            processor.check_input(self.data_test)
+
+        # test there is an error when projection indices are specified as >180 degrees apart within tolerance
+        processor = CofR_xcorrelation(projection_index=[0,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+        # test there is an error when more than 2 projection indices are specified
+        processor = CofR_xcorrelation(projection_index=[0,3,1], ang_tol=1)
+        for angles in self.angles_list:
+            self.data_test.geometry.set_angles(angles)
+            with self.assertRaises(ValueError):
+                processor.check_input(self.data_test)
+
+    def test_CofR_xcorrelation_return_180_index(self):
+        # test finding angle 180 degrees apart to correlate with
+        for angles in self.angles_list:
+            index_180 = CofR_xcorrelation._return_180_index(angles, 0)
+            self.assertEqual(angles[3], angles[index_180])
+
+    def test_CofR_xcorrelation_process(self):
+        # test processor returns expected output with DLS data
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(self.data_DLS)
+        data_out = processor.process()
+        self.assertAlmostEqual(6.33, data_out.geometry.config.system.rotation_axis.position[0],places=2) 
+        
+        # test processor returns expected output with DLS data using out
+        data = self.data_DLS
+        processor = CofR_xcorrelation(projection_index=0, ang_tol=1)
+        processor.set_input(data)
+        processor.process(out = data)
+        self.assertAlmostEqual(6.33, data.geometry.config.system.rotation_axis.position[0],places=2) 
+
+        # test processor returns expected (but less accurate) output with DLS data with limited angles
+        data_limited = Slicer(roi={'angle': ((abs(self.data_DLS.geometry.angles+86)).argmin(), (abs(self.data_DLS.geometry.angles-92)).argmin(), 1)})(self.data_DLS)
+        processor = CofR_xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=5)
+        processor.set_input(data_limited) 
+        processor.get_output(out=data_limited)
+        self.assertAlmostEqual(6.33, data_limited.geometry.config.system.rotation_axis.position[0],places=0) 
+
+        # test there is an error when the target angle is not within tolerance
+        processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
+        with self.assertRaises(ValueError):
+            processor.set_input(data_limited)           
+    
+class TestCentreOfRotation_parallel(unittest.TestCase):
+
+    def setUp(self):
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
+
+    def test_CofR_xcorrelation(self):      
 
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
-        
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
+
         corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
 
+        
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
     def test_CofR_image_sharpness_astra(self):
 
         corr = CentreOfRotationCorrector.image_sharpness(search_range=20, backend='astra')
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)    
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)
 
 
     @unittest.skipUnless(False, "TIGRE not installed")
@@ -1465,18 +1599,18 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CentreOfRotationCorrector.image_sharpness(search_range=20, backend='tigre')
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
 
-    def test_CenterOfRotationCorrector(self):       
+    def test_CenterOfRotationCorrector(self):
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
-        
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
+
         corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)
 
 
 class TestCentreOfRotation_conebeam(unittest.TestCase):
@@ -1507,8 +1641,8 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         if has_tigre:
             Op = TigreProjectionOperator(ig, ag_offset, direct_method='Siddon')
         else:
-            Op = AstraProjectionOperator(ig, ag_offset)        
-            
+            Op = AstraProjectionOperator(ig, ag_offset)
+
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
 
@@ -1516,25 +1650,25 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
     def test_CofR_image_sharpness_astra(self):
         corr = CentreOfRotationCorrector.image_sharpness(backend='astra')
         ad_out = corr(self.data_0)
-        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
         corr = CentreOfRotationCorrector.image_sharpness(backend='astra')
         ad_out = corr(self.data_offset)
-        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
     @unittest.skipUnless(has_tomophantom and has_tigre and has_nvidia, "Tomophantom or TIGRE GPU not installed")
     def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CentreOfRotationCorrector.image_sharpness(backend='tigre')
         ad_out = corr(self.data_0)
-        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
         corr = CentreOfRotationCorrector.image_sharpness(backend='tigre')
         ad_out = corr(self.data_offset)
-        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
 class TestPaddder(unittest.TestCase):
-    
+
     def setUp(self):
 
         self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1]).set_channels(4)
@@ -1554,7 +1688,7 @@ class TestPaddder(unittest.TestCase):
         self.data_test = ImageData(arr_in, True, ig)
 
 
-    def test_parse_input(self):
+    def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
         data = ig.allocate('random')
@@ -1566,7 +1700,8 @@ class TestPaddder(unittest.TestCase):
 
         # check inputs
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(list(data.dimension_labels), proc._labels_in)
         self.assertListEqual(list(data.shape), proc._shape_in)
 
@@ -1587,21 +1722,24 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_width set-up
         proc = Padder('constant', pad_width=2, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=(1,2), pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_tuple, proc._pad_width_param)
         self.assertListEqual(gold_value_default, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_tuple, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=0.1)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dict_custom = [(0,0) if x == (0,0) else (0.1,0.1)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict_custom, proc._pad_values_param)
@@ -1610,14 +1748,16 @@ class TestPaddder(unittest.TestCase):
 
         # check pad_value set-up
         proc = Padder('constant', pad_width=2, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_default, proc._pad_width_param)
         self.assertListEqual(gold_value_tuple, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_default, proc._processed_dims)
         numpy.testing.assert_array_equal(gold_shape_out_default, proc._shape_out)
 
         proc = Padder('constant', pad_width=2, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_width_dict_custom = [(0,0) if x == (0,0) else (2,2)  for x in gold_value_dict]
         gold_shape_out_dict_custom = numpy.array(data.shape) + [4,4,0,4]
         self.assertListEqual(gold_width_dict_custom, proc._pad_width_param)
@@ -1626,7 +1766,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict_custom, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=(0.1,0.2))
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         gold_value_dictionary_custom = [(0,0) if x == (0,0) else (0.1,0.2)  for x in gold_width_dict]
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dictionary_custom, proc._pad_values_param)
@@ -1634,7 +1775,8 @@ class TestPaddder(unittest.TestCase):
         numpy.testing.assert_array_equal(gold_shape_out_dict, proc._shape_out)
 
         proc = Padder('constant', pad_width=pad_width, pad_values=pad_values)
-        proc._parse_input(data)
+        proc.set_input(data)
+        proc._set_up()
         self.assertListEqual(gold_width_dict, proc._pad_width_param)
         self.assertListEqual(gold_value_dict, proc._pad_values_param)
         self.assertListEqual(gold_processed_dims_dict, proc._processed_dims)
@@ -1643,7 +1785,8 @@ class TestPaddder(unittest.TestCase):
         proc = Padder('constant', pad_width=pad_width, pad_values={'horizontal_x':(0.5,0.6)})
         # raise an error as not all axes values defined
         with self.assertRaises(ValueError):
-            proc._parse_input(data)
+            proc.set_input(data)
+            proc._set_up()
 
 
     def test_process_acquisition_geometry(self):
@@ -1654,7 +1797,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag_padded,
+        self.assertEqual(geometry_padded, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag_padded))
 
 
@@ -1668,7 +1811,7 @@ class TestPaddder(unittest.TestCase):
             0.,   90.,  180.,  270.,\
             360., 450.,  540., 630., 720.]
 
-        self.assertEquals(geometry_padded, geometry_gold,
+        self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
 
@@ -1679,10 +1822,10 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_acquisition_geometry()
 
-        self.assertEquals(geometry_padded, self.ag2_padded,
+        self.assertEqual(geometry_padded, self.ag2_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ag2_padded))
 
-    
+
     def test_process_image_geometry(self):
 
         geometry = self.ig
@@ -1691,7 +1834,7 @@ class TestPaddder(unittest.TestCase):
         proc.set_input(geometry)
         geometry_padded = proc._process_image_geometry()
 
-        self.assertEquals(geometry_padded, self.ig_padded,
+        self.assertEqual(geometry_padded, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, self.ig_padded))
 
 
@@ -1730,21 +1873,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ag_padded,
+        self.assertEqual(geometry_out, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ag_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ag_padded,
+        self.assertEqual(data_out.geometry, self.ag_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ag_padded))
 
 
@@ -1764,21 +1907,21 @@ class TestPaddder(unittest.TestCase):
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
-        self.assertEquals(geometry_out, self.ig_padded,
+        self.assertEqual(geometry_out, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_out, self.ig_padded))
 
         proc.set_input(data_in)
         data_out = proc.process()
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
         data_out.fill(0)
         proc.process(out=data_out)
 
         numpy.testing.assert_array_equal(data_gold.array, data_out.array)
-        self.assertEquals(data_out.geometry, self.ig_padded,
+        self.assertEqual(data_out.geometry, self.ig_padded,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, self.ig_padded))
 
 
@@ -1861,7 +2004,7 @@ class TestPaddder(unittest.TestCase):
         6 6 7 8 8
         """
 
-        width = 1 
+        width = 1
         proc = Padder.edge(pad_width=width)
         proc.set_input(self.data_test)
         data_out = proc.get_output()
@@ -1923,7 +2066,7 @@ class TestPaddder(unittest.TestCase):
         4 3 4 5 4
         """
 
-        width = 1 
+        width = 1
         proc = Padder.reflect(pad_width=width)
         proc.set_input(self.data_test)
         data_out = proc.get_output()
@@ -1953,7 +2096,7 @@ class TestPaddder(unittest.TestCase):
         6 6 7 8 8
         """
 
-        width = 1 
+        width = 1
         proc = Padder.symmetric(pad_width=width)
         proc.set_input(self.data_test)
         data_out = proc.get_output()
@@ -1984,7 +2127,7 @@ class TestPaddder(unittest.TestCase):
         2 0 1 2 0
         """
 
-        width = 1 
+        width = 1
         proc = Padder.wrap(pad_width=width)
         proc.set_input(self.data_test)
         data_out = proc.get_output()
@@ -2001,7 +2144,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_pad_ad_full(self):
+    def test_pad_ad_full_tigre(self):
         """
         This test pads a acquisition data asymmetrically.
         It then compares the FBP of the padded and unpadded data on the same ImageGeometry.
@@ -2043,7 +2186,7 @@ class TestPaddder(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
-    def test_pad_id_full(self):
+    def test_pad_id_full_astra(self):
         """
         This test pads an image data asymmetrically.
         It then compares the forward projection of the padded and unpadded phantom on the same AcquisitionGeometry.
@@ -2095,7 +2238,7 @@ class TestPaddder(unittest.TestCase):
 
 
 class TestDataProcessor(unittest.TestCase):
-   
+
     def test_DataProcessorBasic(self):
 
         dc_in = DataContainer(numpy.arange(10), True)
@@ -2172,9 +2315,9 @@ class TestDataProcessor(unittest.TestCase):
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
-        
+
         #print(arr)
-    
+
         ax = AX()
         ax.scalar = 2
 
@@ -2187,248 +2330,270 @@ class TestDataProcessor(unittest.TestCase):
         cast.set_input(c)
         out = cast.get_output()
         self.assertTrue(out.as_array().dtype == numpy.float32)
-        out *= 0 
+        out *= 0
         axm = AX()
         axm.scalar = 0.5
         axm.set_input(c)
         axm.get_output(out)
         numpy.testing.assert_array_equal(out.as_array(), arr*0.5)
-        
+
         #print("check call method of DataProcessor")
-        numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)        
-    
-        
+        numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)
+
+
         # check out in DataSetProcessor
         #a = numpy.asarray([i for i in range( size )])
-           
+
         # create a PixelByPixelDataProcessor
-        
+
         #define a python function which will take only one input (the pixel value)
         pyfunc = lambda x: -x if x > 20 else x
         clip = PixelByPixelDataProcessor()
-        clip.pyfunc = pyfunc 
-        clip.set_input(c)    
+        clip.pyfunc = pyfunc
+        clip.set_input(c)
         #clip.apply()
         v = clip.get_output().as_array()
-        
+
         self.assertTrue(v.max() == 19)
         self.assertTrue(v.min() == -79)
-        
+
         #print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
-        
+
         #dsp = DataProcessor()
         #dsp.set_input(ds)
         #dsp.input = a
         # pipeline
-    
+
         chain = AX()
         chain.scalar = 0.5
         chain.set_input_processor(ax)
         #print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
         numpy.testing.assert_array_equal(chain.get_output().as_array(), arr)
-        
+
         #print("check call method of DataProcessor")
-        numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
+        numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)
 
-class TestMaskGenerator(unittest.TestCase):       
+class TestMaskGenerator(unittest.TestCase):
 
-    def test_MaskGenerator(self): 
-    
+    def test_MaskGenerator(self):
+
         IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
-        
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
+
         data = IG.allocate('random')
-        
+
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
-        
-        # check special values - default
-        m = MaskGenerator.special_values()
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
-        mask_manual[4,5] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check nan
-        m = MaskGenerator.special_values(inf=False)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[4,5] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check inf
-        m = MaskGenerator.special_values(nan=False)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check threshold
-        data = IG.allocate('random')
-        data.as_array()[6,8] = 100
-        data.as_array()[1,3] = 80
-        
-        m = MaskGenerator.threshold(None, 70)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        mask_manual[1,3] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        m = MaskGenerator.threshold(None, 80)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check quantile
-        data = IG.allocate('random')
-        data.as_array()[6,8] = 100
-        data.as_array()[1,3] = 80
-        
-        m = MaskGenerator.quantile(None, 0.98)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        mask_manual[1,3] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        m = MaskGenerator.quantile(None, 0.99)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[6,8] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check mean
+
+   
+        data_as_image_data = data
+        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
+
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
+        data_type_name = ['ImageData', 'DataContainer', 'AcquisitionData']
+
+        for i, data in enumerate(data_objects):
+            with self.subTest(data_type=data_type_name[i]):
+
+                # check special values - default
+                m = MaskGenerator.special_values()
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[2,3] = 0
+                mask_manual[4,5] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check nan
+                m = MaskGenerator.special_values(inf=False)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[4,5] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check inf
+                m = MaskGenerator.special_values(nan=False)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[2,3] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check threshold
+                data.as_array()[2,3] = numpy.random.rand()
+                data.as_array()[4,5] = numpy.random.rand()
+                data.as_array()[6,8] = 100
+                data.as_array()[1,3] = 80
+
+                m = MaskGenerator.threshold(None, 70)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+                mask_manual[1,3] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                m = MaskGenerator.threshold(None, 80)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check quantile
+                data.as_array()[6,8] = 100
+                data.as_array()[1,3] = 80
+
+                m = MaskGenerator.quantile(None, 0.98)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+                mask_manual[1,3] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                m = MaskGenerator.quantile(None, 0.99)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((10,10), dtype=bool)
+                mask_manual[6,8] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+
+        # Tests on larger data for checking mean and median
         IG = ImageGeometry(voxel_num_x=200,
                             voxel_num_y=200)
-        #data = IG.allocate('random', seed=10)
+
+        AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
         data = IG.allocate()
         numpy.random.seed(10)
         data.fill(numpy.random.rand(200,200))
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
-        
-        m = MaskGenerator.mean(axis='horizontal_x')
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        m = MaskGenerator.mean(window=5)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check median
-        m = MaskGenerator.median(axis='horizontal_x')
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        m = MaskGenerator.median()
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check movmean
-        m = MaskGenerator.mean(window=10)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        #
-        m = MaskGenerator.mean(window=20, axis='horizontal_y')
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        m = MaskGenerator.mean(window=10, threshold_factor=10)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check movmedian
-        m = MaskGenerator.median(window=20)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
-        
-        # check movmedian
-        m = MaskGenerator.median(window=40)
-        m.set_input(data)
-        mask = m.process()
-        
-        mask_manual = numpy.ones((200,200), dtype=bool)
-        mask_manual[7,4] = 0
-        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_image_data = data
+        data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
+        data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
+
+        for i, data in enumerate(data_objects):
+            with self.subTest(data_type=data_type_name[i]):
+
+                m = MaskGenerator.mean(axis=1) # this gives horizontal_x for ImageData, or 'dimension_01' for DataContainer
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                m = MaskGenerator.mean(window=5)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check median
+                m = MaskGenerator.median(axis=1)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                m = MaskGenerator.median()
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check movmean
+                m = MaskGenerator.mean(window=10)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                #
+                m = MaskGenerator.mean(window=20, axis=0) # this gives horizontal_y for ImageData, or 'dimension_00' for DataContainer
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                m = MaskGenerator.mean(window=10, threshold_factor=10)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check movmedian
+                m = MaskGenerator.median(window=20)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
+
+                # check movmedian
+                m = MaskGenerator.median(window=40)
+                m.set_input(data)
+                mask = m.process()
+
+                mask_manual = numpy.ones((200,200), dtype=bool)
+                mask_manual[7,4] = 0
+                numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
     def test_TransmissionAbsorptionConverter(self):
-            
+
         ray_direction = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
         detector_direction_row = [1.0, 0.2, 0.0]
         detector_direction_col = [0.0 ,0.0, 1.0]
         rotation_axis_position = [0.1, 2.0, 0.5]
         rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
+
+        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
+                                                    detector_position=detector_position,
+                                                    detector_direction_x=detector_direction_row,
                                                     detector_direction_y=detector_direction_col,
                                                     rotation_axis_position=rotation_axis_position,
                                                     rotation_axis_direction=rotation_axis_direction)
-        
+
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
+
         AG.set_channels(num_channels=10)
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
         AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
@@ -2436,24 +2601,24 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
                                 'horizontal',\
                                 'angle',\
                                 'channel']
-        
+
         ad = AG.allocate('random')
-        
+
         s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
         s.set_input(ad)
         data_exp = s.get_output()
-        
+
         data_new = ad.as_array().copy()
         data_new /= 10
         data_new[data_new < 0.1] = 0.1
         data_new = -1 * numpy.log(data_new)
-        
+
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
-        
+
         data_exp.fill(0)
         s.process(out=data_exp)
-        
+
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
@@ -2467,16 +2632,16 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         detector_direction_col = [0.0 ,0.0, 1.0]
         rotation_axis_position = [0.1, 2.0, 0.5]
         rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
+
+        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
+                                                    detector_position=detector_position,
+                                                    detector_direction_x=detector_direction_row,
                                                     detector_direction_y=detector_direction_col,
                                                     rotation_axis_position=rotation_axis_position,
                                                     rotation_axis_direction=rotation_axis_direction)
-        
+
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
+
         AG.set_channels(num_channels=10)
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
         AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
@@ -2484,59 +2649,104 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
                                 'horizontal',\
                                 'angle',\
                                 'channel']
-        
+
         ad = AG.allocate('random')
-        
+
         s = AbsorptionTransmissionConverter(white_level=10)
         s.set_input(ad)
         data_exp = s.get_output()
-        
+
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
-        
+
         data_exp.fill(0)
         s.process(out=data_exp)
-        
+
         self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)  
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
 
 
-class TestMasker(unittest.TestCase):       
+class TestMasker(unittest.TestCase):
 
     def setUp(self):
-        IG = ImageGeometry(voxel_num_x=10,
+        IG_2D = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
+        IG_3D = ImageGeometry(voxel_num_x=5, 
+                            voxel_num_y=5,
+                            voxel_num_z=5)
         
-        self.data_init = IG.allocate('random')
+        self.data_2D_init = IG_2D.allocate('random')
+        self.data_3D_init = IG_3D.allocate('random')
+
+        self.data_2D = self.data_2D_init.copy()
+        self.data_3D = self.data_3D_init.copy()
+
+        self.mask_coords_2D = [(2,3), (4,5)]
+        self.mask_coords_3D = [(2,3,4), (3,1,2)]
         
-        self.data = self.data_init.copy()
+        self.data_2D.as_array()[self.mask_coords_2D[0]] = float('inf')
+        self.data_2D.as_array()[self.mask_coords_2D[1]] = float('nan')
+
+        self.data_3D.as_array()[self.mask_coords_3D[0]] = float('inf')
+        self.data_3D.as_array()[self.mask_coords_3D[1]] = float('nan')
         
-        self.data.as_array()[2,3] = float('inf')
-        self.data.as_array()[4,5] = float('nan')
+        mask_2D_manual = numpy.ones((10,10), dtype=bool)
+        mask_2D_manual[self.mask_coords_2D[0]] = 0
+        mask_2D_manual[self.mask_coords_2D[1]] = 0
+
+        mask_3D_manual = numpy.ones((5,5,5), dtype=bool)
+        mask_3D_manual[self.mask_coords_3D[0]] = 0
+        mask_3D_manual[self.mask_coords_3D[1]] = 0
         
-        mask_manual = numpy.ones((10,10), dtype=bool)
-        mask_manual[2,3] = 0
-        mask_manual[4,5] = 0
-        
-        self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
-        self.mask_generated = MaskGenerator.special_values()(self.data)
+        self.mask_2D_manual = DataContainer(mask_2D_manual, dimension_labels=self.data_2D.dimension_labels) 
+        self.mask_2D_generated = MaskGenerator.special_values()(self.data_2D)
+
+        self.mask_3D_manual = DataContainer(mask_3D_manual, dimension_labels=self.data_3D.dimension_labels)
+        self.mask_3D_generated = MaskGenerator.special_values()(self.data_3D)
+
+        # make a copy of mask_manual with 1s and 0s instead of bools:
+        mask_int_manual = mask_2D_manual.astype(numpy.int32)
+        self.mask_int_manual = DataContainer(mask_int_manual, dimension_labels=self.data_2D.dimension_labels)
+
 
     def test_Masker_Manual(self):
-        self.Masker_check(self.mask_manual, self.data, self.data_init)
+        self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
     def test_Masker_generated(self):
-        self.Masker_check(self.mask_generated, self.data, self.data_init)
+        self.Masker_check(self.mask_2D_generated, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        self.Masker_check(self.mask_3D_generated, self.data_3D, self.data_3D_init, self.mask_coords_3D)
 
-    def Masker_check(self, mask, data, data_init): 
+    def test_Masker_with_integer_mask(self):
+        self.Masker_check(self.mask_int_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
 
-        # test vaue mode
+    def test_Masker_doesnt_modify_input_mask(self):
+        mask = self.mask_2D_manual.copy()
+        self.Masker_check(self.mask_2D_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_2D_manual.as_array())
+
+        mask = self.mask_3D_manual.copy()
+        self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_3D_manual.as_array())
+
+
+
+    def test_Masker_doesnt_modify_input_integer_mask(self):
+        mask = self.mask_int_manual.copy()
+        self.Masker_check(self.mask_int_manual, self.data_2D, self.data_2D_init, self.mask_coords_2D)
+        numpy.testing.assert_array_equal(mask.as_array(), self.mask_int_manual.as_array())
+
+    def Masker_check(self, mask, data, data_init, mask_coords): 
+
+        # test value mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)     
         
@@ -2544,37 +2754,44 @@ class TestMasker(unittest.TestCase):
         m = Masker.mean(mask=mask)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        tmp = numpy.sum(data_init.as_array())-(data_init.as_array()[2,3]+data_init.as_array()[4,5])
-        tmp /= 98
-        data_test[2,3] = tmp
-        data_test[4,5] = tmp
-        
+        tmp = numpy.sum(data_init.as_array())-numpy.sum([data_init.as_array()[i] for i in mask_coords])
+        tmp /= (data_init.size - len(mask_coords))
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = tmp
+
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test median mode
         m = Masker.median(mask=mask)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
         tmp = data.as_array()[numpy.isfinite(data.as_array())]
-        data_test[2,3] = numpy.median(tmp)
-        data_test[4,5] = numpy.median(tmp)
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = numpy.median(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
-        
+
         # test axis int
         m = Masker.median(mask=mask, axis=0)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        tmp1 = data.as_array()[2,:][numpy.isfinite(data.as_array()[2,:])]
-        tmp2 = data.as_array()[4,:][numpy.isfinite(data.as_array()[4,:])]
-        data_test[2,3] = numpy.median(tmp1)
-        data_test[4,5] = numpy.median(tmp2)
+
+        for mask_coord in mask_coords:
+            # get elements in mask_coord:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                tmp = data.as_array()[:,y][numpy.isfinite(data.as_array()[:,y])]
+            else:
+                x, y, z = mask_coord
+                tmp = data.as_array()[:,y,z][numpy.isfinite(data.as_array()[:,y,z])]
+            
+            data_test[mask_coord] = numpy.median(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
@@ -2582,24 +2799,29 @@ class TestMasker(unittest.TestCase):
         m = Masker.mean(mask=mask, axis=data.dimension_labels[1])
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        tmp1 = data.as_array()[:,3][numpy.isfinite(data.as_array()[:,3])]
-        tmp2 = data.as_array()[:,5][numpy.isfinite(data.as_array()[:,5])]
-        data_test[2,3] = numpy.sum(tmp1) / 9
-        data_test[4,5] = numpy.sum(tmp2) / 9
+        for mask_coord in mask_coords:
+            # get elements in mask_coord:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                tmp = data.as_array()[x,:][numpy.isfinite(data.as_array()[x,:])]
+            else:
+                x, y, z = mask_coord
+                tmp = data.as_array()[x,:,z][numpy.isfinite(data.as_array()[x,:,z])]
+            data_test[mask_coord] = numpy.sum(tmp) / len(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
-        
+
         # test inline
         data = data_init.copy()
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         m.process(out=data)
-        
+
         data_test = data_init.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(data.as_array(), data_test, rtol=1E-6) 
         
@@ -2608,29 +2830,721 @@ class TestMasker(unittest.TestCase):
         m = Masker.value(mask=mask.as_array(), value=10)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        data_test[2,3] = 10
-        data_test[4,5] = 10
+        for mask_coord in mask_coords:
+            data_test[mask_coord] = 10
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
         # test interpolate
         data = data_init.copy()
-        m = Masker.interpolate(mask=mask, method='linear', axis='horizontal_y')
+        m = Masker.interpolate(mask=mask, method='linear', axis=0)
         m.set_input(data)
         res = m.process()
-        
+
         data_test = data.copy().as_array()
-        data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
-        data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
+
+        for mask_coord in mask_coords:
+            if len(mask_coord) == 2:
+                x, y = mask_coord
+                data_test[mask_coord] = (data_test[x-1, y] + data_test[x+1, y]) / 2
+            else:
+                x, y, z = mask_coord
+                data_test[mask_coord] = (data_test[x-1, y, z] + data_test[x+1, y, z]) / 2
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
-        
 
+
+class TestPaganinProcessor(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel([128,128],0.1)\
+            .set_channels(4)
+
+        self.data_multichannel = ag.allocate('random')
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_PaganinProcessor_init(self):
+        # test default values are initialised
+        processor = PaganinProcessor()
+        test_parameter = ['energy', 'wavelength', 'delta', 'beta', 'full_retrieval', 
+                          'filter_type', 'pad', 'return_units']
+        test_value = [40000, 1e2*(constants.h*constants.speed_of_light)/(40000*constants.electron_volt), 
+                      1, 1e-2, True, 'paganin_method', 0, 'cm']
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = PaganinProcessor(1, 2, 3, 'keV', False, 'string', 19, 'mm')
+        test_value = [3, 1e3*(constants.h*constants.speed_of_light)/(3000*constants.electron_volt), 1, 2, False, 'string', 19, 'mm']
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor,test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        with self.assertRaises(ValueError):
+            processor = PaganinProcessor(return_units='string')
+
+    def test_PaganinProcessor_energy_to_wavelength(self):
+        processor = PaganinProcessor()
+        wavelength = processor._energy_to_wavelength(10, 'meV', 'mm')
+        self.assertAlmostEqual(wavelength, 0.12398419)
+
+
+    def test_PaganinProcessor_check_input(self):
+        processor = PaganinProcessor()
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel]:
+            processor.set_input(data)
+            data2 = processor.get_input()
+            numpy.testing.assert_allclose(data2.as_array(), data.as_array())
+
+            # check there is an error when the wrong data type is input
+            with self.assertRaises(TypeError):
+                processor.set_input(data.geometry)
+
+            with self.assertRaises(TypeError):
+                processor.set_input(data.as_array())
+
+            dc = DataContainer(data.as_array())
+            with self.assertRaises(TypeError):
+                processor.set_input(dc)
+
+            # check with different data order
+            data.reorder('astra')
+            with self.assertRaises(ValueError):
+                processor.set_input(data)
+
+
+    def test_PaganinProcessor_set_geometry(self):
+        processor = PaganinProcessor()
+        data = self.data_cone
+        # check there is an error when the data geometry does not have units
+        processor.set_input(data)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(data.geometry, None)
         
-if __name__ == "__main__":
+        # check there is no error when the geometry unit is provided
+        data.geometry.config.units = 'um'
+        processor._set_geometry(data.geometry, None)
+        multiplier = 1e-4 # convert um to return units cm
+        
+        # check the processor finds the correct geometry values, scaled by the units
+        self.assertAlmostEqual(processor.propagation_distance, data.geometry.dist_center_detector*multiplier, 
+                         msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, data.geometry.magnification, 
+                         msg=self.error_message(processor, 'magnification'))
+        self.assertAlmostEqual(processor.pixel_size, data.geometry.pixel_size_h*multiplier, 
+                         msg=self.error_message(processor, 'pixel_size'))
+                
+        # check there is an error when the data geometry does not have propagation distance, and it is not provided in override geometry
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, None)
+        
+        # check override_geometry
+        for data in [self.data_parallel, self.data_cone, self.data_multichannel]:
+            processor.set_input(data)
+            processor._set_geometry(self.data_cone.geometry, override_geometry={'propagation_distance':1,'magnification':2, 'pixel_size':3})
+            
+            self.assertEqual(processor.propagation_distance, 1, 
+                            msg=self.error_message(processor, 'propagation_distance'))
+            self.assertEqual(processor.magnification, 2, 
+                            msg=self.error_message(processor, 'magnification'))
+            self.assertEqual(processor.pixel_size, 3, 
+                            msg=self.error_message(processor, 'pixel_size'))
+        
+        # check the processor goes back to values from geometry if the geometry over-ride is not passed
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        self.assertAlmostEqual(processor.propagation_distance, self.data_cone.geometry.dist_center_detector*multiplier, 
+                        msg=self.error_message(processor, 'propagation_distance'))
+        self.assertEqual(processor.magnification, self.data_cone.geometry.magnification, 
+                        msg=self.error_message(processor, 'magnification'))
+        self.assertAlmostEqual(processor.pixel_size, self.data_cone.geometry.pixel_size_h*multiplier, 
+                        msg=self.error_message(processor, 'pixel_size'))
+        
+        processor.set_input(self.data_parallel)
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry)
+
+        # check there is an error when the pixel_size_h and pixel_size_v are different
+        self.data_parallel.geometry.pixel_size_h = 9
+        self.data_parallel.geometry.pixel_size_h = 10
+        with self.assertRaises(ValueError):
+            processor._set_geometry(self.data_parallel.geometry, override_geometry={'propagation_distance':1})
+
+    def test_PaganinProcessor_create_filter(self):
+        image = self.data_cone.get_slice(angle=0).as_array()
+        Nx, Ny = image.shape
+        
+        delta = 1
+        beta = 2
+        energy = 3
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, return_units='m')
+
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+
+        self.data_cone.geometry.config.units='m'
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
+        
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        
+        kx,ky = numpy.meshgrid( 
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            sparse=False, 
+            indexing='ij'
+            )
+        
+        # check default filter is created with paganin_method
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+        # check generalised_paganin_method
+        processor = PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='generalised_paganin_method', return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter()
+        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+        # check unknown method raises error
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, filter_type='unknown_method', return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        with self.assertRaises(ValueError):
+            processor._create_filter()
+
+        # check parameter override 
+        processor =  PaganinProcessor(delta=delta, beta=beta, energy=energy, return_units='m')
+        processor.set_input(self.data_cone)
+        processor._set_geometry(self.data_cone.geometry)
+        delta = 100
+        beta=200
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        processor._create_filter(override_filter={'delta':delta, 'beta':beta})
+        
+        # check alpha and mu are calculated correctly
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        alpha = 60000*delta/mu
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+        
+        # test specifying alpha, delta and beta
+        delta = 12
+        beta = 13
+        alpha = 14
+        processor.filter_Nx = Nx
+        processor.filter_Ny = Ny
+        with self.assertLogs(level='WARN') as log:
+            processor._create_filter(override_filter = {'delta':delta, 'beta':beta, 'alpha':alpha})
+        wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
+        mu = 4.0*numpy.pi*beta/(wavelength)
+        
+        self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
+        self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
+        self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
+        self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
+        filter =  ifftshift(1/(1. + alpha*(kx**2 + ky**2)))
+        numpy.testing.assert_allclose(processor.filter, filter)
+
+    def test_PaganinProcessor(self):
+
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength)
+
+        data_array = [self.data_cone, self.data_parallel, self.data_multichannel]
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
+        for data in data_array:
+            data.geometry.config.units = 'm'
+            data_abs = -(1/mu)*numpy.log(data)
+            processor = PaganinProcessor(full_retrieval=True, return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False)
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with GPM
+            processor = PaganinProcessor(full_retrieval=True, filter_type='generalised_paganin_method', return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, filter_type='generalised_paganin_method')
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test with padding
+            processor = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')
+            processor.set_input(data)
+            thickness = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(thickness, data_abs), 1e-5)
+            processor = PaganinProcessor(full_retrieval=False, pad=10)
+            processor.set_input(data)
+            filtered_image = processor.get_output(override_geometry={'propagation_distance':1})
+            self.assertLessEqual(quality_measures.mse(filtered_image, data), 1e-5)
+
+            # test in-line
+            thickness_inline = PaganinProcessor(full_retrieval=True, pad=10, return_units='m')(data, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(thickness.as_array(), thickness_inline.as_array())
+            filtered_image_inline = PaganinProcessor(full_retrieval=False, pad=10)(data, override_geometry={'propagation_distance':1})
+            numpy.testing.assert_allclose(filtered_image.as_array(), filtered_image_inline.as_array())
+        
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+    def test_PaganinProcessor_2D(self):
+
+        self.data_parallel.geometry.config.units = 'm'
+        data_slice = self.data_parallel.get_slice(vertical=10)
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data_slice)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data_slice)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+    def test_PaganinProcessor_1angle(self):
+        data = self.data_cone.get_slice(angle=1)
+        data.geometry.config.units = 'm'
+        wavelength = (constants.h*constants.speed_of_light)/(40000*constants.electron_volt)
+        mu = 4.0*numpy.pi*1e-2/(wavelength) 
+        thickness = -(1/mu)*numpy.log(data)
+
+        processor = PaganinProcessor(pad=10)
+        processor.set_input(data)
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
+        output = processor.get_output(override_geometry={'propagation_distance':1})
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+class TestFluxNormaliser(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+            .set_panel([128,128],0.1)\
+            .set_channels(4)
+        self.data_multichannel = ag.allocate('random')
+        self.data_slice = self.data_parallel.get_slice(vertical=1)
+        self.data_reorder = self.data_cone.copy()
+        self.data_reorder.reorder(['angle','horizontal','vertical'])
+        self.data_single_angle = self.data_cone.get_slice(angle=1)
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_angles(numpy.linspace(0,3,3,endpoint=False))\
+            .set_panel([3,3])
+        arr = numpy.array([[[1,2,3],[1,2,3],[1,2,3]],
+                        [[4,5,6],[4,5,6],[4,5,6]], 
+                        [[7,8,9],[7,8,9],[7,8,9]]])
+        self.data_simple = AcquisitionData(arr, geometry=ag)
+
+    def error_message(self,processor, test_parameter):
+            return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_init(self):
+        # test default values are initialised
+        processor = FluxNormaliser()
+        test_parameter = ['flux','roi','target']
+        test_value = [None, None, 'mean']
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = FluxNormaliser(1,2,3)
+        test_value = [1, 2, 3]
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], msg=self.error_message(processor, test_parameter[i]))
+
+    def test_check_input(self):
+        
+        # check there is an error if no flux or roi is specified
+        processor = FluxNormaliser()
+        with self.assertRaises(ValueError):
+            processor.check_input(self.data_cone)
+
+    def test_calculate_flux(self):
+        # check there is an error if flux array size is not equal to the number of angles in data
+        processor = FluxNormaliser(flux = [1,2,3])
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+        
+        # check there is an error if roi is not specified as a dictionary
+        processor = FluxNormaliser(roi='string')
+        processor.set_input(self.data_cone)
+        with self.assertRaises(TypeError):
+            processor._calculate_flux()
+
+        # check there is an error if roi is specified with float values
+        processor = FluxNormaliser(roi={'horizontal':(1.5, 6.5)})
+        processor.set_input(self.data_cone)
+        with self.assertRaises(TypeError):
+            processor._calculate_flux()
+
+        # check there is an error if roi stop is greater than start
+        processor = FluxNormaliser(roi={'horizontal':(10, 5)})
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        # check there is an error if roi stop is greater than the size of the axis
+        processor = FluxNormaliser(roi={'horizontal':(0, self.data_cone.get_dimension_size('horizontal')+1)})
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        # check error raised with 0 flux
+        processor = FluxNormaliser(flux = 0)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux = 0.0)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles)))
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+        processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles), dtype=numpy.uint16))
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor._calculate_flux()
+
+    def test_calculate_target(self):
+
+        # check target calculated with default method 'mean'
+        processor = FluxNormaliser(flux=1)
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)))
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 2)
+
+        # check target calculated with method 'first'
+        processor = FluxNormaliser(flux=1, target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)),
+                                   target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        # check target calculated with method 'last'
+        processor = FluxNormaliser(flux=1, target='first')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 1)
+
+        processor = FluxNormaliser(flux=numpy.linspace(1,3,len(self.data_cone.geometry.angles)),
+                                   target='last')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 3)
+
+        # check target calculated with float
+        processor = FluxNormaliser(flux=1,
+                                   target=55.0)
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        processor._calculate_target()
+        self.assertAlmostEqual(processor.target_value, 55.0)
+
+        # check error if target is an unrecognised string
+        processor = FluxNormaliser(flux=1,
+                                   target='string')
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        with self.assertRaises(ValueError):
+            processor._calculate_target()
+
+        # check error if target is not a string or floar
+        processor = FluxNormaliser(flux=1,
+                                   target={'string': 10})
+        processor.set_input(self.data_cone)
+        processor._calculate_flux()
+        with self.assertRaises(TypeError):
+            processor._calculate_target()
+        
+    @patch('matplotlib.pyplot.show')
+    def test_preview_configuration(self, mock_show):
+        
+        # Suppress backround range warning
+        logging.disable(logging.CRITICAL)
+
+        # Test error in preview configuration if there is no roi
+        processor = FluxNormaliser(flux=10)
+        processor.set_input(self.data_cone)
+        with self.assertRaises(ValueError):
+            processor.preview_configuration()
+        
+        # Test error in preview configuration if set_input not called
+        roi = {'horizontal':(25,40)}
+        processor = FluxNormaliser(roi=roi)
+        with self.assertRaises(TypeError):
+            processor.preview_configuration()
+
+        # Test correct data is plotted
+        roi = {'horizontal':(0,3),'vertical':(0,1)}
+        processor = FluxNormaliser(roi=roi)
+        processor.set_input(self.data_simple)
+        
+        fig = processor.preview_configuration()
+        
+        # Check slice plots
+        slice_plot1 = fig.axes[0].images[0].get_array().data
+        slice_plot2 = fig.axes[2].images[0].get_array().data
+        numpy.testing.assert_allclose(self.data_simple.array[0], slice_plot1)
+        numpy.testing.assert_allclose(self.data_simple.array[2], slice_plot2)
+
+        # Check ROI plots
+        for f in [fig.axes[0], fig.axes[2]]:
+            roi_x_lower = f.lines[0].get_xdata()
+            roi_x_upper = f.lines[1].get_xdata()
+            roi_y_lower = f.lines[0].get_ydata()
+            roi_y_upper = f.lines[1].get_ydata()
+            numpy.testing.assert_allclose(roi_x_lower, [0,3])
+            numpy.testing.assert_allclose(roi_x_upper, [0,3])
+            numpy.testing.assert_allclose(roi_y_lower, [0,0])
+            numpy.testing.assert_allclose(roi_y_upper, [1,1])
+
+            roi_x_left = f.lines[2].get_xdata()
+            roi_x_right = f.lines[3].get_xdata()
+            roi_y_left = f.lines[2].get_ydata()
+            roi_y_right = f.lines[3].get_ydata()
+            numpy.testing.assert_allclose(roi_x_left, [0,0])
+            numpy.testing.assert_allclose(roi_x_right, [3,3])
+            numpy.testing.assert_allclose(roi_y_left, [0,1])
+            numpy.testing.assert_allclose(roi_y_right, [0,1])
+
+        # Check line data
+        data_mean = self.data_simple.get_slice(vertical=1).array.mean(axis=1)
+        plot_mean = fig.axes[4].lines[0].get_ydata()
+        numpy.testing.assert_allclose(data_mean, plot_mean)
+
+        data_min = self.data_simple.get_slice(vertical=1).array.min(axis=1)
+        plot_min = fig.axes[4].lines[1].get_ydata()
+        numpy.testing.assert_allclose(data_min, plot_min)
+
+        data_max = self.data_simple.get_slice(vertical=1).array.max(axis=1)
+        plot_max = fig.axes[4].lines[2].get_ydata()
+        numpy.testing.assert_allclose(data_max, plot_max)
+
+        # Test no error with preview_configuration with different data shapes
+        for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
+                     self.data_slice, self.data_reorder, self.data_single_angle]:
+            mock_show.reset_mock()
+
+            roi = {'horizontal':(25,40)}
+            processor = FluxNormaliser(roi=roi)
+            processor.set_input(data)
+            fig = processor.preview_configuration()
+            
+            mock_show.assert_called_once()
+
+            # for 3D, check no error specifying a single angle to plot
+            if data.geometry.dimension == '3D':
+                processor.preview_configuration(angle=1)
+            # if 2D, attempt to plot single angle should cause error
+            else:
+                with self.assertRaises(ValueError):
+                    processor.preview_configuration(angle=1)
+
+            # if data is multichannel, check no error specifying a single channel to plot
+            if 'channel' in data.dimension_labels:
+                processor.preview_configuration(angle=1, channel=1)
+                processor.preview_configuration(channel=1)
+            # if single channel, check specifying channel causes an error
+            else:
+                with self.assertRaises(ValueError):
+                    processor.preview_configuration(channel=1)
+
+        # Re-enable logging
+        logging.disable(logging.NOTSET)
+
+    def test_FluxNormaliser(self, accelerated=False):
+
+        # Suppress backround range warning
+        logging.disable(logging.CRITICAL)
+
+        #Test flux with no target
+        processor = FluxNormaliser(flux=1, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+        
+        #Test flux with target
+        processor = FluxNormaliser(flux=10, target=5.0, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        
+        #Test flux array with no target
+        flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
+        processor = FluxNormaliser(flux=flux, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        data_norm_test = self.data_cone.copy()
+        for a in range(data_norm_test.get_dimension_size('angle')):
+            data_norm_test.array[a,:,:] /= flux[a]
+            data_norm_test.array[a,:,:]*= numpy.mean(flux.ravel())
+        numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6)
+
+        # #Test flux array with target
+        flux = numpy.arange(1,2,(2-1)/(self.data_cone.get_dimension_size('angle')))
+        norm_value = 5.0
+        processor = FluxNormaliser(flux=flux, target=norm_value, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        data_norm_test = self.data_cone.copy()
+        for a in range(data_norm_test.get_dimension_size('angle')):
+            data_norm_test.array[a,:,:] /= flux[a]
+            data_norm_test.array[a,:,:]*= norm_value
+        numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6)
+
+        # #Test roi with no target
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, self.data_cone.array)
+
+        # #Test roi with norm_value
+        roi = {'vertical':(0,10), 'horizontal':(0,10)}
+        processor = FluxNormaliser(roi=roi, target=5.0, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+
+        # # Test roi with just one dimension
+        roi = {'vertical':(0,2)}
+        processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
+        processor.set_input(self.data_cone)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 5*self.data_cone.array)
+
+        # test roi with different data shapes and different flux values per projection
+        for data in [ self.data_cone, self.data_parallel, self.data_multichannel,
+                      self.data_slice, self.data_reorder]:
+            roi = {'horizontal':(25,40)}
+            processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
+            processor.set_input(data)
+            data_norm = processor.get_output()
+
+            ax = data.get_dimension_axis('horizontal')
+            slc = [slice(None)]*len(data.shape)
+            slc[ax] = slice(25,40)
+            axes=[ax]
+            if 'vertical' in data.dimension_labels:
+                axes.append(data.get_dimension_axis('vertical'))
+            flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+            slice_proj = [slice(None)]*len(data.shape)
+            proj_axis = data.get_dimension_axis('angle')
+            data_norm_test = data.copy()
+            h_size = data.get_dimension_size('horizontal')
+            if 'vertical' in data.dimension_labels:
+                v_size = data.get_dimension_size('vertical')
+            else:
+                v_size = 1
+            proj_size = h_size*v_size
+            for i in range(len(data.geometry.angles)*data.geometry.channels):
+                data_norm_test.array.flat[i*proj_size:(i+1)*proj_size] /=flux.flat[i]
+                data_norm_test.array.flat[i*proj_size:(i+1)*proj_size] *=5
+            numpy.testing.assert_allclose(data_norm.array, data_norm_test.array, atol=1e-6, 
+            err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+
+        data = self.data_single_angle
+        processor = FluxNormaliser(roi=roi, target=5, accelerated=accelerated)
+        processor.set_input(data)
+        data_norm = processor.get_output()
+        ax = data.get_dimension_axis('horizontal')
+        slc = [slice(None)]*len(data.shape)
+        slc[ax] = slice(25,40)
+        axes=[ax,data.get_dimension_axis('vertical')]
+        flux = numpy.mean(data.array[tuple(slc)], axis=tuple(axes))
+
+        numpy.testing.assert_allclose(data_norm.array, 5/flux*data.array, atol=1e-6, 
+        err_msg='Flux Normaliser roi test failed with data shape: ' + str(data.shape) + ' and configuration:\n' + str(data.geometry.config.system))
+
+        # Re-enable logging
+        logging.disable(logging.NOTSET)
     
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_FluxNormaliser_accelerated(self):
+        self.test_FluxNormaliser(accelerated=True)
+
+    def test_FluxNormaliser_preserves_input(self):
+        processor = FluxNormaliser(flux=10, target=5.0)
+        data = self.data_cone.copy()
+        processor.set_input(data)
+        data_norm = processor.get_output()
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        numpy.testing.assert_allclose(data.array, self.data_cone.array)
+
+        processor = FluxNormaliser(flux=10, target=5.0)
+        data = self.data_cone.copy()
+        data_norm = self.data_cone.copy()
+        processor.set_input(data)
+        processor.get_output(out=data_norm)
+        numpy.testing.assert_allclose(data_norm.array, 0.5*self.data_cone.array)
+        numpy.testing.assert_allclose(data.array, self.data_cone.array)
+
+
+if __name__ == "__main__":
+
     d = TestDataProcessor()
     d.test_DataProcessorChaining()
-

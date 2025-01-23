@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -36,10 +35,10 @@ class BlockOperator(Operator):
 
     Parameters
     ----------
-    *args : Operator  
-        Operators in the block.  
-    **kwargs : dict  
-        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.  
+    *args : Operator
+        Operators in the block.
+    **kwargs : dict
+        shape (:obj:`tuple`, optional): If shape is passed the Operators in vararg are considered input in a row-by-row fashion.
 
 
     Note
@@ -52,9 +51,9 @@ class BlockOperator(Operator):
       \min Regulariser + Fidelity
 
 
-    BlockOperators have a generic shape M x N, and when applied on an 
+    BlockOperators have a generic shape M x N, and when applied on an
     Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
-  
+
     Note
     -----
     BlockDatacontainer are only allowed to have the shape of N x 1, with
@@ -88,6 +87,10 @@ class BlockOperator(Operator):
             raise ValueError(
                 'Dimension and size do not match: expected {} got {}'
                 .format(n_elements, len(args)))
+        
+        self._range_block_shape = (shape[0], 1)
+        self._domain_block_shape = (shape[1], 1)    
+        
         # TODO
         # until a decent way to check equality of Acquisition/Image geometries
         # required to fullfil "Operators in a Block are required to have the same
@@ -140,9 +143,9 @@ class BlockOperator(Operator):
         Parameters
         ----------
         row: `int`
-            The row index required. 
+            The row index required.
         col: `int`
-            The column index required. 
+            The column index required.
         '''
         if row > self.shape[0]:
             raise ValueError(
@@ -164,12 +167,12 @@ class BlockOperator(Operator):
         return [op.norm() for op in self.operators]
 
     def set_norms(self, norms):
-        '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values. 
+        '''Uses the set_norm() function in Operator to set the norms of the operators in the BlockOperator from a list of custom values.
 
-        Parameters  
-        ------------  
-        norms: list  
-            A list of positive real values the same length as the number of operators in the BlockOperator.  
+        Parameters
+        ------------
+        norms: list
+            A list of positive real values the same length as the number of operators in the BlockOperator.
 
         '''
         if len(norms) != self.size:
@@ -182,6 +185,13 @@ class BlockOperator(Operator):
     def direct(self, x, out=None):
         '''Direct operation for the BlockOperator
 
+        Parameters
+        ----------
+        x: BlockDataContainer
+            The input BlockDataContainer to apply the BlockOperator on. Can be a DataContainer if the domain geometry permits.  
+        out: BlockDataContainer, optional
+            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the range geometry permits.
+
         Note
         -----
         BlockOperators work on BlockDataContainers, but they will also work on DataContainers
@@ -192,42 +202,57 @@ class BlockOperator(Operator):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape)
-        res = []
+            
+        if x_b.shape != self._domain_block_shape:
+            raise ValueError(
+                'We expect the input to be a block data container of shape {}'.format(  self._domain_block_shape))
+        
+        unwrap_data_container_on_return = False
+        
+        if self._range_block_shape == (1,1):
+            unwrap_data_container_on_return = True 
 
         if out is None:
-
-            for row in range(self.shape[0]):
-                for col in range(self.shape[1]):
-                    if col == 0:
-                        prod = self.get_item(row, col).direct(
-                            x_b.get_item(col))
-                    else:
-                        prod += self.get_item(row,
-                                              col).direct(x_b.get_item(col))
-                res.append(prod)
-            return BlockDataContainer(*res, shape=shape)
-
+            # allocate the output blockdatacontainer of the correct shape
+            res = BlockDataContainer(*[self.get_item(row, 0).range_geometry().allocate(None)
+                                     for row in range(self.shape[0])], shape=self._range_block_shape)
+        elif not isinstance(out, BlockDataContainer):
+                # Handle datacontainers or sirf datacontainers
+                if unwrap_data_container_on_return: 
+                    res = BlockDataContainer(out)
+                else:
+                    raise ValueError(
+                        f'The range of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape {self._range_block_shape}')             
         else:
+            res = out
+            unwrap_data_container_on_return = False
 
-            tmp = self.range_geometry().allocate()
-            for row in range(self.shape[0]):
-                for col in range(self.shape[1]):  
-                    if col == 0:       
-                        self.get_item(row,col).direct(
-                                                      x_b.get_item(col),
-                                                      out=out.get_item(row))                        
-                    else:
-                        temp_out_row = out.get_item(row) # temp_out_row points to the element in out that we are adding to  
-                        self.get_item(row,col).direct(
-                                                      x_b.get_item(col), 
-                                                      out=tmp.get_item(row))
-                        temp_out_row += tmp.get_item(row)
+        for row in range(self.shape[0]):
+            for col in range(self.shape[1]):
                 
+                if col == 0:
+                    self.get_item(row, col).direct(x_b.get_item(col), out=res.get_item(row))
+                else:
+                    # temp_out_row points to the element in res that we are adding to
+                    temp_out_row = res.get_item(row)
+                    temp_out_row += self.get_item(row, col).direct(x_b.get_item(col))
+
+        if unwrap_data_container_on_return:
+            # Return the out as the user passed it in case the range shape is (1,1)
+            return res.get_item(0)
+        else:
+            return res
+
 
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
 
+        Parameters
+        ----------
+        x: BlockDataContainer
+            The input BlockDataContainer to apply the BlockOperator adjoint on. Can be a DataContainer if the range geometry permits.
+        out: BlockDataContainer, optional
+            The output BlockDataContainer to store the result of the operation. If not provided, a new BlockDataContainer is created. Can be a DataContainer if the domain geometry permits.
         Note
         -----
         BlockOperator may contain both LinearOperator and Operator
@@ -241,53 +266,62 @@ class BlockOperator(Operator):
         '''
         if not self.is_linear():
             raise ValueError('Not all operators in Block are linear.')
+
+        
         if not isinstance(x, BlockDataContainer):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
-        shape = self.get_output_shape(x_b.shape, adjoint=True)
+            
+        if x_b.shape != self._range_block_shape:
+            raise ValueError(
+                'We expect the input to be a block data container of shape {}'.format(  self._range_block_shape))
+        
+        unwrap_data_container_on_return = False
+        
+        if self._domain_block_shape == (1,1):
+            unwrap_data_container_on_return = True 
+        
+
         if out is None:
-            res = []
-            for col in range(self.shape[1]):
-                for row in range(self.shape[0]):
-                    if row == 0:
-                        prod = self.get_item(row, col).adjoint(
-                            x_b.get_item(row))
-                    else:
-                        prod += self.get_item(row,
-                                              col).adjoint(x_b.get_item(row))
-                res.append(prod)
-            if self.shape[1] == 1:
-                # the output is a single DataContainer, so we can take it out
-                return res[0]
+            # allocate the output blockdatacontainer of the correct shape
+            res = BlockDataContainer(*[self.get_item(0, col).domain_geometry().allocate(0)
+                                     for col in range(self.shape[1])], shape=self._domain_block_shape)
+            
+
+        elif not isinstance(out, BlockDataContainer):
+            # Handle datacontainers or sirf datacontainers
+            if unwrap_data_container_on_return:
+                    res = BlockDataContainer(out)
+                        
+
             else:
-                return BlockDataContainer(*res, shape=shape)
+                raise ValueError(
+                    f'The domain of this block operator is not compatible with the `out` that was passed. Expected `out` to be `None` or a `BlockDataContainer` of shape {self._domain_block_shape}')    
+                    
         else:
+            res = out
+            unwrap_data_container_on_return = False
 
-            for col in range(self.shape[1]):
-                for row in range(self.shape[0]):
-                    if row == 0:
-                        if issubclass(out.__class__, DataContainer) or \
-                                (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                            self.get_item(row, col).adjoint(
-                                x_b.get_item(row),
-                                out=out)
-                        else:
-                            op = self.get_item(row, col)
-                            self.get_item(row, col).adjoint(
-                                x_b.get_item(row),
-                                out=out.get_item(col))
-                    else:
-                        if issubclass(out.__class__, DataContainer) or \
-                                (has_sirf and issubclass(out.__class__, SIRFDataContainer)):
-                            out += self.get_item(row, col).adjoint(
-                                x_b.get_item(row))
-                        else:
-
-                            temp_out_col = out.get_item(col) # out_col_operator points to the column in out that we are updating 
-                            temp_out_col += self.get_item(row,col).adjoint(
-                                                        x_b.get_item(row),
-                                                        )
+        for col in range(self.shape[1]):
+            for row in range(self.shape[0]):
+                
+                if row == 0:
+                    self.get_item(row, col).adjoint(
+                        x_b.get_item(row),
+                        out=res.get_item(col))
+                else:
+                    # out_col_operator points to the column in res that we are updating
+                    temp_out_col = res.get_item(col)
+                    temp_out_col += self.get_item(row, col).adjoint(
+                        x_b.get_item(row),
+                    )
+                    
+        if unwrap_data_container_on_return:
+            # Return the out as the user passed it in case the range shape is (1,1)
+            return res.get_item(0)
+        else:
+            return res
 
     def is_linear(self):
         '''Returns whether all the elements of the BlockOperator are linear'''
@@ -304,7 +338,7 @@ class BlockOperator(Operator):
         Examples
         --------
         A(N,M) direct u(M,1) -> N,1
-        
+
         A(N,M)^T adjoint u(N,1) -> M,1
         '''
         rows, cols = self.shape
@@ -372,6 +406,8 @@ class BlockOperator(Operator):
             tmp = []
             for i in range(self.shape[1]):
                 tmp.append(self.get_item(0, i).domain_geometry())
+            if self.shape[1] == 1:
+                return tmp[0]
             return BlockGeometry(*tmp)
 
             # shape = (self.shape[0], 1)
@@ -384,6 +420,8 @@ class BlockOperator(Operator):
         tmp = []
         for i in range(self.shape[0]):
             tmp.append(self.get_item(i, 0).range_geometry())
+        if self.shape[0] == 1:
+            return tmp[0]
         return BlockGeometry(*tmp)
 
     def sum_abs_row(self):

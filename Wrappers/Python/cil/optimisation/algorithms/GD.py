@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2019 United Kingdom Research and Innovation
 #  Copyright 2019 The University of Manchester
 #
@@ -19,151 +18,143 @@
 
 import numpy
 from cil.optimisation.algorithms import Algorithm
-import warnings
 import logging
+from cil.optimisation.utilities import ConstantStepSize, ArmijoStepSizeRule, StepSizeRule
+from warnings import warn
+from numbers import Real
+
+log = logging.getLogger(__name__)
+
 
 class GD(Algorithm):
-    ''' 
-    
-        Gradient Descent algorithm
-        
-        
-    '''
+    """Gradient Descent algorithm
 
-    def __init__(self, initial=None, objective_function=None, step_size =None, **kwargs):
-        '''GD algorithm creator
-        
-        initialisation can be done at creation time if all 
-        proper variables are passed or later with set_up
-        
-        :param initial: initial guess
-        :param objective_function: objective function to be minimised
-        :param step_size: step size for gradient descent iteration
-        :param alpha: optional parameter to start the backtracking algorithm, default 1e6
-        :param beta: optional parameter defining the reduction of step, default 0.5.
-                    It's value can be in (0,1)
-        :param rtol: optional parameter defining the relative tolerance comparing the 
-                     current objective function to 0, default 1e-5, see numpy.isclose
-        :param atol: optional parameter defining the absolute tolerance comparing the 
-                     current objective function to 0, default 1e-8, see numpy.isclose
-        '''
-        super(GD, self).__init__(**kwargs)
+    Parameters
+    ----------
+    initial: DataContainer (e.g. ImageData)
+        The initial point for the optimisation 
+    f: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
+        The function to be minimised. 
+    step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
+        If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+    preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
-        self.alpha = kwargs.get('alpha' , 1e6)
-        self.beta = kwargs.get('beta', 0.5)
-        self.rtol = kwargs.get('rtol', 1e-5)
-        self.atol = kwargs.get('atol', 1e-8)
-        if initial is not None and objective_function is not None :
-            self.set_up(initial=initial, objective_function=objective_function, step_size=step_size)
-    
-    def set_up(self, initial, objective_function, step_size):
-        '''initialisation of the algorithm
+    """
+
+
+    def __init__(self, initial=None, f=None, step_size=None,   preconditioner=None, **kwargs):
+
+        self.alpha = kwargs.pop('alpha', None) # to be deprecated
+        self.beta = kwargs.pop('beta', None) # to be deprecated
+        self.rtol = kwargs.pop('rtol', None) # to be deprecated (released in 25.0)
+        self.atol = kwargs.pop('atol', None) # to be deprecated (released in 25.0)
         
-        :param initial: initial guess
-        :param objective_function: objective function to be minimised
-        :param step_size: step size'''
-        logging.info("{} setting up".format(self.__class__.__name__, ))
+
+        if kwargs.get('objective_function') is not None: # to be deprecated
+            warn('The argument `objective_function` will be deprecated in the future. Please use `f` instead.', DeprecationWarning, stacklevel=2)
+            if f is not None:
+                raise ValueError('The argument `objective_function` is being deprecated, replaced by `f`. Please use just `f` not both')
+            f = kwargs.pop('objective_function')
             
-        self.x = initial.copy()
-        self.objective_function = objective_function
+
+        if self.alpha is not None or self.beta is not None: # to be deprecated
+            warn('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ', DeprecationWarning, stacklevel=2)
+
+        if self.rtol!=0 or self.atol!=0: # to be deprecated (released in 25.0)
+            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks),  for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
+        else:
+            log.warn('Breaking backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
+            
+        super().__init__(**kwargs)
         
+        if initial is not None and f is not None:
+            self.set_up(initial=initial, f=f, step_size=step_size,  preconditioner=preconditioner)
+
+    def set_up(self, initial, f, step_size, preconditioner):
+        '''initialisation of the algorithm
+
+        Parameters
+        ----------
+        initial: DataContainer (e.g. ImageData)
+            The initial point for the optimisation 
+        f: CIL function with a defined gradient 
+            The function to be minimised. 
+        step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
+            If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+        preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
+
+        '''
+
+        log.info("%s setting up", self.__class__.__name__)
+
+        self.x = initial.copy()
+        self._objective_function = f
 
         if step_size is None:
-            self.k = 0
-            self.update_step_size = True
-            self.x_armijo = initial.copy()
-            # self.rate = self.armijo_rule() * 2
-            # print (self.rate)
+            self.step_size_rule = ArmijoStepSizeRule(
+                alpha=self.alpha, beta=self.beta)
+        elif isinstance(step_size, Real):
+            self.step_size_rule = ConstantStepSize(step_size)
+        elif isinstance(step_size, StepSizeRule):
+            self.step_size_rule = step_size
         else:
-            self.step_size = step_size
-            self.update_step_size = False
-        
-        
-        self.update_objective()
-
-        self.x_update = initial.copy()
+            raise TypeError(
+                '`step_size` must be `None`, a Real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
+        self.gradient_update = initial.copy()
 
         self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
+
+        self.preconditioner = preconditioner
+
+        log.info("%s configured", self.__class__.__name__)
 
     def update(self):
-        '''Single iteration'''
-        
-        self.objective_function.gradient(self.x, out=self.x_update)
-        
-        if self.update_step_size:
-            # the next update and solution are calculated within the armijo_rule
-            self.step_size = self.armijo_rule()
-        else:
-            self.x.sapyb(1.0, self.x_update, -self.step_size, out=self.x)
-        
+        '''Performs a single iteration of the gradient descent algorithm'''
+        self._objective_function.gradient(self.x, out=self.gradient_update)
+
+        if self.preconditioner is not None:
+            self.preconditioner.apply(
+                self, self.gradient_update, out=self.gradient_update)
+
+        step_size = self.step_size_rule.get_step_size(self)
+
+        self.x.sapyb(1.0, self.gradient_update, -step_size, out=self.x)
 
     def update_objective(self):
-        self.loss.append(self.objective_function(self.x))
+        self.loss.append(self._objective_function(self.solution))
 
-    def armijo_rule(self):
-        '''Applies the Armijo rule to calculate the step size (step_size)
-
-        https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
-
-        The Armijo rule runs a while loop to find the appropriate step_size by starting
-        from a very large number (alpha). The step_size is found by dividing alpha by 2 
-        in an iterative way until a certain criterion is met. To avoid infinite loops, we 
-        add a maximum number of times the while loop is run. 
-
-        This rule would allow to reach a minimum step_size of 10^-alpha. 
-        
-        if
-        alpha = numpy.power(10,gamma)
-        delta = 3
-        step_size = numpy.power(10, -delta)
-        with armijo rule we can get to step_size from initial alpha by repeating the while loop k times 
-        where 
-        alpha / 2^k = step_size
-        10^gamma / 2^k = 10^-delta 
-        2^k = 10^(gamma+delta)
-        k = gamma+delta / log10(2) \\approx 3.3 * (gamma+delta)
-
-        if we would take by default delta = gamma
-        kmax = numpy.ceil ( 2 * gamma / numpy.log10(2) )
-        kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
-
-        '''
-        f_x = self.objective_function(self.x)
-        if not hasattr(self, 'x_update'):
-            self.x_update = self.objective_function.gradient(self.x)
-        
-        while self.k < self.kmax:
-            # self.x - alpha * self.x_update
-            self.x_update.multiply(self.alpha, out=self.x_armijo)
-            self.x.subtract(self.x_armijo, out=self.x_armijo)
+    def should_stop(self): # to be deprecated (released in 25.0)
+        '''Stopping criterion for the gradient descent algorithm '''
+        check_should_stop = False 
+        if self.rtol  is not None or self.atol is not None:
+            check_should_stop = numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
+                          atol=self.atol, equal_nan=False)
+        return super().should_stop() or  check_should_stop
             
-            f_x_a = self.objective_function(self.x_armijo)
-            sqnorm = self.x_update.squared_norm()
-            if f_x_a - f_x <= - ( self.alpha/2. ) * sqnorm:
-                self.x.fill(self.x_armijo)
-                break
-            else:
-                self.k += 1.
-                # we don't want to update kmax
-                self._alpha *= self.beta
 
-        if self.k == self.kmax:
-            raise ValueError('Could not find a proper step_size in {} loops. Consider increasing alpha.'.format(self.kmax))
-        return self.alpha
+    @property
+    def step_size(self):
+        if isinstance(self.step_size_rule, ConstantStepSize):
+            return self.step_size_rule.step_size
+        else:
+            raise TypeError(
+                "There is not a constant step size, it is set by a step-size rule")
+
+    def calculate_objective_function_at_point(self, x):
+        """ Calculates the objective at a given point x
+
+        .. math:: f(x)
+        
+        Parameters
+        ----------
+        x : DataContainer
+        
+        """
+        return self._objective_function(x)
     
     @property
-    def alpha(self):
-        return self._alpha
-    @alpha.setter
-    def alpha(self, alpha):
-        self._alpha = alpha
-        self.kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
-        self.k = 0
-        
-    def should_stop(self):
-        return self.max_iteration_stop_criterion() or \
-            numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol, 
-                atol=self.atol, equal_nan=False)
-
-
+    def objective_function(self):
+        warn('The attribute `objective_function` will be deprecated in the future. Please use `calculate_objective_function_at_point` instead.', DeprecationWarning, stacklevel=2)  
+        return self._objective_function

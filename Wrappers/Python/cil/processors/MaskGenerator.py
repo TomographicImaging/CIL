@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -79,7 +78,7 @@ class MaskGenerator(DataProcessor):
         r'''This creates a MaskGenerator processor which generates a mask for values outside a multiple of standard-devaiations from the mean.
 
         abs(A - mean(A)) < threshold_factor * std(A).
-        
+
         :param threshold_factor: scale factor of standard-deviations to use as threshold
         :type threshold_factor: float, default=3
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
@@ -102,7 +101,7 @@ class MaskGenerator(DataProcessor):
         MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
 
         :param threshold_factor: scale factor of MAD to use as threshold
-        :type threshold_factor: float, default=3        
+        :type threshold_factor: float, default=3
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
         :type axis: int, string
         :param window: specify number of pixels to use in calculation of a rolling median
@@ -124,7 +123,7 @@ class MaskGenerator(DataProcessor):
                  window=5,
                  axis=None):
         r'''Processor to detect outliers and return mask with 0 where outliers were detected and 1 for other pixels.
-                
+
             :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)
             :type mode: string, default='special_values'
             :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
@@ -139,35 +138,35 @@ class MaskGenerator(DataProcessor):
             :type axis: int, string
             :return: returns a DataContainer with boolean mask with 0 where outliers were detected
             :rtype: DataContainer
-            
+
         - special_values    test element-wise for both inf and nan
         - nan               test element-wise for nan
         - inf               test element-wise for inf
         - threshold         test element-wise if array values are within boundaries
-                            given by threshold_values = (float,float). 
+                            given by threshold_values = (float,float).
                             You can secify only lower threshold value by setting another to None
                             such as threshold_values = (float,None), then
-                            upper boundary will be amax(data). Similarly, to specify only upper 
+                            upper boundary will be amax(data). Similarly, to specify only upper
                             boundary, use threshold_values = (None,float). If both threshold_values
                             are set to None, then original array will be returned.
         - quantile          test element-wise if array values are within boundaries
-                            given by quantiles = (q1,q2), 0<=q1,q2<=1. 
+                            given by quantiles = (q1,q2), 0<=q1,q2<=1.
                             You can secify only lower quantile value by setting another to None
                             such as quantiles = (float,q2), then
-                            upper boundary will be amax(data). Similarly, to specify only upper 
+                            upper boundary will be amax(data). Similarly, to specify only upper
                             boundary, use quantiles = (None,q1). If both quantiles
                             are set to None, then original array will be returned.
-        - mean              test element-wise if 
+        - mean              test element-wise if
                             abs(A - mean(A)) < threshold_factor * std(A).
-                            Default value of threshold_factor is 3. If no axis is specified, 
-                            then operates over flattened array. Alternatively operates along axis specified 
+                            Default value of threshold_factor is 3. If no axis is specified,
+                            then operates over flattened array. Alternatively operates along axis specified
                             as dimension_label.
-        - median            test element-wise if 
+        - median            test element-wise if
                             abs(A - median(A)) < threshold_factor * scaled MAD(A),
-                            scaled median absolute deviation (MAD) is defined as 
+                            scaled median absolute deviation (MAD) is defined as
                             c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-                            Default value of threshold_factor is 3. If no axis is specified, 
-                            then operates over flattened array. Alternatively operates along axis specified 
+                            Default value of threshold_factor is 3. If no axis is specified,
+                            then operates over flattened array. Alternatively operates along axis specified
                             as dimension_label.
         - movmean           the same as mean but uses rolling mean with a specified window,
                             default window value is 5
@@ -198,6 +197,15 @@ class MaskGenerator(DataProcessor):
                                 "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
         return True
+    
+    def check_output(self, out):
+        if out is not None:
+            if out.array.dtype != bool:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, bool))
+        
+        return True
+
 
     def process(self, out=None):
 
@@ -212,7 +220,7 @@ class MaskGenerator(DataProcessor):
         ndim = arr.ndim
 
         try:
-            axis_index = data.dimension_labels.index(self.axis)               
+            axis_index = data.dimension_labels.index(self.axis)
         except:
             if type(self.axis) == int:
                 axis_index = self.axis
@@ -221,44 +229,44 @@ class MaskGenerator(DataProcessor):
 
         # intialise mask with all ones
         mask = numpy.ones(arr.shape, dtype=bool)
-        
+
         # if NaN or +/-Inf
         if self.mode == 'special_values':
-            
+
             mask[numpy.logical_or(numpy.isnan(arr), numpy.isinf(arr))] = 0
-        
+
         elif self.mode == 'nan':
-            
+
             mask[numpy.isnan(arr)] = 0
-            
+
         elif self.mode == 'inf':
-            
+
             mask[numpy.isinf(arr)] = 0
-            
+
         elif self.mode == 'threshold':
-            
+
             if not(isinstance(self.threshold_value, tuple)):
                 raise Exception("Threshold value must be given as a tuple containing two values,\n" +\
                     "use None if no threshold value is given")
-                
+
             threshold = self._parse_threshold_value(arr, quantile=False)
-            
+
             mask[numpy.logical_or(arr < threshold[0], arr > threshold[1])] = 0
-            
+
         elif self.mode == 'quantile':
-            
+
             if not(isinstance(self.quantiles, tuple)):
                 raise Exception("Quantiles must be given as a tuple containing two values,\n " + \
                     "use None if no quantile value is given")
-            
+
             quantile = self._parse_threshold_value(arr, quantile=True)
-                
+
             mask[numpy.logical_or(arr < quantile[0], arr > quantile[1])] = 0
-        
+
         elif self.mode == 'mean':
-            
+
             # if mean along specific axis
-            if axis_index is not None:               
+            if axis_index is not None:
                 tile_par = []
                 slice_obj = []
                 for i in range(ndim):
@@ -270,20 +278,20 @@ class MaskGenerator(DataProcessor):
                         slice_obj.append(slice(None, None, 1))
                 tile_par = tuple(tile_par)
                 slice_obj = tuple(slice_obj)
-                
+
                 tmp_mean = numpy.tile((numpy.mean(arr, axis=axis_index))[slice_obj], tile_par)
                 tmp_std = numpy.tile((numpy.std(arr, axis=axis_index))[slice_obj], tile_par)
                 mask[numpy.abs(arr - tmp_mean) > self.threshold_factor * tmp_std] = 0
 
-            # if global mean    
+            # if global mean
             else:
-                
+
                  mask[numpy.abs(arr - numpy.mean(arr)) > self.threshold_factor * numpy.std(arr)] = 0
-        
+
         elif self.mode == 'median':
-            
+
             c = -1 / (numpy.sqrt(2) * special.erfcinv(3 / 2))
-            
+
             # if median along specific axis
             if axis_index is not None:
                 tile_par = []
@@ -301,17 +309,17 @@ class MaskGenerator(DataProcessor):
                 tmp = numpy.abs(arr - numpy.tile((numpy.median(arr, axis=axis_index))[slice_obj], tile_par))
                 median_absolute_dev = numpy.tile((numpy.median(tmp, axis=axis_index))[slice_obj], tile_par)
                 mask[tmp > self.threshold_factor * c * median_absolute_dev] = 0
-            
+
             # if global median
             else:
-                
+
                 tmp = numpy.abs(arr - numpy.median(arr))
                 mask[tmp > self.threshold_factor * c * numpy.median(tmp)] = 0
-            
+
         elif self.mode == 'movmean':
 
-            # if movmean along specific axis     
-            if axis_index is not None:               
+            # if movmean along specific axis
+            if axis_index is not None:
                 kernel = [1] * ndim
                 kernel[axis_index] = self.window
                 kernel = tuple(kernel)
@@ -320,21 +328,21 @@ class MaskGenerator(DataProcessor):
                 std_array = ndimage.generic_filter(arr, numpy.std, size=kernel, mode='reflect')
 
                 mask[numpy.abs(arr - mean_array) > self.threshold_factor * std_array] = 0
-            
+
             # if global movmean
             else:
                 mean_array = ndimage.generic_filter(arr, numpy.mean, size=(self.window,)*ndim, mode='reflect')
                 std_array = ndimage.generic_filter(arr, numpy.std, size=(self.window,)*ndim, mode='reflect')
-                
-                mask[numpy.abs(arr - mean_array) > self.threshold_factor * std_array] = 0          
-            
+
+                mask[numpy.abs(arr - mean_array) > self.threshold_factor * std_array] = 0
+
         elif self.mode == 'movmedian':
 
             c = -1 / (numpy.sqrt(2) * special.erfcinv(3 / 2))
-            
+
             # if movmedian along specific axis
             if axis_index is not None:
-                                
+
                 # construct filter kernel
                 kernel_shape = []
                 for i in range(ndim):
@@ -342,35 +350,40 @@ class MaskGenerator(DataProcessor):
                         kernel_shape.append(self.window)
                     else:
                         kernel_shape.append(1)
-                
+
                 kernel_shape = tuple(kernel_shape)
-                
+
                 median_array = ndimage.median_filter(arr, footprint=kernel_shape, mode='reflect')
-                
+
                 tmp = abs(arr - median_array)
                 mask[tmp > self.threshold_factor * c * ndimage.median_filter(tmp, footprint=kernel_shape, mode='reflect')] = 0
-            
+
             # if global movmedian
-            else:      
+            else:
                 # construct filter kernel
                 kernel_shape = tuple([self.window]*ndim)
                 median_array = ndimage.median_filter(arr, size=kernel_shape, mode='reflect')
-                
+
                 tmp = abs(arr - median_array)
                 mask[tmp > self.threshold_factor * c * ndimage.median_filter(tmp, size=kernel_shape, mode='reflect')] = 0
-        
+
         else:
             raise ValueError('Mode not recognised. One of the following is expected: ' + \
                               'special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian')
-        
+
 
         if out is None:
             mask = numpy.asarray(mask, dtype=bool)
-            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
-            return out
+            if data.geometry is not None:
+                geometry = data.geometry.copy()
+            else:
+                geometry = None
+            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
         else:
             out.fill(mask)
-    
+        
+        return out
+
     def _parse_threshold_value(self, arr, quantile=False):
 
         lower_val = None

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2022 United Kingdom Research and Innovation
 #  Copyright 2022 The University of Manchester
 #
@@ -19,7 +18,8 @@
 # Andrew Shartis (UES, Inc.)
 
 
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry, DataOrder
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
 import olefile
@@ -30,18 +30,17 @@ dxchange_logger.setLevel(logging.ERROR)
 import dxchange
 import warnings
 
-logger = logging.getLogger(__name__)
 
 class ZEISSDataReader(object):
 
     '''
     Create a reader for ZEISS files
-    
+
     Parameters
     ----------
     file_name: str
         file name to read
-    roi: dict, default None 
+    roi: dict, default None
         dictionary with roi to load for each axis:
         ``{'axis_labels_1': (start, end, step),'axis_labels_2': (start, end, step)}``.
         ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.
@@ -52,13 +51,13 @@ class ZEISSDataReader(object):
         For ImageData to skip files or to change number of files to load,
         adjust ``vertical``. E.g. ``'vertical': (100, 300)`` will skip first 100 files
         and will load 200 files.
-        
+
         ``'axis_label': -1`` is a shortcut to load all elements along axis.
 
         ``start`` and ``end`` can be specified as ``None`` which is equivalent
         to ``start = 0`` and ``end = load everything to the end``, respectively.
     '''
-    
+
     def __init__(self, file_name=None, roi=None):
 
         self.file_name = file_name
@@ -72,31 +71,31 @@ class ZEISSDataReader(object):
             self.set_up(file_name, roi = roi)
 
 
-    def set_up(self, 
+    def set_up(self,
                file_name,
                roi = None):
         '''Set up the reader
 
-        
+
         Parameters
         ----------
         file_name: str
             file name to read
-        roi: dict, default None 
+        roi: dict, default None
             dictionary with roi to load for each axis:
             ``{'axis_labels_1': (start, end, step),'axis_labels_2': (start, end, step)}``.
             ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.
 
         Notes
         -----
-        `roi` behaviour:           
+        `roi` behaviour:
             ``'axis_label': -1`` is a shortcut to load all elements along axis.
 
             ``start`` and ``end`` can be specified as ``None`` which is equivalent
             to ``start = 0`` and ``end = load everything to the end``, respectively.
 
             **Acquisition Data**
-            
+
             The axis labels in the `roi` dict for `AcquisitionData` will be:
             ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
 
@@ -114,7 +113,7 @@ class ZEISSDataReader(object):
         file_name = os.path.abspath(file_name)
         if not(os.path.isfile(file_name)):
             raise FileNotFoundError('{}'.format(file_name))
-        
+
         file_type = os.path.basename(file_name).split('.')[-1].lower()
         if file_type not in ['txrm', 'txm']:
             raise TypeError('This reader can only process TXRM or TXM files. Got {}'.format(os.path.basename(file_name)))
@@ -123,23 +122,22 @@ class ZEISSDataReader(object):
 
 
         metadata = self.read_metadata()
-        default_roi = [ [0,metadata['number_of_images'],1], 
+        default_roi = [ [0,metadata['number_of_images'],1],
                         [0,metadata['image_height'],1],
-                        [0,metadata['image_width'],1]] 
+                        [0,metadata['image_width'],1]]
 
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
-                allowed_labels = DataOrder.CIL_AG_LABELS
-                zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
+                zeiss_data_order = {AcquisitionDimension.ANGLE: 0,
+                                    AcquisitionDimension.VERTICAL: 1,
+                                    AcquisitionDimension.HORIZONTAL: 2}
             else:
-                allowed_labels = DataOrder.CIL_IG_LABELS
-                zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
+                zeiss_data_order = {ImageDimension.VERTICAL: 0,
+                                    ImageDimension.HORIZONTAL_Y: 1,
+                                    ImageDimension.HORIZONTAL_X: 2}
 
-            # check roi labels and create tuple for slicing    
+            # check roi labels and create tuple for slicing
             for key in roi.keys():
-                if key not in allowed_labels:
-                    raise Exception("Wrong label, got {0}. Expected dimension labels in {1}, {2}, {3}".format(key,**allowed_labels))
-
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
@@ -150,13 +148,13 @@ class ZEISSDataReader(object):
                             default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] - x
                         else: #step
                             default_roi[idx][i] =  x if x > 0 else 1
-                                
+
             self._roi = default_roi
             self._metadata = self.slice_metadata(metadata)
         else:
             self._roi = False
             self._metadata = metadata
-        
+
         #setup geometry using metadata
         if metadata['data geometry'] == 'acquisition':
             self._setup_acq_geometry()
@@ -181,7 +179,7 @@ class ZEISSDataReader(object):
 
             if file_type == 0:
                 metadata['data geometry'] = 'acquisition'
-        
+
                 # Read source to center and detector to center distances
                 StoRADistance = dxchange.reader._read_ole_arr(ole, \
                         'ImageInfo/StoRADistance', "<{0}f".format(metadata['number_of_images']))
@@ -201,7 +199,7 @@ class ZEISSDataReader(object):
                 metadata['data geometry'] = 'image'
 
         return metadata
-    
+
     def slice_metadata(self,metadata):
         '''
         Slices metadata to configure geometry before reading data
@@ -223,7 +221,7 @@ class ZEISSDataReader(object):
         metadata['image_width'] = len(width_slc)
         metadata['image_height'] = len(height_slc)
         return metadata
-        
+
     def _setup_acq_geometry(self):
         '''
         Setup AcquisitionData container
@@ -234,11 +232,11 @@ class ZEISSDataReader(object):
                 ) \
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']],\
                         pixel_size=[self._metadata['detector_pixel_size']/1000,self._metadata['detector_pixel_size']/1000])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         else:
             self._geometry = AcquisitionGeometry.create_Parallel3D()\
                     .set_panel([self._metadata['image_width'], self._metadata['image_height']])\
-                    .set_angles(self._metadata['thetas'],angle_unit=AcquisitionGeometry.RADIAN)
+                    .set_angles(self._metadata['thetas'],angle_unit=AngleUnit.RADIAN)
         self._geometry.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
     def _setup_image_geometry(self):
@@ -265,7 +263,7 @@ class ZEISSDataReader(object):
         if self._roi:
             slice_range = tuple(self._roi)
         data, _ = dxchange.read_txrm(self.file_name,slice_range)
-        
+
         if isinstance(self._geometry,AcquisitionGeometry):
             # Normalise data by flatfield
             data = data / self._metadata['reference']
@@ -274,7 +272,7 @@ class ZEISSDataReader(object):
                 data[num,:,:] = np.roll(data[num,:,:], \
                     (int(self._metadata['x-shifts'][num]),int(self._metadata['y-shifts'][num])), \
                     axis=(1,0))
-                
+
             acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._geometry.copy(),suppress_warning=True)
             return acq_data
         else:
@@ -291,12 +289,3 @@ class ZEISSDataReader(object):
     def get_metadata(self):
         '''return the metadata of the file'''
         return self._metadata
-
-
-class TXRMDataReader(ZEISSDataReader):
-    def __init__(self, 
-                 **kwargs):
-        warnings.warn('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead',
-              DeprecationWarning)
-        logger.warning('TXRMDataReader has been deprecated and will be removed in following version. Use ZEISSDataReader instead')
-        super().__init__(**kwargs)

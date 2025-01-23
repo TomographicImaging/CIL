@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #  Copyright 2021 United Kingdom Research and Innovation
 #  Copyright 2021 The University of Manchester
 #
@@ -18,9 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, AcquisitionData, ImageData
-from numbers import Number
-from cil.framework import  DataContainer, AcquisitionGeometry, ImageGeometry
+from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
 import numpy as np
 import weakref
 
@@ -30,7 +27,7 @@ class Padder(DataProcessor):
 
 
     It is recommended to use the static methods to configure your Padder object rather than initialising this class directly. See examples for details.
-       
+
 
     Parameters
     ----------
@@ -43,12 +40,12 @@ class Padder(DataProcessor):
 
     Notes
     -----
-    `pad_width` behaviour (number of pixels):
+    `pad_width`  behaviour (number of pixels):
         - int: Each axis will be padded with a border of this size
         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-        - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
-    
-    `pad_values` behaviour:
+        - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+
+    `pad_values`  behaviour:
         - float: Each border will use this value
         - tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)
         - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
@@ -96,7 +93,7 @@ class Padder(DataProcessor):
     def constant(pad_width=None, constant_values=0.0):
         """
         Padder processor wrapping numpy.pad with mode `constant`.
-        
+
         Pads the data with a constant value border. Pads in all *spatial*
         dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
@@ -109,19 +106,19 @@ class Padder(DataProcessor):
 
         Notes
         -----
-        `pad_width` behaviour (number of pixels):
+        `pad_width`  behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}      
-        
-        `constant_values` behaviour (value of pixels):
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+
+        `constant_values`  behaviour (value of pixels):
          - float: Each border will be set to this value
          - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)
          - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
-        
+
         Example
         -------
         >>> processor = Padder.constant(pad_width=1, constant_values=0.0)
@@ -137,7 +134,7 @@ class Padder(DataProcessor):
         [0. 3. 4. 5. 0.]
         [0. 6. 7. 8. 0.]
         [0. 0. 0. 0. 0.]]
-                    
+
         """
 
         processor = Padder(pad_width=pad_width, mode='constant', pad_values=constant_values)
@@ -160,11 +157,11 @@ class Padder(DataProcessor):
         `pad_width` behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}  
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
-        and the last two angles in geometry.angles. The user should ensure the output is as expected.    
-        
+        and the last two angles in geometry.angles. The user should ensure the output is as expected.
+
         Example
         -------
         >>> processor = Padder.edge(pad_width=1)
@@ -180,15 +177,15 @@ class Padder(DataProcessor):
         [3. 3. 4. 5. 5.]
         [6. 6. 7. 8. 8.]
         [6. 6. 7. 8. 8.]]
-        
+
         """
 
         processor = Padder(pad_width=pad_width, mode='edge')
         return processor
-    
+
     @staticmethod
     def linear_ramp(pad_width=None, end_values=0.0):
-        """Padder processor wrapping numpy.pad with mode `linear_ramp` 
+        """Padder processor wrapping numpy.pad with mode `linear_ramp`
 
         Pads the data with values calculated from a linear ramp between the array edge
         value and the set end_value. Pads in all *spatial* dimensions unless a dictionary
@@ -204,7 +201,7 @@ class Padder(DataProcessor):
         `pad_width` behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}  
+         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         `end_values` behaviour:
          - float: Each border will use this end value
@@ -231,11 +228,11 @@ class Padder(DataProcessor):
         [0.  3.  6.  7.  8.  4.  0. ]
         [0.  1.5 3.  3.5 4.  2.  0. ]
         [0.  0.  0.  0.  0.  0.  0. ]]
-                    
+
         """
         processor = Padder(pad_width=pad_width, mode='linear_ramp', pad_values=end_values)
         return processor
-    
+
 
     @staticmethod
     def reflect(pad_width=None):
@@ -273,11 +270,11 @@ class Padder(DataProcessor):
         [4. 3. 4. 5. 4.]
         [7. 6. 7. 8. 7.]
         [4. 3. 4. 5. 4.]]
-        
+
         """
         processor = Padder(pad_width=pad_width, mode='reflect')
         return processor
-    
+
 
     @staticmethod
     def symmetric(pad_width=None):
@@ -317,11 +314,11 @@ class Padder(DataProcessor):
         [3. 3. 4. 5. 5.]
         [6. 6. 7. 8. 8.]
         [6. 6. 7. 8. 8.]]
-        
+
         """
         processor = Padder(pad_width=pad_width, mode='symmetric')
         return processor
-    
+
 
     @staticmethod
     def wrap(pad_width=None):
@@ -362,7 +359,7 @@ class Padder(DataProcessor):
         [5. 3. 4. 5. 3.]
         [8. 6. 7. 8. 6.]
         [2. 0. 1. 2. 0.]]
-        
+
         """
         processor = Padder(pad_width=pad_width, mode='wrap')
         return processor
@@ -376,10 +373,11 @@ class Padder(DataProcessor):
         kwargs = {'mode': mode,
                 'pad_width': pad_width,
                 'pad_values': pad_values,
-                '_data_array': False, 
-                '_geometry': None, 
+                '_data_array': False,
+                '_geometry': None,
                 '_shape_in':None,
                 '_shape_out':None,
+                '_shape_out_full':None,
                 '_labels_in':None,
                 '_processed_dims':None,
                 '_pad_width_param':None,
@@ -409,6 +407,7 @@ class Padder(DataProcessor):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
 
+        self._set_up()
 
     def check_input(self, data):
 
@@ -440,9 +439,7 @@ class Padder(DataProcessor):
         if self.pad_width is None:
             raise ValueError('Please, specify pad_width')
 
-        self._parse_input(data)
-    
-        return True 
+        return True
 
     def _create_tuple(self, value, dtype):
         try:
@@ -466,8 +463,9 @@ class Padder(DataProcessor):
         return dimensions
 
 
-    def _parse_input(self, data):
-
+    def _set_up(self):
+        
+        data = self.get_input()
         offset = 4-data.ndim
 
         #set defaults
@@ -477,20 +475,20 @@ class Padder(DataProcessor):
         self._shape_in = [1]*4
         self._shape_in[offset::] = data.shape
 
-        self._shape_out = self._shape_in.copy()
+        self._shape_out_full = self._shape_in.copy()
 
         self._processed_dims = [0,0,0,0]
 
         self._pad_width_param = [(0,0)]*4
         self._pad_values_param = [(0,0)]*4
 
-        
+
         # if pad_width or set_values is passed a dictionary these keys specify the axes to run over
         if isinstance(self.pad_width, dict) and isinstance(self.pad_values, dict):
-            
+
             if self.pad_width.keys() != self.pad_values.keys():
                 raise ValueError('Dictionaries must contain the same axes')
-            
+
             dimensions = self._get_dimensions_from_dict(self.pad_width)
 
         elif isinstance(self.pad_width, dict):
@@ -521,7 +519,7 @@ class Padder(DataProcessor):
                 i = self._labels_in.index(dim)
                 self._pad_width_param[i] = self._create_tuple(values, int)
             except TypeError:
-                raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0} for axis {1}".format(values, dim))    
+                raise TypeError("`pad_width` should be a integer or a tuple of integers. Got {0} for axis {1}".format(values, dim))
 
         # get pad_values for these dimensions
         for dim in dimensions:
@@ -534,13 +532,15 @@ class Padder(DataProcessor):
                 i = self._labels_in.index(dim)
                 self._pad_values_param[i] = self._create_tuple(values, float)
             except TypeError:
-                raise TypeError("`pad_values` should be a float or a tuple of floats. Got {0} for axis {1}".format(values, dim))    
+                raise TypeError("`pad_values` should be a float or a tuple of floats. Got {0} for axis {1}".format(values, dim))
 
         #create list of processed axes and new_shape
         for i in range(4):
            if self._pad_width_param[i] != (0,0):
-                self._processed_dims[i] = 1 
-                self._shape_out[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
+                self._processed_dims[i] = 1
+                self._shape_out_full[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
+
+        self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
 
 
     def _process_acquisition_geometry(self):
@@ -570,10 +570,10 @@ class Padder(DataProcessor):
                 geometry.config.angles.angle_data = np.pad(a, (self._pad_width_param[i][0],self._pad_width_param[i][1]), mode='linear_ramp',end_values=end_values)
 
             elif dim == 'vertical':
-                geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0] 
+                geometry.config.panel.num_pixels[1] += self._pad_width_param[i][0]
                 geometry.config.panel.num_pixels[1] += self._pad_width_param[i][1]
                 geometry.config.shift_detector_in_plane(offset, dim)
-                    
+
             elif dim == 'horizontal':
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][0]
                 geometry.config.panel.num_pixels[0] += self._pad_width_param[i][1]
@@ -623,7 +623,7 @@ class Padder(DataProcessor):
         elif self.mode == 'linear_ramp':
             arr_out = np.pad(arr_in, self._pad_width_param, mode=self.mode, \
                 end_values=self._pad_values_param).squeeze()
-        
+
         return arr_out
 
 
@@ -658,12 +658,13 @@ class Padder(DataProcessor):
         else:
             # check size and shape if passed out
             try:
-                out.array = out.array.reshape(self._shape_out)
+                out.array = out.array.reshape(self._shape_out_full)
             except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out_full, np.float32, out.array.shape, out.array.dtype))
 
             if new_geometry is not None:
                 if out.geometry != new_geometry:
                     raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, new_geometry))
-            
+
             out.array = self._process_data(data)
+            return out

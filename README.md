@@ -148,7 +148,7 @@ cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUT
 cmake --build ./build --target install
 ```
 
-If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows). Similarly, `<path_to_python_executable>` can be set to the active conda environment by passing `${CONDA_PREFIX}/bin/python` on linux or `%CONDA_PREFIX%/python` in windows.
+If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows). Similarly, `<path_to_python_executable>` can be set to the active conda environment by passing `${CONDA_PREFIX}/bin/python` on linux or `%CONDA_PREFIX%\python` in windows.
 
 #### Linux
 ```sh

@@ -1,7 +1,7 @@
 # GitHub Actions
 
 ## [build.yml](./build.yml)
-This github action file has multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation.
+This github action file has multiple jobs, which build both the conda package and documentation, and optionally publish the documentation.
 
 The jobs are:
 
@@ -70,6 +70,6 @@ The [docs](./build.yml#L124) job:
 >
 > Then open a browser and navigate to <http://localhost:8000/CIL/> to view the documentation.
 
-### [skip.yml](./skip.yml)
+## [skip.yml](./skip.yml)
 
 This action prevents the build jobs from running if only text files have been modified in the PR.

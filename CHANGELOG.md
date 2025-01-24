@@ -19,6 +19,7 @@
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
     - Replaced matplotlib dependency with matplotlib-base (#2031)
+    - Remove CIL-Data from build requirements, update version to >=22 in run requirements (#2046)
   - Changes that break backwards compatibility:
     - show1D argument renamed `label`->`dataset_labels`, default plot size has changed. (#2022)
     - show1D Default behaviour for displaying and labeling multiple plots has changed. Each slice requested will be displayed on a new subplot comparing all datasets at that position. (#2022)

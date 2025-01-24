@@ -268,10 +268,8 @@ class TestStepSizeBB(CCPiTestClass):
     def test_bb_converge(self):
         n = 10
         m = 5
-        np.random.seed(2)
-        A = np.random.uniform(0, 1, (m, n)).astype('float32')
-        b = (A.dot(np.random.randn(n)) + 0.1 *
-             np.random.randn(m)).astype('float32')
+        A = np.ones((m,n))/m
+        b = np.array(range(m))+0.1*np.ones(m)
 
         Aop = MatrixOperator(A)
         bop = VectorData(b)
@@ -299,7 +297,7 @@ class TestStepSizeBB(CCPiTestClass):
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
         alg = GD(initial=initial, f=f, step_size=ss_rule)
 
-        alg.run(100, verbose=0)
+        alg.run(80, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
         

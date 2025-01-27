@@ -266,23 +266,22 @@ class TestStepSizeBB(CCPiTestClass):
         
         
     def test_bb_converge(self):
-        n = 10
-        m = 5
-        
-        stream = np.random.PCG64DXSM
-        rng = np.random.Generator(stream(5))
 
-        A = rng.uniform(0, 1, (m,n)).astype('float32')
-        b = (A.dot(rng.random(n, dtype='float32')) + 0.1 * rng.random(m, dtype='float32'))
+        A = np.array([[0.04119974, 0.30344617, 0.47877404, 0.87702113, 0.4508707,  0.7489252, 0.14314881, 0.2901196,  0.6081065,  0.39111522,],
+                      [0.33625755, 0.4531966,  0.7323498,  0.47445428, 0.39587957, 0.6263374, 0.15895593, 0.85297406, 0.16044202, 0.8820284 ],
+                      [0.4617596,  0.06809104, 0.1346327,  0.66691947, 0.73774, 0.724321, 0.8940343,  0.9068759,  0.9154968,  0.07415677],
+                      [0.34942824, 0.1707828,  0.63186353, 0.12529854, 0.6133797,  0.9043219, 0.27300107, 0.85966766, 0.983884, 0.12591435],
+                      [0.44565696, 0.39292857, 0.6478155,  0.20971642, 0.26178253, 0.87718016, 0.812306, 0.64444983, 0.744506, 0.52754575]], dtype='float32')
+
+        b = np.array([-0.63842267, -1.8694286,   0.10666347, -0.42527917, -0.75809413], dtype='float32')
 
         Aop = MatrixOperator(A)
         bop = VectorData(b)
         ig=Aop.domain
         
-        # run the power method to cache Aop.norm with an initial (fixed) random value
+        # run the power method to cache Aop.norm with initial (fixed) random values
         random_vector = ig.allocate(0)
-        random_vector.fill(np.array([0.81382483, 0.9749577, 0.7255774, 0.40685904, 0.7357079,
-                         0.48137417, 0.26729307, 0.32392278, 0.24379292, 0.7879446]).astype('float32'))
+        random_vector.fill(np.array([0.29291746, 0.39534327, 0.43275824, 0.10410359, 0.09606296, 0.32707754, 0.42188534, 0.71121025, 0.01616312, 0.19384168], dtype='float32'))
         norm = LinearOperator.PowerMethod(Aop, initial=random_vector)
         Aop.set_norm(norm)
         f = LeastSquares(Aop, b=bop, c=2)
@@ -303,7 +302,7 @@ class TestStepSizeBB(CCPiTestClass):
         
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
         alg = GD(initial=initial, f=f, step_size=ss_rule)
-        alg.run(120, verbose=0)
+        alg.run(100, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
         

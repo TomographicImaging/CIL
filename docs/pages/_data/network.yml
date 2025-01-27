@@ -13,6 +13,11 @@
   title: "Science and Technology Facilities Council"
   image: "https://ccpi.ac.uk/wp-content/uploads/2022/10/STFC_White_Text-2.png"
   image_width: 249
+- name: ALC
+  url: "https://adalovelacecentre.ac.uk"
+  title: Ada Lovelace Centre
+  image: "https://adalovelacecentre.ac.uk/wp-content/uploads/2019/05/cropped-alc-logo.png"
+  image_width: 82
 - name: EPSRC
   url: "https://epsrc.ac.uk"
   title: "Engineering and Physical Sciences Research Council"

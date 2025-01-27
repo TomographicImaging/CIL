@@ -303,7 +303,7 @@ class TestStepSizeBB(CCPiTestClass):
         
         ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
         alg = GD(initial=initial, f=f, step_size=ss_rule)
-        alg.run(100, verbose=0)
+        alg.run(120, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=2)
         
         

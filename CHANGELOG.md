@@ -1,4 +1,6 @@
 * 24.3.0
+  - New features:
+    - Added `FluxNormaliser` processor (#1878)
   - Bug fixes:
     - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes (#1548)
     - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
@@ -25,8 +27,6 @@
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
     - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
-  - New features:
-    - Added `FluxNormaliser` processor (#1878)
   - Deprecated code
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)

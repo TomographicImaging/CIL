@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.SVRGFunction &#8212; CIL 24.2.1.dev32+g6c17ad51 documentation</title>
+    <title>cil.optimisation.functions.SVRGFunction &#8212; CIL 24.2.1.dev33+ga14ac332 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=4b6f475cff7c1d6e2a7b" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=4b6f475cff7c1d6e2a7b" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=ad6633196367bee11023" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=ad6633196367bee11023" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../../_static/scripts/fontawesome.js?digest=4b6f475cff7c1d6e2a7b"></script>
+  <script src="../../../../../_static/scripts/fontawesome.js?digest=ad6633196367bee11023"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=4b6f475cff7c1d6e2a7b" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=4b6f475cff7c1d6e2a7b" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=ad6633196367bee11023" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=ad6633196367bee11023" />
 
-    <script src="../../../../../_static/documentation_options.js?v=aef68b36"></script>
+    <script src="../../../../../_static/documentation_options.js?v=7a53651d"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev32+g6c17ad51';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev33+ga14ac332';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev32+g6c17ad51" />
+  <meta name="docsearch:version" content="24.2.1.dev33+ga14ac332" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -506,7 +506,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SVRGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `snapshot_update_interval` number of iterations, a full gradient calculation is made at this &quot;snapshot&quot; point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`s at the current iterate and the snapshot, updating the approximate gradient to be:</span>
+<span class="sd">    The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `snapshot_update_interval` number of iterations, a full gradient calculation is made at this &quot;snapshot&quot; point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`&#39;s at the current iterate and the snapshot, updating the approximate gradient to be:</span>
 
 <span class="sd">    .. math ::</span>
 <span class="sd">        n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),</span>
@@ -535,7 +535,7 @@
 <span class="sd">    snapshot_update_interval : positive int or None, optional</span>
 <span class="sd">        The interval for updating the full gradient (taking a snapshot). The default is 2*len(functions) so a &quot;snapshot&quot; is taken every 2*len(functions) iterations. If the user passes `0` then no full gradient snapshots will be taken. </span>
 <span class="sd">    store_gradients : bool, default: `False`</span>
-<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
+<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -696,28 +696,24 @@
 <div class="viewcode-block" id="LSVRGFunction">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.LSVRGFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LSVRGFunction</span><span class="p">(</span><span class="n">SVRGFunction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a &quot;snapshot&quot;  is calculated at random intervals rather than at fixed numbers of iterations. </span>
-
-
-<span class="sd">    Reference</span>
-<span class="sd">    ----------</span>
-
-<span class="sd">    Kovalev, D., Horváth, S. &amp;; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.</span>
-
-
-
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">     functions : `list`  of functions</span>
+<span class="sd">    functions : `list`  of functions</span>
 <span class="sd">        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions `n` must be strictly greater than 1. </span>
 <span class="sd">    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.</span>
 <span class="sd">        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. </span>
 <span class="sd">    snapshot_update_probability: positive float, default: 1/n</span>
 <span class="sd">        The probability of updating the full gradient (taking a snapshot) at each iteration. The default is :math:`1./n` so, in expectation, a snapshot will be taken every :math:`n` iterations. </span>
 <span class="sd">    store_gradients : bool, default: `False`</span>
-<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and it&#39;s gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
+<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
 
+<span class="sd">        </span>
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    Kovalev, D., Horváth, S. &amp;; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -799,8 +795,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=4b6f475cff7c1d6e2a7b"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=4b6f475cff7c1d6e2a7b"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=ad6633196367bee11023"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=ad6633196367bee11023"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

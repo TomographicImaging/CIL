@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 24.2.1.dev32+g6c17ad51 documentation</title>
+    <title>Framework &#8212; CIL 24.2.1.dev33+ga14ac332 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=4b6f475cff7c1d6e2a7b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=4b6f475cff7c1d6e2a7b" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=ad6633196367bee11023" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=ad6633196367bee11023" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=4b6f475cff7c1d6e2a7b"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=ad6633196367bee11023"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=4b6f475cff7c1d6e2a7b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=4b6f475cff7c1d6e2a7b" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=ad6633196367bee11023" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=ad6633196367bee11023" />
 
-    <script src="../_static/documentation_options.js?v=aef68b36"></script>
+    <script src="../_static/documentation_options.js?v=7a53651d"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev32+g6c17ad51';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.2.1.dev33+ga14ac332';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.2.1.dev32+g6c17ad51" />
+  <meta name="docsearch:version" content="24.2.1.dev33+ga14ac332" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -537,7 +537,7 @@
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionGeometry</span></span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry" title="Link to this definition">#</a></dt>
 <dd><p>This class holds the AcquisitionGeometry of the system.</p>
-<p>Please initialise the AcquisitionGeometry using the using the static methods:</p>
+<p>Please initialise the AcquisitionGeometry using the static methods:</p>
 <p><cite>AcquisitionGeometry.create_Parallel2D()</cite></p>
 <p><cite>AcquisitionGeometry.create_Cone2D()</cite></p>
 <p><cite>AcquisitionGeometry.create_Parallel3D()</cite></p>
@@ -2245,24 +2245,20 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <li><p><strong>b</strong> (<em>scalar</em><em> or </em><a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>)</p></li>
 <li><p><strong>y</strong> (<em>compatible</em><em> (</em><em>Block</em><em>)</em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
 <li><p><strong>out</strong> (<a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>optional</em>) – Provides a placeholder for the result</p></li>
-<li><p><strong>Example</strong></p></li>
-<li><p><strong>--------</strong></p></li>
-<li><p><strong>2</strong> (<em>&gt;&gt;&gt; a =</em>)</p></li>
-<li><p><strong>3</strong> (<em>&gt;&gt;&gt; b =</em>)</p></li>
-<li><p><strong>ImageGeometry</strong><strong>(</strong><strong>10</strong> (<em>&gt;&gt;&gt; ig =</em>)</p></li>
-<li><p><strong>11</strong><strong>)</strong></p></li>
-<li><p><strong>ig.allocate</strong><strong>(</strong><strong>1</strong><strong>)</strong> (<em>&gt;&gt;&gt; x =</em>)</p></li>
-<li><p><strong>ig.allocate</strong><strong>(</strong><strong>2</strong><strong>)</strong> (<em>&gt;&gt;&gt; y =</em>)</p></li>
-<li><p><strong>BlockDataContainer</strong><strong>(</strong><strong>2*x</strong> (<em>&gt;&gt;&gt; bdc1 =</em>)</p></li>
-<li><p><strong>y</strong><strong>)</strong></p></li>
-<li><p><strong>BlockDataContainer</strong><strong>(</strong><strong>x</strong> (<em>&gt;&gt;&gt; bdc2 =</em>)</p></li>
-<li><p><strong>2*y</strong><strong>)</strong></p></li>
-<li><p><strong>bdc1.sapyb</strong><strong>(</strong><strong>a</strong> (<em>&gt;&gt;&gt; out =</em>)</p></li>
-<li><p><strong>bdc2</strong></p></li>
-<li><p><strong>b</strong><strong>)</strong></p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc1</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bdc2</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">bdc1</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">bdc2</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -2708,8 +2704,8 @@ input</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=4b6f475cff7c1d6e2a7b"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=4b6f475cff7c1d6e2a7b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=ad6633196367bee11023"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=ad6633196367bee11023"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

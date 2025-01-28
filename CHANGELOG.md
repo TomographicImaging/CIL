@@ -33,7 +33,6 @@
   - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
 
-
 * 24.2.0
   - New Features:
     - Added SVRG and LSVRG stochastic functions (#1625)

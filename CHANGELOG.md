@@ -1,34 +1,37 @@
-* 24.x.x
+* 24.3.0
+  - New features:
+    - Added `FluxNormaliser` processor (#1878)
   - Bug fixes:
-    - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes.
+    - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes (#1548)
     - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
     - Allow MaskGenerator to be run on DataContainers (#2001)
-    - Make Paganin Processor work with AcquistionData with one angle (#1920)
+    - Make `PaganinProcessor` work with `AcquistionData` with one angle (#1920)
     - Fix bug passing `kwargs` to PDHG (#2010)
-    - Show1D correctly applies slices to N-dimensional data (#2022)
-    - BlockOperator direct and adjoint methods: can pass out as a DataContainer instead of a (1,1) BlockDataContainer where geometry permits (#1926)
+    - `show1D` correctly applies slices to N-dimensional data (#2022)
+    - `BlockOperator` direct and adjoint methods: can pass out as a `DataContainer` instead of a (1,1) `BlockDataContainer` where geometry permits (#1926)
+    - Add path to python executable to cmake commands to fix issue with cmake retrieving wrong python (#2044)
   - Enhancements:
-    - Removed multiple exits from numba implementation of KullbackLeibler divergence (#1901)
+    - Removed multiple exits from numba implementation of `KullbackLeibler` divergence (#1901)
     - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
     - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
-    - Add FluxNormaliser processor (#1878)
-    - SAPBY for the BlockDataContainer now does not require an `out` to be passed (#2008)
+    - SAPBY for the `BlockDataContainer` now does not require an `out` to be passed (#2008)
     - Fixed the rendering of the SAG/SAGA documentation (#2011)
     - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
   - Dependencies:
-    - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
+    - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook (#1955)
     - Replaced matplotlib dependency with matplotlib-base (#2031)
+    - Remove CIL-Data from build requirements, update version to >=22 in run requirements (#2046)
   - Changes that break backwards compatibility:
-    - show1D argument renamed `label`->`dataset_labels`, default plot size has changed. (#2022)
-    - show1D Default behaviour for displaying and labeling multiple plots has changed. Each slice requested will be displayed on a new subplot comparing all datasets at that position. (#2022)
-    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
+    - `show1D` argument renamed `label`->`dataset_labels`, default plot size has changed. (#2022)
+    - `show1D` Default behaviour for displaying and labeling multiple plots has changed. Each slice requested will be displayed on a new subplot comparing all datasets at that position. (#2022)
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
     - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
+  - Deprecated code
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
   - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
-
 
 * 24.2.0
   - New Features:

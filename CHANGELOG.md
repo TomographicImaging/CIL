@@ -1,3 +1,8 @@
+* XX.X
+  - Bug fixes:
+      - Fix deprecation warning for rtol and atol in GD (#2056)
+
+
 * 24.3.0
   - New features:
     - Added `FluxNormaliser` processor (#1878)

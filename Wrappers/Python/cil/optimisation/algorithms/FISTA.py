@@ -230,6 +230,31 @@ class ISTA(Algorithm):
         """
         return self.f(x) + self.g(x)
 
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+@dataclass
+class MomentumCoefficient(ABC):
+    momentum: float = None
+
+    @abstractmethod
+    def __call__(self, algo=None):
+        pass
+
+class ConstantMomentum(MomentumCoefficient):
+
+    def __call__(self, algo):
+        return self.momentum
+        
+
+class Nesterov(MomentumCoefficient):
+
+    def __call__(self, algo=None):
+        t_old = algo.t        
+        algo.t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))  
+        return (t_old-1)/algo.t
+
 class FISTA(ISTA):
 
     r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:
@@ -302,6 +327,20 @@ class FISTA(ISTA):
 
     """
 
+    @property
+    def momentum(self):        
+       return self._momentum  
+
+    def set_momentum(self, momentum):
+
+        if momentum is None:
+            self._momentum = Nesterov()
+        else:
+            if isinstance(momentum, Number):
+                self._momentum = ConstantMomentum(momentum)
+            else:
+                self._momentum = momentum    
+
     def _calculate_default_step_size(self):
         """Calculate the default step size if a step size rule or step size is not provided 
         """
@@ -320,14 +359,16 @@ class FISTA(ISTA):
             raise TypeError(
                 "Can't check convergence criterion for non-constant step size")
 
-    def __init__(self, initial, f, g, step_size=None,  preconditioner=None, **kwargs):
 
+    def __init__(self, initial, f, g, step_size = None, preconditioner=None, momentum=None, **kwargs):
+                     
         self.y = initial.copy()
-        self.t = 1
-        super(FISTA, self).__init__(initial=initial, f=f, g=g,
-                                    step_size=step_size,  preconditioner=preconditioner, **kwargs)
-
-    def update(self):
+        self.t = 1    
+        self._momentum = None
+        self.set_momentum(momentum=momentum)
+        super(FISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, preconditioner=preconditioner,**kwargs)           
+                              
+    def update(self):  
         r"""Performs a single iteration of FISTA. For :math:`k\geq 1`:
 
         .. math::
@@ -339,23 +380,16 @@ class FISTA(ISTA):
             \end{cases}
 
         """
+        
+        self.f.gradient(self.y, out=self.x)  
+        
+        # update step size
+        step_size = self.step_size_rule.get_step_size(self)  
 
-        self.t_old = self.t
-
-        self.f.gradient(self.y, out=self.gradient_update)
-
-        if self.preconditioner is not None:
-            self.preconditioner.apply(
-                self, self.gradient_update, out=self.gradient_update)
-
-        step_size = self.step_size_rule.get_step_size(self)
-
-        self.y.sapyb(1., self.gradient_update, -step_size, out=self.y)
-
+        self.y.sapyb(1., self.x, -step_size, out=self.y)        
         self.g.proximal(self.y, step_size, out=self.x)
 
-        self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
-
         self.x.subtract(self.x_old, out=self.y)
-        self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y)
-
+        
+        momentum = self.momentum(self)        
+        self.y.sapyb(momentum, self.x, 1.0, out=self.y)    

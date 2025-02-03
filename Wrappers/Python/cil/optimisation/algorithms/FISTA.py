@@ -382,6 +382,10 @@ class FISTA(ISTA):
         """
         
         self.f.gradient(self.y, out=self.x)  
+
+        if self.preconditioner is not None:
+            self.preconditioner.apply(
+                self, self.gradient_update, out=self.gradient_update)        
         
         # update step size
         step_size = self.step_size_rule.get_step_size(self)  

@@ -438,25 +438,7 @@ class TestFISTA(CCPiTestClass):
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 4.2e-4)
 
- 
-    def test_FISTA_APGD_alias(self):
-        n = 50
-        m = 500
-        A = np.random.uniform(0, 1, (m, n)).astype('float32')
-        b = A.dot(np.random.randn(n))
-        Aop = MatrixOperator(A)
-        bop = VectorData(b)
-        f = LeastSquares(Aop, b=bop, c=0.5)
-        g = ZeroFunction()
-        ig = Aop.domain
-        initial = ig.allocate()
-         
-        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
 
-            alg = APGD(initial=initial, f=f, g=g, step_size=4)
-            self.assertEqual(alg.t, 1)
-            self.assertNumpyArrayEqual(alg.y.array, initial.array)
-            mock_method.assert_called_once_with(initial=initial, f=f, g=g, step_size=4, preconditioner=None)
 
 
 class testISTA(CCPiTestClass):

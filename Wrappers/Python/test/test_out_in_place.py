@@ -60,13 +60,13 @@ from cil.utilities.quality_measures import mae
 
 from utils import  initialise_tests
 
-from utils import has_astra, has_tigre
+from utils import has_astra, has_tigre, has_nvidia
 
 
 
-if has_astra:
+if has_astra and has_nvidia:
     from cil.plugins.astra.operators import ProjectionOperator as AstraProjector
-if has_tigre:
+if has_tigre and has_nvidia:
     from cil.plugins.tigre import ProjectionOperator as TigreProjector
     
 
@@ -342,11 +342,11 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
     def setUp(self):
 
-        ground_truth = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        ground_truth = dataexample.SIMULATED_SPHERE_VOLUME.get(size = (16, 16,16))
 
-        data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get(size= (20, 16,16))
 
-        data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size= (20, 16,16))
         
         absorption_cone = TransmissionAbsorptionConverter()(data_cone)
         absorption_parallel = TransmissionAbsorptionConverter()(data_parallel)
@@ -358,7 +358,7 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
 
         self.operator_geom_test_list = [] # Contains (operator, domain_geom, range_geom, data_order)
             
-        if has_astra:
+        if has_astra and has_nvidia:
             absorption_cone.reorder(order='astra')
             absorption_parallel.reorder(order='astra')
             absorption_cone_2D.reorder(order='astra')
@@ -380,7 +380,7 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
                             acquisition_geometry=absorption_parallel_2D.geometry)
             self.operator_geom_test_list.append((A_parallel_astra_2D, 'astra'))
             
-        if has_tigre:
+        if has_tigre and has_nvidia:
         
             absorption_cone.reorder(order='tigre')
             absorption_parallel.reorder(order='tigre')

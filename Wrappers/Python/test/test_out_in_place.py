@@ -60,6 +60,16 @@ from cil.utilities.quality_measures import mae
 
 from utils import  initialise_tests
 
+from utils import has_astra, has_tigre
+
+
+
+if has_astra:
+    from cil.plugins.astra.operators import ProjectionOperator as AstraProjector
+if has_tigre:
+    from cil.plugins.tigre import ProjectionOperator as TigreProjector
+    
+
 
 
 initialise_tests()
@@ -121,6 +131,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
 
 
         ]
+        
 
         np.random.seed(5)
         self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32)]
@@ -257,12 +268,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
         self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
         self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.array(range(0,65400, 6540), dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]
-
-
-
-
-
-
+    
     def get_result(self, operator, method, x, *args):
         try:
             input=x.copy() #To check that it isn't changed after function calls
@@ -321,7 +327,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 self.out_test(result, operator,  'direct',  data)
                 self.in_place_test(result, operator, 'direct',  data)
 
-    def test_proximal_out(self):
+    def test_adjoint_out(self):
         for operator, geom in self.operator_geom_test_list:
             for data_array in self.data_arrays:
                 data=geom.allocate(None)
@@ -332,6 +338,117 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
                 result=self.get_result(operator, 'adjoint', data)
                 self.out_test(result, operator, 'adjoint',  data)
                 self.in_place_test(result,operator,  'adjoint',  data)
+
+class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
+    def setUp(self):
+
+        ground_truth = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+
+        data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        
+        absorption_cone = TransmissionAbsorptionConverter()(data_cone)
+        absorption_parallel = TransmissionAbsorptionConverter()(data_parallel)
+        
+        absorption_cone_2D = absorption_cone.get_slice(vertical='centre')
+        absorption_parallel_2D = absorption_parallel.get_slice(vertical='centre')
+
+        ground_truth_2D = ground_truth.get_slice(vertical='centre')
+
+        self.operator_geom_test_list = [] # Contains (operator, domain_geom, range_geom, data_order)
+            
+        if has_astra:
+            absorption_cone.reorder(order='astra')
+            absorption_parallel.reorder(order='astra')
+            absorption_cone_2D.reorder(order='astra')
+            absorption_parallel_2D.reorder(order='astra')
+            
+            A_cone_astra = AstraProjector(image_geometry=ground_truth.geometry, 
+                        acquisition_geometry=absorption_cone.geometry)
+            self.operator_geom_test_list.append((A_cone_astra, 'astra'))
+        
+            A_parallel_astra = AstraProjector(image_geometry=ground_truth.geometry,
+                            acquisition_geometry=absorption_parallel.geometry)
+            self.operator_geom_test_list.append((A_parallel_astra, 'astra'))
+            
+            A_cone_astra_2D = AstraProjector(image_geometry=ground_truth_2D.geometry,
+                            acquisition_geometry=absorption_cone_2D.geometry)
+            self.operator_geom_test_list.append((A_cone_astra_2D, 'astra'))
+            
+            A_parallel_astra_2D = AstraProjector(image_geometry=ground_truth_2D.geometry,
+                            acquisition_geometry=absorption_parallel_2D.geometry)
+            self.operator_geom_test_list.append((A_parallel_astra_2D, 'astra'))
+            
+        if has_tigre:
+        
+            absorption_cone.reorder(order='tigre')
+            absorption_parallel.reorder(order='tigre')
+            absorption_cone_2D.reorder(order='tigre')
+            absorption_parallel_2D.reorder(order='tigre')
+            
+            A_cone_tigre = TigreProjector(image_geometry=ground_truth.geometry,
+                            acquisition_geometry=absorption_cone.geometry)
+            self.operator_geom_test_list.append((A_cone_tigre, 'tigre'))
+            
+            A_parallel_tigre = TigreProjector(image_geometry=ground_truth.geometry,
+                            acquisition_geometry=absorption_parallel.geometry)
+            self.operator_geom_test_list.append((A_parallel_tigre, 'tigre'))
+            
+            A_cone_tigre_2D = TigreProjector(image_geometry=ground_truth_2D.geometry,
+                            acquisition_geometry=absorption_cone_2D.geometry)
+            self.operator_geom_test_list.append((A_cone_tigre_2D, 'tigre'))
+            
+            A_parallel_tigre_2D = TigreProjector(image_geometry=ground_truth_2D.geometry,
+                            acquisition_geometry=absorption_parallel_2D.geometry)
+            self.operator_geom_test_list.append((A_parallel_tigre_2D, 'tigre'))
+    
+        
+
+
+    def get_result(self, operator, method, x, *args):
+        try:
+            input=x.copy() #To check that it isn't changed after function calls
+            if method == 'direct':
+                out= operator.direct(x, *args)
+            elif method == 'adjoint':
+                out= operator.adjoint(x, *args)
+
+            self.assertDataArraysInContainerAllClose(input, x, rtol=1e-5, msg= "In case operator."+method+'(data, *args) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
+            return out
+        except NotImplementedError:
+            raise NotImplementedError(operator.__class__.__name__+" raises a NotImplementedError for "+method)
+
+
+    def out_test(self, desired_result, operator, method,  x, *args):
+        input = x.copy()
+        out2=0*(desired_result.copy())
+        try:
+            if method == 'direct':
+                ret = operator.direct(input, *args, out=out2)
+            elif method == 'adjoint':
+                ret = operator.adjoint(input, *args, out=out2)
+
+            self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
+            self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
+            self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed using return and `out` in ret = operator.{method}(x, *args, out=data) where func is {operator.__class__.__name__}")
+            
+        except (InPlaceError, NotImplementedError):
+            pass
+
+    def test_direct_out(self):
+        for operator, _ in self.operator_geom_test_list:
+            data=operator.domain_geometry().allocate('random', seed=2)
+            result=self.get_result(operator, 'direct', data)
+            self.out_test(result, operator,  'direct',  data)
+
+    def test_adjoint_out(self):
+        for operator, data_order in self.operator_geom_test_list:
+            
+            data=operator.range_geometry().allocate('random', seed=2)
+            data.reorder(data_order)
+            result=self.get_result(operator, 'adjoint', data)
+            self.out_test(result, operator, 'adjoint',  data)
 
 class TestProcessorOutandInPlace(CCPiTestClass):
     def setUp(self):

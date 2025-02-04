@@ -113,7 +113,7 @@ The Fast Iterative Soft Thresholding Algorithm (FISTA).
 
 APGD
 -----
-The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a contant momemtum or a momentum that is updated at each iteration. Note that in CIL, running this algorithm with the default step size and the default momentum coefficient is equivalent to running the FISTA algorithm.
+The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momemtum or a momentum that is updated at each iteration. Note that in CIL, running this algorithm with the default step size and the default momentum coefficient is equivalent to running the FISTA algorithm.
 
 .. autoclass:: cil.optimisation.algorithms.APGD
    :members:

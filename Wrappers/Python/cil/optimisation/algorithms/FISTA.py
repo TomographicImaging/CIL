@@ -248,10 +248,10 @@ class APGD(ISTA):
 
         \begin{cases}
                 x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                y_{k+1} = x_{k} + \text{m}(x_{k} - x_{k-1})
+                y_{k+1} = x_{k} + M(x_{k} - x_{k-1})
         \end{cases}
 
-    where :math:`\alpha` is the :code:`step_size` and :math:`\text{m}` is the momentum coefficient.
+    where :math:`\alpha` is the :code:`step_size` and :math:`M` is the momentum coefficient.
 
     Note that the above applies for :math:`k\geq 1`. For :math:`k=0`, :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`.
     

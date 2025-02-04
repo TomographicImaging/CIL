@@ -1,5 +1,5 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler 
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
@@ -142,3 +142,44 @@ class TestAlgorithmConvergence(CCPiTestClass):
         apgd = APGD(f=f, g=g, initial=initial, update_objective_interval=100, momentum=0.5)
         apgd.run(500, verbose=0)
         self.assertNumpyArrayAlmostEqual(apgd.solution.as_array(), b.as_array(), decimal=3)
+        
+    
+
+    def test_FISTA_momentum(self):
+        
+        np.random.seed(10)
+        n = 100  
+        m = 50 
+        A = np.random.normal(0,1, (m, n)).astype('float32') 
+        # A /= np.linalg.norm(A, axis=1, keepdims=True)
+        b = np.random.normal(0,1, m).astype('float32')
+        reg = 0.5
+        
+        Aop = MatrixOperator(A)
+        bop = VectorData(b) 
+        ig = Aop.domain
+
+        # cvxpy solutions
+        u_cvxpy = cvxpy.Variable(ig.shape[0])
+        objective = cvxpy.Minimize( 0.5 * cvxpy.sum_squares(Aop.A @ u_cvxpy - bop.array) + reg/2 * cvxpy.sum_squares(u_cvxpy))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=False, solver=cvxpy.SCS, eps=1e-4)  
+
+        # default fista
+        f = LeastSquares(A=Aop, b=bop, c=0.5)
+        g = reg/2*L2NormSquared()        
+        fista = FISTA(initial=ig.allocate(), f=f, g=g, update_objective_interval=1)
+        fista.run(500)        
+        np.testing.assert_allclose(fista.objective[-1], p.value, atol=1e-3)
+        np.testing.assert_allclose(fista.solution.array, u_cvxpy.value, atol=1e-3)
+
+        # fista Dossal Chambolle "On the convergence of the iterates of ”FISTA”
+        from cil.optimisation.algorithms.FISTA import MomentumCoefficient
+        class DossalChambolle(MomentumCoefficient):        
+            def __call__(self, algo=None):
+                return (algo.iteration-1)/(algo.iteration+50)
+        momentum = DossalChambolle()
+        fista_dc = APGD(initial=ig.allocate(), f=f, g=g, update_objective_interval=1, momentum=momentum)
+        fista_dc.run(500)
+        np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)
+        np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)

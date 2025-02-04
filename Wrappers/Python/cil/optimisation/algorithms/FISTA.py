@@ -237,6 +237,7 @@ class ISTA(Algorithm):
 class APGD(ISTA):
     
     r"""Accelerated Proximal Gradient Descent (APGD), is used to solve:
+    
     .. math:: \min_{x} f(x) + g(x)
 
     where :math:`f` is differentiable and :math:`g` has a *simple* proximal operator.
@@ -292,6 +293,19 @@ class APGD(ISTA):
         """
         return 1./self.f.L
     
+    def _provable_convergence_condition(self):
+        if self.preconditioner is not None:
+            raise NotImplementedError(
+                "Can't check convergence criterion if a preconditioner is used ")
+
+
+        if isinstance(self.step_size_rule, ConstantStepSize) and isinstance(self.momentum, NesterovMomentum):
+            return self.step_size_rule.step_size <= 1./self.f.L
+        else:
+            raise TypeError(
+                "Can't check convergence criterion for non-constant step size or non-Nesterov momentum coefficient")
+            
+            
     @property
     def momentum(self):        
        return self._momentum  
@@ -306,7 +320,7 @@ class APGD(ISTA):
             elif isinstance(momentum, MomentumCoefficient):
                 self._momentum = momentum
             else:
-                raise TypeError("mMomentum must be a number or a child class of MomentumCoefficient")
+                raise TypeError("Momentum must be a number or a child class of MomentumCoefficient")
         
     def update(self):
         r"""Performs a single iteration of APGD. For :math:`k\geq 1`:

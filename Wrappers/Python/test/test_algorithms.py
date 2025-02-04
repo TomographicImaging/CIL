@@ -308,10 +308,9 @@ class Test_APGD(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_1.as_array())
         
         x_1=self.g.proximal(y_1 - 0.3*self.f.gradient(y_1), 0.3)
-        y_2=x_1 + 0.5*(x_1-y_1)
+        y_2=x_1 + 0.5*(x_1-x_0)
         alg.run(1)
         self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_2.as_array())
-        
         
         
         

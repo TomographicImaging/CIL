@@ -45,7 +45,7 @@ An algorithm is designed for a particular generic optimisation problem accepts a
 instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to
 define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop.
-The user can provide a stopping criterion different than the default max_iteration.
+The user can provide a stopping criterion different than the defaul.
 
 New algorithms can be easily created by extending the :code:`Algorithm` class.
 The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
@@ -78,19 +78,19 @@ GD
 --
 .. autoclass:: cil.optimisation.algorithms.GD
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 CGLS
 ----
 .. autoclass:: cil.optimisation.algorithms.CGLS
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 SIRT
 ----
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members: update, update_objective
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 ISTA/PGD
 --------
@@ -99,7 +99,7 @@ The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradi
 .. _ISTA:
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 
 FISTA
@@ -109,29 +109,34 @@ The Fast Iterative Soft Thresholding Algorithm (FISTA).
 .. _FISTA:
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 APGD
 -----
+The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a contant momemtum or a momentum that is updated at each iteration. Note that in CIL, running this algorithm with the default step size and the default momentum coefficient is equivalent to running the FISTA algorithm.
+
+.. autoclass:: cil.optimisation.algorithms.APGD
+   :members:
+   :inherited-members: run, update_objective_interval
 
 PDHG
 ----
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 LADMM
 -----
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 PD3O
 ----
 .. autoclass:: cil.optimisation.algorithms.PD3O
    :members:
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 
 Algorithms (Stochastic)
@@ -161,7 +166,7 @@ Each iteration considers just one index of the sum, potentially reducing computa
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
    :members: update, set_step_sizes, set_step_sizes_from_ratio, update_objective
-   :inherited-members: run, update_objective_interval, max_iteration
+   :inherited-members: run, update_objective_interval
 
 
 Approximate gradient methods

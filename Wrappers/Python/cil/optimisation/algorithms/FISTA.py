@@ -282,15 +282,7 @@ class APGD(ISTA):
 
         self.y = initial.copy()
 
-        if momentum is None:
-            self.momentum = NesterovMomentum()
-        else:
-            if isinstance(momentum, Number):
-                self.momentum = ConstantMomentum(momentum)  
-            elif isinstance(momentum, MomentumCoefficient):
-                self.momentum = momentum
-            else:
-                raise TypeError("momentum must be a number or a child class of MomentumCoefficient")
+        self.set_momentum(momentum)
             
         super(APGD, self).__init__(initial=initial, f=f, g=g,
                                     step_size=step_size,  preconditioner=preconditioner, **kwargs)
@@ -299,6 +291,22 @@ class APGD(ISTA):
         """Calculate the default step size if a step size rule or step size is not provided 
         """
         return 1./self.f.L
+    
+    @property
+    def momentum(self):        
+       return self._momentum  
+
+    def set_momentum(self, momentum):
+
+        if momentum is None:
+            self._momentum = NesterovMomentum()
+        else:
+            if isinstance(momentum, Number):
+                self._momentum = ConstantMomentum(momentum)  
+            elif isinstance(momentum, MomentumCoefficient):
+                self._momentum = momentum
+            else:
+                raise TypeError("mMomentum must be a number or a child class of MomentumCoefficient")
         
     def update(self):
         r"""Performs a single iteration of APGD. For :math:`k\geq 1`:
@@ -402,6 +410,14 @@ class FISTA(APGD):
 
     """
 
+
+    def _calculate_default_step_size(self):
+        """Calculate the default step size if a step size rule or step size is not provided 
+        """
+        return 1./self.f.L
+
+
+
     def _provable_convergence_condition(self):
         if self.preconditioner is not None:
             raise NotImplementedError(
@@ -413,8 +429,9 @@ class FISTA(APGD):
             raise TypeError(
                 "Can't check convergence criterion for non-constant step size")
 
-    def __init__(self, initial, f, g, step_size=None,  preconditioner=None, **kwargs):
 
+    def __init__(self, initial, f, g, step_size = None, preconditioner=None, momentum=None, **kwargs):
+                     
         self.y = initial.copy()
         super(FISTA, self).__init__(initial=initial, f=f, g=g,
                                     step_size=step_size,  preconditioner=preconditioner, momentum=None,  **kwargs)

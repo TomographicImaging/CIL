@@ -30,7 +30,7 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, NesterovMomentum, MomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
@@ -263,11 +263,65 @@ class TestGD(CCPiTestClass):
         gd.run(10)
         self.assertEqual(gd.iteration, 0)
         
+class Test_APGD(CCPiTestClass):
+    def setUp(self):
+        self.ig = ImageGeometry(127, 139, 149)
+        self.initial = self.ig.allocate(0)
+        self.b = self.ig.allocate("random")**2
+        self.identity = IdentityOperator(self.ig)
+
+        self.f = OperatorCompositionFunction(L2NormSquared(b=self.b), self.identity)
+        self.g= IndicatorBox(lower=0)
+        
+    def test_init_default(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        assert isinstance(alg.momentum, NesterovMomentum) 
+        assert isinstance(alg.step_size_rule, ConstantStepSize)
+        self.assertEqual(alg.step_size_rule.step_size, 1/self.f.L)
+        self.assertEqual(alg.update_objective_interval, 1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), self.initial.as_array())
+
+    def test_init_momentum(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum=1)
+        assert isinstance(alg.momentum, ConstantMomentum)
+        self.assertEqual(alg.momentum(alg),1) 
+        self.assertEqual(alg.momentum.momentum, 1)
+        
+        with self.assertRaises(TypeError):
+            alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum='banana')
+        
+    def test_init_step_size(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=1.0)
+        assert isinstance(alg.step_size_rule, ConstantStepSize)
+        self.assertEqual(alg.step_size_rule.get_step_size(alg), 1.0)
+        self.assertEqual(alg.step_size_rule.step_size, 1.0)
+        
+        with self.assertRaises(TypeError):
+            alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size='banana')
+            
+    def test_update_step(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=0.3, momentum=0.5)
+        y_0=self.initial.copy()
+        x_0=self.g.proximal(y_0 - 0.3*self.f.gradient(y_0), 0.3)
+        y_1=x_0 + 0.5*(x_0-y_0)
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_1.as_array())
+        
+        x_1=self.g.proximal(y_1 - 0.3*self.f.gradient(y_1), 0.3)
+        y_2=x_1 + 0.5*(x_1-y_1)
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_2.as_array())
+        
+        
+        
+        
+        
+        
 
 class TestFISTA(CCPiTestClass):
     def test_FISTA(self):
         ig = ImageGeometry(127, 139, 149)
-        initial = ig.allocate()
+        initial = ig.allocate(0)
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
@@ -412,31 +466,7 @@ class TestFISTA(CCPiTestClass):
         with self.assertRaises(TypeError):
             alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
 
-    def test_FISTA_Denoising(self):
-        # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        data = dataexample.SHAPES.get()
-        ig = data.geometry
-        ag = ig
-        N = 300
-        # Create Noisy data with Poisson noise
-        scale = 5
-        noisy_data = applynoise.poisson(data/scale, seed=10) * scale
 
-        # Regularisation Parameter
-        alpha = 10
-
-        # Setup and run the FISTA algorithm
-        operator = GradientOperator(ig)
-        fid = KullbackLeibler(b=noisy_data)
-        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
-
-        initial = ig.allocate()
-        fista = FISTA(initial=initial, f=reg, g=fid)
-        fista.update_objective_interval = 500
-        fista.run(3000, verbose=0)
-        rmse = (fista.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 4.2e-4)
 
 
 

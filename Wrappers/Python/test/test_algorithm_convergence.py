@@ -1,10 +1,11 @@
-from cil.optimisation.algorithms import SPDHG, PDHG
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction
-from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator
+from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction
+from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler 
-from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData
+from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 
 from cil.utilities import dataexample
+from cil.utilities import noise as applynoise
 
 import numpy as np
 import unittest
@@ -104,3 +105,40 @@ class TestAlgorithmConvergence(CCPiTestClass):
             alg_stochastic.x.as_array(), u_cvxpy.value)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), decimal=6)
+        
+    def test_FISTA_Denoising(self):
+        # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
+        data = dataexample.SHAPES.get()
+        ig = data.geometry
+        ag = ig
+        # Create Noisy data with Poisson noise
+        scale = 5
+        noisy_data = applynoise.poisson(data/scale, seed=10) * scale
+
+        # Regularisation Parameter
+        alpha = 10
+
+        # Setup and run the FISTA algorithm
+        operator = GradientOperator(ig)
+        fid = KullbackLeibler(b=noisy_data)
+        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
+
+        initial = ig.allocate()
+        fista = FISTA(initial=initial, f=reg, g=fid)
+        fista.update_objective_interval = 500
+        fista.run(3000, verbose=0)
+        rmse = (fista.get_output() - data).norm() / data.as_array().size
+        self.assertLess(rmse, 4.2e-4)
+        
+    def test_APGD(self):
+        ig = ImageGeometry(41, 43, 47)
+        initial = ig.allocate(0)
+        b = ig.allocate("random")**2
+        identity = IdentityOperator(ig)
+
+        f = OperatorCompositionFunction(L2NormSquared(b=b), identity)
+        g= IndicatorBox(lower=0)
+        
+        apgd = APGD(f=f, g=g, initial=initial, update_objective_interval=100, momentum=0.5)
+        apgd.run(500, verbose=0)
+        self.assertNumpyArrayAlmostEqual(apgd.solution.as_array(), b.as_array(), decimal=3)

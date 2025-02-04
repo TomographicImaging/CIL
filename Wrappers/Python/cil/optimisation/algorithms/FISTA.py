@@ -18,7 +18,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
-from cil.optimisation.utilities import ConstantStepSize, StepSizeRule, NesterovMomentum, MomentumCoefficient
+from cil.optimisation.utilities import ConstantStepSize, StepSizeRule, NesterovMomentum, MomentumCoefficient, ConstantMomentum
 import numpy
 import logging
 from numbers import Real, Number
@@ -170,6 +170,9 @@ class ISTA(Algorithm):
             self.step_size_rule = ConstantStepSize(step_size)
         elif isinstance(step_size, StepSizeRule):
             self.step_size_rule = step_size
+        else:
+            raise TypeError(
+                "step_size must be a real number or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`")
         
         self.preconditioner = preconditioner
 

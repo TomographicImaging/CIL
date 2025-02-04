@@ -19,6 +19,7 @@
 import unittest
 from cil.framework import AcquisitionGeometry
 import numpy as np
+import math
 
 from utils import has_astra, initialise_tests
 initialise_tests()
@@ -27,56 +28,29 @@ if has_astra:
     from cil.plugins.astra.utilities import convert_geometry_to_astra
     from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
-class TestGeometry(unittest.TestCase):
+
+class TestGeometry_Parallel2D(unittest.TestCase):
     def setUp(self):
-        # Define image geometry.
         pixels_x = 128
-        pixels_y = 3
 
         angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
         angles_rad = angles_deg * np.pi /180.0
 
-        ag = AcquisitionGeometry.create_Parallel2D()\
+        self.ag = AcquisitionGeometry.create_Parallel2D()\
                                 .set_angles(angles_rad, angle_unit='radian')\
                                 .set_labels(['angle','horizontal'])\
                                 .set_panel(pixels_x, 0.1)
 
-        ig = ag.get_ImageGeometry()
+        self.ig = self.ag.get_ImageGeometry()
 
-
-        ag_deg = AcquisitionGeometry.create_Parallel2D()\
+        self.ag_deg = AcquisitionGeometry.create_Parallel2D()\
                                     .set_angles(angles_deg, angle_unit='degree')\
                                     .set_labels(['angle','horizontal'])\
                                     .set_panel(pixels_x, 0.1)
 
-        ag_cone = AcquisitionGeometry.create_Cone2D([0,-2], [0,1])\
-                                     .set_angles(angles_rad, angle_unit='radian')\
-                                     .set_labels(['angle','horizontal'])\
-                                     .set_panel(pixels_x, 0.1)
-
-
-
-        ag3 = AcquisitionGeometry.create_Parallel3D()\
-                                 .set_angles(angles_rad, angle_unit='radian')\
-                                 .set_labels(['vertical', 'angle','horizontal'])\
-                                 .set_panel((pixels_x,pixels_y), (0.1,0.1))
-
-        ig3 = ag3.get_ImageGeometry()
-
-        ag3_cone = AcquisitionGeometry.create_Cone3D([0,-2,0], [0,1,0])\
-                                      .set_angles(angles_rad, angle_unit='radian')\
-                                      .set_labels(['vertical', 'angle','horizontal'])\
-                                      .set_panel((pixels_x,pixels_y), (0.1,0.1))
-        self.ig = ig
-        self.ig3 = ig3
-        self.ag = ag
-        self.ag_deg = ag_deg
-        self.ag_cone = ag_cone
-        self.ag3 = ag3
-        self.ag3_cone = ag3_cone
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
-    def test_convert_geometry_to_astra(self):
+    def test_convert_geometry_simple(self):
 
         #2D parallel radians
         astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
@@ -86,6 +60,11 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(astra_sino['DetectorWidth'], self.ag.pixel_size_h)
         np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
 
+        #2D parallel degrees
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        # check the image geometry
         self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
         self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
         self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
@@ -93,52 +72,11 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
         self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
 
-        #2D parallel degrees
-        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_deg)
-        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
-
-        #2D cone
-        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_cone)
-
-        self.assertEqual(astra_sino['type'], 'fanflat')
-        self.assertEqual(astra_sino['DistanceOriginSource'], self.ag_cone.dist_source_center)
-        self.assertTrue(astra_sino['DistanceOriginDetector'], self.ag_cone.dist_center_detector)
-
-
-        #3D parallel
-        astra_vol, astra_sino = convert_geometry_to_astra(self.ig3, self.ag3)
-        self.assertEqual(astra_sino['type'],  'parallel3d')
-        self.assertEqual(astra_sino['DetectorColCount'], self.ag3.pixel_num_h)
-        self.assertEqual(astra_sino['DetectorRowCount'], self.ag3.pixel_num_v)
-        self.assertEqual(astra_sino['DetectorSpacingX'], self.ag3.pixel_size_h)
-        self.assertEqual(astra_sino['DetectorSpacingY'], self.ag3.pixel_size_h)
-        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag3.angles)
-
-        self.assertEqual(astra_vol['GridColCount'], self.ig3.voxel_num_x)
-        self.assertEqual(astra_vol['GridRowCount'], self.ig3.voxel_num_y)
-        self.assertEqual(astra_vol['GridSliceCount'], self.ig3.voxel_num_z)
-
-        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig3.voxel_num_x * self.ig3.voxel_size_x * 0.5)
-        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig3.voxel_num_x * self.ig3.voxel_size_x * 0.5)
-        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig3.voxel_num_y * self.ig3.voxel_size_y * 0.5)
-        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig3.voxel_num_y * self.ig3.voxel_size_y * 0.5)
-        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig3.voxel_num_z * self.ig3.voxel_size_z * 0.5)
-        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig3.voxel_num_z * self.ig3.voxel_size_z * 0.5)
-
-        #3D cone
-        astra_vol, astra_sino = convert_geometry_to_astra(self.ig3, self.ag3_cone)
-        self.assertEqual(astra_sino['type'], 'cone')
-        self.assertEqual(astra_sino['DistanceOriginSource'], self.ag_cone.dist_source_center)
-        self.assertEqual(astra_sino['DistanceOriginDetector'], self.ag_cone.dist_center_detector)
-        self.assertEqual(astra_sino['DetectorColCount'], self.ag3.pixel_num_h)
-        self.assertEqual(astra_sino['DetectorRowCount'], self.ag3.pixel_num_v)
-        self.assertEqual(astra_sino['DetectorSpacingX'], self.ag3.pixel_size_h)
-        self.assertEqual(astra_sino['DetectorSpacingY'], self.ag3.pixel_size_h)
-        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag3.angles)
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
-    def test_convert_geometry_to_astra_vec_3D(self):
-        #2D parallel radians
+    def test_convert_geometry_vector(self):
+
+        # 2D parallel radians
         astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)
 
         self.assertEqual(astra_sino['type'],  'parallel3d_vec')
@@ -161,7 +99,11 @@ class TestGeometry(unittest.TestCase):
 
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
+        # 2D parallel degrees
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
+        # image geometry
         self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
         self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
         self.assertEqual(astra_vol['GridSliceCount'], 1)
@@ -173,55 +115,416 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(astra_vol['option']['WindowMinZ'], - self.ig.voxel_size_x * 0.5)
         self.assertEqual(astra_vol['option']['WindowMaxZ'], + self.ig.voxel_size_x * 0.5)
 
+class TestGeometry_Parallel3D(unittest.TestCase):
+    def setUp(self):
+        # Define image geometry.
+        pixels_x = 128
+        pixels_y = 3
+
+        angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
+        angles_rad = angles_deg * np.pi /180.0
+
+        self.ag = AcquisitionGeometry.create_Parallel3D()\
+                                 .set_angles(angles_rad, angle_unit='radian')\
+                                 .set_labels(['vertical', 'angle','horizontal'])\
+                                 .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+        self.ag_deg = AcquisitionGeometry.create_Parallel3D()\
+                                    .set_angles(angles_deg, angle_unit='degree')\
+                                    .set_labels(['vertical', 'angle','horizontal'])\
+                                    .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+        self.ig = self.ag.get_ImageGeometry()
+
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_simple(self):
+
+        #3D parallel
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
+        self.assertEqual(astra_sino['type'],  'parallel3d')
+        self.assertEqual(astra_sino['DetectorColCount'], self.ag.pixel_num_h)
+        self.assertEqual(astra_sino['DetectorRowCount'], self.ag.pixel_num_v)
+        self.assertEqual(astra_sino['DetectorSpacingX'], self.ag.pixel_size_h)
+        self.assertEqual(astra_sino['DetectorSpacingY'], self.ag.pixel_size_h)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
         #2D parallel degrees
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        # image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_vector(self):
+
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)
+        self.assertEqual(astra_sino['type'],  'parallel3d_vec')
+        self.assertEqual(astra_sino['DetectorRowCount'], self.ag.pixel_num_v)
+        self.assertEqual(astra_sino['DetectorColCount'], self.ag.pixel_num_h)
+
+        vectors = np.zeros((3,12),dtype='float64')
+
+        vectors[0][1] = 1.0
+        vectors[0][6] = self.ag.pixel_size_h
+        vectors[0][11] = self.ag.pixel_size_h
+
+        vectors[1][0] = 1.0
+        vectors[1][7] = -self.ag.pixel_size_h
+        vectors[1][11] = self.ag.pixel_size_h
+
+        vectors[2][1] = -1.0
+        vectors[2][6] = -self.ag.pixel_size_h
+        vectors[2][11] = self.ag.pixel_size_h
+
+        np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
+
+        #degrees
         astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_deg)
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
+        # image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+
+class TestGeometry_Cone2D(unittest.TestCase):
+    def setUp(self):
+        pixels_x = 128
+
+        angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
+        angles_rad = angles_deg * np.pi /180.0
+
+
+        self.ag = AcquisitionGeometry.create_Cone2D([0,-2], [0,1])\
+                                     .set_angles(angles_rad, angle_unit='radian')\
+                                     .set_labels(['angle','horizontal'])\
+                                     .set_panel(pixels_x, 0.1)
+
+        self.ig = self.ag.get_ImageGeometry()
+
+        self.ag_deg = AcquisitionGeometry.create_Cone2D([0,-2], [0,1])\
+                                     .set_angles(angles_deg, angle_unit='degree')\
+                                     .set_labels(['angle','horizontal'])\
+                                     .set_panel(pixels_x, 0.1)
+        
+
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_simple(self):
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
+
+        self.assertEqual(astra_sino['type'], 'fanflat')
+        self.assertEqual(astra_sino['DistanceOriginSource'], self.ag.dist_source_center)
+        self.assertTrue(astra_sino['DistanceOriginDetector'], self.ag.dist_center_detector)
+
+        self.assertEqual(astra_sino['DetectorCount'], self.ag.pixel_num_h)
+        self.assertEqual(astra_sino['DetectorWidth'], self.ag.pixel_size_h)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        #2D parallel degrees
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        # check the image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_vector(self):
         #2D cone
-        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_cone)
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)
 
         self.assertEqual(astra_sino['type'], 'cone_vec')
 
         vectors = np.zeros((3,12),dtype='float64')
 
-        pixel_size_v = self.ig.voxel_size_x * self.ag_cone.magnification
-        vectors[0][1] = -1 * self.ag_cone.dist_source_center
-        vectors[0][4] = self.ag_cone.dist_center_detector
-        vectors[0][6] = self.ag_cone.pixel_size_h
+        pixel_size_v = self.ig.voxel_size_x * self.ag.magnification
+        vectors[0][1] = -1 * self.ag.dist_source_center
+        vectors[0][4] = self.ag.dist_center_detector
+        vectors[0][6] = self.ag.pixel_size_h
         vectors[0][11] = pixel_size_v
 
-        vectors[1][0] = -1 * self.ag_cone.dist_source_center
-        vectors[1][3] = self.ag_cone.dist_center_detector
-        vectors[1][7] = -self.ag_cone.pixel_size_h
+        vectors[1][0] = -1 * self.ag.dist_source_center
+        vectors[1][3] = self.ag.dist_center_detector
+        vectors[1][7] = -self.ag.pixel_size_h
         vectors[1][11] = pixel_size_v
 
-        vectors[2][1] = self.ag_cone.dist_source_center
-        vectors[2][4] = -1 * self.ag_cone.dist_center_detector
-        vectors[2][6] = -1 * self.ag_cone.pixel_size_h
+        vectors[2][1] = self.ag.dist_source_center
+        vectors[2][4] = -1 * self.ag.dist_center_detector
+        vectors[2][6] = -1 * self.ag.pixel_size_h
         vectors[2][11] = pixel_size_v
 
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
-        #3D cone
-        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig3, self.ag3_cone)
+        #2D parallel degrees
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
 
+        # check image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+
+
+class TestGeometry_Cone3D(unittest.TestCase):
+    def setUp(self):
+        pixels_x = 128
+        pixels_y = 3
+
+        angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
+        angles_rad = angles_deg * np.pi /180.0
+        source_position = [0,-2,0]
+        detector_position = [0,1,0]
+
+        self.ag = AcquisitionGeometry.create_Cone3D(source_position, detector_position)\
+                                      .set_angles(angles_rad, angle_unit='radian')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+        self.ag_deg = AcquisitionGeometry.create_Cone3D(source_position, detector_position)\
+                                      .set_angles(angles_deg, angle_unit='degree')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+        self.ig = self.ag.get_ImageGeometry()
+
+        source_position_set = []
+        detector_position_set = []
+        detector_direction_x_set = []
+        detector_direction_y_set = []
+
+        for angle in angles_rad:
+            rotation_matrix = np.eye(3)
+            rotation_matrix[0,0] = rotation_matrix[1,1] = math.cos(-angle)
+            rotation_matrix[0,1] = -math.sin(-angle)
+            rotation_matrix[1,0] = math.sin(-angle)
+
+            source_position_set.append(rotation_matrix.dot(source_position))
+            detector_position_set.append(rotation_matrix.dot(detector_position))
+            detector_direction_x_set.append(rotation_matrix.dot([1,0,0]))
+            detector_direction_y_set.append(rotation_matrix.dot([0,0,1]))
+
+
+        self.ag_souv = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set,\
+                                                         detector_position_set=detector_position_set,\
+                                                         detector_direction_x_set=detector_direction_x_set,\
+                                                         detector_direction_y_set=detector_direction_y_set)\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_simple(self):
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
+        self.assertEqual(astra_sino['type'], 'cone')
+        self.assertEqual(astra_sino['DistanceOriginSource'], self.ag.dist_source_center)
+        self.assertEqual(astra_sino['DistanceOriginDetector'], self.ag.dist_center_detector)
+        self.assertEqual(astra_sino['DetectorColCount'], self.ag.pixel_num_h)
+        self.assertEqual(astra_sino['DetectorRowCount'], self.ag.pixel_num_v)
+        self.assertEqual(astra_sino['DetectorSpacingX'], self.ag.pixel_size_h)
+        self.assertEqual(astra_sino['DetectorSpacingY'], self.ag.pixel_size_h)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        # degrees
+        astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['ProjectionAngles'], -self.ag.angles)
+
+        # check the image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_vector(self):
+
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)
         self.assertEqual(astra_sino['type'], 'cone_vec')
 
         vectors = np.zeros((3,12),dtype='float64')
+        vectors[0][1] = -1 * self.ag.dist_source_center
+        vectors[0][4] = self.ag.dist_center_detector
+        vectors[0][6] = self.ag.pixel_size_h
+        vectors[0][11] = self.ag.pixel_size_h
 
-        vectors[0][1] = -1 * self.ag_cone.dist_source_center
-        vectors[0][4] = self.ag_cone.dist_center_detector
-        vectors[0][6] = self.ag_cone.pixel_size_h
-        vectors[0][11] = self.ag_cone.pixel_size_h
+        vectors[1][0] = -1 * self.ag.dist_source_center
+        vectors[1][3] = self.ag.dist_center_detector
+        vectors[1][7] = -1 * self.ag.pixel_size_h
+        vectors[1][11] = self.ag.pixel_size_h
 
-        vectors[1][0] = -1 * self.ag_cone.dist_source_center
-        vectors[1][3] = self.ag_cone.dist_center_detector
-        vectors[1][7] = -1 * self.ag_cone.pixel_size_h
-        vectors[1][11] = self.ag_cone.pixel_size_h
-
-        vectors[2][1] = self.ag_cone.dist_source_center
-        vectors[2][4] = -1 * self.ag_cone.dist_center_detector
-        vectors[2][6] = -1 * self.ag_cone.pixel_size_h
-        vectors[2][11] = self.ag_cone.pixel_size_h
+        vectors[2][1] = self.ag.dist_source_center
+        vectors[2][4] = -1 * self.ag.dist_center_detector
+        vectors[2][6] = -1 * self.ag.pixel_size_h
+        vectors[2][11] = self.ag.pixel_size_h
 
         np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
+
+        #degrees
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_deg)
+        np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
+
+        # image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_souv(self):
+        """
+        Checks the SOUV convention agrees with the standard cone geometry 3D
+        """
+
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_souv)
+        self.assertEqual(astra_sino['type'], 'cone_vec')
+
+        vectors = np.zeros((3,12),dtype='float64')
+        vectors[0][1] = -1 * self.ag.dist_source_center
+        vectors[0][4] = self.ag.dist_center_detector
+        vectors[0][6] = self.ag.pixel_size_h
+        vectors[0][11] = self.ag.pixel_size_h
+
+        vectors[1][0] = -1 * self.ag.dist_source_center
+        vectors[1][3] = self.ag.dist_center_detector
+        vectors[1][7] = -1 * self.ag.pixel_size_h
+        vectors[1][11] = self.ag.pixel_size_h
+
+        vectors[2][1] = self.ag.dist_source_center
+        vectors[2][4] = -1 * self.ag.dist_center_detector
+        vectors[2][6] = -1 * self.ag.pixel_size_h
+        vectors[2][11] = self.ag.pixel_size_h
+
+        np.testing.assert_allclose(astra_sino['Vectors'], vectors, atol=1e-6)
+
+        # image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+
+
+
+class TestGeometry_Cone3D_SOUV(unittest.TestCase):
+    def setUp(self):
+        pixels_x = 128
+        pixels_y = 3
+
+        # generate a set of source and detector positions
+        self.source_position_set = [
+            [60.39,	90.29,	63.12],
+            [34.64,	24.1,	-66.48],
+            [1.24,	66.74,	-98.15],
+        ]
+
+        self.detector_position_set = [
+            [6579.59,	6069.16,	-9907.19],
+            [4984.46,	5533.88,	1186.63],
+            [-7528.65,	2598.33,	-7634.18],
+        ]
+
+        # detector direction x and y must be orthogonal
+        self.detector_direction_x_set = [
+            [1.2,	7.91,	-4.95],
+            [4.66,	6.75,	-0.77],
+            [-7.12,	4.69,	0.59]
+        ]
+
+        vec = [
+            [-4.97,	5.62,	-8.26],
+            [-0.97,	-6.93,	7.65],
+            [-5.5,	7.43,	-5.14]
+        ]
+
+        self.detector_direction_y_set = []
+        for i in range(3):
+            self.detector_direction_x_set[i] = self.detector_direction_x_set[i] / np.linalg.norm(self.detector_direction_x_set[i])
+            detector_direction_y = np.cross(self.detector_direction_x_set[i], vec[i])
+            self.detector_direction_y_set.append(detector_direction_y / np.linalg.norm(detector_direction_y))
+
+        self.ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=self.source_position_set,\
+                                                         detector_position_set=self.detector_position_set,\
+                                                         detector_direction_x_set=self.detector_direction_x_set,\
+                                                         detector_direction_y_set=self.detector_direction_y_set,\
+                                                        volume_centre_position=[0,0,0]) \
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((pixels_x,pixels_y), (0.1,0.1))
+        
+        self.ig = self.ag.get_ImageGeometry()
+
+  
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_simple(self):
+
+        with self.assertRaises(ValueError):
+            astra_vol, astra_sino = convert_geometry_to_astra(self.ig, self.ag)
+
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    def test_convert_geometry_vector(self):
+
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag)
+        self.assertEqual(astra_sino['type'], 'cone_vec')
+
+        for i in range(3):
+            np.testing.assert_allclose(astra_sino['Vectors'][i][0:3], self.source_position_set[i], atol=1e-6)
+            np.testing.assert_allclose(astra_sino['Vectors'][i][3:6], self.detector_position_set[i], atol=1e-6)
+            np.testing.assert_allclose(astra_sino['Vectors'][i][6:9], self.detector_direction_x_set[i] * self.ag.pixel_size_h, atol=1e-6)
+            np.testing.assert_allclose(astra_sino['Vectors'][i][9:12], self.detector_direction_y_set[i] * self.ag.pixel_size_h, atol=1e-6)
+            
+        # image geometry
+        self.assertEqual(astra_vol['GridColCount'], self.ig.voxel_num_x)
+        self.assertEqual(astra_vol['GridRowCount'], self.ig.voxel_num_y)
+        self.assertEqual(astra_vol['GridSliceCount'], self.ig.voxel_num_z)
+
+        self.assertEqual(astra_vol['option']['WindowMinX'], -self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxX'], self.ig.voxel_num_x * self.ig.voxel_size_x * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinY'], -self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxY'], self.ig.voxel_num_y * self.ig.voxel_size_y * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMinZ'], -self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)
+        self.assertEqual(astra_vol['option']['WindowMaxZ'], self.ig.voxel_num_z * self.ig.voxel_size_z * 0.5)

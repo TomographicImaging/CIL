@@ -39,6 +39,9 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
         The ASTRA vol_geom and proj_geom
 
     """
+    if sinogram_geometry.geom_type == AcquisitionType.CONE_SOUV:
+        raise ValueError('Cone-SOUV geometry is not supported by this function, use convert_geometry_to_astra_vec_3D instead')
+
     # determine if the geometry is 2D or 3D
     dimension = AcquisitionType.DIM3 if sinogram_geometry.pixel_num_v > 1 else AcquisitionType.DIM2
 

@@ -15,7 +15,7 @@
     - SAPBY for the BlockDataContainer now does not require an `out` to be passed (#2008)
     - Fixed the rendering of the SAG/SAGA documentation (#2011)
     - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
-    - Add accelerated version to TransmissionAbsorption processor (#2032)
+    - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2032)
   - Dependencies:
     - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook.
     - Replaced matplotlib dependency with matplotlib-base (#2031)
@@ -26,7 +26,6 @@
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
     - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
-    - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
   - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
 

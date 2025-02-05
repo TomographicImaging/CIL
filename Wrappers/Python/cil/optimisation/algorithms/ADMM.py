@@ -24,12 +24,12 @@ log = logging.getLogger(__name__)
 
 class LADMM(Algorithm):
 
-    '''
+    r'''
         LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)
 
-        General form of ADMM : min_{x} f(x) + g(y), subject to Ax + By = b
+        General form of ADMM : :math:`min_{x} f(x) + g(y)`, subject to :math:`Ax + By = b`
 
-        Case: A = Id, B = -K, b = 0   ==> min_x f(Kx) + g(x)
+        Case: :math:`A = Id, B = -K, b = 0   ==> min_x f(Kx) + g(x)`
 
         The quadratic term in the augmented Lagrangian is linearized for the x-update.
 
@@ -37,12 +37,13 @@ class LADMM(Algorithm):
         where in the PDHG a proximal and proximal conjugate.
 
         Reference (Section 8) : https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf
+        
+        
+            .. math:: x^{k} = prox_{\tau f } (x^{k-1} - \tau/\sigma A^{T}(Ax^{k-1} - z^{k-1} + u^{k-1} )
 
-            x^{k} = prox_{\tau f } (x^{k-1} - tau/sigma A^{T}(Ax^{k-1} - z^{k-1} + u^{k-1} )
+            .. math:: z^{k} = prox_{\sigma g} (Ax^{k} + u^{k-1})
 
-            z^{k} = prox_{\sigma g} (Ax^{k} + u^{k-1})
-
-            u^{k} = u^{k-1} + Ax^{k} - z^{k}
+            .. math:: u^{k} = u^{k-1} + Ax^{k} - z^{k}
 
     '''
 

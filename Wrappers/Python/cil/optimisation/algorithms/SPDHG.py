@@ -31,9 +31,8 @@ log = logging.getLogger(__name__)
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
-    .. math::
-
-      \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
+    
+      .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
     where :math:`f_i` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous.
 
@@ -282,7 +281,7 @@ class SPDHG(Algorithm):
             gamma : Positive float
                 parameter controlling the trade-off between the primal and dual step sizes
             rho : Positive float
-                 parameter controlling the size of the product :math: \sigma\tau :math:
+                 parameter controlling the size of the product :math:`\sigma\tau`
 
 
 

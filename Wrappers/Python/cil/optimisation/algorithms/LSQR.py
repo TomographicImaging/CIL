@@ -97,25 +97,30 @@ class LSQR(Algorithm):
         '''
         
         log.info("%s setting up", self.__class__.__name__)
-        self.x = initial.copy()
+        self.x = initial #1 domain
         self.operator = operator
 
         # Initialise Golub-Kahan bidiagonalisation (GKB)
-        self.u = data - self.operator.direct(self.x)
-        self.beta = self.u.norm()
-        self.u = self.u/self.beta
         
-        self.v = self.operator.adjoint(self.u)
+        #self.u = data - self.operator.direct(self.x)
+        self.u = self.operator.direct(self.x) #1 range 
+        self.u.sapyb(-1, data, 1, out=self.u)
+        self.beta = self.u.norm()
+        self.u /= self.beta
+        
+        self.v = self.operator.adjoint(self.u) #2 domain 
         self.alpha = self.v.norm()
-        self.v = self.v/self.alpha
+        self.v /= self.alpha
 
         self.rhobar = self.alpha
         self.phibar = self.beta
         self.normr = self.beta
-        self.regalphasq = self.regalpha*self.regalpha
+        self.regalphasq = self.regalpha**2
 
-        self.d = self.v
-
+        self.d = self.v.copy() #3 domain 
+        self.tmp_range = data.copy() #2 range
+        self.tmp_domain = self.x.copy() #4 domain
+        
         self.res2 = 0
 
         self.configured = True
@@ -126,14 +131,18 @@ class LSQR(Algorithm):
         '''single iteration'''
 
         # Update u in GKB
-        self.u = self.operator.direct(self.v) - self.alpha * self.u
+        self.operator.direct(self.v, out=self.tmp_range)
+        self.tmp_range.sapyb(1.,  self.u,-self.alpha, out=self.u)
         self.beta = self.u.norm()
-        self.u = self.u/self.beta
+        self.u /= self.beta
+        print(self.beta)
 
         # Update v in GKB
-        self.v = self.operator.adjoint(self.u) - self.beta * self.v
+        self.operator.adjoint(self.u, out=self.tmp_domain)
+        self.v.sapyb(-self.beta, self.tmp_domain, 1., out=self.v)
         self.alpha = self.v.norm()
-        self.v = self.v/self.alpha
+        self.v /= self.alpha
+        print(self.alpha)
 
         # Eliminate diagonal from regularisation
         if self.regalphasq > 0:
@@ -162,7 +171,7 @@ class LSQR(Algorithm):
         self.d.sapyb(-theta/rho, self.v, 1, out=self.d)
 
         # Estimate residual norm 
-        self.res2 = self.res2 + psi ** 2
+        self.res2 += psi ** 2
         self.normr = math.sqrt(self.phibar ** 2 + self.res2)
         
 
@@ -171,15 +180,4 @@ class LSQR(Algorithm):
             raise StopIteration()
         self.loss.append(self.normr)
 
-    def should_stop(self): # TODO: Deprecated, remove when CGLS tolerance is removed
-        return self.flag() or super().should_stop()
 
-    def flag(self): # TODO: Deprecated, remove when LSQR tolerance is removed
-        flag = False
-
-        if flag:
-            self.update_objective()
-            print('Tolerance is reached: {}'.format(self.tolerance))
-
-        return flag
-    

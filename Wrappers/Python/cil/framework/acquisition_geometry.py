@@ -1596,7 +1596,7 @@ class Configuration(object):
 class AcquisitionGeometry(object):
     """This class holds the AcquisitionGeometry of the system.
 
-    Please initialise the AcquisitionGeometry using the using the static methods:
+    Please initialise the AcquisitionGeometry using the static methods:
 
     `AcquisitionGeometry.create_Parallel2D()`
 

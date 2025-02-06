@@ -55,6 +55,31 @@ Other methods
 Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.
 
+Logging and warning
+=======================
+We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
+
+.. list-table:: Logging and warning guidelines
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Task you want to perform
+     - The best tool for the task
+   * - Display console output for ordinary usage of a command line script or program
+     - ``print()``
+   * - Report events that occur during normal operation of a program 
+       (e.g. for status monitoring or fault investigation)
+     - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
+   * - Issue a warning regarding a particular runtime event
+     - ``warnings.warn()``  if the issue is avoidable and the user's code
+       should be modified to eliminate the warning. 
+
+       A logger’s ``warning()`` method if there is nothing the user can do about 
+       the situation, but the event should still be noted
+   * - Report an error regarding a particular runtime event
+     - Raise an exception
+
+
 Documentation
 =============
 

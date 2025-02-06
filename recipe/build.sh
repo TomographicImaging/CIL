@@ -13,10 +13,11 @@ export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}"
 if test "${GIT_DESCRIBE_NUMBER}" != "0"; then
   export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}.dev${GIT_DESCRIBE_NUMBER}+${GIT_DESCRIBE_HASH}"
 fi
-cmake ${RECIPE_DIR}/../ $extra_args \
+cmake ${RECIPE_DIR}/../ ${extra_args} \
                         -DCONDA_BUILD=ON \
                         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                        -DLIBRARY_LIB=$CONDA_PREFIX/lib \
-                        -DLIBRARY_INC=$CONDA_PREFIX/include \
-                        -DCMAKE_INSTALL_PREFIX=$PREFIX
+                        -DLIBRARY_LIB=${CONDA_PREFIX}/lib \
+                        -DLIBRARY_INC=${CONDA_PREFIX}/include \
+                        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+                        -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
 cmake --build . --target install

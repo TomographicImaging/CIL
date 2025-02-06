@@ -52,7 +52,7 @@ class LSQR(Algorithm):
         Initial guess 
     data : DataContainer in the range of the operator 
         Acquired data to reconstruct
-    alpha : (optional) non-negative float, defaul 0
+    alpha : (optional) non-negative float, default 0
         Regularisation parameter that includes Tikhonov regularisation in the objective, default is zero. In case of zero the algorithm is standard LSQR.
 
 
@@ -178,6 +178,6 @@ class LSQR(Algorithm):
     def update_objective(self):
         if self.normr is numpy.nan:
             raise StopIteration()
-        self.loss.append(self.normr)
+        self.loss.append(self.normr**2)
 
 

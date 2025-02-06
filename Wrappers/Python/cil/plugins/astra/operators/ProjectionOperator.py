@@ -124,15 +124,19 @@ class ProjectionOperator_ag(ProjectionOperator):
         sinogram_geometry_sc = acquisition_geometry.get_slice(channel=0)
         volume_geometry_sc = image_geometry.get_slice(channel=0)
 
+        device = device.lower()
         if device == 'gpu':
             operator = AstraProjector3D(volume_geometry_sc,
                                         sinogram_geometry_sc)
-        elif AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
-            operator = AstraProjector2D(volume_geometry_sc,
-                                        sinogram_geometry_sc,
-                                        device=device)
+        elif device == 'cpu':
+            if AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
+                operator = AstraProjector2D(volume_geometry_sc,
+                                            sinogram_geometry_sc,
+                                            device=device)
+            else:
+                raise NotImplementedError("Cannot use requested CPU to process 3D data. Please use GPU.")
         else:
-            raise NotImplementedError("Cannot process 3D data without a GPU")
+            raise ValueError("Please provide a valid device name: 'gpu' or 'cpu'")
 
         if acquisition_geometry.channels > 1:
             operator_full = ChannelwiseOperator(

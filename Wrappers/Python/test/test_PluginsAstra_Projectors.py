@@ -22,6 +22,7 @@ import numpy as np
 from utils import has_astra, has_nvidia, initialise_tests
 from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 from cil.utilities import dataexample
+from unittest_parametrize import param, parametrize, ParametrizedTestCase
 
 initialise_tests()
 
@@ -69,6 +70,41 @@ class TestAstraProjectors(unittest.TestCase):
         self.ig3_channel = self.ag3_channel.get_ImageGeometry()
 
         self.norm = 14.85
+
+
+    def test_ProjectionOperator_img_geom_default(self):
+        K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='gpu')
+        assert(K.volume_geometry == self.ag.get_ImageGeometry())
+
+    def test_ProjectionOperator_acq_geom_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='gpu')
+    
+    def test_ProjectionOperator_all_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='gpu')
+
+    @parametrize("device, no_error_raised, err_type", 
+        [param('cpu', True, None, id="cpu_NoError"), param('CPU', True, None, id="CPU_NoError"),
+         param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")])
+    def test_ProjectionOperator_2Ddata(self, device, no_error_raised: bool, err_type):
+        if no_error_raised:
+            assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+        else:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig, self.ag, device)
+                
+    @parametrize("device, no_error_raised, err_type", 
+        [param('gpu', True, None, id="gpu_NoError"), param('GPU', True, None, id="GPU_NoError"),
+         param('cpu', False, NotImplementedError, id="cpu_NotImplementedError"), 
+         param('CPU', False, NotImplementedError, id="CPU_NotImplementedError"),
+         param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")]) 
+    def test_ProjectionOperator_3Ddata(self, device, no_error_raised: bool, err_type):
+        if no_error_raised:
+            assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)
+        else:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig3, self.ag3, device)
 
     def foward_projection(self, A, ig, ag):
         image_data = ig.allocate(None)

@@ -16,7 +16,7 @@
 Developers' Guide
 *****************
 
-CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
+CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the following.
 
 Conventions on new CIL objects
@@ -126,14 +126,13 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs_environment.yml``
-#. [Install Ruby version 3.2](https://www.ruby-lang.org/en/documentation/installation/#installers)
+#. `Install Ruby version 3.2 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
 #. Install the web dependencies with ``make web-deps``
 #. Build the documentation with ``make dirhtml web``
 #. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
 
 Example:
 ::
-
   git clone --recurse-submodule git@github.com:TomographicImaging/CIL
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
@@ -155,6 +154,53 @@ The ``mkdemos.py`` script (called by ``make dirhtml``):
 - uses the ``demos-template.rst`` file to generate the gallery in ``source/demos.rst``
 
 The ``nbsphinx`` extension will convert the ``*.ipynb`` files to HTML.
+
+
+Testing
+=============
+
+Parametrized Tests
+----------
+Methods are tested using Python's `unittest <https://docs.python.org/3/library/unittest.html>`_ library. Please see the documentation `here <https://docs.python.org/3/library/unittest.html#basic-example>`_  for information and usage examples.
+The `unittest-parametrize <https://github.com/adamchainz/unittest-parametrize>`_ library is used to generate parametrized test cases.
+
+The ``@parametrize`` decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case. 
+This helps to test various scenarios without duplicating code.
+
+Example: Parameterized Test for ``ProjectionOperator``
+::    
+  @parametrize("device, no_error_raised, err_type", 
+    [param('cpu', True, None, id="cpu_NoError"), param('CPU', True, None, id="CPU_NoError"),
+     param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")])
+
+  def test_ProjectionOperator_2Ddata(self, device, no_error_raised: bool, err_type):
+    if no_error_raised:
+      assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+    else:
+      with self.assertRaises(err_type):
+        ProjectionOperator(self.ig, self.ag, device)
+
+
+The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``, 
+``no_error_raised`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
+In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
+There are 3 sets of parameters: ``param('cpu', True, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.
+``param('CPU', True, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.
+``param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.
+Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
+
+When running the test, each parameterized case is shown as a distinct result:
+::
+  test_ProjectionOperator_2Ddata[cpu_NoError] ... ok
+  test_ProjectionOperator_2Ddata[CPU_NoError] ... ok
+  test_ProjectionOperator_2Ddata[InvalidInput_ValueError] ... ok
+
+  ----------------------------------------------------------------------
+  Ran 3 tests in 0.001s
+
+  OK
+
+
 
 Contributions guidelines
 ========================

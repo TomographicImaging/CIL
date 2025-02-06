@@ -20,6 +20,7 @@ python='3.10'
 name=cil
 test_deps=0
 cil_ver=''
+
 while getopts hn:p:e:tv: option ; do
   case "${option}" in
   n) numpy="${OPTARG}" ;;
@@ -92,6 +93,8 @@ else
     -c ccpi
     --override-channels
   )
+  requirements_test="$(dirname "$0")/requirements-test.yml"
+  conda env create -f "$requirements_test"
 fi
 
-conda "${conda_args[@]}"
+# conda "${conda_args[@]}" # Original Line

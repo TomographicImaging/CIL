@@ -183,10 +183,14 @@ Example: Parameterized Test for ``ProjectionOperator``
 
 The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``, 
 ``no_error_raised`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
+
 In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
-There are 3 sets of parameters: ``param('cpu', True, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.
-``param('CPU', True, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.
-``param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.
+There are 3 sets of parameters: 
+
+- ``param('cpu', True, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.  
+- ``param('CPU', True, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.  
+- ``param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.  
+
 Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
 
 When running the test, each parameterized case is shown as a distinct result:

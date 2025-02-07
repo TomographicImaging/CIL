@@ -115,15 +115,11 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     else:
         volume_geometry_temp = volume_geometry.copy()
 
-        # Compute the current centre
-        current_centre = np.array([
-            volume_geometry_temp.get_min_x() + (volume_geometry_temp.get_max_x() - volume_geometry_temp.get_min_x()) / 2.0,
-            volume_geometry_temp.get_min_y() + (volume_geometry_temp.get_max_y() - volume_geometry_temp.get_min_y()) / 2.0,
-            volume_geometry_temp.get_min_z() + (volume_geometry_temp.get_max_z() - volume_geometry_temp.get_min_z()) / 2.0
-        ])
+        # roi 
+        current_centre = [volume_geometry_temp.center_x, volume_geometry_temp.center_y, volume_geometry_temp.center_z]
 
         # Compute a translation vector that will modify the centre of the reconstructed volume
-        translation = np.array(system.volume_centre.position) - current_centre
+        translation = np.array(system.volume_centre.position)
 
         projector = 'cone_vec'
 

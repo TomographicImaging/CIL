@@ -90,6 +90,54 @@ class SimData(object):
         self._get_roi_3D()
 
 
+    def Cone3DSOUV(self):
+
+        self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.acq_data.reorder(self.backend)
+
+        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+
+        # convert geometry to SOUV
+        system = self.acq_data.geometry.config.system
+        src = system.source.position
+        det_pos = system.detector.position
+        det_dir_x = system.detector.direction_x
+        det_dir_y = system.detector.direction_y
+        obj_pos = system.rotation_axis.position
+        obj_dir = system.rotation_axis.direction
+        angles = self.acq_data.geometry.config.angles.angle_data
+
+        src_pos_set = [None]*len(angles)
+        det_pos_set = [None]*len(angles)
+        det_dir_x_set = [None]*len(angles)
+        det_dir_y_set = [None]*len(angles)
+
+        for i, ang in enumerate(angles):
+            ang_rad = -np.deg2rad(ang)
+            # rotation matrix
+            RotationMatrix = np.eye(3)
+            RotationMatrix[0,0] = RotationMatrix[1,1] = np.cos(ang_rad)
+            RotationMatrix[0,1] = -np.sin(ang_rad)
+            RotationMatrix[1,0] = np.sin(ang_rad)
+            
+            src_pos_set[i] = RotationMatrix.dot(src - obj_pos) + obj_pos
+            det_pos_set[i] = RotationMatrix.dot(det_pos - obj_pos) + obj_pos
+            det_dir_x_set[i] = RotationMatrix.dot(det_dir_x)
+            det_dir_y_set[i] = RotationMatrix.dot(det_dir_y)
+
+        ag_new = AcquisitionGeometry.create_Cone3D_SOUV(src_pos_set, det_pos_set, det_dir_x_set, det_dir_y_set)
+        ag_new.set_panel([self.acq_data.geometry.pixel_num_h, self.acq_data.geometry.pixel_num_v], [self.acq_data.geometry.pixel_size_h, self.acq_data.geometry.pixel_size_v], origin='bottom-left')
+        ag_new.set_labels(self.acq_data.dimension_labels)
+
+        self.ag = ag_new
+        self._get_roi_3D()
+
+
     def Parallel3D(self):
         self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
@@ -309,6 +357,44 @@ class TestCommon_ProjectionOperator_TOY(object):
         norm_3 = 2
         self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
 
+    def Cone3DSOUV(self):
+        '''
+            These are all single cone beam projection geometries. Pixels of  1, 2, 0.5, 0.5, Voxels of 1, 2, 0.5, 0.25
+        '''
+
+        self.test_geometries=[]
+        ag_test_1 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[1,1])
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
+
+        ig_test_1 = ag_test_1.get_ImageGeometry()
+        norm_1 = 4
+        self.test_geometries.append((ag_test_1, ig_test_1, 4))
+
+
+        ag_test_2 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[2,2])
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
+
+        ig_test_2 = ag_test_2.get_ImageGeometry()
+        norm_2 = 8
+        self.test_geometries.append((ag_test_2, ig_test_2, norm_2))
+
+        ag_test_3 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[0.5,0.5])
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
+        ig_test_3 = ag_test_3.get_ImageGeometry()
+
+        norm_3 = 2
+        self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
+
+        ag_test_4 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,1000,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[0.5,0.5])
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
+        ig_test_4 = ag_test_4.get_ImageGeometry()
+
+        norm_4 = 1
+        self.test_geometries.append((ag_test_4, ig_test_4, norm_4))
 
     def test_norm(self):
         count = 1
@@ -337,7 +423,7 @@ class TestCommon_ProjectionOperator(object):
     '''
 
     def Cone3D(self):
-        self.ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-100000,0],detector_position=[0,0,0])\
+        self.ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-100000,0],detector_position=[0,0,0],)\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])\
                                             .set_labels(['vertical','horizontal'])
@@ -360,6 +446,11 @@ class TestCommon_ProjectionOperator(object):
                                             .set_angles([0])\
                                             .set_labels(['horizontal'])
 
+    def Cone3DSOUV(self):
+        self.ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-100000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[1,1])\
+                                            .set_labels(['vertical','horizontal'])
+        
     def test_forward_projector(self):
 
         #create checker-board image
@@ -423,7 +514,7 @@ class TestCommon_ProjectionOperator(object):
         Op = self.ProjectionOperator(ig, self.ag, **self.PO_args)
         bp = Op.adjoint(data)
 
-        if self.ag.geom_type == 'cone':
+        if self.ag.geom_type == 'cone' or self.ag.geom_type == 'cone_souv':
             #as cone beam res is not perfect grid
             np.testing.assert_allclose(bp.array, res, atol=1e-3)
         else:
@@ -526,6 +617,8 @@ class TestCommon_FBP_SIM(SimData):
     def test_FBP_roi(self):
         FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
         reco = FBP(self.acq_data)
+
+        #show2D([reco, self.gold_roi]).save('test0_souv.png')
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
 
         if AcquisitionType.DIM3 & self.ag.dimension:

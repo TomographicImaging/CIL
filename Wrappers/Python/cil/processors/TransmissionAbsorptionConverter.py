@@ -117,12 +117,10 @@ class TransmissionAbsorptionConverter(DataProcessor):
 def numba_loop(arr_in, num_chunks, chunk_size, remainder, arr_out):
     in_flat = arr_in.ravel()
     out_flat = arr_out.ravel()
-    start = 0
-    end = start + chunk_size
     for i in numba.prange(num_chunks):
+        start = i * chunk_size
+        end = start + chunk_size
         out_flat[start:end] = -numpy.log(in_flat[start:end])
-        start += chunk_size
-        end += chunk_size
 
     if remainder > 0:
         start = num_chunks * chunk_size

@@ -120,7 +120,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             volume_geometry_temp.get_min_x() + (volume_geometry_temp.get_max_x() - volume_geometry_temp.get_min_x()) / 2.0,
             volume_geometry_temp.get_min_y() + (volume_geometry_temp.get_max_y() - volume_geometry_temp.get_min_y()) / 2.0,
             volume_geometry_temp.get_min_z() + (volume_geometry_temp.get_max_z() - volume_geometry_temp.get_min_z()) / 2.0
-        ]);
+        ])
 
         # Compute a translation vector that will modify the centre of the reconstructed volume
         translation = np.array(system.volume_centre.position) - current_centre
@@ -145,12 +145,20 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     else:
         vectors = np.zeros((system.num_positions, 12))
 
+        sign_h = 1
+        sign_v = 1
+
+        if 'right' in panel.origin:
+            sign_h = -1
+        if 'top' in panel.origin:
+            sign_v = -1
+
         #for i, (src, det, row, col) in enumerate(zip(system.source.position_set, system.detector.position_set, system.detector.direction_x_set, system.detector.direction_y_set)):
         for i in range(system.num_positions):
             vectors[i, :3] = system.source[i].position
             vectors[i, 3:6]  = system.detector[i].position
-            vectors[i, 6:9] = system.detector[i].direction_x * panel.pixel_size[0]
-            vectors[i, 9:]  = system.detector[i].direction_y * panel.pixel_size[1]
+            vectors[i, 6:9] = sign_h * system.detector[i].direction_x * panel.pixel_size[0]
+            vectors[i, 9:]  = sign_v * system.detector[i].direction_y * panel.pixel_size[1]
 
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)

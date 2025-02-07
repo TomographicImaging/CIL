@@ -22,6 +22,8 @@ from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry
 from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
+from cil.utilities.display import show2D
+
 class SimData(object):
 
     def _get_roi_3D(self):
@@ -432,6 +434,7 @@ class TestCommon_ProjectionOperator_SIM(SimData):
     '''
     Tests forward and backward operators function with and without 'out'
     '''
+
     def test_forward_projector(self):
         Op = self.ProjectionOperator(self.ig, self.ag, **self.PO_args)
         fp = Op.direct(self.img_data)
@@ -442,6 +445,26 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         fp3 = Op.direct(self.img_data,out=fp2)
         np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
         np.testing.assert_equal(id(fp2), id(fp3))
+
+
+    def test_forward_projector_flipped(self):
+        ag = self.ag.copy()
+        ag.set_panel([self.ag.pixel_num_h,self.ag.pixel_num_v],[self.ag.pixel_size_h,self.ag.pixel_size_v],origin='top-right')
+        Op = self.ProjectionOperator(self.ig, ag, **self.PO_args)
+        fp = Op.direct(self.img_data)
+
+        axes = [i for i, label in enumerate(self.acq_data.dimension_labels) if label != 'angle']
+        gold = self.acq_data.copy()
+        gold.fill(np.flip(self.acq_data.as_array(), axis=axes))
+
+       # show2D([self.acq_data, fp, gold],title=['self.acq_data', 'fp', 'gold']).save('test0.png')
+        np.testing.assert_allclose(fp.as_array(), gold.as_array(),atol=self.tolerance_fp)
+
+        fp2 = fp.copy()
+        fp2.fill(0)
+        Op.direct(self.img_data,out=fp2)
+
+        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
 
 
     def test_backward_projectors_functionality(self):
@@ -477,6 +500,26 @@ class TestCommon_FBP_SIM(SimData):
         reco2 = reco.copy()
         reco2.fill(0)
         FBP(self.acq_data,out=reco2)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
+
+    def test_FBP_flipped(self):
+
+        data = self.acq_data.copy()
+        data.geometry.set_panel([self.ag.pixel_num_h,self.ag.pixel_num_v],[self.ag.pixel_size_h,self.ag.pixel_size_v],origin='top-right')
+
+        axes = [i for i, label in enumerate(self.acq_data.dimension_labels) if label != 'angle']
+        data.fill(np.flip(self.acq_data.as_array(), axis=axes))
+
+        FBP = self.FBP(self.ig, data.geometry, **self.FBP_args)
+        reco = FBP(data)
+
+        #show2D([self.img_data, reco],title=['self.img_data', 'reco']).save('test4.png')
+
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        FBP(data,out=reco2)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
 
 

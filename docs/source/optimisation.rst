@@ -620,6 +620,12 @@ Built-in callbacks include:
 .. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
    :members:
 
+.. autoclass:: cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.CGLSEarlyStopping
+   :members:
+
 Users can also write custom callbacks.
 
 Below is an example of a custom callback implementing early stopping.

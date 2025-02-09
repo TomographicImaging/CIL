@@ -147,7 +147,7 @@ class EarlyStoppingObjectiveValue(Callback):
     -----
     This callback only compares the last two calculated objective values. If `update_objective_interval` is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every `update_objective_interval` iterations.
     
-        '''
+    '''
     def __init__(self, threshold=1e-6):
         self.threshold=threshold
     

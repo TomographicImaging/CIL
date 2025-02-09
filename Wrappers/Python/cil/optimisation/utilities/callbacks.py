@@ -160,6 +160,7 @@ class EarlyStoppingObjectiveValue(Callback):
 class CGLSEarlyStopping(Callback):
     '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
     It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`, where `omega` is set to default as 1e6. 
+    
     Parameters
     ----------
     epsilon: float, default 1e-6 

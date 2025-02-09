@@ -49,6 +49,7 @@ class BadPixelCorrector(DataProcessor):
         
         r'''Processor to correct bad pixels in an AcquisitionData, by replacing with the weighted mean value of unmasked nearest 
         neighbours (including diagonals) in the projection
+        Requires the data to be ordered so that horizontal is the last dimension and vertical (if present) is the second last dimension.
 
         Parameters
         ----------
@@ -56,6 +57,7 @@ class BadPixelCorrector(DataProcessor):
             A boolean array with the same dimensions as the size of a projection in the input data (i.e. 1D or 2D), 
             where 'False' represents masked values.
             Mask can be generated using 'MaskGenerator' processor.
+            Axis labels must contain 'horizontal' and optionally 'vertical'.
         '''
 
         kwargs = {'mask': mask}
@@ -86,7 +88,7 @@ class BadPixelCorrector(DataProcessor):
 
         if isinstance(self.mask, DataContainer):
             mask_labels = self.mask.dimension_labels
-            # do not allow anything but horizontal and vertical:
+            # do not allow anything but horizontal and vertical as the axis labels for the mask:
             for mask_label in mask_labels:
                 if mask_label not in ['horizontal', 'vertical']:
                     raise ValueError('Mask must have only horizontal and vertical dimensions')
@@ -140,15 +142,17 @@ class BadPixelCorrector(DataProcessor):
         
         proj_size = math.prod(self._get_proj_shape(data))
 
-        num_proj = int(data.size / proj_size) # product of remaining dimensions
+        num_proj = int(data.size / proj_size) 
 
-        # flat view of full array
+        # flat view of full array:
         out_flat = out.array.ravel()
 
         try:
             masked_pixels = [x * mask_arr.shape[1] + y for (x,y) in masked_pixels]
         except:
             masked_pixels = [x for (x,) in masked_pixels]
+
+        diag_weight = 1/np.sqrt(2) # to be used in weighting mean of diagonal neighbours
         
         #%%
         for k in range(num_proj):
@@ -159,17 +163,17 @@ class BadPixelCorrector(DataProcessor):
             projection_temp = projection_out.copy()
                 
             # Stores coordinates of all bad pixels and whether they have been corrected:
-            masked_pixels_status = {}
+            masked_pixels_status = {} # could replace with masked pixels
             
             for coord in masked_pixels:
                 masked_pixels_status[coord] = False
 
-            masked_pixels_status_temp = masked_pixels_status.copy()
+            masked_pixels_status_temp = masked_pixels_status.copy() # copy of masked pixels
 
             # Loop through masked pixel coordinates until all have been corrected:
             while not all (masked_pixels_status.values()): # later have len >0
-                for coord, corrected in masked_pixels_status.items():
-                    if not corrected:
+                for coord, corrected in masked_pixels_status.items(): # just coord in masked_pixels
+                    if not corrected: # get rid
                         # Get all neighbours
                         neighbours = []
                         diag_neighbours = []
@@ -210,9 +214,9 @@ class BadPixelCorrector(DataProcessor):
                         neighbour_values = []
                         weights = []
                         projection_array = projection_out
-                        diag_weight = 1/np.sqrt(2)
+
                         for neighbour in neighbours + diag_neighbours:
-                            if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour):
+                            if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour): # if in masked_pixels
                                 continue
                             neighbour_values.append(projection_array[neighbour])
                             weights.append(1 if neighbour in neighbours else diag_weight)
@@ -221,7 +225,7 @@ class BadPixelCorrector(DataProcessor):
                             projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
                             masked_pixels_status_temp[coord] = True
 
-                # Update projection_out now that all masked pixels have been addressed in this iteration:
+                # Update projection_out now that all masked pixels which have unmasked neighbours have been addressed in this iteration:
                 projection_out = projection_temp.copy()
                 masked_pixels_status = masked_pixels_status_temp.copy()
 
@@ -233,6 +237,13 @@ class BadPixelCorrector(DataProcessor):
         if return_arr is True:
             return out
 
+# 0 install cil
+# 1 - run unit test - time taken:
+# 2 - modify to remove dict - time taken: 
+# 3 - commit
+# 4 - make version that loops over bad pixel and saves neighbour locations in a dict
+# 5 - record time taken
+# 6 - commit?
         
 
 # # THE FOLLOWING ARE FOR QUICK TESTING ONLY - WILL LATER BE MOVED TO UNIT TESTS

@@ -97,7 +97,7 @@ class LSQR(Algorithm):
         '''
         
         log.info("%s setting up", self.__class__.__name__)
-        self.x = initial #1 domain
+        self.x = initial.copy() #1 domain
         self.operator = operator
 
         # Initialise Golub-Kahan bidiagonalisation (GKB)
@@ -118,8 +118,8 @@ class LSQR(Algorithm):
         self.regalphasq = self.regalpha**2
 
         self.d = self.v.copy() #3 domain 
-        self.tmp_range = data.copy() #2 range
-        self.tmp_domain = self.x.copy() #4 domain
+        self.tmp_range = data.geometry.allocate(None) #2 range
+        self.tmp_domain = self.x.geometry.allocate(None) #4 domain
         
         self.res2 = 0
 

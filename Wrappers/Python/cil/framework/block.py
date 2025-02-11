@@ -319,9 +319,8 @@ class BlockDataContainer(object):
         out : BlockDataContainer, optional
             Provides a placeholder for the result
 
-        Example:
-        --------
-
+        Example
+        -------
         >>> a = 2
         >>> b = 3
         >>> ig = ImageGeometry(10,11)

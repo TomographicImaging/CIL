@@ -61,10 +61,11 @@ class GD(Algorithm):
         if self.alpha is not None or self.beta is not None: # to be deprecated
             warn('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ', DeprecationWarning, stacklevel=2)
 
-        if self.rtol!=0 or self.atol!=0: # to be deprecated (released in 25.0)
-            warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks),  for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
-        else:
-            log.warn('Breaking backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).' )    
+        if self.rtol is not None or self.atol is not None: # to be deprecated (released in 25.0)
+            if self.rtol != 0 or self.atol != 0: # to be deprecated (released in 25.0)
+                warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks), for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
+            else:
+                log.warning('Breaking backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).')
             
         super().__init__(**kwargs)
         

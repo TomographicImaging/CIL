@@ -1,6 +1,7 @@
 * XX.X
   - Bug fixes:
       - Fix deprecation warning for rtol and atol in GD (#2056)
+      - Removed the deprecated usage of run method in test_SIRF.py (#2070)
 
 
 * 24.3.0

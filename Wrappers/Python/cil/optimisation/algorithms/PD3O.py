@@ -18,7 +18,7 @@
 
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.functions import ZeroFunction
+from cil.optimisation.functions import ZeroFunction, SGFunction, SVRGFunction, LSVRGFunction, SAGAFunction, SAGFunction, ApproximateGradientSumFunction
 import logging
 import warnings
 class PD3O(Algorithm):
@@ -125,7 +125,19 @@ class PD3O(Algorithm):
         self.g.proximal(self.x_old, self.gamma, out = self.x)
     
         # update step        
-        self.f.gradient(self.x, out=self.x_old)                    
+        
+        if isinstance(self.f, (SVRGFunction, LSVRGFunction)):
+            if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:
+                self.f._update_full_gradient_and_return(self.x, out=self.x_old)
+            else:
+                self.f.approximate_gradient( self.x, self.f.function_num, out=self.x_old)
+            self.f._data_passes_indices.pop(-1)    
+        elif isinstance(self.f, ApproximateGradientSumFunction):
+            self.f.approximate_gradient( self.x, self.f.function_num, out=self.x_old)
+        else:
+            self.f.gradient(self.x, out=self.x_old)    
+            
+                    
         self.x_old *= self.gamma
         self.grad_f += self.x_old
         self.x.sapyb(2, self.grad_f, -1.0,  out=self.x_old) # 2*x - x_old + gamma*(grad_f_x_old) - gamma*(grad_f_x)

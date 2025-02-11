@@ -224,12 +224,15 @@ class LSVRGFunction(SVRGFunction):
     snapshot_update_probability: positive float, default: 1/n
         The probability of updating the full gradient (taking a snapshot) at each iteration. The default is :math:`1./n` so, in expectation, a snapshot will be taken every :math:`n` iterations. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and it's gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+    seed: int
+        Seed for the random number generator (numpy.random).
 
         
     Reference
     ---------
     Kovalev, D., Horváth, S. &; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.
+
 
     Note
     ----

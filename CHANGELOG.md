@@ -1,6 +1,8 @@
 * XX.X
   - Bug fixes:
       - Fix deprecation warning for rtol and atol in GD (#2056)
+  - Enhancements:
+      - Made the call to next() in algorithm iteration loop explicit (#2069)
 
 
 * 24.3.0

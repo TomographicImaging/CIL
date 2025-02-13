@@ -124,6 +124,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         mamba-version: "*"
         channels: conda-forge
+        conda-remove-defaults: "true"
     - name: conda build & test
       working-directory: recipe
       run: |

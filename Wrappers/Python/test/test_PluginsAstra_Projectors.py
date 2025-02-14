@@ -30,7 +30,7 @@ if has_astra:
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
     from cil.plugins.astra.operators import ProjectionOperator
 
-class TestAstraProjectors(unittest.TestCase):
+class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
     def setUp(self):
 
         N = 128
@@ -87,7 +87,6 @@ class TestAstraProjectors(unittest.TestCase):
     @parametrize("device, no_error_raised, err_type", 
         [param('cpu', True, None, id="cpu_NoError"), param('CPU', True, None, id="CPU_NoError"),
          param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")])
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_ProjectionOperator_2Ddata(self, device, no_error_raised: bool, err_type):
         if no_error_raised:
             assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
@@ -100,7 +99,6 @@ class TestAstraProjectors(unittest.TestCase):
          param('cpu', False, NotImplementedError, id="cpu_NotImplementedError"), 
          param('CPU', False, NotImplementedError, id="CPU_NotImplementedError"),
          param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")]) 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator_3Ddata(self, device, no_error_raised: bool, err_type):
         if no_error_raised:
             assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)

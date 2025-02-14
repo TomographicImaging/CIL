@@ -48,7 +48,7 @@ jobs:
       name: build
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"-DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python -DIPP_LIBRARY=${CMAKE_INSTALL_PREFIX}/lib -DIPP_INCLUDE=${CMAKE_INSTALL_PREFIX}/includes
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"-DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
         cmake --build ./build --target install
     - name: test
       run: |

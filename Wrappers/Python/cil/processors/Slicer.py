@@ -18,6 +18,7 @@
 
 from cil.framework import (DataProcessor, AcquisitionData, ImageData, DataContainer, ImageGeometry, VectorGeometry,
                            AcquisitionGeometry)
+from cil.framework.labels import AcquisitionType
 import numpy as np
 import weakref
 import logging
@@ -145,6 +146,9 @@ class Slicer(DataProcessor):
         else:
             raise TypeError('Processor supports following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
+
+        if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_SOUV:
+            raise NotImplementedError("Cone-SOUV geometry is not supported by this processor")
 
         if self._data_array:
             if data.dtype != np.float32:

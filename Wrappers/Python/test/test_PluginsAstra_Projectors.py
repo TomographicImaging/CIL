@@ -84,29 +84,32 @@ class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
         with self.assertRaises(TypeError):
             ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='gpu')
     
-    @parametrize("device, no_error_raised, err_type", 
-        [param('cpu', True, None, id="cpu_NoError"), param('CPU', True, None, id="CPU_NoError"),
-         param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")])
+    @parametrize("device, raise_error, err_type", 
+        [param('cpu', False, None, id="cpu_NoError"), 
+         param('CPU', False, None, id="CPU_NoError"), 
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
     @unittest.skipUnless(has_astra, "Requires ASTRA")
-    def test_ProjectionOperator_2Ddata(self, device, no_error_raised: bool, err_type):
-        if no_error_raised:
-            assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
-        else:
+    def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
             with self.assertRaises(err_type):
                 ProjectionOperator(self.ig, self.ag, device)
-                         
-    @parametrize("device, no_error_raised, err_type", 
-        [param('gpu', True, None, id="gpu_NoError"), param('GPU', True, None, id="GPU_NoError"),
-         param('cpu', False, NotImplementedError, id="cpu_NotImplementedError"), 
-         param('CPU', False, NotImplementedError, id="CPU_NotImplementedError"),
-         param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")]) 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
-    def test_ProjectionOperator_3Ddata(self, device, no_error_raised: bool, err_type):
-        if no_error_raised:
-            assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)
         else:
+            assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+                         
+    @parametrize("device, raise_error, err_type", 
+        [param('gpu', False, None, id="gpu_NoError"), 
+         param('GPU', False, None, id="GPU_NoError"),
+         param('cpu', True, NotImplementedError, id="cpu_NotImplementedError"), 
+         param('CPU', True, NotImplementedError, id="CPU_NotImplementedError"),
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")]) 
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def test_ProjectionOperator_3Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
             with self.assertRaises(err_type):
                 ProjectionOperator(self.ig3, self.ag3, device)
+        else:
+            assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)
+                
 
     def foward_projection(self, A, ig, ag):
         image_data = ig.allocate(None)

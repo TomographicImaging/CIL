@@ -169,27 +169,28 @@ This helps to test various scenarios without duplicating code.
 
 Example: Parameterized Test for ``ProjectionOperator``
 ::    
-  @parametrize("device, no_error_raised, err_type", 
-    [param('cpu', True, None, id="cpu_NoError"), param('CPU', True, None, id="CPU_NoError"),
-     param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")])
+  @parametrize("device, raise_error, err_type", 
+    [param('cpu', False, None, id="cpu_NoError"), 
+     param('CPU', False, None, id="CPU_NoError"), 
+     param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
 
-  def test_ProjectionOperator_2Ddata(self, device, no_error_raised: bool, err_type):
-    if no_error_raised:
-      assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
-    else:
-      with self.assertRaises(err_type):
-        ProjectionOperator(self.ig, self.ag, device)
+  def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+      if raise_error:
+          with self.assertRaises(err_type):
+              ProjectionOperator(self.ig, self.ag, device)
+      else:
+          assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
 
 
 The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``, 
-``no_error_raised`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
+``raise_error`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
 
 In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
 There are 3 sets of parameters: 
 
-- ``param('cpu', True, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.  
-- ``param('CPU', True, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.  
-- ``param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.  
+- ``param('cpu', False, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.  
+- ``param('CPU', False, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.  
+- ``param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.  
 
 Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
 

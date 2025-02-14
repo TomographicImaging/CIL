@@ -28,12 +28,7 @@ class Sampler():
 
     Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.
 
-
-
-
     Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
-
-
 
     Parameters
     ----------
@@ -187,6 +182,30 @@ class Sampler():
         self._iteration_number = save_last_index
 
         return np.array(output)
+    
+    
+    def get_previous_samples(self):
+        """
+        Generates a list of the samples outputted by the sampler since it was initialised. Calling this does not increment the sampler index or affect the behaviour of the sampler .
+
+        Returns
+        --------
+        List
+            A list of the samples outputted by the sampler since it was initialised
+        """
+
+        return get_samples(self._iteration_number)
+    
+    def get_current_sample(self):
+        """
+        Returns the current sample of the sampler without incrementing the sampler index.
+
+        Returns
+        --------
+        int
+            The current sample of the sampler.
+        """
+        return self._function(self._iteration_number)
 
     def __str__(self):
         repres = "Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. \n"
@@ -688,8 +707,8 @@ class SamplerRandom(Sampler):
         if location == 0:
             self._sampling_list = self._generator.choice(
                 self._num_indices, self._num_indices, p=self._prob_weights, replace=self._replace)
-        out = self._sampling_list[location]
-        return out
+        self._current_sample = self._sampling_list[location]
+        return self._current_sample
 
     def get_samples(self,  num_samples):
         """
@@ -719,6 +738,18 @@ class SamplerRandom(Sampler):
         self._sampling_list = save_sampling_list
 
         return np.array(output)
+    
+    def get_current_sample(self):
+        """
+        Returns the current sample of the sampler without incrementing the sampler index.
+
+        Returns
+        --------
+        int
+            The current sample of the sampler.
+        """
+
+        return self._current_sample
 
     def __str__(self):
         repres = super().__str__()

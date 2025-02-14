@@ -100,7 +100,7 @@ class TestAstraProjectors(unittest.TestCase):
          param('cpu', False, NotImplementedError, id="cpu_NotImplementedError"), 
          param('CPU', False, NotImplementedError, id="CPU_NotImplementedError"),
          param('InvalidInput', False, ValueError, id="InvalidInput_ValueError")]) 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")   
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
     def test_ProjectionOperator_3Ddata(self, device, no_error_raised: bool, err_type):
         if no_error_raised:
             assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)

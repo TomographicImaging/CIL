@@ -20,6 +20,7 @@ python='3.10'
 name=cil
 test_deps=0
 cil_ver=''
+pip_install_pkgs=()
 
 while getopts hn:p:e:tv: option ; do
   case "${option}" in
@@ -93,6 +94,12 @@ else
     -c ccpi
     --override-channels
   )
+  pip_install_pkgs+=(
+    unittest-parametrize
+  )
 fi
 
 conda "${conda_args[@]}" 
+if [[ -n "${pip_install_pkgs[@]}" ]]; then
+  python -m pip install "${pip_install_pkgs[@]}"
+fi

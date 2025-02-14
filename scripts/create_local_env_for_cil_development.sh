@@ -93,8 +93,6 @@ else
     -c ccpi
     --override-channels
   )
-  requirements_test="$(dirname "$0")/requirements-test.yml"
-  conda env create -f "$requirements_test"
 fi
 
-# conda "${conda_args[@]}" # Original Line
+conda "${conda_args[@]}" 

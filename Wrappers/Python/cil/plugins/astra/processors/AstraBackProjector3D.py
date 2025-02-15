@@ -58,7 +58,7 @@ class AstraBackProjector3D(DataProcessor):
     def check_input(self, dataset):
 
         if self.sinogram_geometry.shape != dataset.geometry.shape:
-            raise ValueError("Dataset not compatible with geometry used to create the projector")
+            raise ValueError("Dataset not compatible with geometry used to create the projector. Expected shape {0}, got {1}".format(self.sinogram_geometry.shape, dataset.geometry.shape))
 
         return True
     
@@ -114,9 +114,9 @@ class AstraBackProjector3D(DataProcessor):
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
-            return out
         else:
             out.fill(arr_out)
+        return out
 
     def create_backprojection3d_gpu(self, data, proj_geom, vol_geom, returnData=True, vol_id=None):
 

@@ -54,7 +54,7 @@ conda_args=(create --name="$name"
   ipp-include'>=2021.10'
   libgcc-ng
   libstdcxx-ng
-  matplotlib
+  matplotlib-base
   numba
   olefile'>=0.46'
   packaging
@@ -64,6 +64,7 @@ conda_args=(create --name="$name"
   scikit-image
   scipy
   tqdm
+  zenodo_get'>=1.6'
 )
 if test -n "$cil_ver"; then
   echo "CIL version $cil_ver"

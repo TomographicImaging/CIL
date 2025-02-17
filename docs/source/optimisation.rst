@@ -38,7 +38,7 @@ Algorithms (Deterministic)
 A number of generic algorithm implementations are provided including
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
-Gradient (PDHG), Iterative Shrinkage Thresholding Algorithm (ISTA),
+Gradient (PDHG), Primal dual three-operator (PD3O),  Iterative Shrinkage Thresholding Algorithm (ISTA),
 and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a particular generic optimisation problem accepts and number of
@@ -92,18 +92,23 @@ SIRT
    :members: update, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
-ISTA
-----
+ISTA/PGD
+--------
+The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, :ref:`PGD<ISTA>` is an alias of `ISTA`. 
+
+.. _ISTA:
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-FISTA
+
+FISTA/APGD
 -----
+The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, :ref:`APGD<FISTA>` is an alias of `FISTA`.
+
+.. _FISTA:
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 PDHG
@@ -119,6 +124,11 @@ LADMM
    :members:
    :inherited-members: run, update_objective_interval, max_iteration
 
+PD3O
+----
+.. autoclass:: cil.optimisation.algorithms.PD3O
+   :members:
+   :inherited-members: run, update_objective_interval, max_iteration
 
 
 Algorithms (Stochastic)
@@ -147,7 +157,7 @@ Each iteration considers just one index of the sum, potentially reducing computa
 
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
-   :members:
+   :members: update, set_step_sizes, set_step_sizes_from_ratio, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
 
@@ -160,6 +170,7 @@ For example, when :math:`g(x)=0`, the standard Gradient Descent algorithm utilis
    .. math::
       x_{k+1}=x_k-\alpha \nabla f(x_k) =x_k-\alpha \sum_{i=0}^{n-1}\nabla f_i(x_k).
 :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
+
 
 
 Replacing, :math:`\nabla f(x_k)=\sum_{i=0}^{n-1}\nabla f_i(x_k)` with :math:`n \nabla f_i(x_k)`, for an index :math:`i` which changes each iteration, leads to the well known stochastic gradient descent algorithm. 
@@ -182,9 +193,9 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SAGAFunction\ | SAGA  | Prox-SAGA  | Acc-Prox-SAGA  |
 +----------------+-------+------------+----------------+
-| SVRGFunction\* | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
+| SVRGFunction\ | SVRG  | Prox-SVRG  | Acc-Prox-SVRG  |
 +----------------+-------+------------+----------------+
-| LSVRGFunction\*| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
+| LSVRGFunction\| LSVRG | Prox-LSVRG | Acc-Prox-LSVRG |
 +----------------+-------+------------+----------------+
 
 \*In development 
@@ -233,7 +244,7 @@ Note
 ----
  All the approximate gradients written in CIL are of a similar order of magnitude to the full gradient calculation. For example, in the :code:`SGFunction` we approximate the full gradient by :math:`n\nabla f_i` for an index :math:`i` given by the sampler. 
  The multiplication by :math:`n` is a choice to more easily allow comparisons between stochastic and non-stochastic methods and between stochastic methods with varying numbers of subsets.
- The multiplication ensures that the (SAGA, SGD, and SVRG  and LSVRG) approximate gradients are an unbiased estimator of the full gradient ie :math:`\mathbb{E}\left[\tilde\nabla f(x)\right] =\nabla f(x)``.
+ The multiplication ensures that the (SAGA, SGD, and SVRG  and LSVRG) approximate gradients are an unbiased estimator of the full gradient ie :math:`\mathbb{E}\left[\tilde\nabla f(x)\right] =\nabla f(x)`.
   This has an implication when choosing step sizes. For example, a suitable step size for GD with a SGFunction could be 
   :math:`\propto 1/(L_{max}*n)`, where :math:`L_{max}` is the largest Lipschitz constant of the list of functions in the SGFunction and the additional factor of  :math:`n` reflects this multiplication by  :math:`n` in the approximate gradient. 
 
@@ -243,6 +254,7 @@ Memory requirements
 Note that the approximate gradient methods have different memory requirements:
 + The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
 + `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
++ `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at the expensive of stored memory `n+4` times the image size.  
 
 
 Operators
@@ -404,14 +416,14 @@ This class allows the user to write a function which does the following:
 
   F ( x ) = G ( Ax )
 
-where :math:`A` is an operator. For instance the least squares function l2norm_ :code:`Norm2Sq` can
+where :math:`A` is an operator. For instance the least squares function can
 be expressed as
 
 .. math::
 
-  F(x) = || Ax - b ||^2_2
+  F(x) = || Ax - b ||^2_2 \qquad \text{where} \qquad G(y) = || y - b ||^2_2
 
-.. code::python
+.. code-block :: python
 
   F1 = Norm2Sq(A, b)
   # or equivalently
@@ -526,6 +538,21 @@ SAGA function
 --------------
 
 .. autoclass:: cil.optimisation.functions.SAGAFunction 
+   :members:
+   :inherited-members:
+
+
+
+Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.SVRGFunction 
+   :members:
+   :inherited-members:
+
+
+Loopless Stochastic Variance Reduced Gradient Function 
+----------------------------------------------
+.. autoclass:: cil.optimisation.functions.LSVRGFunction 
    :members:
    :inherited-members:
 
@@ -646,6 +673,10 @@ We also have a number of example classes:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule
    :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
 
 
 Preconditioners

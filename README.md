@@ -1,8 +1,6 @@
 # CIL - Core Imaging Library
 
-Master | Development | Conda binaries
--|-|-
-[![CI-master](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework) | [![CI-dev](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev) | ![conda-ver](https://anaconda.org/ccpi/cil/badges/version.svg) ![conda-date](https://anaconda.org/ccpi/cil/badges/latest_release_date.svg) [![conda-plat](https://anaconda.org/ccpi/cil/badges/platforms.svg) ![conda-dl](https://anaconda.org/ccpi/cil/badges/downloads.svg)](https://anaconda.org/ccpi/cil)
+[![CI-master](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml/badge.svg)](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) ![conda-ver](https://anaconda.org/ccpi/cil/badges/version.svg) ![conda-date](https://anaconda.org/ccpi/cil/badges/latest_release_date.svg) [![conda-plat](https://anaconda.org/ccpi/cil/badges/platforms.svg) ![conda-dl](https://anaconda.org/ccpi/cil/badges/downloads.svg)](https://anaconda.org/ccpi/cil)
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)
 
@@ -23,21 +21,22 @@ We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda
 Install a new environment using:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.1.0
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.3.0 ipp=2021.12
 ```
 
 To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.1.0 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipywidgets
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.3.0 ipp=2021.12 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
 ```
 
 where:
-- `astra-toolbox` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) CPU projector (2D Parallel beam only) (GPLv3 license)
+- `astra-toolbox=*=py*` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) CPU projector (2D Parallel beam only) (GPLv3 license)
 - `astra-toolbox=*=cuda*` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) GPU projectors (GPLv3 license)
 - `tigre` (requires an NVIDIA GPU) enables support for [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license)
 - `ccpi-regulariser` is the [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit)
 - `tomophantom` can generate phantoms to use as test data [Tomophantom](https://github.com/dkazanc/TomoPhantom)
+- `ipykernel`  provides the IPython kernel for Jupyter (allowing jupyter notebooks to be run)
 - `ipywidgets` enables visulisation tools within jupyter noteboooks
 
 ### Dependencies
@@ -85,6 +84,9 @@ docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:lates
 > See [jupyter-docker-stacks](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html) for more information.
 
 ## Getting Started with CIL
+
+### CIL Training
+We typically run training courses at least twice a year - check https://ccpi.ac.uk/training/ for our upcoming events!
 
 ### CIL on binder
 
@@ -142,18 +144,27 @@ conda env create -f scripts/requirements-test.yml
 CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory>
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable>
 cmake --build ./build --target install
 ```
 
-If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows).
+If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows). Similarly, `<path_to_python_executable>` can be set to the active conda environment by passing `${CONDA_PREFIX}/bin/python` on linux or `%CONDA_PREFIX%\python` in windows.
+
+#### Linux
+```sh
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
+```
+#### Windows
+```sh
+cmake -S . -B .\build -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX% -DPython_EXECUTABLE=%CONDA_PREFIX%\python
+```
 
 If not installing to a conda environment then the user will also need to set the locations of the IPP library and includes, and the path to CIL.
 
 By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
 
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
 ```
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.

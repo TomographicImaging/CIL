@@ -154,80 +154,73 @@ class BadPixelCorrector(DataProcessor):
 
         diag_weight = 1/np.sqrt(2) # to be used in weighting mean of diagonal neighbours
         
-        #%%
+        
         for k in range(num_proj):
             print("Processing projection %d of %d" %(k+1, num_proj))
             # this will create a copy the data
             projection_out = out_flat[k*proj_size:(k+1)*proj_size]
         
             projection_temp = projection_out.copy()
-                
-            # Stores coordinates of all bad pixels and whether they have been corrected:
-            masked_pixels_status = {} # could replace with masked pixels
-            
-            for coord in masked_pixels:
-                masked_pixels_status[coord] = False
-
-            masked_pixels_status_temp = masked_pixels_status.copy() # copy of masked pixels
+            masked_pixels_proj = masked_pixels.copy()
+            masked_pixels_temp = masked_pixels.copy() # copy of masked pixels
 
             # Loop through masked pixel coordinates until all have been corrected:
-            while not all (masked_pixels_status.values()): # later have len >0
-                for coord, corrected in masked_pixels_status.items(): # just coord in masked_pixels
-                    if not corrected: # get rid
-                        # Get all neighbours
-                        neighbours = []
-                        diag_neighbours = []
-                        weights = []
-                        if len(mask_arr.shape)== 1:
-                            if coord > 0:
-                                neighbours.append(coord-1)
-                            if coord < mask_arr.shape[0]-1:
-                                neighbours.append(coord+1)
-                        else:
-        
-                            if coord % mask_arr.shape[1]>0:
-                                # Left neighbour
-                                neighbours.append(coord - 1)
-                            if coord > (mask_arr.shape[1]-1):
-                                # Upper neighbour
-                                neighbours.append(coord - mask_arr.shape[1])
-                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]):
-                                # Lower neighbour
-                                neighbours.append(coord + mask_arr.shape[1])
-                            if (coord + 1) % mask_arr.shape[1] >0:
-                                # Right neighbour
-                                neighbours.append(coord + 1)
-                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and coord % mask_arr.shape[1]>0:
-                                # Diagonal lower left neighbour
-                                diag_neighbours.append(coord + mask_arr.shape[1] - 1)
-                            if coord > (mask_arr.shape[1]-1) and (coord + 1) % mask_arr.shape[1] >0:
-                                # Diagonal Upper right neighbour
-                                diag_neighbours.append(coord - mask_arr.shape[1]+1)
-                            if coord > mask_arr.shape[1] and coord % mask_arr.shape[1]>0:
-                                #Diagonal upper left neighbour
-                                diag_neighbours.append(coord - mask_arr.shape[1] -1)
-                            if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and (coord + 1) % mask_arr.shape[1] >0:
-                                # Diagonal lower right neighbour
-                                diag_neighbours.append(coord + mask_arr.shape[1] + 1)
+            while (len(masked_pixels_proj)>0): # later have len >0
+                for coord in masked_pixels_proj: 
+                    # Get all neighbours
+                    neighbours = []
+                    diag_neighbours = []
+                    weights = []
+                    if len(mask_arr.shape)== 1:
+                        if coord > 0:
+                            neighbours.append(coord-1)
+                        if coord < mask_arr.shape[0]-1:
+                            neighbours.append(coord+1)
+                    else:
+    
+                        if coord % mask_arr.shape[1]>0:
+                            # Left neighbour
+                            neighbours.append(coord - 1)
+                        if coord > (mask_arr.shape[1]-1):
+                            # Upper neighbour
+                            neighbours.append(coord - mask_arr.shape[1])
+                        if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]):
+                            # Lower neighbour
+                            neighbours.append(coord + mask_arr.shape[1])
+                        if (coord + 1) % mask_arr.shape[1] >0:
+                            # Right neighbour
+                            neighbours.append(coord + 1)
+                        if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and coord % mask_arr.shape[1]>0:
+                            # Diagonal lower left neighbour
+                            diag_neighbours.append(coord + mask_arr.shape[1] - 1)
+                        if coord > (mask_arr.shape[1]-1) and (coord + 1) % mask_arr.shape[1] >0:
+                            # Diagonal Upper right neighbour
+                            diag_neighbours.append(coord - mask_arr.shape[1]+1)
+                        if coord > mask_arr.shape[1] and coord % mask_arr.shape[1]>0:
+                            #Diagonal upper left neighbour
+                            diag_neighbours.append(coord - mask_arr.shape[1] -1)
+                        if coord < (mask_arr.shape[0]*mask_arr.shape[1] - mask_arr.shape[1]) and (coord + 1) % mask_arr.shape[1] >0:
+                            # Diagonal lower right neighbour
+                            diag_neighbours.append(coord + mask_arr.shape[1] + 1)
 
-                        # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
-                        neighbour_values = []
-                        weights = []
-                        projection_array = projection_out
+                    # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
+                    neighbour_values = []
+                    weights = []
+                    projection_array = projection_out
 
-                        for neighbour in neighbours + diag_neighbours:
-                            if neighbour in masked_pixels_status.keys() and not masked_pixels_status.get(neighbour): # if in masked_pixels
-                                continue
-                            neighbour_values.append(projection_array[neighbour])
-                            weights.append(1 if neighbour in neighbours else diag_weight)
+                    for neighbour in neighbours + diag_neighbours:
+                        if neighbour in masked_pixels_proj:
+                            continue
+                        neighbour_values.append(projection_array[neighbour])
+                        weights.append(1 if neighbour in neighbours else diag_weight)
 
-                        if len(neighbour_values) > 0:
-                            projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
-                            masked_pixels_status_temp[coord] = True
+                    if len(neighbour_values) > 0:
+                        projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
+                        masked_pixels_temp.remove(coord)
 
                 # Update projection_out now that all masked pixels which have unmasked neighbours have been addressed in this iteration:
                 projection_out = projection_temp.copy()
-                masked_pixels_status = masked_pixels_status_temp.copy()
+                masked_pixels_proj = masked_pixels_temp.copy()
 
             # Update the projection:
             # #fill the data back
@@ -237,10 +230,7 @@ class BadPixelCorrector(DataProcessor):
         if return_arr is True:
             return out
 
-# 0 install cil
-# 1 - run unit test - time taken:
-# 2 - modify to remove dict - time taken: 
-# 3 - commit
+
 # 4 - make version that loops over bad pixel and saves neighbour locations in a dict
 # 5 - record time taken
 # 6 - commit?
@@ -361,177 +351,188 @@ class BadPixelCorrector(DataProcessor):
 
 # #%% 1D data with channels
 
-# a = np.array([[6.0,0.0,4.0], [5.0,0,3]])
-# mask = np.array([True, False, True])
-
-# ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0]).set_channels(2)
-# ad = AcquisitionData(array=a, geometry=ag)
-
-# print("Input:")
-# print(ad.as_array())
-
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(ad)
-# # Check the result
-# print("Input:")
-# print(ad.as_array())
-# # print("Result: ")
-# # print(corrected_data.array)
+# Start timer:
+import time
+start = time.time()
 
 
+a = np.array([[6.0,0.0,4.0], [5.0,0,3]])
+mask = np.array([True, False, True])
 
-# #%%
+ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0]).set_channels(2)
+ad = AcquisitionData(array=a, geometry=ag)
 
-# a = np.array([[3.,3.0,3.0], [3,0,3], [3,3,3]])
-# mask = np.array([[True, True, True], [True, False, True], [True, True, True]])
+print("Input:")
+print(ad.as_array())
 
-# ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
-# ad = AcquisitionData(array=a, geometry=ag)
-
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(ad)
-# # Check the result
-# print("Result: ")
-# print(corrected_data.array)
-
-# #%%
-
-# a = np.array([[0.,0.,3], [0,2,2], [1,1,1]])
-# mask = np.array([[False, False, True], [False, True, True], [True, True, True]])
-
-# ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
-# ad = AcquisitionData(array=a, geometry=ag)
-
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(ad)
-# # Check the result
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Input:")
+print(ad.as_array())
 # print("Result: ")
 # print(corrected_data.array)
 
 
-# #%%
-# a = np.array([[1.,1.,1], [0,0,0], [3,3,3]])
-# expected_a = np.array([[1,1,1], [2,2,2], [3,3,3]])
-# print(a.shape)
 
-# ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([3,3]).set_angles([0])
-# ad = AcquisitionData(array=a, geometry=ag) 
+#%%
 
-# mask = np.array([[True, True, True], [False, False, False], [True, True, True]])
+a = np.array([[3.,3.0,3.0], [3,0,3], [3,3,3]])
+mask = np.array([[True, True, True], [True, False, True], [True, True, True]])
 
-# print("Data: ")
-# print(ad.array)
-# print("Mask: ")
-# print(mask)
+ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
+ad = AcquisitionData(array=a, geometry=ag)
 
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(ad)
-# # Check the result
-# print("Result: ")
-# print(corrected_data.array)
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Result: ")
+print(corrected_data.array)
 
-# assert np.allclose(corrected_data.array, expected_a)
+#%%
+
+a = np.array([[0.,0.,3], [0,2,2], [1,1,1]])
+mask = np.array([[False, False, True], [False, True, True], [True, True, True]])
+
+ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
+ad = AcquisitionData(array=a, geometry=ag)
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Result: ")
+print(corrected_data.array)
+
+
+#%%
+a = np.array([[1.,1.,1], [0,0,0], [3,3,3]])
+expected_a = np.array([[1,1,1], [2,2,2], [3,3,3]])
+print(a.shape)
+
+ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([3,3]).set_angles([0])
+ad = AcquisitionData(array=a, geometry=ag) 
+
+mask = np.array([[True, True, True], [False, False, False], [True, True, True]])
+
+print("Data: ")
+print(ad.array)
+print("Mask: ")
+print(mask)
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Result: ")
+print(corrected_data.array)
+
+assert np.allclose(corrected_data.array, expected_a)
 
 
 
-# #%%
+#%%
 
-# a_x = np.array([[1.,1.,1.], [0.,0.,0.], [3.,3.,3.]])
-# a_y = np.array([[2,2,2], [0,0,0], [3,3,3]])
-# a_z = np.array([[3,3,3], [0,0,0], [3,3,3]])
-# a = np.array([a_x, a_y, a_z])
+a_x = np.array([[1.,1.,1.], [0.,0.,0.], [3.,3.,3.]])
+a_y = np.array([[2,2,2], [0,0,0], [3,3,3]])
+a_z = np.array([[3,3,3], [0,0,0], [3,3,3]])
+a = np.array([a_x, a_y, a_z])
 
-# e_a_x = np.array([[1,1,1], [2,2,2], [3,3,3]])
-# e_a_y = np.array([[2,2,2], [2.5,2.5,2.5], [3,3,3]])
-# e_a_z = np.array([[3,3,3], [3,3,3], [3,3,3]])
-# print(a.shape)
+e_a_x = np.array([[1,1,1], [2,2,2], [3,3,3]])
+e_a_y = np.array([[2,2,2], [2.5,2.5,2.5], [3,3,3]])
+e_a_z = np.array([[3,3,3], [3,3,3], [3,3,3]])
+print(a.shape)
              
-# expected_a = np.array([e_a_x, e_a_y, e_a_z])
-# print(a.shape)
+expected_a = np.array([e_a_x, e_a_y, e_a_z])
+print(a.shape)
 
-# ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([3,3]).set_angles([0]).set_channels(3)
-# ad = AcquisitionData(array=a, geometry=ag) 
+ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([3,3]).set_angles([0]).set_channels(3)
+ad = AcquisitionData(array=a, geometry=ag) 
 
-# print(ag.dimension_labels)
-
-
-# print(ad)
-
-# mask = np.array([[True, True, True], [False, False, False], [True, True, True]])
-
-# print("Data: ")
-# print(ad.array)
-# print("Mask: ")
-# print(mask)
-
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(ad)
-# # Check the result
-# print("Result: ")
-# print(corrected_data.array)
-
-# assert np.allclose(corrected_data.array, expected_a)
+print(ag.dimension_labels)
 
 
-# #%%
-# # if __name__ == '__main__':
+print(ad)
 
-# print('BadPixelCorrector: main')
-# # Create a 2D image
-# ig = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([10,10]).set_angles([0,1])
-# data = ig.allocate()
-# print(data.shape)
+mask = np.array([[True, True, True], [False, False, False], [True, True, True]])
 
-# # make array that's one for first row, two for second row:
-# # a = 
-# # data[0].fill(1)
-# # data[1].fill(2)
+print("Data: ")
+print(ad.array)
+print("Mask: ")
+print(mask)
 
-# # print(data.array[:, 2,4])
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(ad)
+# Check the result
+print("Result: ")
+print(corrected_data.array)
 
-# mask_coord = [(2,4), (6,8), (0,0)]
-
-# #%%
-# print(data.array[:].shape)
-
-# for coord in mask_coord:
-#     data.array[0][coord] = np.inf
-#     data.array[1][coord] = np.inf
-
-# print(data.array)
-
-# # Create a mask
-# mask = ig.allocate()
-# mask.fill(True)
-# mask = mask.array[0]
-
-# for coord in mask_coord:
-#     mask[coord] = False
-
-# # convert to bool:
-# # mask = np.array(mask, dtype=bool)
-# print(mask.shape)
-
-# show2D(data.as_array(), title='Original data')
-# show2D(mask, title='Mask')
+assert np.allclose(corrected_data.array, expected_a)
 
 
-# # Create a BadPixelCorrector processor
-# bad_pixel_corrector = BadPixelCorrector(mask=mask)
-# # Apply the processor to the data
-# corrected_data = bad_pixel_corrector(data)
-# # Check the result
-# #print(corrected_data.as_array())
-# print('BadPixelCorrector: main: done')
-# show2D(corrected_data.as_array(), title='Corrected data')
-# # %%
+#%%
+# if __name__ == '__main__':
+
+print('BadPixelCorrector: main')
+# Create a 2D image
+ig = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, -1000], detector_position=[0, 0, 1000]).set_panel([10,10]).set_angles([0,1])
+data = ig.allocate()
+print(data.shape)
+
+# make array that's one for first row, two for second row:
+# a = 
+# data[0].fill(1)
+# data[1].fill(2)
+
+# print(data.array[:, 2,4])
+
+mask_coord = [(2,4), (6,8), (0,0)]
+
+#%%
+print(data.array[:].shape)
+
+for coord in mask_coord:
+    data.array[0][coord] = np.inf
+    data.array[1][coord] = np.inf
+
+print(data.array)
+
+# Create a mask
+mask = ig.allocate()
+mask.fill(True)
+mask = mask.array[0]
+
+for coord in mask_coord:
+    mask[coord] = False
+
+# convert to bool:
+# mask = np.array(mask, dtype=bool)
+print(mask.shape)
+
+show2D(data.as_array(), title='Original data')
+show2D(mask, title='Mask')
+
+
+# Create a BadPixelCorrector processor
+bad_pixel_corrector = BadPixelCorrector(mask=mask)
+# Apply the processor to the data
+corrected_data = bad_pixel_corrector(data)
+# Check the result
+#print(corrected_data.as_array())
+print('BadPixelCorrector: main: done')
+show2D(corrected_data.as_array(), title='Corrected data')
+
+
+
+# %%
+end = time.time()
+
+print(end-start)

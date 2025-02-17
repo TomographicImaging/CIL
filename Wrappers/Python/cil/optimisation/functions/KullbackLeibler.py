@@ -343,25 +343,9 @@ if has_numba:
     @njit(parallel=True)
     def kl_div(x, y, eta):
         accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
+        has_inf = 0
         for i in prange(x.size):
-            X = x.flat[i]
-            Y = y.flat[i] + eta.flat[i]
-            if X > 0 and Y > 0:
-                # out.flat[i] = X * numpy.log(X/Y) - X + Y
-                accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
-            elif X == 0 and Y >= 0:
-                # out.flat[i] = Y
-                accumulator[get_thread_id()] += Y
-            else:
-                # out.flat[i] = numpy.inf
-                return numpy.inf
-        return sum(accumulator)
-    
-    @njit(parallel=True)
-    def kl_div_mask(x, y, eta, mask):
-        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
-        for i in prange(x.size):
-            if mask.flat[i] > 0:
+            if has_inf == 0:
                 X = x.flat[i]
                 Y = y.flat[i] + eta.flat[i]
                 if X > 0 and Y > 0:
@@ -372,7 +356,29 @@ if has_numba:
                     accumulator[get_thread_id()] += Y
                 else:
                     # out.flat[i] = numpy.inf
-                    return numpy.inf
+                    accumulator[get_thread_id()] = numpy.inf
+                    has_inf = 1
+        return sum(accumulator)
+    
+    @njit(parallel=True)
+    def kl_div_mask(x, y, eta, mask):
+        accumulator = numpy.zeros(get_num_threads(), dtype=numpy.float64)
+        has_inf = 0
+        for i in prange(x.size):
+            if has_inf == 0:
+                if mask.flat[i] > 0:
+                    X = x.flat[i]
+                    Y = y.flat[i] + eta.flat[i]
+                    if X > 0 and Y > 0:
+                        # out.flat[i] = X * numpy.log(X/Y) - X + Y
+                        accumulator[get_thread_id()] += X * numpy.log(X/Y) - X + Y
+                    elif X == 0 and Y >= 0:
+                        # out.flat[i] = Y
+                        accumulator[get_thread_id()] += Y
+                    else:
+                        # out.flat[i] = numpy.inf
+                        accumulator[get_thread_id()] = numpy.inf
+                        has_inf = 1
         return sum(accumulator)
 
     # convex conjugate

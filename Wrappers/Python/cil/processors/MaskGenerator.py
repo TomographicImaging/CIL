@@ -197,6 +197,15 @@ class MaskGenerator(DataProcessor):
                                 "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
         return True
+    
+    def check_output(self, out):
+        if out is not None:
+            if out.array.dtype != bool:
+                raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(out.array.dtype, bool))
+        
+        return True
+
 
     def process(self, out=None):
 
@@ -365,10 +374,15 @@ class MaskGenerator(DataProcessor):
 
         if out is None:
             mask = numpy.asarray(mask, dtype=bool)
-            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
-            return out
+            if data.geometry is not None:
+                geometry = data.geometry.copy()
+            else:
+                geometry = None
+            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
         else:
             out.fill(mask)
+        
+        return out
 
     def _parse_threshold_value(self, arr, quantile=False):
 

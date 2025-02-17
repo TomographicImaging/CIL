@@ -23,9 +23,7 @@ import math
 import re
 import io
 import sys
-from cil.framework import AcquisitionGeometry, ImageGeometry, BlockGeometry, AcquisitionData
-from cil.framework.framework import SystemConfiguration
-from cil.framework import Partitioner
+from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
 
 initialise_tests()
 
@@ -497,10 +495,12 @@ class Test_AcquisitionGeometry(unittest.TestCase):
     def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_y=[0,1,1])
         AG.set_panel([1000,2000],[1,1])
+        AG.set_angles([0,1,2,3,5])
         AG_cs = AG.get_centre_slice()
 
         AG2 = AcquisitionGeometry.create_Parallel2D()
         AG2.set_panel([1000,1],[1,math.sqrt(0.5)])
+        AG2.set_angles([0,1,2,3,5])
 
         self.assertEqual(AG2, AG_cs)
 

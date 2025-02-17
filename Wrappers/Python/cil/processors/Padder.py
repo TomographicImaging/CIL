@@ -17,9 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, AcquisitionData, ImageData
-from numbers import Number
-from cil.framework import  DataContainer, AcquisitionGeometry, ImageGeometry
+from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
 import numpy as np
 import weakref
 
@@ -42,12 +40,12 @@ class Padder(DataProcessor):
 
     Notes
     -----
-    `pad_width` behaviour (number of pixels):
+    `pad_width`  behaviour (number of pixels):
         - int: Each axis will be padded with a border of this size
         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
-    `pad_values` behaviour:
+    `pad_values`  behaviour:
         - float: Each border will use this value
         - tuple(float, float): Each value will be used asymmetrically for each axis i.e. (before, after)
         - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
@@ -108,12 +106,12 @@ class Padder(DataProcessor):
 
         Notes
         -----
-        `pad_width` behaviour (number of pixels):
+        `pad_width`  behaviour (number of pixels):
          - int: Each axis will be padded with a border of this size
          - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
          - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
-        `constant_values` behaviour (value of pixels):
+        `constant_values`  behaviour (value of pixels):
          - float: Each border will be set to this value
          - tuple(float, float): Each border value will be used asymmetrically for each axis i.e. (before, after)
          - dict: Specified axes and values: e.g. {'horizontal':(8, 23), 'channel':5}
@@ -379,6 +377,7 @@ class Padder(DataProcessor):
                 '_geometry': None,
                 '_shape_in':None,
                 '_shape_out':None,
+                '_shape_out_full':None,
                 '_labels_in':None,
                 '_processed_dims':None,
                 '_pad_width_param':None,
@@ -408,6 +407,7 @@ class Padder(DataProcessor):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
 
+        self._set_up()
 
     def check_input(self, data):
 
@@ -439,8 +439,6 @@ class Padder(DataProcessor):
         if self.pad_width is None:
             raise ValueError('Please, specify pad_width')
 
-        self._parse_input(data)
-
         return True
 
     def _create_tuple(self, value, dtype):
@@ -465,8 +463,9 @@ class Padder(DataProcessor):
         return dimensions
 
 
-    def _parse_input(self, data):
-
+    def _set_up(self):
+        
+        data = self.get_input()
         offset = 4-data.ndim
 
         #set defaults
@@ -476,7 +475,7 @@ class Padder(DataProcessor):
         self._shape_in = [1]*4
         self._shape_in[offset::] = data.shape
 
-        self._shape_out = self._shape_in.copy()
+        self._shape_out_full = self._shape_in.copy()
 
         self._processed_dims = [0,0,0,0]
 
@@ -539,7 +538,9 @@ class Padder(DataProcessor):
         for i in range(4):
            if self._pad_width_param[i] != (0,0):
                 self._processed_dims[i] = 1
-                self._shape_out[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
+                self._shape_out_full[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
+
+        self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
 
 
     def _process_acquisition_geometry(self):
@@ -657,12 +658,13 @@ class Padder(DataProcessor):
         else:
             # check size and shape if passed out
             try:
-                out.array = out.array.reshape(self._shape_out)
+                out.array = out.array.reshape(self._shape_out_full)
             except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out_full, np.float32, out.array.shape, out.array.dtype))
 
             if new_geometry is not None:
                 if out.geometry != new_geometry:
                     raise ValueError("Geometry of `out` not as expected. Got {0}, expected {1}".format(out.geometry, new_geometry))
 
             out.array = self._process_data(data)
+            return out

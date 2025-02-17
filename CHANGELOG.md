@@ -1,10 +1,76 @@
-* 24.x.x
+* XX.X
+  - Bug fixes:
+      - Fix deprecation warning for rtol and atol in GD (#2056)
+
+
+* 24.3.0
+  - New features:
+    - Added `FluxNormaliser` processor (#1878)
+  - Bug fixes:
+    - Fix bug with 'median' and 'mean' methods in Masker averaging over the wrong axes (#1548)
+    - `SPDHG` `gamma` parameter is now applied correctly so that the product of the dual and primal step sizes remains constant as `gamma` varies (#1644)
+    - Allow MaskGenerator to be run on DataContainers (#2001)
+    - Make `PaganinProcessor` work with `AcquistionData` with one angle (#1920)
+    - Fix bug passing `kwargs` to PDHG (#2010)
+    - `show1D` correctly applies slices to N-dimensional data (#2022)
+    - `BlockOperator` direct and adjoint methods: can pass out as a `DataContainer` instead of a (1,1) `BlockDataContainer` where geometry permits (#1926)
+    - Add path to python executable to cmake commands to fix issue with cmake retrieving wrong python (#2044)
+  - Enhancements:
+    - Removed multiple exits from numba implementation of `KullbackLeibler` divergence (#1901)
+    - Updated the `SPDHG` algorithm to take a stochastic `Sampler`(#1644)
+    - Updated the `SPDHG` algorithm to include setters for step sizes (#1644)
+    - SAPBY for the `BlockDataContainer` now does not require an `out` to be passed (#2008)
+    - Fixed the rendering of the SAG/SAGA documentation (#2011)
+    - Set aliases: ISTA=PGD, FISTA=APGD (#2007)
+  - Dependencies:
+    - Added scikit-image to CIL-Demos conda install command as needed for new Callbacks notebook (#1955)
+    - Replaced matplotlib dependency with matplotlib-base (#2031)
+    - Remove CIL-Data from build requirements, update version to >=22 in run requirements (#2046)
+  - Changes that break backwards compatibility:
+    - `show1D` argument renamed `label`->`dataset_labels`, default plot size has changed. (#2022)
+    - `show1D` Default behaviour for displaying and labeling multiple plots has changed. Each slice requested will be displayed on a new subplot comparing all datasets at that position. (#2022)
+    - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
+    - Paganin processor now requires the CIL data order (#1920)
+    - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
+  - Deprecated code
+    - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
+    - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
+  - Testing
+    - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
+
+* 24.2.0
   - New Features:
+    - Added SVRG and LSVRG stochastic functions (#1625)
     - Added SAG and SAGA stochastic functions (#1624)
     - Allow `SumFunction` with 1 item (#1857)
+    - Added  PD3O algorithm (#1834)
+    - Added Barzilai-Borwein step size rule to work with GD, ISTA, FISTA (#1859)
+    - Added callback `optimisation.utilities.callbacks.EarlyStoppingObjectiveValue` which stops iterations if an algorithm objective changes less than a provided threshold (#1892)
+    - Added callback `optimisation.utilities.callbacks.CGLSEarlyStopping` which replicates the automatic behaviour of CGLS in CIL versions <=24. (#1892)
+    - Added `labels` module with `ImageDimension`, `AcquisitionDimension`, `AcquisitionType`, `AngleUnit`, `FillType` (#1692)
   - Enhancements:
     - Use ravel instead of flat in KullbackLeibler numba backend (#1874)
     - Upgrade Python wrapper (#1873, #1875)
+    - Updated the documentation for the algorithm base class (#1809)
+    - Add checks on out argument passed to processors to ensure correct dtype and size (#1805)
+    - Internal refactor: Replaced string-based label checks with enum-based checks for improved type safety and consistency (#1692)
+    - Internal refactor: Separate framework into multiple files (#1692)
+    - Allow the SIRT algorithm to take `initial=None` (#1906)
+    - Add checks on equality method of `AcquisitionData` and `ImageData` for equality of data type and geometry (#1919)
+    - Add check on equality method of `AcquisitionGeometry` for equality of dimension labels (#1919)
+  - Testing:
+    - New unit tests for operators and functions to check for in place errors and the behaviour of `out` (#1805)
+    - Updates in SPDHG vs PDHG unit test to reduce test time and adjustments to parameters (#1898)
+    - Drop Jenkins in favour of GHA for conda builds (#1914)
+    - New unit tests for `DataContainer`, `AcquisitionData` and `ImageData` to check equality method (`__eq__`) behaves as expected (#1919)
+  - Bug fixes:
+    - `ImageData` removes dimensions of size 1 from the input array. This fixes an issue where single slice reconstructions from 3D data would fail due to shape mismatches (#1885)
+    - Make Binner accept accelerated=False (#1887)
+    - Added checks on memory allocations within `FiniteDifferenceLibrary.cpp` and verified the status of the return in `GradientOperator` (#1929)
+    - Build release version of `cilacc.dll` for Windows. Previously was defaulting to the debug build (#1928)
+    - Armijo step size rule now by default initialises the search for a step size from the previously calculated step size (#1934)
+  - Changes that break backwards compatibility:
+    - CGLS will no longer automatically stop iterations once a default tolerance is reached. The option to pass `tolerance` will be deprecated to be replaced by `optimisation.utilities.callbacks` (#1892)
 
 * 24.1.0
   - New Features:
@@ -29,12 +95,10 @@
     - BlockOperator that would return a BlockDataContainer of shape (1,1) now returns the appropriate DataContainer. BlockDataContainer direct and adjoint methods accept DataContainer as parameter (#1802).
     - BlurringOperator: remove check for geometry class (old SIRF integration bug) (#1807)
     - The `ZeroFunction` and `ConstantFunction` now have a Lipschitz constant of 1. (#1768)
+    - Update dataexample remote data download to work with windows and use zenodo_get for data download (#1774)
   - Changes that break backwards compatibility:
     - Merged the files `BlockGeometry.py` and `BlockDataContainer.py` in `framework` to one file `block.py`. Please use `from cil.framework import BlockGeometry, BlockDataContainer` as before (#1799)
     - Bug fix in `FGP_TV` function to set the default behaviour not to enforce non-negativity (#1826).
-
-
-
 
 * 24.0.0
   - Update to new CCPi-Regularisation toolkit v24.0.0. This is a backward incompatible release of the toolkit.

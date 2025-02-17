@@ -276,8 +276,9 @@ class Algorithm:
         self.max_iteration = self.iteration + iterations
         iters = (count(self.iteration) if np.isposinf(self.max_iteration)
                  else range(self.iteration, self.max_iteration))
-        for _ in zip(iters, self):
+        for _ in iters:
             try:
+                self.__next__()
                 for callback in callbacks:
                     callback(self)
             except StopIteration:

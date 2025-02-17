@@ -8,7 +8,8 @@ if not "%GIT_DESCRIBE_NUMBER%"=="0" (
 :: -G "Visual Studio 16 2019" specifies the the generator
 :: -T v142 specifies the toolset
 
-cmake -S "%RECIPE_DIR%\.." -B "%SRC_DIR%\build_framework" -G "Visual Studio 16 2019" -T "v142" -DCONDA_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBRARY_LIB=%CONDA_PREFIX%\lib -DLIBRARY_INC=%CONDA_PREFIX% -DCMAKE_INSTALL_PREFIX=%PREFIX%
+cmake -S "%RECIPE_DIR%\.." -B "%SRC_DIR%\build_framework" -G "Visual Studio 16 2019" -T "v142" -DCONDA_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBRARY_LIB=%CONDA_PREFIX%\lib -DLIBRARY_INC=%CONDA_PREFIX% -DCMAKE_INSTALL_PREFIX=%PREFIX% -DPython_EXECUTABLE=%CONDA_PREFIX%\python
+
 if errorlevel 1 exit 1
 
 cmake --build "%SRC_DIR%\build_framework" --target install --config RelWithDebInfo

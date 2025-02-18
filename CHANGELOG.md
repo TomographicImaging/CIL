@@ -42,6 +42,7 @@
     - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
   - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
+    - Update random array in test_stepsizes.TestStepSizeBB.test_bb_converge to fix tests on windows (#2052)
 
 * 24.2.0
   - New Features:

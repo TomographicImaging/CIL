@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev5+g871fa836 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev6+g20979278 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=11e156f992ae61025cd3" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=11e156f992ae61025cd3" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=11e156f992ae61025cd3"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=0e2340c29e9ecc6bee80"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=11e156f992ae61025cd3" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=11e156f992ae61025cd3" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
 
-    <script src="../_static/documentation_options.js?v=572cdbea"></script>
+    <script src="../_static/documentation_options.js?v=30cdf2e8"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev5+g871fa836';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev6+g20979278';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev5+g871fa836" />
+  <meta name="docsearch:version" content="24.3.1.dev6+g20979278" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -8902,7 +8902,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </section>
 <section id="callbacks">
 <h3>Callbacks<a class="headerlink" href="#callbacks" title="Link to this heading">#</a></h3>
-<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <a href="#id63"><span class="problematic" id="id64">`Algorithms`_</span></a> <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
+<p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <cite>Algorithm</cite>’s <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
 <span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
@@ -8957,6 +8957,40 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">EarlyStoppingObjectiveValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#EarlyStoppingObjectiveValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue" title="Link to this definition">#</a></dt>
+<dd><p>Callback that stops iterations if the change in the objective value is less than a provided threshold value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>float</em><em>, </em><em>default 1e-6</em>)</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This callback only compares the last two calculated objective values. If <cite>update_objective_interval</cite> is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every <cite>update_objective_interval</cite> iterations.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.utilities.callbacks.CGLSEarlyStopping">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.callbacks.</span></span><span class="sig-name descname"><span class="pre">CGLSEarlyStopping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/callbacks/#CGLSEarlyStopping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.callbacks.CGLSEarlyStopping" title="Link to this definition">#</a></dt>
+<dd><p>Callback to work with CGLS. It causes the algorithm to terminate if  <span class="math notranslate nohighlight">\(||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2\)</span> where <cite>epsilon</cite> is set to default as ‘1e-6’, <span class="math notranslate nohighlight">\(x\)</span> is the current iterate and <span class="math notranslate nohighlight">\(x_0\)</span> is the initial value.
+It will also terminate if the algorithm begins to diverge i.e. if <span class="math notranslate nohighlight">\(||x||_2&gt; \omega\)</span>, where <cite>omega</cite> is set to default as 1e6.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epsilon</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Usually a small number: the algorithm to terminate if <span class="math notranslate nohighlight">\(||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2\)</span></p></li>
+<li><p><strong>omega</strong> (<em>float</em><em>, </em><em>default 1e6</em>) – Usually a large number: the algorithm will terminate if  <span class="math notranslate nohighlight">\(||x||_2&gt; \omega\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions &lt;=24. It also replicates the behaviour of <a class="reference external" href="https://web.stanford.edu/group/SOL/software/cgls/">https://web.stanford.edu/group/SOL/software/cgls/</a>.</p>
+</div>
 </dd></dl>
 
 <p>Users can also write custom callbacks.</p>
@@ -10085,8 +10119,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=11e156f992ae61025cd3"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=11e156f992ae61025cd3"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -145,6 +145,9 @@ class Sampler():
 
     @property
     def current_iter_number(self):
+        """
+        Returns the current iteration number of the sampler.
+        """
         return self._iteration_number
 
     def next(self):
@@ -162,7 +165,7 @@ class Sampler():
 
     def get_samples(self,  num_samples):
         """
-        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .
+        Generates a numpy array of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .
 
         Parameters
         ----------
@@ -171,7 +174,7 @@ class Sampler():
 
         Returns
         --------
-        List
+        Numpy Array
             The first `num_samples" output by the sampler.
         """
         save_last_index = self._iteration_number
@@ -186,15 +189,15 @@ class Sampler():
     
     def get_previous_samples(self):
         """
-        Generates a list of the samples outputted by the sampler since it was initialised. Calling this does not increment the sampler index or affect the behaviour of the sampler .
+        Generates a numpy array of the samples outputted by the sampler since it was initialised. Calling this does not increment the sampler index or affect the behaviour of the sampler .
 
         Returns
         --------
-        List
+        Numpy Array
             A list of the samples outputted by the sampler since it was initialised
         """
 
-        return get_samples(self._iteration_number)
+        return self.get_samples(self._iteration_number)
     
     def get_current_sample(self):
         """
@@ -205,7 +208,9 @@ class Sampler():
         int
             The current sample of the sampler.
         """
-        return self._function(self._iteration_number)
+        if self._iteration_number == 0:
+            raise ValueError('The sampler has not yet been incremented. ')
+        return self._function(self._iteration_number-1)
 
     def __str__(self):
         repres = "Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. \n"
@@ -689,6 +694,7 @@ class SamplerRandom(Sampler):
         self._generator = np.random.RandomState(self._seed)
         self._sampling_list = None
         self._replace = replace
+        self._current_sample = None
 
         super(SamplerRandom, self).__init__(num_indices, self._function,
                                             sampling_type=sampling_type, prob_weights=prob)
@@ -724,6 +730,7 @@ class SamplerRandom(Sampler):
             The first `num_samples` produced by the sampler
         """
         save_last_index = self._iteration_number
+        save_current_value = self._current_sample
         self._iteration_number = 0
 
         save_generator = self._generator
@@ -733,7 +740,7 @@ class SamplerRandom(Sampler):
         output = [self.next() for _ in range(num_samples)]
 
         self._iteration_number = save_last_index
-
+        self._current_sample = save_current_value
         self._generator = save_generator
         self._sampling_list = save_sampling_list
 
@@ -748,7 +755,8 @@ class SamplerRandom(Sampler):
         int
             The current sample of the sampler.
         """
-
+        if self._current_sample is None:
+            raise ValueError('The sampler has not yet been incremented. ')
         return self._current_sample
 
     def __str__(self):

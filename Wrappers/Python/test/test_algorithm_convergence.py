@@ -110,7 +110,6 @@ class TestAlgorithmConvergence(CCPiTestClass):
     def test_bb_step_size_gd_converge(self):
         n = 10
         m = 10
-        np.random.seed(2)
         A = np.array(range(1,n*m+1)).reshape(n,m).astype('float32')
         A = np.diag(1/(np.transpose(A)@np.ones(m)))*A
         x = (np.array(range(n)).astype('float32')-n/2)/n

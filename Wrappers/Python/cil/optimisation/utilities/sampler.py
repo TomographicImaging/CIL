@@ -59,7 +59,8 @@ class Sampler():
     3
     >>> print(sampler.next())
     4
-
+    >>> print(sampler.get_current_sample())
+    4
 
     >>> sampler = Sampler.staggered(num_indices=21, stride=4)
     >>> print(next(sampler))
@@ -68,16 +69,24 @@ class Sampler():
     4
     >>> print(sampler.get_samples(5))
     [ 0  4  8 12 16]
+    >>> print(sampler.get_previous_samples())
+    [0 4]
 
     Example
     -------
     >>> sampler = Sampler.sequential(10)
+    >>> print(sampler.get_previous_samples())
+    []
     >>> print(sampler.get_samples(5))
+    [0 1 2 3 4]
     >>> print(next(sampler))
     0
-    [0 1 2 3 4]
     >>> print(sampler.next())
     1
+    >>> print(sampler.get_current_sample())
+    1
+    >>> print(sampler.get_previous_samples())
+    [0 1]
 
     Example
     -------
@@ -240,10 +249,12 @@ class Sampler():
         -------
         >>> sampler = Sampler.sequential(10)
         >>> print(sampler.get_samples(5))
+        [0 1 2 3 4]
         >>> print(next(sampler))
         0
-        [0 1 2 3 4]
         >>> print(sampler.next())
+        1
+        >>> print(sampler.get_current_sample())
         1
         """
         def function(x):
@@ -319,6 +330,9 @@ class Sampler():
         4
         >>> print(sampler.get_samples(5))
         [ 0  4  8 12 16]
+        >>> print(sampler.get_previous_samples())
+        [0 4]
+        
         Example
         -------
         >>> sampler = Sampler.staggered(num_indices=17, stride=8)
@@ -328,7 +342,10 @@ class Sampler():
         8
         >>> print(sampler.get_samples(10))
         [ 0  8  16 1 9 2 10 3 11 4]
-
+        >>> print(sampler.get_previous_samples())
+        [0 8]
+        >>> print(sampler.get_current_sample())
+        8
 
         """
 
@@ -371,10 +388,16 @@ class Sampler():
         3
         >>> print(sampler.next())
         4
-
+        >>> print(sampler.get_current_sample())
+        4
+        
+        Example
+        -------
         >>> sampler = Sampler.random_with_replacement(num_indices=4, prob=[0.7,0.1,0.1,0.1])
         >>> print(sampler.get_samples(10))
         [0 1 3 0 0 3 0 0 0 0]
+        >>> print(sampler.get_previous_samples())
+        []
         """
 
         sampler = SamplerRandom(

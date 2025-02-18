@@ -122,8 +122,9 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
-        mamba-version: "1.5"
+        mamba-version: "*"
         channels: conda-forge
+        conda-remove-defaults: "true"
     - name: conda build & test
       working-directory: recipe
       run: |

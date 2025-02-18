@@ -141,6 +141,9 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.sequential(10)
         self.assertNumpyArrayEqual(sampler.get_samples(20), np.array(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+        
+        with self.assertRaises(ValueError):
+            sampler.get_current_sample()
 
         for i in range(337):
             self.assertEqual(next(sampler), i % 10)

@@ -95,8 +95,8 @@ jobs:
     steps:
     - id: matrix
       run: |
-        COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-        echo "Commit Message: '${{ github.event.head_commit.message }}'"
+        COMMIT_MESSAGE="${{ github.event.pull_request.head.sha }}"
+        echo "Commit Message: '${{ github.event.pull_request.head.sha }}'"
 
         if [[ "$COMMIT_MESSAGE" == *"#all-tests"* || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT

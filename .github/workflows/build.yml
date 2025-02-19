@@ -95,8 +95,12 @@ jobs:
     steps:
     - id: matrix
       run: |
-        COMMIT_MESSAGE="${{ steps.get_head_commit_message.outputs.headCommitMsg }}"
-        echo "Commit Message: '${{steps.get_head_commit_message.outputs.headCommitMsg }}'"
+        git fetch --depth=1 origin $GITHUB_SHA
+
+        # Get the last commit message
+        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+
+        echo "Extracted Commit Message: $COMMIT_MESSAGE"
 
         if [[ "$COMMIT_MESSAGE" == *"#all-tests"* || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT

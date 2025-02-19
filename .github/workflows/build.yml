@@ -102,8 +102,8 @@ jobs:
       run: |
         # Get the last commit message
         COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}})
-
         echo "Extracted Commit Message: $COMMIT_MESSAGE"
+        echo "Extracted GITHUB_REF: $GITHUB_REF"
 
         if [[ "$COMMIT_MESSAGE" == *"#all-tests"* || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then 
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT

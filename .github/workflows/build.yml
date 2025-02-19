@@ -96,13 +96,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 2
+        fetch-depth: 0
+        ref: ${{github.event.after}}
     - id: matrix
       run: |
-        git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
-
         # Get the last commit message
-        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+        COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}})
 
         echo "Extracted Commit Message: $COMMIT_MESSAGE"
 

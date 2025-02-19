@@ -93,6 +93,10 @@ jobs:
       python-version: ${{ steps.matrix.outputs.python-version }}
       numpy-version: ${{ steps.matrix.outputs.numpy-version }}
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
     - id: matrix
       run: |
         git fetch --depth=1 origin $GITHUB_SHA

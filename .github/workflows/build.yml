@@ -99,7 +99,7 @@ jobs:
         fetch-depth: 2
     - id: matrix
       run: |
-        git fetch --depth=1 origin $GITHUB_SHA
+        git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
 
         # Get the last commit message
         COMMIT_MESSAGE=$(git log -1 --pretty=%B)

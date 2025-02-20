@@ -134,7 +134,7 @@ class BadPixelCorrector(DataProcessor):
 
         return proj_shape
 
-    def _get_neighbours_and_weights(self, mask_arr):
+    def _get_neighbours_and_weights(self, mask_arr, masked_pixels):
         """
         Get the neighbours (including diagonal) and weights for each masked pixel in the mask array.
         
@@ -142,6 +142,9 @@ class BadPixelCorrector(DataProcessor):
         ----------
         mask_arr : numpy.ndarray
             The mask array with masked pixels as 'False'.
+
+        masked_pixels : list
+            A list of the coordinates of the masked pixels in the mask array.
 
         Returns
         -------
@@ -232,7 +235,7 @@ class BadPixelCorrector(DataProcessor):
             masked_pixels = [x for (x,) in masked_pixels]
 
         # Dict of masked pixel coordinates and their unmasked neighbour coordinates and weights:
-        masked_pixel_neighbours = self._get_neighbours_and_weights(mask_arr)
+        masked_pixel_neighbours = self._get_neighbours_and_weights(mask_arr, masked_pixels)
 
         for k in range(num_proj):
             print("Processing projection %d of %d" %(k+1, num_proj))

@@ -25,6 +25,7 @@ import numpy
 from .labels import AcquisitionDimension, AngleUnit, AcquisitionType, FillType
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
+from cil.utilities.random import global_rng
 
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
@@ -2185,25 +2186,24 @@ class AcquisitionGeometry(object):
             # it's created empty, so we make it 0
             out.array.fill(value)
         elif value in FillType:
-            if value == FillType.RANDOM:
-                stream = numpy.random.PCG64DXSM
-                seed = kwargs.get('seed', None)
-                rng = numpy.random.Generator(stream(seed))
+
+            seed = kwargs.get('seed', None)
+            if seed is not None:
+                global_rng.set_seed(seed)  
+
+            if value == FillType.RANDOM:              
                 if numpy.iscomplexobj(out.array):
                     half_dtype = numpy.dtype('f' + str(out.dtype.itemsize // 2))
-                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
+                    r = global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype)
                     out.fill(r)
                 else:
-                    out.fill(rng.random(size=self.shape, dtype=out.dtype))
+                    out.fill(global_rng.random(size=self.shape, dtype=out.dtype))
             elif value == FillType.RANDOM_INT:
-                stream = numpy.random.PCG64DXSM
-                seed = kwargs.get('seed', None)
-                rng = numpy.random.Generator(stream(seed))
                 max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
-                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)
+                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 else:
-                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32)
+                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=dtype))
         elif value is None:
             pass

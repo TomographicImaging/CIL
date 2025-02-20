@@ -232,7 +232,7 @@ class BadPixelCorrector(DataProcessor):
             masked_pixels = [x for (x,) in masked_pixels]
 
         # Dict of masked pixel coordinates and their unmasked neighbour coordinates and weights:
-        masked_pixel_neighbours = _get_masked_pixel_neighbours(mask_arr)
+        masked_pixel_neighbours = self._get_neighbours_and_weights(mask_arr)
 
         for k in range(num_proj):
             print("Processing projection %d of %d" %(k+1, num_proj))

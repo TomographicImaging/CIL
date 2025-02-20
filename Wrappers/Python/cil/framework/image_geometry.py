@@ -287,7 +287,7 @@ class ImageGeometry:
                     half_dtype = numpy.real(complex_example).dtype
                     r = global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype)
                 else:
-                    r = global_rng.random(size=self.shape, dtype=out.dtype)
+                    r = global_rng.random(size=self.shape, dtype=dtype)
 
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)

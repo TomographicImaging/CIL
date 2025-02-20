@@ -2203,7 +2203,7 @@ class AcquisitionGeometry(object):
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=half_dtype)).astype(dtype)
+                    r = (global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
                     r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
             

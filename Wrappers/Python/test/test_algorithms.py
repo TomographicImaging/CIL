@@ -251,6 +251,18 @@ class TestGD(CCPiTestClass):
             gd.run(np.inf, callbacks=[StopCallback()])
         self.assertEqual(gd.iteration, 9)
 
+    def test_gd_deprecate_atol_rtol(self):
+        with self.assertWarns(DeprecationWarning):
+            initial=VectorData(np.array([1.1,1.1]))
+            b=VectorData(np.array([1.,1.]))
+            A=IdentityOperator(b.geometry)
+            gd = GD(initial=initial, f=LeastSquares(A,b ), step_size=1, atol=1, rtol=2)
+            
+        self.assertEqual(gd.rtol, 2.)
+        self.assertEqual(gd.atol, 1.)
+        gd.run(10)
+        self.assertEqual(gd.iteration, 0)
+        
 
 class TestFISTA(CCPiTestClass):
     def test_FISTA(self):

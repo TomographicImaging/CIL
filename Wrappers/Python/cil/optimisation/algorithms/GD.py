@@ -40,37 +40,37 @@ class GD(Algorithm):
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
-    rtol: positive float, default 1e-5
-        optional parameter defining the relative tolerance comparing the current objective function to 0, default 1e-5, see numpy.isclose
-    atol: positive float, default 1e-8
-        optional parameter defining the absolute tolerance comparing the current objective function to 0, default 1e-8, see numpy.isclose
-
     """
 
-    def __init__(self, initial=None, f=None, step_size=None, rtol=1e-5, atol=1e-8,  preconditioner=None, **kwargs):
-        '''GD algorithm creator
-        '''
 
-        self.alpha = kwargs.pop('alpha', None)
-        self.beta = kwargs.pop('beta', None)
+    def __init__(self, initial=None, f=None, step_size=None,   preconditioner=None, **kwargs):
+
+        self.alpha = kwargs.pop('alpha', None) # to be deprecated
+        self.beta = kwargs.pop('beta', None) # to be deprecated
+        self.rtol = kwargs.pop('rtol', None) # to be deprecated (released in 25.0)
+        self.atol = kwargs.pop('atol', None) # to be deprecated (released in 25.0)
         
-        if kwargs.get('objective_function') is not None:
+
+        if kwargs.get('objective_function') is not None: # to be deprecated
             warn('The argument `objective_function` will be deprecated in the future. Please use `f` instead.', DeprecationWarning, stacklevel=2)
             if f is not None:
                 raise ValueError('The argument `objective_function` is being deprecated, replaced by `f`. Please use just `f` not both')
             f = kwargs.pop('objective_function')
             
 
-        super().__init__(**kwargs)
-
-        if self.alpha is not None or self.beta is not None:
+        if self.alpha is not None or self.beta is not None: # to be deprecated
             warn('To modify the parameters for the Armijo rule please use `step_size_rule=ArmijoStepSizeRule(alpha, beta, kmax)`. The arguments `alpha` and `beta` will be deprecated. ', DeprecationWarning, stacklevel=2)
 
-        self.rtol = rtol
-        self.atol = atol
+        if self.rtol is not None or self.atol is not None: # to be deprecated (released in 25.0)
+            if self.rtol != 0 or self.atol != 0: # to be deprecated (released in 25.0)
+                warn('`rtol` and `atol` are deprecated. For early stopping, please use a callback (cil.optimisation.utilities.callbacks), for example `EarlyStoppingObjectiveValue`.', DeprecationWarning, stacklevel=2)
+            else:
+                log.warning('Breaking backwards compatibility, GD no longer automatically stops if the objective function is close to zero. For this functionality, please use a callback (cil.optimisation.utilities.callbacks).')
+            
+        super().__init__(**kwargs)
+        
         if initial is not None and f is not None:
-            self.set_up(initial=initial, f=f,
-                        step_size=step_size,  preconditioner=preconditioner)
+            self.set_up(initial=initial, f=f, step_size=step_size,  preconditioner=preconditioner)
 
     def set_up(self, initial, f, step_size, preconditioner):
         '''initialisation of the algorithm
@@ -126,11 +126,14 @@ class GD(Algorithm):
     def update_objective(self):
         self.loss.append(self._objective_function(self.solution))
 
-    def should_stop(self):
+    def should_stop(self): # to be deprecated (released in 25.0)
         '''Stopping criterion for the gradient descent algorithm '''
-        return super().should_stop() or \
-            numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
+        check_should_stop = False 
+        if self.rtol  is not None or self.atol is not None:
+            check_should_stop = numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol,
                           atol=self.atol, equal_nan=False)
+        return super().should_stop() or  check_should_stop
+            
 
     @property
     def step_size(self):
@@ -143,7 +146,7 @@ class GD(Algorithm):
     def calculate_objective_function_at_point(self, x):
         """ Calculates the objective at a given point x
 
-        .. math:: f(x) + g(x)
+        .. math:: f(x)
         
         Parameters
         ----------

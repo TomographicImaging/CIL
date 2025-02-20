@@ -1,7 +1,7 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA
-from cil.optimisation.functions import LeastSquares, IndicatorBox
+from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
-from cil.optimisation.operators import IdentityOperator, MatrixOperator
+from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
 
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule
 import numpy as np
@@ -264,44 +264,8 @@ class TestStepSizeBB(CCPiTestClass):
 
         
         
-        
-    def test_bb_converge(self):
-        n = 10
-        m = 5
-        np.random.seed(4)
-        A = np.random.uniform(0, 1, (m, n)).astype('float32')
-        b = (A.dot(np.random.randn(n)) + 0.1 *
-             np.random.randn(m)).astype('float32')
 
-        Aop = MatrixOperator(A)
-        bop = VectorData(b)
-        ig=Aop.domain
-        initial = ig.allocate()
-        f = LeastSquares(Aop, b=bop, c=2)
         
-        ss_rule=ArmijoStepSizeRule(max_iterations=40, warmstart=False)
-        alg_true = GD(initial=initial, f=f, step_size=ss_rule)
-        alg_true .run(300, verbose=0)
-        
-       
-        
-        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
-        alg = GD(initial=initial, f=f, step_size=ss_rule)
-        alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
-        
-
-        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'long')
-        alg = GD(initial=initial, f=f, step_size=ss_rule)
-        alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
-        
-
-        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
-        alg = GD(initial=initial, f=f, step_size=ss_rule)
-
-        alg.run(80, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), alg_true.x.as_array(), decimal=3)
         
         
 

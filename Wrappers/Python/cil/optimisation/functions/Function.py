@@ -583,7 +583,7 @@ class SumScalarFunction(SumFunction):
         return self.function.convex_conjugate(x) - self.constant
 
     def proximal(self, x, tau, out=None):
-        """ Returns the proximal operator of :math:`F+scalar`
+        r""" Returns the proximal operator of :math:`F+scalar`
 
         .. math:: \text{prox}_{\tau (F+scalar)}(x) = \text{prox}_{\tau F}
 

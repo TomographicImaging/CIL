@@ -17,7 +17,6 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-#%%
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
 import numpy
@@ -109,6 +108,21 @@ class BadPixelCorrector(DataProcessor):
         return True
     
     def _get_proj_shape(self, data):
+        '''
+        Get the shape of a single projection from the data.
+        This is the shape of the data with the channel and angle dimensions removed.
+
+        Parameters
+        ----------
+        data : AcquisitionData
+            The input data.
+        
+        Returns
+        -------
+        tuple
+            The shape of a single projection.
+        '''
+
         channel = True if 'channel' in data.dimension_labels else None
         angle = True if 'angle' in data.dimension_labels else None
 
@@ -119,46 +133,24 @@ class BadPixelCorrector(DataProcessor):
             proj_shape = data.shape
 
         return proj_shape
+
+    def _get_neighbours_and_weights(self, mask_arr):
+        """
+        Get the neighbours (including diagonal) and weights for each masked pixel in the mask array.
         
+        Parameters
+        ----------
+        mask_arr : numpy.ndarray
+            The mask array with masked pixels as 'False'.
 
-    def process(self, out=None):
-        
-        data = self.get_input()
-        
-        return_arr = False
-        if out is None:
-            out = data.copy()
-            return_arr = True
-        try:
-            mask_arr = self.mask.as_array()
-        except:
-            mask_arr = self.mask
-
-        mask_arr = numpy.array(mask_arr, dtype=bool)
-        mask_invert = ~mask_arr
-
-        # Coordinates of all masked pixels:
-        masked_pixels = numpy.transpose((mask_invert).nonzero())
-        
-        proj_size = math.prod(self._get_proj_shape(data))
-
-        num_proj = int(data.size / proj_size) 
-
-        # flat view of full array:
-        out_flat = out.array.ravel()
-
-        try:
-            masked_pixels = [x * mask_arr.shape[1] + y for (x,y) in masked_pixels]
-        except:
-            masked_pixels = [x for (x,) in masked_pixels]
-
+        Returns
+        -------
+        dict
+            A dictionary with masked pixel coordinates as keys and a dictionary with 'neighbours' and 'weights' as values.
+            'neighbours' and 'weights' are lists of the coordinates of the unmasked neighbours and their weights respectively.
+        """
         diag_weight = 1/np.sqrt(2) # to be used in weighting mean of diagonal neighbours
-
-        # Loop through bad pixels and save neighbour locations in a dict
-
         masked_pixel_neighbours = {}
-
-        # Save locations of neighbours for each masked pixel:
         for coord in masked_pixels: 
             # Get all neighbours
             neighbours = []
@@ -205,42 +197,73 @@ class BadPixelCorrector(DataProcessor):
                     weights.append(diag_weight)
                 
             masked_pixel_neighbours[coord] = {'neighbours': neighbours, 'weights': weights}
+        return masked_pixel_neighbours
 
+
+    def process(self, out=None):
         
+        data = self.get_input()
+        
+        return_arr = False
+        if out is None:
+            out = data.copy()
+            return_arr = True
+        try:
+            mask_arr = self.mask.as_array()
+        except:
+            mask_arr = self.mask
+
+        mask_arr = numpy.array(mask_arr, dtype=bool)
+        mask_invert = ~mask_arr
+
+        # Coordinates of all masked pixels:
+        masked_pixels = numpy.transpose((mask_invert).nonzero())
+        
+        proj_size = math.prod(self.mask.shape)
+
+        num_proj = int(data.size / proj_size) 
+
+        # flat view of full array:
+        out_flat = out.array.ravel()
+
+        try:
+            masked_pixels = [x * mask_arr.shape[1] + y for (x,y) in masked_pixels]
+        except:
+            masked_pixels = [x for (x,) in masked_pixels]
+
+        # Dict of masked pixel coordinates and their unmasked neighbour coordinates and weights:
+        masked_pixel_neighbours = _get_masked_pixel_neighbours(mask_arr)
+
         for k in range(num_proj):
             print("Processing projection %d of %d" %(k+1, num_proj))
-            # this will create a copy the data
             projection_out = out_flat[k*proj_size:(k+1)*proj_size]
         
             projection_temp = projection_out.copy()
             masked_pixels_in_proj = masked_pixels.copy()
-            masked_pixels_temp = masked_pixels.copy() # copy of masked pixels
+            masked_pixels_temp = masked_pixels.copy()
             
             # Loop through masked pixel coordinates until all have been corrected:
             while (len(masked_pixels_in_proj)>0): 
-                # Save coord of unmasked neighbours, should include neighbours and diag_neighbours:
-
-                for coord in masked_pixels_in_proj: # for each masked pix
+                for coord in masked_pixels_in_proj:
                     neighbour_values = []
                     weights = []
                     for i, neighbour in enumerate(masked_pixel_neighbours[coord]['neighbours']):
-                        if neighbour in masked_pixels_in_proj:
-                            continue
-                        else:
+                        if neighbour not in masked_pixels_in_proj:
                             neighbour_values.append(projection_out[neighbour])
                             weights.append(masked_pixel_neighbours[coord]['weights'][i])
                     if len(neighbour_values) > 0:
+                        # Until we have looped through all masked pixels, we will only update the temporary projection
+                        # and temporary copy of the list of masked pixels to be corrected:
                         projection_temp[coord] = numpy.average(neighbour_values, weights=weights)
                         masked_pixels_temp.remove(coord)
 
-                # Update projection_out now that all masked pixels which have unmasked neighbours have been addressed in this iteration:
+                # Update projection_out and remaining masked pixels to be corrected in projection
+                # now that all masked pixels which have unmasked neighbours have been addressed in this iteration:
                 projection_out = projection_temp.copy()
                 masked_pixels_in_proj = masked_pixels_temp.copy()
 
-            # Update the projection:
-            # #fill the data back
+            # Update the projection in out:
             out_flat[k*proj_size:(k+1)*proj_size] = projection_out
-
 
         if return_arr is True:
             return out

@@ -22,7 +22,7 @@ import warnings
 import numpy
 
 from .labels import FillType
-
+from cil.utilities.random import global_rng
 
 class VectorGeometry:
     '''Geometry describing VectorData to contain 1D array'''
@@ -94,30 +94,37 @@ class VectorGeometry:
 
         dtype = kwargs.get('dtype', self.dtype)
         # self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self.copy(), dtype=dtype)
+        
         if isinstance(value, Number):
+            out = VectorData(geometry=self.copy(), dtype=dtype)
             if value != 0:
                 out += value
+
         elif value in FillType:
+            
+            seed = kwargs.get('seed', None)
+            if seed is not None:
+                global_rng.set_seed(seed)
+
             if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
+                    r = global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    r = global_rng.random(size=self.shape, dtype=dtype)
+
             elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+
+            out = VectorData(r, geometry=self.copy(), dtype=dtype)
+
         elif value is None:
-            pass
+            out = VectorData(geometry=self.copy(), dtype=dtype)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

@@ -94,10 +94,12 @@ class VectorGeometry:
 
         dtype = kwargs.get('dtype', self.dtype)
         # self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self.copy(), dtype=dtype)
+        
         if isinstance(value, Number):
+            out = VectorData(geometry=self.copy(), dtype=dtype)
             if value != 0:
                 out += value
+
         elif value in FillType:
             
             seed = kwargs.get('seed', None)
@@ -105,20 +107,24 @@ class VectorGeometry:
                 global_rng.set_seed(seed)
 
             if value == FillType.RANDOM:
-                if numpy.iscomplexobj(out.array):
-                    half_dtype = numpy.dtype('f' + str(out.dtype.itemsize // 2))
-                    out.fill(global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype))
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
+                    r = global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype)
                 else:
-                    out.fill(global_rng.random(size=self.shape, dtype=out.dtype))
+                    r = global_rng.random(size=self.shape, dtype=out.dtype)
+
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=dtype))
+                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+
+            out = VectorData(r, geometry=self.copy(), dtype=dtype)
+
         elif value is None:
-            pass
+            out = VectorData(geometry=self.copy(), dtype=dtype)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

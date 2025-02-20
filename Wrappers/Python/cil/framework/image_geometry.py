@@ -267,13 +267,14 @@ class ImageGeometry:
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+        
 
         if isinstance(value, Number):
-            # it's created empty, so we make it 0
+            out = ImageData(geometry=self.copy(),
+                            dtype=dtype,
+                            suppress_warning=True)
             out.array.fill(value)
+
         elif value in FillType:
             
             seed = kwargs.get('seed', None)
@@ -281,21 +282,29 @@ class ImageGeometry:
                 global_rng.set_seed(seed)
 
             if value == FillType.RANDOM:                
-                if numpy.iscomplexobj(out.array):
-                    half_dtype = numpy.dtype('f' + str(out.dtype.itemsize // 2))
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
                     r = global_rng.random(size=self.shape, dtype=half_dtype) + 1j * global_rng.random(size=self.shape, dtype=half_dtype)
                 else:
                     r = global_rng.random(size=self.shape, dtype=out.dtype)
-                out.fill(numpy.asarray(r, dtype=dtype))
 
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    out.fill(global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32))
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (global_rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*global_rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    out.fill(global_rng.integers(max_value, size=self.shape, dtype=numpy.int32))
+                    r = global_rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+
+            out = ImageData(r,
+                            geometry=self.copy(),
+                            dtype=dtype,
+                            suppress_warning=True)
+        
         elif value is None:
-            pass
+            out = ImageData(geometry=self.copy(),
+                            dtype=dtype,
+                            suppress_warning=True)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

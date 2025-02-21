@@ -38,7 +38,7 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
     L1Norm, L2NormSquared, MixedL21Norm, LeastSquares, \
     SmoothMixedL21Norm, OperatorCompositionFunction, \
      IndicatorBox, TotalVariation,  SumFunction, SumScalarFunction, \
-    WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+    WeightedL2NormSquared, MixedL11Norm, ZeroFunction, FunctionOfAbs
 
 from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
 RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
@@ -117,9 +117,8 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL11Norm(), bg, True, True, False),
             (BlockFunction(L1Norm(),L2NormSquared()), bg, True, True, False),
             (BlockFunction(L2NormSquared(),L2NormSquared()), bg, True, True, True),
-            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False)
-
-
+            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='cpu'), assume_lower_semi=True), ig , True, True, False)
         ]
 
         np.random.seed(5)

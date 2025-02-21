@@ -33,7 +33,8 @@ Institutions Key:
 10 - University of Warwick
 11 - University of Helsinki
 12 - Australian e-Health Research, Australia
-13 - KU Leuven 
+13 - KU Leuven
+14 - Independent Contributor
 
 CIL Developers in date order:
 Edoardo Pasca (2017 – present) - 1
@@ -70,6 +71,8 @@ Joshua Hellier (2024) - 3
 Nicholas Whyatt (2024) - 1
 Rasmia Kulan (2024) - 1
 Francis M Watson (2024) - 3 
+Emmanuel Ferdman (2025) - 14
+
 
 CIL Advisory Board:
 Llion Evans - 9

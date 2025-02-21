@@ -46,7 +46,6 @@ requirements:
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
-    - cil-data
     - ipp-include {{ ipp_version }} 
     - ipp-devel {{ ipp_version }} 
     - ipp {{ ipp_version }} 
@@ -55,7 +54,7 @@ requirements:
     - python
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy >=1.4.0
-    - matplotlib >=3.3.0
+    - matplotlib-base >=3.3.0
     - h5py
     - pillow
     - libgcc-ng     # [linux]
@@ -66,7 +65,7 @@ requirements:
     - dxchange
     - olefile >=0.46
     - pywavelets
-    - cil-data >=21.3.0
+    - cil-data >=22
     - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba

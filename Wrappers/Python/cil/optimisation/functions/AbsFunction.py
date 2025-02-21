@@ -32,14 +32,17 @@ from typing import Optional
 
 class FunctionOfAbs(Function):
     r'''A function which acts on the absolute value of the complex-valued input, 
-    .. math::  
-        G(z) = H(abs(z))
+
+    .. math::  G(z) = H(abs(z))
 
     This function is initialised with another CIL function, :math:`H` in the above formula. When this function is called, first the absolute value of the input is taken, and then the input is passed to the provided function, :math:.
 
-    This function defines the proximal operator and convex conjugate. This is accomplished calculating a bounded proximal operator and making a change of phase,
-    :math:` prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ Phi`, :math:`r = abs(z)`, :math`:\Phi = \exp(i angl(z)):,
-    and :math:`\circ` is element-wise product.  Also define :math:`prox^+` to be the proximal map of :math:`H`  in which the minimisation carried out over the positive orthant.
+    This function defines the proximal operator and convex conjugate, in the case that H is lower semi-continuous, convex, non-decreasing and finite at the origin,  but not the gradient which is not implemented. The calculation of the proximal conjugate from the parent CIL Function class is valid for this function. 
+
+
+    Reference
+    ---------
+    For further details see https://doi.org/10.48550/arXiv.2410.22161
 
 
     Parameters
@@ -50,10 +53,6 @@ class FunctionOfAbs(Function):
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.   Default is False.    
-
-    Reference
-    ---------
-    For further details see https://doi.org/10.48550/arXiv.2410.22161
 
     '''
 
@@ -67,9 +66,14 @@ class FunctionOfAbs(Function):
         return call_abs(self._function, x)
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the proximal operator of function :math:`\tau F`  evaluated at x
+        r'''Returns the proximal operator of function :math:`\tau G`  evaluated at x
 
-        .. math:: \text{prox}_{\tau F}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+        .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
+
+        This is accomplished calculating a bounded proximal operator and making a change of phase,
+        :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i angl(z))`,
+        and :math:`\circ` is element-wise product.  Also define :math:`prox^+` to be the proximal map of :math:`H`  in which the minimisation carried out over the positive orthant.
+
 
         Parameters
         ----------
@@ -83,7 +87,7 @@ class FunctionOfAbs(Function):
         -------
         DataContainer, the proximal operator of the function at x with scalar :math:`\tau`.
 
-        """
+        '''
         prox_abs = self._abs_and_project(self._function.proximal)
         return prox_abs(self._function, x, tau=tau, out=out)
 
@@ -95,8 +99,8 @@ class FunctionOfAbs(Function):
 
         If H = self._function is lower semi-continuous, convex, non-decreasing 
         finite at the origin, then :math:`G^*(z*) = H^+(|z*|)`, where the monotone conjugate :math:`g^+` is
-         .. math::
-            H^+(z*) =sup {(z, z*) - H(z) : z >= O}
+
+        .. math:: H^+(z*) =sup {(z, z*) - H(z) : z >= O}
 
         The monotone conjugate will therefore be less than or equal to the convex conjugate, 
         since it is taken over a smaller set.  It is not available directly, but may coincide with
@@ -177,3 +181,8 @@ class FunctionOfAbs(Function):
                 out.array = fvals.array.astype(np.complex128)*Phi
                 return out
         return _abs_project_decorator
+
+    def gradient(self):
+        '''Gradient of the function at x is not defined for this function.
+        '''
+        raise NotImplementedError('Gradient not available for this function')

@@ -11,16 +11,16 @@ from urllib.request import urlopen
 from tqdm import tqdm
 
 # URLS of the notebooks to render
-NOTEBOOKS_load = [
+NOTEBOOKS_load_links = [
     "https://tomography.stfc.ac.uk/how-tos/ZeissDataReader.ipynb",
     "https://tomography.stfc.ac.uk/how-tos/NikonDataReader.ipynb"
 ]
 
-NOTEBOOKS_geometry = [
+NOTEBOOKS_geometry_links = [
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/demos/1_Introduction/00_CIL_geometry.ipynb"
 ]
 
-NOTEBOOKS_advanced = [
+NOTEBOOKS_advanced_links = [
     "https://github.com/TomographicImaging/CIL-User-Showcase/raw/main/003_1D_integral_inverse_problem/deriv2_cgls.ipynb",
     "https://github.com/TomographicImaging/CIL-Demos/raw/main/misc/callback_demonstration.ipynb"
 ]
@@ -31,20 +31,23 @@ NBDIR = "demos" # notebook subdir to create
 
 # download the notebooks
 def download_notebooks(urls):
+    '''
+    Downloads Jupyter notebooks from the a list of URLs and saves them to the 
+    'source/demos' directory, then generates a list formatted for the documentation. 
+    '''
     notebooks = []
     with tqdm(urls, unit="ipynb") as nb_urls:
         for url in nb_urls :
             notebook = Path(urlparse(url).path)
-            print(notebook)
             nb_urls.set_description(notebook.stem)
             with urlopen(url) as response:
                 (SOURCE / NBDIR / notebook.name).write_bytes(response.read())
             notebooks.append(f"    {NBDIR}/{notebook.stem}")
     return "\n".join(notebooks)
 
-notebooks_load = download_notebooks(NOTEBOOKS_load)
-notebooks_geometry = download_notebooks(NOTEBOOKS_geometry)
-notebooks_advanced = download_notebooks(NOTEBOOKS_advanced)
+notebooks_load = download_notebooks(NOTEBOOKS_load_links)
+notebooks_geometry = download_notebooks(NOTEBOOKS_geometry_links)
+notebooks_advanced = download_notebooks(NOTEBOOKS_advanced_links)
 
 # load template
 tmp = Template((SOURCE / '..' / 'demos-template.rst').read_text())

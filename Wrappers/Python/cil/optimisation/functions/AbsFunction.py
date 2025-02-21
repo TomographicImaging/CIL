@@ -57,7 +57,7 @@ class FunctionOfAbs(Function):
 
     '''
 
-    def __init__(self, function, assume_lower_semi):
+    def __init__(self, function, assume_lower_semi=False):
         self._function = function
         self._lower_semi = assume_lower_semi
         super().__init__(L=function.L)

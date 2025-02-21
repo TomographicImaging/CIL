@@ -1,7 +1,22 @@
 Tutorials
 *********
 
+Load and visualise data
+=======================
+
+.. nbgallery::
+    demos/ZeissDataReader
+    demos/NikonDataReader
+
+Geometry
+=======================
+
 .. nbgallery::
     demos/00_CIL_geometry
+
+Advanced topics
+===============
+
+.. nbgallery::
     demos/deriv2_cgls
     demos/callback_demonstration

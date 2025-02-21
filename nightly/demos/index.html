@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tutorials &#8212; CIL 24.3.1.dev6+g20979278 documentation</title>
+    <title>Tutorials &#8212; CIL 24.3.1.dev7+g842c4296 documentation</title>
   
   
   
@@ -41,30 +41,28 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
 
-    <script src="../_static/documentation_options.js?v=30cdf2e8"></script>
+    <script src="../_static/documentation_options.js?v=550d4d1c"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev6+g20979278';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev7+g842c4296';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex/" />
     <link rel="search" title="Search" href="../search/" />
-    <link rel="next" title="A detailed look at CIL geometry" href="00_CIL_geometry/" />
+    <link rel="next" title="Load and visualise data with ZeissDataReader" href="ZeissDataReader/" />
     <link rel="prev" title="Developers’ Guide" href="../developer_guide/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev6+g20979278" />
+  <meta name="docsearch:version" content="24.3.1.dev7+g842c4296" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -422,9 +420,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="00_CIL_geometry/">A detailed look at CIL geometry</a></li>
-<li class="toctree-l2"><a class="reference internal" href="deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callback_demonstration/">CIL Callbacks How To</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-and-visualise-data">Load and visualise data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ZeissDataReader/">Load and visualise data with ZeissDataReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="NikonDataReader/">Load and visualise data with NikonDataReader</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#geometry">Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="00_CIL_geometry/">A detailed look at CIL geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-topics">Advanced topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="callback_demonstration/">CIL Callbacks How To</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -493,12 +502,36 @@
                   
   <section id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading">#</a></h1>
+<section id="load-and-visualise-data">
+<h2>Load and visualise data<a class="headerlink" href="#load-and-visualise-data" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<div class="nbsphinx-gallery">
+<a class="reference internal" href="ZeissDataReader/">
+  <div><img alt="" src="../_images/demos_ZeissDataReader_16_0.png"></div>
+  <div>Load and visualise data with ZeissDataReader</div>
+</a>
+<a class="reference internal" href="NikonDataReader/">
+  <div><img alt="" src="../_images/demos_NikonDataReader_20_0.png"></div>
+  <div>Load and visualise data with NikonDataReader</div>
+</a>
+</div>
+</div>
+</section>
+<section id="geometry">
+<h2>Geometry<a class="headerlink" href="#geometry" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <div class="nbsphinx-gallery">
 <a class="reference internal" href="00_CIL_geometry/">
   <div><img alt="" src="../_images/demos_00_CIL_geometry_28_5.png"></div>
   <div>A detailed look at CIL geometry</div>
 </a>
+</div>
+</div>
+</section>
+<section id="advanced-topics">
+<h2>Advanced topics<a class="headerlink" href="#advanced-topics" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<div class="nbsphinx-gallery">
 <a class="reference internal" href="deriv2_cgls/">
   <div><img alt="" src="../_images/demos_deriv2_cgls_32_0.png"></div>
   <div>1D inverse problem demo using deriv2 from regtools</div>
@@ -509,6 +542,7 @@
 </a>
 </div>
 </div>
+</section>
 </section>
 
 
@@ -531,11 +565,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="00_CIL_geometry/"
+       href="ZeissDataReader/"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">A detailed look at CIL geometry</p>
+        <p class="prev-next-title">Load and visualise data with ZeissDataReader</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

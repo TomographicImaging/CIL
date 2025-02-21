@@ -515,7 +515,7 @@ Total variation
 Function of Absolute Value 
 --------------------------
 
-.. autoclass:: cil.optimisation.functions.AbsFunction
+.. autoclass:: cil.optimisation.functions.FunctionOfAbs
    :members:
    :inherited-members:
 

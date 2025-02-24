@@ -16,7 +16,6 @@ channels:
   - conda-forge
   - nvidia
   - https://software.repos.intel.com/python/conda
-  - defaults
 dependencies:
   # base (vis. recipe/conda_build_config.yaml)
   - python >=3.10

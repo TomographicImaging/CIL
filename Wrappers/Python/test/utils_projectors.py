@@ -439,8 +439,9 @@ class TestCommon_ProjectionOperator_SIM(SimData):
 
         fp2 = fp.copy()
         fp2.fill(0)
-        Op.direct(self.img_data,out=fp2)
+        fp3 = Op.direct(self.img_data,out=fp2)
         np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
+        np.testing.assert_equal(id(fp2), id(fp3))
 
 
     def test_backward_projectors_functionality(self):
@@ -450,8 +451,9 @@ class TestCommon_ProjectionOperator_SIM(SimData):
 
         bp2 = bp.copy()
         bp2.fill(0)
-        Op.adjoint(self.acq_data,out=bp2)
+        bp3 = Op.adjoint(self.acq_data,out=bp2)
         np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)
+        np.testing.assert_equal(id(bp2), id(bp3))
 
 
     def test_input_arguments(self):
@@ -518,8 +520,9 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
         # test if using data output
 
         v.fill(0)
-        K.adjoint(self.datasplit, out=v)
+        v2 = K.adjoint(self.datasplit, out=v)
         np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
+        np.testing.assert_equal(id(v), id(v2))
 
 
 
@@ -557,5 +560,6 @@ class TestCommon_ProjectionOperatorBlockOperator(object):
 
         check_data_is_the_same(x,y)
         y.fill(0)
-        K.direct(v, out=y)
+        y2 = K.direct(v, out=y)
         check_data_is_the_same(x,y)
+        np.testing.assert_equal(id(y), id(y2))

@@ -155,7 +155,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         Returns
         -------
         DataContainer
-            The processed data. Suppressed if `out` is passed
+            The processed data.
         '''
 
         return self.operator.direct(IM, out=out)
@@ -174,7 +174,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         Returns
         -------
         DataContainer
-            The processed data. Suppressed if `out` is passed
+            The processed data.
         '''
         return self.operator.adjoint(DATA, out=out)
 

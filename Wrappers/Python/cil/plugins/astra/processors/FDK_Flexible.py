@@ -114,6 +114,6 @@ class FDK_Flexible(DataProcessor):
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
-            return out
         else:
             out.fill(arr_out)
+        return out

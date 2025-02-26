@@ -96,7 +96,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
         ref: ${{github.event.after}}
     - id: matrix
       run: |

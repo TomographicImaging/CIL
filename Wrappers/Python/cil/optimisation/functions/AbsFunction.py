@@ -37,7 +37,7 @@ class FunctionOfAbs(Function):
 
     This function is initialised with another CIL function, :math:`H` in the above formula. When this function is called, first the absolute value of the input is taken, and then the input is passed to the provided function, :math:.
 
-    This function defines the proximal operator and convex conjugate, in the case that H is lower semi-continuous, convex, non-decreasing and finite at the origin,  but not the gradient which is not implemented. The calculation of the proximal conjugate from the parent CIL Function class is valid for this function. 
+    This function defines the proximal map and convex conjugate, in the case that H is lower semi-continuous, convex, non-decreasing and finite at the origin,  but not the gradient which is not implemented. The calculation of the proximal conjugate from the parent CIL Function class is valid for this function. 
 
 
     Parameters
@@ -66,11 +66,11 @@ class FunctionOfAbs(Function):
         return call_abs(self._function, x)
 
     def proximal(self, x, tau, out=None):
-        r'''Returns the proximal operator of function :math:`\tau G`  evaluated at x
+        r'''Returns the proximal map of function :math:`\tau G`  evaluated at x
 
         .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
 
-        This is accomplished calculating a bounded proximal operator and making a change of phase,
+        This is accomplished by calculating a bounded proximal map and making a change of phase,
         :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ \Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i angl(z))`,
         and :math:`\circ` is element-wise product.  Also define :math:`prox^+` to be the proximal map of :math:`H`  in which the minimisation carried out over the positive orthant.
 
@@ -85,7 +85,7 @@ class FunctionOfAbs(Function):
 
         Returns
         -------
-        DataContainer, the proximal operator of the function at x with scalar :math:`\tau`.
+        DataContainer, the proximal map of the function at x with scalar :math:`\tau`.
 
         '''
         prox_abs = self._abs_and_project(self._function.proximal)

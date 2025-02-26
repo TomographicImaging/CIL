@@ -40,11 +40,6 @@ class FunctionOfAbs(Function):
     This function defines the proximal operator and convex conjugate, in the case that H is lower semi-continuous, convex, non-decreasing and finite at the origin,  but not the gradient which is not implemented. The calculation of the proximal conjugate from the parent CIL Function class is valid for this function. 
 
 
-    Reference
-    ---------
-    For further details see https://doi.org/10.48550/arXiv.2410.22161
-
-
     Parameters
     ----------
     function : Function
@@ -54,6 +49,11 @@ class FunctionOfAbs(Function):
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.   Default is False.    
 
+
+    Reference
+    ---------
+    For further details see https://doi.org/10.48550/arXiv.2410.22161
+    
     '''
 
     def __init__(self, function, assume_lower_semi=False):
@@ -71,7 +71,7 @@ class FunctionOfAbs(Function):
         .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
 
         This is accomplished calculating a bounded proximal operator and making a change of phase,
-        :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i angl(z))`,
+        :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ \Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i angl(z))`,
         and :math:`\circ` is element-wise product.  Also define :math:`prox^+` to be the proximal map of :math:`H`  in which the minimisation carried out over the positive orthant.
 
 
@@ -100,16 +100,13 @@ class FunctionOfAbs(Function):
         If H = self._function is lower semi-continuous, convex, non-decreasing 
         finite at the origin, then :math:`G^*(z*) = H^+(|z*|)`, where the monotone conjugate :math:`g^+` is
 
-        .. math:: H^+(z*) =sup {(z, z*) - H(z) : z >= O}
+        .. math:: H^+(z^*) =sup {(z, z^*) - H(z) : z >= O}
 
         The monotone conjugate will therefore be less than or equal to the convex conjugate, 
         since it is taken over a smaller set.  It is not available directly, but may coincide with
         the convex conjugate, which is therefore the best estimate we have.  This is only valid for
         real x. In other cases, a general convex conjugate is not available or defined.      
 
-        Reference
-        ---------
-        Convex Analysis, R. Tyrrell Rocakfellar, pp110-111
 
         Parameters
         ----------
@@ -118,6 +115,11 @@ class FunctionOfAbs(Function):
         Returns
         -------
         The value of the convex conjugate of the function at x.
+        
+        Reference
+        ---------
+        Convex Analysis, R. Tyrrell Rocakfellar, pp110-111
+        
         '''
 
         if self._lower_semi:

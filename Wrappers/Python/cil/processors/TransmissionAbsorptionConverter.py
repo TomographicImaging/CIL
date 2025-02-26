@@ -94,11 +94,15 @@ class TransmissionAbsorptionConverter(DataProcessor):
             numpy.clip(arr_in, self.min_intensity, None, out=arr_out)
             arr_in = arr_out
 
-        #beer-lambert
+        # we choose an arbitrary chunk size of 6400, which is a multiple of 32, to allow for efficient threading
         chunk_size = 6400
         num_chunks = data.size // chunk_size
+        # Accelerate using numba if _accelerated is True, 
+        # and if the calculated number of chunks is greater than 5, to avoid making the overhead of threading too large
         if (self._accelerated) & (num_chunks > 5):
+            # we process in an integer number of chunks, so calculate the remainder to process after the loop
             remainder = data.size % chunk_size
+            # set the number of threads to the value specified in cil_mp.NUM_THREADS
             num_threads_original = numba.get_num_threads()
             numba.set_num_threads(cil_mp.NUM_THREADS)
             numba_loop(arr_in, num_chunks, chunk_size, remainder, arr_out)
@@ -120,11 +124,13 @@ def numba_loop(arr_in, num_chunks, chunk_size, remainder, arr_out):
     for i in numba.prange(num_chunks):
         start = i * chunk_size
         end = start + chunk_size
+        #beer-lambert
         out_flat[start:end] = -numpy.log(in_flat[start:end])
 
     if remainder > 0:
         start = num_chunks * chunk_size
         end = start + remainder
+        #beer-lambert
         out_flat[start:end] = -numpy.log(in_flat[start:end])
 
 

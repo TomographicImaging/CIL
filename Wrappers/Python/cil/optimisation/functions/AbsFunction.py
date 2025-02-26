@@ -97,7 +97,7 @@ class FunctionOfAbs(Function):
 
         .. math:: G^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - G(x)
 
-        If H = self._function is lower semi-continuous, convex, non-decreasing 
+        If :math:`H` is lower semi-continuous, convex, non-decreasing 
         finite at the origin, then :math:`G^*(z*) = H^+(|z*|)`, where the monotone conjugate :math:`g^+` is
 
         .. math:: H^+(z^*) =sup {(z, z^*) - H(z) : z >= O}
@@ -127,7 +127,7 @@ class FunctionOfAbs(Function):
             return conv_abs(self._function, x)
         else:
             raise NotImplementedError(
-                'Convex conjugate not available for this function. If you are sure your function is lower semi-continuous, convex, non-decreasing and finite at the origin, set assume_lower_semi=True')
+                'Convex conjugate not available for this function. If you are sure your function is lower semi-continuous, convex, non-decreasing and finite at the origin, set `assume_lower_semi=True`')
 
     def _take_abs_input(self, func):
         '''decorator for function to act on abs of input of a method'''

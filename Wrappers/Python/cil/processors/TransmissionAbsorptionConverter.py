@@ -69,6 +69,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
 
+        # Check if this is slow. Maybe we can remove this and catch the error when we run log
         if data.min() <= 0 and self.min_intensity <= 0:
             raise ValueError('Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.')
 
@@ -84,12 +85,14 @@ class TransmissionAbsorptionConverter(DataProcessor):
         arr_in = data.as_array()
         arr_out = out.as_array()
 
-        #whitelevel
+        #whitelevel. 
+        # Move this inside the numba loop. Check if it's quicker to always divide even if =1, or we have if statement in loop or make 2 different loops
+        # Multiply by 1/white level instead of divide?
         if self.white_level != 1:
             numpy.divide(arr_in, self.white_level, out=arr_out)
             arr_in = arr_out
 
-        #threshold
+        #threshold. Move this inside the numba loop and get rid of check? If log fails catch error. If they process in place this will corrupt the data if it fails half way through
         if self.min_intensity > 0:
             numpy.clip(arr_in, self.min_intensity, None, out=arr_out)
             arr_in = arr_out

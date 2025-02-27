@@ -3,7 +3,7 @@
       - Fix deprecation warning for rtol and atol in GD (#2056)
       - Removed the deprecated usage of run method in test_SIRF.py (#2070)
   - Enhancements:
-      - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036
+      - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036)
       - Made the call to next() in algorithm iteration loop explicit (#2069)
 
 * 24.3.0

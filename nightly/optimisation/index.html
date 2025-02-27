@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev8+ge16c5ee5 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev9+gf17d33ba documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
 
-    <script src="../_static/documentation_options.js?v=cb9707b1"></script>
+    <script src="../_static/documentation_options.js?v=961df404"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev8+ge16c5ee5';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev9+gf17d33ba';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev8+ge16c5ee5" />
+  <meta name="docsearch:version" content="24.3.1.dev9+gf17d33ba" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -3365,7 +3365,7 @@ If <cite>None</cite> is passed, the cache is cleared prompting the function to c
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.LinearOperator.PowerMethod">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PowerMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PowerMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Link to this definition">#</a></dt>
 <dd><p>Power method or Power iteration algorithm</p>
 <p>The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
 absolute value in the real case and modulus in the complex case.</p>
@@ -3374,10 +3374,11 @@ absolute value in the real case and modulus in the complex case.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>)</p></li>
 <li><p><strong>max_iteration</strong> (positive:<cite>int</cite>, default=10) – Number of iterations for the Power method algorithm.</p></li>
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point for the Power method.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em><em>, </em><em>optional</em>) – Starting point for the Power method.</p></li>
 <li><p><strong>tolerance</strong> (positive:<cite>float</cite>, default = 1e-5) – Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</p></li>
 <li><p><strong>return_all</strong> (<cite>boolean</cite>, default = False) – Toggles the verbosity of the return</p></li>
 <li><p><strong>method</strong> (<cite>string</cite> one of <cite>“auto”</cite>, <cite>“composed_with_adjoint”</cite> and <cite>“direct_only”</cite>, default = <cite>“auto”</cite>) – The default <cite>auto</cite> lets the code choose the method, this can be specified with <cite>“direct_only”</cite> or <cite>“composed_with_adjoint”</cite></p></li>
+<li><p><strong>seed</strong> (<cite>int</cite> or default = None, optional) – If initial is not provided, this random is seed used by the random number generator to create the <cite>initial</cite> starting point</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

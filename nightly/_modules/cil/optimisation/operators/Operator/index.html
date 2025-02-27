@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.Operator &#8212; CIL 24.3.1.dev8+ge16c5ee5 documentation</title>
+    <title>cil.optimisation.operators.Operator &#8212; CIL 24.3.1.dev9+gf17d33ba documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
 
-    <script src="../../../../../_static/documentation_options.js?v=cb9707b1"></script>
+    <script src="../../../../../_static/documentation_options.js?v=961df404"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev8+ge16c5ee5';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev9+gf17d33ba';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev8+ge16c5ee5" />
+  <meta name="docsearch:version" content="24.3.1.dev9+gf17d33ba" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -731,8 +731,8 @@
 <div class="viewcode-block" id="LinearOperator.PowerMethod">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.LinearOperator.PowerMethod">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">PowerMethod</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>  <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Power method or Power iteration algorithm </span>
 
 <span class="sd">        The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,</span>
 <span class="sd">        absolute value in the real case and modulus in the complex case.</span>
@@ -743,7 +743,7 @@
 <span class="sd">        operator: LinearOperator</span>
 <span class="sd">        max_iteration: positive:`int`, default=10</span>
 <span class="sd">            Number of iterations for the Power method algorithm.</span>
-<span class="sd">        initial: DataContainer, default = None</span>
+<span class="sd">        initial: DataContainer, default = None, optional</span>
 <span class="sd">            Starting point for the Power method.</span>
 <span class="sd">        tolerance: positive:`float`, default = 1e-5</span>
 <span class="sd">            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</span>
@@ -751,7 +751,8 @@
 <span class="sd">            Toggles the verbosity of the return</span>
 <span class="sd">        method: `string` one of `&quot;auto&quot;`, `&quot;composed_with_adjoint&quot;` and `&quot;direct_only&quot;`, default = `&quot;auto&quot;`</span>
 <span class="sd">            The default `auto` lets the code choose the method, this can be specified with `&quot;direct_only&quot;` or `&quot;composed_with_adjoint&quot;`</span>
-
+<span class="sd">        seed: `int` or default = None, optional</span>
+<span class="sd">            If initial is not provided, this random is seed used by the random number generator to create the `initial` starting point</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -817,7 +818,7 @@
                     <span class="n">apply_adjoint</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">x0</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x0</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 

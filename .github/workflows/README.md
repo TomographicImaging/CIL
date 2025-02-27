@@ -27,7 +27,7 @@ Details on some of these jobs are given below.
 When opening or modifying a pull request to `master`, two variants are built and tested (for linux with minimum & maximum supported `python` & `numpy` versions).
 
 > [!NOTE]
-> When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
+> When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested. To run these tests on a push to a PR, include `#all-tests` in your commit message. You might wish to do this if you are making changes to GitHub actions or CIL dependencies or when preparing for a release.
 
 <!-- <br/> -->
 

@@ -37,3 +37,4 @@ dependencies:
   - pip
   - pip:
     - git+https://github.com/pydata/pydata-sphinx-theme
+    - unittest-parametrize # Needs to be here?

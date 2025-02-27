@@ -515,6 +515,26 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         test2 = np.ndarray([2,5,3,4])
         self.assertEqual(test.shape, test2.shape)
 
+        test3 = AG.allocate('random')
+        self.assertEqual(test3.shape, test2.shape)
+
+        test4 = AG.allocate('random', seed=42)
+        test5 = AG.allocate('random', seed=42)
+        self.assertEqual(test4.shape, test2.shape)
+        np.testing.assert_array_almost_equal(test4.array, test5.array)
+
+        test6 = AG.allocate('random_int')
+        self.assertEqual(test6.shape, test2.shape)
+        self.assertEqual(test6.dtype, AG.dtype)
+
+        test7 = AG.allocate('random_int', seed=42, max_value=10, dtype=np.uint8)
+        self.assertEqual(test7.shape, test2.shape)
+        self.assertEqual(test7.dtype, np.uint8)
+        self.assertTrue(np.all(test7 < 10))
+
+        test7 = AG.allocate(11)
+        np.testing.assert_array_almost_equal(test7.array, np.ones([2,5,3,4])*11)
+
     def test_get_ImageGeometry(self):
 
         AG = AcquisitionGeometry.create_Parallel2D()\

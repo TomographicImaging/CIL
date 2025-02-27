@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 24.3.1.dev7+g842c4296 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 24.3.1.dev8+ge16c5ee5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
 
-    <script src="../_static/documentation_options.js?v=550d4d1c"></script>
+    <script src="../_static/documentation_options.js?v=cb9707b1"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer_guide';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev7+g842c4296';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev8+ge16c5ee5';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev7+g842c4296" />
+  <meta name="docsearch:version" content="24.3.1.dev8+ge16c5ee5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -432,6 +432,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#github-actions">Github Actions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
@@ -771,6 +772,12 @@ make dirhtml web serve
 <span class="n">limitations</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span><span class="o">.</span>
 </pre></div>
 </div>
+</section>
+<section id="github-actions">
+<h2>Github Actions<a class="headerlink" href="#github-actions" title="Link to this heading">#</a></h2>
+<p>If you open a pull request, continuous integration (CI) via github actions will run automatically. The CI will run the tests and build the documentation. For more information please see the GHA README for CIL: <a class="github reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">TomographicImaging/CIL</a>.</p>
+<p>When opening or modifying a pull request to master, two variants are built and tested (for linux with minimum &amp; maximum supported python &amp; numpy versions). When pushing to master or creating an annotated tag, all variants are built and tested. To test all variants on a pull request to master, use <cite>#all-tests</cite> in your commit message. You might wish to do this if you are making changes to github actions or CIL dependencies or when preparing for a release.</p>
+<p>To skip tests, include one of the following in your commit message <cite>[skip ci]</cite>, <cite>[ci skip]</cite>, <cite>[no ci]</cite>, <cite>[skip actions]</cite> or <cite>[actions skip]</cite>. For merging into CIL master, we must see the tests pass.</p>
 </section>
 </section>
 

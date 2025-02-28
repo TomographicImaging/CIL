@@ -19,7 +19,7 @@
 
 import unittest
 import numpy as np
-from cil.optimisation.utilities import ConstantMomentum, NesterovMomentum, MomentumCoefficient
+from cil.optimisation.algorithms.APGD import ConstantMomentum, NesterovMomentum, ScalarMomentumCoefficient
 
 class MockAlgorithm:
     pass  # Placeholder for any required algorithm attributes
@@ -55,7 +55,7 @@ class TestMomentumCoefficients(unittest.TestCase):
         self.assertAlmostEqual(second_value, expected_next_momentum, places=6, msg="Incorrect second iteration momentum value")
         
     def test_momentum_coefficient_abc(self):
-        class InvalidMomentum(MomentumCoefficient):
+        class InvalidMomentum(ScalarMomentumCoefficient):
             pass
         
         with self.assertRaises(TypeError):

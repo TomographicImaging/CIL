@@ -18,7 +18,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
-from cil.optimisation.utilities import ConstantStepSize, StepSizeRule, NesterovMomentum, MomentumCoefficient, ConstantMomentum
+from cil.optimisation.utilities import ConstantStepSize, StepSizeRule
 import numpy
 import logging
 from numbers import Real, Number
@@ -118,7 +118,7 @@ class ISTA(Algorithm):
             return self.step_size_rule.step_size
         else:
             warnings.warn(
-                "Note the step-size is set by a step-size rule and could change with each iteration")
+                "Note the step-size is set by a step-size rule and could change wit each iteration")
             return self.step_size_rule.get_step_size()
 
     # Set default step size
@@ -170,9 +170,6 @@ class ISTA(Algorithm):
             self.step_size_rule = ConstantStepSize(step_size)
         elif isinstance(step_size, StepSizeRule):
             self.step_size_rule = step_size
-        else:
-            raise TypeError(
-                "step_size must be a real number or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`")
         
         self.preconditioner = preconditioner
 
@@ -232,127 +229,8 @@ class ISTA(Algorithm):
         
         """
         return self.f(x) + self.g(x)
-    
-    
-class APGD(ISTA):
-    
-    r"""Accelerated Proximal Gradient Descent (APGD), is used to solve:
-    
-    .. math:: \min_{x} f(x) + g(x)
 
-    where :math:`f` is differentiable and :math:`g` has a *simple* proximal operator.
-
-
-    In each update the algorithm completes the following steps:
-
-    .. math::
-
-        \begin{cases}
-                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                y_{k+1} = x_{k} + M(x_{k} - x_{k-1})
-        \end{cases}
-
-    where :math:`\alpha` is the :code:`step_size` and :math:`M` is the momentum coefficient.
-
-    Note that the above applies for :math:`k\geq 1`. For :math:`k=0`, :math:`x_{0}` and :math:`y_{0}` are initialised to `initial`, and :math:`t_{1}=1`.
-    
-    Parameters
-    ----------
-    initial : DataContainer
-            Starting point of the algorithm
-    f : Function
-        Differentiable function.  If `None` is passed, the algorithm will use the ZeroFunction.
-    g : Function or `None`
-        Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
-    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
-                Step size for the gradient step of ISTA. If a float is passed, this is used as a constant step size. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then it's method :meth:`get_step_size` is called for each update.
-                The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
-    preconditioner : class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
-            This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed  then `self.gradient_update` will remain unmodified.
-    momentum : float or child class of :meth:`cil.optimisation.utilities.MomentumCoefficient`, default = None
-            Momentum coefficient. If a float is passed, this is used as a constant momentum coefficient. If a child class of :meth:`cil.optimisation.utilities.MomentumCoefficient` is passed then it's method :meth:`__call__` is called for each update. The default momentum coefficient is the Nesterov momentum coefficient. 
-    
-    Note
-    -----
-    Running this algorithm with the default step size and the default momentum coefficient is equivalent to running the FISTA algorithm.
-    
-    """
-
-    
-    def __init__(self, initial, f, g, step_size=None,  preconditioner=None, momentum=None,  **kwargs):
-
-        self.y = initial.copy()
-
-        self.set_momentum(momentum)
-            
-        super(APGD, self).__init__(initial=initial, f=f, g=g,
-                                    step_size=step_size,  preconditioner=preconditioner, **kwargs)
-        
-    def _calculate_default_step_size(self):
-        """Calculate the default step size if a step size rule or step size is not provided 
-        """
-        return 1./self.f.L
-    
-    def _provable_convergence_condition(self):
-        if self.preconditioner is not None:
-            raise NotImplementedError(
-                "Can't check convergence criterion if a preconditioner is used ")
-
-
-        if isinstance(self.step_size_rule, ConstantStepSize) and isinstance(self.momentum, NesterovMomentum):
-            return self.step_size_rule.step_size <= 1./self.f.L
-        else:
-            raise TypeError(
-                "Can't check convergence criterion for non-constant step size or non-Nesterov momentum coefficient")
-            
-            
-    @property
-    def momentum(self):        
-       return self._momentum  
-
-    def set_momentum(self, momentum):
-
-        if momentum is None:
-            self._momentum = NesterovMomentum()
-        else:
-            if isinstance(momentum, Number):
-                self._momentum = ConstantMomentum(momentum)  
-            elif isinstance(momentum, MomentumCoefficient):
-                self._momentum = momentum
-            else:
-                raise TypeError("Momentum must be a number or a child class of MomentumCoefficient")
-        
-    def update(self):
-        r"""Performs a single iteration of APGD. For :math:`k\geq 1`:
-
-        .. math::
-
-            \begin{cases}
-                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                y_{k+1} = x_{k} + M(x_{k} - x_{k-1})
-            \end{cases}
-
-        """
-
-        self.f.gradient(self.y, out=self.gradient_update)
-
-        if self.preconditioner is not None:
-            self.preconditioner.apply(
-                self, self.gradient_update, out=self.gradient_update)
-
-        step_size = self.step_size_rule.get_step_size(self)
-
-        self.y.sapyb(1., self.gradient_update, -step_size, out=self.y)
-
-        self.g.proximal(self.y, step_size, out=self.x)
-
-        self.x.subtract(self.x_old, out=self.y)
-        
-        momentum = self.momentum(self)
-        self.y.sapyb(momentum, self.x, 1.0, out=self.y)
-        
-
-class FISTA(APGD):
+class FISTA(ISTA):
 
     r"""Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, is used to solve:
 
@@ -424,7 +302,6 @@ class FISTA(APGD):
 
     """
 
-
     def _calculate_default_step_size(self):
         """Calculate the default step size if a step size rule or step size is not provided 
         """
@@ -443,12 +320,42 @@ class FISTA(APGD):
             raise TypeError(
                 "Can't check convergence criterion for non-constant step size")
 
+    def __init__(self, initial, f, g, step_size=None,  preconditioner=None, **kwargs):
 
-    def __init__(self, initial, f, g, step_size = None, preconditioner=None, momentum=None, **kwargs):
-                     
         self.y = initial.copy()
+        self.t = 1
         super(FISTA, self).__init__(initial=initial, f=f, g=g,
-                                    step_size=step_size,  preconditioner=preconditioner, momentum=None,  **kwargs)
+                                    step_size=step_size,  preconditioner=preconditioner, **kwargs)
 
+    def update(self):
+        r"""Performs a single iteration of FISTA. For :math:`k\geq 1`:
 
+        .. math::
+
+            \begin{cases}
+                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+                t_{k+1} = \frac{1+\sqrt{1+ 4t_{k}^{2}}}{2}\\
+                y_{k+1} = x_{k} + \frac{t_{k}-1}{t_{k+1}}(x_{k} - x_{k-1})
+            \end{cases}
+
+        """
+
+        self.t_old = self.t
+
+        self.f.gradient(self.y, out=self.gradient_update)
+
+        if self.preconditioner is not None:
+            self.preconditioner.apply(
+                self, self.gradient_update, out=self.gradient_update)
+
+        step_size = self.step_size_rule.get_step_size(self)
+
+        self.y.sapyb(1., self.gradient_update, -step_size, out=self.y)
+
+        self.g.proximal(self.y, step_size, out=self.x)
+
+        self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
+
+        self.x.subtract(self.x_old, out=self.y)
+        self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y)
 

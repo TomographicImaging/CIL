@@ -30,7 +30,8 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, NesterovMomentum, MomentumCoefficient, ConstantMomentum
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks
+from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
@@ -1797,3 +1798,4 @@ class Test_PD3O(unittest.TestCase):
         # pd30 vs fista
         np.testing.assert_allclose(
             tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
+

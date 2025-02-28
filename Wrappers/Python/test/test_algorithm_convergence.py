@@ -145,13 +145,12 @@ class TestAlgorithmConvergence(CCPiTestClass):
         
     
 
-    def test_FISTA_momentum(self):
+    def test_APGD_dossal_chambolle(self):
         
         np.random.seed(10)
         n = 100  
         m = 50 
         A = np.random.normal(0,1, (m, n)).astype('float32') 
-        # A /= np.linalg.norm(A, axis=1, keepdims=True)
         b = np.random.normal(0,1, m).astype('float32')
         reg = 0.5
         
@@ -174,8 +173,8 @@ class TestAlgorithmConvergence(CCPiTestClass):
         np.testing.assert_allclose(fista.solution.array, u_cvxpy.value, atol=1e-3)
 
         # fista Dossal Chambolle "On the convergence of the iterates of ”FISTA”
-        from cil.optimisation.algorithms.FISTA import MomentumCoefficient
-        class DossalChambolle(MomentumCoefficient):        
+        from cil.optimisation.algorithms.APGD import ScalarMomentumCoefficient
+        class DossalChambolle(ScalarMomentumCoefficient):        
             def __call__(self, algo=None):
                 return (algo.iteration-1)/(algo.iteration+50)
         momentum = DossalChambolle()

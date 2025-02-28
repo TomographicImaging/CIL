@@ -17,21 +17,26 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
-import warnings
+import logging
 import numpy
 import numba
 from cil.utilities import multiprocessing as cil_mp
 
+log = logging.getLogger(__name__)
+
 class TransmissionAbsorptionConverter(DataProcessor):
 
     r'''Processor to convert from transmission measurements to absorption
-    based on the Beer-Lambert law
+    based on the Beer-Lambert law, by:
+    - dividing by white_level, 
+    - clipping data to min_intensity (any values below min intensity are set to min_intensity) 
+    - taking the logarithm and multiplying by minus 1. 
+    If the data contains zero or negative values, inf or NaN values will be present in the output.
 
     Parameters:
     -----------
     min_intensity: float, default=0
         Clips data below this value to ensure log is taken of positive numbers only. 
-        If it's unknown whether the data contains non-positive values, set this parameter to a small positive value.
     
     white_level: float, default=1.0
         A float defining incidence intensity in the Beer-Lambert law.
@@ -45,9 +50,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     Notes:
     ------
-    Processor first divides by white_level, then clips data to min_intensity (elements below min intensity are set to min_intensity) 
-    and then takes negative logarithm. If non-positive values are present in the data after clipping, NaN and inf values will be present in the output,
-    it's therefore recommended to set min_intensity to a small positive value if it's unknown whether the data contains non-positive values.
+    If it's unknown whether the data contains zero or negative values, it's recommended to set min_intensity to a 
+    small positive value.
     '''
 
     def __init__(self,
@@ -70,8 +74,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
                             ' - DataContainer')
 
         if self.min_intensity <= 0:
-            warning = f"\n Current min_intensity = {self.min_intensity}: ensure your data only contains positive values or set min_intensity to a small positive value, otherwise output may contain NaN or inf."
-            warnings.warn(warning)
+            log.info(f"\n Current min_intensity = {self.min_intensity}: output may contain NaN or inf. Ensure your data only contains positive values or set min_intensity to a small positive value.")
         
         return True
 
@@ -121,8 +124,6 @@ def numba_loop(arr_in, num_chunks, chunk_size, remainder, multiplier, min_intens
         end = start + chunk_size
         out_flat[start:end] = numpy.multiply(in_flat[start:end], multiplier)
         out_flat[start:end] = numpy.clip(out_flat[start:end], min_intensity, None)
-        # if numpy.any(out_flat[start:end]<=0):
-        #     warning_flag = True
         out_flat[start:end] = -numpy.log(out_flat[start:end])
 
 
@@ -131,8 +132,6 @@ def numba_loop(arr_in, num_chunks, chunk_size, remainder, multiplier, min_intens
         end = start + remainder
         out_flat[start:end] = numpy.multiply(in_flat[start:end], multiplier)
         out_flat[start:end] = numpy.clip(out_flat[start:end], min_intensity, None)
-        # if numpy.any(out_flat[start:end]<=0):
-        #     warning_flag = True
         out_flat[start:end] = -numpy.log(out_flat[start:end])
 
 

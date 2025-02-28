@@ -35,7 +35,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     Parameters:
     -----------
-    min_intensity: float, default=0
+    min_intensity: float, default=0.0
         Clips data below this value to ensure log is taken of positive numbers only. 
     
     white_level: float, default=1.0
@@ -55,7 +55,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
     '''
 
     def __init__(self,
-                 min_intensity = 0,
+                 min_intensity = 0.0,
                  white_level = 1.0,
                  accelerated = True,
                  ):

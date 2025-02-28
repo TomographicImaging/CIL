@@ -34,6 +34,7 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
@@ -383,6 +384,21 @@ class TestBinner(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
+    def test_process_acquisition_geometry_cone3Dsouv(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+
+        roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        proc = Binner(roi=roi)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_image_geometry(self):
 
@@ -1058,6 +1074,22 @@ class TestSlicer(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
+    def test_process_acquisition_geometry_cone3Dsouv(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+
+        roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        proc = Slicer(roi=roi)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
+       
 
     def test_process_image_geometry(self):
 
@@ -1564,7 +1596,27 @@ class TestCofR_xcorrelation(unittest.TestCase):
         processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
         with self.assertRaises(ValueError):
             processor.set_input(data_limited)           
+
+
+class TestCofR_image_sharpness(unittest.TestCase):
     
+    def test_process_acquisition_geometry_cone3Dsouv(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        data = ag.allocate('random')
+
+        #mock the _configure_FBP method to bypass the backprojector setup
+        with patch.object(CofR_image_sharpness, '_configure_FBP', return_value=None):
+            corr = CofR_image_sharpness()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(data)
+
+
 class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def setUp(self):
@@ -1667,7 +1719,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
-class TestPaddder(unittest.TestCase):
+class TestPadder(unittest.TestCase):
 
     def setUp(self):
 
@@ -1814,6 +1866,18 @@ class TestPaddder(unittest.TestCase):
         self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
+    def test_process_acquisition_geometry_cone3Dsouv(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_acquisition_geometry_origin(self):
         geometry = self.ag2

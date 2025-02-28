@@ -127,7 +127,6 @@ else:
     has_numba = True
 system_state['has_numba']= has_numba
 
-# has_matplotlib
 module_info = importlib.util.find_spec("matplotlib")
 if module_info is None:
     has_matplotlib = False

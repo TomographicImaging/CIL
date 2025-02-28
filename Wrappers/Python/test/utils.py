@@ -127,6 +127,14 @@ else:
     has_numba = True
 system_state['has_numba']= has_numba
 
+# has_matplotlib
+module_info = importlib.util.find_spec("matplotlib")
+if module_info is None:
+    has_matplotlib = False
+else:
+    has_matplotlib = True
+system_state['has_matplotlib'] = has_matplotlib
+
 
 # to disable prints from 3rd part libraries and tests
 def disable_print():

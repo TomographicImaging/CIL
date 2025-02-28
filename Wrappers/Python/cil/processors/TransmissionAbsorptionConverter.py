@@ -31,7 +31,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
     -----------
     min_intensity: float, default=0
         Clips data below this value to ensure log is taken of positive numbers only. 
-        If you're unsure whether the data contains non-positive values, set this parameter to a small positive value.
+        If it's unknown whether the data contains non-positive values, set this parameter to a small positive value.
     
     white_level: float, default=1.0
         A float defining incidence intensity in the Beer-Lambert law.
@@ -45,8 +45,9 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     Notes:
     ------
-    Processor first divides by white_level (default=1) and then take negative logarithm.
-    Elements below threshold (after division by white_level) are set to threshold.
+    Processor first divides by white_level, then clips data to min_intensity (elements below min intensity are set to min_intensity) 
+    and then takes negative logarithm. If non-positive values are present in the data after clipping, NaN and inf values will be present in the output,
+    it's therefore recommended to set min_intensity to a small positive value if it's unknown whether the data contains non-positive values.
     '''
 
     def __init__(self,
@@ -69,7 +70,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
                             ' - DataContainer')
 
         if self.min_intensity <= 0:
-            warnings.warn(f"Please ensure your data only contains positive values or set min_intensity to a small positive value. Current min_intensity = {self.min_intensity}. ")
+            warning = f"\n Current min_intensity = {self.min_intensity}: ensure your data only contains positive values or set min_intensity to a small positive value, otherwise output may contain NaN or inf."
+            warnings.warn(warning)
         
         return True
 
@@ -119,13 +121,19 @@ def numba_loop(arr_in, num_chunks, chunk_size, remainder, multiplier, min_intens
         end = start + chunk_size
         out_flat[start:end] = numpy.multiply(in_flat[start:end], multiplier)
         out_flat[start:end] = numpy.clip(out_flat[start:end], min_intensity, None)
+        # if numpy.any(out_flat[start:end]<=0):
+        #     warning_flag = True
         out_flat[start:end] = -numpy.log(out_flat[start:end])
+
 
     if remainder > 0:
         start = num_chunks * chunk_size
         end = start + remainder
         out_flat[start:end] = numpy.multiply(in_flat[start:end], multiplier)
         out_flat[start:end] = numpy.clip(out_flat[start:end], min_intensity, None)
+        # if numpy.any(out_flat[start:end]<=0):
+        #     warning_flag = True
         out_flat[start:end] = -numpy.log(out_flat[start:end])
+
 
 

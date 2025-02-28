@@ -19,7 +19,6 @@
 import unittest
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
-from cil.utilities.display import show2D
 from cil.utilities import dataexample
 from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 

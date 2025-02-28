@@ -18,16 +18,20 @@
 # Kyle Pidgeon (UKRI-STFC)
 
 
-#%%
+try:
+    import matplotlib.lines as mlines
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import FancyArrowPatch
+except ImportError as exc:
+    msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
+    raise ImportError(f"Please install {msg}") from exc
+
 from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 from cil.framework.labels import AcquisitionType
 import numpy as np
 import warnings
 
 import os
-import matplotlib.lines as mlines
-import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from itertools import cycle

@@ -18,7 +18,6 @@
 
 from cil.framework import Processor, AcquisitionData
 from cil.framework.labels import AcquisitionDimension, AcquisitionType
-import matplotlib.pyplot as plt
 import scipy
 import numpy as np
 import logging
@@ -231,6 +230,12 @@ class CofR_image_sharpness(Processor):
         return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError as exc:
+            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
+            raise ImportError(f"Please install {msg}") from exc
+
         x=[x / vox_size for x in offsets]
         y=values
 

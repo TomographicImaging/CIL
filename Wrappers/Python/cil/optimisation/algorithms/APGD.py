@@ -119,8 +119,8 @@ class APGD(Algorithm):
                 The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
     preconditioner: class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. 
-    momentum : float or child class of :meth:`cil.optimisation.utilities.MomentumCoefficient`, default = None
-            Momentum coefficient. If a float is passed, this is used as a constant momentum coefficient. If a child class of :meth:`cil.optimisation.utilities.MomentumCoefficient` is passed then it's method :meth:`__call__` is called for each update. The default momentum coefficient is the Nesterov momentum coefficient. 
+    momentum : float or child class of :meth:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`, default = None
+            Momentum coefficient.  The default momentum coefficient is the Nesterov momentum coefficient. 
     
 
     kwargs: Keyword arguments

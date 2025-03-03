@@ -1,5 +1,5 @@
 
-from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD
+from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD, GD
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule

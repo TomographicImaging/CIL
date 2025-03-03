@@ -45,7 +45,7 @@ An algorithm is designed for a particular generic optimisation problem accepts a
 instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to
 define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop.
-The user can provide a stopping criterion different than the defaul.
+The user can provide a stopping criterion different than the default.
 
 New algorithms can be easily created by extending the :code:`Algorithm` class.
 The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
@@ -113,7 +113,7 @@ The Fast Iterative Soft Thresholding Algorithm (FISTA).
 
 APGD
 -----
-The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momemtum or a momentum that is updated at each iteration. Note that in CIL, running this algorithm with the default step size and the default momentum coefficient is equivalent to running the FISTA algorithm.
+The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momemtum or a momentum that is updated at each iteration. 
 
 .. autoclass:: cil.optimisation.algorithms.APGD
    :members:

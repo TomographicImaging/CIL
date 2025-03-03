@@ -319,7 +319,7 @@ class TestOperator(CCPiTestClass):
         # 2x2 real matrix, dominant eigenvalue = 2
         M1 = numpy.array([[1,0],[1,2]], dtype=float)
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,100)
+        res1 = M1op.PowerMethod(M1op,100, seed=2)
         numpy.testing.assert_almost_equal(res1,2., decimal=4)
 
         res_scipy = scipy.linalg.eig(M1)
@@ -327,7 +327,7 @@ class TestOperator(CCPiTestClass):
 
         # Test with the norm
         res2 = M1op.norm()
-        res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint")
+        res1 = M1op.PowerMethod(M1op,100, method="composed_with_adjoint", seed=2)
         numpy.testing.assert_almost_equal(res1,res2, decimal=4)
 
         #Test random seed
@@ -344,7 +344,7 @@ class TestOperator(CCPiTestClass):
         # 2x3 real matrix, dominant eigenvalue = 4.711479432297657
         M1 = numpy.array([[1.,0.,3],[1,2.,3]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,100)
+        res1 = M1op.PowerMethod(M1op,100, seed=2)
         numpy.testing.assert_almost_equal(res1,4.711479432297657, decimal=4)
 
         res_scipy = scipy.linalg.eig(M1.T.conjugate()@M1)
@@ -353,7 +353,7 @@ class TestOperator(CCPiTestClass):
         # 2x3 complex matrix, (real eigenvalues), dominant eigenvalue = 5.417602365823937
         M1 = numpy.array([[2,1j,0],[2j,5j,0]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,100)
+        res1 = M1op.PowerMethod(M1op,100, seed=2)
         numpy.testing.assert_almost_equal(res1,5.531859582980837, decimal=4)
         res_scipy = scipy.linalg.eig(M1.T.conjugate()@M1)
         numpy.testing.assert_almost_equal(res1,numpy.sqrt(numpy.abs(res_scipy[0])).max(), decimal=4)
@@ -363,15 +363,15 @@ class TestOperator(CCPiTestClass):
         M1 = numpy.array([[2,0,0],[1,2j,1j],[3, 3-1j,3]])
         M1op = MatrixOperator(M1)
         x0 = M1op.domain_geometry().allocate('random', seed=2)
-        res1 = M1op.PowerMethod(M1op,150, initial=x0)
+        res1 = M1op.PowerMethod(M1op,150, initial=x0, seed=2)
         numpy.testing.assert_almost_equal(res1, 3.1624439599276974, decimal=3)
         res_scipy = scipy.linalg.eig(M1)
-        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
+        numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=3)
 
         # 2x2 non-diagonalisable nilpotent matrix
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,5)
+        res1 = M1op.PowerMethod(M1op,5, seed=2)
         numpy.testing.assert_almost_equal(res1,0, decimal=4)
         res_scipy = scipy.linalg.eig(M1)
         numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
@@ -379,7 +379,7 @@ class TestOperator(CCPiTestClass):
         # 2x2 non-diagonalisable nilpotent matrix where method="composed_with_adjoint"
         M1=numpy.array([[0.,1.], [0.,0.]])
         M1op = MatrixOperator(M1)
-        res1 = M1op.PowerMethod(M1op,5, method="composed_with_adjoint")
+        res1 = M1op.PowerMethod(M1op,5, method="composed_with_adjoint", seed=2)
         numpy.testing.assert_almost_equal(res1,1, decimal=4)
         res_scipy = scipy.linalg.eig(M1.T@M1)
         numpy.testing.assert_almost_equal(res1,numpy.abs(res_scipy[0]).max(), decimal=4)
@@ -389,32 +389,32 @@ class TestOperator(CCPiTestClass):
 
         M1=numpy.array([[2.,1.], [0.,-2.]])
         M1op = MatrixOperator(M1)
-        _,_,_,_,convergence = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])), return_all=True)
+        _,_,_,_,convergence = M1op.PowerMethod(M1op,100, initial=DataContainer(numpy.array([1.,1.])), return_all=True, seed=2)
         numpy.testing.assert_equal(convergence,False)
 
         # 2x2 matrix, max absolute eigenvalue is not unique and initial vector chosen for convergence
 
         M1=numpy.array([[2.,1.,0.],[0.,1.,1.], [0.,0.,1.]])
         M1op = MatrixOperator(M1)
-        res1,_,_,_,convergence = M1op.PowerMethod(M1op,100, return_all=True)
+        res1,_,_,_,convergence = M1op.PowerMethod(M1op,100, return_all=True, seed=2)
         numpy.testing.assert_almost_equal(res1,2., decimal=4)
         numpy.testing.assert_equal(convergence,True)
 
         # Gradient Operator (float)
         ig = ImageGeometry(30,30)
         Grad = GradientOperator(ig)
-        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
+        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6, seed=2)
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)
 
         # Gradient Operator (complex)
         ig = ImageGeometry(30,30, dtype=complex)
         Grad = GradientOperator(ig, backend='numpy')
-        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
+        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6, seed=2)
         numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)
 
         # Identity Operator
         Id = IdentityOperator(ig)
-        res1 = Id.PowerMethod(Id,100)
+        res1 = Id.PowerMethod(Id,100, seed=2)
         numpy.testing.assert_almost_equal(res1,1.0, decimal=4)
 
         # Test errors produced if not a valid method

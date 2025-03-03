@@ -2482,8 +2482,8 @@ class TestMaskGenerator(unittest.TestCase):
                             voxel_num_y=200)
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
-
-        data = IG.allocate('random', seed=10)
+        data = IG.allocate()
+        data = IG.allocate('random', seed=2)
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
         data_as_data_container = DataContainer(data.as_array().copy())
@@ -2575,7 +2575,7 @@ class TestMaskGenerator(unittest.TestCase):
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
-    def test_TransmissionAbsorptionConverter(self):
+    def test_TransmissionAbsorptionConverter(self, accelerated=False):
 
         ray_direction = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
@@ -2603,7 +2603,8 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
         ad = AG.allocate('random')
 
-        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
+                                            accelerated=accelerated)
         s.set_input(ad)
         data_exp = s.get_output()
 
@@ -2615,12 +2616,14 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
-
         data_exp.fill(0)
         s.process(out=data_exp)
 
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+
+    def test_TransmissionAbsorptionConverter_accelerated(self):
+        self.test_TransmissionAbsorptionConverter(accelerated=True)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -2866,7 +2869,7 @@ class TestPaganinProcessor(unittest.TestCase):
             .set_panel([128,128],0.1)\
             .set_channels(4)
 
-        self.data_multichannel = ag.allocate('random', seed=10)
+        self.data_multichannel = ag.allocate('random')
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter

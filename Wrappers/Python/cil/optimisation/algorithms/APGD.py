@@ -103,7 +103,7 @@ class APGD(Algorithm):
     
     .. math:: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). 
     
-    The default momentum coefficient is the Nesterov momentum coefficient which varies with each iteration. Users can also set a constant momentum coefficient or implement their own momentum coefficient.
+    The default momentum coefficient is the Nesterov momentum coefficient which varies with each iteration. Users can also set a constant momentum coefficient or implement their own momentum coefficient using the :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.
 
 
     Parameters

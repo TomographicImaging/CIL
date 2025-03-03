@@ -30,7 +30,7 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
@@ -266,9 +266,10 @@ class TestGD(CCPiTestClass):
         
 class Test_APGD(CCPiTestClass):
     def setUp(self):
-        self.ig = ImageGeometry(127, 139, 149)
+        self.ig = ImageGeometry(11,12,13)
         self.initial = self.ig.allocate(0)
-        self.b = self.ig.allocate("random")**2
+        self.b = self.ig.allocate(None)
+        self.b.fill(np.array(range(11*12*13)).reshape(13,12,11))
         self.identity = IdentityOperator(self.ig)
 
         self.f = OperatorCompositionFunction(L2NormSquared(b=self.b), self.identity)
@@ -313,6 +314,17 @@ class Test_APGD(CCPiTestClass):
         alg.run(1)
         self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_2.as_array())
         
+    def test_provable_convergence(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        self.assertTrue(alg.is_provably_convergent())
+        
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum=0.5)
+        with self.assertRaises(TypeError):
+            alg.is_provably_convergent()
+            
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, preconditioner=Sensitivity(self.identity))
+        with self.assertRaises(NotImplementedError):
+            alg.is_provably_convergent()
         
         
         
@@ -467,13 +479,6 @@ class TestFISTA(CCPiTestClass):
             alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
 
 
-
-
-
-
-        
-
-        
 
 
 class testISTA(CCPiTestClass):

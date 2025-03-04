@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 24.3.1.dev11+g29c5adde documentation</title>
+    <title>Processors &#8212; CIL 24.3.1.dev12+gff422a45 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=13a8c20e17d7c1077add" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=13a8c20e17d7c1077add" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=0e2340c29e9ecc6bee80"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=13a8c20e17d7c1077add"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=13a8c20e17d7c1077add" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=13a8c20e17d7c1077add" />
 
-    <script src="../_static/documentation_options.js?v=2d6dd634"></script>
+    <script src="../_static/documentation_options.js?v=0c34a7af"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev11+g29c5adde';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev12+gff422a45';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev11+g29c5adde" />
+  <meta name="docsearch:version" content="24.3.1.dev12+gff422a45" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1615,25 +1615,32 @@ the data has channels</p>
 <h3>Transmission to Absorption Converter<a class="headerlink" href="#transmission-to-absorption-converter" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.processors.TransmissionAbsorptionConverter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">TransmissionAbsorptionConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/TransmissionAbsorptionConverter/#TransmissionAbsorptionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">TransmissionAbsorptionConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/TransmissionAbsorptionConverter/#TransmissionAbsorptionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter" title="Link to this definition">#</a></dt>
 <dd><p>Processor to convert from transmission measurements to absorption
-based on the Beer-Lambert law</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>white_level</strong> (<em>float</em><em>, </em><em>optional</em>) – A float defining incidence intensity in the Beer-Lambert law.</p></li>
-<li><p><strong>min_intensity</strong> (<em>float</em><em>, </em><em>optional</em>) – A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level</p></li>
-</ul>
+based on the Beer-Lambert law, by:
+- dividing by white_level,
+- clipping data to min_intensity (any values below min intensity are set to min_intensity)
+- taking the logarithm and multiplying by minus 1.
+If the data contains zero or negative values, inf or NaN values will be present in the output.</p>
+<section id="id3">
+<h4>Parameters:<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>min_intensity: float, default=0.0</dt><dd><p>Clips data below this value to ensure log is taken of positive numbers only.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if ‘out’ is passed</p>
+<dt>white_level: float, default=1.0</dt><dd><p>A float defining incidence intensity in the Beer-Lambert law.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a>, <a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+<dt>accelerated: bool, default=True</dt><dd><p>Specify whether to use multi-threading using numba.</p>
 </dd>
 </dl>
-<p>Processor first divides by white_level (default=1) and then take negative logarithm.
-Elements below threshold (after division by white_level) are set to threshold.</p>
+</section>
+<section id="id4">
+<h4>Returns:<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<p>AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if ‘out’ is passed</p>
+</section>
+<section id="notes">
+<h4>Notes:<a class="headerlink" href="#notes" title="Link to this heading">#</a></h4>
+<p>If it’s unknown whether the data contains zero or negative values, it’s recommended to set min_intensity to a
+small positive value.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.TransmissionAbsorptionConverter.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter.get_output" title="Link to this definition">#</a></dt>
@@ -1662,6 +1669,7 @@ Elements below threshold (after division by white_level) are set to threshold.</
 </dl>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -2018,8 +2026,8 @@ it will be calculated <span class="math notranslate nohighlight">\(\frac{\Delta\
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=13a8c20e17d7c1077add"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=13a8c20e17d7c1077add"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

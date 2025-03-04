@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.TransmissionAbsorptionConverter &#8212; CIL 24.3.1.dev11+g29c5adde documentation</title>
+    <title>cil.processors.TransmissionAbsorptionConverter &#8212; CIL 24.3.1.dev12+gff422a45 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=0e2340c29e9ecc6bee80" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=13a8c20e17d7c1077add" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=13a8c20e17d7c1077add" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../_static/scripts/fontawesome.js?digest=0e2340c29e9ecc6bee80"></script>
+  <script src="../../../../_static/scripts/fontawesome.js?digest=13a8c20e17d7c1077add"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=13a8c20e17d7c1077add" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=13a8c20e17d7c1077add" />
 
-    <script src="../../../../_static/documentation_options.js?v=2d6dd634"></script>
+    <script src="../../../../_static/documentation_options.js?v=0c34a7af"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev11+g29c5adde';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev12+gff422a45';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev11+g29c5adde" />
+  <meta name="docsearch:version" content="24.3.1.dev12+gff422a45" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -490,35 +490,54 @@
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">DataContainer</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiprocessing</span> <span class="k">as</span> <span class="n">cil_mp</span>
 
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TransmissionAbsorptionConverter">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.TransmissionAbsorptionConverter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TransmissionAbsorptionConverter</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to convert from transmission measurements to absorption</span>
-<span class="sd">    based on the Beer-Lambert law</span>
+<span class="sd">    based on the Beer-Lambert law, by:</span>
+<span class="sd">    - dividing by white_level, </span>
+<span class="sd">    - clipping data to min_intensity (any values below min intensity are set to min_intensity) </span>
+<span class="sd">    - taking the logarithm and multiplying by minus 1. </span>
+<span class="sd">    If the data contains zero or negative values, inf or NaN values will be present in the output.</span>
 
-<span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
-<span class="sd">    :type white_level: float, optional</span>
-<span class="sd">    :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level</span>
-<span class="sd">    :type min_intensity: float, optional</span>
-<span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if &#39;out&#39; is passed</span>
-<span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    min_intensity: float, default=0.0</span>
+<span class="sd">        Clips data below this value to ensure log is taken of positive numbers only. </span>
+<span class="sd">    </span>
+<span class="sd">    white_level: float, default=1.0</span>
+<span class="sd">        A float defining incidence intensity in the Beer-Lambert law.</span>
 
-<span class="sd">    Processor first divides by white_level (default=1) and then take negative logarithm.</span>
-<span class="sd">    Elements below threshold (after division by white_level) are set to threshold.</span>
+<span class="sd">    accelerated: bool, default=True</span>
+<span class="sd">        Specify whether to use multi-threading using numba. </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if &#39;out&#39; is passed</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    ------</span>
+<span class="sd">    If it&#39;s unknown whether the data contains zero or negative values, it&#39;s recommended to set min_intensity to a </span>
+<span class="sd">    small positive value.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">min_intensity</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">white_level</span> <span class="o">=</span> <span class="mf">1.0</span>
+                 <span class="n">white_level</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">accelerated</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="p">):</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;min_intensity&#39;</span><span class="p">:</span> <span class="n">min_intensity</span><span class="p">,</span>
-                  <span class="s1">&#39;white_level&#39;</span><span class="p">:</span> <span class="n">white_level</span><span class="p">}</span>
+                  <span class="s1">&#39;white_level&#39;</span><span class="p">:</span> <span class="n">white_level</span><span class="p">,</span>
+                  <span class="s1">&#39;_accelerated&#39;</span><span class="p">:</span> <span class="n">accelerated</span><span class="p">}</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -529,9 +548,9 @@
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - DataContainer&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.&#39;</span><span class="p">)</span>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Current min_intensity = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="si">}</span><span class="s2">: output may contain NaN or inf. Ensure your data only contains positive values or set min_intensity to a small positive value.&quot;</span><span class="p">)</span>
+        
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -544,23 +563,53 @@
         <span class="n">arr_in</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
         <span class="n">arr_out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
-        <span class="c1">#whitelevel</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">white_level</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">white_level</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
-            <span class="n">arr_in</span> <span class="o">=</span> <span class="n">arr_out</span>
+        <span class="c1"># we choose an arbitrary chunk size of 6400, which is a multiple of 32, to allow for efficient threading</span>
+        <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">6400</span>
+        <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">//</span> <span class="n">chunk_size</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span><span class="p">):</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="n">chunk_size</span>
+            <span class="n">num_threads_original</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
+            <span class="n">numba</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">cil_mp</span><span class="o">.</span><span class="n">NUM_THREADS</span><span class="p">)</span>
+            <span class="n">numba_loop</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">remainder</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">white_level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="p">,</span>  <span class="n">arr_out</span><span class="p">)</span>
+            <span class="n">numba</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">num_threads_original</span><span class="p">)</span>
 
-        <span class="c1">#threshold</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
-            <span class="n">arr_in</span> <span class="o">=</span> <span class="n">arr_out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">white_level</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">white_level</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
+                <span class="n">arr_in</span> <span class="o">=</span> <span class="n">arr_out</span>
 
-        <span class="c1">#beer-lambert</span>
-        <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
-        <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
+                <span class="n">arr_in</span> <span class="o">=</span> <span class="n">arr_out</span>
+                
+            <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">arr_out</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">arr_out</span><span class="p">)</span>
 
         <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr_out</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
+
+    
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">numba_loop</span><span class="p">(</span><span class="n">arr_in</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">remainder</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">min_intensity</span><span class="p">,</span> <span class="n">arr_out</span><span class="p">):</span>
+    <span class="n">in_flat</span> <span class="o">=</span> <span class="n">arr_in</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">out_flat</span> <span class="o">=</span> <span class="n">arr_out</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">chunk_size</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">chunk_size</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">in_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">multiplier</span><span class="p">)</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">min_intensity</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+
+
+    <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">num_chunks</span> <span class="o">*</span> <span class="n">chunk_size</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">remainder</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">in_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">multiplier</span><span class="p">)</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">min_intensity</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out_flat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+
+
 
 </pre></div>
 
@@ -591,8 +640,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=0e2340c29e9ecc6bee80"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=0e2340c29e9ecc6bee80"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=13a8c20e17d7c1077add"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=13a8c20e17d7c1077add"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

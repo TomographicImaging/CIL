@@ -115,9 +115,9 @@ class VectorGeometry:
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
+                    r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+                    r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
 
             out = VectorData(r, geometry=self.copy(), dtype=dtype)
 

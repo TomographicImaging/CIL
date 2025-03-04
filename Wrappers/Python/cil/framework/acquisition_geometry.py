@@ -2190,7 +2190,7 @@ class AcquisitionGeometry(object):
             seed = kwargs.get('seed', None)
             rng = numpy.random.default_rng(seed)
             
-            if value == FillType.RANDOM:              
+            if value == FillType.RANDOM:        
                 if numpy.issubdtype(dtype, numpy.complexfloating):
                     complex_example = numpy.array([1 + 1j], dtype=dtype)
                     half_dtype = numpy.real(complex_example).dtype
@@ -2201,9 +2201,9 @@ class AcquisitionGeometry(object):
             elif value == FillType.RANDOM_INT:
                 max_value = kwargs.get('max_value', 100)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (rng.integers(max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
+                    r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    r = rng.integers(max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+                    r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
             
             out = AcquisitionData(r, 
                                 geometry=self.copy(),

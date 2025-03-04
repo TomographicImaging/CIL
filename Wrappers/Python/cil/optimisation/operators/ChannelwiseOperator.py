@@ -119,7 +119,7 @@ class ChannelwiseOperator(LinearOperator):
 
     def direct(self,x,out=None):
         '''
-        Returns D(x) where D is the ChannelwiseOperator and x is the input data.
+        Returns :math:`D(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.
         
         Parameters
         ----------
@@ -144,7 +144,7 @@ class ChannelwiseOperator(LinearOperator):
         return out
 
     def adjoint(self,x, out=None):
-        '''Returns D^{*}(y) where D is the ChannelwiseOperator and y is the input data.
+        '''Returns :math:`D^{*}(y)` where :math:`D` is the ChannelwiseOperator and :math:`y` is the input data.
         
         Parameters
         ----------

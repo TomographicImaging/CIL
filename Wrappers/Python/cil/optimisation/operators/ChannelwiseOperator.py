@@ -22,18 +22,59 @@ from cil.optimisation.operators import LinearOperator
 
 class ChannelwiseOperator(LinearOperator):
 
-    r'''ChannelwiseOperator:  takes in a single-channel operator op and the
-    number of channels to be used, and creates a new multi-channel
-    ChannelwiseOperator, which will apply the operator op independently on
-    each channel for the number of channels specified.
+    r'''The ChannelwiseOperator  takes in an operator  and the number of channels to be used, and creates a new multi-channel
+    `ChannelwiseOperator`, which will apply the operator  independently on each channel for the number of channels specified.
 
-    ChannelwiseOperator supports simple operators as input but not
-    BlockOperators. Typically if such behaviour is desired, it can be achieved
+    ChannelwiseOperator does not currently support BlockOperators. Typically, if such behaviour is desired, it can be achieved
     by creating instead a BlockOperator of ChannelwiseOperators.
 
-        :param op: Single-channel operator
-        :param channels: Number of channels
-        :param dimension: 'prepend' (default) or 'append' channel dimension onto existing dimensions
+    Parameters
+    ----------
+    op : Operator
+        Single-channel operator
+    channels : int
+        Number of channels
+    dimension : str, optional
+        'prepend' (default) or 'append' channel dimension onto existing dimensions
+        
+    Example
+    --------
+    >>> M = 3
+    >>> channels = 2
+    >>> ig = ImageGeometry(M, M, channels=channels)
+    >>> single_ig = ImageGeometry(M, M)
+    >>> x = ImageData( np.stack( [np.ones((M,M)),  2*np.ones((M,M))] , axis=0), geometry=ig )
+    >>> diag = ImageData(np.array(range(M*M), dtype=np.float64).reshape((M,M)), geometry=single_ig)
+    >>> D = DiagonalOperator(diag)
+    >>> C = ChannelwiseOperator(D,channels)
+    >>> y = C.direct(x)
+    >>> print('The original image data is:')
+    >>> print(x.as_array())
+    >>> print('The channel wise operators multiplies each channel element wise by:')
+    >>> print(diag.as_array())
+    >>> print('The result of applying the channel wise operator is:')
+    >>> print(y.as_array())
+
+    The original image data is:
+    [[[1. 1. 1.]
+    [1. 1. 1.]
+    [1. 1. 1.]]
+
+    [[2. 2. 2.]
+    [2. 2. 2.]
+    [2. 2. 2.]]]
+    The channel wise operators multiplies each channel element wise by:
+    [[0. 1. 2.]
+    [3. 4. 5.]
+    [6. 7. 8.]]
+    The result of applying the channel wise operator is:
+    [[[ 0.  1.  2.]
+    [ 3.  4.  5.]
+    [ 6.  7.  8.]]
+
+    [[ 0.  2.  4.]
+    [ 6.  8. 10.]
+    [12. 14. 16.]]]
 
      '''
 
@@ -80,7 +121,21 @@ class ChannelwiseOperator(LinearOperator):
         self.channels = channels
 
     def direct(self,x,out=None):
-        '''Returns D(x)'''
+        '''
+        Returns D(x) where D is the ChannelwiseOperator and x is the input data.
+        
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            Output data, if not provided a new DataContainer will be created
+            
+        Returns
+        -------
+        out : DataContainer
+            Output data
+        '''
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's direct method and fill into multi-channel output data set.
         if out is None:
@@ -92,7 +147,21 @@ class ChannelwiseOperator(LinearOperator):
         return out
 
     def adjoint(self,x, out=None):
-        '''Returns D^{*}(y)'''
+        '''Returns D^{*}(y) where D is the ChannelwiseOperator and y is the input data.
+        
+        Parameters
+        ----------
+        x : DataContainer
+            Input data
+        out : DataContainer, optional
+            Output data, if not provided a new DataContainer will be created
+    
+        Returns
+        -------
+        out : DataContainer
+            Output data
+        
+        '''
         # Loop over channels, extract single-channel data, apply single-channel
         # operator's adjoint method and fill into multi-channel output data set.
         if out is None:

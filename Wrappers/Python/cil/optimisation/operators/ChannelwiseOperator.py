@@ -50,33 +50,30 @@ class ChannelwiseOperator(LinearOperator):
     >>> y = C.direct(x)
     >>> print('The original image data is:')
     >>> print(x.as_array())
-    >>> print('The channel wise operators multiplies each channel element wise by:')
-    >>> print(diag.as_array())
-    >>> print('The result of applying the channel wise operator is:')
-    >>> print(y.as_array())
-
     The original image data is:
     [[[1. 1. 1.]
     [1. 1. 1.]
     [1. 1. 1.]]
-
     [[2. 2. 2.]
     [2. 2. 2.]
     [2. 2. 2.]]]
-    The channel wise operators multiplies each channel element wise by:
+    >>> print('The channel wise operator multiplies each channel element wise by:')
+    >>> print(diag.as_array())
+    The channel wise operator multiplies each channel element wise by:
     [[0. 1. 2.]
     [3. 4. 5.]
     [6. 7. 8.]]
+    >>> print('The result of applying the channel wise operator is:')
+    >>> print(y.as_array())
     The result of applying the channel wise operator is:
     [[[ 0.  1.  2.]
     [ 3.  4.  5.]
     [ 6.  7.  8.]]
-
     [[ 0.  2.  4.]
     [ 6.  8. 10.]
     [12. 14. 16.]]]
-
-     '''
+    
+    '''
 
     def __init__(self, op, channels, dimension='prepend'):
 

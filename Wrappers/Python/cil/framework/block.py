@@ -236,67 +236,91 @@ class BlockDataContainer(object):
     def add(self, other, *args, **kwargs):
         '''Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placehold for the resul.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
         '''
         return self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
     def subtract(self, other, *args, **kwargs):
         '''Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
         '''
         return self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
     def multiply(self, other, *args, **kwargs):
         '''Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer)
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
         '''
         return self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
     def divide(self, other, *args, **kwargs):
         '''Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer)
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
+
         '''
         return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
     def power(self, other, *args, **kwargs):
         '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
         '''
         return self.binary_operations(BlockDataContainer.POWER, other, *args, **kwargs)
     def maximum(self, other, *args, **kwargs):
-        '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        '''Algebra: maximum method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer)
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
         '''
         return self.binary_operations(BlockDataContainer.MAXIMUM, other, *args, **kwargs)
     def minimum(self, other, *args, **kwargs):
-        '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        '''Algebra: minimum method of BlockDataContainer with number/DataContainer or BlockDataContainer
 
-        :param: other (number, DataContainer or subclasses or BlockDataContainer)
-        :param: out (optional): provides a placeholder for the result.
+        Parameters
+        ----------
+        other : number, DataContainer or subclasses or BlockDataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
+            
         '''
         return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 
-    def sapyb(self, a, y, b, out, num_threads = NUM_THREADS):
+    def sapyb(self, a, y, b, out=None, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
 
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
 
-        :param a: scalar
-        :param b: scalar
-        :param y: compatible (Block)DataContainer
-        :param out: (Block)DataContainer to store the result
+        Parameters
+        ----------
+        a : scalar or BlockDataContainer
+        b : scalar or BlockDataContainer
+        y : compatible (Block)DataContainer
+        out : BlockDataContainer, optional
+            Provides a placeholder for the result
 
-
-        Example:
-        --------
-
+        Example
+        -------
         >>> a = 2
         >>> b = 3
         >>> ig = ImageGeometry(10,11)
@@ -307,9 +331,9 @@ class BlockDataContainer(object):
         >>> out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
-            raise ValueError("out container cannot be None")
+            out = self * 0
         kwargs = {'a':a, 'b':b, 'out':out, 'num_threads': NUM_THREADS}
-        self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
+        return self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
 
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):

@@ -80,6 +80,7 @@ class LADMM(Algorithm):
 
     """
 
+
     def __init__(self, f=None, g=None, operator=None, \
                        tau = None, sigma = 1.,
                        initial = None, **kwargs):

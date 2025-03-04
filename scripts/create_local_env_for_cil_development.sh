@@ -54,7 +54,7 @@ conda_args=(create --name="$name"
   ipp-include'>=2021.10'
   libgcc-ng
   libstdcxx-ng
-  matplotlib
+  matplotlib-base
   numba
   olefile'>=0.46'
   packaging
@@ -72,7 +72,7 @@ if test -n "$cil_ver"; then
 fi
 
 if test $test_deps = 0; then
-  conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda -c defaults --override-channels)
+  conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda --override-channels)
 else
   conda_args+=(
     astra-toolbox=2.1=cuda*

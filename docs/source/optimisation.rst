@@ -92,18 +92,23 @@ SIRT
    :members: update, update_objective
    :inherited-members: run, update_objective_interval, max_iteration
 
-ISTA
-----
+ISTA/PGD
+--------
+The Iterative Soft Thresholding Algorithm (ISTA) is also known as Proximal Gradient Descent (PGD). Note that in CIL, :ref:`PGD<ISTA>` is an alias of `ISTA`. 
+
+.. _ISTA:
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
-FISTA
+
+FISTA/APGD
 -----
+The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, :ref:`APGD<FISTA>` is an alias of `FISTA`.
+
+.. _FISTA:
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
    :inherited-members: run, update_objective_interval, max_iteration
 
 PDHG
@@ -593,7 +598,7 @@ In addition, we provide a random sampling class which is a child class of  `cil.
 Callbacks
 ---------
 
-A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithm`'s :code:`run` method.
 
 .. code-block :: python
 
@@ -613,6 +618,12 @@ Built-in callbacks include:
    :members:
 
 .. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.CGLSEarlyStopping
    :members:
 
 Users can also write custom callbacks.

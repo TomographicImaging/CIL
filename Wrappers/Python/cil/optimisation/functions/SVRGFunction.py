@@ -31,7 +31,7 @@ import numbers
 class SVRGFunction(ApproximateGradientSumFunction):
 
     r"""
-    The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `snapshot_update_interval` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`s at the current iterate and the snapshot, updating the approximate gradient to be:
+    The Stochastic Variance Reduced Gradient (SVRG) function calculates the approximate gradient of :math:`\sum_{i=1}^{n-1}f_i`.  For this approximation, every `snapshot_update_interval` number of iterations, a full gradient calculation is made at this "snapshot" point. Intermediate gradient calculations update this snapshot by taking a index :math:`i_k` and calculating the gradient of :math:`f_{i_k}`'s at the current iterate and the snapshot, updating the approximate gradient to be:
 
     .. math ::
         n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(\tilde{x}) + \nabla \sum_{i=0}^{n-1}f_i(\tilde{x}),
@@ -60,7 +60,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     snapshot_update_interval : positive int or None, optional
         The interval for updating the full gradient (taking a snapshot). The default is 2*len(functions) so a "snapshot" is taken every 2*len(functions) iterations. If the user passes `0` then no full gradient snapshots will be taken. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
 
 
     """
@@ -212,28 +212,24 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
 
 class LSVRGFunction(SVRGFunction):
-    """""
+    r"""
     A class representing a function for Loopless Stochastic Variance Reduced Gradient (SVRG) approximation. This is similar to SVRG, except the full gradient at a "snapshot"  is calculated at random intervals rather than at fixed numbers of iterations. 
-
-
-    Reference
-    ----------
-
-    Kovalev, D., Horváth, S. &; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.
-
-
-
+    
     Parameters
     ----------
-     functions : `list`  of functions
+    functions : `list`  of functions
         A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions `n` must be strictly greater than 1. 
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0,...,n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. 
     snapshot_update_probability: positive float, default: 1/n
         The probability of updating the full gradient (taking a snapshot) at each iteration. The default is :math:`1./n` so, in expectation, a snapshot will be taken every :math:`n` iterations. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:` \tilde{x}` and it's gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
 
+        
+    Reference
+    ---------
+    Kovalev, D., Horváth, S. &; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.
 
     Note
     ----

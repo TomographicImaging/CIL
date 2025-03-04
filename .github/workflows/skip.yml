@@ -7,7 +7,7 @@ on:
     - 'CHANGELOG.md'
     - 'CITATION.cff'
     - 'LICENSE'
-    - 'scripts/**'
+    - 'scripts/**.sh'
     - 'NOTICE.txt'
     - '**README.md'
 jobs:

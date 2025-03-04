@@ -1,13 +1,16 @@
 import unittest
 import numpy as np
-from cil.utilities.display import show1D
 from cil.utilities import dataexample
 from unittest.mock import patch
-from utils import initialise_tests
+from utils import initialise_tests, has_matplotlib
 initialise_tests()
 
-import matplotlib
+if has_matplotlib:
+    import matplotlib
+    from cil.utilities.display import show1D
 
+
+@unittest.skipUnless(has_matplotlib, "matplotlib not installed")
 class TestShow1D(unittest.TestCase):
 
     def setUp(self):

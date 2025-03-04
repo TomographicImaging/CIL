@@ -91,8 +91,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         # we choose an arbitrary chunk size of 6400, which is a multiple of 32, to allow for efficient threading
         chunk_size = 6400
         num_chunks = data.size // chunk_size
-        # Use numba if _accelerated is True and if the number of chunks is greater than 5, to avoid the overhead of threading when the data is small
-        if (self._accelerated) & (num_chunks > 5):
+        if (self._accelerated):
             remainder = data.size % chunk_size
             num_threads_original = numba.get_num_threads()
             numba.set_num_threads(cil_mp.NUM_THREADS)

@@ -2576,7 +2576,7 @@ class TestMaskGenerator(unittest.TestCase):
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
-    def test_TransmissionAbsorptionConverter(self):
+    def test_TransmissionAbsorptionConverter(self, accelerated=False):
 
         ray_direction = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
@@ -2604,7 +2604,8 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
         ad = AG.allocate('random')
 
-        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
+                                            accelerated=accelerated)
         s.set_input(ad)
         data_exp = s.get_output()
 
@@ -2621,6 +2622,9 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+
+    def test_TransmissionAbsorptionConverter_accelerated(self):
+        self.test_TransmissionAbsorptionConverter(accelerated=True)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 

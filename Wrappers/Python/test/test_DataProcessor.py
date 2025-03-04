@@ -45,7 +45,7 @@ if has_numba:
 from scipy import constants
 from scipy.fft import ifftshift
 
-from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
 
 initialise_tests()
 
@@ -3323,7 +3323,8 @@ class TestFluxNormaliser(unittest.TestCase):
         processor._calculate_flux()
         with self.assertRaises(TypeError):
             processor._calculate_target()
-        
+    
+    @unittest.skipIf(not has_matplotlib, "matplotlib not installed")
     @patch('matplotlib.pyplot.show')
     def test_preview_configuration(self, mock_show):
         

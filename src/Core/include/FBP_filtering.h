@@ -24,6 +24,7 @@
 #include <random>
 #include "dll_export.h"
 #include "utilities.h"
+#include <nanobind/nanobind.h>
 
 
 #ifdef __cplusplus
@@ -34,3 +35,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+NB_MODULE(cilaccb, m) {
+	m.def("filter_projections_avh", &filter_projections_avh);
+	m.def("filter_projections_vah", &filter_projections_vah);
+}
+

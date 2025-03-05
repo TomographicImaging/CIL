@@ -598,7 +598,7 @@ In addition, we provide a random sampling class which is a child class of  `cil.
 Callbacks
 ---------
 
-A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithms`_ :code:`run` method.
+A list of :code:`Callback` s to be executed each iteration can be passed to `Algorithm`'s :code:`run` method.
 
 .. code-block :: python
 
@@ -618,6 +618,12 @@ Built-in callbacks include:
    :members:
 
 .. autoclass:: cil.optimisation.utilities.callbacks.LogfileCallback
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.CGLSEarlyStopping
    :members:
 
 Users can also write custom callbacks.

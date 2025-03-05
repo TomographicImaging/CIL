@@ -260,6 +260,8 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         Returns a plot of the filter array.
 
+        Requires matplotlib-base (or matplotlib) to be installed.
+
         Returns
         -------
         matplotlib.pyplot
@@ -267,8 +269,9 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         try:
             import matplotlib.pyplot as plt
-        except ImportError:
-            raise ImportError("matplotlib not found. Please install matplotlib to use this method")   
+        except ImportError as exc:
+            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
+            raise ImportError(f"Please install {msg}") from exc
 
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order

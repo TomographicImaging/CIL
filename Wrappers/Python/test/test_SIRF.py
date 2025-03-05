@@ -255,8 +255,8 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
 
         # compare with FISTA algorithm
         f =  0.5 * L2NormSquared(b=self.image1)
-        fista = FISTA(initial=self.image1*0.0, f=f, g=TV, max_iteration=10, update_objective_interval=10)
-        fista.run(verbose=0)
+        fista = FISTA(initial=self.image1*0.0, f=f, g=TV, update_objective_interval=10)
+        fista.run(10, verbose=0)
         np.testing.assert_array_almost_equal(fista.solution.as_array(), res2.as_array(), decimal=3)
 
 
@@ -533,8 +533,8 @@ class TestCILSIRFPrecond(unittest.TestCase):
         trunc.apply(initial_image)
 
         ista = ISTA(initial = initial_image, f = obj_fun, g = IndicatorBox(lower=0.),  step_size = -1.0, 
-                    preconditioner=sens,update_objective_interval=1, max_iteration=10)
-        ista.run(verbose=0)      
+                    preconditioner=sens,update_objective_interval=1)
+        ista.run(10, verbose=0)      
 
         print("adad")
         np.testing.assert_allclose(ista.solution.as_array()[0], reconstructed_image.as_array()[0], rtol=1e-3)         

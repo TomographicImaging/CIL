@@ -221,8 +221,8 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
-        r"""Power method or Power iteration algorithm
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto', seed=None):
+        r"""Power method or Power iteration algorithm 
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
         absolute value in the real case and modulus in the complex case.
@@ -233,7 +233,7 @@ class LinearOperator(Operator):
         operator: LinearOperator
         max_iteration: positive:`int`, default=10
             Number of iterations for the Power method algorithm.
-        initial: DataContainer, default = None
+        initial: DataContainer, default = None, optional
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.
@@ -241,7 +241,8 @@ class LinearOperator(Operator):
             Toggles the verbosity of the return
         method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"`
             The default `auto` lets the code choose the method, this can be specified with `"direct_only"` or `"composed_with_adjoint"`
-
+        seed: `int` or default = None, optional
+            If initial is not provided, this random is seed used by the random number generator to create the `initial` starting point
 
         Returns
         -------
@@ -307,7 +308,7 @@ class LinearOperator(Operator):
                     apply_adjoint = False
 
         if initial is None:
-            x0 = operator.domain_geometry().allocate('random')
+            x0 = operator.domain_geometry().allocate('random', seed=seed)
         else:
             x0 = initial.copy()
 

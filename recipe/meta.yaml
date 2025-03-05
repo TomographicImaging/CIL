@@ -24,6 +24,7 @@ test:
     - packaging
     - ccpi-regulariser=24.0.1 # [not osx]
     - astra-toolbox=2.1=cuda* # [not osx]
+    - unittest-parametrize
 
   source_files:
     - ./Wrappers/Python/test

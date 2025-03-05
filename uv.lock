@@ -313,6 +313,7 @@ wheels = [
 
 [[package]]
 name = "cil"
+version = "0.25.0"
 source = { editable = "." }
 dependencies = [
     { name = "dxchange" },
@@ -330,6 +331,9 @@ dependencies = [
 [package.optional-dependencies]
 astra = [
     { name = "astra-toolbox" },
+]
+tigre = [
+    { name = "pytigre" },
 ]
 
 [package.dev-dependencies]
@@ -369,12 +373,13 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26,<2.0" },
     { name = "olefile", specifier = ">=0.46" },
     { name = "pillow", specifier = ">=11.1.0" },
+    { name = "pytigre", marker = "extra == 'tigre'", git = "https://github.com/purepani/TIGRE?subdirectory=Python&branch=push-myxtropotyqx" },
     { name = "pywavelets", specifier = ">=1.8.0" },
     { name = "scipy", specifier = ">=1.4.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "zenodo-get", specifier = ">=1.6" },
 ]
-provides-extras = ["astra"]
+provides-extras = ["astra", "tigre"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1997,6 +2002,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9e/de/d3144a0bceede957f961e975f3752760fbe390d57fbe194baf709d8f1f7b/python_json_logger-3.3.0.tar.gz", hash = "sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84", size = 16642 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/08/20/0f2523b9e50a8052bc6a8b732dfc8568abbdc42010aef03a2d750bdab3b2/python_json_logger-3.3.0-py3-none-any.whl", hash = "sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7", size = 15163 },
+]
+
+[[package]]
+name = "pytigre"
+version = "3.0.0"
+source = { git = "https://github.com/purepani/TIGRE?subdirectory=Python&branch=push-myxtropotyqx#b54b137abf6556af9bdf8c71b80d5427f0ae1c68" }
+dependencies = [
+    { name = "h5py" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "scipy" },
+    { name = "tqdm" },
 ]
 
 [[package]]

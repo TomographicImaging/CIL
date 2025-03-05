@@ -2,6 +2,7 @@
   - Bug fixes:
       - Fix deprecation warning for rtol and atol in GD (#2056)
       - Removed the deprecated usage of run method in test_SIRF.py (#2070)
+      - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
   - Documentation
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)

@@ -25,17 +25,32 @@ endif()
 
 project(cil LANGUAGES CXX)
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
+# find_package(Python COMPONENTS Interpreter Development.Module REQUIRED) if
+# (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+# set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+# set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+# "MinSizeRel" "RelWithDebInfo") endif()
+
+# file(GLOB SOURCES "${CMAKE_PREFIX_PATH}/*") message(STATUS "${SOURCES}")
+
+# Detect the installed nanobind package and import it into CMake
+# find_package(nanobind CONFIG REQUIRED) find_package(IPP CONFIG REQUIRED)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
 endif()
 
 # If APPLE don't use @rpath
-if (APPLE)
-  option(SHARED_LIBS_ABS_PATH "Force shared libraries to be installed with absolute paths (as opposed to rpaths)" ON)
-  mark_as_advanced( SHARED_LIBS_ABS_PATH )
-  if (SHARED_LIBS_ABS_PATH)
+if(APPLE)
+  option(
+    SHARED_LIBS_ABS_PATH
+    "Force shared libraries to be installed with absolute paths (as opposed to rpaths)"
+    ON)
+  mark_as_advanced(SHARED_LIBS_ABS_PATH)
+  if(SHARED_LIBS_ABS_PATH)
     # Set install_name_dir as the absolute path to install_prefix/lib
-    GET_FILENAME_COMPONENT(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib REALPATH)
+    get_filename_component(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib
+                           REALPATH)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   endif(SHARED_LIBS_ABS_PATH)
 endif(APPLE)
@@ -45,4 +60,4 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 add_subdirectory(src/Core)
-add_subdirectory(Wrappers/Python)
+#add_subdirectory(Wrappers/Python)

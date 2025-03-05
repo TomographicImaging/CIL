@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.ADMM &#8212; CIL 24.3.1.dev14+g90f110de documentation</title>
+    <title>cil.optimisation.algorithms.ADMM &#8212; CIL 24.3.1.dev15+gdbf0b519 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551" />
 
-    <script src="../../../../../_static/documentation_options.js?v=06ec9e97"></script>
+    <script src="../../../../../_static/documentation_options.js?v=60e526ce"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev14+g90f110de';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev15+gdbf0b519';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev14+g90f110de" />
+  <meta name="docsearch:version" content="24.3.1.dev15+gdbf0b519" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -498,42 +498,69 @@
 <div class="viewcode-block" id="LADMM">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.LADMM">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LADMM</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM).</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)</span>
+<span class="sd">    The general form of ADMM is given by the following optimization problem: </span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b</span>
 
-<span class="sd">        General form of ADMM : :math:`min_{x} f(x) + g(y)`, subject to :math:`Ax + By = b`</span>
-
-<span class="sd">        Case: :math:`A = Id, B = -K, b = 0   ==&gt; min_x f(Kx) + g(x)`</span>
-
-<span class="sd">        The quadratic term in the augmented Lagrangian is linearized for the x-update.</span>
-
-<span class="sd">        Main algorithmic difference is that in ADMM we compute two proximal subproblems,</span>
-<span class="sd">        where in the PDHG a proximal and proximal conjugate.</span>
-
-<span class="sd">        Reference (Section 8) : https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf</span>
+<span class="sd">    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives </span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
 <span class="sd">        </span>
+<span class="sd">        \min_x f(Kx) + g(x).</span>
 <span class="sd">        </span>
-<span class="sd">            .. math:: x^{k} = prox_{\tau f } (x^{k-1} - \tau/\sigma A^{T}(Ax^{k-1} - z^{k-1} + u^{k-1} )</span>
+<span class="sd">    The algorithm is given by the following iteration, for :math:`k\geq 1`:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
 
-<span class="sd">            .. math:: z^{k} = prox_{\sigma g} (Ax^{k} + u^{k-1})</span>
+<span class="sd">        \begin{cases}</span>
+<span class="sd">            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\</span>
+<span class="sd">            z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\</span>
+<span class="sd">            u_{k} = u_{k-1} + Ax_{k} - z_{k}</span>
+<span class="sd">        \end{cases}</span>
+<span class="sd">        </span>
+<span class="sd">    where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ------------</span>
+<span class="sd">    operator:  CIL Linear Operator</span>
+<span class="sd">        Operator :math:`K` in the objective function</span>
+<span class="sd">    f: CIL Function</span>
+<span class="sd">        Convex function with &quot;simple&quot; proximal</span>
+<span class="sd">    g: CIL Function</span>
+<span class="sd">        Convex function with &quot;simple&quot; proximal</span>
+<span class="sd">    sigma: float, positive, defaults to 1.</span>
+<span class="sd">        Positive step size parameter</span>
+<span class="sd">    tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`</span>
+<span class="sd">        Positive step size parameter</span>
+<span class="sd">    initial: DataContainer, defaults to DataContainer filled with zeros</span>
+<span class="sd">        Initial guess </span>
+<span class="sd">            </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.</span>
+<span class="sd">    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` </span>
+<span class="sd">    where in the PDHG this is a proximal-conjugate and proximal.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    Reference (Section 8) : O’Connor, D., Vandenberghe, L. On the equivalence of the primal-dual hybrid gradient method and Douglas–Rachford splitting. Math. Program. 179, 85–108 (2020). https://doi.org/10.1007/s10107-018-1321-1</span>
 
-<span class="sd">            .. math:: u^{k} = u^{k-1} + Ax^{k} - z^{k}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
                        <span class="n">tau</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
                        <span class="n">initial</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialisation of the algorithm</span>
-
-<span class="sd">        :param operator: a Linear Operator</span>
-<span class="sd">        :param f: Convex function with &quot;simple&quot; proximal</span>
-<span class="sd">        :param g: Convex function with &quot;simple&quot; proximal</span>
-<span class="sd">        :param sigma: Positive step size parameter</span>
-<span class="sd">        :param tau: Positive step size parameter</span>
-<span class="sd">        :param initial: Initial guess ( Default initial_guess = 0)&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialisation of the algorithm.&quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">LADMM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -543,10 +570,8 @@
 <div class="viewcode-block" id="LADMM.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.LADMM.set_up">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up of the algorithm.&quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tau</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need tau &lt;= sigma / ||K||^2&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
@@ -560,16 +585,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">normK</span> <span class="o">**</span> <span class="mi">2</span>
 
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># allocate space for operator direct &amp; adjoint</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -579,7 +604,7 @@
 <div class="viewcode-block" id="LADMM.update">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.LADMM.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs a single iteration of the LADMM algorithm&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_adj</span><span class="p">)</span>
@@ -605,7 +630,7 @@
 <div class="viewcode-block" id="LADMM.update_objective">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.LADMM.update_objective">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the objective function value&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span>  <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span> <span class="p">)</span></div>
 </div>
 

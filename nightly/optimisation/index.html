@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev14+g90f110de documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev15+gdbf0b519 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551" />
 
-    <script src="../_static/documentation_options.js?v=06ec9e97"></script>
+    <script src="../_static/documentation_options.js?v=60e526ce"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev14+g90f110de';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev15+gdbf0b519';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev14+g90f110de" />
+  <meta name="docsearch:version" content="24.3.1.dev15+gdbf0b519" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -2355,37 +2355,59 @@ The case where both functions are strongly convex is not available at the moment
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">LADMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/ADMM/#LADMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LADMM" title="Link to this definition">#</a></dt>
-<dd><p>LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM)</p>
-<p>General form of ADMM : <span class="math notranslate nohighlight">\(min_{x} f(x) + g(y)\)</span>, subject to <span class="math notranslate nohighlight">\(Ax + By = b\)</span></p>
-<p>Case: <span class="math notranslate nohighlight">\(A = Id, B = -K, b = 0   ==&gt; min_x f(Kx) + g(x)\)</span></p>
-<p>The quadratic term in the augmented Lagrangian is linearized for the x-update.</p>
-<p>Main algorithmic difference is that in ADMM we compute two proximal subproblems,
-where in the PDHG a proximal and proximal conjugate.</p>
-<p>Reference (Section 8) : <a class="reference external" href="https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf">https://link.springer.com/content/pdf/10.1007/s10107-018-1321-1.pdf</a></p>
-<blockquote>
-<div><div class="math notranslate nohighlight">
-\[x^{k} = prox_{\tau f } (x^{k-1} - \tau/\sigma A^{T}(Ax^{k-1} - z^{k-1} + u^{k-1} )\]</div>
+<dd><p>LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM).</p>
+<p>The general form of ADMM is given by the following optimization problem:</p>
 <div class="math notranslate nohighlight">
-\[z^{k} = prox_{\sigma g} (Ax^{k} + u^{k-1})\]</div>
+\[\min_{x} f(x) + g(y), \text{ subject to } Ax + By = b\]</div>
+<p>In CIL, we have implemented the case where <span class="math notranslate nohighlight">\(A = Id\)</span>, <span class="math notranslate nohighlight">\(B = -K\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>  which gives</p>
 <div class="math notranslate nohighlight">
-\[u^{k} = u^{k-1} + Ax^{k} - z^{k}\]</div>
-</div></blockquote>
+\[\min_x f(Kx) + g(x).\]</div>
+<p>The algorithm is given by the following iteration, for <span class="math notranslate nohighlight">\(k\geq 1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+    x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+    z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
+    u_{k} = u_{k-1} + Ax_{k} - z_{k}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathrm{prox}_{\tau f}\)</span> is the proximal operator of <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(\mathrm{prox}_{\sigma g}\)</span> is the proximal operator of <span class="math notranslate nohighlight">\(g\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>operator</strong> (<em>CIL Linear Operator</em>) – Operator <span class="math notranslate nohighlight">\(K\)</span> in the objective function</p></li>
+<li><p><strong>f</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal</p></li>
+<li><p><strong>g</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>positive</em><em>, </em><em>defaults to 1.</em>) – Positive step size parameter</p></li>
+<li><p><strong>tau</strong> (float, positive, defaults to <span class="math notranslate nohighlight">\(\frac{\sigma}{\|K\|^{2}}\)</span>) – Positive step size parameter</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>defaults to DataContainer filled with zeros</em>) – Initial guess</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
+The main algorithmic difference is that in ADMM we compute the proximal of <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span>
+where in the PDHG this is a proximal-conjugate and proximal.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Reference (Section 8) : O’Connor, D., Vandenberghe, L. On the equivalence of the primal-dual hybrid gradient method and Douglas–Rachford splitting. Math. Program. 179, 85–108 (2020). <a class="reference external" href="https://doi.org/10.1007/s10107-018-1321-1">https://doi.org/10.1007/s10107-018-1321-1</a></p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/ADMM/#LADMM.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.set_up" title="Link to this definition">#</a></dt>
-<dd><p>Set up the algorithm</p>
+<dd><p>Set up of the algorithm.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/ADMM/#LADMM.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.update" title="Link to this definition">#</a></dt>
-<dd><p>A single iteration of the algorithm</p>
+<dd><p>Performs a single iteration of the LADMM algorithm</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LADMM.update_objective">
 <span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/ADMM/#LADMM.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LADMM.update_objective" title="Link to this definition">#</a></dt>
-<dd><p>calculates the objective with the current solution</p>
+<dd><p>Update the objective function value</p>
 </dd></dl>
 
 <dl class="py method">

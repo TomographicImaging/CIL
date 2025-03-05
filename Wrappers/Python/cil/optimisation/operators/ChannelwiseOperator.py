@@ -39,6 +39,8 @@ class ChannelwiseOperator(LinearOperator):
         
     Example
     --------
+    In this example, we create a ChannelwiseOperator that applies the same diagonal operator to each channel of a 2 channel image data.
+    
     >>> M = 3
     >>> channels = 2
     >>> ig = ImageGeometry(M, M, channels=channels)
@@ -143,8 +145,8 @@ class ChannelwiseOperator(LinearOperator):
             out.fill(cury.as_array(),channel=k)
         return out
 
-    def adjoint(self,x, out=None):
-        '''Returns :math:`D^{*}(y)` where :math:`D` is the ChannelwiseOperator and :math:`y` is the input data.
+    def adjoint(self, x, out=None):
+        '''Returns :math:`D^{*}(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.
         
         Parameters
         ----------
@@ -170,5 +172,5 @@ class ChannelwiseOperator(LinearOperator):
         return out
 
     def calculate_norm(self, **kwargs):
-        '''Evaluates operator norm of DiagonalOperator'''
+        '''Evaluates operator norm of ChannelWiseOperator'''
         return self.op.norm()

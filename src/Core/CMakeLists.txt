@@ -27,6 +27,36 @@ message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
 find_package(OpenMP REQUIRED)
 add_definitions(${OpenMP_CXX_FLAGS})
 
+cmake_minimum_required(VERSION 3.15)
+
+####NANOBIND
+
+
+
+find_path(IPP_INCLUDE_DIR NAMES ipp.h HINTS "${IPP_ROOT}/include")
+find_library(IPP_LIB NAMES ippiw HINTS "${IPP_ROOT}/lib")
+
+
+set(Python_FIND_VIRTUAL_ENV ONLY)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module OPTIONAL_COMPONENTS Development.SABIModule)
+
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
+# Detect the installed nanobind package and import it into CMake
+#find_package(nanobind CONFIG REQUIRED)
+#Python_add_library(nanobind MODULE)
+############
+
+
+#message(STATUS "IPP_INCLUDE_DIRS: ${IPP_INCLUDE_DIRS}")
+#message(STATUS "IPP_LIBRARIES: ${IPP_LIBRARIES}")
 
 if (WIN32)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
@@ -38,10 +68,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
   # add_compile_options(-march=native -mavx )
 endif()
 
-message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
-message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
-message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
-message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
   set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
@@ -52,56 +78,81 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-if(NOT DEFINED IPP_LIBRARY)
-  if (UNIX)
-    set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib)
-  elseif(WIN32)
-    set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
-  endif()
-endif()
+#if(NOT DEFINED IPP_LIBRARY)
+#if (UNIX)
+#set(IPP_LIBRARY ${SKBUILD_HEADERS_DIR})
+#elseif(WIN32)
+#set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
+#endif()
+#endif()
 
-if(NOT DEFINED IPP_INCLUDE)
-  set(IPP_INCLUDE ${CMAKE_INSTALL_PREFIX}/include)
-endif()
+#if(NOT DEFINED IPP_INCLUDE)
+#set(IPP_INCLUDE ${Python_INCLUDE_DIRS}/include)
+#endif()
+
 
 if (UNIX)
-  find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
 elseif(WIN32)
-  find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
-  find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
-  find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
+	find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
+	find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
+	find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
+	find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
 endif()
 
 if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
-  set(USE_IPP TRUE)
-  message("IPP libraries found")
+	set(USE_IPP TRUE)
+	message("IPP libraries found")
 else()
-  set(USE_IPP FALSE)
-  message("IPP libraries not found, FBP_filtering not in build")
+	set(USE_IPP FALSE)
+	message("IPP libraries not found, FBP_filtering not in build")
 endif()
 
-if(USE_IPP)
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
 
+#if(USE_IPP)
+#  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
+#
+#
+#  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
+#  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#else()
+#  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
+#                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )
+#
+#  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS})
+#  include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#endif()
+#
+nanobind_add_module(
+	cilacc
+	NB_STATIC
+	${CMAKE_CURRENT_SOURCE_DIR}/nanobind.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/axpby.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Binning.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/FBP_filtering.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/FiniteDifferenceLibrary.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/utilities.h
+	${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
+)
+target_link_libraries(cilacc PRIVATE ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
+include_directories(cilacc PUBLIC 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/
+)
 
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
-  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-else()
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )
+install(TARGETS cilacc LIBRARY DESTINATION cil)
 
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS})
-  include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-endif()
 
 ## Install
 #include(GNUInstallDirs)
@@ -112,20 +163,20 @@ endif()
 #	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
 #	)
 
-if (UNIX)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
-install(TARGETS cilacc
-	LIBRARY DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-elseif(WIN32)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
-  install(TARGETS cilacc
-	RUNTIME DESTINATION Library/bin
-	ARCHIVE DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-endif()
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)
+#if (UNIX)
+#message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
+#install(TARGETS cilacc
+#	LIBRARY DESTINATION lib
+#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
+#	)
+#elseif(WIN32)
+#message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
+#  install(TARGETS cilacc
+#	RUNTIME DESTINATION Library/bin
+#	ARCHIVE DESTINATION lib
+#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
+#	)
+#endif()
+#
+#install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
+#        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)

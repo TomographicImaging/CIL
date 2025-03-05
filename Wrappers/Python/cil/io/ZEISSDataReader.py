@@ -22,13 +22,10 @@ from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, Image
 from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
-import olefile
 import logging
+
 dxchange_logger = logging.getLogger('dxchange')
 dxchange_logger.setLevel(logging.ERROR)
-
-import dxchange
-import warnings
 
 
 class ZEISSDataReader(object):
@@ -162,6 +159,10 @@ class ZEISSDataReader(object):
             self._setup_image_geometry()
 
     def read_metadata(self):
+        # defer import
+        import olefile
+        import dxchange
+
         # Read one image to get the metadata
         _,metadata = dxchange.read_txrm(self.file_name,((0,1),(None),(None)))
 
@@ -258,6 +259,8 @@ class ZEISSDataReader(object):
         '''
         Reads projections and return Acquisition (TXRM) or Image (TXM) Data container
         '''
+        # defer imports
+        import dxchange
         # Load projections or slices from file
         slice_range = None
         if self._roi:

@@ -2177,35 +2177,43 @@ class AcquisitionGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = AcquisitionData(geometry=self.copy(),
-                              dtype=dtype,
-                              suppress_warning=True)
+        
 
         if isinstance(value, Number):
-            # it's created empty, so we make it 0
+            out = AcquisitionData(geometry=self.copy(),
+                              dtype=dtype,
+                              suppress_warning=True)
             out.array.fill(value)
+
         elif value in FillType:
-            if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
-                    out.fill(r)
+
+            seed = kwargs.get('seed', None)
+            rng = numpy.random.default_rng(seed)
+            
+            if value == FillType.RANDOM:        
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
+                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    r = rng.random(size=self.shape, dtype=dtype)
+
             elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=dtype))
+                    r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+            
+            out = AcquisitionData(r, 
+                                geometry=self.copy(),
+                                dtype=dtype,
+                                suppress_warning=True)
+            
         elif value is None:
-            pass
+            out = AcquisitionData(geometry=self.copy(),
+                              dtype=dtype,
+                              suppress_warning=True)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

@@ -23,17 +23,21 @@ else()
   cmake_minimum_required(VERSION 3.4)
 endif()
 
-project(cil LANGUAGES CXX)
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
 endif()
 
 # If APPLE don't use @rpath
-if (APPLE)
-  option(SHARED_LIBS_ABS_PATH "Force shared libraries to be installed with absolute paths (as opposed to rpaths)" ON)
-  mark_as_advanced( SHARED_LIBS_ABS_PATH )
-  if (SHARED_LIBS_ABS_PATH)
+if(APPLE)
+  option(
+    SHARED_LIBS_ABS_PATH
+    "Force shared libraries to be installed with absolute paths (as opposed to rpaths)"
+    ON)
+  mark_as_advanced(SHARED_LIBS_ABS_PATH)
+  if(SHARED_LIBS_ABS_PATH)
     # Set install_name_dir as the absolute path to install_prefix/lib
     GET_FILENAME_COMPONENT(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib REALPATH)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -44,5 +48,5 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-add_subdirectory(src/Core)
-add_subdirectory(Wrappers/Python)
+ 
+add_subdirectory(src/cilacc)

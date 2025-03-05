@@ -29,23 +29,29 @@ from cil.optimisation.functions import Function, TotalVariation
 from cil.framework import DataContainer
 from typing import Optional
 
+import logging
+
+log = logging.getLogger(__name__)
 
 class FunctionOfAbs(Function):
     r'''A function which acts on the absolute value of the complex-valued input, 
 
     .. math::  G(z) = H(abs(z))
 
-    This function is initialised with another CIL function, :math:`H` in the above formula. When this function is called, first the absolute value of the input is taken, and then the input is passed to the provided function, :math:.
-
-    This function defines the proximal map and convex conjugate, in the case that H is lower semi-continuous, convex, non-decreasing and finite at the origin,  but not the gradient which is not implemented. The calculation of the proximal conjugate from the parent CIL Function class is valid for this function. 
+    This function is initialised with another CIL function, :math:`H` in the above formula. When this function is called, first the absolute value of the input is taken, and then the input is passed to the provided function.
+    
+    Included in this class is the proximal map for FunctionOfAbs.  From this, the proximal conjugate is also available from the parent CIL Function class, which is valid for this function. 
+    In the case that :math:`H` is lower semi-continuous, convex, non-decreasing and finite at the origin, (and thus `assume_lower_semi` is set to `True` in the `init`) the convex conjugate is also defined.  
+    The gradient is not defined for this function.
+    
 
 
     Parameters
     ----------
-    function : Function
-        Function acting on a real-valued input
-    assume_lower_semi : bool
+    assume_lower_semi : bool, default False
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
+        This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
+        If False, the convex conjugate is not implemented.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.   Default is False.    
 
@@ -108,17 +114,21 @@ class FunctionOfAbs(Function):
         real x. In other cases, a general convex conjugate is not available or defined.      
 
 
+        Reference
+        ---------
+        Convex Analysis, R. Tyrrell Rocakfellar, pp110-111
+        
+        
         Parameters
         ----------
         x : DataContainer
 
         Returns
         -------
-        The value of the convex conjugate of the function at x.
+        float:
+            The value of the convex conjugate of the function at x.
         
-        Reference
-        ---------
-        Convex Analysis, R. Tyrrell Rocakfellar, pp110-111
+        
         
         '''
 
@@ -162,7 +172,7 @@ class FunctionOfAbs(Function):
 
             # Douglas-Rachford splitting to find solution in positive orthant
             if np.any(fvals.array < 0):
-                print('AbsFunctions: projection to +ve orthant triggered')
+                log.info('AbsFunctions: projection to +ve orthant triggered')
                 cts = 0
                 y = r.copy()
                 while np.any(fvals.array < 0):

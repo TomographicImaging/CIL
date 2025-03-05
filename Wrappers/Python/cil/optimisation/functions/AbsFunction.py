@@ -114,9 +114,7 @@ class FunctionOfAbs(Function):
         real x. In other cases, a general convex conjugate is not available or defined.      
 
 
-        Reference
-        ---------
-        Convex Analysis, R. Tyrrell Rocakfellar, pp110-111
+        For reference see:  Convex Analysis, R. Tyrrell Rocakfellar, pp110-111.
         
         
         Parameters
@@ -140,7 +138,7 @@ class FunctionOfAbs(Function):
                 'Convex conjugate not available for this function. If you are sure your function is lower semi-continuous, convex, non-decreasing and finite at the origin, set `assume_lower_semi=True`')
 
     def _take_abs_input(self, func):
-        '''decorator for function to act on abs of input of a method'''
+        '''Decorator for function to act on abs of input of a method'''
 
         def _take_abs_decorator(self, x, *args, **kwargs):
             rgeo = x.geometry.copy()
@@ -153,7 +151,7 @@ class FunctionOfAbs(Function):
         return _take_abs_decorator
 
     def _abs_and_project(self, func):
-        '''decorator for function to act on abs of input, 
+        '''Decorator for function to act on abs of input, 
         with return being projected to the angle of the input.
         Requires function return to have the same shape as input,
         such as prox.'''

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.ChannelwiseOperator &#8212; CIL 24.3.1.dev13+g28b92b02 documentation</title>
+    <title>cil.optimisation.operators.ChannelwiseOperator &#8212; CIL 24.3.1.dev14+g90f110de documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=f9003edd7fb0eec021ef" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=f9003edd7fb0eec021ef" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../../_static/scripts/fontawesome.js?digest=f9003edd7fb0eec021ef"></script>
+  <script src="../../../../../_static/scripts/fontawesome.js?digest=6e7e72663174ced67551"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=f9003edd7fb0eec021ef" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f9003edd7fb0eec021ef" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551" />
 
-    <script src="../../../../../_static/documentation_options.js?v=5d68c828"></script>
+    <script src="../../../../../_static/documentation_options.js?v=06ec9e97"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev13+g28b92b02';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev14+g90f110de';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev13+g28b92b02" />
+  <meta name="docsearch:version" content="24.3.1.dev14+g90f110de" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -497,20 +497,60 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChannelwiseOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;ChannelwiseOperator:  takes in a single-channel operator op and the</span>
-<span class="sd">    number of channels to be used, and creates a new multi-channel</span>
-<span class="sd">    ChannelwiseOperator, which will apply the operator op independently on</span>
-<span class="sd">    each channel for the number of channels specified.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;The ChannelwiseOperator  takes in an operator  and the number of channels to be used, and creates a new multi-channel</span>
+<span class="sd">    `ChannelwiseOperator`, which will apply the operator  independently on each channel for the number of channels specified.</span>
 
-<span class="sd">    ChannelwiseOperator supports simple operators as input but not</span>
-<span class="sd">    BlockOperators. Typically if such behaviour is desired, it can be achieved</span>
+<span class="sd">    ChannelwiseOperator does not currently support BlockOperators. Typically, if such behaviour is desired, it can be achieved</span>
 <span class="sd">    by creating instead a BlockOperator of ChannelwiseOperators.</span>
 
-<span class="sd">        :param op: Single-channel operator</span>
-<span class="sd">        :param channels: Number of channels</span>
-<span class="sd">        :param dimension: &#39;prepend&#39; (default) or &#39;append&#39; channel dimension onto existing dimensions</span>
-
-<span class="sd">     &#39;&#39;&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op : Operator</span>
+<span class="sd">        Single-channel operator</span>
+<span class="sd">    channels : int</span>
+<span class="sd">        Number of channels</span>
+<span class="sd">    dimension : str, optional</span>
+<span class="sd">        &#39;prepend&#39; (default) or &#39;append&#39; channel dimension onto existing dimensions</span>
+<span class="sd">        </span>
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    In this example, we create a ChannelwiseOperator that applies the same diagonal operator to each channel of a 2 channel image data.</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; M = 3</span>
+<span class="sd">    &gt;&gt;&gt; channels = 2</span>
+<span class="sd">    &gt;&gt;&gt; ig = ImageGeometry(M, M, channels=channels)</span>
+<span class="sd">    &gt;&gt;&gt; single_ig = ImageGeometry(M, M)</span>
+<span class="sd">    &gt;&gt;&gt; x = ImageData( np.stack( [np.ones((M,M)),  2*np.ones((M,M))] , axis=0), geometry=ig )</span>
+<span class="sd">    &gt;&gt;&gt; diag = ImageData(np.array(range(M*M), dtype=np.float64).reshape((M,M)), geometry=single_ig)</span>
+<span class="sd">    &gt;&gt;&gt; D = DiagonalOperator(diag)</span>
+<span class="sd">    &gt;&gt;&gt; C = ChannelwiseOperator(D,channels)</span>
+<span class="sd">    &gt;&gt;&gt; y = C.direct(x)</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;The original image data is:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(x.as_array())</span>
+<span class="sd">    The original image data is:</span>
+<span class="sd">    [[[1. 1. 1.]</span>
+<span class="sd">    [1. 1. 1.]</span>
+<span class="sd">    [1. 1. 1.]]</span>
+<span class="sd">    [[2. 2. 2.]</span>
+<span class="sd">    [2. 2. 2.]</span>
+<span class="sd">    [2. 2. 2.]]]</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;The channel wise operator multiplies each channel element wise by:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(diag.as_array())</span>
+<span class="sd">    The channel wise operator multiplies each channel element wise by:</span>
+<span class="sd">    [[0. 1. 2.]</span>
+<span class="sd">    [3. 4. 5.]</span>
+<span class="sd">    [6. 7. 8.]]</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;The result of applying the channel wise operator is:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(y.as_array())</span>
+<span class="sd">    The result of applying the channel wise operator is:</span>
+<span class="sd">    [[[ 0.  1.  2.]</span>
+<span class="sd">    [ 3.  4.  5.]</span>
+<span class="sd">    [ 6.  7.  8.]]</span>
+<span class="sd">    [[ 0.  2.  4.]</span>
+<span class="sd">    [ 6.  8. 10.]</span>
+<span class="sd">    [12. 14. 16.]]]</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">):</span>
 
@@ -557,7 +597,21 @@
 <div class="viewcode-block" id="ChannelwiseOperator.direct">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.direct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns D(x)&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns :math:`D(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : DataContainer</span>
+<span class="sd">            Input data</span>
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">            Output data, if not provided a new DataContainer will be created</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : DataContainer</span>
+<span class="sd">            Output data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Loop over channels, extract single-channel data, apply single-channel</span>
         <span class="c1"># operator&#39;s direct method and fill into multi-channel output data set.</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -571,8 +625,22 @@
 
 <div class="viewcode-block" id="ChannelwiseOperator.adjoint">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.adjoint">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns D^{*}(y)&#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns :math:`D^{*}(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : DataContainer</span>
+<span class="sd">            Input data</span>
+<span class="sd">        out : DataContainer, optional</span>
+<span class="sd">            Output data, if not provided a new DataContainer will be created</span>
+<span class="sd">    </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : DataContainer</span>
+<span class="sd">            Output data</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Loop over channels, extract single-channel data, apply single-channel</span>
         <span class="c1"># operator&#39;s adjoint method and fill into multi-channel output data set.</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -587,7 +655,7 @@
 <div class="viewcode-block" id="ChannelwiseOperator.calculate_norm">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.calculate_norm">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates operator norm of DiagonalOperator&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates operator norm of ChannelWiseOperator&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
 </div>
 
@@ -620,8 +688,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=f9003edd7fb0eec021ef"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=f9003edd7fb0eec021ef"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

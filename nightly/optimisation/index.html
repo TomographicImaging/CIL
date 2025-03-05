@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev13+g28b92b02 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev14+g90f110de documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=f9003edd7fb0eec021ef" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=f9003edd7fb0eec021ef" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=f9003edd7fb0eec021ef"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=6e7e72663174ced67551"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=f9003edd7fb0eec021ef" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=f9003edd7fb0eec021ef" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551" />
 
-    <script src="../_static/documentation_options.js?v=5d68c828"></script>
+    <script src="../_static/documentation_options.js?v=06ec9e97"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev13+g28b92b02';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev14+g90f110de';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev13+g28b92b02" />
+  <meta name="docsearch:version" content="24.3.1.dev14+g90f110de" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -3596,42 +3596,100 @@ Now, matrix-vector multiplcation is allowed and results to a <span class="math n
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.operators.ChannelwiseOperator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></span><span class="sig-name descname"><span class="pre">ChannelwiseOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prepend'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ChannelwiseOperator/#ChannelwiseOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator" title="Link to this definition">#</a></dt>
-<dd><p>ChannelwiseOperator:  takes in a single-channel operator op and the
-number of channels to be used, and creates a new multi-channel
-ChannelwiseOperator, which will apply the operator op independently on
-each channel for the number of channels specified.</p>
-<p>ChannelwiseOperator supports simple operators as input but not
-BlockOperators. Typically if such behaviour is desired, it can be achieved
+<dd><p>The ChannelwiseOperator  takes in an operator  and the number of channels to be used, and creates a new multi-channel
+<cite>ChannelwiseOperator</cite>, which will apply the operator  independently on each channel for the number of channels specified.</p>
+<p>ChannelwiseOperator does not currently support BlockOperators. Typically, if such behaviour is desired, it can be achieved
 by creating instead a BlockOperator of ChannelwiseOperators.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param op<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Single-channel operator</p>
-</dd>
-<dt class="field-even">param channels<span class="colon">:</span></dt>
-<dd class="field-even"><p>Number of channels</p>
-</dd>
-<dt class="field-odd">param dimension<span class="colon">:</span></dt>
-<dd class="field-odd"><p>‘prepend’ (default) or ‘append’ channel dimension onto existing dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Single-channel operator</p></li>
+<li><p><strong>channels</strong> (<em>int</em>) – Number of channels</p></li>
+<li><p><strong>dimension</strong> (<em>str</em><em>, </em><em>optional</em>) – ‘prepend’ (default) or ‘append’ channel dimension onto existing dimensions</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
+<p class="rubric">Example</p>
+<p>In this example, we create a ChannelwiseOperator that applies the same diagonal operator to each channel of a 2 channel image data.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">channels</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">single_ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">M</span><span class="p">)),</span>  <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">M</span><span class="p">))]</span> <span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diag</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">M</span><span class="p">)),</span> <span class="n">geometry</span><span class="o">=</span><span class="n">single_ig</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">DiagonalOperator</span><span class="p">(</span><span class="n">diag</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">channels</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The original image data is:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="go">The original image data is:</span>
+<span class="go">[[[1. 1. 1.]</span>
+<span class="go">[1. 1. 1.]</span>
+<span class="go">[1. 1. 1.]]</span>
+<span class="go">[[2. 2. 2.]</span>
+<span class="go">[2. 2. 2.]</span>
+<span class="go">[2. 2. 2.]]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The channel wise operator multiplies each channel element wise by:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">diag</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="go">The channel wise operator multiplies each channel element wise by:</span>
+<span class="go">[[0. 1. 2.]</span>
+<span class="go">[3. 4. 5.]</span>
+<span class="go">[6. 7. 8.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The result of applying the channel wise operator is:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="go">The result of applying the channel wise operator is:</span>
+<span class="go">[[[ 0.  1.  2.]</span>
+<span class="go">[ 3.  4.  5.]</span>
+<span class="go">[ 6.  7.  8.]]</span>
+<span class="go">[[ 0.  2.  4.]</span>
+<span class="go">[ 6.  8. 10.]</span>
+<span class="go">[12. 14. 16.]]]</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.ChannelwiseOperator.direct">
 <span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ChannelwiseOperator/#ChannelwiseOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator.direct" title="Link to this definition">#</a></dt>
-<dd><p>Returns D(x)</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D(x)\)</span> where <span class="math notranslate nohighlight">\(D\)</span> is the ChannelwiseOperator and <span class="math notranslate nohighlight">\(x\)</span> is the input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Input data</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Output data, if not provided a new DataContainer will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – Output data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.ChannelwiseOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ChannelwiseOperator/#ChannelwiseOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator.adjoint" title="Link to this definition">#</a></dt>
-<dd><p>Returns D^{*}(y)</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D^{*}(x)\)</span> where <span class="math notranslate nohighlight">\(D\)</span> is the ChannelwiseOperator and <span class="math notranslate nohighlight">\(x\)</span> is the input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Input data</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Output data, if not provided a new DataContainer will be created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – Output data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.operators.ChannelwiseOperator.calculate_norm">
 <span class="sig-name descname"><span class="pre">calculate_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/ChannelwiseOperator/#ChannelwiseOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.ChannelwiseOperator.calculate_norm" title="Link to this definition">#</a></dt>
-<dd><p>Evaluates operator norm of DiagonalOperator</p>
+<dd><p>Evaluates operator norm of ChannelWiseOperator</p>
 </dd></dl>
 
 </dd></dl>
@@ -10120,8 +10178,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=f9003edd7fb0eec021ef"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=f9003edd7fb0eec021ef"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

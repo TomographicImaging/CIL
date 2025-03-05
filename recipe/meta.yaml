@@ -24,6 +24,7 @@ test:
     - packaging
     - ccpi-regulariser=24.0.1 # [not osx]
     - astra-toolbox=2.1=cuda* # [not osx]
+    - matplotlib-base >=3.3.0
 
   source_files:
     - ./Wrappers/Python/test
@@ -54,7 +55,6 @@ requirements:
     - python
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy >=1.4.0
-    - matplotlib-base >=3.3.0
     - h5py
     - pillow
     - libgcc-ng     # [linux]

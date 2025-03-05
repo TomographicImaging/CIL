@@ -8,6 +8,9 @@
       - Added option for a random seed in the power method in the linear operator (#1585)
   - Testing
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
+  - Dependencies
+      - matplotlib-base is an optional dependency, instead of required (#2093)
+
 
 * 24.3.0
   - New features:

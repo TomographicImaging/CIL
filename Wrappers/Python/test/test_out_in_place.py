@@ -131,7 +131,6 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
 
 
         ]
-        
 
         np.random.seed(5)
         self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32)]
@@ -351,57 +350,25 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
         absorption_cone = TransmissionAbsorptionConverter()(data_cone)
         absorption_parallel = TransmissionAbsorptionConverter()(data_parallel)
         
-        absorption_cone_2D = absorption_cone.get_slice(vertical='centre')
-        absorption_parallel_2D = absorption_parallel.get_slice(vertical='centre')
-
-        ground_truth_2D = ground_truth.get_slice(vertical='centre')
 
         self.operator_geom_test_list = [] # Contains (operator, domain_geom, range_geom, data_order)
-            
+        #Note that we only test one astra and one tigre projection operator. This is because there is also tests in test/utils_projectors.py: TestCommon_ProjectionOperator_SIM and TestCommon_ProjectionOperatorBlockOperator. 
+        
         if has_astra and has_nvidia:
             absorption_cone.reorder(order='astra')
-            absorption_parallel.reorder(order='astra')
-            absorption_cone_2D.reorder(order='astra')
-            absorption_parallel_2D.reorder(order='astra')
             
             A_cone_astra = AstraProjector(image_geometry=ground_truth.geometry, 
                         acquisition_geometry=absorption_cone.geometry)
             self.operator_geom_test_list.append((A_cone_astra, 'astra'))
         
-            A_parallel_astra = AstraProjector(image_geometry=ground_truth.geometry,
-                            acquisition_geometry=absorption_parallel.geometry)
-            self.operator_geom_test_list.append((A_parallel_astra, 'astra'))
-            
-            A_cone_astra_2D = AstraProjector(image_geometry=ground_truth_2D.geometry,
-                            acquisition_geometry=absorption_cone_2D.geometry)
-            self.operator_geom_test_list.append((A_cone_astra_2D, 'astra'))
-            
-            A_parallel_astra_2D = AstraProjector(image_geometry=ground_truth_2D.geometry,
-                            acquisition_geometry=absorption_parallel_2D.geometry)
-            self.operator_geom_test_list.append((A_parallel_astra_2D, 'astra'))
             
         if has_tigre and has_nvidia:
-        
-            absorption_cone.reorder(order='tigre')
             absorption_parallel.reorder(order='tigre')
-            absorption_cone_2D.reorder(order='tigre')
-            absorption_parallel_2D.reorder(order='tigre')
-            
-            A_cone_tigre = TigreProjector(image_geometry=ground_truth.geometry,
-                            acquisition_geometry=absorption_cone.geometry)
-            self.operator_geom_test_list.append((A_cone_tigre, 'tigre'))
             
             A_parallel_tigre = TigreProjector(image_geometry=ground_truth.geometry,
                             acquisition_geometry=absorption_parallel.geometry)
             self.operator_geom_test_list.append((A_parallel_tigre, 'tigre'))
-            
-            A_cone_tigre_2D = TigreProjector(image_geometry=ground_truth_2D.geometry,
-                            acquisition_geometry=absorption_cone_2D.geometry)
-            self.operator_geom_test_list.append((A_cone_tigre_2D, 'tigre'))
-            
-            A_parallel_tigre_2D = TigreProjector(image_geometry=ground_truth_2D.geometry,
-                            acquisition_geometry=absorption_parallel_2D.geometry)
-            self.operator_geom_test_list.append((A_parallel_tigre_2D, 'tigre'))
+
     
         
 

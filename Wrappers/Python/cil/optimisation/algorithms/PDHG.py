@@ -122,9 +122,10 @@ class PDHG(Algorithm):
 
     .. math::
 
-        \tau \sigma \|K\|^2 < 1
+        \tau \sigma \|K\|^2 < 4/3
 
-
+    For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
+    
     - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
@@ -400,9 +401,14 @@ class PDHG(Algorithm):
         -------
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
+            
+        Reference
+        ----------
+        Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
+        
         """
         if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
-            if self.sigma * self.tau * self.operator.norm()**2 > 1:
+            if self.sigma * self.tau * self.operator.norm()**2 > 4/3:
                 warnings.warn(
                     "Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
                 return False

@@ -203,9 +203,9 @@ class ProjectionOperator_ag(ProjectionOperator):
                                   deep_copy=False,
                                   geometry=self._range_geometry.copy(),
                                   suppress_warning=True)
-            return out
         else:
             out.fill(arr_out)
+        return out
 
     def __call_Atb(self, data):
         if has_gpu_sel:
@@ -236,9 +236,9 @@ class ProjectionOperator_ag(ProjectionOperator):
                             deep_copy=False,
                             geometry=self._domain_geometry.copy(),
                             suppress_warning=True)
-            return out
         else:
             out.fill(arr_out)
+        return out
 
     def domain_geometry(self):
         return self._domain_geometry

@@ -227,3 +227,13 @@ Make sure that each contributed file contains the following text enclosed in the
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+Github Actions
+==============
+If you open a pull request, continuous integration (CI) via github actions will run automatically. The CI will run the tests and build the documentation. For more information please see the GHA README for CIL: https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md.
+
+When opening or modifying a pull request to master, two variants are built and tested (for linux with minimum & maximum supported python & numpy versions). When pushing to master or creating an annotated tag, all variants are built and tested. To test all variants on a pull request to master, use `#all-tests` in your commit message. You might wish to do this if you are making changes to github actions or CIL dependencies or when preparing for a release. 
+
+To skip tests, include one of the following in your commit message `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` or `[actions skip]`. For merging into CIL master, we must see the tests pass.
+
+

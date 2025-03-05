@@ -7,9 +7,9 @@ on:
     - 'CHANGELOG.md'
     - 'CITATION.cff'
     - 'LICENSE'
-    - 'scripts/**'
+    - 'scripts/**.sh'
     - 'NOTICE.txt'
-    - 'README.md'
+    - '**README.md'
 jobs:
   pass:
     runs-on: ubuntu-22.04

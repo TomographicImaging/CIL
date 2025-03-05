@@ -107,6 +107,9 @@ class CofR_image_sharpness(Processor):
         if data.geometry.geom_type == 'cone' and self.slice_index != 'centre':
             raise ValueError("Only the centre slice is supported with this algorithm")
 
+        if data.geometry.geom_type & AcquisitionType.CONE_SOUV:
+            raise ValueError("Cone-SOUV geometry is not supported by this processor")
+        
         if data.geometry.system_description not in ['simple','offset']:
             raise NotImplementedError("Not implemented for rotated system geometries")
 

@@ -20,8 +20,18 @@
 #include <stdio.h>
 #include <omp.h>
 #include "utilities.h"
+#include <nanobind/ndarray.h>
+
+namespace nb = nanobind;
 
 using int64 = long long;
+
+using DataFloatInput = nb::ndarray<const float>;
+using DataDoubleInput = nb::ndarray<const double>;
+
+using DataFloatOutput = nb::ndarray<float>;
+using DataDoubleOutput = nb::ndarray<double>;
+
 
 int saxpby_asbs(const float * x, const float * y, float * out, float a, float b, int64 size, int nThreads);
 int saxpby_avbv(const float * x, const float * y, float * out, const float * a, const float * b, int64 size, int nThreads);
@@ -30,6 +40,14 @@ int daxpby_asbs(const double * x, const double * y, double * out, double a, doub
 int daxpby_avbv(const double * x, const double * y, double * out, const double * a, const double * b, int64 size, int nThreads);
 int daxpby_asbv(const double * x, const double * y, double * out, double a, const double * b, int64 size, int nThreads);
 
-int saxpby(const float * x, const float * y, float * out, const float * a, int type_a, const float * b, int type_b, int64 size, int nThreads);
-int daxpby(const double * x, const double * y, double * out, const double * a, int type_a, const double * b, int type_b, int64 size, int nThreads);
+int saxpby(DataFloatInput x, DataFloatInput y, 
+		DataFloatOutput  out, 
+		DataFloatInput a, int type_a, 
+		DataFloatInput b, int type_b, 
+		int64 size, int nThreads);
+int daxpby(DataDoubleInput x, DataDoubleInput y, 
+		DataDoubleOutput out, 
+		DataDoubleInput a, int type_a, 
+		DataDoubleInput b, int type_b, 
+		int64 size, int nThreads);
 

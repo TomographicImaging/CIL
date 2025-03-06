@@ -41,7 +41,6 @@ jobs:
       run: |
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
-        sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

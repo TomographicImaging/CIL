@@ -22,7 +22,7 @@ on:
     - 'NOTICE.txt'
     - 'README.md'
 jobs:
-  test-cuda:
+  uv-test-cuda:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: [self-hosted, python, cuda]
     strategy:
@@ -32,22 +32,40 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
-    - name: Set up CUDA
-      uses: Jimver/cuda-toolkit@master
-      id: cuda-toolkit
     - name: Install uv
       uses: astral-sh/setup-uv@v5 
       with:
         version: "0.6.5"
+    - id: reqs
+      name: set requirements
+      run: |
+        envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
+        echo "envname=$envname" >> $GITHUB_OUTPUT
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        environment-file: scripts/requirements-cuda.yml
+        activate-environment: ${{ steps.reqs.outputs.envname }}
+        run-post: false
     - name: "Set up Python" 
       uses: actions/setup-python@v5 
       with:
         python-version: ${{ matrix.python-version }}
     - name: "Install Project"
-      run: uv sync --dev --all-extras
+      run: | 
+        conda activate "${{ steps.reqs.outputs.envname }}"
+        conda install conda-forge::cudatoolkit-dev=11.7.0
+        uv sync --dev --all-extras
     - name: test
       run: CIL_DATA_DIR=./Wrappers/Python/data uv run --dev python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
-  test:
+    - if: always()
+      name: Post Run conda-incubator/setup-miniconda@v3
+      shell: bash
+      run: |
+        sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
+        source ~/.profile
+        conda env remove -n "${{ steps.reqs.outputs.envname }}"
+  uv-test:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-22.04
     strategy:
@@ -72,6 +90,6 @@ jobs:
     - name: test
       run: CIL_DATA_DIR=./Wrappers/Python/data uv run --dev python -m unittest discover -v ./Wrappers/Python/test
   pass:
-    needs: [test-cuda, test]
+    needs: [uv-test-cuda, uv-test]
     runs-on: ubuntu-22.04
     steps: [{run: echo success}]

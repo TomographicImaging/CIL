@@ -48,12 +48,14 @@ class FunctionOfAbs(Function):
 
     Parameters
     ----------
+    function : Function
+        Function acting on a real input, :math:`H` in the above formula.
     assume_lower_semi : bool, default False
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.
-        This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
-        If False, the convex conjugate is not implemented.   Default is False.    
+        
+   
 
 
     Reference

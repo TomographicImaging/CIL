@@ -30,9 +30,10 @@ test:
     - ./Wrappers/Python/test
 
   commands:
+    - pip install unittest-parametrize
     - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
-    - pip install unittest-parametrize
+    
 
 requirements:
   build:

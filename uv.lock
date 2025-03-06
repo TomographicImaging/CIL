@@ -3,6 +3,23 @@ revision = 1
 requires-python = ">=3.10"
 
 [[package]]
+name = "astra-toolbox"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "nvidia-cuda-runtime-cu12" },
+    { name = "nvidia-cufft-cu12" },
+    { name = "scipy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d9/d1/0c853ada582b83386df65f76cb09d18df73df3f83a0400ff2ea0c48973fd/astra_toolbox-2.3.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:cecd4363dbd918fddb1c400fdd9f15ea04c7c4e87c121e65994c099cd668f9da", size = 13542028 },
+    { url = "https://files.pythonhosted.org/packages/5a/ab/b8809ff489504c1e554376feb4c400e376bb232de6ee73acb0f59660dba4/astra_toolbox-2.3.0-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:6ccfbe45fcf5b183d1340bcf73cf09ad59920891852a1ec71cd43b838700ec59", size = 13599871 },
+    { url = "https://files.pythonhosted.org/packages/13/9d/4b291ec75d8f856aa483f71ebbf6562ff23162c93e8066e159abb46d4b46/astra_toolbox-2.3.0-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:65ae1bb673de59259f87f39dcc3a257c7afc571d8ac58135b527ed14500de29a", size = 13626974 },
+    { url = "https://files.pythonhosted.org/packages/1c/a6/86d7cea0b52098ec9c452b1a5215a4ce1ce030eedc34e9bf5426022e4a15/astra_toolbox-2.3.0-cp313-cp313-manylinux2014_x86_64.whl", hash = "sha256:0b3dc8b484507fa4bcfbef52270db24237dc5ca26df6198bf93ee68dc97db2c0", size = 13523315 },
+]
+
+[[package]]
 name = "certifi"
 version = "2025.1.31"
 source = { registry = "https://pypi.org/simple" }
@@ -89,6 +106,11 @@ dependencies = [
     { name = "zenodo-get" },
 ]
 
+[package.optional-dependencies]
+astra = [
+    { name = "astra-toolbox" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "ipp" },
@@ -102,6 +124,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "astra-toolbox", marker = "extra == 'astra'", specifier = ">=2.3.0" },
     { name = "dxchange", specifier = ">=0.0.1" },
     { name = "h5py", specifier = ">=3.13.0" },
     { name = "numba", specifier = ">=0.61.0" },
@@ -113,6 +136,7 @@ requires-dist = [
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "zenodo-get", specifier = ">=1.6" },
 ]
+provides-extras = ["astra"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -395,6 +419,24 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/76/8c/2ba3902e1a0fc1c74962ea9bb33a534bb05984ad7ff9515bf8d07527cadd/numpy-1.26.4-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:1dda2e7b4ec9dd512f84935c5f126c8bd8b9f2fc001e9f54af255e8c5f16b0e0", size = 17786643 },
     { url = "https://files.pythonhosted.org/packages/28/4a/46d9e65106879492374999e76eb85f87b15328e06bd1550668f79f7b18c6/numpy-1.26.4-cp312-cp312-win32.whl", hash = "sha256:50193e430acfc1346175fcbdaa28ffec49947a06918b7b92130744e81e640110", size = 5677803 },
     { url = "https://files.pythonhosted.org/packages/16/2e/86f24451c2d530c88daf997cb8d6ac622c1d40d19f5a031ed68a4b73a374/numpy-1.26.4-cp312-cp312-win_amd64.whl", hash = "sha256:08beddf13648eb95f8d867350f6a018a4be2e5ad54c8d8caed89ebca558b2818", size = 15517754 },
+]
+
+[[package]]
+name = "nvidia-cuda-runtime-cu12"
+version = "12.1.105"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/d5/c68b1d2cdfcc59e72e8a5949a37ddb22ae6cade80cd4a57a84d4c8b55472/nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl", hash = "sha256:6e258468ddf5796e25f1dc591a31029fa317d97a0a94ed93468fc86301d61e40", size = 823596 },
+    { url = "https://files.pythonhosted.org/packages/9f/e2/7a2b4b5064af56ea8ea2d8b2776c0f2960d95c88716138806121ae52a9c9/nvidia_cuda_runtime_cu12-12.1.105-py3-none-win_amd64.whl", hash = "sha256:dfb46ef84d73fababab44cf03e3b83f80700d27ca300e537f85f636fac474344", size = 821226 },
+]
+
+[[package]]
+name = "nvidia-cufft-cu12"
+version = "11.0.2.54"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/86/94/eb540db023ce1d162e7bea9f8f5aa781d57c65aed513c33ee9a5123ead4d/nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl", hash = "sha256:794e3948a1aa71fd817c3775866943936774d1c14e7628c74f6f7417224cdf56", size = 121635161 },
+    { url = "https://files.pythonhosted.org/packages/f7/57/7927a3aa0e19927dfed30256d1c854caf991655d847a4e7c01fe87e3d4ac/nvidia_cufft_cu12-11.0.2.54-py3-none-win_amd64.whl", hash = "sha256:d9ac353f78ff89951da4af698f80870b1534ed69993f10a4cf1d96f21357e253", size = 121344196 },
 ]
 
 [[package]]

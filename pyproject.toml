@@ -49,6 +49,7 @@ dev = [
     "numpy>=1.26,<2.0",
     "pytest",
     "scikit-image>=0.25.2",
+    "unittest-parametrize>=1.6.0",
 ]
 
 

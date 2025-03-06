@@ -116,6 +116,7 @@ dev = [
     { name = "numpy" },
     { name = "pytest" },
     { name = "scikit-image" },
+    { name = "unittest-parametrize" },
 ]
 
 [package.metadata]
@@ -139,6 +140,7 @@ dev = [
     { name = "numpy", specifier = ">=1.26,<2.0" },
     { name = "pytest" },
     { name = "scikit-image", specifier = ">=0.25.2" },
+    { name = "unittest-parametrize", specifier = ">=1.6.0" },
 ]
 
 [[package]]
@@ -739,6 +741,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762aeb1c1184ed1f6b14/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2", size = 78540 },
+]
+
+[[package]]
+name = "unittest-parametrize"
+version = "1.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/87/7213448c3151f8cccc410912927fc8f45b12b947b2093bd7ff19335138d5/unittest_parametrize-1.6.0.tar.gz", hash = "sha256:d9d2209a265b61b310ce81c1890f0e3a2282025deae758773f04d5a692cf1a3f", size = 12863 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/42/6cb88de166a949ce51ca817d04313508134650516c21b31f2fd2c97e6462/unittest_parametrize-1.6.0-py3-none-any.whl", hash = "sha256:fcbc0023304b08624b38a4762d25b691468d66f61fd5f11672b372ed71eee0e2", size = 8294 },
 ]
 
 [[package]]

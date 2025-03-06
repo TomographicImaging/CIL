@@ -22,6 +22,10 @@
 #include <omp.h>
 #include "utilities.h"
 
+#include <nanobind/ndarray.h>
+namespace nb = nanobind;
+
+
 int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
 int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
 int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
@@ -29,7 +33,25 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 
 
 int openMPtest(int nThreads);
-int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nc, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads);
-int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads);
-int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads);
+int fdiff4D(nb::ndarray<float> imagefull, 
+		nb::ndarray<float> gradCfull, 
+		nb::ndarray<float> gradZfull, 
+		nb::ndarray<float> gradYfull,
+		nb::ndarray<float> gradXfull,
+		size_t nc, size_t nz, size_t ny, 
+		size_t nx, int boundary, int direction, 
+		int nThreads);
+int fdiff3D(nb::ndarray<float> imagefull, 
+		nb::ndarray<float> gradZfull,
+		nb::ndarray<float> gradYfull,
+		nb::ndarray<float> gradXfull,
+		size_t nz, size_t ny, size_t nx,
+		int boundary, int direction, 
+		int nThreads);
+int fdiff2D(nb::ndarray<float> imagefull,
+		nb::ndarray<float> gradYfull,
+		nb::ndarray<float> gradXfull,
+		size_t ny, size_t nx, 
+		int boundary, int direction, 
+		int nThreads);
 

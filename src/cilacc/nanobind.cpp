@@ -7,7 +7,7 @@
 
 NB_MODULE(cilacc, m) {
 	m.def("saxpby", &saxpby);
-	m.def("saxpby", &saxpby);
+	m.def("daxpby", &daxpby);
 
 	m.def("Binner_delete", &Binner_delete);
 	m.def("Binner_new", &Binner_new);
@@ -20,5 +20,5 @@ NB_MODULE(cilacc, m) {
 	m.def("fdiff4D", &fdiff4D);
 	m.def("fdiff3D", &fdiff3D);
 	m.def("fdiff2D", &fdiff2D);
-	m.doc() = "C-Extension for CIL"
+	m.doc() = "C-Extension for CIL";
 }

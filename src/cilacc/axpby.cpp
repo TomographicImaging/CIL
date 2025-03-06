@@ -104,7 +104,7 @@ int daxpby_asbv(const double * x, const double * y, double * out, double a, cons
 	}
 	return 0;
 }
-DLL_EXPORT int saxpby(const float * x, const float * y, float * out, const float *a, int a_type, const float* b, int b_type, int64 size, int nThreads)
+int saxpby(const float * x, const float * y, float * out, const float *a, int a_type, const float* b, int b_type, int64 size, int nThreads)
 {
 	//type = 0 float
 	//type = 1 array of floats
@@ -127,7 +127,7 @@ DLL_EXPORT int saxpby(const float * x, const float * y, float * out, const float
 
 	return 0;
 }
-DLL_EXPORT int daxpby(const double * x, const double * y, double * out, const double *a, int a_type, const double* b, int b_type, int64 size, int nThreads)
+int daxpby(const double * x, const double * y, double * out, const double *a, int a_type, const double* b, int b_type, int64 size, int nThreads)
 {
 	//type = 0 double
 	//type = 1 array of double

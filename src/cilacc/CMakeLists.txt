@@ -32,15 +32,13 @@ cmake_minimum_required(VERSION 3.15)
 ####NANOBIND
 
 
-message(STATUS "CMAKE PREFIX: ${CMAKE_PREFIX_PATH}")
-message(STATUS "CMAKE MODULE: ${CMAKE_MODULE_PATH}")
 
 find_path(IPP_INCLUDE_DIR NAMES ipp.h HINTS "${IPP_ROOT}/include")
 find_library(IPP_LIB NAMES ippiw HINTS "${IPP_ROOT}/lib")
 
 
 set(Python_FIND_VIRTUAL_ENV ONLY)
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module OPTIONAL_COMPONENTS Development.SABIModule)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -54,12 +52,11 @@ find_package(nanobind CONFIG REQUIRED)
 # Detect the installed nanobind package and import it into CMake
 #find_package(nanobind CONFIG REQUIRED)
 #Python_add_library(nanobind MODULE)
-find_package(nanobind CONFIG REQUIRED)
 ############
 
 
-message(STATUS "IPP_INCLUDE_DIRS: ${IPP_INCLUDE_DIRS}")
-message(STATUS "IPP_LIBRARIES: ${IPP_LIBRARIES}")
+#message(STATUS "IPP_INCLUDE_DIRS: ${IPP_INCLUDE_DIRS}")
+#message(STATUS "IPP_LIBRARIES: ${IPP_LIBRARIES}")
 
 if (WIN32)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
@@ -71,10 +68,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
   # add_compile_options(-march=native -mavx )
 endif()
 
-message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
-message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
-message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
-message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
   set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
@@ -85,56 +78,37 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
+#if(NOT DEFINED IPP_LIBRARY)
+#if (UNIX)
+#set(IPP_LIBRARY ${SKBUILD_HEADERS_DIR})
+#elseif(WIN32)
+#set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
+#endif()
+#endif()
 
-message("Python_LIBRARIES ${Python_LIBRARIES}")
-message("Python_LIBRARY_DIRS ${Python_LIBRARY_DIRS}")
-message("Python_RUNTIME_LIBRARY_DIRS ${Python_RUNTIME_LIBRARY_DIRS}")
-message("Python_STDLIB ${Python_STDLIB}")
-message("Python_STDARCH ${Python_STDARCH}")
-message("Python_SITELIB ${Python_SITELIB}")
-message("Python_SITEARCH ${Python_SITEARCH}")
-message("Python_SOABI ${Python_SOABI}")
-message("Python_SOSABI ${Python_SOSABI}")
-message("Python_Development.Module_FOUND ${Python_Development.Module_FOUND}")
-message("Python_LINK_OPTIONS ${Python_LINK_OPTIONS}")
-message("Python_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
-message("Python_LIBRARY_DIRS ${Python_LIBRARY_DIRS}")
-message("Python_INCLUDE_DIR ${Python_INCLUDE_DIR}")
-message("Python_LIBRARY_DIR ${Python_LIBRARY_DIR}")
-message("SKBUILD_DATA_DIR ${SKBUILD_DATA_DIR}")
-message("SKBUILD_PLATLIB_DIR ${SKBUILD_PLATLIB_DIR}")
-message("SKBUILD_HEADERS_DIR ${SKBUILD_HEADERS_DIR}")
-if(NOT DEFINED IPP_LIBRARY)
-  if (UNIX)
-	  set(IPP_LIBRARY ${SKBUILD_HEADERS_DIR})
-  elseif(WIN32)
-    set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
-  endif()
-endif()
-
-if(NOT DEFINED IPP_INCLUDE)
-	set(IPP_INCLUDE ${Python_INCLUDE_DIRS}/include)
-endif()
+#if(NOT DEFINED IPP_INCLUDE)
+#set(IPP_INCLUDE ${Python_INCLUDE_DIRS}/include)
+#endif()
 
 
 if (UNIX)
-  find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
+	find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
 elseif(WIN32)
-  find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
-  find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
-  find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
+	find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
+	find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
+	find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
+	find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
 endif()
 
 if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
-  set(USE_IPP TRUE)
-  message("IPP libraries found")
+	set(USE_IPP TRUE)
+	message("IPP libraries found")
 else()
-  set(USE_IPP FALSE)
-  message("IPP libraries not found, FBP_filtering not in build")
+	set(USE_IPP FALSE)
+	message("IPP libraries not found, FBP_filtering not in build")
 endif()
 
 
@@ -159,13 +133,25 @@ endif()
 #
 nanobind_add_module(
 	cilacc
-	${CMAKE_CURRENT_SOURCE_DIR}/include/nanobind.h
-
-
+	NB_STATIC
+	${CMAKE_CURRENT_SOURCE_DIR}/nanobind.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/axpby.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Binning.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/FBP_filtering.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/FiniteDifferenceLibrary.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/utilities.h
+	${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
 )
-include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(cilacc PRIVATE ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
+include_directories(cilacc PUBLIC 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/
+)
 
-install(TARGETS cilacc LIBRARY)
+install(TARGETS cilacc LIBRARY DESTINATION cil)
 
 
 ## Install

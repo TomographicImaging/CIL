@@ -105,17 +105,18 @@ class TestZeissDataReader(unittest.TestCase):
     def setUp(self):
         self.data_dir = tempfile.mkdtemp()
         print (f"Creating temp dir {self.data_dir}")
-
-        if has_file:
-            self.reader = ZEISSDataReader()           
         
-            self.reader.set_up(file_name=test_txrm_file)
+
 
     
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
                      f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
     def test_geometry(self):
-        geometry = self.reader.get_geometry()
+        
+        reader = ZEISSDataReader()           
+        reader.set_up(file_name=test_txrm_file)
+
+        geometry = reader.get_geometry()
         # print (geometry)
         assert geometry is not None
         assert geometry.geom_type == 'CONE'
@@ -133,7 +134,9 @@ class TestZeissDataReader(unittest.TestCase):
         assert _geometry == geometry
 
     def read_data(self):
-        data = self.reader.read()
+        reader = ZEISSDataReader()           
+        reader.set_up(file_name=test_txrm_file)
+        data = reader.read()
         
         # Choose the number of voxels to reconstruct onto as number of detector pixels
         N = data.geometry.pixel_num_h
@@ -175,10 +178,12 @@ class TestZeissDataReader(unittest.TestCase):
         reader.set_up(file_name=test_2d_recon_file)
         gt = reader.read()
 
-        self.read_data()
+        zreader = ZEISSDataReader()           
+        zreader.set_up(file_name=test_txrm_file)
+        data = zreader.read()
 
         # get central slice
-        data2d = self.data.get_slice(vertical='centre')
+        data2d = data.get_slice(vertical='centre')
         # d512 = self.data.subset(vertical=512)
         # data2d.fill(d512.as_array())
         # neg log
@@ -205,8 +210,17 @@ class TestZeissDataReader(unittest.TestCase):
         
 
     def test_file_not_found_error(self):
+        reader = ZEISSDataReader()           
+        
         with self.assertRaises(FileNotFoundError):
-            reader = ZEISSDataReader(file_name='no-file')
+            reader.set_up(file_name='no-file')
+
+    @unittest.skipIf(not has_file, "Missing prerequisites: has_file")
+    def test_import_error(self):
+        reader = ZEISSDataReader()
+        with self.assertRaises(ImportError):
+            reader.set_up(file_name=test_txrm_file)
+            
 
 
 class TestTIFF(unittest.TestCase):

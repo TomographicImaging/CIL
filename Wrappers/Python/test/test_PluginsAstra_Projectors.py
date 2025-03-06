@@ -80,6 +80,7 @@ class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
         with self.assertRaises(TypeError):
             ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='gpu')
     
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_ProjectionOperator_all_default(self):
         with self.assertRaises(TypeError):
             ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='gpu')

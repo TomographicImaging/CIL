@@ -48,14 +48,6 @@ class Binner_IPP(object):
 
       """
 
-      cilacc.Binner_new.argtypes = [c_size_t_p,c_size_t_p,c_size_t_p,c_size_t_p]
-      cilacc.Binner_new.restype = ctypes.c_void_p
-
-      cilacc.Binner_bin.argtypes =  [ ctypes.c_void_p, c_float_p,c_float_p]
-      cilacc.Binner_bin.restype = ctypes.c_int32
-
-      cilacc.Binner_delete.argtypes =  [ ctypes.c_void_p]
-      cilacc.Binner_delete.restype = ctypes.c_void_p
 
       shape_in_arr = np.array(shape_in, np.uintp)
       shape_out_arr = np.array(shape_out, np.uintp)

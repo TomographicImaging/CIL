@@ -3,6 +3,7 @@
 #include "axpby.h"
 #include "Binning.h"
 #include "FBP_filtering.h"
+#include "FiniteDifferenceLibrary.h"
 
 NB_MODULE(cilacc, m) {
 	m.def("saxpby", &saxpby);
@@ -19,7 +20,5 @@ NB_MODULE(cilacc, m) {
 	m.def("fdiff4D", &fdiff4D);
 	m.def("fdiff3D", &fdiff3D);
 	m.def("fdiff2D", &fdiff2D);
-
-
-
+	m.doc() = "C-Extension for CIL"
 }

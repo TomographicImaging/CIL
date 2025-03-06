@@ -29,7 +29,10 @@ from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from zenodo_get import zenodo_get
 
+import importlib.resources
+
 class DATA(object):
+
     @classmethod
     def dfile(cls):
         return None

@@ -44,7 +44,7 @@ jobs:
     - name: "Install Project"
       run: uv sync --dev --all-extras
     - name: test
-      run: CIL_DATA_DIR=./Wrappers/Python/data TESTS_FORCE_GPU=1 uv run pytest -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+      run: CIL_DATA_DIR=./Wrappers/Python/data TESTS_FORCE_GPU=1 uv run --dev python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
   test:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-22.04
@@ -68,7 +68,7 @@ jobs:
     - name: "Install Project"
       run: uv sync --dev
     - name: test
-      run: CIL_DATA_DIR=./Wrappers/Python/data uv run pytest ./Wrappers/Python/test
+      run: CIL_DATA_DIR=./Wrappers/Python/data uv run --dev python -m unittest discover -v ./Wrappers/Python/test
   pass:
     needs: [test-cuda, test]
     runs-on: ubuntu-22.04

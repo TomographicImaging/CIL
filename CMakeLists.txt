@@ -23,7 +23,9 @@ else()
   cmake_minimum_required(VERSION 3.4)
 endif()
 
-project(cil LANGUAGES CXX)
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
+
+#find_package(Pythnon COMPONENTS Interpreter Development.Module REQUIRED)
 
 # find_package(Python COMPONENTS Interpreter Development.Module REQUIRED) if
 # (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -59,5 +61,6 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-add_subdirectory(src/Core)
+
+add_subdirectory(src/cilacc)
 #add_subdirectory(Wrappers/Python)

@@ -72,6 +72,7 @@ class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
         self.norm = 14.85
 
 
+    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_ProjectionOperator_img_geom_default(self):
         K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='gpu')
         assert(K.volume_geometry == self.ag.get_ImageGeometry())

@@ -5,8 +5,12 @@
   - Enhancements:
       - Made the call to next() in algorithm iteration loop explicit (#2069)
       - Added option for a random seed in the power method in the linear operator (#1585)
+      - Defer import of olefile and dxchange (#2098)
   - Testing
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
+      - Fixed ZeissDataReader unit tests (#2098)
+  - Dependencies
+      - olefile and dxchange are an optional dependency, instead of required (#2098)
       
 
 

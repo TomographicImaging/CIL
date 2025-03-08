@@ -40,3 +40,4 @@ DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, siz
 #ifdef __cplusplus
 }
 #endif
+

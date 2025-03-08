@@ -27,8 +27,8 @@ from cil.optimisation.algorithms import FISTA, ISTA
 from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler, IndicatorBox
 from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.utilities import AdaptiveSensitivity
-from testclass import CCPiTestClass
-from utils import has_ccpi_regularisation, initialise_tests
+from .testclass import CCPiTestClass
+from .utils import has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 

@@ -22,7 +22,7 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 from scipy.fft  import fft, ifft
 from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
+from .utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass

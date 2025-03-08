@@ -21,7 +21,7 @@ import numpy as np
 
 from cil.framework import AcquisitionGeometry
 from cil.framework.labels import AngleUnit
-from utils import has_tomophantom, initialise_tests
+from .utils import has_tomophantom, initialise_tests
 
 initialise_tests()
 

@@ -17,10 +17,10 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 import os
 import sys
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 import numpy as np
 from cil.optimisation.utilities import Sampler, SamplerRandom
 initialise_tests()

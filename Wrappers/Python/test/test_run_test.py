@@ -23,9 +23,9 @@ from cil.framework import ImageData, ImageGeometry
 
 import numpy.testing
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 
-from utils import has_cvxpy, initialise_tests
+from .utils import has_cvxpy, initialise_tests
 
 initialise_tests()
 

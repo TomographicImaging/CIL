@@ -20,7 +20,7 @@ import unittest
 from cil.framework import AcquisitionGeometry
 import numpy as np
 
-from utils import has_astra, initialise_tests
+from .utils import has_astra, initialise_tests
 initialise_tests()
 
 if has_astra:

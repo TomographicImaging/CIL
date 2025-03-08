@@ -18,7 +18,7 @@
 
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 
 import numpy as np
 
@@ -34,15 +34,15 @@ from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
 from cil.optimisation.utilities import Sampler, SamplerRandom
 
-from testclass import CCPiTestClass
-from utils import has_astra
+from .testclass import CCPiTestClass
+from .utils import has_astra
 
 initialise_tests()
 
 if has_astra:
     from cil.plugins.astra import ProjectionOperator
 
-from utils import has_cvxpy
+from .utils import has_cvxpy
 
 if has_cvxpy:
     import cvxpy

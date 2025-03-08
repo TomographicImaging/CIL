@@ -17,10 +17,10 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils_projectors import TestCommon_ProjectionOperator_SIM
-from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils import disable_print, enable_prints
-from utils import has_astra, initialise_tests
+from .utils_projectors import TestCommon_ProjectionOperator_SIM
+from .utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from .utils import disable_print, enable_prints
+from .utils import has_astra, initialise_tests
 
 initialise_tests()
 

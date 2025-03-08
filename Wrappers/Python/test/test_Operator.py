@@ -18,7 +18,7 @@
 
 import unittest
 from unittest.mock import Mock
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer
 from cil.framework.labels import FillType
 from cil.optimisation.operators import FiniteDifferenceOperator, SymmetrisedGradientOperator
@@ -31,7 +31,7 @@ import numpy
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 
 from cil.utilities import dataexample
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 import scipy
 
 from cil.utilities.errors import InPlaceError

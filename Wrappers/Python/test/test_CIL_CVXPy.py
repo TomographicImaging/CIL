@@ -17,13 +17,13 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.optimisation.functions import L2NormSquared
 from cil.optimisation.functions import TotalVariation
 from cil.utilities import dataexample
 import numpy as np
 import scipy.sparse as sp
-from utils import has_cvxpy
+from .utils import has_cvxpy
 
 initialise_tests()
 

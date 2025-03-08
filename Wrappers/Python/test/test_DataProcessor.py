@@ -38,14 +38,14 @@ from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissi
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
 import gc
 
-from utils import has_numba
+from .utils import has_numba
 if has_numba:
     import numba
 
 from scipy import constants
 from scipy.fft import ifftshift
 
-from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
+from .utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
 
 initialise_tests()
 

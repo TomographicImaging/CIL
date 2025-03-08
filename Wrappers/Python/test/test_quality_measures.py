@@ -18,14 +18,14 @@
 
 import unittest
 import warnings
-from utils import initialise_tests
+from .utils import initialise_tests
 import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
 from cil.utilities.quality_measures import mse, mae, psnr
 from packaging import version
 from cil.processors import Slicer
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:
         from skimage.metrics import mean_squared_error, peak_signal_noise_ratio

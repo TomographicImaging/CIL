@@ -22,7 +22,7 @@ from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
 from cil.framework import ImageGeometry
 
-from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+from .utils import has_nvidia, has_ccpi_regularisation, initialise_tests
 
 initialise_tests()
 

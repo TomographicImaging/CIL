@@ -18,7 +18,7 @@
 import sys
 import unittest
 from unittest.mock import patch
-from utils import initialise_tests
+from .utils import initialise_tests
 
 import numpy as np
 import os
@@ -28,7 +28,7 @@ from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
-from utils import has_astra, has_nvidia
+from .utils import has_astra, has_nvidia
 from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
 import logging

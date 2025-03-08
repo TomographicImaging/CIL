@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator, GradientOperator
 from cil.framework import BlockDataContainer, BlockGeometry, ImageGeometry
@@ -25,7 +25,7 @@ from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 from timeit import default_timer as timer
 
 log = logging.getLogger(__name__)

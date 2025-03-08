@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.optimisation.functions import L1Norm, \
                                         L2NormSquared, \
                                         TranslateFunction, \
@@ -26,7 +26,7 @@ from cil.optimisation.operators import GradientOperator
 from cil.framework import ImageGeometry, DataContainer
 import numpy as np
 import logging
-from testclass import CCPiTestClass as TestFunction
+from .testclass import CCPiTestClass as TestFunction
 
 log = logging.getLogger(__name__)
 initialise_tests()

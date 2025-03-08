@@ -17,9 +17,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils_projectors import TestCommon_ProjectionOperator_SIM
-from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils import has_tigre, has_nvidia, initialise_tests
+from .utils_projectors import TestCommon_ProjectionOperator_SIM
+from .utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from .utils import has_tigre, has_nvidia, initialise_tests
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator

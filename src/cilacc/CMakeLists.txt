@@ -158,11 +158,14 @@ endif()
 #endif()
 #
 nanobind_add_module(
-	cillacb
-	${CMAKE_CURRENT_SOURCE_DIR}/include/FBP_filtering.h
-	${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
+	cilacc
+	${CMAKE_CURRENT_SOURCE_DIR}/include/nanobind.h
+
+
 )
- include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+install(TARGETS cilacc LIBRARY)
 
 
 ## Install

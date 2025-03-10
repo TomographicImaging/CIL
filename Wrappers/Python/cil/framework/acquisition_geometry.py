@@ -2164,29 +2164,54 @@ class AcquisitionGeometry(object):
 
         return geometry_new
 
-    def allocate(self, value=0, **kwargs):
-        '''allocates an AcquisitionData according to the size expressed in the instance
+    def allocate(self, value=0, dtype=None, seed=None, max_value=100, **kwargs):
+        '''allocates an AcquisitionData according to the geometry
+        
+        Parameters
+        ----------
+        value : number or string, default=0
+            The value to allocate. Accepts a number to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random' and 'random_low_mem' allocate floats between 0 and 1
+            'random_int' and 'random_int_low_mem' allocate ints between 0 and max_value.
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
+        dtype : numpy data type, optional
+            The data type to allocate if different from the geometry data type. 
+            Default None allocates an array with the geometry data type
+
+        seed : int, optional
+            A random seed to fix reproducibility, only used if `value` is a random
+            method. Default is `None`.
+
+        max_value : number, optional
+            The maximum value random integer to generate, only used if `value` 
+            is 'random_int' or 'random_int_low_mem'. 
+
+        Note
+        ----
+            The methods used by 'random' or 'random_int' use `numpy.random.random_sample` 
+            which generates the random array as float64, before casting to the 
+            specified dtype.
+            In contrast, 'random_low_mem' or 'random_int_low_mem' use `numpy.random.default_rng` 
+            which allocates memory only for the array of the specified dtype, however
+            this method does not use the global numpy.random.seed() so the seed
+            should be passed directly as an argument to this method.
+
         '''
-        dtype = kwargs.get('dtype', self.dtype)
+        if dtype is None:
+            dtype = self.dtype
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
-        out = AcquisitionData(geometry=self.copy(),
-                              dtype=dtype,
-                              suppress_warning=True)
-
+        
         if isinstance(value, Number):
-            # it's created empty, so we make it 0
+            out = AcquisitionData(geometry=self.copy(), dtype=dtype)
             out.array.fill(value)
+
         elif value in FillType:
+
             if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
+                out = AcquisitionData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
                 if numpy.iscomplexobj(out.array):
@@ -2194,18 +2219,39 @@ class AcquisitionGeometry(object):
                     out.fill(r)
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
+
             elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
+                out = AcquisitionData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 else:
                     r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=dtype))
+            
+            elif value == FillType.RANDOM_LOW_MEM:
+                rng = numpy.random.default_rng(seed)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
+                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
+                else:
+                    r = rng.random(size=self.shape, dtype=dtype)
+
+                out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
+
+            elif value == FillType.RANDOM_INT_LOW_MEM:
+                rng = numpy.random.default_rng(seed)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
+                else:
+                    r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+            
+                out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
+            
         elif value is None:
-            pass
+            out = AcquisitionData(array=None, geometry=self.copy(), dtype=dtype)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

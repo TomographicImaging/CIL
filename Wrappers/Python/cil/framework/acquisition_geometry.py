@@ -2183,8 +2183,7 @@ class AcquisitionGeometry(object):
             should be passed directly as an argument to this method.
 
         '''
-        if dtype is None:
-            dtype = self.dtype
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")

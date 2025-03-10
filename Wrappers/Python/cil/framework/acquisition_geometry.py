@@ -2166,17 +2166,28 @@ class AcquisitionGeometry(object):
 
     def allocate(self, value=0, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
+        Parameters
+        ----------
+        value : number or string, default=0
+            The value to allocate. Accepts numbers to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random', 'random_int', 'random_low_mem' or 'random_int_low_mem'.
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
+        Note
+        ----
+            'random' or 'random_int' use `numpy.random.random_sample` which generates 
+            the random array as float64, before casting to the specified dtype.
+            'random_low_mem' or 'random_int_low_mem' uses `numpy.random.default_rng` 
+            which allocates memory only for the array of the specified dtype, however
+            this method does not use the global numpy.random.seed() so the seed
+            should be passed directly as an argument to this method.
+
         '''
-        dtype = kwargs.get('dtype', self.dtype)
+        if dtype is None:
+            dtype = self.dtype
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
         
         if isinstance(value, Number):
             out = AcquisitionData(geometry=self.copy(),

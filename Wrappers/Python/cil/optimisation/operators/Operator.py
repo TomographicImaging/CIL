@@ -416,8 +416,7 @@ class LinearOperator(Operator):
 
         # Check relative tolerance but normalised with respect to
         # operator, x and y norms and avoid zero division
-        op_norm = operator.PowerMethod(operator, tolerance=1e-5, method="composed_with_adjoint", seed=seed)
-        error = numpy.abs(lhs - rhs) / (op_norm*x.norm()*y.norm() + 1e-12)
+        error = numpy.abs(lhs - rhs) / (operator.norm()*x.norm()*y.norm() + 1e-12)
 
         if error < tolerance:
             return True

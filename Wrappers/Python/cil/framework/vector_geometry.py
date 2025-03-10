@@ -81,14 +81,23 @@ class VectorGeometry:
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
-        :param seed: seed for the random number generator
-        :type seed: int, default None
-        :param max_value: max value of the random int array
-        :type max_value: int, default 100'''
+        Parameters
+        ----------
+        value : number or string, default=0
+            The value to allocate. Accepts numbers to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random', 'random_int', 'random_low_mem' or 'random_int_low_mem'.
+
+        Note
+        ----
+            'random' or 'random_int' use `numpy.random.random_sample` which generates 
+            the random array as float64, before casting to the specified dtype.
+            'random_low_mem' or 'random_int_low_mem' uses `numpy.random.default_rng` 
+            which allocates memory only for the array of the specified dtype, however
+            this method does not use the global numpy.random.seed() so the seed
+            should be passed directly as an argument to this method.
+
+        '''
         from .vector_data import VectorData
 
         dtype = kwargs.get('dtype', self.dtype)

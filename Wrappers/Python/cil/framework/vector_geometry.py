@@ -102,24 +102,44 @@ class VectorGeometry:
         elif value in FillType:
             
             seed = kwargs.get('seed', None)
-            rng = numpy.random.default_rng(seed)
 
             if value == FillType.RANDOM:
+                out = VectorData(geometry=self.copy(), dtype=dtype)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.random_sample(self.shape) + 1.j*numpy.random.random_sample(self.shape))
+                else:
+                    out.fill(numpy.random.random_sample(self.shape))
+            
+            elif value == FillType.RANDOM_INT:
+                out = VectorData(geometry=self.copy(), dtype=dtype)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.get('max_value', 100)
+                if numpy.iscomplexobj(out.array):
+                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+                else:
+                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+
+            elif value == FillType.RANDOM_LOW_MEM:
+                rng = numpy.random.default_rng(seed)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
                     complex_example = numpy.array([1 + 1j], dtype=dtype)
                     half_dtype = numpy.real(complex_example).dtype
                     r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
                 else:
                     r = rng.random(size=self.shape, dtype=dtype)
+                out = VectorData(r, geometry=self.copy(), dtype=dtype)
 
-            elif value == FillType.RANDOM_INT:
+            elif value == FillType.RANDOM_INT_LOW_MEM:
+                rng = numpy.random.default_rng(seed)
                 max_value = kwargs.get('max_value', 100)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
                     r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
                     r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
-
-            out = VectorData(r, geometry=self.copy(), dtype=dtype)
+                out = VectorData(r, geometry=self.copy(), dtype=dtype)
 
         elif value is None:
             out = VectorData(geometry=self.copy(), dtype=dtype)

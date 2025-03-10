@@ -186,6 +186,8 @@ class FillType(StrEnum):
     """
     RANDOM = auto()
     RANDOM_INT = auto()
+    RANDOM_LOW_MEM = auto()
+    RANDOM_INT_LOW_MEM = auto()
 
 
 class AngleUnit(StrEnum):

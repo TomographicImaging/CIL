@@ -108,6 +108,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
         
         
     def test_bb_step_size_gd_converge(self):
+        np.random.seed(2)
         n = 10
         m = 10
         A = np.array(range(1,n*m+1)).reshape(n,m).astype('float32')
@@ -115,10 +116,8 @@ class TestAlgorithmConvergence(CCPiTestClass):
         x = (np.array(range(n)).astype('float32')-n/2)/n
         b=A@x
 
-        
+
         Aop = MatrixOperator(A)
-        norm = Aop.PowerMethod(Aop, method="composed_with_adjoint", seed=4)
-        Aop.set_norm(norm)
         bop = VectorData(b)
         ig=Aop.domain
         

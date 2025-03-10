@@ -7,7 +7,7 @@ from cil.optimisation.operators import IdentityOperator, MatrixOperator
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner
 import numpy as np
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 from unittest.mock import MagicMock
 
 

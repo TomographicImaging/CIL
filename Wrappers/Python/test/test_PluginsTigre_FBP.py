@@ -17,8 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils_projectors import TestCommon_FBP_SIM
-from utils import has_tigre, has_nvidia, initialise_tests
+from .utils_projectors import TestCommon_FBP_SIM
+from .utils import has_tigre, has_nvidia, initialise_tests
 
 initialise_tests()
 

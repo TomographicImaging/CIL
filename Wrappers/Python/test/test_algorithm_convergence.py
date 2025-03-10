@@ -8,7 +8,7 @@ from cil.utilities import dataexample
 
 import numpy as np
 import unittest
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 
 try:
     import cvxpy

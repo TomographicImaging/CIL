@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.optimisation.functions import L1Norm, ScaledFunction, SumFunction,\
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
@@ -26,7 +26,7 @@ from cil.framework import ImageGeometry, DataContainer
 import numpy
 import numpy as np
 from numbers import Number
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 
 initialise_tests()
 

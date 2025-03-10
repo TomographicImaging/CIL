@@ -20,9 +20,9 @@ import unittest
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
 from cil.utilities import dataexample
-from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
+from .utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 
-from utils import has_tigre, has_nvidia, initialise_tests
+from .utils import has_tigre, has_nvidia, initialise_tests
 
 initialise_tests()
 

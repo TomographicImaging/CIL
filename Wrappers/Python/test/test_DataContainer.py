@@ -25,8 +25,8 @@ from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeomet
                            AcquisitionGeometry, BlockGeometry, VectorData)
 from cil.framework.labels import ImageDimension, AcquisitionDimension
 
-from testclass import CCPiTestClass
-from utils import initialise_tests
+from .testclass import CCPiTestClass
+from .utils import initialise_tests
 
 log = logging.getLogger(__name__)
 initialise_tests()

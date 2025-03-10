@@ -17,12 +17,12 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
 import os, sys, shutil
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 import platform
 import numpy as np
 from unittest.mock import patch 

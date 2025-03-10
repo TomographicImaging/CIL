@@ -16,7 +16,7 @@ from cil.optimisation.functions import KullbackLeibler
 from cil.framework import ImageGeometry
 import numpy
 import scipy
-from utils import has_numba, initialise_tests
+from .utils import has_numba, initialise_tests
 
 initialise_tests()
 

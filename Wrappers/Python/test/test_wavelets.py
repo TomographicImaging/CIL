@@ -7,7 +7,7 @@ from cil.framework import ImageGeometry, VectorGeometry
 from cil.optimisation.functions import L1Norm, L1Sparsity
 from cil.optimisation.operators import WaveletOperator
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 
 def setUp(self):
     np.random.seed(1)

@@ -6,7 +6,7 @@ from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearO
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule
 import numpy as np
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 from unittest.mock import MagicMock
 
 

@@ -1,11 +1,11 @@
 
-from utils import initialise_tests
+from .utils import initialise_tests
 from cil.framework import ImageGeometry
 from cil.optimisation.operators import GradientOperator, AdjointOperator, MatrixOperator
 import numpy as np 
 
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 
 
 initialise_tests()

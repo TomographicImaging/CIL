@@ -19,7 +19,7 @@
 import unittest
 from cil.framework import DataContainer, BlockDataContainer
 import numpy as np
-from utils import initialise_tests
+from .utils import initialise_tests
 
 initialise_tests()
 

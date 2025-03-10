@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from cil.utilities import dataexample
 from unittest.mock import patch
-from utils import initialise_tests, has_matplotlib
+from .utils import initialise_tests, has_matplotlib
 initialise_tests()
 
 if has_matplotlib:

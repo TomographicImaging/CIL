@@ -23,7 +23,7 @@ import numpy
 from cil.framework import ImageGeometry
 from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
-from utils import initialise_tests
+from .utils import initialise_tests
 
 log = logging.getLogger(__name__)
 initialise_tests()

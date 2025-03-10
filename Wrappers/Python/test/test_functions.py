@@ -46,11 +46,11 @@ from timeit import default_timer as timer
 import numpy as np
 from cil.utilities import dataexample
 from cil.utilities import noise
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
 import cil.utilities.multiprocessing as cilmp
 
-from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
+from .utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialise_tests
 import numba
 from numbers import Number
 

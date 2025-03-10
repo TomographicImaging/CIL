@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import warnings
-from utils import has_cvxpy
+from .utils import has_cvxpy
 import unittest
 from os import unlink
 from tempfile import NamedTemporaryFile
@@ -47,8 +47,8 @@ from cil.optimisation.functions import Rosenbrock
 from cil.utilities.quality_measures import mae, mse, psnr
 
 import logging
-from testclass import CCPiTestClass
-from utils import has_astra
+from .testclass import CCPiTestClass
+from .utils import has_astra
 
 from unittest.mock import MagicMock
 

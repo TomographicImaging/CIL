@@ -44,7 +44,7 @@ from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRota
 RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
 
 import numpy
-from utils import has_tigre, has_nvidia
+from .utils import has_tigre, has_nvidia
 
 
 from cil.framework import  BlockGeometry
@@ -54,11 +54,11 @@ from timeit import default_timer as timer
 import numpy as np
 
 
-from testclass import CCPiTestClass
+from .testclass import CCPiTestClass
 from cil.utilities.quality_measures import mae
 
 
-from utils import  initialise_tests
+from .utils import  initialise_tests
 
 from utils import has_astra, has_tigre, has_nvidia
 

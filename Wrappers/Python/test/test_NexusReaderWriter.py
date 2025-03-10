@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 import os
 from cil.io import NEXUSDataReader
 from cil.io import NEXUSDataWriter

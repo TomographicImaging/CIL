@@ -17,14 +17,14 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from .utils import initialise_tests
 import numpy as np
 from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
-from testclass import CCPiTestClass as BDCUnittest
+from .testclass import CCPiTestClass as BDCUnittest
 
 from cil.utilities import dataexample
 import numpy

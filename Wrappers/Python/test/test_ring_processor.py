@@ -25,8 +25,8 @@ from cil.utilities.quality_measures import mse
 
 import os
 import numpy as np
-from utils import has_tomophantom, initialise_tests
-from testclass import CCPiTestClass
+from .utils import has_tomophantom, initialise_tests
+from .testclass import CCPiTestClass
 
 initialise_tests()
 

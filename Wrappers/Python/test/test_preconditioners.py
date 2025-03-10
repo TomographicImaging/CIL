@@ -234,7 +234,7 @@ class TestPreconditioners(CCPiTestClass):
         
     def test_adaptive_sensitivity_gd_converges(self):
         ig = ImageGeometry(7, 8, 4)
-        data = ig.allocate('random', seed=3)
+        data = ig.allocate('random', seed=2)
         A = IdentityOperator(ig)
         initial = ig.allocate(0)
 

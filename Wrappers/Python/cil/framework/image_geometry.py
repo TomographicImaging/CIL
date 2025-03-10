@@ -252,48 +252,55 @@ class ImageGeometry:
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
-    def allocate(self, value=0, **kwargs):
-        '''allocates an ImageData according to the size expressed in the instance
+    def allocate(self, value=0, dtype=None, seed=None, max_value=100, **kwargs):
+        '''allocates an ImageData according to the geometry
 
         Parameters
         ----------
         value : number or string, default=0
-            The value to allocate. Accepts numbers to allocate a uniform array, 
+            The value to allocate. Accepts a number to allocate a uniform array, 
             None to allocate an empty memory block, or a string to create a random 
-            array: 'random', 'random_int', 'random_low_mem' or 'random_int_low_mem'.
+            array: 'random' and 'random_low_mem' allocate floats between 0 and 1
+            'random_int' and 'random_int_low_mem' allocate ints between 0 and max_value.
+
+        dtype : numpy data type, optional
+            The data type to allocate if different from the geometry data type. 
+            Default None allocates an array with the geometry data type
+
+        seed : int, optional
+            A random seed to fix reproducibility, only used if `value` is a random
+            method. Default is `None`.
+
+        max_value : number, optional
+            The maximum value random integer to generate, only used if `value` 
+            is 'random_int' or 'random_int_low_mem'. Default is 100
 
         Note
         ----
-            'random' or 'random_int' use `numpy.random.random_sample` which generates 
-            the random array as float64, before casting to the specified dtype.
-            'random_low_mem' or 'random_int_low_mem' uses `numpy.random.default_rng` 
+            The methods used by 'random' or 'random_int' use `numpy.random.random_sample` 
+            which generates the random array as float64, before casting to the 
+            specified dtype.
+            In contrast, 'random_low_mem' or 'random_int_low_mem' use `numpy.random.default_rng` 
             which allocates memory only for the array of the specified dtype, however
             this method does not use the global numpy.random.seed() so the seed
             should be passed directly as an argument to this method.
 
         '''
 
-        dtype = kwargs.get('dtype', self.dtype)
+        if dtype is None:
+            dtype = self.dtype
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        
-
         if isinstance(value, Number):
-            out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+            out = ImageData(geometry=self.copy(), dtype=dtype)
             out.array.fill(value)
 
         elif value in FillType:
             
-            seed = kwargs.get('seed', None)
-
             if value == FillType.RANDOM:
-                out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+                out = ImageData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
                 if numpy.iscomplexobj(out.array):
@@ -303,12 +310,9 @@ class ImageGeometry:
                     out.fill(numpy.random.random_sample(self.shape))
 
             elif value == FillType.RANDOM_INT:
-                out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+                out = ImageData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
                 if numpy.iscomplexobj(out.array):
                     out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
                 else:
@@ -322,27 +326,18 @@ class ImageGeometry:
                     r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
                 else:
                     r = rng.random(size=self.shape, dtype=dtype)
-                out = ImageData(r,
-                            geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+                out = ImageData(r, geometry=self.copy(), dtype=dtype)
 
             elif value == FillType.RANDOM_INT_LOW_MEM:
                 rng = numpy.random.default_rng(seed)
-                max_value = kwargs.get('max_value', 100)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
                     r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
                     r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
-                out = ImageData(r,
-                            geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+                out = ImageData(r, geometry=self.copy(), dtype=dtype)
         
         elif value is None:
-            out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+            out = ImageData(array=None, geometry=self.copy(), dtype=dtype)
         else:
             raise ValueError(f'Value {value} unknown')
         return out

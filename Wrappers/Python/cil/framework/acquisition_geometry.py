@@ -2185,7 +2185,7 @@ class AcquisitionGeometry(object):
 
         max_value : number, optional
             The maximum value random integer to generate, only used if `value` 
-            is 'random_int' or 'random_int_low_mem'. 
+            is 'random_int' or 'random_int_low_mem'. Default is 100. 
 
         Note
         ----

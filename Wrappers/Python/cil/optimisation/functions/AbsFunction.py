@@ -54,6 +54,8 @@ class FunctionOfAbs(Function):
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.
+    precision : str, default 'single'
+        Precision of the calculation, 'single' or 'double'
         
    
 
@@ -64,9 +66,19 @@ class FunctionOfAbs(Function):
     
     '''
 
-    def __init__(self, function, assume_lower_semi=False):
+    def __init__(self, function, assume_lower_semi=False, precision='single'):
         self._function = function
         self._lower_semi = assume_lower_semi
+        
+        if precision == 'single':
+            self.real_dtype = np.float32
+            self.complex_dtype = np.complex64
+        elif precision == 'double':
+            self.real_dtype = np.float64
+            self.complex_dtype = np.complex128
+        else:
+            raise ValueError('Precision must be `single` or `double`')
+        
         super().__init__(L=function.L)
 
     def __call__(self, x):
@@ -86,10 +98,12 @@ class FunctionOfAbs(Function):
         Parameters
         ----------
         x : DataContainer
-
+            The input to the function
         tau: scalar
-
+            The scalar multiplying the function in the proximal map
         out: return DataContainer, if None a new DataContainer is returned, default None.
+            DataContainer to store the result of the proximal map
+        
 
         Returns
         -------
@@ -122,14 +136,12 @@ class FunctionOfAbs(Function):
         Parameters
         ----------
         x : DataContainer
+            The input to the function
 
         Returns
         -------
         float:
-            The value of the convex conjugate of the function at x.
-        
-        
-        
+
         '''
 
         if self._lower_semi:
@@ -141,12 +153,12 @@ class FunctionOfAbs(Function):
 
     def _take_abs_input(self, func):
         '''Decorator for function to act on abs of input of a method'''
-
-        def _take_abs_decorator(self, x, *args, **kwargs):
+ 
+        def _take_abs_decorator(self2, x, *args, **kwargs):
             rgeo = x.geometry.copy()
-            rgeo.dtype = np.float64
+            rgeo.dtype = self.real_dtype
             r = rgeo.allocate(0)
-            r.array = np.abs(x.array).astype(np.float64)
+            r.fill(np.abs(x.array).astype(self.real_dtype))
             # func(self, r, *args, **kwargs) for the abstract class implementation
             fval = func(r, *args, **kwargs)
             return fval
@@ -157,16 +169,16 @@ class FunctionOfAbs(Function):
         with return being projected to the angle of the input.
         Requires function return to have the same shape as input,
         such as prox.'''
-
-        def _abs_project_decorator(self, x, *args, **kwargs):
+        
+            
+        def _abs_project_decorator(self2, x, *args, **kwargs):
             rgeo = x.geometry.copy()
-            rgeo.dtype = np.float64
-            r = rgeo.allocate(0)
-            r.array = np.abs(x.array).astype(np.float64)
-            Phi = np.exp(1j*np.angle(x.array))
-            out = kwargs.get('out', None)
-            if out is not None:
-                del kwargs['out']
+            rgeo.dtype = self.real_dtype
+            r = rgeo.allocate(None)
+            r.fill( np.abs(x.array).astype(self.real_dtype))
+            Phi = np.exp((1j*np.angle(x.array)))
+            out = kwargs.pop('out', None)
+            
             # func(self, r, *args, **kwargs) for the abstract class implementation
             fvals = func(r, *args, **kwargs)
 
@@ -186,12 +198,12 @@ class FunctionOfAbs(Function):
                         break
 
             if out is not None:
-                out.array = fvals.array.astype(np.complex128)*Phi
-                return out
+                out.fill((fvals.array.astype(self.complex_dtype)*Phi))
+                
             else:
-                out = x.geometry.allocate(0)
-                out.array = fvals.array.astype(np.complex128)*Phi
-                return out
+                out = x.geometry.allocate(None)
+                out.fill((fvals.array.astype(self.complex_dtype)*Phi))
+            return out
         return _abs_project_decorator
 
     def gradient(self):

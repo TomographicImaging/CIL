@@ -128,7 +128,9 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (BlockFunction(L1Norm(),L2NormSquared()), bg, True, True, False),
             (BlockFunction(L2NormSquared(),L2NormSquared()), bg, True, True, True),
             (L1Sparsity(WaveletOperator(ig)), ig, True, True, False),
-            (FunctionOfAbs(TotalVariation(backend='cpu'), assume_lower_semi=True), ig , True, True, False)
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start= False), assume_lower_semi=True), ig , True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start=False), assume_lower_semi=True, precision='double'), ig , True, True, False),
+            
         ]
 
         np.random.seed(5)

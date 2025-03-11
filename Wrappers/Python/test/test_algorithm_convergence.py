@@ -1,7 +1,8 @@
-from cil.optimisation.algorithms import SPDHG, PDHG, PD3O
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, TotalVariation, MixedL21Norm
+from cil.optimisation.algorithms import SPDHG, PDHG, GD, PD3O
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler 
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule
+
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData
 
 from cil.utilities import dataexample
@@ -105,6 +106,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), decimal=6)
         
+
     def test_pd3o_convergence(self):
         data = dataexample.CAMERA.get(size=(32, 32))
         # pd30 convergence test using TV denoising
@@ -134,3 +136,38 @@ class TestAlgorithmConvergence(CCPiTestClass):
         # pd30 vs fista
         np.testing.assert_allclose(
             tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
+        
+        
+    def test_bb_step_size_gd_converge(self):
+        np.random.seed(2)
+        n = 10
+        m = 10
+        A = np.array(range(1,n*m+1)).reshape(n,m).astype('float32')
+        A = np.diag(1/(np.transpose(A)@np.ones(m)))*A
+        x = (np.array(range(n)).astype('float32')-n/2)/n
+        b=A@x
+
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+        ig=Aop.domain
+        
+        initial = VectorData((np.array(range(n)).astype('float32')-n/2)/(n+1))
+        f = LeastSquares(Aop, b=bop, c=2)
+
+  
+
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'short')
+        alg = GD(initial=initial, f=f, step_size=ss_rule)
+        alg.run(300, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), x, decimal=4)
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'long')
+        alg = GD(initial=initial, f=f, step_size=ss_rule)
+        alg.run(300, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), x, decimal=4)
+        
+        ss_rule=BarzilaiBorweinStepSizeRule(1/f.L, 'alternate')
+        alg = GD(initial=initial, f=f, step_size=ss_rule)
+        alg.run(300, verbose=0)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), x, decimal=4)

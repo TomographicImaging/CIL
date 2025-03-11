@@ -22,8 +22,13 @@ try:
     import ipywidgets as widgets
 except ImportError as ie:
     raise ImportError("please conda/pip install ipywidgets") from ie
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
+try:
+    import matplotlib.pyplot as plt
+    from matplotlib import gridspec
+except ImportError as ie:
+    msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
+    raise ImportError(f"Please install {msg}") from ie
+
 import numpy
 
 from IPython.display import HTML, display

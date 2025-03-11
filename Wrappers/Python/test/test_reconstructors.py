@@ -22,14 +22,14 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 from scipy.fft  import fft, ifft
 from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia, initialise_tests
+from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 
 import os, sys
-import matplotlib.testing.compare as compare
+
 from scipy.fft import fftfreq
 import tempfile
 
@@ -39,6 +39,9 @@ if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
+
+if has_matplotlib:
+    import matplotlib.testing.compare as compare
 
 
 class Test_Reconstructor(unittest.TestCase):
@@ -298,7 +301,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_ipp and has_matplotlib, "TIGRE, IPP or matplotlib not installed")
     def test_plot_filter(self):
         """
         Tests that the filters are plotted correctly for two different 

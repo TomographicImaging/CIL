@@ -62,6 +62,8 @@ class Sampler():
     >>> print(sampler.get_current_sample())
     4
 
+    Example
+    --------
     >>> sampler = Sampler.staggered(num_indices=21, stride=4)
     >>> print(next(sampler))
     0
@@ -120,6 +122,7 @@ class Sampler():
     def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
 
         self._type = sampling_type
+        
 
         if isinstance (num_indices, numbers.Integral):
             self._num_indices = num_indices
@@ -143,6 +146,7 @@ class Sampler():
 
         self._prob_weights = prob_weights
         self._iteration_number = 0
+        self._current_sample = None 
 
     @property
     def prob_weights(self):
@@ -164,10 +168,10 @@ class Sampler():
         Returns a sample from the list of indices `{0, 1, …, N-1}, where N is the number of indices and increments the sampler.
         """
 
-        out = self._function(self._iteration_number)
+        self._current_sample = self._function(self._iteration_number)
 
         self._iteration_number += 1
-        return out
+        return self._current_sample
 
     def __next__(self):
         return self.next()
@@ -186,15 +190,16 @@ class Sampler():
         Numpy Array
             The first `num_samples" output by the sampler.
         """
+        save_current_sample = self._current_sample
         save_last_index = self._iteration_number
         self._iteration_number = 0
-
+        self._current_sample = None 
         output = [self.next() for _ in range(num_samples)]
 
         self._iteration_number = save_last_index
+        self._current_sample = save_current_sample
 
         return np.array(output)
-    
     
     def get_previous_samples(self):
         """
@@ -217,10 +222,10 @@ class Sampler():
         int
             The current sample of the sampler.
         """
-        if self._iteration_number == 0:
+        if self._current_sample is None:
             raise ValueError('The sampler has not yet been incremented. ')
-        return self._function(self._iteration_number-1)
-
+        return self._current_sample
+    
     def __str__(self):
         repres = "Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. \n"
         repres += "Type : {} \n".format(self._type)
@@ -717,7 +722,6 @@ class SamplerRandom(Sampler):
         self._generator = np.random.RandomState(self._seed)
         self._sampling_list = None
         self._replace = replace
-        self._current_sample = None
 
         super(SamplerRandom, self).__init__(num_indices, self._function,
                                             sampling_type=sampling_type, prob_weights=prob)
@@ -768,19 +772,6 @@ class SamplerRandom(Sampler):
         self._sampling_list = save_sampling_list
 
         return np.array(output)
-    
-    def get_current_sample(self):
-        """
-        Returns the current sample of the sampler without incrementing the sampler index.
-
-        Returns
-        --------
-        int
-            The current sample of the sampler.
-        """
-        if self._current_sample is None:
-            raise ValueError('The sampler has not yet been incremented. ')
-        return self._current_sample
 
     def __str__(self):
         repres = super().__str__()

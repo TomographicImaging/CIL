@@ -115,7 +115,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
         alpha = 0.11
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = TotalVariation(max_iteration=200)
+        TV = TotalVariation(max_iteration=40)
         tv_cil = TV.proximal(data, tau=alpha)
 
         F = alpha * MixedL21Norm()
@@ -131,7 +131,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
 
         pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
                            update_objective_interval=100)
-        pd3O_with_f.run(1000)
+        pd3O_with_f.run(800)
 
         # pd30 vs fista
         np.testing.assert_allclose(

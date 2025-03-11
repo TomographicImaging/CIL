@@ -1681,7 +1681,7 @@ class TestADMM(unittest.TestCase):
             admm.solution.array, pdhg.solution.array,  decimal=3)
 
 
-class Test_PD3O(unittest.TestCase):
+class Test_PD3O(CCPiTestClass):
 
     def setUp(self):
 
@@ -1783,6 +1783,25 @@ class Test_PD3O(unittest.TestCase):
         algo_pd3o.run(1)
         self.assertAlmostEqual(f.data_passes[-1], 8/3)
         self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [0,1,2]])
+        
+        sampler=Sampler.sequential(3)
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=5, store_gradients=True)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[2].array, f.functions[2].gradient(algo_pd3o.solution).array )
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 6/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [2]])
+        
+        
         
         sampler=Sampler.sequential(3)
         f=LSVRGFunction(functions, sampler)

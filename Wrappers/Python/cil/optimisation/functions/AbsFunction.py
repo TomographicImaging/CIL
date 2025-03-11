@@ -198,11 +198,11 @@ class FunctionOfAbs(Function):
                         break
 
             if out is not None:
-                out.fill((fvals.array.astype(self.complex_dtype)*Phi))
+                out.array = fvals.array.astype(self.complex_dtype)*Phi
                 
             else:
                 out = x.geometry.allocate(None)
-                out.fill((fvals.array.astype(self.complex_dtype)*Phi))
+                out.array = fvals.array.astype(self.complex_dtype)*Phi
             return out
         return _abs_project_decorator
 

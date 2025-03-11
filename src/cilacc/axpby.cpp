@@ -133,6 +133,7 @@ int saxpby(DataFloatInput x, DataFloatInput y,
 
 	return 0;
 }
+
 int daxpby(DataDoubleInput x, DataDoubleInput y, 
 		DataDoubleOutput out, 
 		DataDoubleInput a, int type_a, 

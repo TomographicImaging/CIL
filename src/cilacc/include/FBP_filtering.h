@@ -22,7 +22,6 @@
 #include <chrono>
 #include <omp.h>
 #include <random>
-#include "dll_export.h"
 #include "utilities.h"
 
 

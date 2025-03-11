@@ -15,6 +15,7 @@
 //
 // Authors:
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>

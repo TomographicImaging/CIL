@@ -17,7 +17,6 @@
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 // Sam Tygier (UKRI-STFC)
 
-
 #include "FiniteDifferenceLibrary.h"
 
 int openMPtest(int nThreads)

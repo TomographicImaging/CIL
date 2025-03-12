@@ -25,7 +25,7 @@
 
 
 import numpy as np
-from cil.optimisation.functions import Function, TotalVariation
+from cil.optimisation.functions import Function
 from cil.framework import DataContainer
 from typing import Optional
 
@@ -54,7 +54,7 @@ class FunctionOfAbs(Function):
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate is not implemented.
-    precision : str, default 'single'
+    precision : str, default 'double'
         Precision of the calculation, 'single' or 'double'
         
    
@@ -66,7 +66,7 @@ class FunctionOfAbs(Function):
     
     '''
 
-    def __init__(self, function, assume_lower_semi=False, precision='single'):
+    def __init__(self, function: Function, assume_lower_semi: bool=False, precision: str='double'):
         self._function = function
         self._lower_semi = assume_lower_semi
         
@@ -81,11 +81,11 @@ class FunctionOfAbs(Function):
         
         super().__init__(L=function.L)
 
-    def __call__(self, x):
+    def __call__(self, x: DataContainer):
         call_abs = self._take_abs_input(self._function.__call__)
         return call_abs(self._function, x)
 
-    def proximal(self, x, tau, out=None):
+    def proximal(self, x: DataContainer, tau: float, out: Optional[DataContainer]=None):
         r'''Returns the proximal map of function :math:`\tau G`  evaluated at x
 
         .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
@@ -113,7 +113,7 @@ class FunctionOfAbs(Function):
         prox_abs = self._abs_and_project(self._function.proximal)
         return prox_abs(self._function, x, tau=tau, out=out)
 
-    def convex_conjugate(self, x):
+    def convex_conjugate(self, x: DataContainer):
         r'''
         Evaluation of the function G* at x, where G* is the convex conjugate of function G,
 
@@ -151,7 +151,7 @@ class FunctionOfAbs(Function):
             raise NotImplementedError(
                 'Convex conjugate not available for this function. If you are sure your function is lower semi-continuous, convex, non-decreasing and finite at the origin, set `assume_lower_semi=True`')
 
-    def _take_abs_input(self, func):
+    def _take_abs_input(self, func: Function):
         '''Decorator for function to act on abs of input of a method'''
  
         def _take_abs_decorator(self2, x, *args, **kwargs):
@@ -164,7 +164,7 @@ class FunctionOfAbs(Function):
             return fval
         return _take_abs_decorator
 
-    def _abs_and_project(self, func):
+    def _abs_and_project(self, func: Function):
         '''Decorator for function to act on abs of input, 
         with return being projected to the angle of the input.
         Requires function return to have the same shape as input,
@@ -206,7 +206,7 @@ class FunctionOfAbs(Function):
             return out
         return _abs_project_decorator
 
-    def gradient(self):
+    def gradient(self, x):
         '''Gradient of the function at x is not defined for this function.
         '''
         raise NotImplementedError('Gradient not available for this function')

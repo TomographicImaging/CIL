@@ -28,7 +28,7 @@ import numpy as np
 from cil.optimisation.functions import Function
 from cil.framework import DataContainer
 from typing import Optional
-
+import warnings
 import logging
 
 log = logging.getLogger(__name__)
@@ -53,9 +53,12 @@ class FunctionOfAbs(Function):
     assume_lower_semi : bool, default False
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
-        If False, the convex conjugate is not implemented.
+        If False, the convex conjugate returned as 0. This is to ensure compatibility with Algorithms such as PDHG.
     precision : str, default 'double'
         Precision of the calculation, 'single' or 'double'
+        Some complex-valued imaging problems involve high dynamic range and/or require fine phase accuracy, necessitating the use of double precision (default).
+        For example, in synthetic aperture radar imagery 100dB+ dynamic range may be encountered, which is more than single precision allows.
+        In other cases, use of single precision will reduce memory reservation and may improve performance, depending on the compute architecture.
         
    
 
@@ -148,10 +151,10 @@ class FunctionOfAbs(Function):
             conv_abs = self._take_abs_input(self._function.convex_conjugate)
             return conv_abs(self._function, x)
         else:
-            raise NotImplementedError(
-                'Convex conjugate not available for this function. If you are sure your function is lower semi-continuous, convex, non-decreasing and finite at the origin, set `assume_lower_semi=True`')
+            warnings.warn('Convex conjugate is not properly for this function, returning 0 for compatibility with optimisation algorithm')
+            return 0.0
 
-    def _take_abs_input(self, func: Function):
+    def _take_abs_input(self, func: Function) -> Function:
         '''Decorator for function to act on abs of input of a method'''
  
         def _take_abs_decorator(self2, x, *args, **kwargs):
@@ -164,7 +167,7 @@ class FunctionOfAbs(Function):
             return fval
         return _take_abs_decorator
 
-    def _abs_and_project(self, func: Function):
+    def _abs_and_project(self, func: Function) -> Function:
         '''Decorator for function to act on abs of input, 
         with return being projected to the angle of the input.
         Requires function return to have the same shape as input,

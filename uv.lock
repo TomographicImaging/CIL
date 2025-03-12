@@ -113,11 +113,7 @@ astra = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "ipp" },
-    { name = "ipp-devel" },
-    { name = "nanobind" },
     { name = "numpy" },
-    { name = "pip" },
     { name = "pytest" },
     { name = "scikit-image" },
 ]
@@ -140,11 +136,7 @@ provides-extras = ["astra"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "ipp", specifier = ">=2021.12.1,<2022.0" },
-    { name = "ipp-devel" },
-    { name = "nanobind" },
     { name = "numpy", specifier = ">=1.26,<2.0" },
-    { name = "pip", specifier = ">=25.0.1" },
     { name = "pytest" },
     { name = "scikit-image", specifier = ">=0.25.2" },
 ]
@@ -263,43 +255,6 @@ wheels = [
 ]
 
 [[package]]
-name = "ipp"
-version = "2021.12.1"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/1d/4e2f42006b7939dd85e4f66baf0a6df4cb4f50e3a4c87c54d248f94f7877/ipp-2021.12.1-py2.py3-none-manylinux1_i686.whl", hash = "sha256:25111c01238c6a5a49e19ec4620127cbd239eba1dd1b97398f32cbe4d170859d", size = 304563493 },
-    { url = "https://files.pythonhosted.org/packages/d4/29/6728cfd0c4abcffc412fdbd8a888b0aef219f5b92e0d99ede43e1880e66f/ipp-2021.12.1-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:96ef58083a14f492d4d88543a54e017939e77a9bdacd0af94fa297f8f4cf5e26", size = 537242250 },
-    { url = "https://files.pythonhosted.org/packages/76/da/b7f159f6c71a80e43d83542655d1420bafe102f85e8fa7e690026ea5d335/ipp-2021.12.1-py2.py3-none-win32.whl", hash = "sha256:8b4b76fe339b664148e88b5b7cebf52fd9b0f603e8cd6c4859c0b6e5b47adde8", size = 64346441 },
-    { url = "https://files.pythonhosted.org/packages/2e/10/5aa9d4018701474f7e421505fded4e0d0e9a8a6312d7ff81289f117128f6/ipp-2021.12.1-py2.py3-none-win_amd64.whl", hash = "sha256:d61947e6f357065b7f2b3b8fc3696c1008b09ec847aa3785d5859f5b13863f89", size = 98070013 },
-]
-
-[[package]]
-name = "ipp-devel"
-version = "2021.12.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "ipp" },
-    { name = "ipp-include" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/f3/0d8fd8d6c5a6aa33082a2be7719de27ca0ccd355be8c6ec562f21ed39dac/ipp_devel-2021.12.1-py2.py3-none-manylinux1_i686.whl", hash = "sha256:ce333dbd00b75c930b04f36ab952b4804ed5811eb66177cf1354a1fd27dea4ca", size = 3706 },
-    { url = "https://files.pythonhosted.org/packages/59/6f/3d9e4d33d530574fde7cd5711930205ba7928e3c580795ece6822a955053/ipp_devel-2021.12.1-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:727ae6055bad88fef3c8f33a2e336e17611364366bd1c6f0c1031c28840bdc94", size = 3708 },
-    { url = "https://files.pythonhosted.org/packages/b6/38/260c2a4d81265f4634573790e8defd18cb8bc33a3483f958e381479e099a/ipp_devel-2021.12.1-py2.py3-none-win32.whl", hash = "sha256:d22eedecd752b4dee56c7444f2063d34170a45a55e36119c9020f9e8080479d7", size = 210702 },
-    { url = "https://files.pythonhosted.org/packages/9d/de/8d3573f37ac2590df89910c42c5fa000bff1ad3c561dbfee574f1759eadd/ipp_devel-2021.12.1-py2.py3-none-win_amd64.whl", hash = "sha256:5f6c3dc5309c4b021b58fe667f48c3d3549c5d15c49184bf7cb877bd33a96e0f", size = 196506 },
-]
-
-[[package]]
-name = "ipp-include"
-version = "2021.12.1"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/ba/176ad779f4c1a91449ad5a9268f5348f77a24cb8bd42fa31f280a3cdf644/ipp_include-2021.12.1-py2.py3-none-manylinux1_i686.whl", hash = "sha256:7544103c7107bfe23ed980bb8ec69681f08d72b3f5dd542a9cff10e74dc7cdd5", size = 316694 },
-    { url = "https://files.pythonhosted.org/packages/4d/64/c485b848b2f1c5f2c3d1642263fb157d4e1ce4f94fc0846a97ab4a753812/ipp_include-2021.12.1-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:5332e38501edcf66dacdb58cef2e4fd39f57294c5461bdce750a4a459f364429", size = 316696 },
-    { url = "https://files.pythonhosted.org/packages/26/1d/b08d3fe550e76e48b3d50c8e14c0df405a965167143ef5b13997895ee30f/ipp_include-2021.12.1-py2.py3-none-win32.whl", hash = "sha256:fbdb687c407d86c481a0d118f6cbef2eeea2329fbe7e3b51d320812729eacb23", size = 318440 },
-    { url = "https://files.pythonhosted.org/packages/5d/05/d0dc5fe61c03fddc16e18f3265b4c73b4f0fc21f1d749f9ba28916a3177e/ipp_include-2021.12.1-py2.py3-none-win_amd64.whl", hash = "sha256:5fee60ce963431550a98b7ddb29e989ecb107f6c3eacb35ab263ffbe1e1ae948", size = 318444 },
-]
-
-[[package]]
 name = "lazy-loader"
 version = "0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -337,15 +292,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/1b/656f5a357de7135a3777bd735cc7c9b8f23b4d37465505bd0eaf4be9befe/llvmlite-0.44.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:46224058b13c96af1365290bdfebe9a6264ae62fb79b2b55693deed11657a8bf", size = 42361904 },
     { url = "https://files.pythonhosted.org/packages/d8/e1/12c5f20cb9168fb3464a34310411d5ad86e4163c8ff2d14a2b57e5cc6bac/llvmlite-0.44.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:aa0097052c32bf721a4efc03bd109d335dfa57d9bffb3d4c24cc680711b8b4fc", size = 41184245 },
     { url = "https://files.pythonhosted.org/packages/d0/81/e66fc86539293282fd9cb7c9417438e897f369e79ffb62e1ae5e5154d4dd/llvmlite-0.44.0-cp313-cp313-win_amd64.whl", hash = "sha256:2fb7c4f2fb86cbae6dca3db9ab203eeea0e22d73b99bc2341cdf9de93612e930", size = 30331193 },
-]
-
-[[package]]
-name = "nanobind"
-version = "2.5.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/20/fa/8e5930837f9b08202c4e566cf529480b0c3266e88f39723388baf8c69700/nanobind-2.5.0.tar.gz", hash = "sha256:cc8412e94acffa20a369191382bcdbb6fbfb302e475e87cacff9516d51023a15", size = 962802 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8e/9e/dadc3831f40e22c1b3925f07894646ada7906ef5b48db5c5eb2b03ca9faa/nanobind-2.5.0-py3-none-any.whl", hash = "sha256:e1e5c816e5d10f0b252d82ba7f769f0f6679f5e043cf406aec3d9e184bf2a60d", size = 236912 },
 ]
 
 [[package]]
@@ -531,15 +477,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cd/00/20f40a935514037b7d3f87adfc87d2c538430ea625b63b3af8c3f5578e72/pillow-11.1.0-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:d44ff19eea13ae4acdaaab0179fa68c0c6f2f45d66a4d8ec1eda7d6cecbcc15f", size = 3446208 },
     { url = "https://files.pythonhosted.org/packages/28/3c/7de681727963043e093c72e6c3348411b0185eab3263100d4490234ba2f6/pillow-11.1.0-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:d3d8da4a631471dfaf94c10c85f5277b1f8e42ac42bade1ac67da4b4a7359b73", size = 3509746 },
     { url = "https://files.pythonhosted.org/packages/41/67/936f9814bdd74b2dfd4822f1f7725ab5d8ff4103919a1664eb4874c58b2f/pillow-11.1.0-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:4637b88343166249fe8aa94e7c4a62a180c4b3898283bb5d3d2fd5fe10d8e4e0", size = 2626353 },
-]
-
-[[package]]
-name = "pip"
-version = "25.0.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/70/53/b309b4a497b09655cb7e07088966881a57d082f48ac3cb54ea729fd2c6cf/pip-25.0.1.tar.gz", hash = "sha256:88f96547ea48b940a3a385494e181e29fb8637898f88d88737c5049780f196ea", size = 1950850 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/bc/b7db44f5f39f9d0494071bddae6880eb645970366d0a200022a1a93d57f5/pip-25.0.1-py3-none-any.whl", hash = "sha256:c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f", size = 1841526 },
 ]
 
 [[package]]

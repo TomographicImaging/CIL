@@ -18,9 +18,58 @@
 
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.functions import ZeroFunction, SGFunction, SVRGFunction, LSVRGFunction, SAGAFunction, SAGFunction, ApproximateGradientSumFunction
+from cil.optimisation.functions import ZeroFunction, ScaledFunction, SGFunction, SVRGFunction, LSVRGFunction, SAGAFunction, SAGFunction, ApproximateGradientSumFunction
 import logging
 import warnings
+
+class FunctionWrappingForPD3O():  
+    """
+    An internal class that wraps the functions, :math:`f`, in PD3O to allow :math:`f` to be an `ApproximateGradientSumFunction`. 
+    
+    Note that currently :math:`f`  can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but this is not set up to work for a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. 
+    
+    Parameters
+    ----------
+    f : function 
+        The function :math:`f` to use in PD3O
+    """
+    def __init__(self, f):  
+        self.f = f 
+        self.scalar = 1
+        if isinstance(f, ScaledFunction):
+            self.f = f.function
+            self.scalar = f.scalar
+        self._gradient_call_index = 0
+        
+    def gradient(self, x, out=None):  
+        if self._gradient_call_index == 0:  
+            self._gradient_call_index += 1  
+            self.f.gradient(x, out)  
+        else:
+            if isinstance(self.f, (SVRGFunction, LSVRGFunction)):  
+                if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:  
+                    self.f._update_full_gradient_and_return(x, out=out)  
+                else:  
+                    self.f.approximate_gradient( x, self.f.function_num, out=out)  
+                self.f._data_passes_indices.pop(-1)    
+            elif isinstance(self.f, ApproximateGradientSumFunction):  
+                self.f.approximate_gradient( x, self.f.function_num, out=out)  
+            else:  
+                self.f.gradient(x, out=out)  
+            # reset  
+            self._gradient_call_index = 0  
+
+        out *= self.scalar
+        return out
+
+    def __call__(self, x):  
+        return self.scalar * self.f(x)  
+    
+    @property
+    def L(self):
+        return  abs(self.scalar) * self.f.L
+    
+    
 class PD3O(Algorithm):
     
 
@@ -45,6 +94,9 @@ class PD3O(Algorithm):
         initial : DataContainer, optional default is a container of zeros, in the domain of the operator 
             Initial point for the  algorithm.             
 
+        Note
+        -----
+        Note that currently :math:`f` in PD3O can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but we have not implemented or tested when it is a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. 
 
         Reference
         ---------
@@ -64,12 +116,14 @@ class PD3O(Algorithm):
         
         logging.info("{} setting up".format(self.__class__.__name__, ))
         
-        self.f = f # smooth function
-        if isinstance(self.f, ZeroFunction):
-            warnings.warn(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
+        
+        
+        if isinstance(f, ZeroFunction):
+            warnings.warn(" If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
             if gamma is None:
                 gamma = 1.0/operator.norm()                      
         
+        self.f = FunctionWrappingForPD3O(f) 
         self.g = g # proximable
         self.h = h # composite
         self.operator = operator
@@ -126,16 +180,8 @@ class PD3O(Algorithm):
     
         # update step        
         
-        if isinstance(self.f, (SVRGFunction, LSVRGFunction)):
-            if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:
-                self.f._update_full_gradient_and_return(self.x, out=self.x_old)
-            else:
-                self.f.approximate_gradient( self.x, self.f.function_num, out=self.x_old)
-            self.f._data_passes_indices.pop(-1)    
-        elif isinstance(self.f, ApproximateGradientSumFunction):
-            self.f.approximate_gradient( self.x, self.f.function_num, out=self.x_old)
-        else:
-            self.f.gradient(self.x, out=self.x_old)    
+        
+        self.f.gradient(self.x, out=self.x_old)    
             
                     
         self.x_old *= self.gamma

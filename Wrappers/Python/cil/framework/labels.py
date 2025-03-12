@@ -178,6 +178,10 @@ class FillType(StrEnum):
         Fill with random values.
     RANDOM_INT:
         Fill with random integers.
+    RANDOM_LOW_MEM:
+        Fill with random values using numpy.random.default_rng which allocates memory of the required dtype.
+    RANDOM_LOW_MEM:
+        Fill with random integers using numpy.random.default_rng which allocates memory of the required dtype.
 
     Examples
     --------
@@ -186,6 +190,8 @@ class FillType(StrEnum):
     """
     RANDOM = auto()
     RANDOM_INT = auto()
+    RANDOM_LOW_MEM = auto()
+    RANDOM_INT_LOW_MEM = auto()
 
 
 class AngleUnit(StrEnum):

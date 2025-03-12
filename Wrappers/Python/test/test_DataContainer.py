@@ -713,7 +713,15 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_int_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
     def test_AcquisitionGeometry_allocate_complex(self):
         # Detectors
@@ -751,7 +759,14 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        data=ag.allocate('random_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
+
+        data=ag.allocate('random_int_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
     def test_VectorGeometry_allocate_complex(self):
         vg = VectorGeometry(3)
@@ -765,6 +780,14 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        data=vg.allocate('random_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
+
+        data=vg.allocate('random_int_low_mem', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
+
 
     def test_ImageGeometry_allocate_random_same_seed(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
@@ -772,6 +795,10 @@ class TestDataContainer(CCPiTestClass):
         image2 = vgeometry.allocate('random', seed=0)
         np.testing.assert_allclose(image1.as_array(), image2.as_array())
 
+        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        image1 = vgeometry.allocate('random_low_mem', seed=0)
+        image2 = vgeometry.allocate('random_low_mem', seed=0)
+        np.testing.assert_allclose(image1.as_array(), image2.as_array())
 
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(np.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)

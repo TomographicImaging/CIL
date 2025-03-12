@@ -81,11 +81,11 @@ class FunctionOfAbs(Function):
         
         super().__init__(L=function.L)
 
-    def __call__(self, x: DataContainer):
+    def __call__(self, x: DataContainer) -> float:
         call_abs = self._take_abs_input(self._function.__call__)
         return call_abs(self._function, x)
 
-    def proximal(self, x: DataContainer, tau: float, out: Optional[DataContainer]=None):
+    def proximal(self, x: DataContainer, tau: float, out: Optional[DataContainer]=None) -> DataContainer:
         r'''Returns the proximal map of function :math:`\tau G`  evaluated at x
 
         .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
@@ -113,7 +113,7 @@ class FunctionOfAbs(Function):
         prox_abs = self._abs_and_project(self._function.proximal)
         return prox_abs(self._function, x, tau=tau, out=out)
 
-    def convex_conjugate(self, x: DataContainer):
+    def convex_conjugate(self, x: DataContainer) -> float:
         r'''
         Evaluation of the function G* at x, where G* is the convex conjugate of function G,
 

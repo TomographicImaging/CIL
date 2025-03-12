@@ -77,15 +77,6 @@ class FunctionOfAbs(Function):
             self.precision = precision
         else: 
             raise ValueError('Precision must be `single` or `double`')
-
-        # if precision == 'single':
-        #     self.real_dtype = np.float32
-        #     self.complex_dtype = np.complex64
-        # elif precision == 'double':
-        #     self.real_dtype = np.float64
-        #     self.complex_dtype = np.complex128
-        # else:
-        #     raise ValueError('Precision must be `single` or `double`')
         
         super().__init__(L=function.L)
 
@@ -156,7 +147,7 @@ class FunctionOfAbs(Function):
             conv_abs = (_take_abs_input(self.precision))(self._function.convex_conjugate)
             return conv_abs(self._function, x)
         else:
-            warnings.warn('Convex conjugate is not properly for this function, returning 0 for compatibility with optimisation algorithm')
+            warnings.warn('Convex conjugate is not properly for this function, returning 0 for compatibility with optimisation algorithms')
             return 0.0
 
     def gradient(self, x):
@@ -179,7 +170,6 @@ def _take_abs_input(precision='double'):
                 rgeo.dtype = real_dtype
                 r = rgeo.allocate(0)
                 r.fill(np.abs(x.array).astype(real_dtype))
-                # func(self, r, *args, **kwargs) for the abstract class implementation
                 fval = func(r, *args, **kwargs)
                 return fval
             return _take_abs_decorator
@@ -209,7 +199,6 @@ def _abs_and_project(precision='double'):
                 Phi = np.exp((1j*np.angle(x.array)))
                 out = kwargs.pop('out', None)
                 
-                # func(self, r, *args, **kwargs) for the abstract class implementation
                 fvals = func(r, *args, **kwargs)
 
                 # Douglas-Rachford splitting to find solution in positive orthant

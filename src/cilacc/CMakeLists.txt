@@ -33,11 +33,6 @@ cmake_minimum_required(VERSION 3.15)
 
 
 
-find_path(IPP_INCLUDE_DIR NAMES ipp.h HINTS "${IPP_ROOT}/include")
-find_library(IPP_LIB NAMES ippiw HINTS "${IPP_ROOT}/lib")
-
-
-set(Python_FIND_VIRTUAL_ENV ONLY)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module OPTIONAL_COMPONENTS Development.SABIModule)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -45,12 +40,12 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-execute_process(
-  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
-# Detect the installed nanobind package and import it into CMake
-#find_package(nanobind CONFIG REQUIRED)
+
+execute_process(
+	COMMAND "${Python_EXECUTABLE}" -c "import sysconfig; print(sysconfig.get_paths()[\"data\"])"
+	OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE DATA_DIR)
+list(APPEND CMAKE_PREFIX_PATH ${DATA_DIR}/cmake)
 #Python_add_library(nanobind MODULE)
 ############
 
@@ -90,26 +85,10 @@ endif()
 #set(IPP_INCLUDE ${Python_INCLUDE_DIRS}/include)
 #endif()
 
+find_package(IPP REQUIRED CONFIG)
 
-if (UNIX)
-	find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
-	find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
-	find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
-	find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
-elseif(WIN32)
-	find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
-	find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
-	find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
-	find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
-endif()
 
-if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
-	set(USE_IPP TRUE)
-	message("IPP libraries found")
 else()
-	set(USE_IPP FALSE)
-	message("IPP libraries not found, FBP_filtering not in build")
-endif()
 
 
 #if(USE_IPP)
@@ -146,7 +125,7 @@ nanobind_add_module(
 	${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
 )
-target_link_libraries(cilacc PRIVATE ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
+target_link_libraries(cilacc PUBLIC ${OpenMP_EXE_LINKER_FLAGS} ${IPP_LIBRARIES})
 include_directories(cilacc PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/
 )

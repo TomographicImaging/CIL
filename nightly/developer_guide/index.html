@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 24.3.1.dev16+g126efd3f documentation</title>
+    <title>Developers’ Guide &#8212; CIL 24.3.1.dev17+gb5ee284f documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=6e7e72663174ced67551" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=2a06020fc4abf388d8e9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=2a06020fc4abf388d8e9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=6e7e72663174ced67551"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=2a06020fc4abf388d8e9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=2a06020fc4abf388d8e9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=2a06020fc4abf388d8e9" />
 
-    <script src="../_static/documentation_options.js?v=ef028134"></script>
+    <script src="../_static/documentation_options.js?v=9bd7e50f"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev16+g126efd3f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev17+gb5ee284f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev16+g126efd3f" />
+  <meta name="docsearch:version" content="24.3.1.dev17+gb5ee284f" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -431,6 +431,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#notebooks-gallery">Notebooks gallery</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parametrized-tests">Parametrized Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#github-actions">Github Actions</a></li>
 </ul>
@@ -502,7 +506,7 @@
                   
   <section id="developers-guide">
 <h1>Developers’ Guide<a class="headerlink" href="#developers-guide" title="Link to this heading">#</a></h1>
-<p>CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
+<p>CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the following.</p>
 <section id="conventions-on-new-cil-objects">
 <h2>Conventions on new CIL objects<a class="headerlink" href="#conventions-on-new-cil-objects" title="Link to this heading">#</a></h2>
@@ -538,8 +542,8 @@ All methods should follow the convention of small caps underscore separated word
 <section id="logging-and-warning">
 <h2>Logging and warning<a class="headerlink" href="#logging-and-warning" title="Link to this heading">#</a></h2>
 <p>We follow pythons convention on logging (see e.g. <a class="reference external" href="https://docs.python.org/3/howto/logging.html">https://docs.python.org/3/howto/logging.html</a>). In particular:</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id1">
-<caption><span class="caption-text">Logging and warning guidelines</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<div class="pst-scrollable-table-container"><table class="table" id="id2">
+<caption><span class="caption-text">Logging and warning guidelines</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 40.0%" />
 <col style="width: 60.0%" />
@@ -584,8 +588,8 @@ for docstring formatting and this rendered <a class="reference external" href="h
 <p>The following provides an example of the docstring format used within <code class="docutils literal notranslate"><span class="pre">cil</span></code>, and the rendered documentation generated from it.</p>
 <section id="source">
 <h5>Source<a class="headerlink" href="#source" title="Link to this heading">#</a></h5>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
@@ -724,7 +728,7 @@ a HTTP server to view the documentation.</p>
 <li><p>Follow the instructions <a class="reference external" href="https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code">here</a> to create a conda environment and build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source</p></li>
 <li><p>Go to <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder</p></li>
 <li><p>Install packages from <code class="docutils literal notranslate"><span class="pre">docs_environment.yml</span></code></p></li>
-<li><p>[Install Ruby version 3.2](<a class="reference external" href="https://www.ruby-lang.org/en/documentation/installation/#installers">https://www.ruby-lang.org/en/documentation/installation/#installers</a>)</p></li>
+<li><p><a class="reference external" href="https://www.ruby-lang.org/en/documentation/installation/#installers">Install Ruby version 3.2</a></p></li>
 <li><p>Install the web dependencies with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">web-deps</span></code></p></li>
 <li><p>Build the documentation with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dirhtml</span> <span class="pre">web</span></code></p></li>
 <li><p>Start an HTTP server with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">serve</span></code> to access the docs via <a class="reference external" href="http://localhost:8000">localhost:8000</a>.</p></li>
@@ -752,6 +756,51 @@ make dirhtml web serve
 <li><p>uses the <code class="docutils literal notranslate"><span class="pre">demos-template.rst</span></code> file to generate the gallery in <code class="docutils literal notranslate"><span class="pre">source/demos.rst</span></code></p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">nbsphinx</span></code> extension will convert the <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files to HTML.</p>
+</section>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<section id="parametrized-tests">
+<h3>Parametrized Tests<a class="headerlink" href="#parametrized-tests" title="Link to this heading">#</a></h3>
+<p>Methods are tested using Python’s <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> library. Please see the documentation <a class="reference external" href="https://docs.python.org/3/library/unittest.html#basic-example">here</a>  for information and usage examples.
+The <a class="reference external" href="https://github.com/adamchainz/unittest-parametrize">unittest-parametrize</a> library is used to generate parametrized test cases.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;parametrize</span></code> decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case.
+This helps to test various scenarios without duplicating code.</p>
+<p>Example: Parameterized Test for <code class="docutils literal notranslate"><span class="pre">ProjectionOperator</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@parametrize</span><span class="p">(</span><span class="s2">&quot;device, raise_error, err_type&quot;</span><span class="p">,</span>
+  <span class="p">[</span><span class="n">param</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;cpu_NoError&quot;</span><span class="p">),</span>
+   <span class="n">param</span><span class="p">(</span><span class="s1">&#39;CPU&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;CPU_NoError&quot;</span><span class="p">),</span>
+   <span class="n">param</span><span class="p">(</span><span class="s1">&#39;InvalidInput&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;InvalidInput_ValueError&quot;</span><span class="p">)])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_ProjectionOperator_2Ddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">raise_error</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">err_type</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">err_type</span><span class="p">):</span>
+            <span class="n">ProjectionOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">),</span> <span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The parameters passed to the test are: The <code class="docutils literal notranslate"><span class="pre">device</span></code> (string), which is the device name passed to the <code class="docutils literal notranslate"><span class="pre">ProjectionOperator</span></code>,
+<code class="docutils literal notranslate"><span class="pre">raise_error</span></code> (bool), which specifies if an error is expected during initialisation, and the expected <code class="docutils literal notranslate"><span class="pre">err_type</span></code>.</p>
+<p>In this example, the test instantiates a <code class="docutils literal notranslate"><span class="pre">ProjectionOperator</span></code> with a <code class="docutils literal notranslate"><span class="pre">device</span></code> name, checks if any errors should be raised, and ensures they are the expected type.
+There are 3 sets of parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">param('cpu',</span> <span class="pre">False,</span> <span class="pre">None,</span> <span class="pre">id=&quot;cpu_NoError&quot;)</span></code> - Test using the device name ‘cpu’ (lowercase), and expects no error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">param('CPU',</span> <span class="pre">False,</span> <span class="pre">None,</span> <span class="pre">id=&quot;CPU_NoError&quot;)</span></code> - Test using the device name ‘CPU’ (uppercase), and expects no error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">param('InvalidInput',</span> <span class="pre">True,</span> <span class="pre">ValueError,</span> <span class="pre">id=&quot;InvalidInput_ValueError&quot;)</span></code> - Test using an invalid string, and expects the <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> to be raised.</p></li>
+</ul>
+<p>Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., <code class="docutils literal notranslate"><span class="pre">cpu_NoError</span></code>, <code class="docutils literal notranslate"><span class="pre">InvalidInput_ValueError</span></code>)</p>
+<p>When running the test, each parameterized case is shown as a distinct result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_ProjectionOperator_2Ddata</span><span class="p">[</span><span class="n">cpu_NoError</span><span class="p">]</span> <span class="o">...</span> <span class="n">ok</span>
+<span class="n">test_ProjectionOperator_2Ddata</span><span class="p">[</span><span class="n">CPU_NoError</span><span class="p">]</span> <span class="o">...</span> <span class="n">ok</span>
+<span class="n">test_ProjectionOperator_2Ddata</span><span class="p">[</span><span class="n">InvalidInput_ValueError</span><span class="p">]</span> <span class="o">...</span> <span class="n">ok</span>
+
+<span class="o">----------------------------------------------------------------------</span>
+<span class="n">Ran</span> <span class="mi">3</span> <span class="n">tests</span> <span class="ow">in</span> <span class="mf">0.001</span><span class="n">s</span>
+
+<span class="n">OK</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="contributions-guidelines">
@@ -827,8 +876,8 @@ make dirhtml web serve
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=6e7e72663174ced67551"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=6e7e72663174ced67551"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=2a06020fc4abf388d8e9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=2a06020fc4abf388d8e9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

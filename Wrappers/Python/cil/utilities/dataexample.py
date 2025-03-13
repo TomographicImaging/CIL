@@ -35,7 +35,7 @@ class DATA(object):
         return None
 
 class CILDATA(DATA):
-    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
+    data_dir = os.environ["CIL_DATA_DIR"]
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)

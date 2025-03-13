@@ -1,0 +1,75 @@
+name: build_uv
+on:
+  release:
+    types: [published]
+  push:
+    branches: [master]
+    tags: ['**']
+    paths-ignore:
+    - 'CHANGELOG.md'
+    - 'CITATION.cff'
+    - 'LICENSE'
+    - 'scripts/**'
+    - 'NOTICE.txt'
+    - 'README.md'
+  pull_request:
+    branches: [master]
+    paths-ignore:
+    - 'CHANGELOG.md'
+    - 'CITATION.cff'
+    - 'LICENSE'
+    - 'scripts/**'
+    - 'NOTICE.txt'
+    - 'README.md'
+jobs:
+  test-cuda:
+    defaults: {run: {shell: 'bash -el {0}'}}
+    runs-on: [self-hosted, python, cuda]
+    strategy:
+      matrix:
+        python-version: [3.11]
+        numpy-version: [1.25]
+    steps:
+
+    - uses: actions/checkout@v4
+      with: {fetch-depth: 0, submodules: recursive}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5 
+      with:
+        version: "0.6.5"
+    - name: "Set up Python" 
+      uses: actions/setup-python@v5 
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: "Install Project"
+      run: uv sync --dev --all-extras
+    - name: test
+      run: CIL_DATA_DIR=./Wrappers/Python/data TESTS_FORCE_GPU=1 uv run pytest -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+  test:
+    defaults: {run: {shell: 'bash -el {0}'}}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - python-version: '3.10'
+          - python-version: 3.12
+    steps:
+    - uses: actions/checkout@v4
+      with: {fetch-depth: 0, submodules: recursive}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5 
+      with:
+        version: "0.6.5"
+        enable-cache: true
+    - name: "Set up Python" 
+      uses: actions/setup-python@v5 
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: "Install Project"
+      run: uv sync --dev
+    - name: test
+      run: CIL_DATA_DIR=./Wrappers/Python/data uv run pytest ./Wrappers/Python/test
+  pass:
+    needs: [test-cuda, test]
+    runs-on: ubuntu-22.04
+    steps: [{run: echo success}]

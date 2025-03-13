@@ -4,6 +4,7 @@ requires = [
     	"ipp-devel>=2022.0,<2022.1",
 	"nanobind",
 	"scikit-build-core>=0.11.0",
+	"intel-openmp==2025.0.5",
 ]
 build-backend = "scikit_build_core.build"
 

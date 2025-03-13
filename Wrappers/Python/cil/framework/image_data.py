@@ -21,7 +21,7 @@ from .data_container import DataContainer
 from .labels import ImageDimension, Backend
 
 class ImageData(DataContainer):
-    '''DataContainer for holding 2D or 3D DataContainer'''
+    
     __container_priority__ = 1
 
     @property
@@ -46,6 +46,18 @@ class ImageData(DataContainer):
                  deep_copy=False,
                  geometry=None,
                  **kwargs):
+        """
+        DataContainer for holding 2D or 3D image data
+        
+        Parameters
+        ----------
+        array : numpy.ndarray or DataContainer
+            The data array.
+        deep_copy : bool, default is False
+            If True, the array will be deep copied. If False, the array will be shallow copied.
+        geometry : ImageGeometry
+            The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.
+        """
 
         dtype = kwargs.get('dtype', numpy.float32)
 

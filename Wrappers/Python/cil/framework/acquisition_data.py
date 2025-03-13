@@ -23,7 +23,7 @@ from .partitioner import Partitioner
 
 
 class AcquisitionData(DataContainer, Partitioner):
-    '''DataContainer for holding 2D or 3D sinogram'''
+    ''''''
     __container_priority__ = 1
 
     @property
@@ -48,6 +48,18 @@ class AcquisitionData(DataContainer, Partitioner):
                  deep_copy=True,
                  geometry = None,
                  **kwargs):
+        """
+        DataContainer for holding 2D or 3D sinogram
+        
+        Parameters
+        ----------
+        array : numpy.ndarray or DataContainer
+            The data array.
+        deep_copy : bool, default is True
+            If True, the array will be deep copied. If False, the array will be shallow copied.
+        geometry : AcquisitionGeometry
+            The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.
+        """
 
         dtype = kwargs.get('dtype', numpy.float32)
 

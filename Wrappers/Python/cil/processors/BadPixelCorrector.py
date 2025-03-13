@@ -40,8 +40,8 @@ class BadPixelCorrector(DataProcessor):
         Axis labels must contain 'horizontal' and optionally 'vertical'.
     '''
 
-    def __init__(self, mask):
-        kwargs = {'mask': mask}
+    def __init__(self, mask, accelerated=False):
+        kwargs = {'mask': mask, 'accelerated': accelerated}
 
         super(BadPixelCorrector, self).__init__(**kwargs)
     
@@ -203,13 +203,21 @@ class BadPixelCorrector(DataProcessor):
         return masked_pixels
 
     def process(self, out=None):
-        
         data = self.get_input()
-        
         return_arr = False
         if out is None:
             out = data.copy()
             return_arr = True
+
+        if self.accelerated:
+            pass
+        else:
+            self._process_numpy(data, out)
+
+        if return_arr:
+            return out
+
+    def _process_numpy(self, data, out):
 
         # flat view of full array:
         out_flat = out.array.ravel()
@@ -258,6 +266,4 @@ class BadPixelCorrector(DataProcessor):
             # Update the projection in out: CHECK IF REDUNDANT:
             out_flat[k*proj_size:(k+1)*proj_size] = projection_out
 
-        if return_arr is True:
-            return out
         

@@ -158,6 +158,94 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
 
 
+    def test_create_CONE3D_SOUV(self):
+        source_position_set = [[0.1, -500.0,0.2], [0.3, -499.0,0.4]]
+        detector_position_set = [[-1.3,1000.0, -1.0], [-1.4,1004.0, -0.08]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)
+
+        def get_unit_vec(x):
+            x = np.array(x)
+            return x / np.linalg.norm(x)
+        
+        # check the values
+        for i in range(len(source_position_set)):
+            np.testing.assert_array_equal(ag.config.system.source[i].position, source_position_set[i])
+            np.testing.assert_array_equal(ag.config.system.detector[i].position, detector_position_set[i])
+            np.testing.assert_array_equal(ag.config.system.detector[i].direction_x, get_unit_vec(detector_direction_x_set[i]))
+            np.testing.assert_array_equal(ag.config.system.detector[i].direction_y, get_unit_vec(detector_direction_y_set[i]))
+
+
+    def test_create_CONE3D_SOUV_invalid_values(self):
+        source_position_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
+        detector_position_set = [[0.0, 0.0, 1], [1, 0.0, 0.0]]
+        detector_direction_x_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
+        detector_direction_y_set = [[0.0, 1, 0.0], [0.0, 1, 0.0]]
+
+        invalid_values = [
+            "not a list",          # Not a list
+            [1, 2, 3],             # List of integers, not lists/arrays
+            [[1,2],[3,4],[5,6]],      # List of lists of incorrect length
+            [[1, 2, 3], [3, 4]],   # Lists of incorrect length
+            [[1,2], "not a list"], # List with invalid value
+        ]
+
+        for invalid_value in invalid_values:
+            try:
+                with self.assertRaises(ValueError) as cm:
+                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                        source_position_set=invalid_value,
+                        detector_position_set=detector_position_set,
+                        detector_direction_x_set=detector_direction_x_set,
+                        detector_direction_y_set=detector_direction_y_set
+                    )
+            except AssertionError as e:
+                print(f"Test failed for source_position_set={invalid_value}: {e}")
+                raise
+
+            try:
+                with self.assertRaises(ValueError) as cm:
+                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                        source_position_set=source_position_set,
+                        detector_position_set=invalid_value,
+                        detector_direction_x_set=detector_direction_x_set,
+                        detector_direction_y_set=detector_direction_y_set
+                    )
+            except AssertionError as e:
+                print(f"Test failed for detector_position_set={invalid_value}: {e}")
+                raise
+
+            try:
+                with self.assertRaises(ValueError) as cm:
+                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                        source_position_set=source_position_set,
+                        detector_position_set=detector_position_set,
+                        detector_direction_x_set=invalid_value,
+                        detector_direction_y_set=detector_direction_y_set
+                    )
+            except AssertionError as e:
+                print(f"Test failed for detector_direction_x_set={invalid_value}: {e}")
+                raise
+
+            try:
+                with self.assertRaises(ValueError) as cm:
+                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                        source_position_set=source_position_set,
+                        detector_position_set=detector_position_set,
+                        detector_direction_x_set=detector_direction_x_set,
+                        detector_direction_y_set=invalid_value
+                    )
+            except AssertionError as e:
+                print(f"Test failed for detector_direction_y_set={invalid_value}: {e}")
+                raise
+
+
+
     def test_shift_detector_origin_bottom_left(self):
         initial_position = np.array([2.5, -1.3, 10.2])
         pixel_size = np.array([0.5, 0.7])

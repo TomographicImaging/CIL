@@ -38,11 +38,12 @@ jobs:
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
         sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@v3.1.1
       with:
         python-version: ${{ matrix.python-version }}
         environment-file: scripts/requirements-test.yml
         activate-environment: ${{ steps.reqs.outputs.envname }}
+        conda-remove-defaults: "true"
         run-post: false
     - id: build
       name: build
@@ -55,7 +56,7 @@ jobs:
         conda activate "${{ steps.reqs.outputs.envname }}"
         TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
-      name: Post Run conda-incubator/setup-miniconda@v3
+      name: Post Run conda-incubator/setup-miniconda@v3.1.1
       shell: bash
       run: |
         sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
@@ -76,11 +77,12 @@ jobs:
       with: {fetch-depth: 0, submodules: recursive}
     - name: set requirements
       run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@v3.1.1
       with:
         python-version: ${{ matrix.python-version }}
         environment-file: scripts/requirements-test.yml
         activate-environment: cil_dev
+        conda-remove-defaults: "true"
     - name: build
       run: |
         cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
@@ -176,7 +178,9 @@ jobs:
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
-      with: {python-version: 3.11}
+      with: 
+        python-version: 3.11
+        conda-remove-defaults: "true"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
@@ -184,7 +188,7 @@ jobs:
         cache-version: 0
     - name: install dependencies
       run: |
-        conda install -c conda-forge -yq conda-merge
+        conda install -c conda-forge -yq conda-merge --override-channels
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list

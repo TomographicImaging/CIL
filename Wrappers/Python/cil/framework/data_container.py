@@ -108,7 +108,11 @@ class DataContainer(object):
 
         # finally copy the geometry, and force dtype of the geometry of the data = the dype of the data
         if 'geometry' in kwargs.keys():
-            self.geometry = kwargs['geometry'].copy()
+            geometry = kwargs['geometry']
+            if geometry is not None:
+                self.geometry = geometry.copy()
+            else:
+                self.geometry = geometry
             try:
                 self.geometry.dtype = self.dtype
             except:

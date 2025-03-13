@@ -25,18 +25,6 @@ endif()
 
 project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
-#find_package(Pythnon COMPONENTS Interpreter Development.Module REQUIRED)
-
-# find_package(Python COMPONENTS Interpreter Development.Module REQUIRED) if
-# (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-# set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-# set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-# "MinSizeRel" "RelWithDebInfo") endif()
-
-# file(GLOB SOURCES "${CMAKE_PREFIX_PATH}/*") message(STATUS "${SOURCES}")
-
-# Detect the installed nanobind package and import it into CMake
-# find_package(nanobind CONFIG REQUIRED) find_package(IPP CONFIG REQUIRED)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
@@ -63,4 +51,3 @@ endif()
 
 
 add_subdirectory(src/cilacc)
-#add_subdirectory(Wrappers/Python)

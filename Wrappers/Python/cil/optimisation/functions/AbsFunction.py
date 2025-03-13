@@ -192,36 +192,41 @@ def _abs_and_project(precision='double'):
                     complex_dtype = np.complex128
                 else:
                     raise ValueError('Precision must be `single` or `double`')
+                
                 rgeo = x.geometry.copy()
                 rgeo.dtype = real_dtype
                 r = rgeo.allocate(None)
-                r.fill( np.abs(x.array).astype(real_dtype))
+                r.fill(np.abs(x.as_array()).astype(real_dtype))
                 Phi = np.exp((1j*np.angle(x.array)))
                 out = kwargs.pop('out', None)
                 
                 fvals = func(r, *args, **kwargs)
-
+                fvals_numpy = fvals.as_array()
+                
                 # Douglas-Rachford splitting to find solution in positive orthant
-                if np.any(fvals.array < 0):
+                if np.any(fvals_numpy < 0):
                     log.info('AbsFunctions: projection to +ve orthant triggered')
                     cts = 0
                     y = r.copy()
-                    while np.any(fvals.array < 0):
-                        tmp = fvals.array - 0.5*y.array + 0.5*r.array
+                    fvals_numpy = fvals.as_array()
+                    while np.any(fvals_numpy < 0):
+                        tmp = fvals_numpy  - 0.5*y.as_array() + 0.5*r.as_array()
                         tmp[tmp < 0] = 0.
-                        y.array += tmp - fvals.array
+                        y += DataContainter(tmp, y.geometry) - fvals
                         fvals = func(y, *args, **kwargs)
                         cts += 1
                         if cts > 10:
-                            fvals.array[fvals.array < 0] = 0.
+                            fvals_numpy = fvals.as_array()
+                            fvals_numpy[fvals_numpy < 0] = 0.
                             break
 
-                if out is not None:
-                    out.array = fvals.array.astype(complex_dtype)*Phi
+                
                     
-                else:
-                    out = x.geometry.allocate(None)
-                    out.array = fvals.array.astype(complex_dtype)*Phi
+                if out is None: 
+                    out_geom = x.geometry.copy()
+                    out_geom.dtype = complex_dtype
+                    out = out_geom.allocate(None)
+                out.fill( fvals_numpy.astype(complex_dtype)*Phi)
                 return out
             return _abs_project_decorator
     return _abs_and_project_inner

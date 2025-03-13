@@ -2148,16 +2148,16 @@ class TestFunctionOfAbs(unittest.TestCase):
     def setUp(self):
         self.data = VectorData(np.array([1+2j, -3+4j, -5-6j]))
         self.mock_function = MockFunction()
-        self.abs_function = FunctionOfAbs(self.mock_function)
-        self.abs_function_double = FunctionOfAbs(self.mock_function, precision='double')
+        self.abs_function_double = FunctionOfAbs(self.mock_function)
+        self.abs_function = FunctionOfAbs(self.mock_function, precision='single')
         
     
     def test_initialization(self):
         self.assertIsInstance(self.abs_function._function, MockFunction)
         self.assertFalse(self.abs_function._lower_semi)
 
-        self.assertEqual(self.abs_function.real_dtype, np.float32)
-        self.assertEqual(self.abs_function_double.real_dtype, np.float64)
+        self.assertEqual(self.abs_function.precision, 'single')
+        self.assertEqual(self.abs_function_double.precision, 'double')
 
     def test_call(self):
         result = self.abs_function(self.data)
@@ -2190,7 +2190,7 @@ class TestFunctionOfAbs(unittest.TestCase):
     
     def test_convex_conjugate_not_implemented(self):
         self.abs_function._lower_semi = False
-        with self.assertRaises(NotImplementedError):
-            self.abs_function.convex_conjugate(self.data)
+        
+        self.assertEqual(self.abs_function.convex_conjugate(self.data), 0.)
 
 

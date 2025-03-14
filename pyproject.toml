@@ -88,4 +88,4 @@ cil = "Wrappers/Python/cil"
 "cil/cilacc" = "src/cilacc"
 
 [tool.uv.sources]
-pytigre = { git = "https://github.com/purepani/TIGRE", subdirectory = "Python", branch = "push-myxtropotyqx" }
+pytigre = { git = "https://github.com/purepani/TIGRE", branch = "push-myxtropotyqx" }

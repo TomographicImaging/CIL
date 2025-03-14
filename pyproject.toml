@@ -43,6 +43,9 @@ changelog = "https://github.com/TomographicImaging/CIL/blob/master/CHANGELOG.md"
 astra = [
     "astra-toolbox>=2.3.0",
 ]
+tigre = [
+    "pytigre",
+]
 
 [dependency-groups]
 dev = [
@@ -62,3 +65,6 @@ search.site-packages = true
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
 "cil/cilacc" = "src/cilacc"
+
+[tool.uv.sources]
+pytigre = { git = "https://github.com/purepani/TIGRE", subdirectory = "Python", branch = "push-myxtropotyqx" }

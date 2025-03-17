@@ -181,6 +181,7 @@ class SystemConfiguration:
     SYSTEM_SIMPLE = 'simple'
     SYSTEM_OFFSET = 'offset'
     SYSTEM_ADVANCED = 'advanced'
+    SYSTEM_NONSTANDARD = 'non-standard'
 
     @property
     def dimension(self):
@@ -1253,6 +1254,91 @@ class Cone3D_SOUV(SystemConfiguration):
         Label the units of distance used for the configuration
 
     '''
+
+    def estimate_volume_centre(self):
+        """
+        Method to estimate the volume centre as the mean of the midpoints of the lines connecting the source and detector positions.
+
+        `lineSegClosestPoints` function adapted from: https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
+        Returns
+        -------
+        numpy.ndarray
+            A 3D vector describing the estimated position of the centre of the reconstructed volume
+
+        """
+        def clamp(n, smallest, largest):
+                return max(smallest, min(n, largest))
+
+        # The function below has been adapted from:
+        # https://zalo.github.io/blog/closest-point-between-segments/
+        def lineSegClosestPoints(a, u, b, v):
+            """
+            Function to find the closest points between two line segments
+
+            Adapted from: https://zalo.github.io/blog/closest-point-between-segments/
+
+            Parameters
+            ----------
+            a : array_like
+                The starting point of the first line segment
+            u : array_like
+                The direction of the first line segment
+            b : array_like
+                The starting point of the second line segment
+            v : array_like
+                The direction of the second line segment
+            """
+            r = b - a
+
+            ru = numpy.dot(r, u)
+            rv = numpy.dot(r, v)
+            uu = numpy.dot(u, u)
+            uv = numpy.dot(u, v)
+            vv = numpy.dot(v, v)
+
+            det = uu*vv - uv*uv
+
+            # if det is too close to 0, then they're parallel
+            # you can work out a way to handle this case
+
+            # compute optimal values for s and t
+            s = (ru*vv - rv*uv)/det
+            t = (ru*uv - rv*uu)/det
+
+            # constrain values s and t so that they describe points on the segments
+            s = clamp(s, 0, 1)
+            t = clamp(t, 0, 1)
+
+            # convert value s for segA into the corresponding closest value t for segB
+            # and vice versa
+            S = (t*uv + ru)/uu
+            T = (s*uv - rv)/vv
+
+            # constrain
+            S = clamp(S, 0, 1)
+            T = clamp(T, 0, 1)
+
+            return a + S*u, b + T*v
+
+        if self.num_positions == 1:
+            return self.source[0].position
+        
+        points = numpy.zeros(((self.num_positions - 1) * 2, 3))
+        for i in range(self.num_positions - 1):
+            a = self.source[i+0].position
+            b = self.source[i+1].position
+
+            u = self.detector[i + 0].position - self.source[i + 0].position
+            v = self.detector[i + 1].position - self.source[i + 1].position
+            
+            A, B = lineSegClosestPoints(a, u, b, v)
+            
+            points[i * 2 + 0] = A
+            points[i * 2 + 1] = B
+
+        return [points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]
+
+
     def __init__ (self, source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units='units'):
 
         self.num_positions = len(source_position_set)
@@ -1273,151 +1359,23 @@ class Cone3D_SOUV(SystemConfiguration):
             self.detector[i].set_direction(detector_direction_x_set[i], detector_direction_y_set[i])
 
         #reconstructed volume centre
-        if volume_centre_position is not None:
+        if volume_centre_position is None:
+            self.volume_centre.position = self.estimate_volume_centre()
+        else:
             self.volume_centre.position = volume_centre_position
 
-        # Estimate the position
-        else:
-            def clamp(n, smallest, largest):
-                return max(smallest, min(n, largest))
 
-            # The function below has been adapted from:
-            # https://zalo.github.io/blog/closest-point-between-segments/
-            def lineSegClosestPoints(a, u, b, v):
-                r = b - a
+    def system_description(self):
+        """
+        Returns the system configuration type
+        """
+        return SystemConfiguration.SYSTEM_NONSTANDARD
 
-                ru = numpy.dot(r, u)
-                rv = numpy.dot(r, v)
-                uu = numpy.dot(u, u)
-                uv = numpy.dot(u, v)
-                vv = numpy.dot(v, v)
+    def get_centre_slice(self):
 
-                det = uu*vv - uv*uv
-
-                # if det is too close to 0, then they're parallel
-                # you can work out a way to handle this case
-
-                # compute optimal values for s and t
-                s = (ru*vv - rv*uv)/det
-                t = (ru*uv - rv*uu)/det
-
-                # constrain values s and t so that they describe points on the segments
-                s = clamp(s, 0, 1)
-                t = clamp(t, 0, 1)
-
-                # convert value s for segA into the corresponding closest value t for segB
-                # and vice versa
-                S = (t*uv + ru)/uu
-                T = (s*uv - rv)/vv
-
-                # constrain
-                S = clamp(S, 0, 1)
-                T = clamp(T, 0, 1)
-
-                return a + S*u, b + T*v
-
-            points = numpy.zeros(((len(source_position_set) - 1) * 2, 3))
-
-            for i in range(len(source_position_set) - 1):
-                a = self.source[i+0].position
-                b = self.source[i+1].position
-
-                u = self.detector[i + 0].position - self.source[i + 0].position
-                v = self.detector[i + 1].position - self.source[i + 1].position
-                
-                A, B = lineSegClosestPoints(a, u, b, v)
-                
-                points[i * 2 + 0] = A
-                points[i * 2 + 1] = B
-
-            self.volume_centre.position = [points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]
-
-
-
-
-    # def align_z(self):
-    #     r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
-    #     '''
-    #     self.set_origin(self.rotation_axis.position)
-    #     rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
-
-    #     #apply transform
-    #     self.rotation_axis.direction = [0,0,1]
-    #     self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
-    #     self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
-    #     new_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
-    #     new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
-    #     self.detector.set_direction(new_x, new_y)
-
-
-    # def align_reference_frame(self, definition='cil'):
-    #     r'''Transforms and rotates the system to backend definitions
-    #     '''
-
-    #     self.align_z()
-
-    #     if definition=='cil':
-    #         rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
-    #     elif definition=='tigre':
-    #         rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
-    #     else:
-    #         raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
-
-    #     self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
-    #     self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
-    #     new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
-    #     new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
-    #     self.detector.set_direction(new_direction_x, new_direction_y)
-
-
-    # def system_description(self):
-    #     r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
-    #         \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
-    #         \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-    #     '''
-
-    #     vec_src2det = ComponentDescription.create_unit_vector(self.detector.position - self.source.position)
-
-    #     principal_ray_centred = ComponentDescription.test_parallel(vec_src2det, self.detector.normal)
-    #     centre_ray_perpendicular_rotation = ComponentDescription.test_perpendicular(vec_src2det, self.rotation_axis.direction)
-    #     rotation_parallel_detector_y = ComponentDescription.test_parallel(self.rotation_axis.direction, self.detector.direction_y)
-
-    #     #rotation axis to detector is parallel with centre ray
-    #     if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal
-    #         rotation_axis_centred = True
-    #     else:
-    #         vec_b = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position )
-    #         rotation_axis_centred = ComponentDescription.test_parallel(vec_src2det, vec_b)
-
-    #     if not principal_ray_centred or\
-    #         not centre_ray_perpendicular_rotation or\
-    #         not rotation_parallel_detector_y:
-    #         config = SystemConfiguration.SYSTEM_ADVANCED
-    #     elif not rotation_axis_centred:
-    #         config =  SystemConfiguration.SYSTEM_OFFSET
-    #     else:
-    #         config =  SystemConfiguration.SYSTEM_SIMPLE
-
-    #     return config
-
-    # def get_centre_slice(self):
-    #     """Returns the 2D system configuration corresponding to the centre slice
-    #     """
-    #     #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
-    #     dp1 = self.rotation_axis.direction.dot(self.detector.normal)
-    #     dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
-
-    #     if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
-    #         temp = self.copy()
-    #         temp.align_reference_frame()
-    #         source_position = temp.source.position[0:2]
-    #         detector_position = temp.detector.position[0:2]
-    #         detector_direction_x = temp.detector.direction_x[0:2]
-    #         rotation_axis_position = temp.rotation_axis.position[0:2]
-
-    #         return Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
-    #     else:
-    #         raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpendicular to the detector.')
+        """Returns the 2D system configuration corresponding to the centre slice
+        """
+        raise NotImplementedError("This method is not implemented for Cone3D_SOUV")
 
     def __str__(self):
         def csv(val):
@@ -1450,6 +1408,7 @@ class Cone3D_SOUV(SystemConfiguration):
             return True
 
         return False
+
 
     def calculate_magnification(self):
         """
@@ -1492,104 +1451,6 @@ class Cone3D_SOUV(SystemConfiguration):
 
 
         return [dist_source_center, dist_center_detector, magnification]
-
-    # def rotation_axis_on_detector(self):
-    #     """
-    #     Calculates the position, on the detector, of the projection of the rotation axis in the world coordinate system
-
-    #     Returns
-    #     -------
-    #     PositionDirectionVector
-    #         Position and direction in the 3D system
-    #     """
-    #     #calculate the intersection with the detector, of source to pv
-    #     Pv = self.rotation_axis.position
-    #     vec_a = Pv - self.source.position
-    #     ratio = (self.detector.position - Pv).dot(self.detector.normal) / vec_a.dot(self.detector.normal)
-    #     point1 = Pv + vec_a * ratio
-
-    #     #calculate the intersection with the detector, of source to pv
-    #     Pv = self.rotation_axis.position + self.rotation_axis.direction
-    #     vec_a = Pv - self.source.position
-    #     ratio = (self.detector.position - Pv).dot(self.detector.normal) / vec_a.dot(self.detector.normal)
-    #     point2 = Pv + vec_a * ratio
-
-    #     out = PositionDirectionVector(3)
-    #     out.position = point1
-    #     out.direction = point2 - point1
-    #     return out
-
-    # def calculate_centre_of_rotation(self):
-    #     """
-    #     Calculates the position, on the detector, of the projection of the rotation axis in the detector coordinate system
-
-    #     Note
-    #     ----
-    #      - Origin is in the centre of the detector
-    #      - Axes directions are specified by detector.direction_x, detector.direction_y
-    #      - Units are the units of distance used to specify the component's positions
-
-    #     Returns
-    #     -------
-    #     Float
-    #         Offset position along the detector x_axis at y=0
-    #     Float
-    #         Angle between the y_axis and the rotation axis projection, in radians
-    #     """
-    #     rotate_axis_projection = self.rotation_axis_on_detector()
-
-    #     p1 = rotate_axis_projection.position
-    #     p2 = p1 + rotate_axis_projection.direction
-
-    #     #point1 and point2 are on the detector plane. need to return them in the detector coordinate system
-    #     dp1 = p1 - self.detector.position
-    #     x1 = self.detector.direction_x.dot(dp1)
-    #     y1 = self.detector.direction_y.dot(dp1)
-    #     dp2 = p2 - self.detector.position
-    #     x2 = self.detector.direction_x.dot(dp2)
-    #     y2 = self.detector.direction_y.dot(dp2)
-
-    #     #y = m * x + c
-    #     #c = y1 - m * x1
-    #     #when y is 0
-    #     #x=-c/m
-    #     #x_y0 = -y1/m + x1
-    #     offset_x_y0 = x1 -y1 * (x2 - x1)/(y2-y1)
-
-    #     angle = math.atan2(x2 - x1, y2 - y1)
-    #     offset = offset_x_y0
-
-    #     return (offset, angle)
-
-
-    # def set_centre_of_rotation(self, offset, angle):
-    #     """ Configures the geometry to have the requested centre of rotation offset at the detector
-    #     """
-    #     #two points on the detector
-    #     x1 = offset
-    #     y1 = 0
-    #     x2 = offset + math.tan(angle)
-    #     y2 = 1
-
-    #     #convert to 3d coordinates in system frame
-    #     p1 = self.detector.position + x1 * self.detector.direction_x + y1 * self.detector.direction_y
-    #     p2 = self.detector.position + x2 * self.detector.direction_x + y2 * self.detector.direction_y
-
-    #     # vectors from source define plane
-    #     sp1 = p1 - self.source.position
-    #     sp2 = p2 - self.source.position
-
-    #     #find vector intersection with a plane defined by rotate axis (pos and dir) and det_x direction
-    #     plane_normal = numpy.cross(self.rotation_axis.direction, self.detector.direction_x)
-
-    #     ratio = (self.rotation_axis.position - self.source.position).dot(plane_normal) / sp1.dot(plane_normal)
-    #     p1_on_plane = self.source.position + sp1 * ratio
-
-    #     ratio = (self.rotation_axis.position - self.source.position).dot(plane_normal) / sp2.dot(plane_normal)
-    #     p2_on_plane = self.source.position + sp2 * ratio
-
-    #     self.rotation_axis.position = p1_on_plane
-    #     self.rotation_axis.direction = p2_on_plane - p1_on_plane
 
 
 class Panel(object):

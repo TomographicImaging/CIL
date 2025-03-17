@@ -23,16 +23,46 @@ import numpy
 import warnings
 
 class Normaliser(Processor):
-    '''Normalisation based on flat and dark
+    r""" This processor can be used to normalise data with flat-field and dark-field images.
 
-    This processor read in a AcquisitionData and normalises it based on
-    the instrument reading with and without incident photons or neutrons.
+    The dark-field image is used to remove the offset from the input data, and the flat-field image is used to scale the data. 
 
-    Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSet
-    '''
+    The normalisation is done as follows:
+
+    .. math::
+        \text{output} = \frac{\text{input} - \text{offset}}{\text{scale} - \text{offset}}
+
+    where :math:`\text{input}`, :math:`\text{offset}` and :math:`\text{scale}` are the input, dark-field and flat-field images respectively.
+
+    The processor can be used in-place to reduce memory usage.
+
+    Parameters
+    ----------
+    flat_field : numpy.ndarray, optional
+        The flat field image. It must have the same shape as a single projection.
+    dark_field : numpy.ndarray, optional
+        The dark field image. It must have the same shape as a single projection.
+    tolerance : float, optional
+        The value to substitute for output values where division by zero occurs.
+
+        
+    Examples
+    --------
+    Basic usage with flat and dark fields:
+
+    >>> from cil.processors import Normaliser
+    >>> normaliser = Normaliser(flat_field, dark_field)
+    >>> normaliser.set_input(data)
+    >>> normalised_data = normaliser.get_output()
+
+    In-place usage:
+
+    >>> from cil.processors import Normaliser
+    >>> normaliser = Normaliser(flat_field, dark_field)
+    >>> normaliser.set_input(data)
+    >>> normaliser.get_output(out=data)
+
+    """
 
     def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
         kwargs = {
@@ -105,14 +135,14 @@ class Normaliser(Processor):
         if self.dark_field is None:
             offset = 0
         else:
-            if input_arr.shape[-2::] != self.dark_field.shape:
+            if input_arr.shape[-len(self.dark_field.shape)::]!=self.dark_field.shape:
                 raise ValueError('Dark field and projections size do not match.')
             offset = self.dark_field
 
         if self.flat_field is None:
             scale = 1
         else:
-            if input_arr.shape[-2::] != self.flat_field.shape:
+            if input_arr.shape[-len(self.flat_field.shape)::]!=self.flat_field.shape:
                 raise ValueError('Flat field and projections size do not match.')
             scale = self.flat_field - offset
 

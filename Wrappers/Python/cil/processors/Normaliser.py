@@ -16,9 +16,11 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
+
 from cil.framework import Processor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
 import numpy
+import warnings
 
 class Normaliser(Processor):
     '''Normalisation based on flat and dark
@@ -73,14 +75,6 @@ class Normaliser(Processor):
         elif issubclass(type(df), DataContainer):
             self.flat_field = self.set_flat_field(df.as_array())
 
-    @staticmethod
-    def Normalise_projection(projection, flat, dark, tolerance):
-        a = (projection - dark)
-        b = (flat-dark)
-        with numpy.errstate(divide='ignore', invalid='ignore'):
-            c = numpy.true_divide( a, b )
-            c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0
-        return c
 
     @staticmethod
     def estimate_normalised_error(projection, flat, dark, delta_flat, delta_dark):
@@ -98,30 +92,53 @@ class Normaliser(Processor):
 
     def process(self, out=None):
 
-        projections = self.get_input()
-        dark = self.dark_field
-        flat = self.flat_field
+        input_arr = self.get_input().array
 
-        if projections.number_of_dimensions == 3:
-            if not (projections.shape[1:] == dark.shape and \
-               projections.shape[1:] == flat.shape):
-                raise ValueError('Flats/Dark and projections size do not match.')
-
-
-            a = numpy.asarray(
-                    [ Normaliser.Normalise_projection(
-                            projection, flat, dark, self.tolerance) \
-                     for projection in projections.as_array() ]
-                    )
-        elif projections.number_of_dimensions == 2:
-            a = Normaliser.Normalise_projection(projections.as_array(),
-                                                flat, dark, self.tolerance)
-        
         if out is None:
-            out = type(projections)( a , True,
-                        dimension_labels=projections.dimension_labels,
-                        geometry=projections.geometry)
-        else:
-            out.fill(a)
+            out = self.get_input().geometry.allocate(None)
         
+        out_array = out.array
+
+        if self.flat_field is None and self.dark_field is None:
+            raise ValueError('No flat or dark field provided. Please provide at least one.')
+        
+        if self.dark_field is None:
+            offset = 0
+        else:
+            if input_arr.shape[-2::] != self.dark_field.shape:
+                raise ValueError('Dark field and projections size do not match.')
+            offset = self.dark_field
+
+        if self.flat_field is None:
+            scale = 1
+        else:
+            if input_arr.shape[-2::] != self.flat_field.shape:
+                raise ValueError('Flat field and projections size do not match.')
+            scale = self.flat_field - offset
+
+        zero_err = False
+        numpy.seterr(divide='warn')
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+
+            denom_inv = 1.0 / scale
+            # Check if any warnings were raised
+            if len(w) > 0 and issubclass(w[-1].category, RuntimeWarning):
+                zero_err = True
+        
+        if self.dark_field is not None:
+            numpy.subtract(input_arr, offset, out=out_array)
+            input_arr = out_array
+
+        if self.flat_field is not None:
+            numpy.multiply(input_arr, denom_inv, out=out_array)
+
+        if zero_err:
+            warnings.warn("Divide by zero detected. These values will be substitued by the set tolerance. Please check your data for bad pixels.", UserWarning, stacklevel=2)
+            # create map of zeros in scale array
+            zero_map = numpy.where(scale == 0)
+            # set these to the tolerance value in all projections
+            for i in range(out_array.shape[0]):
+                out_array[i][zero_map] = self.tolerance
+
         return out

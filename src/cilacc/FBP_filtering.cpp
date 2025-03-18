@@ -66,7 +66,7 @@ int filter_projections_avh(DataFloat data, DataFloatConst filter, DataFloatConst
 				ippsSet_32fc({ 0.f,0.f }, src, width);
 				ippsRealToCplx_32f(out_ptr, out_ptr + pix_x, src + offset, pix_x);
 				ippsFFTFwd_CToC_32fc(src, dst, pSpec, pMemBuffer);
-				ippsMul_32f32fc_I(filter.data(), dst, width);
++				ippsMul_32f32fc_I(filter.data(), dst, width);
 				ippsFFTInv_CToC_32fc(dst, src, pSpec, pMemBuffer);
 				ippsCplxToReal_32fc(src + offset, out_ptr, out_ptr+pix_x, pix_x);
 			}

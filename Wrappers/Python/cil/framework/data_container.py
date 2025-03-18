@@ -553,8 +553,6 @@ class DataContainer(object):
         :type num_threads: int, optional, default 1/2 CPU of the system
         '''
 
-        c_float_p = ctypes.POINTER(ctypes.c_float)
-        c_double_p = ctypes.POINTER(ctypes.c_double)
 
         #convert a and b to numpy arrays and get the reference to the data (length = 1 or ndx.size)
         try:
@@ -593,19 +591,19 @@ class DataContainer(object):
             ndb = ndb.astype(dtype, casting='same_kind')
 
         if dtype == numpy.float32:
-            x_p = ndx.ctypes.data_as(c_float_p)
-            y_p = ndy.ctypes.data_as(c_float_p)
-            out_p = ndout.ctypes.data_as(c_float_p)
-            a_p = nda.ctypes.data_as(c_float_p)
-            b_p = ndb.ctypes.data_as(c_float_p)
+            x_p = ndx
+            y_p = ndy
+            out_p = ndout
+            a_p = nda
+            b_p = ndb
             f = cilacc.saxpby
 
         elif dtype == numpy.float64:
-            x_p = ndx.ctypes.data_as(c_double_p)
-            y_p = ndy.ctypes.data_as(c_double_p)
-            out_p = ndout.ctypes.data_as(c_double_p)
-            a_p = nda.ctypes.data_as(c_double_p)
-            b_p = ndb.ctypes.data_as(c_double_p)
+            x_p = ndx
+            y_p = ndy
+            out_p = ndout
+            a_p = nda
+            b_p = ndb
             f = cilacc.daxpby
 
         else:
@@ -615,24 +613,6 @@ class DataContainer(object):
 
 
         # int psaxpby(float * x, float * y, float * out, float a, float b, long size)
-        cilacc.saxpby.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the second array
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the third array
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to A
-                                  ctypes.c_int,                    # type of type of A selector (int)
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to B
-                                  ctypes.c_int,                    # type of type of B selector (int)
-                                  ctypes.c_longlong,               # type of size of first array
-                                  ctypes.c_int]                    # number of threads
-        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array
-                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array
-                                  ctypes.POINTER(ctypes.c_double), # type of A (c_double)
-                                  ctypes.c_int,                    # type of type of A selector (int)
-                                  ctypes.POINTER(ctypes.c_double), # type of B (c_double)
-                                  ctypes.c_int,                    # type of type of B selector (int)
-                                  ctypes.c_longlong,               # type of size of first array
-                                  ctypes.c_int]                    # number of threads
 
         if f(x_p, y_p, out_p, a_p, a_vec, b_p, b_vec, ndx.size, num_threads) != 0:
             raise RuntimeError('axpby execution failed')

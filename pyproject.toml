@@ -1,10 +1,12 @@
 [build-system]
 requires = [
-	"ipp",
-    	"ipp-devel",
+	#"ipp",
+    	#"ipp-devel",
     	"pip",
 	"nanobind",
 	"scikit-build-core>=0.11.0",
+	"nanobind",
+    	#"intel-openmp>=2025.0.5",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -20,8 +22,10 @@ dev = [
     "ipp>=2021.12.1,<2022.0",
     "numpy>=1.26,<2.0",
     "pip>=25.0.1",
-    	"ipp-devel",
-	"nanobind",
+    "ipp-devel",
+    "nanobind",
+    "pytest",
+    "scikit-image>=0.25.2",
 ]
 
 [project]
@@ -37,7 +41,9 @@ keywords = ["tomography", "optimisation"]
 dependencies = [
     "dxchange>=0.0.1",
     "h5py>=3.13.0",
-    "ipp>=2021.12.1,<2022.0",
+    #"ipp>=2021.12.1,<2022.0",
+    #"ipp-include>=2021.12.1,<2022.0",
+    #"ipp-static>=2021.12.1,<2022.0",
     "numba>=0.61.0",
     "olefile>=0.46",
     "pillow>=11.1.0",
@@ -45,9 +51,14 @@ dependencies = [
     "scipy>=1.4.0",
     "tqdm>=4.67.1",
     "zenodo-get>=1.6",
-    "scikit-build-core>=0.11.0"
+    "scikit-build-core>=0.11.0",
 ]
 
 [tool.scikit-build]
 search.site-packages = true
-wheel.packages = ["Wrappers/Python/cil"]
+wheel.py-api = "cp312"
+
+
+
+[tool.scikit-build.wheel.packages]
+cil = "Wrappers/Python/cil"

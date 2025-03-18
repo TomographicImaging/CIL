@@ -15,9 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-import ctypes
-import platform
-from ctypes import util
 import cil.cilacc as cilacc
 
 cilacc = cilacc

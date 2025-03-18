@@ -16,10 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import ctypes
-from pathlib import Path
+import platform
+from ctypes import util
+import cil.cilacc as cilacc
 
-try:
-    cilacc_path = next((Path(__file__).parent.parent / 'lib').resolve().glob("*cilacc.*"))
-except StopIteration:
-    raise FileNotFoundError("cilacc library not found")
-cilacc = ctypes.cdll.LoadLibrary(str(cilacc_path))
+cilacc = cilacc

@@ -34,23 +34,6 @@ try:
 except AttributeError:
     has_ipp = False
 
-if has_ipp:
-    cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array
-                                    ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
-                                    ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
-                                    ctypes.c_int16, #order of the fft
-                                    ctypes.c_long, #num_proj
-                                    ctypes.c_long, #pix_v
-                                    ctypes.c_long] #pix_x
-
-    cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array
-                                    ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
-                                    ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
-                                    ctypes.c_int16, #order of the fft
-                                    ctypes.c_long, #pix_v
-                                    ctypes.c_long, #num_proj
-                                    ctypes.c_long] #pix_x
-
 class GenericFilteredBackProjection(Reconstructor):
     """
     Abstract Base Class GenericFilteredBackProjection holding common and virtual methods for FBP and FDK

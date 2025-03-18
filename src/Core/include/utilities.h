@@ -15,6 +15,7 @@
 //
 // Authors:
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-#include "omp.h"
+
+#include <omp.h>
 
 void threads_setup(int nThreads_requested, int *nThreads_current);

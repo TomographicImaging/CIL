@@ -15,16 +15,22 @@
 //
 // Authors:
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-#ifndef _BINNER_H_
-#define _BINNER_H_
 
 #include <cstddef>
-#include "dll_export.h"
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
 
-extern "C"
-{
-    DLL_EXPORT void Binner_delete(void* binner);
-    DLL_EXPORT void* Binner_new(const size_t* shape_in, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list);
-    DLL_EXPORT int Binner_bin(void* binner, const float* data_in, float* data_binned);
-}
-#endif
+namespace nb = nanobind;
+
+using Shape = nb::ndarray<const size_t>;
+using DataInput = nb::ndarray<const float>;
+using DataBinned = nb::ndarray<float>;
+
+void Binner_delete(void* binner);
+void* Binner_new(Shape shape_in, 
+		Shape shape_out, 
+		Shape pixel_index_start, 
+		Shape binning_list
+);
+int Binner_bin(void* binner, DataInput data_in, DataBinned data_binned);
+

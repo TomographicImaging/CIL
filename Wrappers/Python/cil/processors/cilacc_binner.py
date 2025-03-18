@@ -48,30 +48,17 @@ class Binner_IPP(object):
 
       """
 
-      cilacc.Binner_new.argtypes = [c_size_t_p,c_size_t_p,c_size_t_p,c_size_t_p]
-      cilacc.Binner_new.restype = ctypes.c_void_p
-
-      cilacc.Binner_bin.argtypes =  [ ctypes.c_void_p, c_float_p,c_float_p]
-      cilacc.Binner_bin.restype = ctypes.c_int32
-
-      cilacc.Binner_delete.argtypes =  [ ctypes.c_void_p]
-      cilacc.Binner_delete.restype = ctypes.c_void_p
 
       shape_in_arr = np.array(shape_in, np.uintp)
       shape_out_arr = np.array(shape_out, np.uintp)
       start_index_arr = np.array(start_index, np.uintp)
       binning_arr = np.array(binning, np.uintp)
 
-      shape_in_p = shape_in_arr.ctypes.data_as(c_size_t_p)
-      shape_out_p = shape_out_arr.ctypes.data_as(c_size_t_p)
-      ind_start_p = start_index_arr.ctypes.data_as(c_size_t_p)
-      binning_p = binning_arr.ctypes.data_as(c_size_t_p)
-
       for i in range(4):
-         if shape_out_p[i] * binning_p[i] + ind_start_p[i] > shape_in_p[i]:
+         if shape_out_arr[i] * binning_arr[i] + start_index_arr[i] > shape_in_arr[i]:
             raise ValueError("Input dimension mismatch on dimension {0}".format(i))
 
-      self.obj = cilacc.Binner_new(shape_in_p, shape_out_p, ind_start_p, binning_p)
+      self.obj = cilacc.Binner_new(shape_in_arr, shape_out_arr, start_index_arr, binning_arr)
 
 
    def bin(self, array_in, array_binned):
@@ -88,10 +75,8 @@ class Binner_IPP(object):
       array_binned : ndarray
          Must have shape corresponding to shape_out. Data type float32. C ordered, contiguous memory
       """
-      data_p = array_in.ctypes.data_as(c_float_p)
-      data_out_p = array_binned.ctypes.data_as(c_float_p)
 
-      return cilacc.Binner_bin(self.obj, data_p, data_out_p)
+      return cilacc.Binner_bin(self.obj, array_in, array_binned)
 
    def __del__(self):
       """This deletes the cilacc Binner object

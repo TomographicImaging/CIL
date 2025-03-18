@@ -17,17 +17,11 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Kyle Pidgeon (UKRI-STFC)
 
-try:
-    from ipywidgets import interactive_output
-    import ipywidgets as widgets
-except ImportError as ie:
-    raise ImportError("please conda/pip install ipywidgets") from ie
-try:
-    import matplotlib.pyplot as plt
-    from matplotlib import gridspec
-except ImportError as ie:
-    msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-    raise ImportError(f"Please install {msg}") from ie
+from ipywidgets import interactive_output
+import ipywidgets as widgets
+
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 import numpy
 

@@ -230,11 +230,7 @@ class CofR_image_sharpness(Processor):
         return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}") from exc
+        import matplotlib.pyplot as plt
 
         x=[x / vox_size for x in offsets]
         y=values

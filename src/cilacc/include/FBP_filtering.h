@@ -32,4 +32,3 @@ using DataFloat = nb::ndarray<float>;
 
 int filter_projections_avh(DataFloat data, DataFloatConst filter, DataFloatConst weights, int order, long num_proj, long pix_y, long pix_x);
 int filter_projections_vah(DataFloat data, DataFloatConst filter, DataFloatConst weights, int order, long pix_y, long num_proj, long pix_x);
-

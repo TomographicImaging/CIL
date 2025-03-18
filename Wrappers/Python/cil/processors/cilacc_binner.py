@@ -19,10 +19,7 @@
 from cil.framework import cilacc
 
 import numpy as np
-import ctypes
 
-c_float_p = ctypes.POINTER(ctypes.c_float)
-c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
 
 class Binner_IPP(object):
 

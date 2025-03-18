@@ -164,7 +164,7 @@ class Normaliser(Processor):
             numpy.multiply(input_arr, denom_inv, out=out_array)
 
         if zero_err:
-            warnings.warn("Divide by zero detected. These values will be substitued by the set tolerance. Please check your data for bad pixels.", UserWarning, stacklevel=2)
+            warnings.warn("Divide by zero detected. These values will be substituted by the set tolerance. Please check your data for bad pixels.", UserWarning, stacklevel=2)
             # create map of zeros in scale array
             zero_map = numpy.where(scale == 0)
             # set these to the tolerance value in all projections

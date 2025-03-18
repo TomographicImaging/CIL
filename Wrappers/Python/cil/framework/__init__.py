@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from .cilacc import cilacc
+from cil import cilacc
 from .acquisition_data import AcquisitionData
 from .acquisition_geometry import AcquisitionGeometry, SystemConfiguration
 from .data_container import DataContainer

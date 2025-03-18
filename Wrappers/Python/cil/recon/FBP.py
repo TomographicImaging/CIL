@@ -22,11 +22,8 @@ from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 
 import numpy as np
-import ctypes
 from tqdm import tqdm
 
-c_float_p = ctypes.POINTER(ctypes.c_float)
-c_double_p = ctypes.POINTER(ctypes.c_double)
 
 try:
     cilacc.filter_projections_avh
@@ -297,9 +294,9 @@ class GenericFilteredBackProjection(Reconstructor):
                             .format(filter_array.size,self.fft_order))
 
         #call ext function
-        data_ptr = acquistion_data.array.ctypes.data_as(c_float_p)
-        filter_ptr = filter_array.ctypes.data_as(c_float_p)
-        weights_ptr = self._weights.ctypes.data_as(c_float_p)
+        data_ptr = acquistion_data.array
+        filter_ptr = filter_array
+        weights_ptr = self._weights
 
         ag = acquistion_data.geometry
         if ag.dimension_labels == ('angle','vertical','horizontal'):

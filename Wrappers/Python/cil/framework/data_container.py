@@ -16,14 +16,13 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import copy
-import ctypes
 import warnings
 from functools import reduce
 from numbers import Number
 
 import numpy
 
-from .cilacc import cilacc
+from cil import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
 
 

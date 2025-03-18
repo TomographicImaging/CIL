@@ -3571,6 +3571,25 @@ class TestNormaliser(unittest.TestCase):
         normaliser(self.data, out=self.data)
         numpy.testing.assert_allclose(self.data.array, normalised_data.array)
 
+    def test_bad_input(self):
+        arr = numpy.ones((5)) 
+        normaliser = Normaliser(flat_field=arr, dark_field=None)
+        normaliser.set_input(self.data)
+
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()
+
+        arr = numpy.ones((5,6)) 
+        normaliser.set_flat_field(arr)
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()      
+
+        arr = numpy.ones((5,6)) 
+        normaliser.set_dark_field(arr)
+        normaliser.set_flat_field(None)
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()     
+
     def test_no_offset(self):
         #test with no dark-field
         flat_field = numpy.ones(self.data.shape[1::]) * 2.0

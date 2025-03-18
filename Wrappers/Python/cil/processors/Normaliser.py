@@ -139,22 +139,21 @@ class Normaliser(Processor):
                 raise ValueError('Dark field and projections size do not match.')
             offset = self.dark_field
 
-        if self.flat_field is None:
-            scale = 1
-        else:
+        zero_err = False
+        if self.flat_field is not None:
             if input_arr.shape[-len(self.flat_field.shape)::]!=self.flat_field.shape:
                 raise ValueError('Flat field and projections size do not match.')
+            
             scale = self.flat_field - offset
 
-        zero_err = False
-        numpy.seterr(divide='warn')
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+            numpy.seterr(divide='warn')
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
 
-            denom_inv = 1.0 / scale
-            # Check if any warnings were raised
-            if len(w) > 0 and issubclass(w[-1].category, RuntimeWarning):
-                zero_err = True
+                denom_inv = 1.0 / scale
+                # Check if any warnings were raised and handle these later
+                if len(w) > 0 and issubclass(w[-1].category, RuntimeWarning):
+                    zero_err = True
         
         if self.dark_field is not None:
             numpy.subtract(input_arr, offset, out=out_array)

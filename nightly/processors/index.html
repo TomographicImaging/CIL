@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 24.3.1.dev17+gb5ee284f documentation</title>
+    <title>Processors &#8212; CIL 24.3.1.dev18+ga5821f9b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=2a06020fc4abf388d8e9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=2a06020fc4abf388d8e9" />
 
-    <script src="../_static/documentation_options.js?v=9bd7e50f"></script>
+    <script src="../_static/documentation_options.js?v=27ca1a56"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev17+gb5ee284f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev18+ga5821f9b';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev17+gb5ee284f" />
+  <meta name="docsearch:version" content="24.3.1.dev18+ga5821f9b" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1446,15 +1446,37 @@ This method is unreliable on half-scan data with ‘tuning-fork’ style artifac
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.processors.Normaliser">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">Normaliser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Normaliser/#Normaliser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser" title="Link to this definition">#</a></dt>
-<dd><p>Normalisation based on flat and dark</p>
-<p>This processor read in a AcquisitionData and normalises it based on
-the instrument reading with and without incident photons or neutrons.</p>
-<p>Input: AcquisitionData
-Parameter: 2D projection with flat field (or stack)</p>
-<blockquote>
-<div><p>2D projection with dark field (or stack)</p>
-</div></blockquote>
-<p>Output: AcquisitionDataSet</p>
+<dd><p>This processor can be used to normalise data with flat-field and dark-field images.</p>
+<p>The dark-field image is used to remove the offset from the input data, and the flat-field image is used to scale the data.</p>
+<p>The normalisation is done as follows:</p>
+<div class="math notranslate nohighlight">
+\[\text{output} = \frac{\text{input} - \text{offset}}{\text{scale} - \text{offset}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{input}\)</span>, <span class="math notranslate nohighlight">\(\text{offset}\)</span> and <span class="math notranslate nohighlight">\(\text{scale}\)</span> are the input, dark-field and flat-field images respectively.</p>
+<p>The processor can be used in-place to reduce memory usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flat_field</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – The flat field image. It must have the same shape as a single projection.</p></li>
+<li><p><strong>dark_field</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – The dark field image. It must have the same shape as a single projection.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>optional</em>) – The value to substitute for output values where division by zero occurs.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Basic usage with flat and dark fields:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Normaliser</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normaliser</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="p">(</span><span class="n">flat_field</span><span class="p">,</span> <span class="n">dark_field</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normaliser</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalised_data</span> <span class="o">=</span> <span class="n">normaliser</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In-place usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Normaliser</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normaliser</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="p">(</span><span class="n">flat_field</span><span class="p">,</span> <span class="n">dark_field</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normaliser</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normaliser</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.Normaliser.estimate_normalised_error">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_normalised_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_dark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/Normaliser/#Normaliser.estimate_normalised_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.estimate_normalised_error" title="Link to this definition">#</a></dt>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Normaliser &#8212; CIL 24.3.1.dev17+gb5ee284f documentation</title>
+    <title>cil.processors.Normaliser &#8212; CIL 24.3.1.dev18+ga5821f9b documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=2a06020fc4abf388d8e9" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=2a06020fc4abf388d8e9" />
 
-    <script src="../../../../_static/documentation_options.js?v=9bd7e50f"></script>
+    <script src="../../../../_static/documentation_options.js?v=27ca1a56"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev17+gb5ee284f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev18+ga5821f9b';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev17+gb5ee284f" />
+  <meta name="docsearch:version" content="24.3.1.dev18+ga5821f9b" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -489,23 +489,55 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span>\
  <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">ImageData</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <div class="viewcode-block" id="Normaliser">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; This processor can be used to normalise data with flat-field and dark-field images.</span>
 
-<span class="sd">    This processor read in a AcquisitionData and normalises it based on</span>
-<span class="sd">    the instrument reading with and without incident photons or neutrons.</span>
+<span class="sd">    The dark-field image is used to remove the offset from the input data, and the flat-field image is used to scale the data. </span>
 
-<span class="sd">    Input: AcquisitionData</span>
-<span class="sd">    Parameter: 2D projection with flat field (or stack)</span>
-<span class="sd">               2D projection with dark field (or stack)</span>
-<span class="sd">    Output: AcquisitionDataSet</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    The normalisation is done as follows:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \text{output} = \frac{\text{input} - \text{offset}}{\text{scale} - \text{offset}}</span>
+
+<span class="sd">    where :math:`\text{input}`, :math:`\text{offset}` and :math:`\text{scale}` are the input, dark-field and flat-field images respectively.</span>
+
+<span class="sd">    The processor can be used in-place to reduce memory usage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flat_field : numpy.ndarray, optional</span>
+<span class="sd">        The flat field image. It must have the same shape as a single projection.</span>
+<span class="sd">    dark_field : numpy.ndarray, optional</span>
+<span class="sd">        The dark field image. It must have the same shape as a single projection.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        The value to substitute for output values where division by zero occurs.</span>
+
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Basic usage with flat and dark fields:</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.processors import Normaliser</span>
+<span class="sd">    &gt;&gt;&gt; normaliser = Normaliser(flat_field, dark_field)</span>
+<span class="sd">    &gt;&gt;&gt; normaliser.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; normalised_data = normaliser.get_output()</span>
+
+<span class="sd">    In-place usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; from cil.processors import Normaliser</span>
+<span class="sd">    &gt;&gt;&gt; normaliser = Normaliser(flat_field, dark_field)</span>
+<span class="sd">    &gt;&gt;&gt; normaliser.set_input(data)</span>
+<span class="sd">    &gt;&gt;&gt; normaliser.get_output(out=data)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -548,14 +580,6 @@
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_flat_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Normalise_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">numpy</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-            <span class="n">c</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span> <span class="o">~</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span> <span class="n">c</span> <span class="p">)]</span> <span class="o">=</span> <span class="n">tolerance</span> <span class="c1"># set to not zero if 0/0</span>
-        <span class="k">return</span> <span class="n">c</span>
 
 <div class="viewcode-block" id="Normaliser.estimate_normalised_error">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser.estimate_normalised_error">[docs]</a>
@@ -576,32 +600,54 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="n">projections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
-        <span class="n">dark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span>
-        <span class="n">flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span>
+        <span class="n">input_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">array</span>
 
-        <span class="k">if</span> <span class="n">projections</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">dark</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> \
-               <span class="n">projections</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">flat</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flats/Dark and projections size do not match.&#39;</span><span class="p">)</span>
-
-
-            <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-                    <span class="p">[</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span>
-                            <span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> \
-                     <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="p">]</span>
-                    <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">projections</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
-                                                <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span>
-        
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">projections</span><span class="p">)(</span> <span class="n">a</span> <span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
-                        <span class="n">dimension_labels</span><span class="o">=</span><span class="n">projections</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span>
-                        <span class="n">geometry</span><span class="o">=</span><span class="n">projections</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         
+        <span class="n">out_array</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No flat or dark field provided. Please provide at least one.&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span><span class="o">.</span><span class="n">shape</span><span class="p">)::]</span><span class="o">!=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dark field and projections size do not match.&#39;</span><span class="p">)</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span>
+
+        <span class="n">zero_err</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">)::]</span><span class="o">!=</span><span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flat field and projections size do not match.&#39;</span><span class="p">)</span>
+            
+            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">-</span> <span class="n">offset</span>
+
+            <span class="n">numpy</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+
+                <span class="n">denom_inv</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">scale</span>
+                <span class="c1"># Check if any warnings were raised and handle these later</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">):</span>
+                    <span class="n">zero_err</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">input_arr</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out_array</span><span class="p">)</span>
+            <span class="n">input_arr</span> <span class="o">=</span> <span class="n">out_array</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">input_arr</span><span class="p">,</span> <span class="n">denom_inv</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out_array</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">zero_err</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Divide by zero detected. These values will be substituted by the set tolerance. Please check your data for bad pixels.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># create map of zeros in scale array</span>
+            <span class="n">zero_map</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># set these to the tolerance value in all projections</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">out_array</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">zero_map</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span>
+
         <span class="k">return</span> <span class="n">out</span></div>
 
 </pre></div>

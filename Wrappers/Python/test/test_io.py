@@ -123,7 +123,7 @@ class TestZeissDataReader(unittest.TestCase):
         assert geometry.dimension == '3D'
         
         from cil.framework import AcquisitionGeometry
-        metadata = self.reader.get_metadata()
+        metadata = reader.get_metadata()
         _geometry = AcquisitionGeometry.create_Cone3D(
                 [0,-metadata['dist_source_center'],0],[0,metadata['dist_center_detector'],0] \
                 ) \
@@ -191,11 +191,6 @@ class TestZeissDataReader(unittest.TestCase):
         data2d *= -1
 
         ig2d = data2d.geometry.get_ImageGeometry()
-        # Construct the appropriate ImageGeometry
-        ig2d = ImageGeometry(voxel_num_x=self.N,
-                            voxel_num_y=self.N,
-                            voxel_size_x=self.voxel_size_h,
-                            voxel_size_y=self.voxel_size_h)
         assert data2d.geometry is not None, "data2d geometry is None"
         fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
@@ -215,7 +210,7 @@ class TestZeissDataReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             reader.set_up(file_name='no-file')
 
-    @unittest.skipIf(not has_file, "Missing prerequisites: has_file")
+    @unittest.skipIf(has_dxchange, f"Missing prerequisites: has_dxchange {has_dxchange}")
     def test_import_error(self):
         reader = ZEISSDataReader()
         with self.assertRaises(ImportError):

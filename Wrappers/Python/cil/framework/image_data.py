@@ -27,7 +27,7 @@ class ImageData(DataContainer):
     Parameters
     ----------
     array : numpy.ndarray or DataContainer
-        The data array. Default None creates an empty array.
+        The data array. Default None creates an empty array of size determined by the geometry.
     deep_copy : bool, default is False
         If True, the array will be deep copied. If False, the array will be shallow copied.
     geometry : ImageGeometry
@@ -35,7 +35,7 @@ class ImageData(DataContainer):
 
     **kwargs:
         dtype : numpy.dtype
-            Specify the data type of the ImageData array, this is useful if you do not pass None to array and want to over-ride the dtype of the geometry. 
+            Specify the data type of the ImageData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. 
             If an array is passed, dtype must match the dtype of the array.
     """
     

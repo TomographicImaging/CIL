@@ -2146,51 +2146,83 @@ class MockFunction(Function):
 
 class TestFunctionOfAbs(unittest.TestCase):
     def setUp(self):
-        self.data = VectorData(np.array([1+2j, -3+4j, -5-6j]))
+        self.data_complex64 = VectorData(np.array([1+2j, -3+4j, -5-6j], dtype=np.complex64))
+        self.data_complex128 = VectorData(np.array([1+2j, -3+4j, -5-6j], dtype=np.complex128))
+        self.data_real32 = VectorData(np.array([1, 2, 3], dtype=np.float32))
         self.mock_function = MockFunction()
-        self.abs_function_double = FunctionOfAbs(self.mock_function)
-        self.abs_function = FunctionOfAbs(self.mock_function, precision='single')
+        self.abs_function = FunctionOfAbs(self.mock_function)
         
     
     def test_initialization(self):
         self.assertIsInstance(self.abs_function._function, MockFunction)
         self.assertFalse(self.abs_function._lower_semi)
 
-        self.assertEqual(self.abs_function.precision, 'single')
-        self.assertEqual(self.abs_function_double.precision, 'double')
+
 
     def test_call(self):
-        result = self.abs_function(self.data)
-        expected = np.abs(self.data.array)**2
+        result = self.abs_function(self.data_complex64)
+        expected = np.abs(self.data_complex64.array)**2
         np.testing.assert_array_almost_equal(result, expected, decimal=4)
         
-        result = self.abs_function_double(self.data)
+        result = self.abs_function(self.data_complex128)
+        expected = np.abs(self.data_complex128.array)**2
         np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+        result = self.abs_function(self.data_real32)
+        expected = np.abs(self.data_real32.array)**2
+        np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+    def test_get_real_complex_dtype(self):
+        from cil.optimisation.functions.AbsFunction import _get_real_complex_dtype
+        real, compl = _get_real_complex_dtype(self.data_complex128)
+        self.assertEqual( real, np.float64)
+        self.assertEqual(compl, np.complex128)
+        
+        real, compl = _get_real_complex_dtype(self.data_complex64)
+        self.assertEqual( real, np.float32)
+        self.assertEqual(compl, np.complex64)
+        
+        real, compl = _get_real_complex_dtype(self.data_real32)
+        self.assertEqual( real, np.float32)
+        self.assertEqual(compl, np.complex64)
+        
+        
         
     
     def test_proximal(self):
         tau = 0.5
-        result = self.abs_function.proximal(self.data, tau)
-        expected = (np.abs(self.data.array) / (1 + tau)) * np.exp(1j * np.angle(self.data.array))
-        np.testing.assert_array_almost_equal(result.array, expected)
+        result = self.abs_function.proximal(self.data_complex128, tau)
+        expected = (np.abs(self.data_complex128.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_complex128.array))
+        np.testing.assert_array_almost_equal(result.array, expected, decimal=6)
     
-        result = self.abs_function_double.proximal(self.data, tau)
+        result = self.abs_function.proximal(self.data_complex64, tau)
+        expected = (np.abs(self.data_complex64.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_complex64.array))
         np.testing.assert_array_almost_equal(result.array, expected, decimal=4)
+        
+        result = self.abs_function.proximal(self.data_real32, tau)
+        expected = (np.abs(self.data_real32.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_real32.array))
+        np.testing.assert_array_almost_equal(result.array, expected, decimal=4)
+        
+        
         
     def test_convex_conjugate_lower_semi(self):
         self.abs_function._lower_semi = True
-        result = self.abs_function.convex_conjugate(self.data)
-        expected = 0.5 * np.abs(self.data.array) ** 2
+        result = self.abs_function.convex_conjugate(self.data_complex128)
+        expected = 0.5 * np.abs(self.data_complex128.array) ** 2
+        np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+        result = self.abs_function.convex_conjugate(self.data_complex64)
+        expected = 0.5 * np.abs(self.data_complex64.array) ** 2
         np.testing.assert_array_almost_equal(result, expected, decimal=4)
         
-        self.abs_function_double._lower_semi = True
-        result = self.abs_function_double.convex_conjugate(self.data)
-        np.testing.assert_array_almost_equal(result, expected, decimal=6)
-    
+        result = self.abs_function.convex_conjugate(self.data_real32)
+        expected = 0.5 * np.abs(self.data_real32.array) ** 2
+        np.testing.assert_array_almost_equal(result, expected, decimal=4)
+        
     
     def test_convex_conjugate_not_implemented(self):
         self.abs_function._lower_semi = False
         
-        self.assertEqual(self.abs_function.convex_conjugate(self.data), 0.)
+        self.assertEqual(self.abs_function.convex_conjugate(self.data_real32), 0.)
 
 

@@ -54,14 +54,6 @@ class FunctionOfAbs(Function):
         If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate returned as 0. This is to ensure compatibility with Algorithms such as PDHG.
-    precision : str, default 'double'
-        Precision of the calculation, 'single' or 'double'
-        Some complex-valued imaging problems involve high dynamic range and/or require fine phase accuracy, necessitating the use of double precision (default).
-        For example, in synthetic aperture radar imagery 100dB+ dynamic range may be encountered, which is more than single precision allows.
-        In other cases use of single precision will reduce memory reservation and may improve performance, depending on the compute architecture.
-        
-   
-
 
     Reference
     ---------
@@ -69,19 +61,14 @@ class FunctionOfAbs(Function):
     
     '''
 
-    def __init__(self, function: Function, assume_lower_semi: bool=False, precision: str='double'):
+    def __init__(self, function: Function, assume_lower_semi: bool=False):
         self._function = function
         self._lower_semi = assume_lower_semi
-        
-        if precision=='single' or precision=='double':
-            self.precision = precision
-        else: 
-            raise ValueError('Precision must be `single` or `double`')
-        
+                
         super().__init__(L=function.L)
 
     def __call__(self, x: DataContainer) -> float:
-        call_abs = (_take_abs_input(self.precision))(self._function.__call__)
+        call_abs = _take_abs_input(self._function.__call__)
         return call_abs(self._function, x)
 
     def proximal(self, x: DataContainer, tau: float, out: Optional[DataContainer]=None) -> DataContainer:
@@ -109,7 +96,7 @@ class FunctionOfAbs(Function):
         DataContainer, the proximal map of the function at x with scalar :math:`\tau`.
 
         '''
-        prox_abs = _abs_and_project(self.precision)(self._function.proximal)
+        prox_abs = _abs_and_project(self._function.proximal)
         return prox_abs(self._function, x, tau=tau, out=out)
 
     def convex_conjugate(self, x: DataContainer) -> float:
@@ -144,7 +131,7 @@ class FunctionOfAbs(Function):
         '''
 
         if self._lower_semi:
-            conv_abs = (_take_abs_input(self.precision))(self._function.convex_conjugate)
+            conv_abs = _take_abs_input(self._function.convex_conjugate)
             return conv_abs(self._function, x)
         else:
             warnings.warn('Convex conjugate is not properly for this function, returning 0 for compatibility with optimisation algorithms')
@@ -155,78 +142,85 @@ class FunctionOfAbs(Function):
         '''
         raise NotImplementedError('Gradient not available for this function')
 
-def _take_abs_input(precision='double'):
-    def _take_abs_input_inner(func):
-            '''Decorator for function to act on abs of input of a method'''
+
+
+
+def _take_abs_input(func):
+    '''Decorator for function to act on abs of input of a method'''
+
+    def _take_abs_decorator(self, x: DataContainer, *args, **kwargs):
+        real_dtype, _ = _get_real_complex_dtype(x)
+        
+        rgeo = x.geometry.copy()
+        rgeo.dtype = real_dtype
+        r = rgeo.allocate(0)
+        r.fill(np.abs(x.array).astype(real_dtype))
+        fval = func(r, *args, **kwargs)
+        return fval
+    return _take_abs_decorator
+
+
+def _abs_and_project(func):
+    '''Decorator for function to act on abs of input, 
+    with return being projected to the angle of the input.
+    Requires function return to have the same shape as input,
+    such as prox.'''
     
-            def _take_abs_decorator(self, x: DataContainer, *args, **kwargs):
-                if precision == 'single':
-                    real_dtype = np.float32
-                elif precision == 'double':
-                    real_dtype = np.float64
-                else:
-                    raise ValueError('Precision must be `single` or `double`')
-                rgeo = x.geometry.copy()
-                rgeo.dtype = real_dtype
-                r = rgeo.allocate(0)
-                r.fill(np.abs(x.array).astype(real_dtype))
-                fval = func(r, *args, **kwargs)
-                return fval
-            return _take_abs_decorator
-    return _take_abs_input_inner
-
-def _abs_and_project(precision='double'):
-    def _abs_and_project_inner(func):
-            '''Decorator for function to act on abs of input, 
-            with return being projected to the angle of the input.
-            Requires function return to have the same shape as input,
-            such as prox.'''
+        
+    def _abs_project_decorator(self, x: DataContainer, *args, **kwargs):
+        
+        real_dtype, complex_dtype = _get_real_complex_dtype(x)
             
-                
-            def _abs_project_decorator(self, x: DataContainer, *args, **kwargs):
-                if precision == 'single':
-                    real_dtype = np.float32
-                    complex_dtype = np.complex64
-                elif precision == 'double':
-                    real_dtype = np.float64
-                    complex_dtype = np.complex128
-                else:
-                    raise ValueError('Precision must be `single` or `double`')
-                
-                rgeo = x.geometry.copy()
-                rgeo.dtype = real_dtype
-                r = rgeo.allocate(None)
-                r.fill(np.abs(x.as_array()).astype(real_dtype))
-                Phi = np.exp((1j*np.angle(x.array)))
-                out = kwargs.pop('out', None)
-                
-                fvals = func(r, *args, **kwargs)
-                fvals_numpy = fvals.as_array()
-                
-                # Douglas-Rachford splitting to find solution in positive orthant
-                if np.any(fvals_numpy < 0):
-                    log.info('AbsFunctions: projection to +ve orthant triggered')
-                    cts = 0
-                    y = r.copy()
-                    fvals_numpy = fvals.as_array()
-                    while np.any(fvals_numpy < 0):
-                        tmp = fvals_numpy  - 0.5*y.as_array() + 0.5*r.as_array()
-                        tmp[tmp < 0] = 0.
-                        y += DataContainter(tmp, y.geometry) - fvals
-                        fvals = func(y, *args, **kwargs)
-                        cts += 1
-                        if cts > 10:
-                            fvals_numpy = fvals.as_array()
-                            fvals_numpy[fvals_numpy < 0] = 0.
-                            break
-
-                
                     
-                if out is None: 
-                    out_geom = x.geometry.copy()
-                    out_geom.dtype = complex_dtype
-                    out = out_geom.allocate(None)
-                out.fill( fvals_numpy.astype(complex_dtype)*Phi)
-                return out
-            return _abs_project_decorator
-    return _abs_and_project_inner
+        rgeo = x.geometry.copy()
+        rgeo.dtype = real_dtype
+        r = rgeo.allocate(None)
+        r.fill(np.abs(x.as_array()).astype(real_dtype))
+        Phi = np.exp((1j*np.angle(x.array)))
+        out = kwargs.pop('out', None)
+        
+        fvals = func(r, *args, **kwargs)
+        fvals_np = fvals.as_array()
+        
+        # Douglas-Rachford splitting to find solution in positive orthant
+        if np.any(fvals_np < 0):
+            log.info('AbsFunctions: projection to +ve orthant triggered')
+            cts = 0
+            y = r.copy()
+            fvals_np = fvals.as_array()
+            while np.any(fvals_np < 0):
+                tmp = fvals_np  - 0.5*y.as_array() + 0.5*r.as_array()
+                tmp[tmp < 0] = 0.
+                y += DataContainter(tmp, y.geometry) - fvals
+                fvals = func(y, *args, **kwargs)
+                cts += 1
+                if cts > 10:
+                    fvals_np = fvals.as_array()
+                    fvals_np[fvals_np < 0] = 0.
+                    break
+
+        if out is None: 
+            out_geom = x.geometry.copy()
+            out = out_geom.allocate(None)
+        if np.isreal(x.as_array()).all():
+            out.fill( np.real(fvals_np.astype(complex_dtype)*Phi))
+        else:
+            out.fill( fvals_np.astype(complex_dtype)*Phi)
+        return out
+    return _abs_project_decorator
+
+
+def _get_real_complex_dtype(x: DataContainer):
+    '''An internal function to find the type of x and set the corresponding real and complex data types '''
+    
+    x_dtype = x.as_array().dtype
+    if np.issubdtype(x_dtype, np.complexfloating):
+        complex_dtype = x_dtype
+        complex_example = np.array([1 + 1j], dtype=x_dtype)
+        real_dtype = np.real(complex_example).dtype
+    else: 
+        real_dtype = x_dtype
+        complex_example = 1j*np.array([1], dtype=x_dtype)
+        complex_dtype = complex_example.dtype
+    return real_dtype, complex_dtype            
+            

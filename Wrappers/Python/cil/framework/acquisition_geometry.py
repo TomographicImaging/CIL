@@ -2173,10 +2173,10 @@ class AcquisitionGeometry(object):
         :type dtype: numpy type, default numpy.float32
         '''
         dtype = kwargs.get('dtype', self.dtype)
-
+        
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
+                
         out = AcquisitionData(geometry=self.copy(),
                               dtype=dtype,
                               suppress_warning=True)

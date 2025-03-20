@@ -106,18 +106,22 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.from_function(50, self.example_function)
         order = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+        self.assertNumpyArrayEqual(sampler.get_previous_samples(), np.array([]))
         self.assertNumpyArrayEqual(sampler.get_samples(20), np.array(
             order)[:20])
 
         N = 25
         for i in range(N):
             self.assertEqual(next(sampler), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
 
         self.assertEqual(sampler._iteration_number, N)
         self.assertEqual(sampler.current_iter_number, N)
 
         self.assertEqual(sampler.get_samples(
             550)[519], self.example_function(519))
+        
+        self.assertNumpyArrayEqual(sampler.get_previous_samples(), np.array(order[:N]))
 
         sampler = Sampler.from_function(50, self.example_function)
         self.assertListEqual(sampler.prob_weights, [1/50] * 50)
@@ -138,9 +142,17 @@ class TestSamplers(CCPiTestClass):
         sampler = Sampler.sequential(10)
         self.assertNumpyArrayEqual(sampler.get_samples(20), np.array(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+        
+        with self.assertRaises(ValueError):
+            sampler.get_current_sample()
 
         for i in range(337):
             self.assertEqual(next(sampler), i % 10)
+            self.assertEqual(sampler.get_current_sample(), i % 10)
+            self.assertEqual(sampler.get_current_sample(), i % 10)
+            
+        self.assertEqual(sampler.current_iter_number, 337)
+        self.assertEqual(len(sampler.get_previous_samples()), 337)
 
         self.assertNumpyArrayEqual(sampler.get_samples(20), np.array(
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
@@ -166,8 +178,12 @@ class TestSamplers(CCPiTestClass):
         self.assertNumpyArrayEqual(
             sampler.get_samples(25), np.array(order[:25]))
 
+        with self.assertRaises(ValueError):
+            sampler.get_current_sample()
+            
         for i in range(25):
             self.assertEqual(next(sampler), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
 
         self.assertNumpyArrayEqual(
             sampler.get_samples(25), np.array(order[:25]))
@@ -188,7 +204,12 @@ class TestSamplers(CCPiTestClass):
             sampler.get_samples(14), np.array(order[:14]))
 
         for i in range(25):
+            self.assertEqual(sampler.current_iter_number, i)
             self.assertEqual(sampler.next(), order[i % 12])
+            self.assertEqual(sampler.get_current_sample(), order[i % 12])
+            self.assertEqual(sampler.get_current_sample(), order[i % 12])
+            
+        self.assertNumpyArrayEqual(sampler.get_samples(25), sampler.get_previous_samples())
 
         self.assertNumpyArrayEqual(
             sampler.get_samples(14), np.array(order[:14]))
@@ -211,13 +232,21 @@ class TestSamplers(CCPiTestClass):
                  2, 0, 4, 1, 2, 1, 3, 2, 2, 1, 1, 1, 1]
         self.assertNumpyArrayEqual(
             sampler.get_samples(14), np.array(order[:14]))
+        
+        with self.assertRaises(ValueError):
+            sampler.get_current_sample()
 
         for i in range(25):
             self.assertEqual(next(sampler), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
+            self.assertEqual(sampler.current_iter_number, i+1)
 
         self.assertNumpyArrayEqual(
             sampler.get_samples(14), np.array(order[:14]))
 
+        self.assertNumpyArrayEqual(sampler.get_samples(25), sampler.get_previous_samples())
+        
         sampler = Sampler.random_with_replacement(
             4, [0.7, 0.1, 0.1, 0.1], seed=5)
         order = [0, 2, 0, 3, 0, 0, 1, 0, 0, 0, 0, 1,
@@ -227,6 +256,11 @@ class TestSamplers(CCPiTestClass):
 
         for i in range(25):
             self.assertEqual(sampler.next(), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
+            self.assertEqual(sampler.get_current_sample(), order[i])
+            self.assertEqual(sampler.current_iter_number, i+1)
+            
+        self.assertNumpyArrayEqual(sampler.get_samples(25), sampler.get_previous_samples())
 
         self.assertNumpyArrayEqual(
             sampler.get_samples(14), np.array(order[:14]))
@@ -252,6 +286,12 @@ class TestSamplers(CCPiTestClass):
 
         for i in range(25):
             self.assertEqual(next(sampler), order[i % 21])
+            self.assertEqual(sampler.get_current_sample(), order[i % 21])
+            self.assertEqual(sampler.get_current_sample(), order[i % 21])
+            self.assertEqual(sampler.current_iter_number, i+1)
 
         self.assertNumpyArrayEqual(
             sampler.get_samples(10), np.array(order[:10]))
+        
+        self.assertNumpyArrayEqual(sampler.get_samples(25), sampler.get_previous_samples())
+

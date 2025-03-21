@@ -1427,7 +1427,7 @@ class TestDataContainer(CCPiTestClass):
 
         self.assertEqual(dtype_before, ag.dtype)
 
-    def test_image_data_geometry_override(self):
+    def test_geometry_dtype_change(self):
         ag = AcquisitionGeometry.create_Cone2D([0,-100], [0,200], units='mm',detector_direction_x=[1, 0])
         ag.set_panel(120, pixel_size=0.1, origin='bottom-left')
         ag.set_angles(np.linspace(0., 360., 120, endpoint=False))

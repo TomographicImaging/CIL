@@ -71,7 +71,6 @@ class AcquisitionData(DataContainer, Partitioner):
             if dtype != array.dtype:
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
 
-
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
         

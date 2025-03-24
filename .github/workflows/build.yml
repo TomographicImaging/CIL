@@ -178,7 +178,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
           'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
-    defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
+    defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -188,6 +188,11 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
       with: {python-version: 3.11}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "0.6.9"
+        enable-cache: true
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
@@ -202,6 +207,7 @@ jobs:
     - name: build cil
       working-directory: .
       run: |
+        UV_PROJECT_ENVIRONMENT=$CONDA_PREFIX uv sync --dev --group docs --inexact
         cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
         cmake --build ./build --target install
     - name: checkout docs

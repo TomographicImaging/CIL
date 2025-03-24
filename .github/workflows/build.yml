@@ -178,7 +178,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
           'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
-    defaults: {run: {shell: 'bash -el {0}'}}
+    defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -186,13 +186,20 @@ jobs:
         fetch-depth: 0
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
-    - uses: conda-incubator/setup-miniconda@v3
-      with: {python-version: 3.11}
     - name: Set up uv
       uses: astral-sh/setup-uv@v5
       with:
         version: "0.6.9"
         enable-cache: true
+    - name: set requirements
+      working-directory: .
+      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
+    - name: Set conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        environment-file: scripts/requirements-test.yml
+        activate-environment: cil_dev
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
@@ -200,10 +207,7 @@ jobs:
         cache-version: 0
     - name: install dependencies
       run: |
-        conda install -c conda-forge -yq conda-merge
-        conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
-        conda env update -n test
-        conda list
+        conda install -c conda-forge -yq pandoc
     - name: build cil
       working-directory: .
       run: |
@@ -225,7 +229,7 @@ jobs:
         docs_dir="${{ github.ref_name }}"
         docs_dir="${docs_dir//\//_}"
         if test "$docs_dir" = master; then docs_dir=nightly; fi
-        make BUILDSUBDIR="$docs_dir" dirhtml
+        UV_PROJECT_ENVIRONMENT=$CONDA_PREFIX uv run --dev --group docs --no-sync make BUILDSUBDIR="$docs_dir" dirhtml
     - uses: actions/upload-artifact@v4
       with:
         name: DocumentationHTML

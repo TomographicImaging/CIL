@@ -1,16 +1,15 @@
 name: cil_demos
 channels:
   - conda-forge
-  - ccpi
   - https://software.repos.intel.com/python/conda
 dependencies:
   - python=3.12
-  - cil=24.3.0
+  - ccpi::cil=24.3.0
   - numpy=1.26
   - astra-toolbox=2.1=cuda*
-  - tigre=2.6
-  - ccpi-regulariser=24.0.1
-  - tomophantom=2.0.0
+  - ccpi::tigre=2.6
+  - ccpi::ccpi-regulariser=24.0.1
+  - ccpi::tomophantom=2.0.0
   - ipykernel 
   - ipywidgets 
   - scikit-image

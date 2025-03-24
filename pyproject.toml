@@ -67,6 +67,7 @@ dev = [
     "cvxpy>=1.6.4",
     "matplotlib>=3.10.1",
     "packaging>=24.2",
+    "pip>=25.0.1",
     "setuptools>=64",
     "setuptools_scm>=8"
  ]

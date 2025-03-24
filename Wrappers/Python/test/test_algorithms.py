@@ -1786,9 +1786,9 @@ class Test_PD3O(CCPiTestClass):
         
         sampler=Sampler.sequential(3)
         f=SVRGFunction(functions, sampler, snapshot_update_interval=5, store_gradients=True)
-        algo_pd3o = PD3O(f= 2*f, g=G1, h=H1, operator=operator)
-        self.assertTrue(isinstance(2*f,ScaledFunction) )
-        self.assertEqual(algo_pd3o.f.scalar, 2)
+        algo_pd3o = PD3O(f= 3*(2*f), g=G1, h=H1, operator=operator)
+        self.assertTrue(isinstance(3*2*f,ScaledFunction) )
+        self.assertEqual(algo_pd3o.f.scalar, 6)
         algo_pd3o.run(1)
         self.assertEqual(f.data_passes[-1], 1)
         self.assertEqual(f.data_passes_indices, [[0,1,2]])

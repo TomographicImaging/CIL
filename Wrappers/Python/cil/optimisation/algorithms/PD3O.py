@@ -36,31 +36,47 @@ class FunctionWrappingForPD3O():
     def __init__(self, f):  
         self.f = f 
         self.scalar = 1
-        if isinstance(f, ScaledFunction):
-            self.f = f.function
-            self.scalar = f.scalar
+        while isinstance(self.f, ScaledFunction):
+            self.scalar *= self.f.scalar
+            self.f = self.f.function
+            
         self._gradient_call_index = 0
         
-    def gradient(self, x, out=None):  
+        if isinstance(self.f, (SVRGFunction, LSVRGFunction)):
+            self.gradient = self.svrg_gradient
+        elif isinstance(self.f, ApproximateGradientSumFunction):  
+            self.gradient = self.approximate_sum_function_gradient
+        else:
+            self.gradient = f.gradient
+        
+    def svrg_gradient(self, x, out=None):
         if self._gradient_call_index == 0:  
             self._gradient_call_index += 1  
-            self.f.gradient(x, out)  
-        else:
-            if isinstance(self.f, (SVRGFunction, LSVRGFunction)):  
-                if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:  
-                    self.f._update_full_gradient_and_return(x, out=out)  
-                else:  
-                    self.f.approximate_gradient( x, self.f.function_num, out=out)  
-                self.f._data_passes_indices.pop(-1)    
-            elif isinstance(self.f, ApproximateGradientSumFunction):  
-                self.f.approximate_gradient( x, self.f.function_num, out=out)  
+            self.f.gradient(x, out) 
+        else: 
+            if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:  
+                self.f._update_full_gradient_and_return(x, out=out)  
             else:  
-                self.f.gradient(x, out=out)  
-            # reset  
+                self.f.approximate_gradient( x, self.f.function_num, out=out)  
+            self.f._data_passes_indices.pop(-1)   
             self._gradient_call_index = 0  
-
-        out *= self.scalar
+            
+        if self.scalar != 1:
+            out *= self.scalar
         return out
+    
+    def approximate_sum_function_gradient(self, x, out=None):
+        if self._gradient_call_index == 0:  
+            self._gradient_call_index += 1  
+            self.f.gradient(x, out) 
+        else: 
+            self.f.approximate_gradient( x, self.f.function_num, out=out) 
+            self._gradient_call_index = 0  
+             
+        if self.scalar != 1:
+            out *= self.scalar
+        return out
+    
 
     def __call__(self, x):  
         return self.scalar * self.f(x)  

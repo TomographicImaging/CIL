@@ -13,8 +13,8 @@ To build on a mac you can follow the instructions for Linux at
 https://github.com/TomographicImaging/CIL#building-cil-from-source-code
 
 It is suggested to:
-1. create a conda environment with the `scripts/requirements-osx.yml` environment file
-2. clone the CIL repository and checkout the `macbuild` branch
+1. clone the CIL repository and checkout the `macbuild` branch
+2. create a conda environment with the `scripts/requirements-osx.yml` environment file
 3. create a build directory as suggested in the build [instructions](https://github.com/TomographicImaging/CIL#building-cil-from-source-code)
 
 

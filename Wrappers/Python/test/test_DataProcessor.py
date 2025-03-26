@@ -193,7 +193,7 @@ class TestBinner(unittest.TestCase):
         proc = Binner(roi=roi,accelerated=False)
         self.assertTrue(proc._accelerated==False)
         
-        proc = Binner(roi,accelerated=True)
+        proc = Binner(roi, accelerated=has_ipp)
         proc.set_input(data)
         proc._set_up()
 
@@ -238,7 +238,7 @@ class TestBinner(unittest.TestCase):
         ]
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ag)
             ag_out = proc._process_acquisition_geometry()
 
@@ -276,7 +276,7 @@ class TestBinner(unittest.TestCase):
         ]
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ag)
             ag_out = proc._process_acquisition_geometry()
 
@@ -317,7 +317,7 @@ class TestBinner(unittest.TestCase):
         ]
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ag)
             ag_out = proc._process_acquisition_geometry()
 
@@ -343,7 +343,7 @@ class TestBinner(unittest.TestCase):
         ]
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ag)
             ag_out = proc._process_acquisition_geometry()
 
@@ -377,7 +377,7 @@ class TestBinner(unittest.TestCase):
         ]
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ag)
             ag_out = proc._process_acquisition_geometry()
 
@@ -420,14 +420,14 @@ class TestBinner(unittest.TestCase):
 
 
         for i, roi in enumerate(rois):
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ig_in)
             ig_out = proc._process_image_geometry()
             self.assertEqual(ig_gold[i], ig_out, msg="Binning image geometry with roi {} failed".format(i))
 
         with self.assertRaises(ValueError):
             roi = {'wrong label':(None,None,None)}
-            proc = Binner(roi=roi)
+            proc = Binner(roi=roi, accelerated=has_ipp)
             proc.set_input(ig_in)
             ig_out = proc._process_image_geometry(ig_in)
 
@@ -437,13 +437,13 @@ class TestBinner(unittest.TestCase):
         ig_gold = ImageGeometry(10,10,10,48,48,48,-192,-32,-432)
 
         roi = {'vertical':(32,64,3),'horizontal_x':(32,64,3),'horizontal_y':(32,64,3)}
-        proc = Binner(roi,accelerated=True)
+        proc = Binner(roi,accelerated=has_ipp)
         proc.set_input(ig_in)
         ig_out = proc.get_output()
 
         self.assertEqual(ig_gold, ig_out, msg="Binning image geometry with offset roi failed")
 
-
+    @unittest.skipUnless(has_ipp, 'IPP is not available')
     def test_bin_array_consistency(self):
 
         ig = ImageGeometry(64,32,16,channels=8)
@@ -494,7 +494,7 @@ class TestBinner(unittest.TestCase):
         horizontal_x = range(0,4,2)
 
         roi = {'channel':channel,'vertical':vertical,'horizontal_x':horizontal_x,'horizontal_y':horizontal_y}
-        proc = Binner(roi,accelerated=True)
+        proc = Binner(roi,accelerated=has_ipp)
         proc.set_input(data)
         binned_data = proc.get_output()
 
@@ -542,7 +542,7 @@ class TestBinner(unittest.TestCase):
         horizontal = range(0,4,2)
 
         roi = {'channel':channel,'vertical':vertical,'horizontal':horizontal,'angle':angle}
-        proc = Binner(roi,accelerated=True)
+        proc = Binner(roi,accelerated=has_ipp)
         proc.set_input(data)
         binned_data = proc.get_output()
 
@@ -582,7 +582,7 @@ class TestBinner(unittest.TestCase):
         data_in = AcquisitionData(arr, False, geometry)
 
         roi = {'vertical':(None,None,2),'angle':(None,None,2),'horizontal':(None,None,2)}
-        proc = Binner(roi)
+        proc = Binner(roi, accelerated=has_ipp)
 
         geometry_gold = AcquisitionGeometry.create_Parallel2D().set_angles([45]).set_panel(2,2)
         el1 = (0+1+4+5+12+13+16+17)/8
@@ -616,7 +616,7 @@ class TestBinner(unittest.TestCase):
         data_in = ImageData(arr, False, geometry)
 
         roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
-        proc = Binner(roi)
+        proc = Binner(roi, accelerated=has_ipp)
 
         geometry_gold = VectorGeometry(2,dimension_labels='horizontal_x')
         el1 = (0+1+4+5+12+13+16+17)/8
@@ -655,7 +655,7 @@ class TestBinner(unittest.TestCase):
         el2 = (2+3+6+7+14+15+18+19)/8
         data_gold = numpy.array([el1,el2],dtype=numpy.float32)
 
-        proc = Binner(roi)
+        proc = Binner(roi, accelerated=has_ipp)
         proc.set_input(data_in)
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
@@ -669,7 +669,7 @@ class TestBinner(unittest.TestCase):
 
         roi = {'LABEL_A':(None,None,2),'LABEL_B':(None,None,2),'LABEL_C':(None,None,2)}
 
-        proc = Binner(roi)
+        proc = Binner(roi, accelerated=has_ipp)
         proc.set_input(data_in)
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
@@ -690,7 +690,7 @@ class TestBinner(unittest.TestCase):
         recon =FBP(data).run(verbose=0)
 
         roi = {'vertical':(20,40,5),'horizontal_y':(70,100,3),'horizontal_x':(-80,-40,2)}
-        binner = Binner(roi)
+        binner = Binner(roi, accelerated=has_ipp)
 
         binner.set_input(recon.geometry)
         ig_roi = binner.get_output()
@@ -724,7 +724,7 @@ class TestBinner(unittest.TestCase):
 
 
         roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
-        binner = Binner(roi)
+        binner = Binner(roi, accelerated=has_ipp)
 
         binner.set_input(ag)
         ag_roi = binner.get_output()
@@ -758,7 +758,7 @@ class TestBinner(unittest.TestCase):
         fp_full = PO.direct(phantom)
 
         roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
-        binner = Binner(roi)
+        binner = Binner(roi, accelerated=has_ipp)
 
         binner.set_input(ag)
         ag_roi = binner.get_output()
@@ -793,7 +793,7 @@ class TestBinner(unittest.TestCase):
 
 
         roi = {'angle':(25,26),'vertical':(5,62,2),'horizontal':(-75,0,2)}
-        binner = Binner(roi)
+        binner = Binner(roi, accelerated=has_ipp)
 
         binner.set_input(ag)
         ag_roi = binner.get_output()

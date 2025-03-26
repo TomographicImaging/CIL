@@ -19,11 +19,9 @@
 from cil.processors import Slicer
 import numpy as np
 
-try:
-    from cil.processors.cilacc_binner import Binner_IPP
-    has_ipp = True
-except:
-    has_ipp = False
+from cil.framework import cilacc 
+has_ipp = hasattr(cilacc, 'filter_projections_avh') 
+
 
 # Note to developers: Binner and Slicer share a lot of common code
 # so Binner has been implemented as a child of Slicer. This makes use

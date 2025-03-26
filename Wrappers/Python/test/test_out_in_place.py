@@ -44,7 +44,7 @@ from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRota
 RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
 
 import numpy
-from utils import has_tigre, has_nvidia
+from utils import has_tigre, has_nvidia, has_ipp
 
 
 from cil.framework import  BlockGeometry
@@ -544,8 +544,8 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     RingRemover(info=False),
                     Slicer(roi={'horizontal':(None,None,None),'angle':(None,None,None)}), 
                     Slicer(roi={'horizontal':(1,3,2),'angle':(None,4,2)}), 
-                    Binner(roi={'horizontal':(None,None,None),'angle':(None,None,None)}),
-                    Binner(roi={'horizontal':(1,None,2),'angle':(None,4,2)}),
+                    Binner(roi={'horizontal':(None,None,None),'angle':(None,None,None)}, accelerated=has_ipp),
+                    Binner(roi={'horizontal':(1,None,2),'angle':(None,4,2)}, accelerated=has_ipp),
                     Padder(pad_width=0),
                     Padder(pad_width=1),
                     Normaliser(flat_field=data.get_slice(angle=0).as_array()*1, dark_field=data.get_slice(angle=0).as_array()*1e-5),

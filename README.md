@@ -169,6 +169,8 @@ cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUT
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
 
+### #MacOS
+Go to the specific experimental [build instructions for mac](MacBuild.md)
 
 ### Building with Docker
 

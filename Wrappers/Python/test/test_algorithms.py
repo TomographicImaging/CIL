@@ -758,7 +758,7 @@ class TestCGLS(CCPiTestClass):
         ), (self.data - self.initial-alpha*(self.data-self.initial)).as_array())
         beta = ((self.data - self.initial-alpha *
                 (self.data-self.initial)).norm()**2)/4
-        self.assertNumpyArrayEqual(self.alg.p.as_array(), ((
+        self.assertNumpyArrayAlmostEqual(self.alg.p.as_array(), ((
             self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array())
 
 

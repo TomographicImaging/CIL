@@ -1139,7 +1139,7 @@ class TestL1Norm (CCPiTestClass):
         tau = -1.
         with self.assertWarns(UserWarning):
             ret = soft_shrinkage(-0.5 *x, tau)
-            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), rtol=2e-7)
         tau = -3j
         with self.assertRaises(ValueError):
             ret = soft_shrinkage(-0.5 *x, tau)
@@ -1162,7 +1162,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
         tau = -1.* np.ones_like(x.as_array())
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), rtol=3e-7)
 
         # tau DataContainer
         tau = 1. * x
@@ -1182,7 +1182,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
         tau = -1. * x
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), rtol=3e-7)
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 

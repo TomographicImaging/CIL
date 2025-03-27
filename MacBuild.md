@@ -2,10 +2,9 @@
 
 Binaries for mac (apple silicon) are currently not available. You can manually build and install CIL for mac following these instructions. 
 
-## Known Issues
-
-1. Some underlying CIL code depends on Intel IPP library which specifically targets Intel CPU architecture. This is optional and will not be available on macs
-2. TIGRE and ASTRA plugins are developed in CUDA and use NVIDIA GPU. Mac laptops do not have NVIDIA GPUs, so you would only be able to do basic 2D parallel/fan beam with ASTRA.
+> [!IMPORTANT]
+> 1. Some underlying CIL code depends on Intel IPP library which specifically targets Intel CPU architecture. This is optional and will not be available on macs
+> 2. TIGRE and ASTRA plugins are developed in CUDA and use NVIDIA GPU. Mac laptops do not have NVIDIA GPUs, so you would only be able to do basic 2D parallel/fan beam with ASTRA.
 
 ## Build instructions
 
@@ -19,6 +18,11 @@ It is suggested to:
 
 
 ```sh
+git clone https://github.com/TomographicImaging/CIL.git
+cd CIL
+git checkout macbuild
+conda env create -f scripts/requirements-osx.yml
+conda activate cil_dev
 cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
 cmake --build ./build --target install --config RelWithDebInfo
 ```

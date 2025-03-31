@@ -20,6 +20,7 @@
 import astra
 import numpy as np
 from cil.framework.labels import AngleUnit
+from cil.framework.labels import AcquisitionType, AcquisitionType
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
@@ -41,6 +42,9 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
     """
     sinogram_geometry = sinogram_geometry_in.copy()
+
+    if sinogram_geometry.geom_type == AcquisitionType.CONE_SOUV:
+        raise ValueError('Cone-SOUV geometry is not supported by this function, use convert_geometry_to_astra_vec_3D instead')
 
     #this catches behaviour modified after CIL 21.3.1
     try:

@@ -75,7 +75,7 @@ class Test_Reconstructor(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random_deprecated')
         self.ig3D = self.ag3D.get_ImageGeometry()
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -165,7 +165,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random_deprecated')
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 
@@ -363,7 +363,7 @@ class Test_FDK(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random_deprecated')
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 
@@ -389,7 +389,7 @@ class Test_FDK(unittest.TestCase):
             .set_panel([64,3],[0.1,0.1])\
             .set_angles([0,90])
 
-        ad = ag.allocate('random',seed=0)
+        ad = ag.allocate('random_deprecated',seed=0)
 
         reconstructor = FDK(ad)
         out1 = ad.copy()
@@ -471,7 +471,7 @@ class Test_FBP(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random_deprecated')
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 
@@ -508,7 +508,7 @@ class Test_FBP(unittest.TestCase):
             .set_panel([64,3],[0.1,0.1])\
             .set_angles([0,90])
 
-        ad = ag.allocate('random',seed=0)
+        ad = ag.allocate('random_deprecated',seed=0)
 
         reconstructor = FBP(ad)
         out1 = ad.copy()

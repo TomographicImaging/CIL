@@ -519,15 +519,15 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertEqual(test3.shape, test2.shape)
         self.assertEqual(test3.dtype, AG.dtype)
 
-        test4 = AG.allocate('random_low_mem')
+        test4 = AG.allocate('random_deprecated')
         self.assertEqual(test4.shape, test2.shape)
         self.assertEqual(test4.dtype, AG.dtype)
 
-        test5 = AG.allocate('random_int_low_mem')
+        test5 = AG.allocate('random_int')
         self.assertEqual(test5.shape, test2.shape)
         self.assertEqual(test5.dtype, AG.dtype)
 
-        test6 = AG.allocate('random_int')
+        test6 = AG.allocate('random_int_deprecated')
         self.assertEqual(test6.shape, test2.shape)
         self.assertEqual(test6.dtype, AG.dtype)
 

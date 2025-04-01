@@ -298,7 +298,7 @@ def test_ConstantFunction(self):
         M, N, K = 3,4,5
         ig = ImageGeometry(M, N, K)
 
-        tmp = ig.allocate('random_int')
+        tmp = ig.allocate('random_int_deprecated')
 
         constant = 10
         f = ConstantFunction(constant)

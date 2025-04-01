@@ -90,11 +90,11 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
 
         scalar = 4
 
-        b = ag.allocate('random', seed=2)
-        weight_ls = ig.allocate('random', seed=2)
+        b = ag.allocate('random_deprecated', seed=2)
+        weight_ls = ig.allocate('random_deprecated', seed=2)
 
         A = IdentityOperator(ig)
-        b_ig = ig.allocate('random')
+        b_ig = ig.allocate('random_deprecated')
         c = numpy.float64(0.3)
         bg = BlockGeometry(ig, ig)
         # [(function, geometry, test_proximal, test_proximal_conjugate, test_gradient), ...]
@@ -256,9 +256,9 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             (ZeroOperator(ig), ig),
             (IdentityOperator(ig), ig),
             (3 * IdentityOperator(ig), ig),
-            (DiagonalOperator(ig.allocate('random',seed=101)), ig),
+            (DiagonalOperator(ig.allocate('random_deprecated',seed=101)), ig),
             (MaskOperator(mask), ig),
-            (ChannelwiseOperator(DiagonalOperator(ig_2D.allocate('random',seed=101)),3), ig),
+            (ChannelwiseOperator(DiagonalOperator(ig_2D.allocate('random_deprecated',seed=101)),3), ig),
             (BlurringOperator(PSF,ig), ig),
             (FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann') , ig),
             (FiniteDifferenceOperator(ig, direction = 0) , ig)]
@@ -405,14 +405,14 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
 
     def test_direct_out(self):
         for operator, _ in self.operator_geom_test_list:
-            data=operator.domain_geometry().allocate('random', seed=2)
+            data=operator.domain_geometry().allocate('random_deprecated', seed=2)
             result=self.get_result(operator, 'direct', data)
             self.out_test(result, operator,  'direct',  data)
 
     def test_adjoint_out(self):
         for operator, data_order in self.operator_geom_test_list:
             
-            data=operator.range_geometry().allocate('random', seed=2)
+            data=operator.range_geometry().allocate('random_deprecated', seed=2)
             data.reorder(data_order)
             result=self.get_result(operator, 'adjoint', data)
             self.out_test(result, operator, 'adjoint',  data)

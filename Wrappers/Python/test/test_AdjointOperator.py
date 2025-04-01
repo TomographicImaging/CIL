@@ -21,8 +21,8 @@ class TestAdjointOperator(CCPiTestClass):
     def test_direct_adjoint_gradient_operator(self):
 
         G = GradientOperator(self.ig_real)
-        x = G.domain_geometry().allocate("random", seed=10)
-        y = G.range_geometry().allocate("random", seed=10)
+        x = G.domain_geometry().allocate("random_deprecated", seed=10)
+        y = G.range_geometry().allocate("random_deprecated", seed=10)
         G_adjoint = AdjointOperator(G)
 
         res1 = G.adjoint(y)
@@ -44,8 +44,8 @@ class TestAdjointOperator(CCPiTestClass):
         Amat = MatrixOperator(Anp)
         Amat_tr = MatrixOperator(Anp.T)
 
-        x = Amat.domain_geometry().allocate("random")
-        y = Amat.range_geometry().allocate("random")
+        x = Amat.domain_geometry().allocate("random_deprecated")
+        y = Amat.range_geometry().allocate("random_deprecated")
 
         res1 = Amat.adjoint(y)
         res2 = Amat_tr.direct(y)
@@ -75,8 +75,8 @@ class TestAdjointOperator(CCPiTestClass):
         Amat = MatrixOperator(Anp)
         Amat_tr = AdjointOperator(Amat)
 
-        x = Amat.domain_geometry().allocate("random", dtype="complex")
-        y = Amat.range_geometry().allocate("random", dtype="complex")
+        x = Amat.domain_geometry().allocate("random_deprecated", dtype="complex")
+        y = Amat.range_geometry().allocate("random_deprecated", dtype="complex")
 
 
         # <Ax,y> = <x, A^* y> using numpy arrays
@@ -99,8 +99,8 @@ class TestAdjointOperator(CCPiTestClass):
         G = GradientOperator(ig)
         div = AdjointOperator(G)
 
-        x = G.domain.allocate("random_int")
-        y = G.range.allocate("random_int")
+        x = G.domain.allocate("random_int_deprecated")
+        y = G.range.allocate("random_int_deprecated")
         print(x.array)
         res1 = G.direct(x).dot(y)
         res2 = x.dot(div.direct(y))

@@ -30,9 +30,9 @@ class TestKullbackLeiblerNumpy(unittest.TestCase):
         M, N, K =  2, 3, 4
         self.ig = ImageGeometry(N, M, K)
 
-        self.u1 = self.ig.allocate('random', seed = 500)
-        self.g1 = self.ig.allocate('random', seed = 100)
-        self.b1 = self.ig.allocate('random', seed = 1000)
+        self.u1 = self.ig.allocate('random_deprecated', seed = 500)
+        self.g1 = self.ig.allocate('random_deprecated', seed = 100)
+        self.b1 = self.ig.allocate('random_deprecated', seed = 1000)
 
         self.f = KullbackLeibler(b = self.g1, backend='numpy')
         self.f1 = KullbackLeibler(b = self.g1, eta = self.b1,  backend='numpy')
@@ -125,12 +125,12 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M)
 
-        u1 = ig.allocate('random', seed = 500)
+        u1 = ig.allocate('random_deprecated', seed = 500)
         u1 = ig.allocate(0.2)
-        #g1 = ig.allocate('random', seed = 100)
+        #g1 = ig.allocate('random_deprecated', seed = 100)
         g1 = ig.allocate(1)
 
-        b1 = ig.allocate('random', seed = 1000)
+        b1 = ig.allocate('random_deprecated', seed = 1000)
         eta = ig.allocate(1e-3)
 
         mask = ig.allocate(1)

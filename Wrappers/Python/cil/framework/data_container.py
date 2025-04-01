@@ -110,7 +110,9 @@ class DataContainer(object):
         if 'geometry' in kwargs.keys():
             try:
                 self.geometry = kwargs['geometry'].copy()
-                self.geometry.dtype = self.dtype
+                if self.geometry.dtype != self.dtype:
+                    warnings.warn("Over-riding geometry.dtype with data.dtype", UserWarning)
+                    self.geometry.dtype = self.dtype
             except:
                 pass
 

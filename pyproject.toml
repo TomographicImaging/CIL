@@ -68,15 +68,12 @@ gpu = [
 [dependency-groups]
 test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
+    "cvxpy",
     "matplotlib>=3.3.0",
     "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",
-]
-test-linux = [
-    "cvxpy",
-    {include-group = "test"},
 ]
 docs = [
   "jinja2",

@@ -20,6 +20,8 @@ python='3.10'
 name=cil
 test_deps=0
 cil_ver=''
+pip_install_pkgs=()
+
 while getopts hn:p:e:tv: option ; do
   case "${option}" in
   n) numpy="${OPTARG}" ;;
@@ -72,7 +74,7 @@ if test -n "$cil_ver"; then
 fi
 
 if test $test_deps = 0; then
-  conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda -c defaults --override-channels)
+  conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda --override-channels)
 else
   conda_args+=(
     astra-toolbox=2.1=cuda*
@@ -92,6 +94,12 @@ else
     -c ccpi
     --override-channels
   )
+  pip_install_pkgs+=(
+    unittest-parametrize
+  )
 fi
 
-conda "${conda_args[@]}"
+conda "${conda_args[@]}" 
+if [[ -n "${pip_install_pkgs[@]}" ]]; then
+  python -m pip install "${pip_install_pkgs[@]}"
+fi

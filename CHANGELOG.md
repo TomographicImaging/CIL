@@ -2,10 +2,25 @@
   - Bug fixes:
       - Fix deprecation warning for rtol and atol in GD (#2056)
       - Removed the deprecated usage of run method in test_SIRF.py (#2070)
+      - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
+      - Made ProjectionOperator `device` input case-insensitive (#1990)
+  - Documentation
+      - Updated documentation for the ChannelWiseOperator including new example (#2096)
+      - Updated documentation for LADMM (#2015)
+      - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
   - Enhancements:
+      - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036)
       - Made the call to next() in algorithm iteration loop explicit (#2069)
-      
-
+      - Added option for a random seed in the power method in the linear operator (#1585)
+      - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
+  - Testing
+      - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
+      - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
+      - Added tests for Normaliser processor
+      - Update minimum cmake version to 3.5
+  - Dependencies
+      - matplotlib-base is an optional dependency, instead of required (#2093)
+      - `unittest-parametrize has been added as a dependency for tests (#1990)
 
 
 * 24.3.0
@@ -42,6 +57,7 @@
     - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
   - Testing
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
+    - Update random array in test_stepsizes.TestStepSizeBB.test_bb_converge to fix tests on windows (#2052)
 
 * 24.2.0
   - New Features:

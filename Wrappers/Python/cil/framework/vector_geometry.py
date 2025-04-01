@@ -78,44 +78,48 @@ class VectorGeometry:
 
         return repres
 
-    def allocate(self, value=0, dtype=None, seed=None, max_value=100, **kwargs):
-        '''allocates a VectorData according to the geometry
+    def allocate(self, value=0, **kwargs):
+        '''Allocates a VectorData according to the geometry
 
         Parameters
         ----------
         value : number or string, default=0
             The value to allocate. Accepts a number to allocate a uniform array, 
             None to allocate an empty memory block, or a string to create a random 
-            array: 'random' and 'random_low_mem' allocate floats between 0 and 1
-            'random_int' and 'random_int_low_mem' allocate ints between 0 and max_value.
+            array: 'random' allocates floats between 0 and 1, 'random_int' allocates 
+            ints between 0 and 100.
 
-        dtype : numpy data type, optional
-            The data type to allocate if different from the geometry data type. 
-            Default None allocates an array with the geometry data type
+        **kwargs:
+            dtype : numpy data type, optional
+                The data type to allocate if different from the geometry data type. 
+                Default None allocates an array with the geometry data type.
 
-        seed : int, optional
-            A random seed to fix reproducibility, only used if `value` is a random
-            method. Default is `None`.
+            seed : int, optional
+                A random seed to fix reproducibility, only used if `value` is a random
+                method. Default is `None`.
 
-        max_value : number, optional
-            The maximum value random integer to generate, only used if `value` 
-            is 'random_int' or 'random_int_low_mem'. 
+            min_value : number, optional
+                The maximum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 0.
+
+            max_value : number, optional
+                The maximum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 100.
 
         Note
         ----
-            The methods used by 'random' or 'random_int' use `numpy.random.random_sample` 
-            which generates the random array as float64, before casting to the 
-            specified dtype.
-            In contrast, 'random_low_mem' or 'random_int_low_mem' use `numpy.random.default_rng` 
-            which allocates memory only for the array of the specified dtype, however
-            this method does not use the global numpy.random.seed() so the seed
-            should be passed directly as an argument to this method.
+            The methods used by 'random' or 'random_int' use `numpy.random.default_rng` 
+            which allocates memory only for the array of the specified dtype. This
+            method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as an argument to allocate.
+            To allocate random numbers using the deprecated `numpy.random.random_sample`
+            and `numpy.random.randint` methods use `value='random_deprecated'` 
+            or `value='random_int_deprecated'` 
 
         '''
         from .vector_data import VectorData
 
-        if dtype is None:
-            dtype = self.dtype
+        dtype = kwargs.pop('dtype', self.dtype)
         
         if isinstance(value, Number):
             out = VectorData(geometry=self.copy(), dtype=dtype)
@@ -123,8 +127,10 @@ class VectorGeometry:
                 out += value
 
         elif value in FillType:
+            seed = kwargs.pop("seed", None)
             
-            if value == FillType.RANDOM:
+            if value == FillType.RANDOM_DEPRECATED:
+                warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
                 out = VectorData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
@@ -133,16 +139,19 @@ class VectorGeometry:
                 else:
                     out.fill(numpy.random.random_sample(self.shape))
             
-            elif value == FillType.RANDOM_INT:
+            elif value == FillType.RANDOM_INT_DEPRECATED:
+                warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
                 out = VectorData(geometry=self.copy(), dtype=dtype)
                 if seed is not None:
                     numpy.random.seed(seed)
+                max_value = kwargs.pop("max_value", 100)
+                min_value = kwargs.pop("min_value", 0)
                 if numpy.iscomplexobj(out.array):
-                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+                    out.fill(numpy.random.randint(min_value, max_value, size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
                 else:
-                    out.fill(numpy.random.randint(max_value, size=self.shape, dtype=numpy.int32))
+                    out.fill(numpy.random.randint(min_value, max_value, size=self.shape, dtype=numpy.int32))
 
-            elif value == FillType.RANDOM_LOW_MEM:
+            elif value == FillType.RANDOM:
                 rng = numpy.random.default_rng(seed)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
                     complex_example = numpy.array([1 + 1j], dtype=dtype)
@@ -152,16 +161,22 @@ class VectorGeometry:
                     r = rng.random(size=self.shape, dtype=dtype)
                 out = VectorData(r, geometry=self.copy(), dtype=dtype)
 
-            elif value == FillType.RANDOM_INT_LOW_MEM:
+            elif value == FillType.RANDOM_INT:
                 rng = numpy.random.default_rng(seed)
+                max_value = kwargs.pop("max_value", 100)
+                min_value = kwargs.pop("min_value", 0)
                 if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (rng.integers(0, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
+                    r = (rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
                 else:
-                    r = rng.integers(0, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+                    r = rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
                 out = VectorData(r, geometry=self.copy(), dtype=dtype)
 
         elif value is None:
             out = VectorData(array=None, geometry=self.copy(), dtype=dtype)
         else:
             raise ValueError(f'Value {value} unknown')
+        
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
+
         return out

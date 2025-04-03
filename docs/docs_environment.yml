@@ -18,23 +18,4 @@ channels:
   - ccpi
   - defaults
 dependencies:
-  # in addition to CIL deps (see ../scripts/requirements-test.yml)
-  - jinja2
-  # - pydata-sphinx-theme
-  - recommonmark
-  - sphinx
-  - sphinx_rtd_theme
-  - sphinx-autobuild
-  - sphinx-click
-  - sphinx-copybutton
-  - sphinx-panels
-  - sphinxcontrib-bibtex
-  - nbsphinx
-  - sphinx-gallery
-  - sphinx-copybutton
-  - notebook
-  # TODO: remove after https://github.com/pydata/pydata-sphinx-theme/pull/1795 is released
-  - pip
-  - pip:
-    - git+https://github.com/pydata/pydata-sphinx-theme
-    - unittest-parametrize # Needs to be here?
+  - pandoc

@@ -16,13 +16,15 @@ ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox=2.1.0=cuda*"
 COPY --chown="${NB_USER}" scripts/requirements-test.yml environment.yml
 # channel_priority: https://stackoverflow.com/q/58555389
 RUN sed -ri '/tigre|astra-toolbox| python /d' environment.yml \
+  && curl -LsSf https://astral.sh/uv/0.6.9/install.sh | sh \
   && for pkg in 'jupyter-server-proxy>4.1.0' $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
   && for ch in defaults nvidia ccpi https://software.repos.intel.com/python/conda conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \
-  && fix-permissions "${CONDA_DIR}" /home/${NB_USER}
+  && fix-permissions "${CONDA_DIR}" /home/${NB_USER} \
+  && UV_PROJECT_ENVIRONMENT=$CONDA_DIR uv sync --all-extras --dev --inexact
 
 # NB: trailing `/` is required
 ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/

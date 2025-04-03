@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.sampler &#8212; CIL 24.3.1.dev19+g4afd9ceb documentation</title>
+    <title>cil.optimisation.utilities.sampler &#8212; CIL 24.3.1.dev20+ga06f691f documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../../_static/documentation_options.js?v=bc5184c5"></script>
+    <script src="../../../../../_static/documentation_options.js?v=41d805c0"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev19+g4afd9ceb';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev20+ga06f691f';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev19+g4afd9ceb" />
+  <meta name="docsearch:version" content="24.3.1.dev20+ga06f691f" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -501,12 +501,7 @@
 
 <span class="sd">    Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.</span>
 
-
-
-
 <span class="sd">    Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.</span>
-
-
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -537,8 +532,11 @@
 <span class="sd">    3</span>
 <span class="sd">    &gt;&gt;&gt; print(sampler.next())</span>
 <span class="sd">    4</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_current_sample())</span>
+<span class="sd">    4</span>
 
-
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; sampler = Sampler.staggered(num_indices=21, stride=4)</span>
 <span class="sd">    &gt;&gt;&gt; print(next(sampler))</span>
 <span class="sd">    0</span>
@@ -546,16 +544,24 @@
 <span class="sd">    4</span>
 <span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(5))</span>
 <span class="sd">    [ 0  4  8 12 16]</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">    [0 4]</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; sampler = Sampler.sequential(10)</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">    []</span>
 <span class="sd">    &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">    [0 1 2 3 4]</span>
 <span class="sd">    &gt;&gt;&gt; print(next(sampler))</span>
 <span class="sd">    0</span>
-<span class="sd">    [0 1 2 3 4]</span>
 <span class="sd">    &gt;&gt;&gt; print(sampler.next())</span>
 <span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_current_sample())</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">    [0 1]</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -589,6 +595,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span>  <span class="n">sampling_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">sampling_type</span>
+        
 
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span> <span class="o">=</span> <span class="n">num_indices</span>
@@ -612,6 +619,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="n">prob_weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="kc">None</span> 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">prob_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -623,29 +631,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">current_iter_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current iteration number of the sampler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
 
-<div class="viewcode-block" id="Sampler.next">
-<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.next">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a sample from the list of indices `{0, 1, …, N-1}, where N is the number of indices and increments the sampler.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Sampler.get_samples">
-<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.Sampler.get_samples">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">num_samples</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
+<span class="sd">        Generates a numpy array of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -654,19 +660,45 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
-<span class="sd">        List</span>
+<span class="sd">        Numpy Array</span>
 <span class="sd">            The first `num_samples&quot; output by the sampler.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_current_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span>
         <span class="n">save_last_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="kc">None</span> 
         <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="n">save_last_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="n">save_current_sample</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_previous_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a numpy array of the samples outputted by the sampler since it was initialised. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        Numpy Array</span>
+<span class="sd">            A list of the samples outputted by the sampler since it was initialised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current sample of the sampler without incrementing the sampler index.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        int</span>
+<span class="sd">            The current sample of the sampler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The sampler has not yet been incremented. &#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span>
+    
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Type : </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
@@ -697,10 +729,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; sampler = Sampler.sequential(10)</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(5))</span>
+<span class="sd">        [0 1 2 3 4]</span>
 <span class="sd">        &gt;&gt;&gt; print(next(sampler))</span>
 <span class="sd">        0</span>
-<span class="sd">        [0 1 2 3 4]</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_current_sample())</span>
 <span class="sd">        1</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -779,6 +813,9 @@
 <span class="sd">        4</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(5))</span>
 <span class="sd">        [ 0  4  8 12 16]</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">        [0 4]</span>
+<span class="sd">        </span>
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; sampler = Sampler.staggered(num_indices=17, stride=8)</span>
@@ -788,7 +825,10 @@
 <span class="sd">        8</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(10))</span>
 <span class="sd">        [ 0  8  16 1 9 2 10 3 11 4]</span>
-
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">        [0 8]</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_current_sample())</span>
+<span class="sd">        8</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -834,10 +874,16 @@
 <span class="sd">        3</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.next())</span>
 <span class="sd">        4</span>
-
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_current_sample())</span>
+<span class="sd">        4</span>
+<span class="sd">        </span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; sampler = Sampler.random_with_replacement(num_indices=4, prob=[0.7,0.1,0.1,0.1])</span>
 <span class="sd">        &gt;&gt;&gt; print(sampler.get_samples(10))</span>
 <span class="sd">        [0 1 3 0 0 3 0 0 0 0]</span>
+<span class="sd">        &gt;&gt;&gt; print(sampler.get_previous_samples())</span>
+<span class="sd">        []</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sampler</span> <span class="o">=</span> <span class="n">SamplerRandom</span><span class="p">(</span>
@@ -899,8 +945,8 @@
 <span class="sd">        num_indices: int</span>
 <span class="sd">            The sampler will select from a range of indices 0 to num_indices.</span>
 
-<span class="sd">    function : callable</span>
-<span class="sd">        A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -&gt; int</span>
+<span class="sd">        function : callable</span>
+<span class="sd">            A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -&gt; int</span>
 
 <span class="sd">        prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices</span>
 <span class="sd">            Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.</span>
@@ -1188,11 +1234,9 @@
         <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_indices</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_replace</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span><span class="p">[</span><span class="n">location</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span><span class="p">[</span><span class="n">location</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span>
 
-<div class="viewcode-block" id="SamplerRandom.get_samples">
-<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.SamplerRandom.get_samples">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">num_samples</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .</span>
@@ -1207,6 +1251,7 @@
 <span class="sd">            The first `num_samples` produced by the sampler</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">save_last_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span>
+        <span class="n">save_current_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="n">save_generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span>
@@ -1216,12 +1261,11 @@
         <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_iteration_number</span> <span class="o">=</span> <span class="n">save_last_index</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_sample</span> <span class="o">=</span> <span class="n">save_current_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">save_generator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_list</span> <span class="o">=</span> <span class="n">save_sampling_list</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">repres</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>

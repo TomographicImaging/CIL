@@ -27,22 +27,27 @@ class TestModuleBase(unittest.TestCase):
         import cil
         self.assertEqual(cil.__version__, version.version)
 
+    @unittest.skip("Statically declaring version in pyproject.toml")
     def test_version_major(self):
         from cil import version
         self.assertTrue(isinstance(version.major, int))
 
+    @unittest.skip("Statically declaring version in pyproject.toml")
     def test_version_minor(self):
         from cil import version
         self.assertTrue(isinstance(version.minor, int))
 
+    @unittest.skip("Statically declaring version in pyproject.toml")
     def test_version_patch(self):
         from cil import version
         self.assertTrue(isinstance(version.patch, int))
 
+    @unittest.skip("Statically declaring version in pyproject.toml")
     def test_version_num_commit(self):
         from cil import version
         self.assertTrue(isinstance(version.num_commit, int))
 
+    @unittest.skip("Statically declaring version in pyproject.toml")
     def test_version_commit_hash(self):
         from cil import version
         self.assertTrue(isinstance(version.commit_hash, str))

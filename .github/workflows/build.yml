@@ -48,7 +48,7 @@ jobs:
       name: build
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"-DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
         cmake --build ./build --target install
     - name: test
       run: |
@@ -83,7 +83,7 @@ jobs:
         activate-environment: cil_dev
     - name: build
       run: |
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX" -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
         cmake --build ./build --target install
     - name: test
       run: python -m unittest discover -v ./Wrappers/Python/test
@@ -191,7 +191,7 @@ jobs:
     - name: build cil
       working-directory: .
       run: |
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX" -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
         cmake --build ./build --target install
     - name: checkout docs
       uses: actions/checkout@v4

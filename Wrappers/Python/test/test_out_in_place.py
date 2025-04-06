@@ -38,7 +38,7 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
     L1Norm, L2NormSquared, MixedL21Norm, LeastSquares, \
     SmoothMixedL21Norm, OperatorCompositionFunction, \
      IndicatorBox, TotalVariation,  SumFunction, SumScalarFunction, \
-    WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+    WeightedL2NormSquared, MixedL11Norm, ZeroFunction, FunctionOfAbs
 
 from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
 RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
@@ -87,6 +87,9 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
         ag.set_panel(10)
 
         ig = ag.get_ImageGeometry()
+        
+        ig_complex = ig.copy()
+        ig_complex.dtype = np.complex128
 
         scalar = 4
 
@@ -127,13 +130,13 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL11Norm(), bg, True, True, False),
             (BlockFunction(L1Norm(),L2NormSquared()), bg, True, True, False),
             (BlockFunction(L2NormSquared(),L2NormSquared()), bg, True, True, True),
-            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False)
-
-
+            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start= False), assume_lower_semi=True), ig , True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start= False), assume_lower_semi=True), ig_complex , True, True, False)             
         ]
 
         np.random.seed(5)
-        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32)]
+        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32) ]
 
     def get_result(self, function, method, x, *args):
         try:

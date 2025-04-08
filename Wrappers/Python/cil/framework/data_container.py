@@ -527,9 +527,11 @@ class DataContainer(object):
                 self._axpby(a, b, y, out, out.dtype, num_threads)
                 return out
             except RuntimeError as rte:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+                warnings.warn("sapyb defaulting to NumPy due to: {}".format(rte))
             except TypeError as te:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+                warnings.warn("sapyb defaulting to NumPy due to: {}".format(te))
+            except ValueError as ve:
+                warnings.warn("sapyb defaulting to NumPy due to: {}".format(ve))
             finally:
                 pass
 
@@ -561,15 +563,19 @@ class DataContainer(object):
         c_double_p = ctypes.POINTER(ctypes.c_double)
 
         #convert a and b to numpy arrays and get the reference to the data (length = 1 or ndx.size)
+        # CAREFUL
+        # this will fail if the numpy array cannot be created without copying to RAM
         try:
-            nda = a.as_array()
-        except:
-            nda = numpy.asarray(a)
+            a = a.as_array()
+        except AttributeError:
+            pass
+        nda = numpy.asarray(a, copy=False)
 
         try:
-            ndb = b.as_array()
-        except:
-            ndb = numpy.asarray(b)
+            b = b.as_array()
+        except AttributeError:
+            pass
+        ndb = numpy.asarray(b, copy=False)
 
         a_vec = 0
         if nda.size > 1:
@@ -580,9 +586,9 @@ class DataContainer(object):
             b_vec = 1
 
         # get the reference to the data
-        ndx = self.as_array()
-        ndy = y.as_array()
-        ndout = out.as_array()
+        ndx   = numpy.asarray(self.as_array(), copy=False)
+        ndy   = numpy.asarray(y.as_array(),    copy=False)
+        ndout = numpy.asarray(out.as_array(),  copy=False)
 
         if ndout.dtype != dtype:
             raise Warning("out array of type {0} does not match requested dtype {1}. Using {0}".format(ndout.dtype, dtype))

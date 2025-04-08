@@ -72,3 +72,35 @@ print("################")
 print (cil_np1.array)
 mixed_diff = cil_np0.subtract(cil_tc0, out=cil_np1)
 print (cil_np1.array)
+
+print("########## test sapyb with pytorch ########## ")
+a = [ torch.ones([2, 4], dtype=torch.float32),
+      torch.ones([2, 4], dtype=torch.float32),
+      torch.ones([2, 4], dtype=torch.float32)]
+
+cil_tc = [ DataContainer(el, deep_copy=False) for el in a]
+
+# 2 * 1 + 3 * 1
+res = cil_tc[1].sapyb(2, cil_tc[1], 3)
+cil_tc[1].sapyb(2, cil_tc[1], 3, out=cil_tc[2])
+
+numpy.testing.assert_allclose(cil_tc[2].as_array().numpy(), 
+                              (res).as_array().numpy())
+
+print(res.array)
+
+print("########## test sapyb with numpy ########## ")
+b = [ numpy.ones([2, 4], dtype=numpy.float32),
+      numpy.ones([2, 4], dtype=numpy.float32),
+      numpy.ones([2, 4], dtype=numpy.float32)]
+
+cil_np = [ DataContainer(el, deep_copy=False) for el in b]
+
+# 2 * 1 + 3 * 1
+res = cil_np[1].sapyb(2, cil_np[1], 3)
+cil_np[1].sapyb(2, cil_np[1], 3, out=cil_np[2])
+
+numpy.testing.assert_allclose(cil_np[2].as_array(), 
+                              (res).as_array())
+
+print(res.array)

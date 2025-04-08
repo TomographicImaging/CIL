@@ -49,22 +49,22 @@ class ImageData(DataContainer):
                  deep_copy=False,
                  geometry=None,
                  **kwargs):
-        '''Default to NumPy array if array is not passed'''
+        '''Default to np array if array is not passed'''
 
-        # xp = get_namespace()
         
         # TODO: change
         if array is None:
-            # defaults to a numpy array
+            # defaults to a np array
             xp = np
+            dtype = kwargs.get('dtype', xp.float32)
             array = xp.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             # this is a reference so we might make a mess modifying both ends
             array = array.as_array()
             xp = array_namespace(array)
-        # elif issubclass(type(array) , numpy.ndarray):
+        # elif issubclass(type(array) , np.ndarray):
             # remove singleton dimensions
-            # array = numpy.squeeze(array)
+            # array = np.squeeze(array)
         else:
             # Consider array as an object is compliant to the array API
             # https://docs.scipy.org/doc/scipy-1.15.2/dev/api-dev/array_api.html 
@@ -74,7 +74,7 @@ class ImageData(DataContainer):
             array = xp.squeeze(array)
             
         # else:
-        #     raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+        #     raise TypeError('array must be a CIL type DataContainer or np.ndarray got {}'.format(type(array)))
 
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
@@ -83,8 +83,7 @@ class ImageData(DataContainer):
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
 
 
-        dtype = kwargs.get('dtype', xp.float32)
-
+        
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
 
@@ -98,11 +97,11 @@ class ImageData(DataContainer):
     def __eq__(self, other):
         '''
         Check if two ImageData objects are equal. This is done by checking if the geometry, data and dtype are equal.
-        Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.
+        Also, if the other object is a np.ndarray, it will check if the data and dtype are equal.
         
         Parameters
         ----------
-        other: ImageData or numpy.ndarray
+        other: ImageData or np.ndarray
             The object to compare with.
         
         Returns
@@ -112,11 +111,11 @@ class ImageData(DataContainer):
         '''
 
         if isinstance(other, ImageData):
-            if numpy.array_equal(self.as_array(), other.as_array()) \
+            if np.array_equal(self.as_array(), other.as_array()) \
                 and self.geometry == other.geometry \
                 and self.dtype == other.dtype:
                 return True 
-        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+        elif np.array_equal(self.as_array(), other) and self.dtype==other.dtype:
             return True
         else:
             return False
@@ -137,7 +136,7 @@ class ImageData(DataContainer):
         if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-            ind0 = int(numpy.floor(centre_slice_pos))
+            ind0 = int(np.floor(centre_slice_pos))
 
             w2 = centre_slice_pos - ind0
             out = DataContainer.get_slice(self, channel=channel, vertical=ind0, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
@@ -182,10 +181,10 @@ class ImageData(DataContainer):
         y_range = (ig.voxel_num_y-1)/2
         x_range = (ig.voxel_num_x-1)/2
 
-        Y, X = numpy.ogrid[-y_range:y_range+1,-x_range:x_range+1]
+        Y, X = np.ogrid[-y_range:y_range+1,-x_range:x_range+1]
 
         # use centre from geometry in units distance to account for aspect ratio of pixels
-        dist_from_center = numpy.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
+        dist_from_center = np.sqrt((X*ig.voxel_size_x+ ig.center_x)**2 + (Y*ig.voxel_size_y+ig.center_y)**2)
 
         size_x = ig.voxel_num_x * ig.voxel_size_x
         size_y = ig.voxel_num_y * ig.voxel_size_y
@@ -197,17 +196,17 @@ class ImageData(DataContainer):
 
         # approximate the voxel as a circle and get the radius
         # ie voxel area = 1, circle of area=1 has r = 0.56
-        r=((ig.voxel_size_x * ig.voxel_size_y )/numpy.pi)**(1/2)
+        r=((ig.voxel_size_x * ig.voxel_size_y )/np.pi)**(1/2)
 
         # we have the voxel centre distance to mask. voxels with distance greater than |r| are fully inside or outside.
         # values on the border region between -r and r are preserved
         mask =(radius_applied-dist_from_center).clip(-r,r)
 
         #  rescale to -pi/2->+pi/2
-        mask *= (0.5*numpy.pi)/r
+        mask *= (0.5*np.pi)/r
 
         # the sin of the linear distance gives us an approximation of area of the circle to include in the mask
-        numpy.sin(mask, out = mask)
+        np.sin(mask, out = mask)
 
         # rescale the data 0 - 1
         mask = 0.5 + mask * 0.5
@@ -224,13 +223,13 @@ class ImageData(DataContainer):
 
         if in_place == True:
             self.reorder(labels)
-            numpy.multiply(self.array, mask, out=self.array)
+            np.multiply(self.array, mask, out=self.array)
             self.reorder(labels_orig)
 
         else:
             image_data_out = self.copy()
             image_data_out.reorder(labels)
-            numpy.multiply(image_data_out.array, mask, out=image_data_out.array)
+            np.multiply(image_data_out.array, mask, out=image_data_out.array)
             image_data_out.reorder(labels_orig)
 
             return image_data_out

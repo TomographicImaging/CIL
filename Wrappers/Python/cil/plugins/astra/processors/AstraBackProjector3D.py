@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 from cil.framework import DataProcessor, ImageData
-from cil.framework.labels import AcquisitionDimension, ImageDimension
+from cil.framework.labels import AcquisitionDimension, AcquisitionType, ImageDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
 import astra.experimental
@@ -53,7 +53,13 @@ class AstraBackProjector3D(DataProcessor):
         self.set_AcquisitionGeometry(sinogram_geometry)
 
         vol_geom, proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
-        self.projector_id = astra.create_projector('cuda3d', proj_geom, vol_geom)
+
+        proj_cfg = astra.astra_dict('cuda3d')
+        proj_cfg['ProjectionGeometry'] = proj_geom
+        proj_cfg['VolumeGeometry'] = vol_geom
+        if AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
+            proj_cfg['ProjectionKernel'] = '2d_weighting'
+        self.projector_id = astra.projector3d.create(proj_cfg)
 
     def __del__(self):
         astra.projector3d.delete(self.projector_id)

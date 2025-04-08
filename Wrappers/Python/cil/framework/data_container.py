@@ -414,10 +414,8 @@ class DataContainer(object):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
-            elif isinstance(x2, numpy.ndarray):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
             else:
-                raise TypeError('Expected x2 type as number or DataContainer, got {}'.format(type(x2)))
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
             geom = self.geometry
             if geom is not None:
                 geom = self.geometry.copy()
@@ -438,17 +436,12 @@ class DataContainer(object):
                 #       geometry=self.geometry)
                 return out
             raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
-        elif issubclass(type(out), DataContainer) and \
-             isinstance(x2, (Number, numpy.ndarray)):
-            if self.check_dimensions(out):
-                if isinstance(x2, numpy.ndarray) and\
-                    not (x2.shape == self.shape and x2.dtype == self.dtype):
-                    raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
+        elif issubclass(type(out), DataContainer) and self.check_dimensions(out):
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )
                 return out
-            raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
-        elif issubclass(type(out), numpy.ndarray):
+        # elif issubclass(type(out), numpy.ndarray):
+        else:
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
                 kwargs['out'] = out
                 pwop(self.as_array(), x2, *args, **kwargs)
@@ -456,41 +449,48 @@ class DataContainer(object):
                 #       deep_copy=False,
                 #       dimension_labels=self.dimension_labels,
                 #       geometry=self.geometry)
-        else:
-            raise ValueError(f"incompatible class: {pwop.__name__} {type(out)}")
+        # else:
+        #     raise ValueError(f"incompatible class: {pwop.__name__} {type(out)}")
 
     def add(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.add(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.add, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.add, other, *args, **kwargs)
 
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.subtract(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.multiply(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.multiply, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.multiply, other, *args, **kwargs)
 
     def divide(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.divide(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.divide, other, *args, **kwargs)
 
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.power, other, *args, **kwargs)
 
     def maximum(self, x2, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.maximum, x2, *args, **kwargs)
 
     def minimum(self,x2, out=None, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.minimum, x2=x2, out=out, *args, **kwargs)
 
 
     def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
@@ -658,32 +658,39 @@ class DataContainer(object):
                 pwop(self.as_array(), *args, **kwargs )
             else:
                 raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
-        elif issubclass(type(out), numpy.ndarray):
+        # elif issubclass(type(out), numpy.ndarray):
+        else:
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
                 kwargs['out'] = out
                 pwop(self.as_array(), *args, **kwargs)
-        else:
-            raise ValueError("incompatible class: {pwop.__name__} {type(out)}")
+        # else:
+        #     raise ValueError("incompatible class: {pwop.__name__} {type(out)}")
 
     def abs(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.abs, *args,  **kwargs)
 
     def sign(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.sign, *args,  **kwargs)
 
     def sqrt(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.sqrt, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.sqrt, *args,  **kwargs)
 
     def conjugate(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.conjugate, *args,  **kwargs)
 
     def exp(self, *args, **kwargs):
         '''Applies exp pixel-wise to the DataContainer'''
-        return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.exp, *args, **kwargs)
 
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
-        return self.pixel_wise_unary(numpy.log, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.log, *args, **kwargs)
 
     ## reductions
     def squared_norm(self, **kwargs):

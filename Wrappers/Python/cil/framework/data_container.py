@@ -22,6 +22,7 @@ from functools import reduce
 from numbers import Number
 
 import numpy
+from array_api_compat import array_namespace
 
 from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
@@ -94,14 +95,16 @@ class DataContainer(object):
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
         #if type(array) == numpy.ndarray:
-        if hasattr(array, "__array_interface__"):
-            if deep_copy:
-                self.array = array.copy()
-            else:
-                self.array = array
+        # if hasattr(array, "__array_interface__"):
+        if deep_copy:
+            # self.array = array.copy()
+            xp = array_namespace(array)
+            self.array = xp.asarray(array, copy=True)
         else:
-            raise TypeError('Array must be adhere to the array interface protocol {0}'\
-                            .format(type(array)))
+            self.array = array
+        # else:
+        #     raise TypeError('Array must be adhere to the array interface protocol {0}'\
+        #                     .format(type(array)))
 
         #Don't set for derived classes
         if type(self) is DataContainer:

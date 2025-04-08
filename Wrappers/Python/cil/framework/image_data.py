@@ -15,10 +15,13 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-import numpy
+import numpy as np
 
 from .data_container import DataContainer
 from .labels import ImageDimension, Backend
+
+from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
+# import array interface as xp
 
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -46,9 +49,41 @@ class ImageData(DataContainer):
                  deep_copy=False,
                  geometry=None,
                  **kwargs):
+        '''Default to NumPy array if array is not passed'''
 
-        dtype = kwargs.get('dtype', numpy.float32)
+        # xp = get_namespace()
+        
+        # TODO: change
+        if array is None:
+            # defaults to a numpy array
+            xp = np
+            array = xp.empty(geometry.shape, dtype=dtype)
+        elif issubclass(type(array) , DataContainer):
+            # this is a reference so we might make a mess modifying both ends
+            array = array.as_array()
+            xp = array_namespace(array)
+        # elif issubclass(type(array) , numpy.ndarray):
+            # remove singleton dimensions
+            # array = numpy.squeeze(array)
+        else:
+            # Consider array as an object is compliant to the array API
+            # https://docs.scipy.org/doc/scipy-1.15.2/dev/api-dev/array_api.html 
+            # this might raise an exception but that's fine
+            xp = array_namespace(array)
+            # remove singleton dimensions
+            array = xp.squeeze(array)
+            
+        # else:
+        #     raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
+        if array.shape != geometry.shape:
+            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
+
+        if array.ndim not in [2,3,4]:
+            raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
+
+
+        dtype = kwargs.get('dtype', xp.float32)
 
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
@@ -57,22 +92,6 @@ class ImageData(DataContainer):
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
-        if array is None:
-            array = numpy.empty(geometry.shape, dtype=dtype)
-        elif issubclass(type(array) , DataContainer):
-            array = array.as_array()
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
-        else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-
-        if array.shape != geometry.shape:
-            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
-
-        if array.ndim not in [2,3,4]:
-            raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
 
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
 

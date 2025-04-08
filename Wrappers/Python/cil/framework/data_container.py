@@ -93,13 +93,14 @@ class DataContainer(object):
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
-        if type(array) == numpy.ndarray:
+        #if type(array) == numpy.ndarray:
+        if hasattr(array, "__array_interface__"):
             if deep_copy:
                 self.array = array.copy()
             else:
                 self.array = array
         else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
+            raise TypeError('Array must be adhere to the array interface protocol {0}'\
                             .format(type(array)))
 
         #Don't set for derived classes

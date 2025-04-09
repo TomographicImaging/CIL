@@ -237,15 +237,13 @@ class DataContainer(object):
 
         dc.fill(some_data, vertical=1, horizontal_x=32)
         will copy the data in some_data into the data container.
+        https://data-apis.org/array-api/latest/design_topics/copies_views_and_mutation.html
+        https://data-apis.org/array-api/latest/API_specification/generated/array_api.array.__setitem__.html#array_api.array.__setitem__
         '''
         if id(array) == id(self.array):
             return
         if dimension == {}:
-            if isinstance(array, numpy.ndarray):
-                numpy.copyto(self.array, array)
-            elif isinstance(array, Number):
-                self.array.fill(array)
-            elif issubclass(array.__class__ , DataContainer):
+            if issubclass(array.__class__ , DataContainer):
 
                 try:
                     if self.dimension_labels != array.dimension_labels:
@@ -260,7 +258,9 @@ class DataContainer(object):
                                      'Expecting shape {0} got {1}'.format(
                                      self.shape,array.shape))
             else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                # raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                xp = array_namespace(self.as_array())
+                self.array.__setitem__(slice(None, None, None), array)
         else:
 
             axis = [':']* self.number_of_dimensions
@@ -276,7 +276,7 @@ class DataContainer(object):
                     command += ','
                 command += str(el)
                 i+=1
-
+            
             if isinstance(array, numpy.ndarray):
                 command = command + "] = array[:]"
             elif issubclass(array.__class__, DataContainer):
@@ -661,7 +661,20 @@ class DataContainer(object):
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
-                pwop(self.as_array(), *args, **kwargs )
+                try:
+                    pwop(self.as_array(), *args, **kwargs )
+                except TypeError as te:
+                    import inspect
+                    txt = inspect.getmembers(pwop)
+                    msg = "Error out parameter not supported: "
+                    for el in txt:
+                        if el[0] in ['__name__', '__module__']:
+                            msg += f"{el[0]}: {el[1]} "
+                    import warnings
+                    warnings.warn(msg)
+                    kwargs.pop('out')
+                    out.fill(pwop(self.as_array(), *args, **kwargs ))
+                    return out
             else:
                 raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
         # elif issubclass(type(out), numpy.ndarray):

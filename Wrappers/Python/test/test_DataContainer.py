@@ -19,6 +19,7 @@ import functools
 import logging
 import sys
 
+import array_api_compat.numpy
 import numpy as np
 
 from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
@@ -27,6 +28,12 @@ from cil.framework.labels import ImageDimension, AcquisitionDimension
 
 from testclass import CCPiTestClass
 from utils import initialise_tests
+
+import array_api_compat
+from unittest_parametrize import param, parametrize, ParametrizedTestCase
+import numpy
+import torch
+
 
 log = logging.getLogger(__name__)
 initialise_tests()
@@ -37,19 +44,23 @@ def aid(x):
     return x.as_array().__array_interface__['data'][0]
 
 
-class TestDataContainer(CCPiTestClass):
-    def create_DataContainer(self, X,Y,Z, value=1):
+class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
+    def create_DataContainer(self, X,Y,Z, value=1, backend='numpy'):
         a = value * np.ones((X, Y, Z), dtype='float32')
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         return ds
 
-    def test_creation_nocopy(self):
+    @parametrize("xp, raise_error, err_type", 
+        [param(numpy, None, None, id="numpy"), 
+         param(torch, None, None, id="torch"),
+         ]) 
+    def test_creation_nocopy(self, xp, raise_error, err_type):
         shape = 2, 3, 4, 5
-        size = np.prod(shape)
-        a = np.arange(size)
+        size = xp.prod(xp.asarray(shape))
+        a = xp.arange(size)
         #print("a refcount " , sys.getrefcount(a))
-        a = np.reshape(a, shape)
+        a = xp.reshape(a, shape)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z', 'W'])
         #print("a refcount " , sys.getrefcount(a))

@@ -16,10 +16,10 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 from cil.framework import DataProcessor, ImageData
-from cil.framework.labels import AcquisitionDimension, ImageDimension
+from cil.framework.labels import AcquisitionDimension, AcquisitionType, ImageDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
-from astra import astra_dict, algorithm, data3d
+import astra.experimental
 import numpy as np
 
 
@@ -44,8 +44,7 @@ class AstraBackProjector3D(DataProcessor):
         kwargs = {
                   'volume_geometry'  : volume_geometry,
                   'sinogram_geometry'  : sinogram_geometry,
-                  'proj_geom'  : None,
-                  'vol_geom'  : None}
+                  'projector_id'  : None}
 
         #DataProcessor.__init__(self, **kwargs)
         super(AstraBackProjector3D, self).__init__(**kwargs)
@@ -53,7 +52,17 @@ class AstraBackProjector3D(DataProcessor):
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
 
-        self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
+        vol_geom, proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
+
+        proj_cfg = astra.astra_dict('cuda3d')
+        proj_cfg['ProjectionGeometry'] = proj_geom
+        proj_cfg['VolumeGeometry'] = vol_geom
+        if AcquisitionType.DIM2 & self.sinogram_geometry.dimension:
+            proj_cfg['ProjectionKernel'] = '2d_weighting'
+        self.projector_id = astra.projector3d.create(proj_cfg)
+
+    def __del__(self):
+        astra.projector3d.delete(self.projector_id)
 
     def check_input(self, dataset):
 
@@ -95,20 +104,15 @@ class AstraBackProjector3D(DataProcessor):
         new_shape_ag = [self.sinogram_geometry.pixel_num_v,self.sinogram_geometry.num_projections,self.sinogram_geometry.pixel_num_h]
         data_temp = DATA.as_array().reshape(new_shape_ag)
 
+        new_shape_ig = [self.volume_geometry.voxel_num_z,self.volume_geometry.voxel_num_y,self.volume_geometry.voxel_num_x]
+        new_shape_ig = [x if x>0 else 1 for x in new_shape_ig]
+
         if out is None:
-            rec_id, arr_out = astra.create_backprojection3d_gpu(data_temp,
-                            self.proj_geom,
-                            self.vol_geom)
+            arr_out = np.zeros(new_shape_ig, dtype=np.float32)
         else:
-            new_shape_ig = [self.volume_geometry.voxel_num_z,self.volume_geometry.voxel_num_y,self.volume_geometry.voxel_num_x]
-            new_shape_ig = [x if x>0 else 1 for x in new_shape_ig]
             arr_out = out.as_array().reshape(new_shape_ig)
 
-            rec_id = astra.data3d.link('-vol', self.vol_geom, arr_out)
-            self.create_backprojection3d_gpu( data_temp, self.proj_geom, self.vol_geom, False, rec_id)
-
-        # delete the GPU copy
-        astra.data3d.delete(rec_id)
+        astra.experimental.direct_BP3D(self.projector_id, arr_out, data_temp)
 
         arr_out = np.squeeze(arr_out)
 
@@ -117,62 +121,3 @@ class AstraBackProjector3D(DataProcessor):
         else:
             out.fill(arr_out)
         return out
-
-    def create_backprojection3d_gpu(self, data, proj_geom, vol_geom, returnData=True, vol_id=None):
-
-        """
-        Call to ASTRA to create a backward projection of an image (3D)
-
-        Parameters
-        ----------
-
-        data : numpy.ndarray or int
-            Image data or ID.
-
-        proj_geom : dict
-            Projection geometry.
-
-        vol_geom : dict
-            Volume geometry.
-
-        returnData : bool
-            If False, only return the ID of the forward projection.
-
-        vol_id : int, default None
-            ID of the np array linked with astra.
-
-        Returns
-        -------
-
-        proj_geom : int or (int, numpy.ndarray)
-            If ``returnData=False``, returns the ID of the back projection. Otherwise returns a tuple containing the ID of the back projection and the back projection itself.
-        """
-
-        if isinstance(data, np.ndarray):
-            sino_id = data3d.create('-sino', proj_geom, data)
-        else:
-            sino_id = data
-
-        if vol_id is None:
-            vol_id = data3d.create('-vol', vol_geom, 0)
-
-        cfg = astra_dict('BP3D_CUDA')
-        cfg['ProjectionDataId'] = sino_id
-        cfg['ReconstructionDataId'] = vol_id
-        alg_id = algorithm.create(cfg)
-        algorithm.run(alg_id)
-        algorithm.delete(alg_id)
-
-        if isinstance(data, np.ndarray):
-            data3d.delete(sino_id)
-
-        if vol_id is not None:
-            if returnData:
-                return vol_id, data3d.get_shared(vol_id)
-            else:
-                return vol_id
-        else:
-            if returnData:
-                return vol_id, data3d.get(vol_id)
-            else:
-                return vol_id

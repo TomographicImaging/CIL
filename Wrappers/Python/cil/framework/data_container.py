@@ -464,7 +464,7 @@ class DataContainer(object):
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
-            return other.subtract(self, *args, **kwargs)
+            return (-other).add(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
@@ -476,7 +476,7 @@ class DataContainer(object):
     def divide(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
-            return other.divide(self, *args, **kwargs)
+            return other.power(-1).multiply(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
 
     def power(self, other, *args, **kwargs):

@@ -587,13 +587,12 @@ For ease of use we provide the following static methods in `cil.optimisation.uti
 They will all instantiate a Sampler defined in the following class:
 
 .. autoclass:: cil.optimisation.utilities.Sampler
-   :members:
+   
 
-
-In addition, we provide a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement:
+The random samplers are instantiated from a random sampling class which is a child class of  `cil.optimisation.utilities.sampler` and provides options for sampling with and without replacement:
 
 .. autoclass:: cil.optimisation.utilities.SamplerRandom
-   :members:
+   
 
 Callbacks
 ---------

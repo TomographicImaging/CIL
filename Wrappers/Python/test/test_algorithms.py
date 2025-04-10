@@ -82,7 +82,7 @@ class TestGD(CCPiTestClass):
         # b = initial.copy()
         # fill with random numbers
         # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random_deprecated')
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -111,7 +111,7 @@ class TestGD(CCPiTestClass):
         '''
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        b = ig.allocate('random')
+        b = ig.allocate('random_deprecated')
         identity = IdentityOperator(ig)
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
@@ -201,7 +201,7 @@ class TestGD(CCPiTestClass):
         # b = initial.copy()
         # fill with random numbers
         # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random_deprecated')
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -271,7 +271,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM_DEPRECATED"])
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -372,9 +372,9 @@ class TestFISTA(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
-        b = ig.allocate(FillType["RANDOM"])
+        b = ig.allocate(FillType["RANDOM_DEPRECATED"])
         # fill with random numbers
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM_DEPRECATED"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -399,7 +399,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM_DEPRECATED"])
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -646,7 +646,7 @@ class TestCGLS(CCPiTestClass):
         self.ig = ImageGeometry(10, 2)
         np.random.seed(2)
         self.initial = self.ig.allocate(1.)
-        self.data = self.ig.allocate('random')
+        self.data = self.ig.allocate('random_deprecated')
         self.operator = IdentityOperator(self.ig)
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                         update_objective_interval=2)
@@ -878,7 +878,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_step_sizes(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -965,7 +965,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -998,7 +998,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1036,7 +1036,7 @@ class TestPDHG(CCPiTestClass):
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1051,7 +1051,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_pdhg_theta(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1090,7 +1090,7 @@ class TestSIRT(CCPiTestClass):
         # set up with linear operator
         self.ig2 = ImageGeometry(3, 4, 5)
         self.initial2 = self.ig2.allocate(0.)
-        self.b2 = self.ig2.allocate('random')
+        self.b2 = self.ig2.allocate('random_deprecated')
         self.A2 = IdentityOperator(self.ig2)
 
     def tearDown(self):
@@ -1243,7 +1243,7 @@ class TestSIRT(CCPiTestClass):
         ig = data.geometry
         A = IdentityOperator(ig)
         constraint = TotalVariation(warm_start=False)
-        initial = ig.allocate('random', seed=5)
+        initial = ig.allocate('random_deprecated', seed=5)
         sirt = SIRT(initial=initial, operator=A, data=data,
                     constraint=constraint)
         sirt.run(2, verbose=0)
@@ -1257,7 +1257,7 @@ class TestSIRT(CCPiTestClass):
         ig = data.geometry
         A = IdentityOperator(ig)
         constraint = 1e6*TotalVariation(warm_start=True, max_iteration=100)
-        initial = ig.allocate('random', seed=5)
+        initial = ig.allocate('random_deprecated', seed=5)
         sirt = SIRT(initial=initial, operator=A, data=data,
                     constraint=constraint)
         sirt.run(25, verbose=0)
@@ -1535,7 +1535,7 @@ class TestCallbacks(unittest.TestCase):
         ig = ImageGeometry(10, 2)
         np.random.seed(2)
         initial = ig.allocate(1.)
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
         operator = IdentityOperator(ig)
         alg = CGLS(initial=initial, operator=operator, data=data,
                    update_objective_interval=2)
@@ -1702,11 +1702,11 @@ class Test_PD3O(unittest.TestCase):
         self.assertTrue(algo_pd3o.configured)
 
         algo_pd3o = PD3O(f=F1, g=G1, h=H1, operator=operator, gamma=3,
-                         delta=43.1, initial=self.data.geometry.allocate('random', seed=3))
+                         delta=43.1, initial=self.data.geometry.allocate('random_deprecated', seed=3))
         self.assertEqual(algo_pd3o.gamma, 3)
         self.assertEqual(algo_pd3o.delta, 43.1)
         np.testing.assert_array_equal(
-            algo_pd3o.x.array, self.data.geometry.allocate('random', seed=3).array)
+            algo_pd3o.x.array, self.data.geometry.allocate('random_deprecated', seed=3).array)
         self.assertTrue(algo_pd3o.configured)
 
         with self.assertWarnsRegex(UserWarning, "Please use PDHG instead."):

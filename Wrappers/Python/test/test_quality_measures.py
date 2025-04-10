@@ -48,8 +48,8 @@ class TestQualityMeasures(CCPiTestClass):
             id_coins_noisy = noise.gaussian(id_coins, var=0.05, seed=10)
 
             ig = id_coins.geometry.copy()
-            dc1 = ig.allocate('random')
-            dc2 = ig.allocate('random')
+            dc1 = ig.allocate('random_deprecated')
+            dc2 = ig.allocate('random_deprecated')
 
             self.dc1 = dc1
             self.dc2 = dc2

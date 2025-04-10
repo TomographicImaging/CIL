@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev20+ga06f691f documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev21+g3b60d763 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../_static/documentation_options.js?v=41d805c0"></script>
+    <script src="../_static/documentation_options.js?v=6e636dcb"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev20+ga06f691f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev21+g3b60d763';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev20+ga06f691f" />
+  <meta name="docsearch:version" content="24.3.1.dev21+g3b60d763" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -2016,7 +2016,8 @@ In the future, these parameters will be properties of the corresponding function
 <li><p>Convergence is guaranteed if <span class="math notranslate nohighlight">\(\theta\)</span> = 1.0,  the operator norm <span class="math notranslate nohighlight">\(\|K\|\)</span>, the dual step size <span class="math notranslate nohighlight">\(\sigma\)</span> and the primal step size <span class="math notranslate nohighlight">\(\tau\)</span>, satisfy the following inequality:</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\tau \sigma \|K\|^2 &lt; 1\]</div>
+\[\tau \sigma \|K\|^2 &lt; 4/3\]</div>
+<p>For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.</p>
 <ul>
 <li><p>By default, the step sizes <span class="math notranslate nohighlight">\(\sigma\)</span> and <span class="math notranslate nohighlight">\(\tau\)</span> are positive scalars and defined as below:</p>
 <ul class="simple">
@@ -2169,10 +2170,13 @@ In the future, these parameters will be properties of the corresponding function
 <dd><p>Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Boolean</p>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>Boolean</em> – True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.</p></li>
+<li><p><em>Reference</em></p></li>
+<li><p><em>———-</em></p></li>
+<li><p><strong>Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv</strong> (<em>2201.00139.</em>)</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>

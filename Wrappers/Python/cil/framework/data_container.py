@@ -174,14 +174,19 @@ class DataContainer(object):
         dimension_labels_list = list(self.dimension_labels)
 
         #remove axes from array and labels
+        squeeze_axes = []
         for key, value in kw.items():
             if value is not None:
                 axis = dimension_labels_list.index(key)
+                squeeze_axes.append(axis)
                 dimension_labels_list.remove(key)
                 if new_array is None:
                     new_array = self.as_array()
                 new_array = new_array.take(indices=value, axis=axis)
 
+        print ("new_array.shape", new_array.shape)
+        # xp = array_namespace(new_array)
+        # new_array = xp.squeeze(new_array, axis=tuple(squeeze_axes))
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
         from .vector_data import VectorData
@@ -252,7 +257,9 @@ class DataContainer(object):
                     pass
 
                 if self.array.shape == array.shape:
-                    numpy.copyto(self.array, array.array)
+                    # numpy.copyto(self.array, array.array)
+                    xp = array_namespace(self.as_array())
+                    self.array.__setitem__(slice(None, None, None), array.array)
                 else:
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting shape {0} got {1}'.format(
@@ -262,31 +269,27 @@ class DataContainer(object):
                 xp = array_namespace(self.as_array())
                 self.array.__setitem__(slice(None, None, None), array)
         else:
+            slices = []
+            where = 0
+            for i,el in enumerate(self.dimension_labels):
+                for k,v in dimension.items():
+                    if el == k:
+                        slices.append(slice(v,v+1,None))
+                        where = i
+                    else:
+                        slices.append(slice(None, None, None))
+            # give new shape to the array to insert so that it fits
+            # the shape of the target data
+            try:
+                 
+                xp = array_namespace(array)
+                xp.expand_dims(array, axis=where)
+                self.array.__setitem__(tuple(slices), array)
+                xp.squeeze(array, axis=where)
 
-            axis = [':']* self.number_of_dimensions
-            dimension_labels = tuple(self.dimension_labels)
-            for k,v in dimension.items():
-                i = dimension_labels.index(k)
-                axis[i] = v
-
-            command = 'self.array['
-            i = 0
-            for el in axis:
-                if i > 0:
-                    command += ','
-                command += str(el)
-                i+=1
-            
-            if isinstance(array, numpy.ndarray):
-                command = command + "] = array[:]"
-            elif issubclass(array.__class__, DataContainer):
-                command = command + "] = array.as_array()[:]"
-            elif isinstance (array, Number):
-                command = command + "] = array"
-            else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
-            exec(command)
-
+            except AttributeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+                
 
     def check_dimensions(self, other):
         return self.shape == other.shape

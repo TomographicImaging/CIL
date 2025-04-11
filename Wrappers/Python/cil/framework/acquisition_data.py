@@ -20,7 +20,8 @@ import numpy
 from .labels import AcquisitionDimension, Backend
 from .data_container import DataContainer
 from .partitioner import Partitioner
-
+import array_api_compat
+from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
 
 class AcquisitionData(DataContainer, Partitioner):
     '''DataContainer for holding 2D or 3D sinogram'''
@@ -49,7 +50,7 @@ class AcquisitionData(DataContainer, Partitioner):
                  geometry = None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', numpy.float32)
+        
 
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
@@ -59,15 +60,18 @@ class AcquisitionData(DataContainer, Partitioner):
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
         if array is None:
-            array = numpy.empty(geometry.shape, dtype=dtype)
+            xp = array_api_compat.numpy
+            dtype = kwargs.get('dtype', xp.float32)
+            array = xp.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-
+            # xp = array_namespace(array)
+            # idx = numpy.where(numpy.asarray(array.shape) == 1)
+            # # remove singleton dimensions
+            # for axis in idx:    
+            #     array = xp.squeeze(array, axis=axis)
+            array = array.squeeze()
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 

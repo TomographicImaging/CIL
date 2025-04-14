@@ -17,10 +17,9 @@
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 // Sam Tygier (UKRI-STFC)
 
-
 #include "FiniteDifferenceLibrary.h"
 
-DLL_EXPORT int openMPtest(int nThreads)
+int openMPtest(int nThreads)
 {
 	omp_set_num_threads(nThreads);
 
@@ -538,7 +537,14 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	return 0;
 }
 
-DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nc, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
+ int fdiff4D(nb::ndarray<float> imagefull,
+		 nb::ndarray<float> gradCfull,
+		 nb::ndarray<float> gradZfull,
+		 nb::ndarray<float> gradYfull,
+		 nb::ndarray<float> gradXfull,
+		 size_t nc, size_t nz, size_t ny, size_t nx,
+		 int boundary, int direction,
+		 int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -547,22 +553,28 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, flo
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 		else
-			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 		else
-			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 	}
 
 	omp_set_num_threads(nThreads_initial);
 	return status;
 }
-DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, size_t nz, size_t ny, size_t nx, int boundary, int direction, int nThreads)
+int fdiff3D(nb::ndarray<float> imagefull,
+		nb::ndarray<float> gradZfull,
+		nb::ndarray<float> gradYfull,
+		nb::ndarray<float> gradXfull,
+		size_t nz, size_t ny, size_t nx,
+		int boundary, int direction,
+		int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -571,22 +583,27 @@ DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, flo
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 		else
-			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 		else
-			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);
 	return status;
 }
-DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, size_t ny, size_t nx, int boundary, int direction, int nThreads)
+int fdiff2D(nb::ndarray<float> imagefull,
+		nb::ndarray<float> gradYfull,
+		nb::ndarray<float> gradXfull,
+		size_t ny, size_t nx,
+		int boundary, int direction,
+		int nThreads)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -595,16 +612,16 @@ DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, siz
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 		else
-			status = fdiff_adjoint_periodic(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 		else
-			status = fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);

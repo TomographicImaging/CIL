@@ -269,60 +269,8 @@ class Gradient_numpy(LinearOperator):
 
 import ctypes, platform
 from ctypes import util
-# check for the extension
-if platform.system() == 'Linux':
-    dll = 'libcilacc.so'
-elif platform.system() == 'Windows':
-    dll_file = 'cilacc.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libcilacc.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
 
-cilacc = ctypes.cdll.LoadLibrary(dll)
-
-c_float_p = ctypes.POINTER(ctypes.c_float)
-
-cilacc.openMPtest.restypes = ctypes.c_int32
-cilacc.openMPtest.argtypes = [ctypes.c_int32]
-
-cilacc.fdiff4D.restype = ctypes.c_int32
-cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_int32,
-                       ctypes.c_int32,
-                       ctypes.c_int32]
-
-cilacc.fdiff3D.restype = ctypes.c_int32
-cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_int32,
-                       ctypes.c_int32,
-                       ctypes.c_int32]
-
-cilacc.fdiff2D.restype = ctypes.c_int32
-cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.POINTER(ctypes.c_float),
-                       ctypes.c_size_t,
-                       ctypes.c_size_t,
-                       ctypes.c_int32,
-                       ctypes.c_int32,
-                       ctypes.c_int32]
-
+import cil.cilacc as cilacc
 
 class Gradient_C(LinearOperator):
 
@@ -391,7 +339,7 @@ class Gradient_C(LinearOperator):
     def direct(self, x, out=None):
 
         ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
-        x_p = Gradient_C.ndarray_as_c_pointer(ndx)
+        x_p = ndx
 
         if out is None:
             out = self.range_geometry().allocate(None)
@@ -404,7 +352,7 @@ class Gradient_C(LinearOperator):
             ndout.insert(ind, out.get_item(0).as_array()) #insert channels dc at correct point for channel data
 
         #pass list of all arguments
-        arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
+        arg1 = [ndout[i] for i in range(len(ndout))]
         arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         status = self.fd(x_p, *args)
@@ -437,7 +385,7 @@ class Gradient_C(LinearOperator):
             out = self.domain_geometry().allocate(None)
 
         ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')
-        out_p = Gradient_C.ndarray_as_c_pointer(ndout)
+        out_p = ndout
 
         if self.split is False:
             ndx = [el.as_array() for el in x.containers]
@@ -450,7 +398,7 @@ class Gradient_C(LinearOperator):
             if el != 1:
                 ndx[i]/=el
 
-        arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
+        arg1 = [ndx[i] for i in range(self.ndim)]
         arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 

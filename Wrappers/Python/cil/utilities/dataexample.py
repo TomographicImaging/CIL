@@ -29,13 +29,16 @@ from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from zenodo_get import zenodo_get
 
+import importlib.resources
+
 class DATA(object):
+
     @classmethod
     def dfile(cls):
         return None
 
 class CILDATA(DATA):
-    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
+    data_dir = os.environ["CIL_DATA_DIR"]
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)

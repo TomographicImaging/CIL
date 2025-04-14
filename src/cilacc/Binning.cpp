@@ -24,6 +24,8 @@
 #include "ipp.h"
 #include <omp.h>
 #include "utilities.h"
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
 
 class Binner {
 
@@ -190,9 +192,15 @@ void Binner::bin_4D(const float* data_in, float* data_binned)
 }
 
 
-extern "C"
-{
-	void Binner_delete(void* binner) { delete (Binner*)binner; }
-	void* Binner_new(const size_t* shape_in, const size_t* shape_out, const size_t* pixel_index_start, const size_t* binning_list) { return new Binner(shape_in, shape_out, pixel_index_start, binning_list); }
-	int Binner_bin(void* binner, const float* data_in, float* data_binned) { return ((Binner*)binner)->bin(data_in, data_binned); }
-}
+void Binner_delete(void* binner) { delete (Binner*)binner; }
+void* Binner_new(
+		Shape shape_in, 
+		Shape shape_out, 
+		Shape pixel_index_start, 
+		Shape binning_list) { 
+	return new Binner(shape_in.data(), shape_out.data(), pixel_index_start.data(), binning_list.data()); 
+ }
+int Binner_bin(void* binner, DataInput data_in, DataBinned data_binned) { 
+	return ((Binner*)binner)->bin(data_in.data(), data_binned.data()); 
+ }
+

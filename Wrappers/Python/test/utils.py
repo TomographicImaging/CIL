@@ -22,7 +22,7 @@ import sys
 import importlib
 
 import logging
-import cil.version
+import cil
 import pprint
 import unittest
 
@@ -37,7 +37,7 @@ def startTestRun(self):
 
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
-    print("CIL version: ", cil.version.version)
+    print("CIL version: ", cil.__version__)
     pprint.pprint(system_state)
     print("----------------------------------------------------------------------\n")
     sys.stdout.flush()

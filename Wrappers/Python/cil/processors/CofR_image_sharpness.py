@@ -139,12 +139,7 @@ class CofR_image_sharpness(Processor):
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
 
         #set FBPOperator class from backend
-        try:
-            module = importlib.import_module(f'cil.plugins.{backend}')
-        except ImportError as exc:
-            msg = {'tigre': "TIGRE (e.g. `conda install ccpi::tigre`)",
-                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
-            raise ImportError(f"Please install {msg} or select a different backend") from exc
+        module = importlib.import_module(f'cil.plugins.{backend}')
 
         return module.FBP
 

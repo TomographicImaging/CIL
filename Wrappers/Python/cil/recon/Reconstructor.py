@@ -110,12 +110,7 @@ class Reconstructor(object):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(backend))
 
         #set ProjectionOperator class from backend
-        try:
-            module = importlib.import_module(f'cil.plugins.{backend}')
-        except ImportError as exc:
-            msg = {'tigre': "TIGRE (e.g. `conda install ccpi::tigre`)",
-                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
-            raise ImportError(f"Please install {msg} or select a different backend") from exc
+        module = importlib.import_module(f'cil.plugins.{backend}')
 
         self._PO_class = module.ProjectionOperator
         self._backend = backend

@@ -1411,3 +1411,37 @@ class TestDataContainer(CCPiTestClass):
         xcil = VectorData(x)
         ycil = VectorData(y)
         self.assertAlmostEqual( ycil.dot(xcil), xcil.dot(ycil).conjugate())
+
+    def test_acquisition_data_geometry_override(self):
+        ag = AcquisitionGeometry.create_Cone2D([0,-100], [0,200], units='mm',detector_direction_x=[1, 0])
+        ag.set_panel(120, pixel_size=0.1, origin='bottom-left')
+        ag.set_angles(np.linspace(0., 360., 120, endpoint=False))
+        ag.set_labels(('angle','horizontal'))
+
+        ig = ag.get_ImageGeometry()
+
+        dtype_before = ag.dtype
+
+        sinogram64 = np.zeros((120, 120), dtype='float64')
+        AcquisitionData(sinogram64, deep_copy=False, geometry=ag)
+
+        self.assertEqual(dtype_before, ag.dtype)
+
+    def test_geometry_dtype_change(self):
+        ag = AcquisitionGeometry.create_Cone2D([0,-100], [0,200], units='mm',detector_direction_x=[1, 0])
+        ag.set_panel(120, pixel_size=0.1, origin='bottom-left')
+        ag.set_angles(np.linspace(0., 360., 120, endpoint=False))
+        ag.set_labels(('angle','horizontal'))
+
+        ig = ag.get_ImageGeometry()
+
+        ag_dtype_before = ag.dtype
+        ig_dtype_before = ig.dtype
+
+        sinogram64 = np.zeros((120, 120), dtype='float64')
+
+        AcquisitionData(sinogram64, deep_copy=False, geometry=ag)
+        self.assertEqual(ag_dtype_before, ag.dtype)
+
+        ImageData(sinogram64, deep_copy=False, geometry=ig)
+        self.assertEqual(ig_dtype_before, ig.dtype)

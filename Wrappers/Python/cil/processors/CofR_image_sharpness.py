@@ -139,12 +139,7 @@ class CofR_image_sharpness(Processor):
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
 
         #set FBPOperator class from backend
-        try:
-            module = importlib.import_module(f'cil.plugins.{backend}')
-        except ImportError as exc:
-            msg = {'tigre': "TIGRE (e.g. `conda install conda-forge::tigre`)",
-                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
-            raise ImportError(f"Please install {msg} or select a different backend") from exc
+        module = importlib.import_module(f'cil.plugins.{backend}')
 
         return module.FBP
 
@@ -230,11 +225,7 @@ class CofR_image_sharpness(Processor):
         return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}") from exc
+        import matplotlib.pyplot as plt
 
         x=[x / vox_size for x in offsets]
         y=values

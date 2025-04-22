@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.image_data &#8212; CIL 24.3.1.dev23+gc10f3de6 documentation</title>
+    <title>cil.framework.image_data &#8212; CIL 24.3.1.dev24+g3129beed documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../_static/documentation_options.js?v=cf2dd438"></script>
+    <script src="../../../../_static/documentation_options.js?v=7fe5c591"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev23+gc10f3de6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev24+g3129beed';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev23+gc10f3de6" />
+  <meta name="docsearch:version" content="24.3.1.dev24+g3129beed" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -494,7 +494,24 @@
 <div class="viewcode-block" id="ImageData">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;DataContainer for holding 2D or 3D DataContainer&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataContainer for holding 2D or 3D image data</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array : numpy.ndarray or DataContainer</span>
+<span class="sd">        The data array. Default None creates an empty array of size determined by the geometry.</span>
+<span class="sd">    deep_copy : bool, default is False</span>
+<span class="sd">        If True, the array will be deep copied. If False, the array will be shallow copied.</span>
+<span class="sd">    geometry : ImageGeometry</span>
+<span class="sd">        The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.</span>
+
+<span class="sd">    **kwargs:</span>
+<span class="sd">        dtype : numpy.dtype</span>
+<span class="sd">            Specify the data type of the ImageData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. </span>
+<span class="sd">            If an array is passed, dtype must match the dtype of the array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
@@ -520,8 +537,10 @@
                  <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">!=</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;dtype must match the array dtype got </span><span class="si">{}</span><span class="s1"> expected </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;ImageData requires a geometry&quot;</span><span class="p">)</span>
@@ -532,12 +551,17 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Deprecated: &#39;dimension_labels&#39; cannot be set with &#39;allocate()&#39;. Use &#39;geometry.set_labels()&#39; to modify the geometry before using allocate.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">array</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">dtype</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="c1"># remove singleton dimensions</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;array must be a CIL type DataContainer or numpy.ndarray got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
 

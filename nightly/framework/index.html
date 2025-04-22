@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 24.3.1.dev23+gc10f3de6 documentation</title>
+    <title>Framework &#8212; CIL 24.3.1.dev24+g3129beed documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../_static/documentation_options.js?v=cf2dd438"></script>
+    <script src="../_static/documentation_options.js?v=7fe5c591"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev23+gc10f3de6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev24+g3129beed';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev23+gc10f3de6" />
+  <meta name="docsearch:version" content="24.3.1.dev24+g3129beed" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1169,6 +1169,21 @@ Default is to accumulate and return data as float64 or complex128</p>
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_data/#AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionData" title="Link to this definition">#</a></dt>
 <dd><p>DataContainer for holding 2D or 3D sinogram</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>numpy.ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The data array. Default None creates an empty array of size determined by the geometry.</p></li>
+<li><p><strong>deep_copy</strong> (<em>bool</em><em>, </em><em>default is True</em>) – If True, the array will be deep copied. If False, the array will be shallow copied.</p></li>
+<li><p><strong>geometry</strong> (<a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt>dtype<span class="classifier">numpy.dtype</span></dt><dd><p>Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry.
+If an array is passed, dtype must match the dtype of the array.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.as_array">
 <span class="sig-name descname"><span class="pre">as_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.as_array" title="Link to this definition">#</a></dt>
@@ -1494,7 +1509,22 @@ Default is to accumulate and return data as float64 or complex128</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.ImageData">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_data/#ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageData" title="Link to this definition">#</a></dt>
-<dd><p>DataContainer for holding 2D or 3D DataContainer</p>
+<dd><p>DataContainer for holding 2D or 3D image data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>numpy.ndarray</em><em> or </em><a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The data array. Default None creates an empty array of size determined by the geometry.</p></li>
+<li><p><strong>deep_copy</strong> (<em>bool</em><em>, </em><em>default is False</em>) – If True, the array will be deep copied. If False, the array will be shallow copied.</p></li>
+<li><p><strong>geometry</strong> (<a class="reference internal" href="#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt>dtype<span class="classifier">numpy.dtype</span></dt><dd><p>Specify the data type of the ImageData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry.
+If an array is passed, dtype must match the dtype of the array.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.ImageData.get_slice">
 <span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_data/#ImageData.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageData.get_slice" title="Link to this definition">#</a></dt>

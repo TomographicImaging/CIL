@@ -267,11 +267,7 @@ class GenericFilteredBackProjection(Reconstructor):
         matplotlib.pyplot
             A plot of the filter
         """
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}") from exc
+        import matplotlib.pyplot as plt
 
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order

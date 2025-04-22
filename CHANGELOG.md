@@ -14,6 +14,8 @@
       - Made the call to next() in algorithm iteration loop explicit (#2069)
       - Added option for a random seed in the power method in the linear operator (#1585)
       - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
+      - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
+      - PDHG 'check_convergence' updated for new literature (#2084)
   - Testing
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)

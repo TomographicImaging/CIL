@@ -18,13 +18,9 @@
 # Kyle Pidgeon (UKRI-STFC)
 
 
-try:
-    import matplotlib.lines as mlines
-    import matplotlib.pyplot as plt
-    from matplotlib.patches import FancyArrowPatch
-except ImportError as exc:
-    msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-    raise ImportError(f"Please install {msg}") from exc
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
 
 from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 from cil.framework.labels import AcquisitionType

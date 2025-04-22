@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.FluxNormaliser &#8212; CIL 24.3.1.dev26+gf2df4673 documentation</title>
+    <title>cil.processors.FluxNormaliser &#8212; CIL 24.3.1.dev27+gf981307d documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../_static/documentation_options.js?v=4c557bad"></script>
+    <script src="../../../../_static/documentation_options.js?v=fb835b26"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev26+gf2df4673';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev27+gf981307d';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev26+gf2df4673" />
+  <meta name="docsearch:version" content="24.3.1.dev27+gf981307d" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -494,13 +494,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
 
-<span class="n">matplotlibAvailable</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="n">matplotlibAvailable</span> <span class="o">=</span> <span class="kc">False</span>
-
-
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FluxNormaliser">
@@ -757,9 +750,7 @@
 <span class="sd">        matplotlib.figure.Figure</span>
 <span class="sd">            The figure object created to plot the configuration</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">matplotlibAvailable</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)&quot;</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please install </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_flux</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_slice</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -850,9 +841,7 @@
 <span class="sd">        ax: int, default=111</span>
 <span class="sd">            The subplot axis to display the slice on</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">matplotlibAvailable</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)&quot;</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please install </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
         
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev25+g5041be17 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev26+gf2df4673 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../_static/documentation_options.js?v=fbd89db4"></script>
+    <script src="../_static/documentation_options.js?v=4c557bad"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev25+g5041be17';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev26+gf2df4673';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev25+g5041be17" />
+  <meta name="docsearch:version" content="24.3.1.dev26+gf2df4673" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -8406,7 +8406,7 @@ The <code class="code docutils literal notranslate"><span class="pre">cil.optimi
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">12</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">12</span><span class="p">)))</span>
 <span class="go">[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]</span>
 </pre></div>
 </div>
@@ -8418,7 +8418,7 @@ The <code class="code docutils literal notranslate"><span class="pre">cil.optimi
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
 <span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
 </pre></div>
 </div>
@@ -8432,7 +8432,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span><span class="p">(</span><span class="n">custom_list</span><span class="p">[</span><span class="n">iteration_number</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">custom_list</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
 <span class="go">[0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="p">)</span>
 <span class="go">Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.</span>
@@ -8461,7 +8461,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="go">[0 1 2 3 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
 <span class="go">0</span>
@@ -8497,7 +8497,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
 <span class="go">4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="go">[ 0  4  8 12 16]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_previous_samples</span><span class="p">())</span>
 <span class="go">[0 4]</span>
@@ -8509,7 +8509,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
 <span class="go">8</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 <span class="go">[ 0  8  16 1 9 2 10 3 11 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_previous_samples</span><span class="p">())</span>
 <span class="go">[0 8]</span>
@@ -8542,7 +8542,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <p>Herman GT, Meyer LB. Algebraic reconstruction techniques can be made computationally efficient. IEEE Trans Med Imaging.  doi: 10.1109/42.241889.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">herman_meyer</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 <span class="go">[ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
 </pre></div>
 </div>
@@ -8570,7 +8570,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 <span class="go">[3 4 0 0 2 3 3 2 2 1]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
 <span class="go">3</span>
@@ -8582,7 +8582,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="p">[</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 <span class="go">[0 1 3 0 0 3 0 0 0 0]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_previous_samples</span><span class="p">())</span>
 <span class="go">[]</span>
@@ -8610,7 +8610,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">randomWithoutReplacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 <span class="go">[6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
 </pre></div>
 </div>
@@ -8641,7 +8641,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
 <span class="go">[3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
 <span class="go">3</span>
@@ -8657,7 +8657,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
 <span class="go">4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="go">[ 0  4  8 12 16]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_previous_samples</span><span class="p">())</span>
 <span class="go">[0 4]</span>
@@ -8667,7 +8667,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_previous_samples</span><span class="p">())</span>
 <span class="go">[]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="go">[0 1 2 3 4]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">sampler</span><span class="p">))</span>
 <span class="go">0</span>
@@ -8681,7 +8681,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">herman_meyer</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 <span class="go">[ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]</span>
 </pre></div>
 </div>
@@ -8693,7 +8693,7 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="n">iteration_number</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="n">num_indices</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">my_sampling_function</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
 <span class="go">[1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]</span>
 </pre></div>
 </div>
@@ -8730,13 +8730,13 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
 <span class="go">[3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span><span class="o">=</span><span class="n">Sampler</span><span class="o">.</span><span class="n">randomWithoutReplacement</span><span class="p">(</span><span class="n">num_indices</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">view_samples</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
 <span class="go">[6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]</span>
 </pre></div>
 </div>

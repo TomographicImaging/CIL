@@ -7,10 +7,6 @@ requires = [
 ]
 build-backend = "scikit_build_core.build"
 
-[tool.scikit-build.wheel.packages]
-cil = "Wrappers/Python/cil"
-"cil/cilacc" = "src/Core"
-
 [tool.setuptools_scm]
 version_file = "Wrappers/Python/cil/version.py"
 version_file_template = """

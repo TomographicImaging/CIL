@@ -17,7 +17,7 @@
 set -euxo pipefail
 numpy='1.24'
 python='3.10'
-name=cil_test_sh
+name=cil
 test_deps=0
 cil_ver=''
 pip_install_pkgs=()

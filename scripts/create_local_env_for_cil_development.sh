@@ -48,7 +48,7 @@ echo "Environment name $name"
 conda_args=(create --name="$name"
   python="$python"
   numpy="$numpy"
-  cmake'>=3.16'
+  cmake'>=3.20'
   dxchange
   h5py
   ipp'>=2021.10'
@@ -99,7 +99,7 @@ else
   )
 fi
 
-conda "${conda_args[@]}" 
+conda "${conda_args[@]}"
 if [[ -n "${pip_install_pkgs[@]}" ]]; then
   python -m pip install "${pip_install_pkgs[@]}"
 fi

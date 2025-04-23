@@ -42,8 +42,7 @@ requirements:
     - pip
     - setuptools >=64
     - setuptools_scm >=8
-    - cmake         # [not osx]
-    - cmake >=3.16  # [osx]
+    - cmake >=3.20
     - libgcc-ng     # [linux]
     - libstdcxx-ng  # [linux]
     - _openmp_mutex # [linux]

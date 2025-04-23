@@ -54,8 +54,6 @@ conda_args=(create --name="$name"
   ipp'>=2021.10'
   ipp-devel'>=2021.10'
   ipp-include'>=2021.10'
-  libgcc-ng
-  libstdcxx-ng
   matplotlib-base
   numba
   olefile'>=0.46'
@@ -69,9 +67,8 @@ conda_args=(create --name="$name"
   zenodo_get'>=1.6'
 )
 
-if [[ "$(uname)" == "Linux" ]]; then
-  conda_args+=(libgcc-ng
-  libstdcxx-ng)
+if test "$(uname)" = Linux; then
+  conda_args+=(libgcc-ng libstdcxx-ng)
 fi
 
 if test -n "$cil_ver"; then
@@ -108,7 +105,7 @@ fi
 conda "${conda_args[@]}"
 if [[ -n "${pip_install_pkgs[@]}" ]]; then
   env_path=$(conda info --base)/envs/"$name"
-  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+  if [[ "$OSTYPE" =~ msys|win32|cygwin ]]; then
     python_exec="$env_path/python.exe"
   else
     python_exec="$env_path/bin/python"

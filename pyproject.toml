@@ -1,16 +1,15 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8",
-    	"ipp-static>=2022.0,<2022.1",
-    	"ipp-devel>=2022.0,<2022.1",
-	"nanobind",
-	"scikit-build-core>=0.11.0",
-	"intel-openmp==2025.0.5",
+requires = [
+    "setuptools>=64",
+    "setuptools_scm>=8",
+    "scikit-build-core",
+    #"ipp-devel==2021.12.*", # PyPI conflicts with conda package
 ]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
-"cil/cilacc" = "src/cilacc"
+"cil/cilacc" = "src/Core"
 
 [tool.setuptools_scm]
 version_file = "Wrappers/Python/cil/version.py"

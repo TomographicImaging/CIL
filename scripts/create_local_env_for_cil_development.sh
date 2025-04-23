@@ -17,7 +17,7 @@
 set -euxo pipefail
 numpy='1.24'
 python='3.10'
-name=cil
+name=cil_test_sh
 test_deps=0
 cil_ver=''
 pip_install_pkgs=()
@@ -68,6 +68,12 @@ conda_args=(create --name="$name"
   tqdm
   zenodo_get'>=1.6'
 )
+
+if [[ "$(uname)" == "Linux" ]]; then
+  conda_args+=(libgcc-ng
+  libstdcxx-ng)
+fi
+
 if test -n "$cil_ver"; then
   echo "CIL version $cil_ver"
   conda_args+=(cil="${cil_ver}")

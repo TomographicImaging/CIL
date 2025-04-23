@@ -48,6 +48,6 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-add_subdirectory(src/Core)
+add_subdirectory(src/cil)
 
 cmake_policy(POP)

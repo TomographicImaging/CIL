@@ -99,7 +99,8 @@ else
   )
 fi
 
-conda "${conda_args[@]}" 
+conda "${conda_args[@]}"
 if [[ -n "${pip_install_pkgs[@]}" ]]; then
-  python -m pip install "${pip_install_pkgs[@]}"
+  env_path=$(conda info --base)/envs/"$name"
+  "$env_path/bin/python" -m pip install "${pip_install_pkgs[@]}"
 fi

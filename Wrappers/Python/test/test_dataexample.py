@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils import initialise_tests
+from utils import initialise_tests, has_zenodo_get
 from cil.framework import ImageGeometry, AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
@@ -29,7 +29,8 @@ from unittest.mock import patch
 from zipfile import ZipFile
 from io import StringIO
 import uuid
-from zenodo_get import zenodo_get
+if has_zenodo_get:
+    from zenodo_get import zenodo_get
 
 initialise_tests()
 
@@ -169,6 +170,7 @@ class TestRemoteData(unittest.TestCase):
             
     @patch('cil.utilities.dataexample.input', return_value='y')
     @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)
+    @unittest.skipUnless(has_zenodo_get, "zenodo_get not installed")
     def test_download_data_input_y(self, mock_zenodo_get, input):
         '''
         Test the download_data function, when the user input is 'y' to 'are you sure you want to download data'

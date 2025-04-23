@@ -26,6 +26,7 @@
   - Dependencies
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
+      - zenodo_get is an optional dependency, instead of required (#2146)
 
 
 * 24.3.0

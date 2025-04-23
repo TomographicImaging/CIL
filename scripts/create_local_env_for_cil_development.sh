@@ -102,5 +102,10 @@ fi
 conda "${conda_args[@]}"
 if [[ -n "${pip_install_pkgs[@]}" ]]; then
   env_path=$(conda info --base)/envs/"$name"
-  "$env_path/bin/python" -m pip install "${pip_install_pkgs[@]}"
+  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+    python_exec="$env_path/python.exe"
+  else
+    python_exec="$env_path/bin/python"
+  fi
+  "$python_exec" -m pip install "${pip_install_pkgs[@]}"
 fi

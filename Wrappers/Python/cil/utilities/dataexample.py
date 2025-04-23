@@ -27,6 +27,10 @@ import sys
 from zipfile import ZipFile
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
+try:
+    from zenodo_get import zenodo_get
+except ImportError:
+    zenodo_get = None
 
 class DATA(object):
     @classmethod
@@ -69,11 +73,9 @@ class REMOTEDATA(DATA):
             if user_input.lower() not in ('y', 'yes'):
                 print('Download cancelled')
                 return False
-            try:
-                from zenodo_get import zenodo_get
-            except ImportError as exc:
-                msg = "zenodo_get (e.g. `conda install conda-forge::zenodo_get`)"
-                raise ImportError(f"Please install {msg}") from exc
+
+            if zenodo_get is None:
+                raise ImportError(f"Please install optional dependency zenodo_get to use dataexample.REMOTEDATA.download_data")
             
             zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
             with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:

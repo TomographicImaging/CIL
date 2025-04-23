@@ -25,7 +25,7 @@ import os, sys, shutil
 from testclass import CCPiTestClass
 import platform
 import numpy as np
-from unittest.mock import patch 
+from unittest.mock import patch
 from zipfile import ZipFile
 from io import StringIO
 import uuid
@@ -241,7 +241,4 @@ class TestRemoteData(unittest.TestCase):
         
         with self.assertRaises(ValueError):
             remote_data.download_data('.')
-
-    def test_a(self):
-        from cil.utilities.dataexample import WALNUT
             

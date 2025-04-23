@@ -6,6 +6,7 @@
       - Made ProjectionOperator `device` input case-insensitive (#1990)
       - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
       - Copy geometry in the creation of a DataContainer (#2108)
+      - Update install script to pip install unittest-parametrize into correct conda env (#2131)
   - Documentation
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)

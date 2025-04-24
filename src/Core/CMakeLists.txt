@@ -15,8 +15,6 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Richard Brown (UCL)
-
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
@@ -26,7 +24,6 @@ endif()
 message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
 find_package(OpenMP REQUIRED)
 add_definitions(${OpenMP_CXX_FLAGS})
-
 
 if (WIN32)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")

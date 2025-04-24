@@ -29,7 +29,7 @@ dependencies:
   - python-wget
   - scikit-image
   - packaging
-  - cmake >=3.20
+  - cmake >=3.16
   - setuptools <71
   - ipp-include=2021.12
   - ipp-devel=2021.12

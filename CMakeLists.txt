@@ -15,7 +15,11 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-cmake_minimum_required(VERSION 3.20)
+if(APPLE)
+  cmake_minimum_required(VERSION 3.16)
+else()
+  cmake_minimum_required(VERSION 3.5)
+endif()
 
 project(cil LANGUAGES CXX)
 

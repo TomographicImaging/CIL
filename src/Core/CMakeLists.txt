@@ -52,25 +52,21 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(IPP)
 
+list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp)
+list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND cilacc_LIBRARIES ${OpenMP_EXE_LINKER_FLAGS})
+
 if(IPP_FOUND)
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
-
-
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_LIBRARIES})
-  include_directories(cilacc PUBLIC ${IPP_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  list(APPEND cilacc_SOURCES FBP_filtering.cpp Binning.cpp)
+  list(APPEND cilacc_INCLUDES ${IPP_INCLUDE_DIRS})
+  list(APPEND cilacc_LIBRARIES ${IPP_LIBRARIES})
 else()
   message(WARNING "IPP libraries not found, FBP_filtering not in build")
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )
-
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS})
-  include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 endif()
+
+add_library(cilacc SHARED ${cilacc_SOURCES})
+target_link_libraries(cilacc ${cilacc_LIBRARIES})
+include_directories(cilacc PUBLIC ${cilacc_INCLUDES})
 
 ## Install
 #include(GNUInstallDirs)

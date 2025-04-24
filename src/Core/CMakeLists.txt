@@ -52,30 +52,10 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-if (UNIX)
-  find_library(IPP_CORE libippcore.so)
-  find_library(IPP_S libipps.so)
-  find_library(IPP_VM libippvm.so)
-  find_library(IPP_I libippi.so)
-elseif(WIN32)
-  find_library(IPP_CORE ippcore)
-  find_library(IPP_S ipps)
-  find_library(IPP_VM ippvm)
-  find_library(IPP_I ippi)
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(IPP)
 
-if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
-  set(USE_IPP TRUE)
-  message("IPP libraries found")
-  file(REAL_PATH ${IPP_CORE}/../.. LIB_BASE)
-  find_file(IPP_INCLUDE ipp.h ${LIB_BASE} PATH_SUFFIXES include include/ipp)
-  cmake_path(GET IPP_INCLUDE PARENT_PATH IPP_INCLUDE)
-else()
-  set(USE_IPP FALSE)
-  message("IPP libraries not found, FBP_filtering not in build")
-endif()
-
-if(USE_IPP)
+if(IPP_FOUND)
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
@@ -83,9 +63,10 @@ if(USE_IPP)
                             ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
 
 
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
-  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_LIBRARIES})
+  include_directories(cilacc PUBLIC ${IPP_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 else()
+  message(WARNING "IPP libraries not found, FBP_filtering not in build")
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )

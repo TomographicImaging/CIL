@@ -20,6 +20,7 @@ import math
 from functools import partial
 import time
 import numbers
+from warnings import warn 
 
 class Sampler():
     # TODO: Work out how to make the examples testable
@@ -28,12 +29,7 @@ class Sampler():
 
     Static methods to easily configure several samplers are provided, such as sequential, staggered, Herman-Mayer, random with and without replacement.
 
-
-
-
     Custom deterministic samplers can be created by using the `from_function` static method or by subclassing this sampler class.
-
-
 
     Parameters
     ----------
@@ -58,36 +54,47 @@ class Sampler():
     Example
     -------
     >>> sampler = Sampler.random_with_replacement(5)
-    >>> print(sampler.get_samples(20))
+    >>> print(sampler.view_samples(20))
     [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
     >>> print(next(sampler))
     3
     >>> print(sampler.next())
     4
+    >>> print(sampler.get_current_sample())
+    4
 
-
+    Example
+    --------
     >>> sampler = Sampler.staggered(num_indices=21, stride=4)
     >>> print(next(sampler))
     0
     >>> print(sampler.next())
     4
-    >>> print(sampler.get_samples(5))
+    >>> print(sampler.view_samples(5))
     [ 0  4  8 12 16]
+    >>> print(sampler.get_previous_samples())
+    [0 4]
 
     Example
     -------
     >>> sampler = Sampler.sequential(10)
-    >>> print(sampler.get_samples(5))
+    >>> print(sampler.get_previous_samples())
+    []
+    >>> print(sampler.view_samples(5))
+    [0 1 2 3 4]
     >>> print(next(sampler))
     0
-    [0 1 2 3 4]
     >>> print(sampler.next())
     1
+    >>> print(sampler.get_current_sample())
+    1
+    >>> print(sampler.get_previous_samples())
+    [0 1]
 
     Example
     -------
     >>> sampler = Sampler.herman_meyer(12)
-    >>> print(sampler.get_samples(16))
+    >>> print(sampler.view_samples(16))
     [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
 
 
@@ -102,7 +109,7 @@ class Sampler():
     >>>     return (iteration_number+1)%10
     >>>
     >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)
-    >>> print(list(sampler.get_samples(25)))
+    >>> print(list(sampler.view_samples(25)))
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
 
 
@@ -116,6 +123,7 @@ class Sampler():
     def __init__(self, num_indices, function,  sampling_type=None, prob_weights=None):
 
         self._type = sampling_type
+        
 
         if isinstance (num_indices, numbers.Integral):
             self._num_indices = num_indices
@@ -139,6 +147,7 @@ class Sampler():
 
         self._prob_weights = prob_weights
         self._iteration_number = 0
+        self._current_sample = None 
 
     @property
     def prob_weights(self):
@@ -150,6 +159,9 @@ class Sampler():
 
     @property
     def current_iter_number(self):
+        """
+        Returns the current iteration number of the sampler.
+        """
         return self._iteration_number
 
     def next(self):
@@ -157,17 +169,22 @@ class Sampler():
         Returns a sample from the list of indices `{0, 1, …, N-1}, where N is the number of indices and increments the sampler.
         """
 
-        out = self._function(self._iteration_number)
+        self._current_sample = self._function(self._iteration_number)
 
         self._iteration_number += 1
-        return out
+        return self._current_sample
 
     def __next__(self):
         return self.next()
+    
+    def get_samples(self, num_samples):
+        
+        warn("use 'view_samples' instead of 'get_samples'", DeprecationWarning, stacklevel=2)
+        return self.view_samples(num_samples)
 
-    def get_samples(self,  num_samples):
+    def view_samples(self,  num_samples):
         """
-        Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .
+        Generates a numpy array of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .
 
         Parameters
         ----------
@@ -176,18 +193,45 @@ class Sampler():
 
         Returns
         --------
-        List
+        Numpy Array
             The first `num_samples" output by the sampler.
         """
+        save_current_sample = self._current_sample
         save_last_index = self._iteration_number
         self._iteration_number = 0
-
+        self._current_sample = None 
         output = [self.next() for _ in range(num_samples)]
 
         self._iteration_number = save_last_index
+        self._current_sample = save_current_sample
 
         return np.array(output)
+    
+    def get_previous_samples(self):
+        """
+        Generates a numpy array of the samples outputted by the sampler since it was initialised. Calling this does not increment the sampler index or affect the behaviour of the sampler .
 
+        Returns
+        --------
+        Numpy Array
+            A list of the samples outputted by the sampler since it was initialised
+        """
+
+        return self.view_samples(self._iteration_number)
+    
+    def get_current_sample(self):
+        """
+        Returns the current sample of the sampler without incrementing the sampler index.
+
+        Returns
+        --------
+        int
+            The current sample of the sampler.
+        """
+        if self._current_sample is None:
+            raise ValueError('The sampler has not yet been incremented. ')
+        return self._current_sample
+    
     def __str__(self):
         repres = "Sampler that selects from a list of indices {0, 1, …, N-1}, where N is the number of indices. \n"
         repres += "Type : {} \n".format(self._type)
@@ -215,11 +259,13 @@ class Sampler():
         Example
         -------
         >>> sampler = Sampler.sequential(10)
-        >>> print(sampler.get_samples(5))
+        >>> print(sampler.view_samples(5))
+        [0 1 2 3 4]
         >>> print(next(sampler))
         0
-        [0 1 2 3 4]
         >>> print(sampler.next())
+        1
+        >>> print(sampler.get_current_sample())
         1
         """
         def function(x):
@@ -293,8 +339,11 @@ class Sampler():
         0
         >>> print(sampler.next())
         4
-        >>> print(sampler.get_samples(5))
+        >>> print(sampler.view_samples(5))
         [ 0  4  8 12 16]
+        >>> print(sampler.get_previous_samples())
+        [0 4]
+        
         Example
         -------
         >>> sampler = Sampler.staggered(num_indices=17, stride=8)
@@ -302,9 +351,12 @@ class Sampler():
         0
         >>> print(sampler.next())
         8
-        >>> print(sampler.get_samples(10))
+        >>> print(sampler.view_samples(10))
         [ 0  8  16 1 9 2 10 3 11 4]
-
+        >>> print(sampler.get_previous_samples())
+        [0 8]
+        >>> print(sampler.get_current_sample())
+        8
 
         """
 
@@ -341,16 +393,22 @@ class Sampler():
         Example
         -------
         >>> sampler = Sampler.random_with_replacement(5)
-        >>> print(sampler.get_samples(10))
+        >>> print(sampler.view_samples(10))
         [3 4 0 0 2 3 3 2 2 1]
         >>> print(next(sampler))
         3
         >>> print(sampler.next())
         4
-
+        >>> print(sampler.get_current_sample())
+        4
+        
+        Example
+        -------
         >>> sampler = Sampler.random_with_replacement(num_indices=4, prob=[0.7,0.1,0.1,0.1])
-        >>> print(sampler.get_samples(10))
+        >>> print(sampler.view_samples(10))
         [0 1 3 0 0 3 0 0 0 0]
+        >>> print(sampler.get_previous_samples())
+        []
         """
 
         sampler = SamplerRandom(
@@ -383,7 +441,7 @@ class Sampler():
         Example
         -------
         >>> sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)
-        >>> print(sampler.get_samples(16))
+        >>> print(sampler.view_samples(16))
         [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
 
         """
@@ -406,8 +464,8 @@ class Sampler():
         num_indices: int
             The sampler will select from a range of indices 0 to num_indices.
 
-    function : callable
-        A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -> int
+        function : callable
+            A deterministic function that takes an integer as an argument, representing the iteration number, and returns an integer between 0 and num_indices. The function signature should be function(iteration_number: int) -> int
 
         prob_weights: list of floats of length num_indices that sum to 1. Default is [1 / num_indices] * num_indices
             Consider that the sampler is incremented a large number of times this argument holds the expected number of times each index would be outputted,  normalised to 1.
@@ -428,7 +486,7 @@ class Sampler():
         >>>     return 2
         >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0, 0, 1])
-        >>> print(list(sampler.get_samples(12)))
+        >>> print(list(sampler.view_samples(12)))
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 
 
@@ -442,7 +500,7 @@ class Sampler():
         >>>     return (iteration_number+1)%10
         >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function)
-        >>> print(list(sampler.get_samples(25)))
+        >>> print(list(sampler.view_samples(25)))
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
 
 
@@ -458,7 +516,7 @@ class Sampler():
         >>>    return(custom_list[iteration_number%len(custom_list)])
         >>>
         >>> sampler = Sampler.from_function(num_indices=num_indices, function=my_sampling_function, prob_weights=[0.6, 0.1, 0.1, 0.1, 0.1, 0.0])
-        >>> print(list(sampler.get_samples(25)))
+        >>> print(list(sampler.view_samples(25)))
         [0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0, 0, 3, 2, 1, 4, 0, 0, 0, 0, 0]
         >>> print(sampler)
         Sampler that wraps a function that takes an iteration number and selects from a list of indices {0, 1, …, N-1}, where N is the number of indices.
@@ -577,7 +635,7 @@ class Sampler():
         Example
         -------
         >>> sampler=Sampler.herman_meyer(12)
-        >>> print(sampler.get_samples(16))
+        >>> print(sampler.view_samples(16))
         [ 0  6  3  9  1  7  4 10  2  8  5 11  0  6  3  9]
         """
 
@@ -650,13 +708,13 @@ class SamplerRandom(Sampler):
     Example
     -------
     >>> sampler = Sampler.random_with_replacement(5)
-    >>> print(sampler.get_samples(20))
+    >>> print(sampler.view_samples(20))
     [3 4 0 0 2 3 3 2 2 1 1 4 4 3 0 2 4 4 2 4]
 
     Example
     -------
     >>> sampler=Sampler.randomWithoutReplacement(num_indices=7, seed=1)
-    >>> print(sampler.get_samples(16))
+    >>> print(sampler.view_samples(16))
     [6 2 1 0 4 3 5 1 0 4 2 5 6 3 3 2]
 
     """
@@ -688,10 +746,15 @@ class SamplerRandom(Sampler):
         if location == 0:
             self._sampling_list = self._generator.choice(
                 self._num_indices, self._num_indices, p=self._prob_weights, replace=self._replace)
-        out = self._sampling_list[location]
-        return out
+        self._current_sample = self._sampling_list[location]
+        return self._current_sample
+    
+    def get_samples(self, num_samples):
+        
+        warn("use 'view_samples' instead of 'get_samples'", DeprecationWarning, stacklevel=2)
+        return self.view_samples(num_samples)
 
-    def get_samples(self,  num_samples):
+    def view_samples(self,  num_samples):
         """
         Generates a list of the first num_samples output by the sampler. Calling this does not increment the sampler index or affect the behaviour of the sampler .
 
@@ -705,6 +768,7 @@ class SamplerRandom(Sampler):
             The first `num_samples` produced by the sampler
         """
         save_last_index = self._iteration_number
+        save_current_value = self._current_sample
         self._iteration_number = 0
 
         save_generator = self._generator
@@ -714,7 +778,7 @@ class SamplerRandom(Sampler):
         output = [self.next() for _ in range(num_samples)]
 
         self._iteration_number = save_last_index
-
+        self._current_sample = save_current_value
         self._generator = save_generator
         self._sampling_list = save_sampling_list
 

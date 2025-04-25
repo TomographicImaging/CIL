@@ -29,8 +29,6 @@ from unittest.mock import patch
 from zipfile import ZipFile
 from io import StringIO
 import uuid
-if has_zenodo_get:
-    from zenodo_get import zenodo_get
 
 initialise_tests()
 
@@ -169,7 +167,7 @@ class TestRemoteData(unittest.TestCase):
 
             
     @patch('cil.utilities.dataexample.input', return_value='y')
-    @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)
+    @patch('zenodo_get.zenodo_get', side_effect=mock_zenodo_get)
     @unittest.skipUnless(has_zenodo_get, "zenodo_get not installed")
     def test_download_data_input_y(self, mock_zenodo_get, input):
         '''
@@ -198,7 +196,7 @@ class TestRemoteData(unittest.TestCase):
 
 
     @patch('cil.utilities.dataexample.input', return_value='n')
-    @patch('cil.utilities.dataexample.zenodo_get', side_effect=mock_zenodo_get)   
+    @patch('zenodo_get.zenodo_get', side_effect=mock_zenodo_get)
     def test_download_data_input_n(self, mock_zenodo_get, input):
         '''
         Test the download_data function, when the user input is 'n' to 'are you sure you want to download data'

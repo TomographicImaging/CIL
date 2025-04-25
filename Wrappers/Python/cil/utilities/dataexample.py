@@ -27,10 +27,6 @@ import sys
 from zipfile import ZipFile
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
-try:
-    from zenodo_get import zenodo_get
-except ImportError:
-    zenodo_get = None
 
 class DATA(object):
     @classmethod
@@ -73,8 +69,10 @@ class REMOTEDATA(DATA):
             if user_input.lower() not in ('y', 'yes'):
                 print('Download cancelled')
                 return False
-
-            if zenodo_get is None:
+            
+            try:
+                from zenodo_get import zenodo_get
+            except ImportError as ie:
                 raise ImportError(f"Please install optional dependency zenodo_get to use dataexample.REMOTEDATA.download_data")
             
             zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])

@@ -258,7 +258,6 @@ class ZEISSDataReader(object):
         '''
         Reads projections and return Acquisition (TXRM) or Image (TXM) Data container
         '''
-        # defer imports
         import dxchange
         # Load projections or slices from file
         slice_range = None

@@ -20,7 +20,7 @@
   - Dependencies
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
-      - olefile and dxchange are an optional dependency, instead of required (#2098)
+      - olefile and dxchange are an optional dependency, instead of required (#2149)
 
 
 * 24.3.0

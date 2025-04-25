@@ -159,12 +159,11 @@ class ZEISSDataReader(object):
             self._setup_image_geometry()
 
     def read_metadata(self):
-        # defer import
         import dxchange
+        import olefile
         # Read one image to get the metadata
         _,metadata = dxchange.read_txrm(self.file_name,((0,1),(None),(None)))
 
-        import olefile
         with olefile.OleFileIO(self.file_name) as ole:
             #Configure beam geometry
             xray_geometry = dxchange.reader._read_ole_value(ole, 'ImageInfo/XrayGeometry', '<i')

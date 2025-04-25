@@ -18,6 +18,7 @@
       - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
       - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) #2128 
       - PDHG 'check_convergence' updated for new literature (#2084)
+      - Make install local env script work on windows (#2144)
   - Testing
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)

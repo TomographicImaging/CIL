@@ -69,12 +69,8 @@ class REMOTEDATA(DATA):
             if user_input.lower() not in ('y', 'yes'):
                 print('Download cancelled')
                 return False
-            
-            try:
-                from zenodo_get import zenodo_get
-            except ImportError as ie:
-                raise ImportError(f"Please install optional dependency zenodo_get to use dataexample.REMOTEDATA.download_data")
-            
+
+            from zenodo_get import zenodo_get
             zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
             with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
                 zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))

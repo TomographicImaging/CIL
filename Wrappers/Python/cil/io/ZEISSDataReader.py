@@ -24,8 +24,6 @@ import numpy as np
 import os
 import logging
 
-dxchange_logger = logging.getLogger('dxchange')
-dxchange_logger.setLevel(logging.ERROR)
 
 
 class ZEISSDataReader(object):

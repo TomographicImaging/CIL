@@ -22,23 +22,30 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 from scipy.fft  import fft, ifft
 from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia, initialise_tests
+from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 
 import os, sys
-import matplotlib.testing.compare as compare
+
 from scipy.fft import fftfreq
 import tempfile
 
 initialise_tests()
 
 if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
+    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator_tigre
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
+
+if has_astra:
+    from cil.plugins.astra import ProjectionOperator as ProjectionOperator_astra
+    from cil.plugins.astra import FBP as FBP_astra
+
+if has_matplotlib:
+    import matplotlib.testing.compare as compare
 
 
 class Test_Reconstructor(unittest.TestCase):
@@ -298,7 +305,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_ipp and has_matplotlib, "TIGRE, IPP or matplotlib not installed")
     def test_plot_filter(self):
         """
         Tests that the filters are plotted correctly for two different 
@@ -651,20 +658,8 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
         self.ig = self.img_data.geometry
         self.ag = self.acq_data.geometry
 
-    def test_results_3D_tigre(self):
+    def test_results_3D(self):
         reconstructor = FBP(self.acq_data)
-
-        reco = reconstructor.run(verbose=0)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
-
-        reco2 = reco.copy()
-        reco2.fill(0)
-        reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
-
-    def test_results_3D_astra(self):
-        self.acq_data.reorder('astra')
-        reconstructor = FBP(self.acq_data, backend='astra')
 
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
@@ -704,25 +699,11 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
         reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
 
-    def test_results_2D_tigre(self):
+    def test_results_2D(self):
         data2D = self.acq_data.get_slice(vertical='centre')
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FBP(data2D)
-        reco = reconstructor.run(verbose=0)
-        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
-
-        reco2 = reco.copy()
-        reco2.fill(0)
-        reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
-
-    def test_results_2D_astra(self):
-        data2D = self.acq_data.get_slice(vertical='centre')
-        data2D.reorder('astra')
-        img_data2D = self.img_data.get_slice(vertical='centre')
-
-        reconstructor = FBP(data2D, backend='astra')
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
 
@@ -759,3 +740,94 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
 
         diff = (data_filtered - self.acq_data).abs().mean()
         self.assertGreater(diff,0.8)
+
+
+@unittest.skipUnless(has_astra and has_nvidia and has_ipp, "ASTRA or IPP not installed")
+class Test_FBP_astra_ipp(unittest.TestCase):
+    def setUp(self):
+        self.acq_data = SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.img_data = SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+        self.acq_data.reorder('astra')
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+    def test_results_3D(self):
+        reconstructor = FBP(self.acq_data, backend='astra')
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_3D_split(self):
+
+        reconstructor = FBP(self.acq_data, backend='astra')
+        reconstructor.set_split_processing(8)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_3D_split_reverse(self):
+        acq_data = self.acq_data.copy()
+        acq_data.geometry.config.panel.origin = 'top-left'
+
+        reconstructor = FBP(acq_data, backend='astra')
+        reconstructor.set_split_processing(8)
+
+        expected_image = np.flip(self.img_data.as_array(),0)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), expected_image,atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_2D(self):
+        data2D = self.acq_data.get_slice(vertical='centre')
+        data2D.reorder('astra')
+        img_data2D = self.img_data.get_slice(vertical='centre')
+
+        reconstructor = FBP(data2D, backend='astra')
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_with_astra(self):
+        fbp_astra = FBP_astra(self.ig, self.ag)
+        reco_astra = fbp_astra(self.acq_data)
+
+        reconstructor_cil = FBP(self.acq_data, backend='astra')
+        reco_cil = reconstructor_cil.run(verbose=0)
+
+        np.testing.assert_allclose(reco_cil.as_array(), reco_astra.as_array(),atol=1e-4)
+
+    def test_results_inplace_filtering(self):
+        reconstructor = FBP(self.acq_data, backend='astra')
+        reco = reconstructor.run(verbose=0)
+
+        data_filtered= self.acq_data.copy()
+        reconstructor_inplace = FBP(data_filtered, backend='astra')
+        reconstructor_inplace.set_filter_inplace(True)
+        reconstructor_inplace.run(out=reco, verbose=0)
+
+        diff = (data_filtered - self.acq_data).abs().mean()
+        self.assertGreater(diff,0.8)
+

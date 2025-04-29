@@ -18,16 +18,16 @@
 # Kyle Pidgeon (UKRI-STFC)
 
 
-#%%
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
+
 from cil.framework import AcquisitionGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 from cil.framework.labels import AcquisitionType
 import numpy as np
 import warnings
 
 import os
-import matplotlib.lines as mlines
-import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from itertools import cycle

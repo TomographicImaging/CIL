@@ -20,6 +20,8 @@ python='3.10'
 name=cil
 test_deps=0
 cil_ver=''
+pip_install_pkgs=()
+
 while getopts hn:p:e:tv: option ; do
   case "${option}" in
   n) numpy="${OPTARG}" ;;
@@ -52,8 +54,6 @@ conda_args=(create --name="$name"
   ipp'>=2021.10'
   ipp-devel'>=2021.10'
   ipp-include'>=2021.10'
-  libgcc-ng
-  libstdcxx-ng
   matplotlib-base
   numba
   olefile'>=0.46'
@@ -66,6 +66,11 @@ conda_args=(create --name="$name"
   tqdm
   zenodo_get'>=1.6'
 )
+
+if test "$(uname)" = Linux; then
+  conda_args+=(libgcc-ng libstdcxx-ng)
+fi
+
 if test -n "$cil_ver"; then
   echo "CIL version $cil_ver"
   conda_args+=(cil="${cil_ver}")
@@ -92,6 +97,18 @@ else
     -c ccpi
     --override-channels
   )
+  pip_install_pkgs+=(
+    unittest-parametrize
+  )
 fi
 
 conda "${conda_args[@]}"
+if [[ -n "${pip_install_pkgs[@]}" ]]; then
+  env_path=$(conda info --base)/envs/"$name"
+  if [[ "$OSTYPE" =~ msys|win32|cygwin ]]; then
+    python_exec="$env_path/python.exe"
+  else
+    python_exec="$env_path/bin/python"
+  fi
+  "$python_exec" -m pip install "${pip_install_pkgs[@]}"
+fi

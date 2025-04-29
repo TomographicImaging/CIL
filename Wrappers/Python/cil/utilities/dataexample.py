@@ -27,7 +27,6 @@ import sys
 from zipfile import ZipFile
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
-from zenodo_get import zenodo_get
 
 class DATA(object):
     @classmethod
@@ -71,6 +70,7 @@ class REMOTEDATA(DATA):
                 print('Download cancelled')
                 return False
 
+            from zenodo_get import zenodo_get
             zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
             with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
                 zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))

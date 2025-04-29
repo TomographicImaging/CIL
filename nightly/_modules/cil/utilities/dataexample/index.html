@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.dataexample &#8212; CIL 24.3.1.dev28+g26f9556e documentation</title>
+    <title>cil.utilities.dataexample &#8212; CIL 24.3.1.dev30+ga5def19d documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../_static/documentation_options.js?v=5aad01d0"></script>
+    <script src="../../../../_static/documentation_options.js?v=93d0c8d9"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev28+g26f9556e';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev30+ga5def19d';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev28+g26f9556e" />
+  <meta name="docsearch:version" content="24.3.1.dev30+ga5def19d" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -498,7 +498,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">zipfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZipFile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">loadmat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEXUSDataReader</span><span class="p">,</span> <span class="n">NikonDataReader</span><span class="p">,</span> <span class="n">ZEISSDataReader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">zenodo_get</span><span class="w"> </span><span class="kn">import</span> <span class="n">zenodo_get</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">DATA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
@@ -542,6 +541,7 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Download cancelled&#39;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
+            <span class="kn">from</span><span class="w"> </span><span class="nn">zenodo_get</span><span class="w"> </span><span class="kn">import</span> <span class="n">zenodo_get</span>
             <span class="n">zenodo_get</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="n">ZENODO_RECORD</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">])</span>
             <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
                 <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">))</span>

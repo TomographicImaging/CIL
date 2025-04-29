@@ -28,6 +28,12 @@
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
       - zenodo_get is an optional dependency, instead of required (#2146)
+   
+  - Removed the following code which has been deprecated since v23.0.0 or earlier:
+      - `dimension_labels` kwarg in `AcquisitionGeometry.allocate()` and in `ImageData`'s `__init__`
+      - `axpby` (alias of `sapyb`)
+      - `shape` setter in `DataContainer` and `ImageGeometry`
+      - use of integer compression in `NEXUSDataWriter`
 
 
 * 24.3.0

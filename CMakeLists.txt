@@ -23,6 +23,9 @@ endif()
 
 project(cil LANGUAGES CXX)
 
+cmake_policy(PUSH)
+
+cmake_policy(SET CMP0074 NEW)
 if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
 endif()
@@ -44,3 +47,5 @@ endif()
 
 add_subdirectory(src/Core)
 add_subdirectory(Wrappers/Python)
+
+cmake_policy(POP)

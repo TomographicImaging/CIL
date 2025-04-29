@@ -98,7 +98,6 @@ class NEXUSDataWriter(object):
             raise Exception('h5py is not available, cannot write NEXUS files.')
 
     def write(self):
-
         '''
         write dataset to disk
         '''

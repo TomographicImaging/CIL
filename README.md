@@ -164,7 +164,7 @@ If not installing to a conda environment then the user will also need to set the
 By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
 
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable> -DIPP_ROOT=<path_to_ipp>
 ```
 
 The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.

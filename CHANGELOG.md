@@ -6,7 +6,7 @@
       - Made ProjectionOperator `device` input case-insensitive (#1990)
       - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
       - Copy geometry in the creation of a DataContainer (#2108)
-  - Documentation
+  - Documentation:
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)
       - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
@@ -19,15 +19,18 @@
       - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) #2128 
       - PDHG 'check_convergence' updated for new literature (#2084)
       - Make install local env script work on windows (#2144)
-  - Testing
+  - Testing:
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
       - Added tests for Normaliser processor
       - Update minimum cmake version to 3.5
-  - Dependencies
+  - Dependencies:
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
       - zenodo_get is an optional dependency, instead of required (#2146)
+      - `FindIPP.cmake` fallback (#2148)
+        - enable `find_package` using `*_ROOT` hints
+        - simplified `cilacc` build logic for optional dependencies
 
 
 * 24.3.0

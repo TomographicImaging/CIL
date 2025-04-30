@@ -5,7 +5,9 @@
       - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
       - Made ProjectionOperator `device` input case-insensitive (#1990)
       - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
-  - Documentation
+      - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
+      - Copy geometry in the creation of a DataContainer (#2108)
+  - Documentation:
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)
       - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
@@ -15,14 +17,21 @@
       - Added option for a random seed in the power method in the linear operator (#1585)
       - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
       - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
-  - Testing
+      - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) #2128 
+      - PDHG 'check_convergence' updated for new literature (#2084)
+      - Make install local env script work on windows (#2144)
+  - Testing:
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
       - Added tests for Normaliser processor
       - Update minimum cmake version to 3.5
-  - Dependencies
+  - Dependencies:
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
+      - zenodo_get is an optional dependency, instead of required (#2146)
+      - `FindIPP.cmake` fallback (#2148)
+        - enable `find_package` using `*_ROOT` hints
+        - simplified `cilacc` build logic for optional dependencies
 
 
 * 24.3.0

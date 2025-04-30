@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.PD3O &#8212; CIL 24.3.1.dev31+g967f0947 documentation</title>
+    <title>cil.optimisation.algorithms.PD3O &#8212; CIL 24.3.1.dev32+g3230c759 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../../_static/documentation_options.js?v=470fe2d0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a729829f"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev31+g967f0947';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev32+g3230c759';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev31+g967f0947" />
+  <meta name="docsearch:version" content="24.3.1.dev32+g3230c759" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -489,9 +489,74 @@
 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZeroFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZeroFunction</span><span class="p">,</span> <span class="n">ScaledFunction</span><span class="p">,</span> <span class="n">SGFunction</span><span class="p">,</span> <span class="n">SVRGFunction</span><span class="p">,</span> <span class="n">LSVRGFunction</span><span class="p">,</span> <span class="n">SAGAFunction</span><span class="p">,</span> <span class="n">SAGFunction</span><span class="p">,</span> <span class="n">ApproximateGradientSumFunction</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionWrappingForPD3O</span><span class="p">():</span>  
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An internal class that wraps the functions, :math:`f`, in PD3O to allow :math:`f` to be an `ApproximateGradientSumFunction`. </span>
+<span class="sd">    </span>
+<span class="sd">    Note that currently :math:`f`  can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but this is not set up to work for a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : function </span>
+<span class="sd">        The function :math:`f` to use in PD3O</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">ScaledFunction</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">scalar</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">function</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">SVRGFunction</span><span class="p">,</span> <span class="n">LSVRGFunction</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svrg_gradient</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">approximate_sum_function_gradient</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">svrg_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">+=</span> <span class="mi">1</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">data_passes_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">num_indices</span><span class="p">:</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_update_full_gradient_and_return</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
+            <span class="k">else</span><span class="p">:</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">approximate_gradient</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">function_num</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_data_passes_indices</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>   
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">=</span> <span class="mi">0</span>  
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
+        <span class="k">return</span> <span class="n">out</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">approximate_sum_function_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">+=</span> <span class="mi">1</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">approximate_gradient</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">function_num</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gradient_call_index</span> <span class="o">=</span> <span class="mi">0</span>  
+             
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span>
+        <span class="k">return</span> <span class="n">out</span>
+    
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>  
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>  <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">L</span>
+    
+    
 <div class="viewcode-block" id="PD3O">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PD3O">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PD3O</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
@@ -518,6 +583,13 @@
 <span class="sd">        initial : DataContainer, optional default is a container of zeros, in the domain of the operator </span>
 <span class="sd">            Initial point for the  algorithm.             </span>
 
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        Note that currently :math:`f` in PD3O can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction`.</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        -----</span>
+<span class="sd">        We have not implemented or tested when  :math:`f` is a stochastic function (`ApproximateGradientSumFunction`) wrapped as a `SumFunction` or `TranslatedFunction`.  </span>
 
 <span class="sd">        Reference</span>
 <span class="sd">        ---------</span>
@@ -539,12 +611,12 @@
         
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="c1"># smooth function</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">ZeroFunction</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot; If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma &quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ZeroFunction</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot; If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma &quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">gamma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">gamma</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>                      
         
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">FunctionWrappingForPD3O</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span> <span class="c1"># proximable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">h</span> <span class="c1"># composite</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>

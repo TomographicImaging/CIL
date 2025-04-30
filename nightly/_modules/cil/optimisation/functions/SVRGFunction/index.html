@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.SVRGFunction &#8212; CIL 24.3.1.dev31+g967f0947 documentation</title>
+    <title>cil.optimisation.functions.SVRGFunction &#8212; CIL 24.3.1.dev32+g3230c759 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../../_static/documentation_options.js?v=470fe2d0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a729829f"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev31+g967f0947';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev32+g3230c759';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev31+g967f0947" />
+  <meta name="docsearch:version" content="24.3.1.dev32+g3230c759" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -533,7 +533,7 @@
 <span class="sd">    snapshot_update_interval : positive int or None, optional</span>
 <span class="sd">        The interval for updating the full gradient (taking a snapshot). The default is 2*len(functions) so a &quot;snapshot&quot; is taken every 2*len(functions) iterations. If the user passes `0` then no full gradient snapshots will be taken. </span>
 <span class="sd">    store_gradients : bool, default: `False`</span>
-<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
+<span class="sd">        Flag indicating whether to store and update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -635,11 +635,11 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_full_gradient_and_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Takes a &quot;snapshot&quot; at the point :math:`x`, saving both the point :math:` \tilde{x}=x` and its gradient :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is computed and stored at the &quot;snapshot&quot;..</span>
+<span class="sd">        Takes a &quot;snapshot&quot; at the point :math:`x`, saving both the point :math:`\tilde{x}=x` and its gradient :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is computed and stored at the &quot;snapshot&quot;..</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        Takes a &quot;snapshot&quot; at the point :math:`x`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is stored, otherwise only  the sum of the gradients and the snapshot point :math:` \tilde{x}=x` are stored.</span>
+<span class="sd">        Takes a &quot;snapshot&quot; at the point :math:`x`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is stored, otherwise only  the sum of the gradients and the snapshot point :math:`\tilde{x}=x` are stored.</span>
 <span class="sd">        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.</span>
 
 <span class="sd">        Returns</span>
@@ -706,12 +706,15 @@
 <span class="sd">    snapshot_update_probability: positive float, default: 1/n</span>
 <span class="sd">        The probability of updating the full gradient (taking a snapshot) at each iteration. The default is :math:`1./n` so, in expectation, a snapshot will be taken every :math:`n` iterations. </span>
 <span class="sd">    store_gradients : bool, default: `False`</span>
-<span class="sd">        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
+<span class="sd">        Flag indicating whether to store and update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and it&#39;s gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.</span>
+<span class="sd">    seed: int</span>
+<span class="sd">        Seed for calculating the random update snapshot intervals (generated using numpy.random).</span>
 
 <span class="sd">        </span>
 <span class="sd">    Reference</span>
 <span class="sd">    ---------</span>
 <span class="sd">    Kovalev, D., Horváth, S. &amp;; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.</span>
+
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>

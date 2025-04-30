@@ -2,7 +2,6 @@ from cil.optimisation.algorithms import SPDHG, PDHG, GD, PD3O
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule
-
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData
 
 from cil.utilities import dataexample

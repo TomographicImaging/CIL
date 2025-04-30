@@ -112,7 +112,11 @@ class PD3O(Algorithm):
 
         Note
         -----
-        Note that currently :math:`f` in PD3O can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but we have not implemented or tested when it is a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. 
+        Note that currently :math:`f` in PD3O can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction`.
+        
+        Note
+        -----
+        We have not implemented or tested when  :math:`f` is a stochastic function (`ApproximateGradientSumFunction`) wrapped as a `SumFunction` or `TranslatedFunction`.  
 
         Reference
         ---------
@@ -131,8 +135,6 @@ class PD3O(Algorithm):
     def set_up(self, f, g, h, operator, delta=None, gamma=None, initial=None,**kwargs):
         
         logging.info("{} setting up".format(self.__class__.__name__, ))
-        
-        
         
         if isinstance(f, ZeroFunction):
             warnings.warn(" If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
@@ -195,11 +197,7 @@ class PD3O(Algorithm):
         self.g.proximal(self.x_old, self.gamma, out = self.x)
     
         # update step        
-        
-        
-        self.f.gradient(self.x, out=self.x_old)    
-            
-                    
+        self.f.gradient(self.x, out=self.x_old)                    
         self.x_old *= self.gamma
         self.grad_f += self.x_old
         self.x.sapyb(2, self.grad_f, -1.0,  out=self.x_old) # 2*x - x_old + gamma*(grad_f_x_old) - gamma*(grad_f_x)

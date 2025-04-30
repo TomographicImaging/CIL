@@ -32,9 +32,11 @@ import numpy
 class ScalarMomentumCoefficient(ABC):
     '''Abstract base class for MomentumCoefficient objects. The `__call__` method of this class returns the momentum coefficient for the given iteration.
     
-    The idea of the ScalarMomentumCoefficient is to return a scalar value that can be used in the update of the algorithm. For example, in the APGD algorithm, the momentum coefficient is used to update the solution as follows: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). The momentum coefficient M is returned by the ScalarMomentumCoefficient object.
+    The call method of the ScalarMomentumCoefficient returns a scalar gradient value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
     
-    Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state. 
+    The `apply_momentum_in_APGD" function,  is  used to update the solution in the APGD algorithm as follows: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). The momentum coefficient M is returned by the ScalarMomentumCoefficient object.
+    
+     
     '''
     def __init__(self):
         '''Initialises the momentum coefficient object.
@@ -52,6 +54,21 @@ class ScalarMomentumCoefficient(ABC):
         '''
         
         pass
+    
+    def apply_momentum_in_APGD(self, algorithm, out=None):
+        '''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate .
+        
+        Parameters
+        ----------
+        algorithm: instantiated CIL Algorithm
+            The algorithm object.
+        out: DataContainer, default is None
+            Object to contain the next iterate. 
+        '''
+        momentum = self.__call__(algorithm)
+        return algorithm.y.sapyb(momentum, algorithm.x, 1.0, out=out)
+
+        
     
 class ConstantMomentum(ScalarMomentumCoefficient):
     
@@ -119,8 +136,8 @@ class APGD(Algorithm):
                 The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
     preconditioner: class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. 
-    momentum : float or child class of :meth:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`, default = None
-            Momentum coefficient.  The default momentum coefficient is the Nesterov momentum coefficient. 
+    momentum : float or child class of :meth:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`, default is Nesterov Momentum. 
+            Class with an internal function `apply_momentum_in_APGD` that takes in an initiated algorithm and returns the next iterate.  
     
 
     kwargs: Keyword arguments
@@ -229,11 +246,8 @@ class APGD(Algorithm):
 
         self.x.subtract(self.x_old, out=self.y)
         
-        if isinstance(self.momentum, ScalarMomentumCoefficient):
-            momentum = self.momentum(self)
-            self.y.sapyb(momentum, self.x, 1.0, out=self.y)
-        else:
-            raise TypeError("Momentum must be a child class of ScalarMomentumCoefficient. No other options are currently implemented.") 
+        self.momentum.apply_momentum_in_APGD(self, out=self.y)
+         
         
     def _update_previous_solution(self):
         """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.

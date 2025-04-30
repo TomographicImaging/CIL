@@ -4,6 +4,7 @@
       - Removed the deprecated usage of run method in test_SIRF.py (#2070)
       - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
       - Made ProjectionOperator `device` input case-insensitive (#1990)
+      - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
   - Documentation
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)

@@ -125,6 +125,7 @@ Current options for are based on the scalar momentum, with base class:
    :members:
 
 Implemented examples are: 
+
 .. autoclass:: cil.optimisation.algorithms.APGD.ConstantMomentum
    :members:
 

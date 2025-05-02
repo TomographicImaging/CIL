@@ -33,7 +33,7 @@ class ScalarMomentumCoefficient(ABC):
 
     The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
-    The `apply_momentum_in_APGD" function,  is  used to update the solution in the APGD algorithm as follows: :math:`x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k})`, where M is the calculated scalar momentum value. 
+    The `apply_momentum_in_APGD" function,  updates the solution in the APGD algorithm as :math:`x_{k+1}=y_{k+1}+M(y_{k+1}-y_{k})`, where :math:`M` is the calculated scalar momentum value. 
 
 
     '''
@@ -56,7 +56,9 @@ class ScalarMomentumCoefficient(ABC):
         pass
 
     def apply_momentum_in_APGD(self, algorithm, out=None):
-        '''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate .
+        '''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate.
+        
+        Uses the calculation, :math:`x_{k+1}=y_{k+1}+M(y_{k+1}-y_{k})`, where :math:`M` is the calculated scalar momentum value. 
 
         Parameters
         ----------
@@ -89,7 +91,7 @@ class ConstantMomentum(ScalarMomentumCoefficient):
 class NesterovMomentum(ScalarMomentumCoefficient):
     '''MomentumCoefficient object that returns the Nesterov momentum coefficient.
 
-    Starting with t=1, the Nesterov momentum coefficient is updated as follows: :math:`t_{k+1} = \frac{1/2}(1 + \sqrt{(1 + 4t_{k}^2)})`. The momentum coefficient is then returned as :math:`\frac{t_{k}-1}{t_{k}}`.
+    Starting with t=1, the Nesterov algorithm updates with each iteration :math:`t_{k+1}=\dfrac{1}{2}(1+\sqrt{(1+4t_{k}^2))`. The momentum coefficient is then returned as :math:`\dfrac{t_{k}-1}{t_{k}}`.
 
     '''
 
@@ -116,7 +118,7 @@ class APGD(Algorithm):
 
     where :math:`\alpha` is the :code:`step_size`.
 
-    The next iterate is then calculated from :math:`y_{k+1}`. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
+    The next iterate, :math:`x_{k+1}`, is then calculated from :math:`y_{k+1}`. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
     
 
     Currently, we have implemented options for a scalar momentum coefficient (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.). In this case, the momentum term is added as follows:
@@ -224,13 +226,11 @@ class APGD(Algorithm):
         r"""Performs a single iteration of APGD. For :math:`k\geq 1`:
 
         .. math::
-
-            \begin{cases}
+        
                 y_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                x_{k+1} = \mathrm{momentum.apply\_momentum\_in\_APGD}\left(y_{k+1}, \mathrm{anything else stored in the algorithm}\right)
-            \end{cases}
+            
 
-        where :math:`\alpha` is the step size.
+        where :math:`\alpha` is the step size. From :math:`y_{k+1}` (and any other information available in the algorithm class) the momentum function then calculates :math:`x_{k+1}`. 
         """
 
         self.f.gradient(self.y, out=self.gradient_update)

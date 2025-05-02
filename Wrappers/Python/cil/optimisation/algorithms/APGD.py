@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 
 class ScalarMomentumCoefficient(ABC):
-    '''Abstract base class for MomentumCoefficient objects. The `__call__` method of this class returns the momentum coefficient for the given iteration.
+    r'''Abstract base class for MomentumCoefficient objects. The `__call__` method of this class returns the momentum coefficient for the given iteration.
 
     The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
@@ -39,13 +39,13 @@ class ScalarMomentumCoefficient(ABC):
     '''
 
     def __init__(self):
-        '''Initialises the momentum coefficient object.
+        r'''Initialises the momentum coefficient object.
         '''
         pass
 
     @abstractmethod
     def __call__(self, algorithm):
-        '''Returns the momentum coefficient for the given iteration.
+        r'''Returns the momentum coefficient for the given iteration.
 
         Parameters
         ----------
@@ -56,7 +56,7 @@ class ScalarMomentumCoefficient(ABC):
         pass
 
     def apply_momentum_in_APGD(self, algorithm, out=None):
-        '''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate.
+        r'''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate.
         
         Uses the calculation, :math:`x_{k+1}=y_{k+1}+M(y_{k+1}-y_{k})`, where :math:`M` is the calculated scalar momentum value. 
 
@@ -91,7 +91,7 @@ class ConstantMomentum(ScalarMomentumCoefficient):
 class NesterovMomentum(ScalarMomentumCoefficient):
     '''MomentumCoefficient object that returns the Nesterov momentum coefficient.
 
-    Starting with t=1, the Nesterov algorithm updates with each iteration :math:`t_{k+1}=\dfrac{1}{2}(1+\sqrt{(1+4t_{k}^2))`. The momentum coefficient is then returned as :math:`\dfrac{t_{k}-1}{t_{k}}`.
+    Starting with :math:`t=1`, the Nesterov algorithm updates with each iteration :math:`t_{k+1}=\dfrac{1}{2}\right(1+\sqrt{1+4t_{k}^2}\left)`. The momentum coefficient is then returned as :math:`\dfrac{t_{k}-1}{t_{k}}`.
 
     '''
 

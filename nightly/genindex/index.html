@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; CIL 24.3.1.dev32+g3230c759 documentation</title>
+    <title>Index &#8212; CIL 24.3.1.dev33+ge8874967 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../_static/documentation_options.js?v=a729829f"></script>
+    <script src="../_static/documentation_options.js?v=3ade84f7"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev32+g3230c759';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev33+ge8874967';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev32+g3230c759" />
+  <meta name="docsearch:version" content="24.3.1.dev33+ge8874967" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -593,10 +593,10 @@
         <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.adjoint">(cil.optimisation.operators.ZeroOperator method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm">Algorithm (class in cil.optimisation.algorithms)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="../framework/#cil.framework.AcquisitionGeometry.allocate">allocate() (cil.framework.AcquisitionGeometry method)</a>
 
       <ul>
@@ -609,6 +609,8 @@
 </li>
       <li><a href="../framework/#cil.framework.labels.AngleUnit">AngleUnit (class in cil.framework.labels)</a>
 </li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD">APGD (class in cil.optimisation.algorithms)</a>
+</li>
       <li><a href="../optimisation/#cil.optimisation.utilities.preconditioner.AdaptiveSensitivity.apply">apply() (cil.optimisation.utilities.preconditioner.AdaptiveSensitivity method)</a>
 
       <ul>
@@ -618,6 +620,8 @@
 </li>
       </ul></li>
       <li><a href="../framework/#cil.framework.ImageData.apply_circular_mask">apply_circular_mask() (cil.framework.ImageData method)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient.apply_momentum_in_APGD">apply_momentum_in_APGD() (cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient method)</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.approximate_gradient">approximate_gradient() (cil.optimisation.functions.ApproximateGradientSumFunction method)</a>
 
@@ -697,9 +701,11 @@
         <li><a href="../optimisation/#cil.optimisation.operators.ZeroOperator.calculate_norm">(cil.optimisation.operators.ZeroOperator method)</a>
 </li>
       </ul></li>
-      <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.calculate_objective_function_at_point">calculate_objective_function_at_point() (cil.optimisation.algorithms.FISTA method)</a>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.calculate_objective_function_at_point">calculate_objective_function_at_point() (cil.optimisation.algorithms.APGD method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.calculate_objective_function_at_point">(cil.optimisation.algorithms.FISTA method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.GD.calculate_objective_function_at_point">(cil.optimisation.algorithms.GD method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.ISTA.calculate_objective_function_at_point">(cil.optimisation.algorithms.ISTA method)</a>
@@ -821,6 +827,8 @@
       <li><a href="../processors/#cil.processors.Padder.constant">constant() (cil.processors.Padder static method)</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.functions.ConstantFunction">ConstantFunction (class in cil.optimisation.functions)</a>
+</li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.ConstantMomentum">ConstantMomentum (class in cil.optimisation.algorithms.APGD)</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.utilities.StepSizeMethods.ConstantStepSize">ConstantStepSize (class in cil.optimisation.utilities.StepSizeMethods)</a>
 </li>
@@ -1211,6 +1219,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_loss">get_last_loss() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.get_last_loss">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_last_loss">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.get_last_loss">(cil.optimisation.algorithms.FISTA method)</a>
@@ -1233,6 +1243,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_last_objective">get_last_objective() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.get_last_objective">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_last_objective">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.get_last_objective">(cil.optimisation.algorithms.FISTA method)</a>
@@ -1262,6 +1274,8 @@
         <li><a href="../framework/#cil.framework.Processor.get_output">(cil.framework.Processor method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.get_output">(cil.optimisation.algorithms.Algorithm method)</a>
+</li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.get_output">(cil.optimisation.algorithms.APGD method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.get_output">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
@@ -1465,6 +1479,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.is_provably_convergent">is_provably_convergent() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.is_provably_convergent">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.is_provably_convergent">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.is_provably_convergent">(cil.optimisation.algorithms.FISTA method)</a>
@@ -1493,6 +1509,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.iterations">iterations (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.iterations">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.iterations">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.iterations">(cil.optimisation.algorithms.FISTA property)</a>
@@ -1643,6 +1661,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.loss">loss (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.loss">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.loss">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.loss">(cil.optimisation.algorithms.FISTA property)</a>
@@ -1693,6 +1713,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration">max_iteration (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.max_iteration">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.max_iteration">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.max_iteration">(cil.optimisation.algorithms.FISTA property)</a>
@@ -1715,6 +1737,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.max_iteration_stop_criterion">max_iteration_stop_criterion() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.max_iteration_stop_criterion">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.max_iteration_stop_criterion">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.max_iteration_stop_criterion">(cil.optimisation.algorithms.FISTA method)</a>
@@ -1801,6 +1825,8 @@
         <li><a href="../framework/#cil.framework.VectorData.ndim">(cil.framework.VectorData property)</a>
 </li>
       </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.NesterovMomentum">NesterovMomentum (class in cil.optimisation.algorithms.APGD)</a>
+</li>
       <li><a href="../framework/#cil.framework.BlockDataContainer.next">next() (cil.framework.BlockDataContainer method)</a>, <a href="../optimisation/#cil.framework.BlockDataContainer.next">[1]</a>
 </li>
       <li><a href="../io/#cil.io.NEXUSDataReader">NEXUSDataReader (class in cil.io)</a>
@@ -1850,6 +1876,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.objective">objective (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.objective">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.objective">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.objective">(cil.optimisation.algorithms.FISTA property)</a>
@@ -1872,6 +1900,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.objective_to_dict">objective_to_dict() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.objective_to_dict">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.objective_to_dict">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.objective_to_dict">(cil.optimisation.algorithms.FISTA method)</a>
@@ -1896,6 +1926,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.objective_to_string">objective_to_string() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.objective_to_string">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.objective_to_string">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.objective_to_string">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2184,6 +2216,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.run">run() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.run">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.run">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.run">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2245,6 +2279,8 @@
         <li><a href="../utilities/#cil.utilities.display.show_geometry.save">(cil.utilities.display.show_geometry method)</a>
 </li>
       </ul></li>
+      <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient">ScalarMomentumCoefficient (class in cil.optimisation.algorithms.APGD)</a>
+</li>
       <li><a href="../optimisation/#cil.optimisation.functions.ScaledFunction">ScaledFunction (class in cil.optimisation.functions)</a>
 </li>
       <li><a href="../optimisation/#cil.optimisation.operators.ScaledOperator">ScaledOperator (class in cil.optimisation.operators)</a>
@@ -2372,6 +2408,8 @@
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.set_up">(cil.optimisation.algorithms.Algorithm method)</a>
 </li>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.set_up">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.set_up">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.set_up">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2408,6 +2446,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.should_stop">should_stop() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.should_stop">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.should_stop">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.should_stop">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2462,6 +2502,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.solution">solution (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.solution">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.solution">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.solution">(cil.optimisation.algorithms.FISTA property)</a>
@@ -2572,6 +2614,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.update">update() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.update">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.update">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.update">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2594,6 +2638,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.update_objective">update_objective() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.update_objective">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.update_objective">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.update_objective">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2618,6 +2664,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.update_objective_interval">update_objective_interval (cil.optimisation.algorithms.Algorithm property)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.update_objective_interval">(cil.optimisation.algorithms.APGD property)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.update_objective_interval">(cil.optimisation.algorithms.CGLS property)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.update_objective_interval">(cil.optimisation.algorithms.FISTA property)</a>
@@ -2656,6 +2704,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_header">verbose_header() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.verbose_header">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.verbose_header">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.verbose_header">(cil.optimisation.algorithms.FISTA method)</a>
@@ -2680,6 +2730,8 @@
       <li><a href="../optimisation/#cil.optimisation.algorithms.Algorithm.verbose_output">verbose_output() (cil.optimisation.algorithms.Algorithm method)</a>
 
       <ul>
+        <li><a href="../optimisation/#cil.optimisation.algorithms.APGD.verbose_output">(cil.optimisation.algorithms.APGD method)</a>
+</li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.CGLS.verbose_output">(cil.optimisation.algorithms.CGLS method)</a>
 </li>
         <li><a href="../optimisation/#cil.optimisation.algorithms.FISTA.verbose_output">(cil.optimisation.algorithms.FISTA method)</a>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.callbacks &#8212; CIL 24.3.1.dev32+g3230c759 documentation</title>
+    <title>cil.optimisation.utilities.callbacks &#8212; CIL 24.3.1.dev33+ge8874967 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../../../../../_static/documentation_options.js?v=a729829f"></script>
+    <script src="../../../../../_static/documentation_options.js?v=3ade84f7"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev32+g3230c759';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev33+ge8874967';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev32+g3230c759" />
+  <meta name="docsearch:version" content="24.3.1.dev33+ge8874967" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -469,7 +469,26 @@
                 <article class="bd-article">
                   
   <h1>Source code for cil.optimisation.utilities.callbacks</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2024 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partialmethod</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span> <span class="k">as</span> <span class="n">tqdm_auto</span>

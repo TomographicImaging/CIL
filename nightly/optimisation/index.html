@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev32+g3230c759 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev33+ge8874967 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
 
-    <script src="../_static/documentation_options.js?v=a729829f"></script>
+    <script src="../_static/documentation_options.js?v=3ade84f7"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev32+g3230c759';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev33+ge8874967';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev32+g3230c759" />
+  <meta name="docsearch:version" content="24.3.1.dev33+ge8874967" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -418,7 +418,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#cgls">CGLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sirt">SIRT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ista-pgd">ISTA/PGD</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fista-apgd">FISTA/APGD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fista">FISTA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apgd">APGD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pdhg">PDHG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ladmm">LADMM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pd3o">PD3O</a></li>
@@ -578,7 +579,7 @@ and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).</p>
 instances of <code class="code docutils literal notranslate"><span class="pre">Function</span></code> derived classes and/or <code class="code docutils literal notranslate"><span class="pre">Operator</span></code> derived classes as input to
 define a specific instance of the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop.
-The user can provide a stopping criterion different than the default max_iteration.</p>
+The user can provide a stopping criterion different than the default.</p>
 <p>New algorithms can be easily created by extending the <code class="code docutils literal notranslate"><span class="pre">Algorithm</span></code> class.
 The user is required to implement only 4 methods: set_up, __init__, update and update_objective.</p>
 <ul class="simple">
@@ -1213,7 +1214,7 @@ print to screen of the status of the optimisation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.SIRT">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">SIRT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/SIRT/#SIRT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.SIRT" title="Link to this definition">#</a></dt>
-<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id42" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
+<dd><p>Simultaneous Iterative Reconstruction Technique, see <span id="id1">[<a class="reference internal" href="#id43" title="Avinash C. Kak and Malcolm Slaney. Principles of Computerized Tomographic Imaging. Society for Industrial and Applied Mathematics, January 2001. URL: https://doi.org/10.1137/1.9780898719277, doi:10.1137/1.9780898719277.">8</a>]</span>.</p>
 <p>Simultaneous Iterative Reconstruction Technique (SIRT) solves
 the following problem</p>
 <div class="math notranslate nohighlight">
@@ -1466,7 +1467,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 <dl class="py class" id="ista">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">ISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA" title="Link to this definition">#</a></dt>
-<dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id39" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
+<dd><p>Iterative Shrinkage-Thresholding Algorithm (ISTA), see <span id="id2">[<a class="reference internal" href="#id41" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id3">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
@@ -1480,7 +1481,7 @@ or <a class="reference internal" href="#cil.optimisation.functions.TotalVariatio
 is guaranteed if</p>
 <div class="math notranslate nohighlight">
 \[\alpha\in(0, \frac{2}{L}),\]</div>
-<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id44" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is the Lipschitz constant of <span class="math notranslate nohighlight">\(f\)</span>, see <span id="id4">[<a class="reference internal" href="#id45" title="Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. Multiscale Modeling &amp; Simulation, 4(4):1168-1200, 2005. URL: https://doi.org/10.1137/050626090, arXiv:https://doi.org/10.1137/050626090, doi:10.1137/050626090.">4</a>]</span>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1704,13 +1705,13 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dd></dl>
 
 </section>
-<section id="fista-apgd">
-<h3>FISTA/APGD<a class="headerlink" href="#fista-apgd" title="Link to this heading">#</a></h3>
-<p>The Fast Iterative Soft Thresholding Algorithm (FISTA) is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, <a class="reference internal" href="#fista"><span class="std std-ref">APGD</span></a> is an alias of <cite>FISTA</cite>.</p>
-<dl class="py class" id="fista">
+<section id="fista">
+<h3>FISTA<a class="headerlink" href="#fista" title="Link to this heading">#</a></h3>
+<p>The Fast Iterative Soft Thresholding Algorithm (FISTA).</p>
+<dl class="py class" id="id5">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">FISTA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#FISTA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.FISTA" title="Link to this definition">#</a></dt>
-<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id5">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id39" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
+<dd><p>Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see <span id="id6">[<a class="reference internal" href="#id41" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id7">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, is used to solve:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} f(x) + g(x)\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
@@ -1738,12 +1739,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id7">[<a class="reference internal" href="#id34" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
-<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id8">[<a class="reference internal" href="#id33" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
+<p>If the function <cite>g</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Accelerated Gradient Descent by Nesterov (<span id="id8">[<a class="reference internal" href="#id35" title="Yurii Nesterov. Introductory lectures on convex optimization: A basic course. Volume 87. Springer Science &amp; Business Media, 2003.">9</a>]</span> algorithm 2.2.9).</p>
+<p>If the function <cite>f</cite> is set to <cite>None</cite> or to the <cite>ZeroFunction</cite> then the FISTA algorithm is equivalent to Guler’s First Accelerated Proximal Point Method  (<span id="id9">[<a class="reference internal" href="#id34" title="Osman Güler. New proximal point algorithms for convex minimization. SIAM Journal on Optimization, 2(4):649–664, 1992.">6</a>]</span> sec 2).</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, ‘APGD’ is an alias of ‘FISTA’.</p>
+<p>FISTA is sometimes also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, ‘APGD’ with the default Nesterov momentum is equivalent to ‘FISTA’ but the ‘APGD’ algorithm gives more options for momentum.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -1946,12 +1947,284 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dd></dl>
 
 </section>
+<section id="apgd">
+<h3>APGD<a class="headerlink" href="#apgd" title="Link to this heading">#</a></h3>
+<p>The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momemtum or a momentum that is updated at each iteration.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">APGD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD" title="Link to this definition">#</a></dt>
+<dd><p>The Accelerated Proximal Gradient Descent (APGD) algorithm is used to solve:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x} f(x) + g(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> is differentiable, and <span class="math notranslate nohighlight">\(g\)</span> has a <em>simple</em> proximal operator.</p>
+<p>In each update, the algorithm computes:</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the <code class="code docutils literal notranslate"><span class="pre">step_size</span></code>.</p>
+<p>Then, <span class="math notranslate nohighlight">\(y_{k+1}\)</span>, is then calculated from <span class="math notranslate nohighlight">\(x_{k+1}\)</span>, based on a momentum rule. Note that <span class="math notranslate nohighlight">\(y_0=x_0\)</span>. Users have flexibility to do this however they wish by passing to <cite>momentum</cite> a class that has an <cite>apply_montemum_in_APGD</cite> function which takes an intialised algorithm and returns the next iterate.</p>
+<p>Currently, we have implemented options for a scalar momentum coefficient (see <a class="reference internal" href="#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient" title="cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient</span></code></a> class.). In this case, the momentum term is added as follows:</p>
+<div class="math notranslate nohighlight">
+\[y_{k+1} = x_{k+1} + M(x_{k+1} - x_{k}).\]</div>
+<p>The default momentum coefficient is the Nesterov momentum coefficient which varies with each iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess of ISTA. <span class="math notranslate nohighlight">\(x_{0}\)</span></p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Differentiable function. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
+<li><p><strong>g</strong> (Function or <cite>None</cite>) – Convex function with <em>simple</em> proximal operator. If <cite>None</cite> is passed, the algorithm will use the ZeroFunction.</p></li>
+<li><p><strong>step_size</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code> or child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’,  the default <code class="code docutils literal notranslate"><span class="pre">step_size</span></code> is a constant <span class="math notranslate nohighlight">\(\frac{1}{L}\)</span> or 1 if <cite>f=None</cite>.) – Step size for the gradient step of APGD. If a float is passed, this is used as a constant step size.  If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code> is passed then its method <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_step_size()</span></code> is called for each update.</p></li>
+<li><p><strong>preconditioner</strong> (class with an <cite>apply</cite> method or a function that takes an initialised CIL algorithm as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditoner()</span></code>. If None is passed then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
+<li><p><strong>momentum</strong> (float or class with an <cite>apply_momentum_in_APGD</cite> function that takes an intialised CIL algorithm and returns the next iterate, default is Nesterov Momentum.) – This could be a custom momentum class or one provided by CIL (see <a class="reference internal" href="#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient" title="cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient</span></code></a>). If a float is passed, scalar momentum is used with the float as a fixed constant.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>kwargs: Keyword arguments</dt><dd><p>Arguments from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The APGD algorithm with (default) Nesterov momentum is equivalent to the FISTA algorithm.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">momentum</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.set_up" title="Link to this definition">#</a></dt>
+<dd><p>Set up of the algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.update" title="Link to this definition">#</a></dt>
+<dd><p>Performs a single iteration of APGD. For <span class="math notranslate nohighlight">\(k\geq 1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the step size. From <span class="math notranslate nohighlight">\(x_{k+1}\)</span> (and any other information available in the algorithm class) the momentum function then calculates <span class="math notranslate nohighlight">\(y_{k+1}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.update_objective">
+<span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.update_objective" title="Link to this definition">#</a></dt>
+<dd><p>Updates the objective</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.calculate_objective_function_at_point">
+<span class="sig-name descname"><span class="pre">calculate_objective_function_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.calculate_objective_function_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.calculate_objective_function_at_point" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the objective at a given point x</p>
+<div class="math notranslate nohighlight">
+\[f(x) + g(x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.get_output" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.get_last_loss">
+<span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.get_last_loss" title="Link to this definition">#</a></dt>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.get_last_objective">
+<span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.get_last_objective" title="Link to this definition">#</a></dt>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.is_provably_convergent">
+<span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.is_provably_convergent" title="Link to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.iterations">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterations</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.iterations" title="Link to this definition">#</a></dt>
+<dd><p>returns the iterations at which the objective has been evaluated</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.loss">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.loss" title="Link to this definition">#</a></dt>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.max_iteration">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_iteration</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.max_iteration" title="Link to this definition">#</a></dt>
+<dd><p>gets the maximum number of iterations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.objective">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.objective" title="Link to this definition">#</a></dt>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.run" title="Link to this definition">#</a></dt>
+<dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">TomographicImaging/CIL-Demos</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.should_stop">
+<span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.should_stop" title="Link to this definition">#</a></dt>
+<dd><p>default stopping criterion: number of iterations</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.solution">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.update_objective_interval">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Current options for are based on the scalar momentum, with base class:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.APGD.</span></span><span class="sig-name descname"><span class="pre">ScalarMomentumCoefficient</span></span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#ScalarMomentumCoefficient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient" title="Link to this definition">#</a></dt>
+<dd><p>Abstract base class for MomentumCoefficient objects. The <cite>__call__</cite> method of this class returns the momentum coefficient for the given iteration.</p>
+<p>The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.</p>
+<p>The <cite>apply_momentum_in_APGD</cite> function,  updates the solution in the APGD algorithm as</p>
+<div class="math notranslate nohighlight">
+\[y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(M\)</span> is the calculated scalar momentum value.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient.apply_momentum_in_APGD">
+<span class="sig-name descname"><span class="pre">apply_momentum_in_APGD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#ScalarMomentumCoefficient.apply_momentum_in_APGD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient.apply_momentum_in_APGD" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate.</p>
+<p>Uses the calculation, <span class="math notranslate nohighlight">\(y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k})\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is the calculated scalar momentum value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>algorithm</strong> (<em>instantiated CIL Algorithm</em>) – The algorithm object.</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default is None</em>) – Object to contain the next iterate.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Implemented examples are:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.ConstantMomentum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.APGD.</span></span><span class="sig-name descname"><span class="pre">ConstantMomentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">momentum</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#ConstantMomentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.ConstantMomentum" title="Link to this definition">#</a></dt>
+<dd><p>MomentumCoefficient object that returns a constant momentum coefficient.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>momentum</strong> (<em>float</em>) – The constant momentum coefficient.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.NesterovMomentum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.APGD.</span></span><span class="sig-name descname"><span class="pre">NesterovMomentum</span></span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#NesterovMomentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.NesterovMomentum" title="Link to this definition">#</a></dt>
+<dd><p>MomentumCoefficient object that returns the Nesterov momentum coefficient.</p>
+<p>Starting with <span class="math notranslate nohighlight">\(t=1\)</span>, the Nesterov algorithm updates with each iteration:</p>
+<div class="math notranslate nohighlight">
+\[t_{k+1}=\dfrac{1}{2}(1+\sqrt{1+4t_{k}^2})\]</div>
+<p>The momentum coefficient is then returned as <span class="math notranslate nohighlight">\(\dfrac{t_{k}-1}{t_{k}}\)</span>.</p>
+</dd></dl>
+
+</section>
 <section id="pdhg">
 <h3>PDHG<a class="headerlink" href="#pdhg" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">PDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_fconj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/PDHG/#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Link to this definition">#</a></dt>
-<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id9">[<a class="reference internal" href="#id35" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id10">[<a class="reference internal" href="#id36" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id10">[<a class="reference internal" href="#id36" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id11">[<a class="reference internal" href="#id37" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1977,7 +2250,7 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 </dl>
 <p class="rubric">Example</p>
 <p>In our CIL-Demos repository (<a class="github reference external" href="https://github.com/TomographicImaging/CIL-Demos">TomographicImaging/CIL-Demos</a>) you can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpainting
-and Total Variation Tomography reconstruction. More examples can also be found in <span id="id11">[<a class="reference internal" href="#id38" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id12">[<a class="reference internal" href="#id37" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
+and Total Variation Tomography reconstruction. More examples can also be found in <span id="id12">[<a class="reference internal" href="#id39" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">7</a>]</span>, <span id="id13">[<a class="reference internal" href="#id38" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">10</a>]</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, the strongly convex constants are passed as parameters of PDHG.
@@ -3470,7 +3743,7 @@ Evaluates if the following equivalence holds
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default = 1</em>) – Seed random generator</p></li>
 <li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 1e-6</em>) – Check if the following expression is below the tolerance</p></li>
-<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id45"><span class="problematic" id="id46">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
+<li><p><strong>math::</strong> (<em>..</em>) – <a href="#id46"><span class="problematic" id="id47">|Ax\times y - y \times A^Tx|</span></a>/(|A||x||y| + 1e-12) &lt; tolerance</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -4288,8 +4561,8 @@ out: BlockDataContainer, default None</p>
 <dt class="sig sig-object py" id="cil.optimisation.operators.SymmetrisedGradientOperator.adjoint">
 <span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/SymmetrisedGradientOperator/#SymmetrisedGradientOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SymmetrisedGradientOperator.adjoint" title="Link to this definition">#</a></dt>
 <dd><p>Returns the adjoint of the symmetrised gradient operator</p>
-<section id="id13">
-<h4>Parameters:<a class="headerlink" href="#id13" title="Link to this heading">#</a></h4>
+<section id="id14">
+<h4>Parameters:<a class="headerlink" href="#id14" title="Link to this heading">#</a></h4>
 <p>x: BlockDataContainer
 out: BlockDataContainer, default None</p>
 <blockquote>
@@ -4321,7 +4594,7 @@ Default = <cite>None</cite>, meaning all dimensions are transformed. Same as axe
 </dd>
 </dl>
 <section id="kwargs">
-<h4><a href="#id14"><span class="problematic" id="id15">**</span></a>kwargs<a class="headerlink" href="#kwargs" title="Link to this heading">#</a></h4>
+<h4><a href="#id15"><span class="problematic" id="id16">**</span></a>kwargs<a class="headerlink" href="#kwargs" title="Link to this heading">#</a></h4>
 <dl class="simple">
 <dt>correlation: str, default ‘All’. Note: Only applied if <cite>axes = None</cite>!</dt><dd><p>‘All’ will compute the wavelet decomposition on every possible dimension.
 ‘Space’ will compute the wavelet decomposition on only the spatial dimensions. If there are multiple channels, each channel is decomposed independently.
@@ -5541,8 +5814,8 @@ function.</p>
 </pre></div>
 </div>
 </section>
-<section id="id16">
-<h4>Example:<a class="headerlink" href="#id16" title="Link to this heading">#</a></h4>
+<section id="id17">
+<h4>Example:<a class="headerlink" href="#id17" title="Link to this heading">#</a></h4>
 <p>Set the number of threads used in accelerated mode.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_threads</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">ib</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -6642,7 +6915,7 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 <dt class="sig sig-object py" id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/MixedL21Norm/#SmoothMixedL21Norm.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Link to this definition">#</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id47"><span class="problematic" id="id48">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id48"><span class="problematic" id="id49">|x|</span></a>}</p>
 </dd></dl>
 
 <dl class="py property">
@@ -6863,7 +7136,7 @@ algorithm to solve:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)\]</div>
 <p>The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-applied to the _dual <a href="#id49"><span class="problematic" id="id50">problem_</span></a> of the above problem, see <span id="id17">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id18">[<a class="reference internal" href="#id39" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id19">[<a class="reference internal" href="#id43" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
+applied to the _dual <a href="#id50"><span class="problematic" id="id51">problem_</span></a> of the above problem, see <span id="id18">[<a class="reference internal" href="#id41" title="Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM Journal on Imaging Sciences, 2(1):183-202, 2009. URL: https://doi.org/10.1137/080716542, arXiv:https://doi.org/10.1137/080716542, doi:10.1137/080716542.">1</a>]</span>, <span id="id19">[<a class="reference internal" href="#id40" title="Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. IEEE Transactions on Image Processing, 18(11):2419-2434, 2009. doi:10.1109/TIP.2009.2028250.">2</a>]</span>, <span id="id20">[<a class="reference internal" href="#id44" title="Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. Computational Optimization and Applications, 47(3):377-400, Nov 2010. URL: https://doi.org/10.1007/s10589-008-9225-2, doi:10.1007/s10589-008-9225-2.">12</a>]</span>.</p>
 <p>See also “Multicontrast MRI Reconstruction with Structure-Guided Total Variation”, Ehrhardt, Betcke, 2016.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -6911,7 +7184,7 @@ However, during the evaluation of <cite>proximal</cite> the memory requirements 
 <div class="math notranslate nohighlight">
 \[\mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}\]</div>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> should be relatively small, so as the second term above will not act as an additional regulariser.
-For more information, see <span id="id20">[<a class="reference internal" href="#id41" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id21">[<a class="reference internal" href="#id35" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
+For more information, see <span id="id21">[<a class="reference internal" href="#id42" title="Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. Computational Optimization and Applications, 76(2):381-430, Jun 2020. URL: https://doi.org/10.1007/s10589-020-00186-y, doi:10.1007/s10589-020-00186-y.">11</a>]</span>, <span id="id22">[<a class="reference internal" href="#id36" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="math notranslate nohighlight">
@@ -7068,7 +7341,7 @@ The multiplication by <span class="math notranslate nohighlight">\(n\)</span> is
 <blockquote>
 <div><ul class="simple">
 <li><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes_indices</span></code> is a list of lists holding the indices of the functions that are processed in each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending a list of the indices of the functions used to calculate the gradient.</p></li>
-<li><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes</span></code> is a list of floats that holds the amount of data that has been processed up until each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal <cite>amount</cite> of data, for example your data was not partitioned into equal batches, then you must first use the <a href="#id22"><span class="problematic" id="id23">`</span></a>set_data_partition_weights” function for this to be accurate.</p></li>
+<li><p>The property <code class="code docutils literal notranslate"><span class="pre">data_passes</span></code> is a list of floats that holds the amount of data that has been processed up until each call of <cite>gradient</cite>. This list is updated each time <cite>gradient</cite> is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal <cite>amount</cite> of data, for example your data was not partitioned into equal batches, then you must first use the <a href="#id23"><span class="problematic" id="id24">`</span></a>set_data_partition_weights” function for this to be accurate.</p></li>
 </ul>
 </div></blockquote>
 </div>
@@ -8540,8 +8813,8 @@ The probability weights are passed to the sampler as they are not uniform.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.optimisation.utilities.Sampler" title="cil.optimisation.utilities.Sampler">Sampler</a></p>
 </dd>
 </dl>
-<section id="id24">
-<h4>Reference<a class="headerlink" href="#id24" title="Link to this heading">#</a></h4>
+<section id="id25">
+<h4>Reference<a class="headerlink" href="#id25" title="Link to this heading">#</a></h4>
 <p>With thanks to Imraj Singh and Zeljko Kereta for their help with the initial implementation of the Herman Meyer sampling. Their implementation was used in:</p>
 <p>Singh I, et al. Deep Image Prior PET Reconstruction using a SIRF-Based Objective - IEEE MIC, NSS &amp; RTSD 2022. <a class="reference external" href="https://discovery.ucl.ac.uk/id/eprint/10176077/1/MIC_Conference_Record.pdf">https://discovery.ucl.ac.uk/id/eprint/10176077/1/MIC_Conference_Record.pdf</a></p>
 <p>The sampling method was introduced in:</p>
@@ -8927,8 +9200,8 @@ In each iteration of the <code class="code docutils literal notranslate"><span c
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.utilities.StepSizeMethods.</span></span><span class="sig-name descname"><span class="pre">ArmijoStepSizeRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/utilities/StepSizeMethods/#ArmijoStepSizeRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule" title="Link to this definition">#</a></dt>
 <dd><p>Applies the Armijo rule to calculate the step size (step_size).</p>
 <p>The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (<cite>alpha</cite>). The step_size is found by reducing the step size (by a factor <cite>beta</cite>) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (<cite>max_iterations</cite>) the while loop is run.</p>
-<section id="id25">
-<h4>Reference<a class="headerlink" href="#id25" title="Link to this heading">#</a></h4>
+<section id="id26">
+<h4>Reference<a class="headerlink" href="#id26" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p>Algorithm 3.1 in Nocedal, J. and Wright, S.J. eds., 1999. Numerical optimization. New York, NY: Springer New York. <a class="reference external" href="https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf">https://www.math.uci.edu/~qnie/Publications/NumericalOptimization.pdf</a>)</p></li>
 <li><p><a class="reference external" href="https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080">https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080</a></p></li>
@@ -8997,8 +9270,8 @@ In the case of <em>well-behaved</em> convex functions, <cite>warmstart = True</c
 </ul>
 </dd>
 </dl>
-<section id="id26">
-<h4>Reference<a class="headerlink" href="#id26" title="Link to this heading">#</a></h4>
+<section id="id27">
+<h4>Reference<a class="headerlink" href="#id27" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p>Barzilai, Jonathan; Borwein, Jonathan M. (1988). “Two-Point Step Size Gradient Methods”. IMA Journal of Numerical Analysis. 8: 141–148, <a class="reference external" href="https://doi.org/10.1093/imanum/8.1.141">https://doi.org/10.1093/imanum/8.1.141</a></p></li>
 <li><p>Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). <a class="reference external" href="https://doi.org/10.4208/jcm.1911-m2019-0171">https://doi.org/10.4208/jcm.1911-m2019-0171</a></p></li>
@@ -9207,8 +9480,8 @@ do basic algebra between <a class="reference internal" href="#blockdatacontainer
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id27"><span class="problematic" id="id28">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id29"><span class="problematic" id="id30">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id28"><span class="problematic" id="id29">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id30"><span class="problematic" id="id31">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -9863,57 +10136,57 @@ Otherwise it is a BlockGeometry.</p>
 <p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 <section id="references">
 <h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
-<div class="docutils container" id="id32">
+<div class="docutils container" id="id33">
 <div role="list" class="citation-list">
-<div class="citation" id="id40" role="doc-biblioentry">
+<div class="citation" id="id41" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id17">3</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id18">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. <em>SIAM Journal on Imaging Sciences</em>, 2(1):183–202, 2009. URL: <a class="reference external" href="https://doi.org/10.1137/080716542">https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/080716542">arXiv:https://doi.org/10.1137/080716542</a>, <a class="reference external" href="https://doi.org/10.1137/080716542">doi:10.1137/080716542</a>.</p>
 </div>
-<div class="citation" id="id39" role="doc-biblioentry">
+<div class="citation" id="id40" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id6">2</a>,<a role="doc-backlink" href="#id18">3</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id7">2</a>,<a role="doc-backlink" href="#id19">3</a>)</span>
 <p>Amir Beck and Marc Teboulle. Fast gradient-based algorithms for constrained total variation image denoising and deblurring problems. <em>IEEE Transactions on Image Processing</em>, 18(11):2419–2434, 2009. <a class="reference external" href="https://doi.org/10.1109/TIP.2009.2028250">doi:10.1109/TIP.2009.2028250</a>.</p>
 </div>
-<div class="citation" id="id35" role="doc-biblioentry">
+<div class="citation" id="id36" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id21">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id10">1</a>,<a role="doc-backlink" href="#id22">2</a>)</span>
 <p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
 </div>
-<div class="citation" id="id44" role="doc-biblioentry">
+<div class="citation" id="id45" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Patrick L. Combettes and Valérie R. Wajs. Signal recovery by proximal forward-backward splitting. <em>Multiscale Modeling &amp; Simulation</em>, 4(4):1168–1200, 2005. URL: <a class="reference external" href="https://doi.org/10.1137/050626090">https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/050626090">arXiv:https://doi.org/10.1137/050626090</a>, <a class="reference external" href="https://doi.org/10.1137/050626090">doi:10.1137/050626090</a>.</p>
 </div>
-<div class="citation" id="id36" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">5</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">5</a><span class="fn-bracket">]</span></span>
 <p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
 </div>
-<div class="citation" id="id33" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">6</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">6</a><span class="fn-bracket">]</span></span>
 <p>Osman Güler. New proximal point algorithms for convex minimization. <em>SIAM Journal on Optimization</em>, 2(4):649–664, 1992.</p>
 </div>
-<div class="citation" id="id38" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">7</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">7</a><span class="fn-bracket">]</span></span>
 <p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
 </div>
-<div class="citation" id="id42" role="doc-biblioentry">
+<div class="citation" id="id43" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">8</a><span class="fn-bracket">]</span></span>
 <p>Avinash C. Kak and Malcolm Slaney. <em>Principles of Computerized Tomographic Imaging</em>. Society for Industrial and Applied Mathematics, January 2001. URL: <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">https://doi.org/10.1137/1.9780898719277</a>, <a class="reference external" href="https://doi.org/10.1137/1.9780898719277">doi:10.1137/1.9780898719277</a>.</p>
 </div>
-<div class="citation" id="id34" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">9</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">9</a><span class="fn-bracket">]</span></span>
 <p>Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em>. Volume 87. Springer Science &amp; Business Media, 2003.</p>
 </div>
-<div class="citation" id="id37" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">10</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">10</a><span class="fn-bracket">]</span></span>
 <p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </div>
-<div class="citation" id="id41" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">11</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id21">11</a><span class="fn-bracket">]</span></span>
 <p>Julian Rasch and Antonin Chambolle. Inexact first-order primal–dual algorithms. <em>Computational Optimization and Applications</em>, 76(2):381–430, Jun 2020. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">https://doi.org/10.1007/s10589-020-00186-y</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-020-00186-y">doi:10.1007/s10589-020-00186-y</a>.</p>
 </div>
-<div class="citation" id="id43" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">12</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id44" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">12</a><span class="fn-bracket">]</span></span>
 <p>Mingqiang Zhu, Stephen J. Wright, and Tony F. Chan. Duality-based algorithms for total-variation-regularized image restoration. <em>Computational Optimization and Applications</em>, 47(3):377–400, Nov 2010. URL: <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">https://doi.org/10.1007/s10589-008-9225-2</a>, <a class="reference external" href="https://doi.org/10.1007/s10589-008-9225-2">doi:10.1007/s10589-008-9225-2</a>.</p>
 </div>
 </div>

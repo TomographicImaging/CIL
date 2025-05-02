@@ -119,6 +119,16 @@ The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension
    :members:
    :inherited-members: run, update_objective_interval
 
+Current options for momentum include:
+
+.. autoclass:: cil.optimisation.algorithms.APGD.ConstantMomentum
+   :members:
+
+
+.. autoclass:: cil.optimisation.algorithms.APGD.NesterovMomentum
+   :members:
+
+
 PDHG
 ----
 .. autoclass:: cil.optimisation.algorithms.PDHG
@@ -708,8 +718,6 @@ We also have a number of already provided pre-conditioners
 
 .. autoclass:: cil.optimisation.utilities.preconditioner.AdaptiveSensitivity
    :members:
-
-
 
 Block Framework
 ***************

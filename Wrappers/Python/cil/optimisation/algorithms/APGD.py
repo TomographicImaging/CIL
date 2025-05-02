@@ -31,9 +31,9 @@ log = logging.getLogger(__name__)
 class ScalarMomentumCoefficient(ABC):
     '''Abstract base class for MomentumCoefficient objects. The `__call__` method of this class returns the momentum coefficient for the given iteration.
 
-    The call method of the ScalarMomentumCoefficient returns a scalar gradient value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
+    The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
-    The `apply_momentum_in_APGD" function,  is  used to update the solution in the APGD algorithm as follows: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). The momentum coefficient M is returned by the ScalarMomentumCoefficient object.
+    The `apply_momentum_in_APGD" function,  is  used to update the solution in the APGD algorithm as follows: :math:`x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k})`, where M is the calculated scalar momentum value. 
 
 
     '''
@@ -116,7 +116,7 @@ class APGD(Algorithm):
 
     where :math:`\alpha` is the :code:`step_size`.
 
-    A momentum term is then added to the update. Currently, we have implemented options for a scalar momentum coefficient. In this case, the momentum term is added as follows:
+    The next iterate is then calculated from `y_{k+1}`. Currently, we have implemented options for a scalar momentum coefficient. In this case, the momentum term is added as follows:
 
     .. math:: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). 
 
@@ -131,13 +131,12 @@ class APGD(Algorithm):
         Differentiable function. If `None` is passed, the algorithm will use the ZeroFunction.
     g : Function or `None`
         Convex function with *simple* proximal operator. If `None` is passed, the algorithm will use the ZeroFunction.
-    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  default = None
+    step_size : positive :obj:`float` or child class of :meth:`cil.optimisation.utilities.StepSizeRule`',  the default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
                 Step size for the gradient step of APGD. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then its method :meth:`get_step_size` is called for each update. 
-                The default :code:`step_size` is a constant :math:`\frac{1}{L}` or 1 if `f=None`.
-    preconditioner: class with an `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
+    preconditioner: class with an `apply` method or a function that takes an initialised CIL algorithm as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. 
-    momentum : float or child class of :meth:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`, default is Nesterov Momentum. 
-            Class with an internal function `apply_momentum_in_APGD` that takes in an initiated algorithm and returns the next iterate.  
+    momentum : float or class with an `apply_momentum_in_APGD` functions that takes an intialised CIL algorithm and returns the next iterate, default is Nesterov Momentum. 
+            This could be a custom momentum class or one provided by CIL (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`). If a float is passed, scalar momentum is used with the float as a fixed constant. 
 
 
     kwargs: Keyword arguments
@@ -192,7 +191,7 @@ class APGD(Algorithm):
             self.step_size_rule = step_size
         else:
             raise TypeError(
-                "step_size must be a real number or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`")
+                "Step_size must be a real number or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`")
 
         self.preconditioner = preconditioner
         self._set_momentum(momentum)
@@ -224,11 +223,11 @@ class APGD(Algorithm):
         .. math::
 
             \begin{cases}
-                x_{k} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                y_{k+1} = x_{k} + M(x_{k} - x_{k-1})
+                y_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
+                x_{k+1} = \mathrm{momentum.apply_momentum_in_APGD}(y_{k+1}, \mathrm{anything else stored in the algorithm})
             \end{cases}
 
-        where :math:`\alpha` is the :code:`step_size` and :math:`M` is a scalar momentum coefficient.
+        where :math:`\alpha` is the step size.
         """
 
         self.f.gradient(self.y, out=self.gradient_update)

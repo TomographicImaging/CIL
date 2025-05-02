@@ -33,11 +33,11 @@ class ScalarMomentumCoefficient(ABC):
 
     The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
-    The `apply_momentum_in_APGD" function,  updates the solution in the APGD algorithm as 
+    The `apply_momentum_in_APGD` function,  updates the solution in the APGD algorithm as 
     
-    .. math:: y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k})
+    .. math:: y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k}),
     
-    , where :math:`M` is the calculated scalar momentum value. 
+    where :math:`M` is the calculated scalar momentum value. 
 
 
     '''

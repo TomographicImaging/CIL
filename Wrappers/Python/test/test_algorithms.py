@@ -36,7 +36,7 @@ from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
 
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
 from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
 
 
@@ -1703,7 +1703,7 @@ class TestADMM(unittest.TestCase):
             admm.solution.array, pdhg.solution.array,  decimal=3)
 
 
-class Test_PD3O(unittest.TestCase):
+class Test_PD3O(CCPiTestClass):
 
     def setUp(self):
 
@@ -1717,7 +1717,7 @@ class Test_PD3O(unittest.TestCase):
         G1 = IndicatorBox(lower=0)
 
         algo_pd3o = PD3O(f=F1, g=G1, h=H1, operator=operator)
-        self.assertEqual(algo_pd3o.gamma, 0.99*2.0/F1.L)
+        self.assertEqual(algo_pd3o.gamma, 0.99*2.0/F1.L) 
         self.assertEqual(algo_pd3o.delta, F1.L/(2.0*operator.norm()**2))
         np.testing.assert_array_equal(
             algo_pd3o.x.array, self.data.geometry.allocate(0).array)
@@ -1774,33 +1774,93 @@ class Test_PD3O(unittest.TestCase):
         np.testing.assert_allclose(
             pdhg.objective[-1], pd3O.objective[-1], atol=1e-2)
 
-    def test_pd3o_convergence(self):
+ 
+    def test_PD3O_stochastic_f(self): 
+        sampler=Sampler.sequential(3)
+        initial = VectorData(np.zeros(21))
+        b =  VectorData(np.array(range(1,22)))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(21)
+            diagonal[7*i:7*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+        
+        H1 = 0.1 * L1Norm()
+        operator = IdentityOperator(initial.geometry)
+        G1 = IndicatorBox(lower=0)
 
-        # pd30 convergence test using TV denoising
 
-        # regularisation parameter
-        alpha = 0.11
-
-        # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = TotalVariation(max_iteration=200)
-        tv_cil = TV.proximal(self.data, tau=alpha)
-
-        F = alpha * MixedL21Norm()
-        operator = GradientOperator(self.data.geometry)
-        norm_op = operator.norm()
-
-        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)
-        H = alpha * MixedL21Norm()
-        G = 0.25 * L2NormSquared(b=self.data)
-        F = 0.25 * L2NormSquared(b=self.data)
-        gamma = 2./F.L
-        delta = 1./(gamma*norm_op**2)
-
-        pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
-                           update_objective_interval=100)
-        pd3O_with_f.run(1000)
-
-        # pd30 vs fista
-        np.testing.assert_allclose(
-            tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
-
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=3)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 8/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [0,1,2]])
+        
+        sampler=Sampler.sequential(3)
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=5, store_gradients=True)
+        algo_pd3o = PD3O(f= 3*(2*f), g=G1, h=H1, operator=operator)
+        self.assertTrue(isinstance(3*2*f,ScaledFunction) )
+        self.assertEqual(algo_pd3o.f.scalar, 6)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[2].array, f.functions[2].gradient(algo_pd3o.solution).array )
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 6/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [2]])
+        
+        
+        
+        sampler=Sampler.sequential(3)
+        f=LSVRGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+            
+        sampler=Sampler.sequential(3)
+        f=SGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+    
+        sampler=Sampler.sequential(3)
+        f=SAGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+        
+        sampler=Sampler.sequential(3)
+        f=SAGAFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+        

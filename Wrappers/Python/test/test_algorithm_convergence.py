@@ -1,6 +1,5 @@
-
-from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD, GD
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares
+from cil.optimisation.algorithms import SPDHG, PDHG, FISTA, APGD, GD, PD3O
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
@@ -185,6 +184,36 @@ class TestAlgorithmConvergence(CCPiTestClass):
         fista_dc.run(500)
         np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)
         np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)
+
+    def test_pd3o_convergence(self):
+        data = dataexample.CAMERA.get(size=(32, 32))
+        # pd30 convergence test using TV denoising
+
+        # regularisation parameter
+        alpha = 0.11
+
+        # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
+        TV = TotalVariation(max_iteration=40)
+        tv_cil = TV.proximal(data, tau=alpha)
+
+        F = alpha * MixedL21Norm()
+        operator = GradientOperator(data.geometry)
+        norm_op = operator.norm()
+
+        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)
+        H = alpha * MixedL21Norm()
+        G = 0.25 * L2NormSquared(b=data)
+        F = 0.25 * L2NormSquared(b=data)
+        gamma = 2./F.L
+        delta = 1./(gamma*norm_op**2)
+
+        pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
+                           update_objective_interval=100)
+        pd3O_with_f.run(800)
+
+        # pd30 vs fista
+        np.testing.assert_allclose(
+            tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
 
         
         

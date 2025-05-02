@@ -119,8 +119,12 @@ The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension
    :members:
    :inherited-members: run, update_objective_interval
 
-Current options for momentum include:
+Current options for are based on the scalar momentum, with base class:
 
+.. autoclass:: cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient 
+   :members:
+
+Implemented examples are: 
 .. autoclass:: cil.optimisation.algorithms.APGD.ConstantMomentum
    :members:
 

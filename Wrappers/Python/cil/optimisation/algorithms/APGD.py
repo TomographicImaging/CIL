@@ -89,7 +89,7 @@ class ConstantMomentum(ScalarMomentumCoefficient):
 class NesterovMomentum(ScalarMomentumCoefficient):
     '''MomentumCoefficient object that returns the Nesterov momentum coefficient.
 
-    Starting with t=1, the Nesterov momentum coefficient is updated as follows: :math:`t_{k+1} = 0.5(1 + \sqrt(1 + 4(t_{k}^2)))`. The momentum coefficient is then returned as :math:`(t_{k}-1)/t_{k}`.
+    Starting with t=1, the Nesterov momentum coefficient is updated as follows: :math:`t_{k+1} = \frac{1/2}(1 + \sqrt{(1 + 4t_{k}^2)})`. The momentum coefficient is then returned as :math:`\frac{t_{k}-1}{t_{k}}`.
 
     '''
 
@@ -116,11 +116,14 @@ class APGD(Algorithm):
 
     where :math:`\alpha` is the :code:`step_size`.
 
-    The next iterate is then calculated from `y_{k+1}`. Currently, we have implemented options for a scalar momentum coefficient. In this case, the momentum term is added as follows:
+    The next iterate is then calculated from :math:`y_{k+1}`. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
+    
+
+    Currently, we have implemented options for a scalar momentum coefficient (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.). In this case, the momentum term is added as follows:
 
     .. math:: x_{k+1} = y_{k+1} + M(y_{k+1} - y_{k}). 
 
-    The default momentum coefficient is the Nesterov momentum coefficient which varies with each iteration. Users can also set a constant momentum coefficient or implement their own momentum coefficient using the :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.
+    The default momentum coefficient is the Nesterov momentum coefficient which varies with each iteration. 
 
 
     Parameters
@@ -135,7 +138,7 @@ class APGD(Algorithm):
                 Step size for the gradient step of APGD. If a float is passed, this is used as a constant step size.  If a child class of :meth:`cil.optimisation.utilities.StepSizeRule` is passed then its method :meth:`get_step_size` is called for each update. 
     preconditioner: class with an `apply` method or a function that takes an initialised CIL algorithm as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditoner`. If None is passed then `self.gradient_update` will remain unmodified. 
-    momentum : float or class with an `apply_momentum_in_APGD` functions that takes an intialised CIL algorithm and returns the next iterate, default is Nesterov Momentum. 
+    momentum : float or class with an `apply_momentum_in_APGD` function that takes an intialised CIL algorithm and returns the next iterate, default is Nesterov Momentum. 
             This could be a custom momentum class or one provided by CIL (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient`). If a float is passed, scalar momentum is used with the float as a fixed constant. 
 
 
@@ -224,7 +227,7 @@ class APGD(Algorithm):
 
             \begin{cases}
                 y_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-                x_{k+1} = \mathrm{momentum.apply_momentum_in_APGD}(y_{k+1}, \mathrm{anything else stored in the algorithm})
+                x_{k+1} = \mathrm{momentum.apply\_momentum\_in\_APGD}\left(y_{k+1}, \mathrm{anything else stored in the algorithm}\right)
             \end{cases}
 
         where :math:`\alpha` is the step size.

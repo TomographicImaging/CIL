@@ -287,22 +287,19 @@ class APGD(Algorithm):
             try:
                 return self._step_size
             except NameError:
-                return NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. After running one update step, a step-size will be returned"))
+                return NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. After running one update step, a step-size will be returned")
 
+    @property
+    def momentum(self):
+        return self._momentum
 
-                    @ property
-                    def momentum(self):
-                    return self._momentum
-
-
-                    def _provable_convergence_condition(self):
-                    if self.preconditioner is not None:
-                    raise NotImplementedError(
+    def _provable_convergence_condition(self):
+        if self.preconditioner is not None:
+            raise NotImplementedError(
                 "Can't check convergence criterion if a preconditioner is used ")
 
-
-                    if isinstance(self.step_size_rule, ConstantStepSize) and isinstance(self.momentum, NesterovMomentum):
-                    return self.step_size_rule.step_size <= 1./self.f.L
-                    else:
-                    raise TypeError(
+        if isinstance(self.step_size_rule, ConstantStepSize) and isinstance(self.momentum, NesterovMomentum):
+            return self.step_size_rule.step_size <= 1./self.f.L
+        else:
+            raise TypeError(
                 "Can't check convergence criterion for non-constant step size or non-Nesterov momentum coefficient")

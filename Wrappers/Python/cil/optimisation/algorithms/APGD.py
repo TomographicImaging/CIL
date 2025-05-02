@@ -33,7 +33,11 @@ class ScalarMomentumCoefficient(ABC):
 
     The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
-    The `apply_momentum_in_APGD" function,  updates the solution in the APGD algorithm as :math:`y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k})`, where :math:`M` is the calculated scalar momentum value. 
+    The `apply_momentum_in_APGD" function,  updates the solution in the APGD algorithm as 
+    
+    .. math:: y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k})
+    
+    , where :math:`M` is the calculated scalar momentum value. 
 
 
     '''
@@ -121,7 +125,7 @@ class APGD(Algorithm):
 
     where :math:`\alpha` is the :code:`step_size`.
 
-    Then, :math:`y_{k+1}`, is then calculated from :math:`x_{k+1}`, based on a momentum rule. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
+    Then, :math:`y_{k+1}`, is then calculated from :math:`x_{k+1}`, based on a momentum rule. Note that :math:`y_0=x_0`. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
     
 
     Currently, we have implemented options for a scalar momentum coefficient (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.). In this case, the momentum term is added as follows:

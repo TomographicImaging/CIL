@@ -68,6 +68,8 @@ add_library(cilacc SHARED ${cilacc_SOURCES})
 target_link_libraries(cilacc ${cilacc_LIBRARIES})
 include_directories(cilacc PUBLIC ${cilacc_INCLUDES})
 
-install(TARGETS cilacc LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME}/lib)
+install(TARGETS cilacc
+        LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME}/lib
+        RUNTIME DESTINATION ${SKBUILD_PROJECT_NAME}/lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
         DESTINATION ${SKBUILD_PROJECT_NAME}/include/${SKBUILD_PROJECT_NAME})

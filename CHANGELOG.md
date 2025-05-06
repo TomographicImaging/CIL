@@ -7,6 +7,7 @@
       - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
       - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
       - Copy geometry in the creation of a DataContainer (#2108)
+      - Fix order of operations for subtraction and division between a BlockDataContainer and DataContainer (#2133)
   - Documentation:
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)

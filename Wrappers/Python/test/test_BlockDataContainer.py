@@ -17,7 +17,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-
 from utils import initialise_tests
 import numpy as np
 from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData, DataContainer

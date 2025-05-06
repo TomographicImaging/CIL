@@ -466,7 +466,7 @@ class DataContainer(object):
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
-            return other.sapyb(-1,self,1, out=kwargs.get('out', None})
+            return other.sapyb(-1,self,1, out=kwargs.get('out', None))
         return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):

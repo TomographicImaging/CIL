@@ -29,11 +29,11 @@
   - Dependencies:
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
+      - olefile and dxchange are an optional dependency, instead of required (#2149)
       - zenodo_get is an optional dependency, instead of required (#2146)
       - `FindIPP.cmake` fallback (#2148)
         - enable `find_package` using `*_ROOT` hints
         - simplified `cilacc` build logic for optional dependencies
-
 
 * 24.3.0
   - New features:

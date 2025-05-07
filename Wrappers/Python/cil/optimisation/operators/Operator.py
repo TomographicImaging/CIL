@@ -308,7 +308,7 @@ class LinearOperator(Operator):
                     apply_adjoint = False
 
         if initial is None:
-            x0 = operator.domain_geometry().allocate('random', seed=seed)
+            x0 = operator.domain_geometry().allocate('random_deprecated', seed=seed)
         else:
             x0 = initial.copy()
 
@@ -400,11 +400,11 @@ class LinearOperator(Operator):
         seed = kwargs.get('seed', 1)
 
         if range_init is None:
-            y = operator.range_geometry().allocate('random', seed=seed + 10)
+            y = operator.range_geometry().allocate('random_deprecated', seed=seed + 10)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random', seed=seed)
+            x = operator.domain_geometry().allocate('random_deprecated', seed=seed)
         else:
             x = domain_init
 

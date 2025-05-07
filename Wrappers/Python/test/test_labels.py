@@ -53,7 +53,7 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(getattr(Backend, i), Backend)
 
     def test_fill_types(self):
-        for i in ('RANDOM', 'RANDOM_INT'):
+        for i in ('RANDOM', 'RANDOM_INT', 'RANDOM_DEPRECATED', 'RANDOM_INT_DEPRECATED'):
             self.assertIn(i, FillType)
             self.assertIn(i.lower(), FillType)
             self.assertIn(getattr(FillType, i), FillType)

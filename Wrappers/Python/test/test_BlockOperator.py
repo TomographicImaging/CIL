@@ -43,14 +43,14 @@ class TestBlockOperator(CCPiTestClass):
     def test_BlockOperator(self):
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random')
+        arr = ig.allocate('random_deprecated')
 
         G = GradientOperator(ig)
         Id = IdentityOperator(ig)
 
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random')
+        u = ig.allocate('random_deprecated')
         z1 = B.direct(u)
 
         res = B.range_geometry().allocate()
@@ -59,7 +59,7 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertBlockDataContainerEqual(z1, res)
 
-        z1 = B.range_geometry().allocate(FillType["RANDOM"])
+        z1 = B.range_geometry().allocate(FillType["RANDOM_DEPRECATED"])
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -160,7 +160,7 @@ class TestBlockOperator(CCPiTestClass):
             )
 
         B1 = BlockOperator(G, Id)
-        U = ig.allocate(FillType["RANDOM"])
+        U = ig.allocate(FillType["RANDOM_DEPRECATED"])
         #U = BlockDataContainer(u,u)
         RES1 = B1.range_geometry().allocate()
 
@@ -176,7 +176,7 @@ class TestBlockOperator(CCPiTestClass):
         operator1=-IdentityOperator(ig)
         K = BlockOperator(operator0, operator1, shape = (1,2))
         bg=BlockGeometry(ig, ig)
-        data=bg.allocate('random', seed=2)
+        data=bg.allocate('random_deprecated', seed=2)
         ans = K.direct(data)
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.as_array(), ig.allocate(0).as_array())
@@ -189,7 +189,7 @@ class TestBlockOperator(CCPiTestClass):
         self.assertTrue(isinstance(ans2, BlockDataContainer))
         self.assertNumpyArrayEqual(ans2.shape, (2,1))
 
-        range_data=ans.geometry.allocate('random', seed=2)
+        range_data=ans.geometry.allocate('random_deprecated', seed=2)
         ans3=K.adjoint(range_data)
         self.assertNumpyArrayEqual(ans3.shape, (2,1))
         self.assertNumpyArrayEqual(ans3.get_item(0).as_array(), range_data.as_array())
@@ -201,7 +201,7 @@ class TestBlockOperator(CCPiTestClass):
         operator1=-IdentityOperator(ig)
         K = BlockOperator(operator0, operator1, shape = (2,1))
         bg=BlockGeometry(ig, ig)
-        data=ig.allocate('random', seed=2)
+        data=ig.allocate('random_deprecated', seed=2)
         ans = K.direct(data)
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.get_item(0).as_array(), data.as_array())
@@ -218,7 +218,7 @@ class TestBlockOperator(CCPiTestClass):
         operator1=-IdentityOperator(ig)
         K = BlockOperator(operator0, operator1, shape = (1,2))
         bg=BlockGeometry(ig, ig)
-        data=bg.allocate('random', seed=2)
+        data=bg.allocate('random_deprecated', seed=2)
         out=K.range.allocate(0)
         assert not isinstance(out, BlockDataContainer)
         ans = K.direct(data)  
@@ -234,7 +234,7 @@ class TestBlockOperator(CCPiTestClass):
         
         #test adjoint wrong dimension 
         out=ig.allocate(0) 
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
         print(K.range_geometry)
         with self.assertRaises(ValueError):
             K.adjoint(data, out)
@@ -246,7 +246,7 @@ class TestBlockOperator(CCPiTestClass):
         operator1=-IdentityOperator(ig)
         K = BlockOperator(operator0, operator1, shape = (2,1))
         bg=BlockGeometry(ig, ig)
-        data=bg.allocate('random', seed=2)
+        data=bg.allocate('random_deprecated', seed=2)
         out=K.domain.allocate(0)
         assert not isinstance(out, BlockDataContainer)
         ans = K.adjoint(data)  
@@ -262,7 +262,7 @@ class TestBlockOperator(CCPiTestClass):
         
         #test direct wrong dimension 
         out=ig.allocate(0) 
-        data = ig.allocate('random')
+        data = ig.allocate('random_deprecated')
         print(K.range_geometry)
         with self.assertRaises(ValueError):
             K.direct(data, out)
@@ -274,7 +274,7 @@ class TestBlockOperator(CCPiTestClass):
     def test_timedifference(self):
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
-        arr = ig.allocate('random')
+        arr = ig.allocate('random_deprecated')
 
         G = GradientOperator(ig, backend='numpy')
         Id = IdentityOperator(ig)
@@ -283,7 +283,7 @@ class TestBlockOperator(CCPiTestClass):
 
 
         # Nx1 case
-        u = ig.allocate('random')
+        u = ig.allocate('random_deprecated')
         steps = [timer()]
         i = 0
         n = 10.
@@ -336,15 +336,15 @@ class TestBlockOperator(CCPiTestClass):
     def test_BlockOperatorLinearValidity(self):
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random', seed=1)
+        arr = ig.allocate('random_deprecated', seed=1)
 
         G = GradientOperator(ig)
         Id = IdentityOperator(ig)
 
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(FillType["RANDOM"], seed=3)
+        u = ig.allocate('random_deprecated', seed=2)
+        w = B.range_geometry().allocate(FillType["RANDOM_DEPRECATED"], seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
         self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
@@ -551,7 +551,7 @@ class TestBlockOperator(CCPiTestClass):
         N, M = 200, 300
 
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)
-        u = ig.allocate('random_int')
+        u = ig.allocate('random_int_deprecated')
         G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
         log.info("%s %s", type(u), u.as_array())
         log.info("%s", G.direct(u).as_array())
@@ -560,7 +560,7 @@ class TestBlockOperator(CCPiTestClass):
 
         M1, N1, K1 = 200, 300, 2
         ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
-        u1 = ig1.allocate('random_int')
+        u1 = ig1.allocate('random_int_deprecated')
         G1 = FiniteDifferenceOperator(ig1, direction=2, bnd_cond = 'Periodic')
         log.info(ig1.shape==u1.shape)
         log.info("%s", G1.norm())

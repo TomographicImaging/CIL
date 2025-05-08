@@ -46,25 +46,24 @@ def remove_environment(env_name):
 
 def create_environment(env_name, package_name):
     """Create a conda environment from a temporary environment file."""
-    temp_env_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
-    try:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_env_file = os.path.join(temp_dir, "environment.yml")
+
         # Copy and filter the environment file
-        with open(env_file, "r", encoding="utf-8") as original, open(temp_env_file.name, "w", encoding="utf-8") as temp:
+        with open(env_file, "r", encoding="utf-8") as original, open(temp_env_file, "w", encoding="utf-8") as temp:
             for line in original:
                 if not is_linux and "# [linux]" in line:
                     continue
                 temp.write(line)
 
-        # Append the package to the environment file
-        with open(temp_env_file.name, "a", encoding="utf-8") as temp:
+        # Append the cil package to the environment file
+        with open(temp_env_file, "a", encoding="utf-8") as temp:
             temp.write(f"  - local::{package_name}\n")
 
         # Create the environment
-        create_env_command = f"conda env create -f {temp_env_file.name} -n {env_name}"
+        create_env_command = f"conda env create -f {temp_env_file} -n {env_name}"
         print(f"Running: {create_env_command}")
         subprocess.run(create_env_command, shell=True, text=True, check=True)
-    finally:
-        os.unlink(temp_env_file.name)
 
 def run_tests(env_name, python_version, numpy_version):
     """Run tests in the specified environment."""
@@ -74,13 +73,12 @@ def run_tests(env_name, python_version, numpy_version):
     result = subprocess.run(test_command, shell=True, text=True, capture_output=True, check=True)
     stderr_output = result.stderr
 
-    match = re.search(r"Ran (\d+) tests in ([\d.]+)s\n\n(OK|FAILED)(.*)", stderr_output, re.DOTALL)
+    match = re.search(r"Ran (\d+) tests in ([\d.]+)s\n\n(OK|FAILED)(?: \(skipped=(\d+)\))?", stderr_output, re.DOTALL)
     if match:
         tests_run = int(match.group(1))
         time_taken = match.group(2)
         status = match.group(3)
-        skipped_match = re.search(r"skipped=(\d+)", match.group(4))
-        skipped = int(skipped_match.group(1)) if skipped_match else 0
+        skipped = int(match.group(4))
 
         return {
             "python_version": python_version,

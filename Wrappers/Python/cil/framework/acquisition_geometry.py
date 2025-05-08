@@ -199,6 +199,12 @@ class SystemConfiguration:
     def acquisition_type(self, val):
         self._acquisition_type = AcquisitionType(val).validate()
 
+    @property
+    def volume_centre(self):
+        return self._volume_centre
+
+
+
     def __init__(self, dof: int, geometry, units='units', number_vectors=1):
         self.acquisition_type = AcquisitionType(f"{dof}D") | AcquisitionType(geometry)
         self._num_vectors = number_vectors

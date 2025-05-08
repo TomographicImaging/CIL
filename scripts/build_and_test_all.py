@@ -4,7 +4,6 @@ import re
 import tempfile
 import platform
 
-# Set PYTHONUNBUFFERED globally to disable buffering
 os.environ["PYTHONUNBUFFERED"] = "1"
 
 # Define Python and NumPy version combinations
@@ -17,7 +16,6 @@ combinations = {
 # Define channels and paths
 channels = "-c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi"
 anaconda_user = "ccpi"
-
 is_linux = platform.system() == "Linux"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 recipe_path = os.path.join(script_dir, '..', 'recipe')
@@ -67,7 +65,6 @@ def create_environment(env_name, package_name):
         subprocess.run(create_env_command, shell=True, text=True, check=True)
     finally:
         os.unlink(temp_env_file.name)
-
 
 def run_tests(env_name, python_version, numpy_version):
     """Run tests in the specified environment."""
@@ -123,8 +120,8 @@ def build_and_test():
         python_version = f"{python_version_digits[0]}.{python_version_digits[1:]}"
         numpy_versions = combinations[python_version]
 
-        if not os.path.exists(path):
-            # Rebuild the specific package with the appropriate Python version
+        if not os.path.exists(os.path.join(path, f"{package}.tar.bz2")):
+            # build the package if it doesn't exist
             rebuild_command = f"{command} --no-test --no-anaconda-upload --python {python_version}"
             print(f"Running: {rebuild_command}")
             subprocess.run(rebuild_command, shell=True, text=True, check=True)
@@ -138,22 +135,17 @@ def build_and_test():
             np_version_digits = numpy_version.replace(".", "")
             env_name = f"test_py{python_version_digits}_np{np_version_digits}"
 
-            # Remove and recreate the environment
             remove_environment(env_name)
             create_environment(env_name, package_name)
 
-            # Run tests and log results
             result = run_tests(env_name, python_version, numpy_version)
             if result:
                 test_results.append(result)
 
-            # Remove the environment after testing
             remove_environment(env_name)
 
-    # Print test summary
     print_test_summary(test_results)
 
-    # Upload the package to Anaconda
     package_upload = input("Do you want to upload the package? (y/n): ")
     if package_upload.lower() == "y":
         for package, path in packages.items():

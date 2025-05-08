@@ -31,6 +31,7 @@ conda create --name cil -c conda-forge -c https://software.repos.intel.com/pytho
 ```
 
 where:
+
 - `astra-toolbox=*=py*` enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) CPU projector (2D Parallel beam only) (GPLv3 license)
 - `astra-toolbox=*=cuda*` (requires an NVIDIA GPU) enables CIL support for [ASTRA toolbox](http://www.astra-toolbox.com) GPU projectors (GPLv3 license)
 - `tigre` (requires an NVIDIA GPU) enables support for [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license)
@@ -86,7 +87,8 @@ docker run --rm --gpus all -p 8888:8888 -it ghcr.io/tomographicimaging/cil:lates
 ## Getting Started with CIL
 
 ### CIL Training
-We typically run training courses at least twice a year - check https://ccpi.ac.uk/training/ for our upcoming events!
+
+We typically run training courses at least twice a year - check <https://ccpi.ac.uk/training/> for our upcoming events!
 
 ### CIL on binder
 
@@ -116,59 +118,44 @@ The use of `--recurse-submodule` is necessary if the user wants the examples dat
 git submodule update --init --recursive
 ```
 
-### Build dependencies
+### Building with `pip`
+
+#### Install Dependencies
 
 To create a conda environment with all the dependencies for building CIL run the following shell script:
 
 ```sh
-bash scripts/create_local_env_for_cil_development.sh
+bash ./scripts/create_local_env_for_cil_development.sh
 ```
 
 Or with the CIL build and test dependencies:
 
 ```sh
-bash scripts/create_local_env_for_cil_development.sh -t
+bash ./scripts/create_local_env_for_cil_development.sh -t
 ```
 
-And then install CIL in to this environment using CMake.
+And then install CIL in to this environment using `pip`.
 
 Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the
 appropriate dependencies on any OS, using the following command:
 
 ```sh
-conda env create -f scripts/requirements-test.yml
+conda env create -f ./scripts/requirements-test.yml
 ```
 
-### Build with CMake
+#### Build CIL
 
-CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable>
-cmake --build ./build --target install
+pip install --no-deps .
 ```
 
-If targeting an active conda environment then the `<install_directory>` can be set to the `CONDA_PREFIX` environment variable (e.g. `${CONDA_PREFIX}` in Bash, or `%CONDA_PREFIX%` in the Anaconda Prompt on Windows). Similarly, `<path_to_python_executable>` can be set to the active conda environment by passing `${CONDA_PREFIX}/bin/python` on linux or `%CONDA_PREFIX%\python` in windows.
-
-#### Linux
-```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python
-```
-#### Windows
-```sh
-cmake -S . -B .\build -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX% -DPython_EXECUTABLE=%CONDA_PREFIX%\python
-```
-
-If not installing to a conda environment then the user will also need to set the locations of the IPP library and includes, and the path to CIL.
-
-By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters:
+If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
 
 ```sh
-cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=<install_directory> -DPython_EXECUTABLE=<path_to_python_executable> -DIPP_ROOT=<path_to_ipp>
+pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
 ```
-
-The user will then need to add the path `<install_directory>/lib` to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system OS.
-
 
 ### Building with Docker
 
@@ -179,7 +166,6 @@ git submodule update --init --recursive
 docker build . -t ghcr.io/tomographicimaging/cil
 ```
 
-
 ### Testing
 
 One installed, CIL functionality can be tested using the following command:
@@ -189,9 +175,7 @@ export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
 python -m unittest discover -v ./Wrappers/Python/test
 ```
 
-
 ## Citing CIL
-
 
 If you use CIL in your research, please include citations to **both** the software on Zenodo, and a CIL paper:
 
@@ -199,7 +183,6 @@ E. Pasca, J. S. Jørgensen, E. Papoutsellis, E. Ametova, G. Fardell, K. Thielema
 Core Imaging Library (CIL) <br>
 Zenodo [software archive] <br>
 **DOI:** https://doi.org/10.5281/zenodo.4746198 <br>
-
 
 In most cases, the first CIL paper will be the appropriate choice:
 

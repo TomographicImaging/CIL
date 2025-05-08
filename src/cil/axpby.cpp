@@ -104,7 +104,13 @@ int daxpby_asbv(const double * x, const double * y, double * out, double a, cons
 	}
 	return 0;
 }
-DLL_EXPORT int saxpby(const float * x, const float * y, float * out, const float *a, int a_type, const float* b, int b_type, int64 size, int nThreads)
+
+int saxpby(DataFloatInput x, DataFloatInput y, 
+		DataFloatOutput  out, 
+		DataFloatInput a, int type_a, 
+		DataFloatInput b, int type_b, 
+		int64 size, int nThreads
+	  )
 {
 	//type = 0 float
 	//type = 1 array of floats
@@ -114,20 +120,25 @@ DLL_EXPORT int saxpby(const float * x, const float * y, float * out, const float
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
 
-	if (a_type == 0 && b_type == 0)
-		saxpby_asbs(x, y, out, *a, *b, size, nThreads);
-	else if (a_type == 1 && b_type == 1)
-		saxpby_avbv(x, y, out, a, b, size, nThreads);
-	else if (a_type == 0 && b_type == 1)
-		saxpby_asbv(x, y, out, *a, b, size, nThreads);
-	else if (a_type == 1 && b_type == 0)
-		saxpby_asbv(y, x, out, *b, a, size, nThreads);
+	if (type_a == 0 && type_b == 0)
+		saxpby_asbs(x.data(), y.data(), out.data(), *a.data(), *b.data(), size, nThreads);
+	else if (type_a == 1 && type_b == 1)
+		saxpby_avbv(x.data(), y.data(), out.data(), a.data(), b.data(), size, nThreads);
+	else if (type_a == 0 && type_b == 1)
+		saxpby_asbv(x.data(), y.data(), out.data(), *a.data(), b.data(), size, nThreads);
+	else if (type_a == 1 && type_b == 0)
+		saxpby_asbv(y.data(), x.data(), out.data(), *b.data(), a.data(), size, nThreads);
 
 	omp_set_num_threads(nThreads_initial);
 
 	return 0;
 }
-DLL_EXPORT int daxpby(const double * x, const double * y, double * out, const double *a, int a_type, const double* b, int b_type, int64 size, int nThreads)
+
+int daxpby(DataDoubleInput x, DataDoubleInput y, 
+		DataDoubleOutput out, 
+		DataDoubleInput a, int type_a, 
+		DataDoubleInput b, int type_b, 
+		int64 size, int nThreads)
 {
 	//type = 0 double
 	//type = 1 array of double
@@ -137,14 +148,14 @@ DLL_EXPORT int daxpby(const double * x, const double * y, double * out, const do
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
 
-	if (a_type == 0 && b_type == 0)
-		daxpby_asbs(x, y, out, *a, *b, size, nThreads);
-	else if (a_type == 1 && b_type == 1)
-		daxpby_avbv(x, y, out, a, b, size, nThreads);
-	else if (a_type == 0 && b_type == 1)
-		daxpby_asbv(x, y, out, *a, b, size, nThreads);
-	else if (a_type == 1 && b_type == 0)
-		daxpby_asbv(y, x, out, *b, a, size, nThreads);
+	if (type_a == 0 && type_b == 0)
+		daxpby_asbs(x.data(), y.data(), out.data(), *a.data(), *b.data(), size, nThreads);
+	else if (type_a == 1 && type_b == 1)
+		daxpby_avbv(x.data(), y.data(), out.data(), a.data(), b.data(), size, nThreads);
+	else if (type_a == 0 && type_b == 1)
+		daxpby_asbv(x.data(), y.data(), out.data(), *a.data(), b.data(), size, nThreads);
+	else if (type_a == 1 && type_b == 0)
+		daxpby_asbv(y.data(), x.data(), out.data(), *b.data(), a.data(), size, nThreads);
 
 	omp_set_num_threads(nThreads_initial);
 

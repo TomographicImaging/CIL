@@ -24,8 +24,6 @@
 #include "ipp.h"
 #include <omp.h>
 #include "utilities.h"
-#include <nanobind/nanobind.h>
-#include <nanobind/ndarray.h>
 
 class Binner {
 
@@ -201,6 +199,6 @@ void* Binner_new(
 	return new Binner(shape_in.data(), shape_out.data(), pixel_index_start.data(), binning_list.data()); 
  }
 int Binner_bin(void* binner, DataInput data_in, DataBinned data_binned) { 
-	return ((Binner*)binner)->bin(data_in.data(), data_binned.data()); 
+	return ((Binner*)binner)->bin(data_in.data(), data_binned.mutable_data()); 
  }
 

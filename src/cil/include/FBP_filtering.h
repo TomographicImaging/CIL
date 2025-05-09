@@ -24,12 +24,13 @@
 #include <omp.h>
 #include <random>
 #include "utilities.h"
-#include <nanobind/ndarray.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
-namespace nb = nanobind;
+namespace py = pybind11;
 
-using DataFloatConst = nb::ndarray<const float>;
-using DataFloat = nb::ndarray<float>;
+using DataFloatConst = py::array_t<const float>;
+using DataFloat = py::array_t<float>;
 
 int filter_projections_avh(DataFloat data, DataFloatConst filter, DataFloatConst weights, int order, long num_proj, long pix_y, long pix_x);
 int filter_projections_vah(DataFloat data, DataFloatConst filter, DataFloatConst weights, int order, long pix_y, long num_proj, long pix_x);

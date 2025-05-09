@@ -22,8 +22,16 @@
 #include <omp.h>
 #include "utilities.h"
 
-#include <nanobind/ndarray.h>
-namespace nb = nanobind;
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+
+namespace py = pybind11;
+
+using DataFloat = py::array_t<float>;
+
+int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
+int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
+namespace py = pybind11;
 
 
 int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, size_t nx, size_t ny, size_t nz, size_t nc);
@@ -33,24 +41,24 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 
 
 int openMPtest(int nThreads);
-int fdiff4D(nb::ndarray<float> imagefull, 
-		nb::ndarray<float> gradCfull, 
-		nb::ndarray<float> gradZfull, 
-		nb::ndarray<float> gradYfull,
-		nb::ndarray<float> gradXfull,
+int fdiff4D(DataFloat imagefull, 
+		DataFloat gradCfull, 
+		DataFloat gradZfull, 
+		DataFloat gradYfull,
+		DataFloat gradXfull,
 		size_t nc, size_t nz, size_t ny, 
 		size_t nx, int boundary, int direction, 
 		int nThreads);
-int fdiff3D(nb::ndarray<float> imagefull, 
-		nb::ndarray<float> gradZfull,
-		nb::ndarray<float> gradYfull,
-		nb::ndarray<float> gradXfull,
+int fdiff3D(DataFloat imagefull, 
+		DataFloat gradZfull,
+		DataFloat gradYfull,
+		DataFloat gradXfull,
 		size_t nz, size_t ny, size_t nx,
 		int boundary, int direction, 
 		int nThreads);
-int fdiff2D(nb::ndarray<float> imagefull,
-		nb::ndarray<float> gradYfull,
-		nb::ndarray<float> gradXfull,
+int fdiff2D(DataFloat imagefull,
+		DataFloat gradYfull,
+		DataFloat gradXfull,
 		size_t ny, size_t nx, 
 		int boundary, int direction, 
 		int nThreads);

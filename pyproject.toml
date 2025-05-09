@@ -3,7 +3,7 @@ requires = [
     "setuptools>=64",
     "setuptools_scm>=8",
     "scikit-build-core>=0.10",
-    "nanobind", 
+    "pybind11", 
     "ipp-devel>=2022.1", 
     "ipp-static>=2022.1", 
     "intel-openmp",

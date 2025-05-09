@@ -17,14 +17,15 @@
 // CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 #include <cstddef>
-#include <nanobind/nanobind.h>
-#include <nanobind/ndarray.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
-namespace nb = nanobind;
+namespace py = pybind11;
 
-using Shape = nb::ndarray<const size_t>;
-using DataInput = nb::ndarray<const float>;
-using DataBinned = nb::ndarray<float>;
+
+using Shape = py::array_t<const size_t>;
+using DataInput = py::array_t<const float>;
+using DataBinned = py::array_t<float>;
 
 void Binner_delete(void* binner);
 void* Binner_new(Shape shape_in, 

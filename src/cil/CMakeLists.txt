@@ -20,14 +20,12 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
-find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 
-find_package(nanobind CONFIG REQUIRED)
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG REQUIRED)
 
 find_package(IPP REQUIRED CONFIG)
 find_package(OpenMP REQUIRED)
-
-
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
   # appends some flags
@@ -52,7 +50,7 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp nanobind.cpp)
+list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp pybind11.cpp)
 list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(APPEND cilacc_LIBRARIES ${OpenMP_EXE_LINKER_FLAGS})
 
@@ -67,9 +65,8 @@ endif()
 message(STATUS ${cilacc_INCLUDES})
 message(STATUS ${IPP_LIBRARIES})
 
-nanobind_add_module(
+pybind11_add_module(
 	cilacc
-	NB_STATIC
 	${cilacc_SOURCES}
 )
 include_directories(cilacc PUBLIC ${cilacc_INCLUDES})

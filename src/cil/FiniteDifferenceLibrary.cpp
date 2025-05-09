@@ -537,11 +537,11 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	return 0;
 }
 
- int fdiff4D(nb::ndarray<float> imagefull,
-		 nb::ndarray<float> gradCfull,
-		 nb::ndarray<float> gradZfull,
-		 nb::ndarray<float> gradYfull,
-		 nb::ndarray<float> gradXfull,
+ int fdiff4D(DataFloat imagefull,
+		 DataFloat gradCfull,
+		 DataFloat gradZfull,
+		 DataFloat gradYfull,
+		 DataFloat gradXfull,
 		 size_t nc, size_t nz, size_t ny, size_t nx,
 		 int boundary, int direction,
 		 int nThreads)
@@ -553,25 +553,25 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), gradZfull.mutable_data(), gradCfull.mutable_data(), nx, ny, nz, nc);
 		else
-			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
+			status = fdiff_adjoint_periodic(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), gradZfull.mutable_data(), gradCfull.mutable_data(), nx, ny, nz, nc);
 		else
-			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
+			status = fdiff_adjoint_neumann(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), gradCfull.data(), nx, ny, nz, nc);
 	}
 
 	omp_set_num_threads(nThreads_initial);
 	return status;
 }
-int fdiff3D(nb::ndarray<float> imagefull,
-		nb::ndarray<float> gradZfull,
-		nb::ndarray<float> gradYfull,
-		nb::ndarray<float> gradXfull,
+int fdiff3D(DataFloat imagefull,
+		DataFloat gradZfull,
+		DataFloat gradYfull,
+		DataFloat gradXfull,
 		size_t nz, size_t ny, size_t nx,
 		int boundary, int direction,
 		int nThreads)
@@ -583,24 +583,24 @@ int fdiff3D(nb::ndarray<float> imagefull,
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), gradZfull.mutable_data(), NULL, nx, ny, nz, 1);
 		else
-			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_periodic(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), gradZfull.mutable_data(), NULL, nx, ny, nz, 1);
 		else
-			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
+			status = fdiff_adjoint_neumann(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), gradZfull.data(), NULL, nx, ny, nz, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);
 	return status;
 }
-int fdiff2D(nb::ndarray<float> imagefull,
-		nb::ndarray<float> gradYfull,
-		nb::ndarray<float> gradXfull,
+int fdiff2D(DataFloat imagefull,
+		DataFloat gradYfull,
+		DataFloat gradXfull,
 		size_t ny, size_t nx,
 		int boundary, int direction,
 		int nThreads)
@@ -612,16 +612,16 @@ int fdiff2D(nb::ndarray<float> imagefull,
 	if (boundary)
 	{
 		if (direction)
-			status = fdiff_direct_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_periodic(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), NULL, NULL, nx, ny, 1, 1);
 		else
-			status = fdiff_adjoint_periodic(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_periodic(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 	}
 	else
 	{
 		if (direction)
-			status = fdiff_direct_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_direct_neumann(imagefull.data(), gradXfull.mutable_data(), gradYfull.mutable_data(), NULL, NULL, nx, ny, 1, 1);
 		else
-			status = fdiff_adjoint_neumann(imagefull.data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
+			status = fdiff_adjoint_neumann(imagefull.mutable_data(), gradXfull.data(), gradYfull.data(), NULL, NULL, nx, ny, 1, 1);
 	}
 
 	omp_set_num_threads(nThreads_initial);

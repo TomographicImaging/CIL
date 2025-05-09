@@ -121,13 +121,13 @@ int saxpby(DataFloatInput x, DataFloatInput y,
 	threads_setup(nThreads, &nThreads_initial);
 
 	if (type_a == 0 && type_b == 0)
-		saxpby_asbs(x.data(), y.data(), out.data(), *a.data(), *b.data(), size, nThreads);
+		saxpby_asbs(x.data(), y.data(), out.mutable_data(), *a.data(), *b.data(), size, nThreads);
 	else if (type_a == 1 && type_b == 1)
-		saxpby_avbv(x.data(), y.data(), out.data(), a.data(), b.data(), size, nThreads);
+		saxpby_avbv(x.data(), y.data(), out.mutable_data(), a.data(), b.data(), size, nThreads);
 	else if (type_a == 0 && type_b == 1)
-		saxpby_asbv(x.data(), y.data(), out.data(), *a.data(), b.data(), size, nThreads);
+		saxpby_asbv(x.data(), y.data(), out.mutable_data(), *a.data(), b.data(), size, nThreads);
 	else if (type_a == 1 && type_b == 0)
-		saxpby_asbv(y.data(), x.data(), out.data(), *b.data(), a.data(), size, nThreads);
+		saxpby_asbv(y.data(), x.data(), out.mutable_data(), *b.data(), a.data(), size, nThreads);
 
 	omp_set_num_threads(nThreads_initial);
 
@@ -149,13 +149,13 @@ int daxpby(DataDoubleInput x, DataDoubleInput y,
 	threads_setup(nThreads, &nThreads_initial);
 
 	if (type_a == 0 && type_b == 0)
-		daxpby_asbs(x.data(), y.data(), out.data(), *a.data(), *b.data(), size, nThreads);
+		daxpby_asbs(x.data(), y.data(), out.mutable_data(), *a.data(), *b.data(), size, nThreads);
 	else if (type_a == 1 && type_b == 1)
-		daxpby_avbv(x.data(), y.data(), out.data(), a.data(), b.data(), size, nThreads);
+		daxpby_avbv(x.data(), y.data(), out.mutable_data(), a.data(), b.data(), size, nThreads);
 	else if (type_a == 0 && type_b == 1)
-		daxpby_asbv(x.data(), y.data(), out.data(), *a.data(), b.data(), size, nThreads);
+		daxpby_asbv(x.data(), y.data(), out.mutable_data(), *a.data(), b.data(), size, nThreads);
 	else if (type_a == 1 && type_b == 0)
-		daxpby_asbv(y.data(), x.data(), out.data(), *b.data(), a.data(), size, nThreads);
+		daxpby_asbv(y.data(), x.data(), out.mutable_data(), *b.data(), a.data(), size, nThreads);
 
 	omp_set_num_threads(nThreads_initial);
 

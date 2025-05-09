@@ -61,7 +61,7 @@ int filter_projections_avh(DataFloat data, DataFloatConst filter, DataFloatConst
 			for (j = 0; j < half_pixy; j++)
 			{
 				row_start = (size_t)2 * j * pix_x;
-				out_ptr = &data.data()[proj_start + row_start];
+				out_ptr = &data.mutable_data()[proj_start + row_start];
 				ippsMul_32f_I(weights.data()+row_start, out_ptr, 2* pix_x);
 				ippsSet_32fc({ 0.f,0.f }, src, width);
 				ippsRealToCplx_32f(out_ptr, out_ptr + pix_x, src + offset, pix_x);
@@ -76,7 +76,7 @@ int filter_projections_avh(DataFloat data, DataFloatConst filter, DataFloatConst
 				if (pix_y % 2)
 				{
 					row_start = (size_t)pix_y * pix_x - pix_x;
-					out_ptr = &data.data()[proj_start + row_start];
+					out_ptr = &data.mutable_data()[proj_start + row_start];
 
 					ippsMul_32f_I(weights.data() + row_start, out_ptr, pix_x);
 					ippsSet_32fc({ 0.f,0.f }, src, width);
@@ -140,7 +140,7 @@ int filter_projections_vah(DataFloat data, DataFloatConst filter, DataFloatConst
 			for (j = 0; j < half_proj; j++)
 			{
 				row_start = (size_t)2 * j * pix_x;
-				out_ptr = &data.data()[col_start + row_start];
+				out_ptr = &data.mutable_data()[col_start + row_start];
 				ippsMul_32f_I(weights_ptr, out_ptr, pix_x);
 				ippsMul_32f_I(weights_ptr, out_ptr + pix_x, pix_x);
 
@@ -157,7 +157,7 @@ int filter_projections_vah(DataFloat data, DataFloatConst filter, DataFloatConst
 				if (num_proj % 2)
 				{
 					row_start = (size_t)num_proj * pix_x - pix_x;
-					out_ptr = &data.data()[col_start + row_start];
+					out_ptr = &data.mutable_data()[col_start + row_start];
 					ippsMul_32f_I(weights_ptr, out_ptr, pix_x);
 					ippsSet_32fc({ 0.f,0.f }, src, width);
 					ippsRealToCplx_32f(out_ptr, NULL, src + offset, pix_x);

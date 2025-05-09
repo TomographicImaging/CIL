@@ -21,17 +21,19 @@
 #include <stdio.h>
 #include <omp.h>
 #include "utilities.h"
-#include <nanobind/ndarray.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
-namespace nb = nanobind;
+namespace py = pybind11;
+
 
 using int64 = long long;
 
-using DataFloatInput = nb::ndarray<const float>;
-using DataDoubleInput = nb::ndarray<const double>;
+using DataFloatInput = py::array_t<const float>;
+using DataDoubleInput = py::array_t<const double>;
 
-using DataFloatOutput = nb::ndarray<float>;
-using DataDoubleOutput = nb::ndarray<double>;
+using DataFloatOutput = py::array_t<float>;
+using DataDoubleOutput = py::array_t<double>;
 
 
 int saxpby_asbs(const float * x, const float * y, float * out, float a, float b, int64 size, int nThreads);
@@ -42,7 +44,7 @@ int daxpby_avbv(const double * x, const double * y, double * out, const double *
 int daxpby_asbv(const double * x, const double * y, double * out, double a, const double * b, int64 size, int nThreads);
 
 int saxpby(DataFloatInput x, DataFloatInput y, 
-		DataFloatOutput  out, 
+		DataFloatOutput out, 
 		DataFloatInput a, int type_a, 
 		DataFloatInput b, int type_b, 
 		int64 size, int nThreads);

@@ -21,19 +21,20 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
-find_package(OpenMP REQUIRED)
-add_definitions(${OpenMP_CXX_FLAGS})
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG REQUIRED)
 
-if (WIN32)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
-endif()
+find_package(IPP REQUIRED CONFIG)
+find_package(OpenMP REQUIRED)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
   # appends some flags
   add_compile_options(-ftree-vectorize -fopt-info-vec-optimized -fopt-info-vec)
   # add_compile_options(-march=native -mavx )
 endif()
+
+message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
+#add_definitions(${OpenMP_CXX_FLAGS})
 
 message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
@@ -49,10 +50,7 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(IPP)
-
-list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp)
+list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp pybind11.cpp)
 list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(APPEND cilacc_LIBRARIES ${OpenMP_EXE_LINKER_FLAGS})
 
@@ -60,37 +58,18 @@ if(IPP_FOUND)
   list(APPEND cilacc_SOURCES FBP_filtering.cpp Binning.cpp)
   list(APPEND cilacc_INCLUDES ${IPP_INCLUDE_DIRS})
   list(APPEND cilacc_LIBRARIES ${IPP_LIBRARIES})
+  message(STATUS "IPP Libraries Found")
 else()
   message(WARNING "IPP libraries not found, FBP_filtering not in build")
 endif()
+message(STATUS ${cilacc_INCLUDES})
+message(STATUS ${IPP_LIBRARIES})
 
-add_library(cilacc SHARED ${cilacc_SOURCES})
-target_link_libraries(cilacc ${cilacc_LIBRARIES})
+pybind11_add_module(
+	cilacc
+	${cilacc_SOURCES}
+)
 include_directories(cilacc PUBLIC ${cilacc_INCLUDES})
+target_link_libraries(cilacc PUBLIC ${cilacc_LIBRARIES})
 
-## Install
-#include(GNUInstallDirs)
-#install(TARGETS cilacc
-#	RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib
-#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-#	)
-
-if (UNIX)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
-install(TARGETS cilacc
-	LIBRARY DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-elseif(WIN32)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
-  install(TARGETS cilacc
-	RUNTIME DESTINATION Library/bin
-	ARCHIVE DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-endif()
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)
+install(TARGETS cilacc LIBRARY DESTINATION cil)

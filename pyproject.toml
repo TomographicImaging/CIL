@@ -1,6 +1,23 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=64",
+    "setuptools_scm>=8",
+    "scikit-build-core>=0.10",
+    "pybind11", 
+    "ipp-devel>=2022.1", 
+    "ipp-static>=2022.1", 
+    "intel-openmp",
+]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.16"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["Wrappers/Python/cil/version.py"]
+sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
+[tool.scikit-build.wheel.packages]
+cil = "Wrappers/Python/cil"
 
 [tool.setuptools_scm]
 version_file = "Wrappers/Python/cil/version.py"
@@ -62,7 +79,7 @@ plugins = [
     #"tomophantom==2.0.0", # [linux] # missing from PyPI
 ]
 gpu = [
-    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
+    "astra-toolbox", # [not osx]
     #"tigre>=2.4,<=2.6", # missing from PyPI
 ]
 [dependency-groups]

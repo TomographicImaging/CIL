@@ -65,9 +65,9 @@ class NEXUSDataWriter(object):
             The dataset to write to file
         file_name: os.path or string, default None
             The file name to write
-        compression: int, default 0
-            The lossy compression to apply, default 0 will not compress data.
-            8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        compression: str, {'uint8', 'uint16', None}, default None
+            The lossy compression to apply, default None will not compress data.
+            uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.
         '''
         self.data = data
         self.file_name = file_name
@@ -93,14 +93,11 @@ class NEXUSDataWriter(object):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
 
-
-
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot write NEXUS files.')
 
     def write(self):
-
         '''
         write dataset to disk
         '''

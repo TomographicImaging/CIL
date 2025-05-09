@@ -86,11 +86,11 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
-                      data = im, compression=16)
+                      data = im, compression='uint16')
         writer.write()
 
         self.assertTrue(writer.dtype == numpy.uint16)
-        self.assertTrue(writer.compression == 16)
+        self.assertTrue(writer.compression == 'uint16')
 
         self.readImageDataAndTest(atol=1e-4)
 

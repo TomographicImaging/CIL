@@ -336,12 +336,6 @@ class BlockDataContainer(object):
         return self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
 
 
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
-        '''Deprecated method. Alias of sapyb'''
-        return self.sapyb(a,y,b,out,num_threads)
-
-
-
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
 

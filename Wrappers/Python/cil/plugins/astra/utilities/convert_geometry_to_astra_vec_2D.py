@@ -42,11 +42,7 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
     """
     sinogram_geometry = sinogram_geometry_in.copy()
 
-    #this catches behaviour modified after CIL 21.3.1
-    try:
-        sinogram_geometry.config.system.align_reference_frame('cil')
-    except:
-        sinogram_geometry.config.system.update_reference_frame()
+    sinogram_geometry.config.system.align_reference_frame('cil')
 
     angles = sinogram_geometry.config.angles
     system = sinogram_geometry.config.system

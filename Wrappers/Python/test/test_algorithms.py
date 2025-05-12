@@ -30,7 +30,7 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
@@ -135,8 +135,8 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
-        with self.assertRaises(TypeError):
-            gd.step_size
+        with self.assertRaises(NotImplementedError):
+            self.assertEqual(gd.step_size,3)
 
         gd = GD(initial=self.initial,
                 f=self.f, alpha=1e2, beta=0.25)
@@ -145,9 +145,6 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e2) / np.log10(2)))
 
-        with self.assertRaises(TypeError):
-            gd = GD(initial=self.initial, f=self.f,
-                    step_size=0.1, step_size_rule=ConstantStepSize(0.5))
 
     def test_gd_constant_step_size_init(self):
         rule = ConstantStepSize(0.4)
@@ -193,7 +190,7 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.beta, 0.2)
         self.assertEqual(gd.step_size_rule.max_iterations, 5)
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(NotImplementedError):
             gd.step_size
 
     def test_GDArmijo(self):
@@ -300,7 +297,26 @@ class Test_APGD(CCPiTestClass):
         
         with self.assertRaises(TypeError):
             alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size='banana')
+
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        self.assertEqual(alg.step_size, 1/self.f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 1/self.f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.45/(algorithm.iteration+1)
             
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.45)
+        self.assertEqual(alg.step_size, 0.45)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.45/2)
+        self.assertEqual(alg.step_size, 0.45/2)
+        
+        
     def test_update_step(self):
         alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=0.3, momentum=0.5)
         y_0=self.initial.copy()
@@ -479,7 +495,45 @@ class TestFISTA(CCPiTestClass):
             alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
 
 
+    def test_FISTA_step_size_init(self):
+        np.random.seed(10)
+        n = 5
+        m = 3
 
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        Aop = MatrixOperator(A)
+        bop = VectorData(b)
+
+        f = LeastSquares(Aop, b=bop, c=0.5)
+        g = ZeroFunction()
+        ig = Aop.domain
+
+        initial = ig.allocate()
+        
+        alg= FISTA(initial=initial, f=f, g=g, step_size=0.002)
+        self.assertEqual(alg.step_size_rule.step_size, 0.002)
+        self.assertEqual(alg.step_size, 0.002)
+
+        alg = FISTA(initial=initial, f=f, g=g)
+        self.assertEqual(alg.step_size, 1/f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 1/f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.99/(algorithm.iteration+1)
+            
+        alg = FISTA(initial=initial, f=f, g=g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99)
+        self.assertEqual(alg.step_size, 0.99)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99/2)
+        self.assertEqual(alg.step_size, 0.99/2)
 
 class testISTA(CCPiTestClass):
 
@@ -658,10 +712,31 @@ class testISTA(CCPiTestClass):
         with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
 
             alg = PGD(initial=self.initial, f=self.f, g=self.g, step_size=4)
-            self.assertEqual(alg._step_size, 4)
             mock_method.assert_called_once_with(initial=self.initial, f=self.f, g=self.g, step_size=4, preconditioner=None)
 
 
+    def test_ISTA_step_size_init(self):
+        alg= ISTA(initial=self.initial, f=self.f, g=self.g, step_size=0.002)
+        self.assertEqual(alg.step_size_rule.step_size, 0.002)
+        self.assertEqual(alg.step_size, 0.002)
+
+        alg = ISTA(initial=self.initial, f=self.f, g=self.g)
+        self.assertEqual(alg.step_size, 0.99*2.0/self.f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 0.99*2.0/self.f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.99**algorithm.iteration
+            
+        alg = ISTA(initial=self.initial, f=self.f, g=self.g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99**0)
+        self.assertEqual(alg.step_size, 0.99**0)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99**1)
+        self.assertEqual(alg.step_size, 0.99**1)
 
 class TestCGLS(CCPiTestClass):
     def setUp(self):

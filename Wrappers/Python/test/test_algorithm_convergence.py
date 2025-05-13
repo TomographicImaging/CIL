@@ -146,7 +146,7 @@ class TestAlgorithmConvergence(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(apgd.solution.as_array(), b.as_array(), decimal=3)
         
     
-
+    @unittest.skipUnless(has_cvxpy, "cvxpy not available")
     def test_APGD_dossal_chambolle(self):
         
         np.random.seed(10)

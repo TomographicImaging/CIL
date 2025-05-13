@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>1D inverse problem demo using deriv2 from regtools &#8212; CIL 24.3.1.dev35+g5b151e1f documentation</title>
+    <title>1D inverse problem demo using deriv2 from regtools &#8212; CIL 24.3.1.dev36+g64e0b1b6 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=38847caffe24bbc62201" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=38847caffe24bbc62201" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=005327348bbd87ef69dc" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=005327348bbd87ef69dc" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=38847caffe24bbc62201"></script>
+  <script src="../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../_static/documentation_options.js?v=669de13c"></script>
+    <script src="../../_static/documentation_options.js?v=49266863"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev35+g5b151e1f';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev36+g64e0b1b6';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="A detailed look at CIL geometry" href="../00_CIL_geometry/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev35+g5b151e1f" />
+  <meta name="docsearch:version" content="24.3.1.dev36+g64e0b1b6" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -517,6 +517,7 @@
 <span class="c1">#</span>
 <span class="c1">#   Authored by:  Bill Lionheart (University of Manchester),</span>
 <span class="c1">#   Edited by:  Margaret Duff (STFC - UKRI)</span>
+<span class="c1">#               Hannah Robarts (STFC - UKRI)</span>
 </pre></div>
 </div>
 </div>
@@ -527,7 +528,7 @@ for tomographic imaging.” Philosophical Transactions of the Royal Society A 37
 <p>This notebook was developed as part of the CCPi CIL Hackathon <a class="reference external" href="https://ccpi.ac.uk/events/byod-cil-hackathon/">https://ccpi.ac.uk/events/byod-cil-hackathon/</a> in March 2023 in Cambridge as part of the Rich Nonlinear Tomography programme at the Isaac Newton Institute for Mathematical Sciences <a class="reference external" href="https://www.newton.ac.uk/event/rnt/">https://www.newton.ac.uk/event/rnt/</a>. The CIL is supported by the CCPi EPSRC grant EP/T026677/1 and the Isaac NewtonInstitute by EP/R014604/1 The author would like to thank the Isaac Newton Institute for support and hospitality.(c) W.R.B. Lionheart 2023.
 Apache License</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -537,11 +538,12 @@ Apache License</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">VectorData</span><span class="p">,</span> <span class="n">BlockDataContainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">deriv2</span><span class="w"> </span><span class="kn">import</span> <span class="n">deriv2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span><span class="n">IdentityOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">callbacks</span>
 </pre></div>
 </div>
 </div>
-<section id="CIL-version-23.0.1">
-<h2>CIL version 23.0.1<a class="headerlink" href="#CIL-version-23.0.1" title="Link to this heading">#</a></h2>
+<section id="CIL-version-24.3.0">
+<h2>CIL version 24.3.0<a class="headerlink" href="#CIL-version-24.3.0" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -556,7 +558,7 @@ Apache License</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-23.0.1
+24.3.0
 </pre></div></div>
 </div>
 <p>We set up a 1D inverse problem, in which the forward model integrates twice. The notebook will first set up and solve a basic formulation of the problem using just python/numpy, and after that using CIL.</p>
@@ -726,7 +728,7 @@ Apache License</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4.213659415696782e-15
+4.731464782457117e-15
 </pre></div></div>
 </div>
 <p>However this is not a desired solution to our inverse problem. Now, instead, solve using Tikonov regularization:</p>
@@ -794,8 +796,8 @@ Apache License</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#bop = VectorData(np.reshape(b,[-1]))</span>
 <span class="n">op</span> <span class="o">=</span> <span class="n">VectorData</span><span class="p">(</span><span class="n">bn</span><span class="p">)</span>
-<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">Aop</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bop</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">Aop</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">bop</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span><span class="n">cgls</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Least squares solution with early stopping&#39;</span><span class="p">)</span>
@@ -808,15 +810,9 @@ Apache License</p>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-     Iter   Max Iter     Time/Iter            Objective
-                               [s]
-        0          4         0.000          2.16038e-01
--------------------------------------------------------
-        4          4         0.081
-Stop criterion has been reached.
-
+100%|██████████| 4/4 [00:00&lt;00:00, 26.95it/s, objective=0.216]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -826,7 +822,7 @@ Stop criterion has been reached.
 <img alt="../../_images/demos_deriv2_cgls_27_1.png" src="../../_images/demos_deriv2_cgls_27_1.png" />
 </div>
 </div>
-<p>We can also do Tikhonov regularisation using the CIL framework. For example, in the block framework below:</p>
+<p>We can also do Tikhonov regularisation using the CIL framework. For example, in the block framework below. The early stopping callback stops iterations if the change in the objective value between calculations is less than 1e-6</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
@@ -838,32 +834,17 @@ Stop criterion has been reached.
 <span class="n">zero_data</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">data_block</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">bop</span><span class="p">,</span> <span class="n">zero_data</span><span class="p">)</span>
 
-<span class="n">cglsb</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">operator_block</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_block</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">update_objctive_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">cglsb</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">cglsb</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">operator_block</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_block</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">cglsb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">(),</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">EarlyStoppingObjectiveValue</span><span class="p">()])</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-     Iter   Max Iter     Time/Iter            Objective
-                               [s]
-        0       1000         0.000          2.16038e-01
-        1       1000         0.130          3.73899e-03
-        2       1000         0.108          9.73406e-04
-        3       1000         0.109          8.16896e-04
-        4       1000         0.111          8.07526e-04
-        5       1000         0.106          8.07019e-04
-        6       1000         0.105          8.07002e-04
-        7       1000         0.106          8.07002e-04
-        8       1000         0.110          8.07002e-04
-Tolerance is reached: 1e-06
--------------------------------------------------------
-        8       1000         0.110          8.07002e-04
-Stop criterion has been reached.
-
+  0%|          | 5/1000 [00:00&lt;00:46, 21.52it/s, objective=0.000793]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -957,8 +938,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=38847caffe24bbc62201"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=38847caffe24bbc62201"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

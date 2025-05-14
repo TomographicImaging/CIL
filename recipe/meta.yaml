@@ -39,10 +39,7 @@ test:
 requirements:
   build:
     - python
-    - numpy {{ numpy }}
-    - pip
-    - setuptools >=64
-    - setuptools_scm >=8
+    - uv
     - cmake         # [not osx]
     - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]
@@ -51,10 +48,6 @@ requirements:
     - openmp        # [osx]
     - vc 14         # [win]
     - ninja         # [not win]
-    - ipp-include {{ ipp_version }}
-    - ipp-devel {{ ipp_version }}
-    - ipp {{ ipp_version }}
-    - scikit-build-core >=0.10
 
   run:
     - python
@@ -71,7 +64,6 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data >=22
-    - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba
 

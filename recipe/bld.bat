@@ -6,5 +6,5 @@ if not "%GIT_DESCRIBE_NUMBER%"=="0" (
 )
 :: -G "Visual Studio 16 2019" specifies the the generator
 :: -T v142 specifies the toolset
-pip install . --no-deps -Ccmake.args="-G Visual Studio 16 2019 -T v142"
+uv pip install . -Ccmake.args="-G Visual Studio 16 2019 -T v142"
 if errorlevel 1 exit 1

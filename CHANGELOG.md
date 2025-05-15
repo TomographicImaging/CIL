@@ -23,7 +23,6 @@
       - Make install local env script work on windows (#2144)
       - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
   - Testing:
-      - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
       - Added tests for Normaliser processor
       - Update minimum cmake version to 3.5

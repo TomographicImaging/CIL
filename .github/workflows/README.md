@@ -22,12 +22,17 @@ The jobs are:
 
 Details on some of these jobs are given below.
 
+> [!TIP]
+> To skip tests, include [one of the following](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/skipping-workflow-runs) in your commit message: `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` or `[actions skip]`.
+
 ### conda
 
 When opening or modifying a pull request to `master`, two variants are built and tested (for linux with minimum & maximum supported `python` & `numpy` versions).
 
 > [!NOTE]
 > When pushing to `master` or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
+>
+> To test *all* variants on other branches, use [the `Run workflow` button on the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml).
 
 <!-- <br/> -->
 

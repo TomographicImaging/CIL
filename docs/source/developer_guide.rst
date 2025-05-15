@@ -56,7 +56,7 @@ Methods that are not meant to be used by the user should have a `_` (underscore)
 All methods should follow the convention of small caps underscore separated words.
 
 Logging and warning
-=======================
+===================
 We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
 
 .. list-table:: Logging and warning guidelines
@@ -67,14 +67,14 @@ We follow pythons convention on logging (see e.g. https://docs.python.org/3/howt
      - The best tool for the task
    * - Display console output for ordinary usage of a command line script or program
      - ``print()``
-   * - Report events that occur during normal operation of a program 
+   * - Report events that occur during normal operation of a program
        (e.g. for status monitoring or fault investigation)
      - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
    * - Issue a warning regarding a particular runtime event
      - ``warnings.warn()``  if the issue is avoidable and the user's code
-       should be modified to eliminate the warning. 
+       should be modified to eliminate the warning.
 
-       A logger’s ``warning()`` method if there is nothing the user can do about 
+       A logger’s ``warning()`` method if there is nothing the user can do about
        the situation, but the event should still be noted
    * - Report an error regarding a particular runtime event
      - Raise an exception
@@ -157,54 +157,59 @@ The ``nbsphinx`` extension will convert the ``*.ipynb`` files to HTML.
 
 
 Testing
-=============
+=======
 
 Parametrized Tests
-----------
+------------------
 Methods are tested using Python's `unittest <https://docs.python.org/3/library/unittest.html>`_ library. Please see the documentation `here <https://docs.python.org/3/library/unittest.html#basic-example>`_  for information and usage examples.
 The `unittest-parametrize <https://github.com/adamchainz/unittest-parametrize>`_ library is used to generate parametrized test cases.
 
-The ``@parametrize`` decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case. 
+The ``@parametrize`` decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case.
 This helps to test various scenarios without duplicating code.
 
 Example: Parameterized Test for ``ProjectionOperator``
-::    
-  @parametrize("device, raise_error, err_type", 
-    [param('cpu', False, None, id="cpu_NoError"), 
-     param('CPU', False, None, id="CPU_NoError"), 
-     param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
 
-  def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
-      if raise_error:
-          with self.assertRaises(err_type):
-              ProjectionOperator(self.ig, self.ag, device)
-      else:
-          assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+.. code:: python
+   @parametrize("device, raise_error, err_type",
+     [param('cpu', False, None, id="cpu_NoError"),
+      param('CPU', False, None, id="CPU_NoError"),
+      param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
 
+   def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+       if raise_error:
+           with self.assertRaises(err_type):
+               ProjectionOperator(self.ig, self.ag, device)
+       else:
+           assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
 
-The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``, 
+The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``,
 ``raise_error`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
 
 In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
-There are 3 sets of parameters: 
+There are 3 sets of parameters:
 
-- ``param('cpu', False, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.  
-- ``param('CPU', False, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.  
-- ``param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.  
+- ``param('cpu', False, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.
+- ``param('CPU', False, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.
+- ``param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.
 
 Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
 
 When running the test, each parameterized case is shown as a distinct result:
-::
-  test_ProjectionOperator_2Ddata[cpu_NoError] ... ok
-  test_ProjectionOperator_2Ddata[CPU_NoError] ... ok
-  test_ProjectionOperator_2Ddata[InvalidInput_ValueError] ... ok
 
-  ----------------------------------------------------------------------
-  Ran 3 tests in 0.001s
+.. code:: python
+   test_ProjectionOperator_2Ddata[cpu_NoError] ... ok
+   test_ProjectionOperator_2Ddata[CPU_NoError] ... ok
+   test_ProjectionOperator_2Ddata[InvalidInput_ValueError] ... ok
 
-  OK
+   ----------------------------------------------------------------------
+   Ran 3 tests in 0.001s
 
+   OK
+
+GitHub Actions CI
+-----------------
+
+If you open a pull request, continuous integration & deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. For more information please see the `GHA README <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 
 
 Contributions guidelines

@@ -34,7 +34,7 @@ class DATA(object):
         return None
 
 class CILDATA(DATA):
-    data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
+    data_dir = os.getenv("CIL_DATA_DIR", os.path.abspath(os.path.join(sys.prefix, 'share','cil')))
     @classmethod
     def get(cls, size=None, scale=(0,1), **kwargs):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
@@ -344,7 +344,7 @@ class SANDSTONE(REMOTEDATA):
         if extension == '.mat':
             return loadmat(os.path.join(data_dir,filename))
         raise KeyError(f"Unknown extension: {extension}")
-        
+
 
 class TestData(object):
     '''Class to return test data

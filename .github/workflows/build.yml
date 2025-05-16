@@ -53,7 +53,8 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+        test -d $HOME/.cache/cil || cp -r $(python -c 'import sys; print(sys.prefix)')/share/cil $HOME/.cache/
+        TESTS_FORCE_GPU=1 CIL_DATA_DIR=$HOME/.cache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       shell: bash
@@ -104,7 +105,7 @@ jobs:
         echo "Extracted Commit Message: $COMMIT_MESSAGE"
         echo "Extracted GITHUB_REF: $GITHUB_REF"
 
-        if [[ "$COMMIT_MESSAGE" == *"#all-tests"* || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then 
+        if [[ "$COMMIT_MESSAGE" == *"#all-tests"* || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23, 1.24, 1.25, 1.26]" >> $GITHUB_OUTPUT
         else

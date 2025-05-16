@@ -14,8 +14,8 @@
 #  limitations under the License.
 #
 # Authors:
-# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Maike Meier and Mariam Demir, SCD STFC
+# CIL Developers and contributers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 
 from cil.optimisation.algorithms import Algorithm
 import numpy
@@ -63,12 +63,7 @@ class LSQR(Algorithm):
     def __init__(self, initial=None, operator=None, data=None, alpha=None, **kwargs):
         '''initialisation of the algorithm
         '''
-        #We are deprecating tolerance 
-        self.tolerance=kwargs.pop("tolerance", None)
-        if self.tolerance is not None:
-            warnings.warn( stacklevel=2, category=DeprecationWarning, message="Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour")
-        else:
-            self.tolerance = 0
+
         
         super(LSQR, self).__init__(**kwargs)
 
@@ -81,6 +76,8 @@ class LSQR(Algorithm):
 
         if initial is not None and operator is not None and data is not None:
             self.set_up(initial=initial, operator=operator, data=data)
+        else:
+            raise ValueError(' You must initialise LSQR with an `operator` and `data`')
 
 
     def set_up(self, initial, operator, data):
@@ -135,14 +132,12 @@ class LSQR(Algorithm):
         self.tmp_range.sapyb(1.,  self.u,-self.alpha, out=self.u)
         self.beta = self.u.norm()
         self.u /= self.beta
-        print(self.beta)
 
         # Update v in GKB
         self.operator.adjoint(self.u, out=self.tmp_domain)
         self.v.sapyb(-self.beta, self.tmp_domain, 1., out=self.v)
         self.alpha = self.v.norm()
         self.v /= self.alpha
-        print(self.alpha)
 
         # Eliminate diagonal from regularisation
         if self.regalphasq > 0:

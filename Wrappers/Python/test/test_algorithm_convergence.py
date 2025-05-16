@@ -1,5 +1,5 @@
-from cil.optimisation.algorithms import SPDHG, PDHG
-from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction
+from cil.optimisation.algorithms import SPDHG, PDHG, LSQR
+from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, LeastSquares
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator
 from cil.optimisation.utilities import Sampler 
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData
@@ -104,3 +104,35 @@ class TestAlgorithmConvergence(CCPiTestClass):
             alg_stochastic.x.as_array(), u_cvxpy.value)
         self.assertNumpyArrayAlmostEqual(
             alg_stochastic.x.as_array(), b.as_array(), decimal=6)
+        
+        
+class TestLSQR(CCPiTestClass):
+
+    def setUp(self):
+        # Mock the operator and data containers
+        
+        np.random.seed(10)
+        self.n = 50
+        self.m = 70
+
+        A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
+        x = np.array(range(self.n))/self.n
+        b = A.dot(x)
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+        self.x = VectorData(x)
+        
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate(None)
+        self.initial.fill(np.ones(self.n)/self.n)
+        
+
+    def test_convergence(self):
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0)
+        lsqr.run(200)
+        self.assertNumpyArrayAlmostEqual(lsqr.solution.as_array(), self.x.as_array(), 3)
+        self.assertAlmostEqual(lsqr.objective[-1], (self.Aop.direct(self.x)-self.bop).norm()**2, 1)
+
+ 

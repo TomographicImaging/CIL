@@ -36,7 +36,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD, LSQR
 
 
 from scipy.optimize import minimize, rosen
@@ -1781,3 +1781,131 @@ class Test_PD3O(unittest.TestCase):
         # pd30 vs fista
         np.testing.assert_allclose(
             tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
+
+
+
+class TestLSQR(CCPiTestClass):
+
+    def setUp(self):
+        # Mock the operator and data containers
+        
+        np.random.seed(10)
+        self.n = 50
+        self.m = 70
+
+        A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
+        x = np.array(range(self.n))/self.n
+        b = A.dot(x)
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+        self.x = VectorData(x)
+        
+
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+        self.h = L1Norm()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate(None)
+        self.initial.fill(np.ones(self.n)/self.n)
+        
+
+    def test_initialization_defaults(self):
+        lsqr = LSQR(operator=self.Aop, data=self.bop)
+        self.assertEqual(lsqr.regalpha, 0)
+        self.assertNumpyArrayAlmostEqual(lsqr.x.as_array(), np.zeros(self.n))
+        self.assertTrue(lsqr.configured)
+        with self.assertRaises(ValueError):
+            LSQR()
+
+    def test_initialization_with_params(self):
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        self.assertEqual(lsqr.regalpha, 0.5)
+        self.assertNumpyArrayAlmostEqual(lsqr.operator.direct(self.x).as_array(), self.bop.as_array())
+        self.assertNumpyArrayAlmostEqual(lsqr.u.as_array(), (-lsqr.operator.direct(self.initial).as_array()+ self.bop.as_array())/lsqr.beta)
+        self.assertTrue(lsqr.configured)
+
+    def test_set_up(self):
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        beta =  (self.bop -self.Aop.direct(self.initial)).norm()
+        self.assertAlmostEqual(lsqr.beta,  beta, 5 )
+        self.assertAlmostEqual(lsqr.phibar,  beta, 5 )
+        self.assertAlmostEqual(lsqr.normr,  beta, 5 )
+        alpha = self.Aop.adjoint((self.bop -self.Aop.direct(self.initial))/beta).norm()
+        self.assertAlmostEqual(lsqr.alpha, alpha, 5)
+        self.assertAlmostEqual(lsqr.rhobar, alpha, 5)
+        
+        self.assertEqual(lsqr.regalphasq, 0.25)
+
+    def test_update_reg_0(self): 
+        #Compared to algorithm in https://www-leland.stanford.edu/group/SOL/software/lsqr/lsqr-toms82a.pdf
+        
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0)
+        # update u 
+        u1 = lsqr.u.copy()
+        v1 = lsqr.v.copy()
+        w1 = lsqr.v.copy()
+        alpha1 =  lsqr.alpha
+        beta1  =  lsqr.beta
+        rhobar1 = alpha1
+        phibar1 = beta1
+        x0 = self.initial
+        
+        u2= self.Aop.direct(v1)-alpha1*u1
+        beta2 = u2.norm()
+        u2 /= beta2
+        
+        v2 = self.Aop.adjoint(u2)- beta2*v1
+        alpha2 = v2.norm()
+        v2 /= alpha2
+        rho1 = np.sqrt( rhobar1**2 + beta2**2)
+        c1= rhobar1/rho1
+        s1= beta2/rho1
+        theta2 =s1*alpha2
+        rhobar2= -c1*alpha2
+        phi1 = c1*phibar1
+        phibar2 = s1*phibar1
+        
+        x1 = x0 +(phi1/rho1)*w1
+        w2 = v2- (theta2/rho1)*w1
+        
+        lsqr.run(1)
+        self.assertNumpyArrayAlmostEqual(lsqr.solution.as_array(), x1.as_array())
+        self.assertNumpyArrayAlmostEqual(lsqr.d.as_array(), w2.as_array())
+        self.assertAlmostEqual(lsqr.rhobar, rhobar2)
+        self.assertAlmostEqual(lsqr.phibar, phibar2)
+        self.assertAlmostEqual(lsqr.alpha, alpha2)
+        self.assertAlmostEqual(lsqr.beta, beta2)
+
+
+    def test_update_regularised(self):
+        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        
+        L = IdentityOperator(self.ig)
+        alpha = 0.5
+
+        operator_block = BlockOperator(self.Aop, alpha*L)
+        zero_data = L.range.allocate(0)
+        data_block = BlockDataContainer(self.bop, zero_data)
+        initial_block = self.initial
+        
+        lsqr_block = LSQR (initial=initial_block, operator=operator_block, data=data_block, alpha=0)
+        
+        lsqr_block.run(1)
+        lsqr_reg.run(1)
+        
+        self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
+        
+        lsqr_block.run(1)
+        lsqr_reg.run(1)
+        
+        self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
+
+
+    def test_update_objective(self):
+        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        lsqr_reg.run(1)
+        self.assertAlmostEqual(lsqr_reg.objective[0], (self.Aop.direct(self.initial)-self.bop).norm()**2 + 0.5*self.initial.norm()**2, 1)

@@ -127,6 +127,20 @@ else:
     has_numba = True
 system_state['has_numba']= has_numba
 
+module_info = importlib.util.find_spec("matplotlib")
+if module_info is None:
+    has_matplotlib = False
+else:
+    has_matplotlib = True
+system_state['has_matplotlib'] = has_matplotlib
+
+#has_zenodo_get
+module_info = importlib.util.find_spec("zenodo_get")
+if module_info is None:
+    has_zenodo_get = False
+else:
+    has_zenodo_get = True
+system_state['has_zenodo_get'] = has_zenodo_get
 
 # to disable prints from 3rd part libraries and tests
 def disable_print():

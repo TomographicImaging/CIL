@@ -185,6 +185,6 @@ class FBP_CPU(Processor):
         arr_out = np.flip(arr_out, 0)
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
-            return out
         else:
             out.fill(arr_out)
+        return out

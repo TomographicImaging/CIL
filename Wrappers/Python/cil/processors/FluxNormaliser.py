@@ -21,7 +21,6 @@ from cil.utilities import multiprocessing as cil_mp
 
 import numpy
 import logging
-import matplotlib.pyplot as plt
 import numba
 
 log = logging.getLogger(__name__)
@@ -254,6 +253,8 @@ class FluxNormaliser(Processor):
         Preview the FluxNormalisation processor configuration for roi mode.
         Plots the region of interest on the image and the mean, maximum and 
         minimum intensity in the roi.
+
+        Requires matplotlib (or matplotlib-base) to be installed
         
         Parameters:
         -----------
@@ -274,6 +275,8 @@ class FluxNormaliser(Processor):
         matplotlib.figure.Figure
             The figure object created to plot the configuration
         '''
+        import matplotlib.pyplot as plt
+
         self._calculate_flux()
         if self.roi_slice is None:
             raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
@@ -362,6 +365,8 @@ class FluxNormaliser(Processor):
         ax: int, default=111
             The subplot axis to display the slice on
         '''
+        import matplotlib.pyplot as plt
+        
         data = self.get_input()
         if angle_index is not None and 'angle' in data.dimension_labels:
             data_slice = data.get_slice(angle=angle_index)

@@ -16,7 +16,7 @@
 Developers' Guide
 *****************
 
-CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
+CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the following.
 
 Conventions on new CIL objects
@@ -126,14 +126,13 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs_environment.yml``
-#. [Install Ruby version 3.2](https://www.ruby-lang.org/en/documentation/installation/#installers)
+#. `Install Ruby version 3.2 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
 #. Install the web dependencies with ``make web-deps``
 #. Build the documentation with ``make dirhtml web``
 #. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
 
 Example:
 ::
-
   git clone --recurse-submodule git@github.com:TomographicImaging/CIL
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
@@ -156,6 +155,58 @@ The ``mkdemos.py`` script (called by ``make dirhtml``):
 
 The ``nbsphinx`` extension will convert the ``*.ipynb`` files to HTML.
 
+
+Testing
+=============
+
+Parametrized Tests
+----------
+Methods are tested using Python's `unittest <https://docs.python.org/3/library/unittest.html>`_ library. Please see the documentation `here <https://docs.python.org/3/library/unittest.html#basic-example>`_  for information and usage examples.
+The `unittest-parametrize <https://github.com/adamchainz/unittest-parametrize>`_ library is used to generate parametrized test cases.
+
+The ``@parametrize`` decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case. 
+This helps to test various scenarios without duplicating code.
+
+Example: Parameterized Test for ``ProjectionOperator``
+::    
+  @parametrize("device, raise_error, err_type", 
+    [param('cpu', False, None, id="cpu_NoError"), 
+     param('CPU', False, None, id="CPU_NoError"), 
+     param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+
+  def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+      if raise_error:
+          with self.assertRaises(err_type):
+              ProjectionOperator(self.ig, self.ag, device)
+      else:
+          assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+
+
+The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``, 
+``raise_error`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
+
+In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
+There are 3 sets of parameters: 
+
+- ``param('cpu', False, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.  
+- ``param('CPU', False, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.  
+- ``param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.  
+
+Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
+
+When running the test, each parameterized case is shown as a distinct result:
+::
+  test_ProjectionOperator_2Ddata[cpu_NoError] ... ok
+  test_ProjectionOperator_2Ddata[CPU_NoError] ... ok
+  test_ProjectionOperator_2Ddata[InvalidInput_ValueError] ... ok
+
+  ----------------------------------------------------------------------
+  Ran 3 tests in 0.001s
+
+  OK
+
+
+
 Contributions guidelines
 ========================
 
@@ -176,3 +227,13 @@ Make sure that each contributed file contains the following text enclosed in the
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+Github Actions
+==============
+If you open a pull request, continuous integration (CI) via github actions will run automatically. The CI will run the tests and build the documentation. For more information please see the GHA README for CIL: https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md.
+
+When opening or modifying a pull request to master, two variants are built and tested (for linux with minimum & maximum supported python & numpy versions). When pushing to master or creating an annotated tag, all variants are built and tested. To test all variants on a pull request to master, use `#all-tests` in your commit message. You might wish to do this if you are making changes to github actions or CIL dependencies or when preparing for a release. 
+
+To skip tests, include one of the following in your commit message `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]` or `[actions skip]`. For merging into CIL master, we must see the tests pass.
+
+

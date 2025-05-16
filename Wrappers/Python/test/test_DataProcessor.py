@@ -35,7 +35,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
 import gc
 
 from utils import has_numba
@@ -45,7 +45,7 @@ if has_numba:
 from scipy import constants
 from scipy.fft import ifftshift
 
-from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp
+from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
 
 initialise_tests()
 
@@ -2576,7 +2576,7 @@ class TestMaskGenerator(unittest.TestCase):
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
-    def test_TransmissionAbsorptionConverter(self):
+    def test_TransmissionAbsorptionConverter(self, accelerated=False):
 
         ray_direction = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
@@ -2604,7 +2604,8 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
         ad = AG.allocate('random')
 
-        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
+                                            accelerated=accelerated)
         s.set_input(ad)
         data_exp = s.get_output()
 
@@ -2621,6 +2622,9 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+
+    def test_TransmissionAbsorptionConverter_accelerated(self):
+        self.test_TransmissionAbsorptionConverter(accelerated=True)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -3319,7 +3323,8 @@ class TestFluxNormaliser(unittest.TestCase):
         processor._calculate_flux()
         with self.assertRaises(TypeError):
             processor._calculate_target()
-        
+    
+    @unittest.skipIf(not has_matplotlib, "matplotlib not installed")
     @patch('matplotlib.pyplot.show')
     def test_preview_configuration(self, mock_show):
         
@@ -3544,7 +3549,99 @@ class TestFluxNormaliser(unittest.TestCase):
         numpy.testing.assert_allclose(data.array, self.data_cone.array)
 
 
-if __name__ == "__main__":
+class TestNormaliser(unittest.TestCase):
 
-    d = TestDataProcessor()
-    d.test_DataProcessorChaining()
+    def setUp(self):
+        self.data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+
+    def test_normaliser_standard(self):
+        flat_field = numpy.ones(self.data.shape[1::]) * 1.5
+        dark_field = numpy.ones(self.data.shape[1::]) * 0.5
+        normaliser = Normaliser(flat_field=flat_field, dark_field=dark_field)
+        normalised_data = normaliser(self.data)
+        test_out =  self.data.array-normalised_data.array
+        numpy.testing.assert_allclose(test_out, 0.5)
+
+        # test default with out
+        out = self.data.geometry.allocate(None)
+        normaliser(self.data, out=out)
+        numpy.testing.assert_allclose(out.array, normalised_data.array)
+
+        # test default inplace
+        normaliser(self.data, out=self.data)
+        numpy.testing.assert_allclose(self.data.array, normalised_data.array)
+
+    def test_bad_input(self):
+        arr = numpy.ones((5)) 
+        normaliser = Normaliser(flat_field=arr, dark_field=None)
+        normaliser.set_input(self.data)
+
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()
+
+        arr = numpy.ones((5,6)) 
+        normaliser.set_flat_field(arr)
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()      
+
+        arr = numpy.ones((5,6)) 
+        normaliser.set_dark_field(arr)
+        normaliser.set_flat_field(None)
+        with self.assertRaises(ValueError):
+            out = normaliser.get_output()     
+
+    def test_no_offset(self):
+        #test with no dark-field
+        flat_field = numpy.ones(self.data.shape[1::]) * 2.0
+        dark_field = None
+        normaliser = Normaliser(flat_field=flat_field, dark_field=dark_field)
+        normalised_data = normaliser(self.data)
+        test_out =  normalised_data.array/self.data.array
+        numpy.testing.assert_allclose(test_out, 0.5)
+
+        # test default with out
+        out = self.data.geometry.allocate(None)
+        normaliser(self.data, out=out)
+        numpy.testing.assert_allclose(out.array, normalised_data.array)
+
+        # test default inplace
+        normaliser(self.data, out=self.data)
+        numpy.testing.assert_allclose(self.data.array, normalised_data.array)
+
+    def test_no_flat(self): 
+        #test with no flat-field
+        flat_field = None
+        dark_field = numpy.ones(self.data.shape[1::]) * 0.5
+        normaliser = Normaliser(flat_field=flat_field, dark_field=dark_field)
+        normalised_data = normaliser(self.data)
+        test_out =  self.data.array-normalised_data.array
+        numpy.testing.assert_allclose(test_out, 0.5)
+
+        # test default with out
+        out = self.data.geometry.allocate(None)
+        normaliser(self.data, out=out)
+        numpy.testing.assert_allclose(out.array, normalised_data.array)
+
+        # test default inplace
+        normaliser(self.data, out=self.data)
+        numpy.testing.assert_allclose(self.data.array, normalised_data.array)
+
+    def test_no_flat_no_dark(self):
+        #test with no flat or dark-field
+        flat_field = None
+        dark_field = None
+        normaliser = Normaliser(flat_field=flat_field, dark_field=dark_field)
+        with self.assertRaises(ValueError):
+            normalised_data = normaliser(self.data)
+
+    def test_zeros_in_flat(self):
+        # test with zeros in flat field
+        flat_field = numpy.ones(self.data.shape[1::])
+        flat_field[0,0] = 0
+        dark_field = None
+        normaliser = Normaliser(flat_field=flat_field, dark_field=dark_field)
+        with numpy.testing.assert_warns(UserWarning):
+            normalised_data = normaliser(self.data)
+        test_out = self.data.array.copy()
+        test_out[:,0,0] = 1e-5
+        numpy.testing.assert_allclose(normalised_data.array, test_out)

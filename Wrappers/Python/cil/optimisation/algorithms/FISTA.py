@@ -280,7 +280,7 @@ class FISTA(ISTA):
 
     Note
     -----
-    FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' is an alias of 'FISTA'.
+    FISTA is sometimes also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' with the default Nesterov momentum is equivalent to 'FISTA' but the 'APGD' algorithm gives more options for momentum. 
 
 
     Examples

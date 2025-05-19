@@ -23,13 +23,6 @@ import numpy
 import logging
 import numba
 
-matplotlibAvailable = True
-try:
-    import matplotlib.pyplot as plt
-except:
-    matplotlibAvailable = False
-
-
 log = logging.getLogger(__name__)
 
 class FluxNormaliser(Processor):
@@ -282,9 +275,7 @@ class FluxNormaliser(Processor):
         matplotlib.figure.Figure
             The figure object created to plot the configuration
         '''
-        if not matplotlibAvailable:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}")
+        import matplotlib.pyplot as plt
 
         self._calculate_flux()
         if self.roi_slice is None:
@@ -374,9 +365,7 @@ class FluxNormaliser(Processor):
         ax: int, default=111
             The subplot axis to display the slice on
         '''
-        if not matplotlibAvailable:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}")
+        import matplotlib.pyplot as plt
         
         data = self.get_input()
         if angle_index is not None and 'angle' in data.dimension_labels:

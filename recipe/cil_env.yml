@@ -1,8 +1,0 @@
-name: cil
-channels:
-  - conda-forge
-  - https://software.repos.intel.com/python/conda
-dependencies:
-  - python=3.12
-  - ccpi::cil=24.3.0
-  - numpy=1.26

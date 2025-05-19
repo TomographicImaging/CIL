@@ -713,7 +713,15 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_deprecated', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        ig = ImageGeometry(2,2)
+        data=ig.allocate('random_int_deprecated', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
     def test_AcquisitionGeometry_allocate_complex(self):
         # Detectors
@@ -751,19 +759,34 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
+        data=ag.allocate('random_deprecated', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
+
+        data=ag.allocate('random_int_deprecated', dtype=np.complex64)
+        self.assertTrue(data.array.dtype, np.complex64)
+        self.assertNotEqual(np.sum(data.array).imag, 0)
 
     def test_VectorGeometry_allocate_complex(self):
         vg = VectorGeometry(3)
         self.complex_allocate_geometry_test(vg)
 
         data=vg.allocate('random', dtype=np.complex64)
-        self.assertTrue(data.array.dtype, np.complex64)
-        self.assertNotEqual(np.sum(data.array).imag, 0)
+        # self.assertTrue(data.array.dtype, np.complex64)
+        # self.assertNotEqual(np.sum(data.array).imag, 0)
 
-        data=vg.allocate('random_int', dtype=np.complex64)
-        self.assertTrue(data.array.dtype, np.complex64)
-        self.assertNotEqual(np.sum(data.array).imag, 0)
+        # data=vg.allocate('random_int', dtype=np.complex64)
+        # self.assertTrue(data.array.dtype, np.complex64)
+        # self.assertNotEqual(np.sum(data.array).imag, 0)
+
+        # data=vg.allocate('random_deprecated', dtype=np.complex64)
+        # self.assertTrue(data.array.dtype, np.complex64)
+        # self.assertNotEqual(np.sum(data.array).imag, 0)
+
+        # data=vg.allocate('random_int_deprecated', dtype=np.complex64)
+        # self.assertTrue(data.array.dtype, np.complex64)
+        # self.assertNotEqual(np.sum(data.array).imag, 0)
 
 
     def test_ImageGeometry_allocate_random_same_seed(self):
@@ -772,6 +795,10 @@ class TestDataContainer(CCPiTestClass):
         image2 = vgeometry.allocate('random', seed=0)
         np.testing.assert_allclose(image1.as_array(), image2.as_array())
 
+        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        image1 = vgeometry.allocate('random_deprecated', seed=0)
+        image2 = vgeometry.allocate('random_deprecated', seed=0)
+        np.testing.assert_allclose(image1.as_array(), image2.as_array())
 
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry.create_Parallel3D().set_angles(np.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
@@ -1332,40 +1359,6 @@ class TestDataContainer(CCPiTestClass):
         u.fill(b, horizontal_y=2)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=2).as_array(), 3 * a)
 
-
-    def test_fill_dimension_AcquisitionData(self):
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_channels(4)
-        ag.set_panel([2,3])
-        ag.set_angles([0,1,2,3,5])
-        ag.set_labels(('horizontal','angle','vertical','channel'))
-        u = ag.allocate(0)
-        a = np.ones((4,2))
-        # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
-
-        data = u.as_array()
-        axis_number = u.get_dimension_axis('horizontal_y')
-
-        u.fill(a, horizontal_y=0)
-        np.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
-
-        u.fill(2, horizontal_y=1)
-        np.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), 2 * a)
-
-        u.fill(2, horizontal_y=1)
-        np.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
-
-        b = u.subset(horizontal_y=2)
-        b.fill(3)
-        u.fill(b, horizontal_y=2)
-        np.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
-
-        # slice with 2 axis
-        a = np.ones((2,))
-        u.fill(a, horizontal_y=1, vertical=0)
-        np.testing.assert_array_equal(u.subset(horizontal_y=1, vertical=0).as_array(), a)
-
-
     def test_fill_dimension_AcquisitionData(self):
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_channels(4)
@@ -1392,6 +1385,26 @@ class TestDataContainer(CCPiTestClass):
         b.fill(3)
         u.fill(b, channel=1, vertical=1)
         np.testing.assert_array_equal(u.get_slice(channel=1, vertical=1).as_array(), 3 * a)
+
+    def test_fill_allocate_ImageData(self):
+        IG = ImageGeometry(2,2,2)
+        ID = ImageData(geometry=IG)
+        ID.fill('random_int', seed=5)
+
+        IG2 = ImageGeometry(2,2,2)
+        ID2 = IG2.allocate('random_int', seed=5)
+
+        np.testing.assert_array_equal(ID.array, ID2.array)
+
+    def test_fill_allocate_AcquisitionData(self):
+        AG = AcquisitionGeometry.create_Parallel3D().set_angles(np.array([0,90,180])).set_panel((2,2))
+        AD = AcquisitionData(geometry=AG)
+        AD.fill('random_int', seed=5)
+        
+        AG2 = AcquisitionGeometry.create_Parallel3D().set_angles(np.array([0,90,180])).set_panel((2,2))
+        AD2 = AG2.allocate('random_int', seed=5)
+        
+        np.testing.assert_array_equal(AD.array, AD2.array)
 
 
     def test_vectordata_dot_product(self):

@@ -2165,47 +2165,22 @@ class AcquisitionGeometry(object):
         return geometry_new
 
     def allocate(self, value=0, **kwargs):
-        '''allocates an AcquisitionData according to the size expressed in the instance
+        '''Allocates an AcquisitionData according to the geometry
+        
+        Parameters
+        ----------
+        value : number or string default=0
+            The value or method with which to fill the allocated array. See
+            DataContainer.fill()
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
         '''
-        dtype = kwargs.get('dtype', self.dtype)
+        dtype = kwargs.pop('dtype', self.dtype)
 
-        if kwargs.get('dimension_labels', None) is not None:
+        if kwargs.pop('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
+        
+        out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        if value is not None:
+            out.fill(value, **kwargs)
 
-        out = AcquisitionData(geometry=self.copy(),
-                              dtype=dtype,
-                              suppress_warning=True)
-
-        if isinstance(value, Number):
-            # it's created empty, so we make it 0
-            out.array.fill(value)
-        elif value in FillType:
-            if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
-                    out.fill(r)
-                else:
-                    out.fill(numpy.random.random_sample(self.shape))
-            elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                else:
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=dtype))
-        elif value is None:
-            pass
-        else:
-            raise ValueError(f'Value {value} unknown')
         return out

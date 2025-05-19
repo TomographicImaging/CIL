@@ -1359,40 +1359,6 @@ class TestDataContainer(CCPiTestClass):
         u.fill(b, horizontal_y=2)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=2).as_array(), 3 * a)
 
-
-    def test_fill_dimension_AcquisitionData(self):
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_channels(4)
-        ag.set_panel([2,3])
-        ag.set_angles([0,1,2,3,5])
-        ag.set_labels(('horizontal','angle','vertical','channel'))
-        u = ag.allocate(0)
-        a = np.ones((4,2))
-        # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
-
-        data = u.as_array()
-        axis_number = u.get_dimension_axis('horizontal_y')
-
-        u.fill(a, horizontal_y=0)
-        np.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
-
-        u.fill(2, horizontal_y=1)
-        np.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), 2 * a)
-
-        u.fill(2, horizontal_y=1)
-        np.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
-
-        b = u.subset(horizontal_y=2)
-        b.fill(3)
-        u.fill(b, horizontal_y=2)
-        np.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
-
-        # slice with 2 axis
-        a = np.ones((2,))
-        u.fill(a, horizontal_y=1, vertical=0)
-        np.testing.assert_array_equal(u.subset(horizontal_y=1, vertical=0).as_array(), a)
-
-
     def test_fill_dimension_AcquisitionData(self):
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_channels(4)
@@ -1419,6 +1385,26 @@ class TestDataContainer(CCPiTestClass):
         b.fill(3)
         u.fill(b, channel=1, vertical=1)
         np.testing.assert_array_equal(u.get_slice(channel=1, vertical=1).as_array(), 3 * a)
+
+    def test_fill_allocate_ImageData(self):
+        IG = ImageGeometry(2,2,2)
+        ID = ImageData(geometry=IG)
+        ID.fill('random_int', seed=5)
+
+        IG2 = ImageGeometry(2,2,2)
+        ID2 = IG2.allocate('random_int', seed=5)
+
+        np.testing.assert_array_equal(ID.array, ID2.array)
+
+    def test_fill_allocate_AcquisitionData(self):
+        AG = AcquisitionGeometry.create_Parallel3D().set_angles(np.array([0,90,180])).set_panel((2,2))
+        AD = AcquisitionData(geometry=AG)
+        AD.fill('random_int', seed=5)
+        
+        AG2 = AcquisitionGeometry.create_Parallel3D().set_angles(np.array([0,90,180])).set_panel((2,2))
+        AD2 = AG2.allocate('random_int', seed=5)
+        
+        np.testing.assert_array_equal(AD.array, AD2.array)
 
 
     def test_vectordata_dot_product(self):

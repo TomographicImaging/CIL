@@ -2169,38 +2169,9 @@ class AcquisitionGeometry(object):
         
         Parameters
         ----------
-        value : number or string, default=0
-            The value to allocate. Accepts a number to allocate a uniform array, 
-            None to allocate an empty memory block, or a string to create a random 
-            array: 'random' allocates floats between 0 and 1, 'random_int' allocates 
-            ints between 0 and 100.
-
-        **kwargs:
-            dtype : numpy data type, optional
-                The data type to allocate if different from the geometry data type. 
-                Default None allocates an array with the geometry data type.
-
-            seed : int, optional
-                A random seed to fix reproducibility, only used if `value` is a random
-                method. Default is `None`.
-
-            min_value : number, optional
-                The maximum value random integer to generate, only used if `value` 
-                is 'random_int'. Default is 0.
-
-            max_value : number, optional
-                The maximum value random integer to generate, only used if `value` 
-                is 'random_int'. Default is 100.
-
-        Note
-        ----
-            The methods used by 'random' or 'random_int' use `numpy.random.default_rng` 
-            which allocates memory only for the array of the specified dtype. This
-            method does not use the global numpy.random.seed() so if a seed is 
-            required it should be passed directly as an argument to allocate.
-            To allocate random numbers using the deprecated `numpy.random.random_sample`
-            and `numpy.random.randint` methods use `value='random_deprecated'` 
-            or `value='random_int_deprecated'` 
+        value : number or string default=0
+            The value or method with which to fill the allocated array. See
+            DataContainer.fill()
 
         '''
         dtype = kwargs.pop('dtype', self.dtype)
@@ -2208,64 +2179,70 @@ class AcquisitionGeometry(object):
         if kwargs.pop('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
         
-        if isinstance(value, Number):
-            out = AcquisitionData(geometry=self.copy(), dtype=dtype)
-            out.array.fill(value)
-
-        elif value in FillType:
-            seed = kwargs.pop("seed", None)
-
-            if value == FillType.RANDOM_DEPRECATED:
-                warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
-                out = AcquisitionData(geometry=self.copy(), dtype=dtype)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
-                    out.fill(r)
-                else:
-                    out.fill(numpy.random.random_sample(self.shape))
-
-            elif value == FillType.RANDOM_INT_DEPRECATED:
-                warnings.warn("RANDOM_INT_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
-                out = AcquisitionData(geometry=self.copy(), dtype=dtype)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                max_value = kwargs.pop("max_value", 100)
-                min_value = kwargs.pop("min_value", 0)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.randint(min_value, max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                else:
-                    r = numpy.random.randint(min_value, max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=dtype))
-            
-            elif value == FillType.RANDOM:
-                rng = numpy.random.default_rng(seed)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    complex_example = numpy.array([1 + 1j], dtype=dtype)
-                    half_dtype = numpy.real(complex_example).dtype
-                    r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
-                else:
-                    r = rng.random(size=self.shape, dtype=dtype)
-                out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
-
-            elif value == FillType.RANDOM_INT:
-                rng = numpy.random.default_rng(seed)
-                max_value = kwargs.pop("max_value", 100)
-                min_value = kwargs.pop("min_value", 0)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
-                else:
-                    r = rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
-            
-                out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
-            
-        elif value is None:
-            out = AcquisitionData(array=None, geometry=self.copy(), dtype=dtype)
-        else:
-            raise ValueError(f'Value {value} unknown')
+        out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        if value is not None:
+            out.fill(value, **kwargs)
         
-        if kwargs:
-            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
+
+
+        # if isinstance(value, Number):
+        #     out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        #     out.array.fill(value)
+
+        # elif value in FillType:
+        #     seed = kwargs.pop("seed", None)
+
+        #     if value == FillType.RANDOM_DEPRECATED:
+        #         warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+        #         out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        #         if seed is not None:
+        #             numpy.random.seed(seed)
+        #         if numpy.iscomplexobj(out.array):
+        #             r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
+        #             out.fill(r)
+        #         else:
+        #             out.fill(numpy.random.random_sample(self.shape))
+
+        #     elif value == FillType.RANDOM_INT_DEPRECATED:
+        #         warnings.warn("RANDOM_INT_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+        #         out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        #         if seed is not None:
+        #             numpy.random.seed(seed)
+        #         max_value = kwargs.pop("max_value", 100)
+        #         min_value = kwargs.pop("min_value", 0)
+        #         if numpy.iscomplexobj(out.array):
+        #             r = numpy.random.randint(min_value, max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+        #         else:
+        #             r = numpy.random.randint(min_value, max_value,size=self.shape, dtype=numpy.int32)
+        #         out.fill(numpy.asarray(r, dtype=dtype))
+            
+        #     elif value == FillType.RANDOM:
+        #         rng = numpy.random.default_rng(seed)
+        #         if numpy.issubdtype(dtype, numpy.complexfloating):
+        #             complex_example = numpy.array([1 + 1j], dtype=dtype)
+        #             half_dtype = numpy.real(complex_example).dtype
+        #             r = rng.random(size=self.shape, dtype=half_dtype) + 1j * rng.random(size=self.shape, dtype=half_dtype)
+        #         else:
+        #             r = rng.random(size=self.shape, dtype=dtype)
+        #         out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
+
+        #     elif value == FillType.RANDOM_INT:
+        #         rng = numpy.random.default_rng(seed)
+        #         max_value = kwargs.pop("max_value", 100)
+        #         min_value = kwargs.pop("min_value", 0)
+        #         if numpy.issubdtype(dtype, numpy.complexfloating):
+        #             r = (rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.shape, dtype=numpy.int32)).astype(dtype)
+        #         else:
+        #             r = rng.integers(min_value, max_value, size=self.shape, dtype=numpy.int32).astype(dtype)
+            
+        #         out = AcquisitionData(r, geometry=self.copy(), dtype=dtype)
+            
+        # elif value is None:
+        #     out = AcquisitionData(array=None, geometry=self.copy(), dtype=dtype)
+        # else:
+        #     raise ValueError(f'Value {value} unknown')
+        
+        # if kwargs:
+        #     warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
         return out

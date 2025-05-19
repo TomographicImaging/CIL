@@ -216,73 +216,168 @@ class DataContainer(object):
         else:
             self.geometry.set_labels(dimension_labels_new)
 
-    def fill(self, array, **dimension):
-        '''fills the internal data array with the DataContainer, numpy array or number provided
+    def fill(self, array, **kwargs):
+        '''Fills the internal data array with a DataContainer, numpy array, number 
+        or using a random fill method
 
-        :param array: number, numpy array or DataContainer to copy into the DataContainer
-        :type array: DataContainer or subclasses, numpy array or number
-        :param dimension: dictionary, optional
+        Parameters
+        ----------
+        array : DataContainer, numpy array, number or string, default=0
+            The value or method with which to fill the DataContainer. Accepts a 
+            numpy array or DataContainer or a number to allocate a uniform array
+            or a string specifying a method to fill with a random array: 'random' 
+            allocates floats between 0 and 1, 'random_int' allocates ints between 
+            0 and 100.
 
-        if the passed numpy array points to the same array that is contained in the DataContainer,
-        it just returns
+        **kwargs:
+            **dimension : int, optional 
+                An optional named parameter to specify in which axis the fill should 
+                happen. The name passed must match one of the DataContainer 
+                dimension_labels and the axis must be an int
 
-        In case a DataContainer or subclass is passed, there will be a check of the geometry,
-        if present, and the array will be resorted if the data is not in the appropriate order.
+            dtype : numpy data type, optional
+                The data type to allocate if different from the DataContainer data 
+                type. Default `None` allocates an array with the existing data type.
 
-        User may pass a named parameter to specify in which axis the fill should happen:
+            seed : int, optional
+                A random seed to fix reproducibility, only used if `array` is a 
+                random method. Default is `None`.
 
-        dc.fill(some_data, vertical=1, horizontal_x=32)
-        will copy the data in some_data into the data container.
+            min_value : number, optional
+                The maximum value random integer to generate, only used if `array` 
+                is 'random_int'. Default is 0.
+
+            max_value : number, optional
+                The maximum value random integer to generate, only used if `array` 
+                is 'random_int'. Default is 100.
+        
+        Note
+        ----
+            If the passed numpy array points to the same array that is contained 
+            in the DataContainer, it just returns
+        
+        Note
+        ----
+            In case a DataContainer or subclass is passed, there will be a check 
+            of the geometry, if present, and the array will be resorted if the 
+            data is not in the appropriate order.
+
+        Note
+        ----
+            The methods used by 'random' or 'random_int' use `numpy.random.default_rng` 
+            which allocates memory only for the array of the specified dtype. This
+            method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as an argument.
+            To fill random numbers using the deprecated `numpy.random.random_sample`
+            and `numpy.random.randint` methods use `value='random_deprecated'` 
+            or `value='random_int_deprecated'` 
+        
+        Example
+        -------
+        This example shows how to pass a dimension to specify an axis to fill
+        >>> from cil.framework import DataContainer
+        >>> DC = DataContainer(old_data)
+        >>> DC.fill(new_data, vertical=1, horizontal_x=32)
+        will copy the data in new_data into the data container.
         '''
+        from cil.framework.labels import FillType
+        dimension = {}
+
+        try:
+            dimension_labels = self.dimension_labels
+        except AttributeError:
+            dimension_labels = None
+        
+        if dimension_labels is not None:
+            for k in list(kwargs):
+                if k in self.dimension_labels:
+                    dimension[k] = kwargs.pop(k)
+
+            index = [slice(None)] * self.number_of_dimensions
+            dimension_labels = tuple(self.dimension_labels)
+
+            for k, v in dimension.items():
+                i = dimension_labels.index(k)
+                index[i] = v  
+            index = tuple(index)
+        else:
+            index = (slice(None),) * self.array.ndim
+
+        dtype = kwargs.pop('dtype', self.dtype)
+
         if id(array) == id(self.array):
             return
-        if dimension == {}:
-            if isinstance(array, numpy.ndarray):
-                numpy.copyto(self.array, array)
-            elif isinstance(array, Number):
-                self.array.fill(array)
-            elif issubclass(array.__class__ , DataContainer):
+        
+        if isinstance(array, numpy.ndarray):
+            numpy.copyto(self.array[index], array)
+        
+        elif isinstance(array, Number):
+            self.array[index] = array
+        
+        elif issubclass(array.__class__ , DataContainer):
+            if dimension_labels is not None:
+                indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
+                if tuple(indexed_dimension_labels) != array.dimension_labels:
+                    raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
+            
+            if self.array[index].shape == array.shape:
+                numpy.copyto(self.array[index], array.array)
+            else:
+                raise ValueError('Cannot fill with the provided array.' + \
+                                    'Expecting shape {0} got {1}'.format(
+                                    self.array[index].shape, array.shape))
+            
+        elif array in FillType:
 
-                try:
-                    if self.dimension_labels != array.dimension_labels:
-                        raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
-                except AttributeError:
-                    pass
-
-                if self.array.shape == array.shape:
-                    numpy.copyto(self.array, array.array)
+            seed = kwargs.pop("seed", None)
+            
+            if array == FillType.RANDOM_DEPRECATED:
+                warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (numpy.random.random_sample(self.array[index].shape) + 1j * numpy.random.random_sample(self.array[index].shape)).astype(dtype)
                 else:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
-            else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                    r = numpy.random.random_sample(self.array[index].shape).astype(dtype)
+                self.array[index] = r
+            
+            elif array == FillType.RANDOM_INT_DEPRECATED:
+                warnings.warn("RANDOM_INT_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.pop("max_value", 100)
+                min_value = kwargs.pop("min_value", 0)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.array[index].shape, dtype=numpy.int32)).astype(dtype)
+                else:
+                    r = numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32).astype(dtype)
+                self.array[index] = r
+
+            elif array == FillType.RANDOM:
+                rng = numpy.random.default_rng(seed)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                    half_dtype = numpy.real(complex_example).dtype
+                    r = (rng.random(size=self.array[index].shape, dtype=half_dtype) + 1j * rng.random(size=self.array[index].shape, dtype=half_dtype)).astype(dtype)
+                else:
+                    r = rng.random(size=self.array[index].shape, dtype=dtype)
+                self.array[index] = r
+
+            elif array == FillType.RANDOM_INT:
+                rng = numpy.random.default_rng(seed)
+                max_value = kwargs.pop("max_value", 100)
+                min_value = kwargs.pop("min_value", 0)
+                if numpy.issubdtype(dtype, numpy.complexfloating):
+                    r = (rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.array[index].shape, dtype=numpy.int32)).astype(dtype)
+                else:
+                    r = rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32).astype(dtype)
+                self.array[index] = r
+
         else:
+            raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
 
-            axis = [':']* self.number_of_dimensions
-            dimension_labels = tuple(self.dimension_labels)
-            for k,v in dimension.items():
-                i = dimension_labels.index(k)
-                axis[i] = v
-
-            command = 'self.array['
-            i = 0
-            for el in axis:
-                if i > 0:
-                    command += ','
-                command += str(el)
-                i+=1
-
-            if isinstance(array, numpy.ndarray):
-                command = command + "] = array[:]"
-            elif issubclass(array.__class__, DataContainer):
-                command = command + "] = array.as_array()[:]"
-            elif isinstance (array, Number):
-                command = command + "] = array"
-            else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
-            exec(command)
-
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def check_dimensions(self, other):
         return self.shape == other.shape

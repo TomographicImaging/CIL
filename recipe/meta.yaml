@@ -34,15 +34,12 @@ test:
     - pip install unittest-parametrize
     - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
-    
+
 
 requirements:
   build:
     - python
-    - numpy {{ numpy }}
-    - pip
-    - setuptools >=64
-    - setuptools_scm >=8
+    - uv
     - cmake         # [not osx]
     - cmake >=3.16  # [osx]
     - libgcc-ng     # [linux]
@@ -50,9 +47,7 @@ requirements:
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
-    - ipp-include {{ ipp_version }} 
-    - ipp-devel {{ ipp_version }} 
-    - ipp {{ ipp_version }} 
+    - ninja         # [not win]
 
   run:
     - python
@@ -69,7 +64,6 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data >=22
-    - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba
 

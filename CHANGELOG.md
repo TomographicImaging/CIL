@@ -33,8 +33,13 @@
       - olefile and dxchange are an optional dependency, instead of required (#2149)
       - zenodo_get is an optional dependency, instead of required (#2146)
       - `FindIPP.cmake` fallback (#2148)
-        - enable `find_package` using `*_ROOT` hints
-        - simplified `cilacc` build logic for optional dependencies
+         - enable `find_package` using `*_ROOT` hints
+         - simplified `cilacc` build logic for optional dependencies   
+  - Removed the following code which has been deprecated since v23.0.0 or earlier (#2150):
+      - `dimension_labels` kwarg in `AcquisitionGeometry.allocate()` and in `ImageData`'s `__init__`
+      - `axpby` (alias of `sapyb`)
+      - `shape` setter in `DataContainer` and `ImageGeometry`
+      - use of integer compression in `NEXUSDataWriter`
 
 * 24.3.0
   - New features:

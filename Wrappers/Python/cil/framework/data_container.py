@@ -66,10 +66,6 @@ class DataContainer(object):
         '''Returns the shape of the DataContainer'''
         return self.array.shape
 
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
-
     @property
     def ndim(self):
         '''Returns the ndim of the DataContainer'''

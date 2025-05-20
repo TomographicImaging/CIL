@@ -63,8 +63,9 @@ class REMOTEDATA(DATA):
 
         Parameters
         ----------
-        data_dir: str, optional
-           The path to the data directory where the downloaded data should be stored
+        data_dir: str
+           The path to the data directory where the downloaded data should be stored.
+           If unspecified, tries to use the CIL_DATA_DIR environment variable.
         '''
         cls.assert_dir(data_dir)
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):

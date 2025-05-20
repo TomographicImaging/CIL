@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.block &#8212; CIL 24.3.1.dev36+g64e0b1b6 documentation</title>
+    <title>cil.framework.block &#8212; CIL 24.3.1.dev37+g96468fda documentation</title>
   
   
   
@@ -34,12 +34,12 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=49266863"></script>
+    <script src="../../../../_static/documentation_options.js?v=12aacbb3"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev36+g64e0b1b6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev37+g96468fda';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev36+g64e0b1b6" />
+  <meta name="docsearch:version" content="24.3.1.dev37+g96468fda" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -848,15 +848,6 @@
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mi">0</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="BlockDataContainer.axpby">
-<a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.axpby">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Deprecated method. Alias of sapyb&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">out</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span></div>
-
 
 
 

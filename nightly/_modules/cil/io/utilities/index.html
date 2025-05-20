@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.utilities &#8212; CIL 24.3.1.dev36+g64e0b1b6 documentation</title>
+    <title>cil.io.utilities &#8212; CIL 24.3.1.dev37+g96468fda documentation</title>
   
   
   
@@ -34,12 +34,12 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=49266863"></script>
+    <script src="../../../../_static/documentation_options.js?v=12aacbb3"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev36+g64e0b1b6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev37+g96468fda';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev36+g64e0b1b6" />
+  <meta name="docsearch:version" content="24.3.1.dev37+g96468fda" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -498,30 +498,20 @@
 
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
-<span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
+<span class="sd">    compression : string. Default is None, no compression.</span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
 <span class="sd">    compress : bool, True if compression is required, False otherwise</span>
 
-<span class="sd">    Note:</span>
-<span class="sd">    -----</span>
-
-<span class="sd">    The use of int is deprecated and will be removed in the future. Use string instead.</span>
-
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use string instead of int&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">compression</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">compress</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="n">compression</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">]:</span>
-        <span class="n">compress</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">elif</span> <span class="n">compression</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="n">compression</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]:</span>
         <span class="n">compress</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Compression bits not valid. Got </span><span class="si">{0}</span><span class="s1"> expected value in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Compression bits not valid. Got </span><span class="si">{0}</span><span class="s1"> expected value in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]))</span>
 
     <span class="k">return</span> <span class="n">compress</span>
 
@@ -534,23 +524,21 @@
 <span class="sd">    -----------</span>
 <span class="sd">    data : DataContainer, numpy array</span>
 <span class="sd">        the data to be compressed</span>
-<span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
+<span class="sd">    compression : string. Default is None, no compression.</span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
 <span class="sd">    dtype : numpy type, the numpy type to be used for compression</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use string instead of int&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">compression</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
-    <span class="k">elif</span> <span class="n">compression</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="n">compression</span> <span class="o">==</span> <span class="s1">&#39;uint8&#39;</span><span class="p">:</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
-    <span class="k">elif</span> <span class="n">compression</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="n">compression</span> <span class="o">==</span> <span class="s1">&#39;uint16&#39;</span><span class="p">:</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Compression bits not valid. Got </span><span class="si">{0}</span><span class="s1"> expected value in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Compression bits not valid. Got </span><span class="si">{0}</span><span class="s1"> expected value in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="s1">&#39;uint16&#39;</span><span class="p">]))</span>
 
     <span class="k">return</span> <span class="n">dtype</span>
 
@@ -561,18 +549,16 @@
 <span class="sd">    -----------</span>
 <span class="sd">    data : DataContainer, numpy array</span>
 <span class="sd">        The data to be compressed</span>
-<span class="sd">    compression : string, int. Default is None, no compression.</span>
-<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39; and deprecated 0, 8, 16.</span>
+<span class="sd">    compression : string. Default is None, no compression.</span>
+<span class="sd">        It specifies the number of bits to use for compression, allowed values are None, &#39;uint8&#39;, &#39;uint16&#39;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
 <span class="sd">    scale : float, the scale to be applied to the data for compression to the specified number of bits</span>
 <span class="sd">    offset : float, the offset to be applied to the data for compression to the specified number of bits</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compression</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use string instead of int&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">compression</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># no compression</span>
         <span class="c1"># return scale 1.0 and offset 0.0</span>
         <span class="k">return</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.NEXUSDataWriter &#8212; CIL 24.3.1.dev36+g64e0b1b6 documentation</title>
+    <title>cil.io.NEXUSDataWriter &#8212; CIL 24.3.1.dev37+g96468fda documentation</title>
   
   
   
@@ -34,12 +34,12 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=49266863"></script>
+    <script src="../../../../_static/documentation_options.js?v=12aacbb3"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev36+g64e0b1b6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev37+g96468fda';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev36+g64e0b1b6" />
+  <meta name="docsearch:version" content="24.3.1.dev37+g96468fda" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -540,9 +540,9 @@
 <span class="sd">            The dataset to write to file</span>
 <span class="sd">        file_name: os.path or string, default None</span>
 <span class="sd">            The file name to write</span>
-<span class="sd">        compression: int, default 0</span>
-<span class="sd">            The lossy compression to apply, default 0 will not compress data.</span>
-<span class="sd">            8 or 16 will compress to 8 and 16 bit dtypes respectively.</span>
+<span class="sd">        compression: str, {&#39;uint8&#39;, &#39;uint16&#39;, None}, default None</span>
+<span class="sd">            The lossy compression to apply, default None will not compress data.</span>
+<span class="sd">            uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
@@ -568,8 +568,6 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
 
-
-
         <span class="c1"># check that h5py library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">h5pyAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot write NEXUS files.&#39;</span><span class="p">)</span></div>
@@ -578,7 +576,6 @@
 <div class="viewcode-block" id="NEXUSDataWriter.write">
 <a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        write dataset to disk</span>
 <span class="sd">        &#39;&#39;&#39;</span>

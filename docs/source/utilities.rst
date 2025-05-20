@@ -19,8 +19,8 @@
 Utilities
 *********
 
-By default, CIL will look for data in the `CIL_DATA_DIR` environment variable (if present),
-or `{sys.prefix}/share/cil` otherwise.
+By default, CIL will look for small (built-in) data in `{sys.prefix}/share/cil`,
+and larger remote (downloadable) data in the `CIL_DATA_DIR` environment variable (if present).
 
 Test datasets
 =============

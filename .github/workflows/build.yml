@@ -53,8 +53,7 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        test -d $HOME/.cache/cil || cp -r $(python -c 'import sys; print(sys.prefix)')/share/cil $HOME/.cache/
-        TESTS_FORCE_GPU=1 CIL_DATA_DIR=$HOME/.cache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       shell: bash

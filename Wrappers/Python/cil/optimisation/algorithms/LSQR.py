@@ -27,42 +27,56 @@ log = logging.getLogger(__name__)
 
 class LSQR(Algorithm):
 
-    r''' Least Squares QR (LSQR) algorithm
     
-    The Least Squares QR (LSQR) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.
+    r"""
+    Least Squares QR (LSQR) algorithm.
 
-    Problem:
+    The LSQR algorithm is used to solve large-scale linear systems and least-squares problems, particularly when the matrix is sparse or implicitly defined.
 
-    .. math::
-
-      \min_x || A x - b ||^2_2
-      
-    An optional regularisation parameter alpha can be included to instead solve the Tikhonov regularised problem
+    Solves the problem:
 
     .. math::
 
-      \min_x { || A x - b ||^2_2 + alpha^2 || x ||_2^2 }
+        \min_x \|Ax - b\|_2^2
 
-        
+    Optionally, with Tikhonov regularisation:
+
+    .. math::
+
+        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x\|_2^2
+
     Parameters
-    ------------
+    ----------
     operator : Operator
-        Linear operator for the inverse problem
-    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
-        Initial guess 
-    data : DataContainer in the range of the operator 
-        Acquired data to reconstruct
-    alpha : (optional) non-negative float, default 0
-        Regularisation parameter that includes Tikhonov regularisation in the objective, default is zero. In case of zero the algorithm is standard LSQR.
-
+        Linear operator representing the forward model.
+    initial : DataContainer, optional
+        Initial guess for the solution. If not provided, a zero-initialised container is used.
+    data : DataContainer
+        Measured data (right-hand side of the equation).
+    alpha : float, optional
+        Non-negative regularisation parameter. If zero, standard LSQR is used.
 
     Reference
     ---------
     https://web.stanford.edu/group/SOL/software/lsqr/
-    '''
+    """
+
     def __init__(self, initial=None, operator=None, data=None, alpha=None, **kwargs):
-        '''initialisation of the algorithm
-        '''
+        """
+        Initialise the LSQR algorithm.
+
+        Parameters
+        ----------
+        initial : DataContainer, optional
+            Initial guess for the solution.
+        operator : Operator
+            Linear operator representing the forward model.
+        data : DataContainer
+            Measured data.
+        alpha : float, optional
+            Regularisation parameter. Default is 0 (no regularisation).
+        """
+
 
         
         super(LSQR, self).__init__(**kwargs)
@@ -81,17 +95,19 @@ class LSQR(Algorithm):
 
 
     def set_up(self, initial, operator, data):
-        r'''Initialisation of the algorithm
-        Parameters
-        ------------
-        operator : Operator
-            Linear operator for the inverse problem
-        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
-            Initial guess 
-        data : DataContainer in the range of the operator 
-            Acquired data to reconstruct
+        r"""
+        Set up the LSQR algorithm with the problem definition.
 
-        '''
+        Parameters
+        ----------
+        initial : DataContainer
+            Initial guess for the solution.
+        operator : Operator
+            Linear operator representing the forward model.
+        data : DataContainer
+            Measured data.
+        """
+
         
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy() #1 domain
@@ -125,7 +141,11 @@ class LSQR(Algorithm):
 
 
     def update(self):
-        '''single iteration'''
+        
+        """
+        Perform a single iteration of the LSQR algorithm.
+        """
+
 
         # Update u in GKB
         self.operator.direct(self.v, out=self.tmp_range)
@@ -171,6 +191,10 @@ class LSQR(Algorithm):
         
 
     def update_objective(self):
+        """
+        Update the objective function value (residual norm squared).
+        """
+
         if self.normr is numpy.nan:
             raise StopIteration()
         self.loss.append(self.normr**2)

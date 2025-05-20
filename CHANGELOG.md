@@ -4,8 +4,10 @@
       - Removed the deprecated usage of run method in test_SIRF.py (#2070)
       - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
       - Made ProjectionOperator `device` input case-insensitive (#1990)
+      - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
       - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
       - Copy geometry in the creation of a DataContainer (#2108)
+      - Fix order of operations for subtraction and division between a BlockDataContainer and DataContainer (#2133)
   - Documentation:
       - Updated documentation for the ChannelWiseOperator including new example (#2096)
       - Updated documentation for LADMM (#2015)
@@ -16,9 +18,10 @@
       - Added option for a random seed in the power method in the linear operator (#1585)
       - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
       - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
-      - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) #2128 
+      - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) (#2128)
       - PDHG 'check_convergence' updated for new literature (#2084)
       - Make install local env script work on windows (#2144)
+      - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
   - Testing:
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
@@ -27,6 +30,7 @@
   - Dependencies:
       - matplotlib-base is an optional dependency, instead of required (#2093)
       - `unittest-parametrize has been added as a dependency for tests (#1990)
+      - olefile and dxchange are an optional dependency, instead of required (#2149)
       - zenodo_get is an optional dependency, instead of required (#2146)
       - `FindIPP.cmake` fallback (#2148)
          - enable `find_package` using `*_ROOT` hints
@@ -36,7 +40,6 @@
       - `axpby` (alias of `sapyb`)
       - `shape` setter in `DataContainer` and `ImageGeometry`
       - use of integer compression in `NEXUSDataWriter`
-
 
 * 24.3.0
   - New features:

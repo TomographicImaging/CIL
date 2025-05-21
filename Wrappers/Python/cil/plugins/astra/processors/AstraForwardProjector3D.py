@@ -19,7 +19,7 @@ from cil.framework import DataProcessor, AcquisitionData
 from cil.framework.labels import ImageDimension, AcquisitionDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 import astra
-from astra import astra_dict, algorithm, data3d
+import astra.experimental
 import numpy as np
 
 class AstraForwardProjector3D(DataProcessor):
@@ -43,8 +43,7 @@ class AstraForwardProjector3D(DataProcessor):
         kwargs = {
                   'volume_geometry'  : volume_geometry,
                   'sinogram_geometry'  : sinogram_geometry,
-                  'proj_geom'  : None,
-                  'vol_geom'  : None,
+                  'projector_id'  : None
                   }
 
         super(AstraForwardProjector3D, self).__init__(**kwargs)
@@ -52,7 +51,12 @@ class AstraForwardProjector3D(DataProcessor):
         self.set_ImageGeometry(volume_geometry)
         self.set_AcquisitionGeometry(sinogram_geometry)
 
-        self.vol_geom, self.proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
+        vol_geom, proj_geom = convert_geometry_to_astra_vec_3D(self.volume_geometry, self.sinogram_geometry)
+        self.projector_id = astra.create_projector('cuda3d', proj_geom, vol_geom)
+
+    def __del__(self):
+        astra.projector3d.delete(self.projector_id)
+
 
     def check_input(self, dataset):
 
@@ -97,19 +101,14 @@ class AstraForwardProjector3D(DataProcessor):
 
         data_temp = IM.as_array().reshape(new_shape_ig)
 
+        new_shape_ag = [self.sinogram_geometry.pixel_num_v,self.sinogram_geometry.num_projections,self.sinogram_geometry.pixel_num_h]
+
         if out is None:
-            sinogram_id, arr_out = astra.create_sino3d_gpu(data_temp,
-                                                           self.proj_geom,
-                                                           self.vol_geom)
+            arr_out = np.zeros(new_shape_ag, dtype=np.float32)
         else:
-            new_shape_ag = [self.sinogram_geometry.pixel_num_v,self.sinogram_geometry.num_projections,self.sinogram_geometry.pixel_num_h]
             arr_out = out.as_array().reshape(new_shape_ag)
 
-            sinogram_id = astra.data3d.link('-sino', self.proj_geom, arr_out)
-            self.create_sino3d_gpu(data_temp, self.proj_geom, self.vol_geom, False, sino_id=sinogram_id)
-
-        #clear the memory on GPU
-        astra.data3d.delete(sinogram_id)
+        astra.experimental.direct_FP3D(self.projector_id, data_temp, arr_out)
 
         arr_out = np.squeeze(arr_out)
 
@@ -118,64 +117,3 @@ class AstraForwardProjector3D(DataProcessor):
         else:
             out.fill(arr_out)
         return out
-
-    def create_sino3d_gpu(self, data, proj_geom, vol_geom, returnData=True, gpuIndex=None, sino_id=None):
-        """
-        Call to ASTRA to create a forward projection of an image (3D)
-
-        Parameters
-        ----------
-
-        data : numpy.ndarray or int
-            Image data or ID.
-
-        proj_geom : dict
-            Projection geometry.
-
-        vol_geom : dict
-            Volume geometry.
-
-        returnData : bool
-            If False, only return the ID of the forward projection.
-
-        gpuIndex : int, optional
-            Optional GPU index.
-
-        Returns
-        -------
-
-        proj_geom : int or (int, numpy.ndarray)
-            If ``returnData=False``, returns the ID of the forward projection. Otherwise returns a tuple containing the ID of the forward projection and the forward projection itself.
-
-        """
-
-
-        if isinstance(data, np.ndarray):
-            volume_id = data3d.create('-vol', vol_geom, data)
-        else:
-            volume_id = data
-        if sino_id is None:
-            sino_id = data3d.create('-sino', proj_geom, 0)
-
-        algString = 'FP3D_CUDA'
-        cfg = astra_dict(algString)
-        if not gpuIndex==None:
-            cfg['option']={'GPUindex':gpuIndex}
-        cfg['ProjectionDataId'] = sino_id
-        cfg['VolumeDataId'] = volume_id
-        alg_id = algorithm.create(cfg)
-        algorithm.run(alg_id)
-        algorithm.delete(alg_id)
-
-        if isinstance(data, np.ndarray):
-            data3d.delete(volume_id)
-        if sino_id is None:
-            if returnData:
-                return sino_id, data3d.get(sino_id)
-            else:
-                return sino_id
-        else:
-            if returnData:
-                return sino_id, data3d.get_shared(sino_id)
-            else:
-                return sino_id

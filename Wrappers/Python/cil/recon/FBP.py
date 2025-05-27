@@ -267,11 +267,7 @@ class GenericFilteredBackProjection(Reconstructor):
         matplotlib.pyplot
             A plot of the filter
         """
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}") from exc
+        import matplotlib.pyplot as plt
 
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order
@@ -548,7 +544,7 @@ class FBP(GenericFilteredBackProjection):
         self.operator = self._PO_class(ig_slice,ag_slice)
 
     def _process_chunk(self, i, step):
-        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
+        np.take(self.input.array, np.arange(i,i+step), axis=self.input.get_dimension_axis("vertical"), out=self.data_slice.array)
         if not self.filter_inplace:
             self._pre_filtering(self.data_slice)
 

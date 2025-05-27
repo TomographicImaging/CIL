@@ -25,6 +25,7 @@ test:
     - ccpi-regulariser=24.0.1 # [not osx]
     - astra-toolbox=2.1=cuda* # [not osx]
     - matplotlib-base >=3.3.0
+    - zenodo_get >=1.6
 
   source_files:
     - ./Wrappers/Python/test
@@ -71,7 +72,6 @@ requirements:
     - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba
-    - zenodo_get >=1.6
 
   #optional packages with version dependancies
   run_constrained:

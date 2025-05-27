@@ -42,3 +42,52 @@ maintainers = [{name="CIL developers", email="tomography+cil@stfc.ac.uk"}]
 requires-python = ">=3.10"
 readme = "README.md"
 keywords = ["tomography", "optimisation"]
+dependencies = [
+    #"cil-data>=22", # missing from PyPI
+    "dxchange",
+    "h5py",
+    #"ipp==2021.12.*", # PyPI conflicts with conda package
+    "numba",
+    "numpy>=1.23",
+    "olefile>=0.46",
+    "pillow",
+    "pywavelets",
+    "scipy>=1.4.0",
+    "tqdm",
+    "zenodo_get>=1.6",
+]
+[project.optional-dependencies]
+plugins = [
+    "ipywidgets",
+    #"tomophantom==2.0.0", # [linux] # missing from PyPI
+]
+gpu = [
+    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
+    #"tigre>=2.4,<=2.6", # missing from PyPI
+]
+[dependency-groups]
+test = [
+    #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
+    "cvxpy",
+    "matplotlib>=3.3.0",
+    "packaging",
+    "scikit-image",
+    "unittest-parametrize",
+    "wget",
+]
+docs = [
+  "jinja2",
+  #"pydata-sphinx-theme",
+  "recommonmark",
+  "sphinx",
+  "sphinx_rtd_theme",
+  "sphinx-autobuild",
+  "sphinx-click",
+  "sphinx-copybutton",
+  "sphinx-panels",
+  "sphinxcontrib-bibtex",
+  "nbsphinx",
+  "sphinx-gallery",
+  "sphinx-copybutton",
+  "notebook",
+]

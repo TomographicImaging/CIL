@@ -66,10 +66,6 @@ class DataContainer(object):
         '''Returns the shape of the DataContainer'''
         return self.array.shape
 
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
-
     @property
     def ndim(self):
         '''Returns the ndim of the DataContainer'''
@@ -108,9 +104,11 @@ class DataContainer(object):
 
         # finally copy the geometry, and force dtype of the geometry of the data = the dype of the data
         if 'geometry' in kwargs.keys():
-            self.geometry = kwargs['geometry']
             try:
-                self.geometry.dtype = self.dtype
+                self.geometry = kwargs['geometry'].copy()
+                if self.geometry.dtype != self.dtype:
+                    warnings.warn("Over-riding geometry.dtype with data.dtype", UserWarning)
+                    self.geometry.dtype = self.dtype
             except:
                 pass
 
@@ -464,7 +462,7 @@ class DataContainer(object):
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
-            return other.subtract(self, *args, **kwargs)
+            return other.sapyb(-1,self,1, out=kwargs.get('out', None))
         return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
@@ -476,7 +474,9 @@ class DataContainer(object):
     def divide(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
-            return other.divide(self, *args, **kwargs)
+            _out = other.divide(self, *args, **kwargs)
+            _out.power(-1, out=_out)
+            return _out
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
 
     def power(self, other, *args, **kwargs):

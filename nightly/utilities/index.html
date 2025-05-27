@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utilities &#8212; CIL 24.3.1.dev37+g96468fda documentation</title>
+    <title>Utilities &#8212; CIL 24.3.1.dev38+gba408532 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../_static/documentation_options.js?v=12aacbb3"></script>
+    <script src="../_static/documentation_options.js?v=da90415d"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev37+g96468fda';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev38+gba408532';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Recon" href="../recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev37+g96468fda" />
+  <meta name="docsearch:version" content="24.3.1.dev38+gba408532" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -510,6 +510,8 @@
                   
   <section id="utilities">
 <h1>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h1>
+<p>By default, CIL will look for small (built-in) data in <cite>{sys.prefix}/share/cil</cite>,
+and larger remote (downloadable) data in the <cite>CIL_DATA_DIR</cite> environment variable (if present).</p>
 <section id="test-datasets">
 <h2>Test datasets<a class="headerlink" href="#test-datasets" title="Link to this heading">#</a></h2>
 <p>A range of small test datasets to generate and use</p>
@@ -807,7 +809,7 @@ from that data directory using <cite>get(data_dir)</cite>.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.WALNUT.get">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#WALNUT.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.get" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#WALNUT.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.get" title="Link to this definition">#</a></dt>
 <dd><p>Get the microcomputed tomography dataset of a walnut from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a>
 This function returns the raw projection data from the .txrm file</p>
 <dl class="field-list simple">
@@ -825,11 +827,12 @@ This function returns the raw projection data from the .txrm file</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.WALNUT.download_data">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.download_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.download_data" title="Link to this definition">#</a></dt>
 <dd><p>Download a dataset from a remote repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory where the downloaded data should be stored</p>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -851,7 +854,7 @@ This function returns the raw projection data from the .txrm file</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.USB.get">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#USB.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.USB.get" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#USB.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.USB.get" title="Link to this definition">#</a></dt>
 <dd><p>Get the microcomputed tomography dataset of a usb memory stick from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a>
 This function returns the raw projection data from the .txrm file</p>
 <dl class="field-list simple">
@@ -869,11 +872,12 @@ This function returns the raw projection data from the .txrm file</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.USB.download_data">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.USB.download_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.USB.download_data" title="Link to this definition">#</a></dt>
 <dd><p>Download a dataset from a remote repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory where the downloaded data should be stored</p>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -895,7 +899,7 @@ This function returns the raw projection data from the .txrm file</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.KORN.get">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#KORN.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.KORN.get" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#KORN.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.KORN.get" title="Link to this definition">#</a></dt>
 <dd><p>Get the microcomputed tomography dataset of a sunflower seeds in a box from <a class="reference external" href="https://zenodo.org/records/6874123">https://zenodo.org/records/6874123</a>
 This function returns the raw projection data from the .xtekct file</p>
 <dl class="field-list simple">
@@ -913,11 +917,12 @@ This function returns the raw projection data from the .xtekct file</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.KORN.download_data">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.KORN.download_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.KORN.download_data" title="Link to this definition">#</a></dt>
 <dd><p>Download a dataset from a remote repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory where the downloaded data should be stored</p>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -940,7 +945,7 @@ A small subset of the data containing selected projections and 4 slices of the r
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.SANDSTONE.get">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SANDSTONE.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.get" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SANDSTONE.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.get" title="Link to this definition">#</a></dt>
 <dd><p>Get the synchrotron x-ray tomography dataset of sandstone from <a class="reference external" href="https://zenodo.org/records/4912435">https://zenodo.org/records/4912435</a>
 A small subset of the data containing selected projections and 4 slices of the reconstruction
 :param data_dir: The path to the directory where the dataset is stored. Data can be downloaded with dataexample.SANDSTONE.download_data(data_dir)
@@ -959,11 +964,12 @@ A small subset of the data containing selected projections and 4 slices of the r
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.utilities.dataexample.SANDSTONE.download_data">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.download_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.download_data" title="Link to this definition">#</a></dt>
 <dd><p>Download a dataset from a remote repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory where the downloaded data should be stored</p>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 </dd>
 </dl>
 </dd></dl>

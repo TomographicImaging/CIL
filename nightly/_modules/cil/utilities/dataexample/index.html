@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.dataexample &#8212; CIL 24.3.1.dev37+g96468fda documentation</title>
+    <title>cil.utilities.dataexample &#8212; CIL 24.3.1.dev38+gba408532 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=12aacbb3"></script>
+    <script src="../../../../_static/documentation_options.js?v=da90415d"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev37+g96468fda';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev38+gba408532';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev37+g96468fda" />
+  <meta name="docsearch:version" content="24.3.1.dev38+gba408532" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -513,28 +513,34 @@
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">dfile</span><span class="p">(),</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">REMOTEDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
-
     <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">CIL_DATA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CIL_DATA_DIR&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assert_dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s2">&quot;data_dir must be specified&quot;</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">CIL_DATA_DIR</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Download a dataset from a remote repository</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data_dir: str, optional</span>
-<span class="sd">           The path to the data directory where the downloaded data should be stored</span>
-
+<span class="sd">        data_dir: str</span>
+<span class="sd">           The path to the data directory where the downloaded data should be stored.</span>
+<span class="sd">           If unspecified, tries to use the CIL_DATA_DIR environment variable.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">)):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset folder already exists in &quot;</span> <span class="o">+</span> <span class="n">data_dir</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset folder already exists in </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Are you sure you want to download </span><span class="si">{cls.ZIP_FILE}</span><span class="s2"> dataset from Zenodo record </span><span class="si">{cls.ZENODO_RECORD}</span><span class="s2">? [Y/n]: &quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">prompt</span> <span class="k">else</span> <span class="s1">&#39;y&#39;</span>
             <span class="k">if</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
@@ -699,7 +705,7 @@
 <div class="viewcode-block" id="WALNUT.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.WALNUT.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
@@ -714,6 +720,7 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            The walnut dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;valnut&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_2014-03-21_643_28&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_tomo-A.txrm&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
@@ -743,7 +750,7 @@
 <div class="viewcode-block" id="USB.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.USB.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
@@ -758,6 +765,7 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            The usb dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;gruppe 4&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_2014-03-20_1404_12&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_tomo-A.txrm&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
@@ -787,7 +795,7 @@
 <div class="viewcode-block" id="KORN.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.KORN.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
 <span class="sd">        This function returns the raw projection data from the .xtekct file</span>
@@ -803,6 +811,7 @@
 <span class="sd">            The korn dataset</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;Korn i kasse&#39;</span><span class="p">,</span><span class="s1">&#39;47209 testscan korn01_recon.xtekct&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
@@ -834,7 +843,7 @@
 <div class="viewcode-block" id="SANDSTONE.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SANDSTONE.get">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
 <span class="sd">        A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
@@ -851,13 +860,16 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            The selected sandstone dataset</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;filename must be specified&quot;</span><span class="p">)</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;.mat&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown extension: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </div>
 
-        
+
 
 <div class="viewcode-block" id="TestData">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData">[docs]</a>

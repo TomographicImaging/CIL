@@ -22,6 +22,7 @@
       - PDHG 'check_convergence' updated for new literature (#2084)
       - Make install local env script work on windows (#2144)
       - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
+      - Improved consistency of `step_size` property across GD, ISTA, FISTA and APGD algorithms (#2157)
   - Testing:
       - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
       - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)

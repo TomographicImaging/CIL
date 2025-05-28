@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev39+g6e1ef3f7 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev40+g064bb361 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../_static/documentation_options.js?v=689b99c1"></script>
+    <script src="../_static/documentation_options.js?v=69c64ec9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev39+g6e1ef3f7';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev40+g064bb361';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev39+g6e1ef3f7" />
+  <meta name="docsearch:version" content="24.3.1.dev40+g064bb361" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -798,7 +798,7 @@ print to screen of the status of the optimisation.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> (</em><em>e.g. ImageData</em><em>)</em>) – The initial point for the optimisation</p></li>
 <li><p><strong>f</strong> (CIL function (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Function()</span></code></a>. ) with a defined gradient method) – The function to be minimised.</p></li>
-<li><p><strong>step_size</strong> (positive real float or subclass of <code class="xref py py-meth docutils literal notranslate"><span class="pre">StepSizeRule()</span></code>, default = None) – If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’ is passed then it’s method <cite>get_step_size</cite> is called for each update.</p></li>
+<li><p><strong>step_size</strong> (positive real float or subclass of <code class="xref py py-meth docutils literal notranslate"><span class="pre">StepSizeRule()</span></code>, default = None) – If you pass a float this will be used as a constant step size. If left as None and do not pass a step size rule then the Armijo rule will be used to perform backtracking to choose a step size at each iteration (<code class="xref py py-meth docutils literal notranslate"><span class="pre">ArmijoStepSizeRule()</span></code>). If a child class of <code class="xref py py-meth docutils literal notranslate"><span class="pre">cil.optimisation.utilities.StepSizeRule()</span></code>’ is passed then its method <cite>get_step_size</cite> is called for each update.</p></li>
 <li><p><strong>preconditioner</strong> (class with a <cite>apply</cite> method or a function that takes an initialised CIL function as an argument and modifies a provided <cite>gradient</cite>.) – This could be a custom <cite>preconditioner</cite> or one provided in <code class="xref py py-meth docutils literal notranslate"><span class="pre">preconditioner()</span></code>. If None is passed  then <cite>self.gradient_update</cite> will remain unmodified.</p></li>
 </ul>
 </dd>
@@ -835,6 +835,12 @@ print to screen of the status of the optimisation.</p>
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.should_stop">
 <span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/GD/#GD.should_stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.GD.should_stop" title="Link to this definition">#</a></dt>
 <dd><p>Stopping criterion for the gradient descent algorithm</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.GD.step_size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_size</span></span><a class="headerlink" href="#cil.optimisation.algorithms.GD.step_size" title="Link to this definition">#</a></dt>
+<dd><p>Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1522,6 +1528,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#cil.optimisation.algorithms.FISTA" title="cil.optimisation.algorithms.FISTA"><code class="xref py py-class docutils literal notranslate"><span class="pre">FISTA</span></code></a>, <a class="reference internal" href="#cil.optimisation.algorithms.GD" title="cil.optimisation.algorithms.GD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GD</span></code></a></p>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.step_size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_size</span></span><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.step_size" title="Link to this definition">#</a></dt>
+<dd><p>Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.ISTA.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/FISTA/#ISTA.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.ISTA.set_up" title="Link to this definition">#</a></dt>
@@ -1918,6 +1930,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dd><p>Returns the current solution.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.step_size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_size</span></span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.step_size" title="Link to this definition">#</a></dt>
+<dd><p>Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.FISTA.update_objective">
 <span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.FISTA.update_objective" title="Link to this definition">#</a></dt>
@@ -2026,6 +2044,12 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.get_output">
 <span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/APGD/#APGD.get_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.APGD.get_output" title="Link to this definition">#</a></dt>
 <dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.APGD.step_size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">step_size</span></span><a class="headerlink" href="#cil.optimisation.algorithms.APGD.step_size" title="Link to this definition">#</a></dt>
+<dd><p>Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size.</p>
 </dd></dl>
 
 <dl class="py method">

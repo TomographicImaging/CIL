@@ -36,7 +36,7 @@ class GD(Algorithm):
     f: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
         The function to be minimised. 
     step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
-        If you pass a float this will be used as a constant step size. If left as None and do not pass a step size rule then the Armijo rule will be used to perform backtracking to choose a step size at each iteration (:meth:`~cil.optimisation.utilities.ArmijoStepSizeRule`). If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+        If you pass a float this will be used as a constant step size. If left as None and do not pass a step size rule then the Armijo rule will be used to perform backtracking to choose a step size at each iteration (:meth:`~cil.optimisation.utilities.ArmijoStepSizeRule`). If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then its method `get_step_size` is called for each update. 
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 

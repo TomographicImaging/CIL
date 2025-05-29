@@ -137,8 +137,7 @@ Example:
   cd CIL
   sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
   conda activate ENVIRONMENT_NAME
-  cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
-  cmake --build ./build --target install
+  pip install .
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME

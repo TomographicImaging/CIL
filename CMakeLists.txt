@@ -21,7 +21,10 @@ else()
   cmake_minimum_required(VERSION 3.5)
 endif()
 
-project(cil LANGUAGES CXX)
+if(NOT SKBUILD_PROJECT_NAME)
+  set(SKBUILD_PROJECT_NAME cil)
+endif()
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
 cmake_policy(PUSH)
 
@@ -46,6 +49,5 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 add_subdirectory(src/Core)
-add_subdirectory(Wrappers/Python)
 
 cmake_policy(POP)

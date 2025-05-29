@@ -34,7 +34,7 @@ test:
     - pip install unittest-parametrize
     - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
-    
+
 
 requirements:
   build:
@@ -50,9 +50,11 @@ requirements:
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
-    - ipp-include {{ ipp_version }} 
-    - ipp-devel {{ ipp_version }} 
-    - ipp {{ ipp_version }} 
+    - ninja         # [not win]
+    - ipp-include {{ ipp_version }}
+    - ipp-devel {{ ipp_version }}
+    - ipp {{ ipp_version }}
+    - scikit-build-core >=0.10
 
   run:
     - python

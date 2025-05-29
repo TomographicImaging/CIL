@@ -29,7 +29,5 @@ ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/
 
 # build & install CIL
 COPY --chown="${NB_USER}" . src
-RUN cmake -S ./src -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="${CONDA_DIR}" \
-  && cmake --build ./build --target install \
-  && rm -rf src build \
+RUN pip install ./src && rm -rf src \
   && fix-permissions "${CONDA_DIR}" /home/${NB_USER}

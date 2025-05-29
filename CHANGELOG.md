@@ -29,6 +29,7 @@
     - Added tests for Normaliser processor
     - Update minimum cmake version to 3.5
   - Dependencies:
+    - Move from CMake to `pip install` (#2145)
     - matplotlib-base is an optional dependency, instead of required (#2093)
     - `unittest-parametrize has been added as a dependency for tests (#1990)
     - olefile and dxchange are an optional dependency, instead of required (#2149)

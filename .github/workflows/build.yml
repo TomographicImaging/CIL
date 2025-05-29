@@ -48,8 +48,7 @@ jobs:
       name: build
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
-        cmake --build ./build --target install
+        pip install .
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
@@ -81,10 +80,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         environment-file: scripts/requirements-test.yml
         activate-environment: cil_dev
-    - name: build
-      run: |
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
-        cmake --build ./build --target install
+    - run: pip install .
     - name: test
       run: python -m unittest discover -v ./Wrappers/Python/test
   conda-matrix:
@@ -179,11 +175,7 @@ jobs:
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
         conda env update -n test
         conda list
-    - name: build cil
-      working-directory: .
-      run: |
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONDA_BUILD=ON -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX"
-        cmake --build ./build --target install
+    - run: pip install ..
     - name: checkout docs
       uses: actions/checkout@v4
       with:

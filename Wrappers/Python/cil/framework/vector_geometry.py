@@ -99,7 +99,7 @@ class VectorGeometry:
                 method. Default is `None`.
 
             min_value : number, optional
-                The maximum value random integer to generate, only used if `value` 
+                The minimum value random integer to generate, only used if `value` 
                 is 'random_int'. Default is 0.
 
             max_value : number, optional

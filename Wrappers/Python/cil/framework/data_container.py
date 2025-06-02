@@ -228,8 +228,7 @@ class DataContainer(object):
             The value or method with which to fill the DataContainer. Accepts a 
             numpy array or DataContainer or a number to allocate a uniform array
             or a string specifying a method to fill with a random array: 'random' 
-            allocates floats between 0 and 1, 'random_int' allocates ints between 
-            0 and 100.
+            allocates floats between 0 and 1, 'random_int' by default allocates integers between 0 and 100  or between provided `min_value` and `max_value`.
 
         **kwargs:
             **dimension : int, optional 
@@ -245,18 +244,18 @@ class DataContainer(object):
                 A random seed to fix reproducibility, only used if `array` is a 
                 random method. Default is `None`.
 
-            min_value : number, optional
-                The maximum value random integer to generate, only used if `array` 
+            min_value : int, optional, default=0
+                The minimum value random integer to generate, only used if `array` 
                 is 'random_int'. Default is 0.
 
-            max_value : number, optional
+            max_value : int, optional, default=100
                 The maximum value random integer to generate, only used if `array` 
                 is 'random_int'. Default is 100.
         
         Note
         ----
             If the passed numpy array points to the same array that is contained 
-            in the DataContainer, it just returns
+            in the DataContainer, the DataContainer is not updated, and None is returned.
         
         Note
         ----

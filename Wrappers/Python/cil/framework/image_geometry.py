@@ -273,7 +273,7 @@ class ImageGeometry:
                 method. Default is `None`.
 
             min_value : number, optional
-                The maximum value random integer to generate, only used if `value` 
+                The minimum value random integer to generate, only used if `value` 
                 is 'random_int'. Default is 0.
             
             max_value : number, optional
@@ -293,8 +293,6 @@ class ImageGeometry:
         '''
         dtype = kwargs.pop('dtype', self.dtype)
 
-        if kwargs.pop('dimension_labels', None) is not None:
-            raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
         out = ImageData(geometry=self.copy(), dtype=dtype)
         if value is not None:

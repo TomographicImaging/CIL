@@ -2176,8 +2176,6 @@ class AcquisitionGeometry(object):
         '''
         dtype = kwargs.pop('dtype', self.dtype)
 
-        if kwargs.pop('dimension_labels', None) is not None:
-            raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
         
         out = AcquisitionData(geometry=self.copy(), dtype=dtype)
         if value is not None:

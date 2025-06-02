@@ -273,11 +273,11 @@ class ImageGeometry:
                 A random seed to fix reproducibility, only used if `value` is a random
                 method. Default is `None`.
 
-            min_value : number, optional
+            min_value : int, optional
                 The minimum value random integer to generate, only used if `value` 
                 is 'random_int'. Default is 0.
             
-            max_value : number, optional
+            max_value : int, optional
                 The maximum value random integer to generate, only used if `value` 
                 is 'random_int'. Default is 100.
 

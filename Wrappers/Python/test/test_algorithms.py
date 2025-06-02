@@ -80,9 +80,6 @@ class TestGD(CCPiTestClass):
     def test_GD(self):
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(np.random.random(initial.shape))
         b = ig.allocate('random_deprecated')
         identity = IdentityOperator(ig)
 

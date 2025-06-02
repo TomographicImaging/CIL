@@ -228,7 +228,8 @@ class DataContainer(object):
             The value or method with which to fill the DataContainer. Accepts a 
             numpy array or DataContainer or a number to allocate a uniform array
             or a string specifying a method to fill with a random array: 'random' 
-            allocates floats between 0 and 1, 'random_int' by default allocates integers between 0 and 100  or between provided `min_value` and `max_value`.
+            allocates floats between 0 and 1, 'random_int' by default allocates 
+            integers between 0 and 100  or between provided `min_value` and `max_value`.
 
         **kwargs:
             **dimension : int, optional 
@@ -256,19 +257,12 @@ class DataContainer(object):
         ----
             If the passed numpy array points to the same array that is contained 
             in the DataContainer, the DataContainer is not updated, and None is returned.
-        
-        Note
-        ----
-            In case a DataContainer or subclass is passed, there will be a check 
-            of the geometry, if present, and the array will be resorted if the 
-            data is not in the appropriate order.
 
         Note
         ----
-            The methods used by 'random' or 'random_int' use `numpy.random.default_rng` 
-            which allocates memory only for the array of the specified dtype. This
-            method does not use the global numpy.random.seed() so if a seed is 
-            required it should be passed directly as an argument.
+            The methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
+            This method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as a kwarg.
             To fill random numbers using the deprecated `numpy.random.random_sample`
             and `numpy.random.randint` methods use `value='random_deprecated'` 
             or `value='random_int_deprecated'` 

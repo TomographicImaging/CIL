@@ -763,7 +763,6 @@ class TestDataContainer(CCPiTestClass):
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
 
-
         data=ag.allocate('random_int_deprecated', dtype=np.complex64)
         self.assertTrue(data.array.dtype, np.complex64)
         self.assertNotEqual(np.sum(data.array).imag, 0)
@@ -771,23 +770,6 @@ class TestDataContainer(CCPiTestClass):
     def test_VectorGeometry_allocate_complex(self):
         vg = VectorGeometry(3)
         self.complex_allocate_geometry_test(vg)
-
-        data=vg.allocate('random', dtype=np.complex64)
-        # self.assertTrue(data.array.dtype, np.complex64)
-        # self.assertNotEqual(np.sum(data.array).imag, 0)
-
-        # data=vg.allocate('random_int', dtype=np.complex64)
-        # self.assertTrue(data.array.dtype, np.complex64)
-        # self.assertNotEqual(np.sum(data.array).imag, 0)
-
-        # data=vg.allocate('random_deprecated', dtype=np.complex64)
-        # self.assertTrue(data.array.dtype, np.complex64)
-        # self.assertNotEqual(np.sum(data.array).imag, 0)
-
-        # data=vg.allocate('random_int_deprecated', dtype=np.complex64)
-        # self.assertTrue(data.array.dtype, np.complex64)
-        # self.assertNotEqual(np.sum(data.array).imag, 0)
-
 
     def test_ImageGeometry_allocate_random_same_seed(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)

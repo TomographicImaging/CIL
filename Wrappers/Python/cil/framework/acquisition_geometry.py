@@ -2169,9 +2169,38 @@ class AcquisitionGeometry(object):
         
         Parameters
         ----------
-        value : number or string default=0
-            The value or method with which to fill the allocated array. See
-            DataContainer.fill()
+        value : number or string, default=0
+            The value to allocate. Accepts a number to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random' allocates floats between 0 and 1, 'random_int' by default 
+            allocates integers between 0 and 100  or between provided `min_value` and 
+            `max_value`
+        
+        **kwargs:
+            dtype : numpy data type, optional
+                The data type to allocate if different from the geometry data type. 
+                Default None allocates an array with the geometry data type.
+
+            seed : int, optional
+                A random seed to fix reproducibility, only used if `value` is a random
+                method. Default is `None`.
+
+            min_value : number, optional
+                The minimum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 0.
+            
+            max_value : number, optional
+                The maximum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 100.
+
+        Note
+        ----
+            The methods used by 'random' or 'random_int' use `numpy.random.default_rng`.
+            This method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as a kwarg. 
+            To allocate random numbers using the deprecated `numpy.random.random_sample`
+            and `numpy.random.randint` methods use `value='random_deprecated'` 
+            or `value='random_int_deprecated'` 
 
         '''
         dtype = kwargs.pop('dtype', self.dtype)

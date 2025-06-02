@@ -16,8 +16,6 @@
       - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036)
       - Made the call to next() in algorithm iteration loop explicit (#2069)
       - Added option for a random seed in the power method in the linear operator (#1585)
-      - Moved fill methods in `geometry.allocate()` to `DataContainer.fill()` (#2037)
-      - Update `RANDOM` and `RANDOM_INT` `DataContainer.fill()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED` (#2037)
       - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
       - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
       - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) (#2128)
@@ -37,6 +35,9 @@
       - `FindIPP.cmake` fallback (#2148)
         - enable `find_package` using `*_ROOT` hints
         - simplified `cilacc` build logic for optional dependencies
+    - Changes that break backwards compatibility:
+      - Update `RANDOM` and `RANDOM_INT` `DataContainer.fill()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED` (#2037)
+      - Moved fill methods in `geometry.allocate()` to `DataContainer.fill()` (#2037)
 
 * 24.3.0
   - New features:

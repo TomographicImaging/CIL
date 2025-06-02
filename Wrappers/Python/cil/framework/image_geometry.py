@@ -260,8 +260,9 @@ class ImageGeometry:
         value : number or string, default=0
             The value to allocate. Accepts a number to allocate a uniform array, 
             None to allocate an empty memory block, or a string to create a random 
-            array: 'random' allocates floats between 0 and 1, 'random_int' allocates 
-            ints between 0 and 100.
+            array: 'random' allocates floats between 0 and 1, 'random_int' by default
+            allocates integers between 0 and 100  or between provided `min_value` and 
+            `max_value`
         
         **kwargs:
             dtype : numpy data type, optional
@@ -282,10 +283,9 @@ class ImageGeometry:
 
         Note
         ----
-            The methods used by 'random' or 'random_int' use `numpy.random.default_rng` 
-            which allocates memory only for the array of the specified dtype. This
-            method does not use the global numpy.random.seed() so if a seed is 
-            required it should be passed directly as an argument to allocate. 
+            The methods used by 'random' or 'random_int' use `numpy.random.default_rng`.
+            This method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as a kwarg. 
             To allocate random numbers using the deprecated `numpy.random.random_sample`
             and `numpy.random.randint` methods use `value='random_deprecated'` 
             or `value='random_int_deprecated'` 

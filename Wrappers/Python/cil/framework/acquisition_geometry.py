@@ -2204,7 +2204,6 @@ class AcquisitionGeometry(object):
 
         '''
         dtype = kwargs.pop('dtype', self.dtype)
-
         
         out = AcquisitionData(geometry=self.copy(), dtype=dtype)
         if value is not None:

@@ -62,10 +62,6 @@ class ImageGeometry:
                       ImageDimension.HORIZONTAL_X: self.voxel_num_x}
         return tuple(shape_dict[label] for label in self.dimension_labels)
 
-    @shape.setter
-    def shape(self, val):
-        print("Deprecated - shape will be set automatically")
-
     @property
     def spacing(self):
         spacing_dict = {ImageDimension.CHANNEL: self.channel_spacing,

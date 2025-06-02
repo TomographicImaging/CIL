@@ -266,8 +266,11 @@ class DataContainer(object):
                                      self.shape,array.shape))
             else:
                 # raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                import warnings
+                warnings.filterwarnings('error')
                 xp = array_namespace(self.as_array())
                 self.array.__setitem__(slice(None, None, None), array)
+                warnings.resetwarnings()
         else:
             slices = []
             where = 0

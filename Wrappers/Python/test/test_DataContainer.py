@@ -719,7 +719,9 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
 
     def complex_allocate_geometry_test(self, geometry):
         data = geometry.allocate(dtype=np.complex64)
-        r = (1 + 1j*1)* np.ones(data.shape, dtype=data.dtype)
+        from array_api_compat import array_namespace
+        xp = array_namespace(data.array)
+        r = (1 + 1j*1)* xp.ones(data.shape, dtype=data.dtype)
         data.fill(r)
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)
         np.testing.assert_almost_equal(data.abs().array, np.abs(r))
@@ -728,7 +730,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         try:
             data1.fill(r)
             self.assertTrue(False)
-        except TypeError as err:
+        except numpy.exceptions.ComplexWarning as err:
             log.info(str(err))
             self.assertTrue(True)
 

@@ -689,15 +689,6 @@ class TestDataContainer(CCPiTestClass):
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)
         np.testing.assert_almost_equal(data.abs().array, np.abs(r))
 
-        data1 = geometry.allocate(dtype=np.float32)
-        try:
-            data1.fill(r)
-            self.assertTrue(False)
-        except TypeError as err:
-            log.info(str(err))
-            self.assertTrue(True)
-
-
     def test_ImageGeometry_allocate_complex(self):
         ig = ImageGeometry(2,2)
         self.complex_allocate_geometry_test(ig)
@@ -1317,6 +1308,79 @@ class TestDataContainer(CCPiTestClass):
 
         np.testing.assert_array_equal(ds.as_array(), -a)
 
+    def test_fill_DataContainer(self):
+        array = np.array([[1,2],[3,4]])
+        array0 = np.zeros_like(array)
+        # array
+        dc = DataContainer(array0)
+        dc.fill(array)
+        self.assertNumpyArrayEqual(dc.array, array)
+
+        # number
+        dc = DataContainer(array0)
+        dc.fill(5)
+        self.assertNumpyArrayEqual(dc.array, 5*np.ones_like(array0))
+
+        # test dtype argument
+        dc = DataContainer(array0)
+        dc.fill(5, dtype=np.float64)
+        self.assertNumpyArrayEqual(dc.array, 5*np.ones_like(array0))
+        self.assertEqual(dc.dtype, np.float64)
+        
+        # DataContainer
+        dc = DataContainer(array0)
+        dc.fill(DataContainer(array))
+        self.assertNumpyArrayEqual(dc.array, array)
+
+        # mismatched dimension labels
+        dc = DataContainer(array0, dimension_labels=('first_dim','second_dim'))
+        with self.assertRaises(ValueError):
+            dc.fill(DataContainer(array0, dimension_labels=('second_dim','first_dim')))
+
+        # mismatched array size
+        dc = DataContainer(array0)
+        with self.assertRaises(ValueError):
+            dc.fill(DataContainer(array0[0,:]))
+
+        # test dimension argument
+        dc = DataContainer(array0)
+        dc.fill(array[0,:], dimension_00=1)
+
+        # dismatched dimension size
+        dc = DataContainer(array0)
+        with self.assertRaises(ValueError):
+            dc.fill(array, dimension_00=1)
+
+    def test_random_fill_DataContainer(self):
+        array = np.array([[1,2],[3,4]])
+        array0 = np.zeros_like(array)
+
+        dc = DataContainer(array0)
+        dc.fill('RANDOM_INT')
+        self.assertGreater(dc.mean(), 0)
+        
+        dc = DataContainer(array0)
+        dc.fill('RANDOM_INT', min_value=3, max_value=6)
+        self.assertGreaterEqual(dc.min(), 3)
+        self.assertLessEqual(dc.max(), 6)
+
+        dc = DataContainer(array0)
+        with self.assertRaises(ValueError):
+          dc.fill('RANDOM_INT', min_value=6, max_value=3)
+
+        dc = DataContainer(array0)
+        dc.fill('RANDOM_INT', seed=3)
+        dc2 = DataContainer(array0)
+        dc2.fill('RANDOM_INT', seed=3)
+        self.assertNumpyArrayEqual(dc.array, dc2.array)
+
+        dc = DataContainer(array0.astype(np.float32))
+        dc.fill('RANDOM')
+        self.assertGreater(dc.mean(), 0)
+
+        dc = DataContainer(array0.astype(np.float32))
+        dc.fill(array='RANDOM', dtype=np.float64)
+        self.assertEqual(dc.dtype, np.float64)
 
     def test_fill_dimension_ImageData(self):
         ig = ImageGeometry(2,3,4)

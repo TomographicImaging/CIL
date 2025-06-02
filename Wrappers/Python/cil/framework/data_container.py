@@ -367,6 +367,9 @@ class DataContainer(object):
         else:
             raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
 
+        if dtype != self.dtype:
+            self.array = self.array.astype(dtype)
+
         if kwargs:
             warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 

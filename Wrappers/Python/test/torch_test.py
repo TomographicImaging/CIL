@@ -104,3 +104,21 @@ numpy.testing.assert_allclose(cil_np[2].as_array(),
                               (res).as_array())
 
 print(res.array)
+
+torch.squeeze(a[0])
+
+shape = [3,5,1,5]
+
+print (numpy.where(numpy.asarray(shape) == 1))
+
+tt = torch.asarray([1,2,-1,10])
+print(torch.sign(tt))
+ts = tt*0
+torch.sign(tt, out=ts)
+print (ts)
+ts = tt*0
+xp = array_namespace(tt)
+# xp.sign(tt, out=ts)
+print (ts)
+tt.sign(out=ts)
+print (ts)

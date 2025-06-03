@@ -52,7 +52,7 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       shell: bash

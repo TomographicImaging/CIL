@@ -233,10 +233,6 @@ class DataContainer(object):
                 happen. The name passed must match one of the DataContainer 
                 dimension_labels and the axis must be an int
 
-            dtype : numpy data type, optional
-                The data type to allocate if different from the DataContainer data 
-                type. Default `None` allocates an array with the existing data type.
-
             seed : int, optional
                 A random seed to fix reproducibility, only used if `array` is a 
                 random method. Default is `None`.
@@ -294,8 +290,6 @@ class DataContainer(object):
         else:
             index = (slice(None),) * self.array.ndim
 
-        dtype = kwargs.pop('dtype', self.dtype)
-
         if id(array) == id(self.array):
             return
         
@@ -326,10 +320,10 @@ class DataContainer(object):
                 warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (numpy.random.random_sample(self.array[index].shape) + 1j * numpy.random.random_sample(self.array[index].shape)).astype(dtype)
+                if numpy.issubdtype(self.dtype, numpy.complexfloating):
+                    r = (numpy.random.random_sample(self.array[index].shape) + 1j * numpy.random.random_sample(self.array[index].shape)).astype(self.dtype)
                 else:
-                    r = numpy.random.random_sample(self.array[index].shape).astype(dtype)
+                    r = numpy.random.random_sample(self.array[index].shape).astype(self.dtype)
                 self.array[index] = r
             
             elif array == FillType.RANDOM_INT_DEPRECATED:
@@ -338,37 +332,34 @@ class DataContainer(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.pop("max_value", 100)
                 min_value = kwargs.pop("min_value", 0)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.array[index].shape, dtype=numpy.int32)).astype(dtype)
+                if numpy.issubdtype(self.dtype, numpy.complexfloating):
+                    r = (numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.array[index].shape, dtype=numpy.int32)).astype(self.dtype)
                 else:
-                    r = numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32).astype(dtype)
+                    r = numpy.random.randint(min_value, max_value,size=self.array[index].shape, dtype=numpy.int32).astype(self.dtype)
                 self.array[index] = r
 
             elif array == FillType.RANDOM:
                 rng = numpy.random.default_rng(seed)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    complex_example = numpy.array([1 + 1j], dtype=dtype)
+                if numpy.issubdtype(self.dtype, numpy.complexfloating):
+                    complex_example = numpy.array([1 + 1j], dtype=self.dtype)
                     half_dtype = numpy.real(complex_example).dtype
-                    r = (rng.random(size=self.array[index].shape, dtype=half_dtype) + 1j * rng.random(size=self.array[index].shape, dtype=half_dtype)).astype(dtype)
+                    r = (rng.random(size=self.array[index].shape, dtype=half_dtype) + 1j * rng.random(size=self.array[index].shape, dtype=half_dtype)).astype(self.dtype)
                 else:
-                    r = rng.random(size=self.array[index].shape, dtype=dtype)
+                    r = rng.random(size=self.array[index].shape, dtype=self.dtype)
                 self.array[index] = r
 
             elif array == FillType.RANDOM_INT:
                 rng = numpy.random.default_rng(seed)
                 max_value = kwargs.pop("max_value", 100)
                 min_value = kwargs.pop("min_value", 0)
-                if numpy.issubdtype(dtype, numpy.complexfloating):
-                    r = (rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.array[index].shape, dtype=numpy.int32)).astype(dtype)
+                if numpy.issubdtype(self.dtype, numpy.complexfloating):
+                    r = (rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32) + 1j*rng.integers(0, max_value, size=self.array[index].shape, dtype=numpy.int32)).astype(self.dtype)
                 else:
-                    r = rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32).astype(dtype)
+                    r = rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32).astype(self.dtype)
                 self.array[index] = r
 
         else:
             raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
-
-        if dtype != self.dtype:
-            self.array = self.array.astype(dtype)
 
         if kwargs:
             warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)

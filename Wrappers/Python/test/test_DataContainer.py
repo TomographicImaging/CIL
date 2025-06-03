@@ -1320,13 +1320,7 @@ class TestDataContainer(CCPiTestClass):
         dc = DataContainer(array0)
         dc.fill(5)
         self.assertNumpyArrayEqual(dc.array, 5*np.ones_like(array0))
-
-        # test dtype argument
-        dc = DataContainer(array0)
-        dc.fill(5, dtype=np.float64)
-        self.assertNumpyArrayEqual(dc.array, 5*np.ones_like(array0))
-        self.assertEqual(dc.dtype, np.float64)
-        
+       
         # DataContainer
         dc = DataContainer(array0)
         dc.fill(DataContainer(array))
@@ -1378,9 +1372,17 @@ class TestDataContainer(CCPiTestClass):
         dc.fill('RANDOM')
         self.assertGreater(dc.mean(), 0)
 
-        dc = DataContainer(array0.astype(np.float32))
-        dc.fill(array='RANDOM', dtype=np.float64)
-        self.assertEqual(dc.dtype, np.float64)
+        # test dtypes
+        for dtype in [np.float64, np.int32, np.complex128]:
+            dc = DataContainer(array0.astype(dtype))
+            dc.fill('RANDOM_INT')
+            self.assertEqual(dc.dtype, dtype)
+
+        for dtype in [np.float64, np.complex128]:
+            dc = DataContainer(array0.astype(dtype))
+            dc.fill('RANDOM')
+            self.assertEqual(dc.dtype, dtype)
+
 
     def test_fill_dimension_ImageData(self):
         ig = ImageGeometry(2,3,4)

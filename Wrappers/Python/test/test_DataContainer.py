@@ -173,8 +173,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         self.assertFalse(data == data_different_shape)
 
         # Check the equality of two ImageData with different dtypes
-        data_different_dtype = data.copy()
-        data_different_dtype.array = data_different_dtype.array.astype(np.float64)
+        data_different_dtype = data.geometry.allocate(0, dtype=np.float64)
         self.assertFalse(data == data_different_dtype)
 
 
@@ -1354,9 +1353,6 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         u = ig.allocate(0)
         a = xp.ones((4,2))
         # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
-
-        data = u.as_array()
-        axis_number = u.get_dimension_axis('horizontal_y')
 
         u.fill(a, horizontal_y=0)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=0).as_array(), a)

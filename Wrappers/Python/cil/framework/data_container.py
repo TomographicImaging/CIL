@@ -27,6 +27,23 @@ from array_api_compat import array_namespace
 from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
 
+def squeeze_array(array):
+    '''squeezes the array, removing all singleton dimensions recursively
+    
+    Parameters
+    ----------
+    array : array-like
+        The array to squeeze
+    '''
+    xp = array_namespace(array)
+    # find and remove singleton dimensions
+    s = xp.nonzero(xp.asarray(array.shape) == 1)[0]
+    singletons = s.tolist()
+    if len(singletons) > 1:
+        # remove singleton dimension recursively
+        return squeeze_array(xp.squeeze(array, axis=singletons[0]))
+    return array
+
 
 class DataContainer(object):
     '''Generic class to hold data

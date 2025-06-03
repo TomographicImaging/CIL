@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy as np
 
-from .data_container import DataContainer
+from .data_container import DataContainer, squeeze_array
 from .labels import ImageDimension, Backend
 
 from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
@@ -69,10 +69,7 @@ class ImageData(DataContainer):
             # Consider array as an object is compliant to the array API
             # https://docs.scipy.org/doc/scipy-1.15.2/dev/api-dev/array_api.html 
             # this might raise an exception but that's fine
-            xp = array_namespace(array)
-            # remove singleton dimensions
-            array = xp.squeeze(array)
-            
+            array = squeeze_array(array)
         # else:
         #     raise TypeError('array must be a CIL type DataContainer or np.ndarray got {}'.format(type(array)))
 

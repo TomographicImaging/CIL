@@ -49,5 +49,6 @@ dependencies:
   - tqdm
   - zenodo_get >=1.6
   - pip
+  - array-api-compat
   - pip:
     - unittest-parametrize

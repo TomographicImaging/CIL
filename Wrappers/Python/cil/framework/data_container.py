@@ -185,7 +185,6 @@ class DataContainer(object):
                     new_array = self.as_array()
                 new_array = new_array.take(indices=value, axis=axis)
 
-        print ("new_array.shape", new_array.shape)
         # xp = array_namespace(new_array)
         # new_array = xp.squeeze(new_array, axis=tuple(squeeze_axes))
         if new_array.ndim > 1:

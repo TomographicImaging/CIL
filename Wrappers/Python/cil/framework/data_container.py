@@ -260,15 +260,14 @@ class DataContainer(object):
             self.array.__setitem__(slice(None, None, None), array)
             warnings.resetwarnings()
         else:
-            slices = []
-            where = [] * self.number_of_dimensions
+            slices = [slice(None, None, None)] * self.number_of_dimensions
+            where = []
             for i,el in enumerate(self.dimension_labels):
                 for k,v in dimension.items():
                     if el == k:
-                        slices.append(slice(v,v+1,None))
-                        where[i] = 1
-                    else:
-                        slices.append(slice(None, None, None))
+                        slices[i] = slice(v,v+1,None)
+                        where.append(i)
+
             # give new shape to the array to insert so that it fits
             # the shape of the target data
             try:

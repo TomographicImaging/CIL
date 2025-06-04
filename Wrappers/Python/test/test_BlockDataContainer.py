@@ -19,7 +19,7 @@
 import unittest
 from utils import initialise_tests
 import numpy as np
-from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData, DataContainer
 from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
@@ -643,7 +643,39 @@ class TestBlockDataContainer(BDCUnittest):
         out = cp0.sapyb(a,data1,b, num_threads=4)
         
         self.assertBlockDataContainerEqual(out, res)
-        
+
+    def test_BlockDataContainer_mixed_arithmetic(self):
+        a = numpy.ones([2, 2], dtype=numpy.float32) * 2
+        b = numpy.ones([2, 2], dtype=numpy.float32) * 4
+        c = numpy.ones([2, 2], dtype=numpy.float32) * 3
+
+        bdc = BlockDataContainer(DataContainer(a))
+        bdc2 = BlockDataContainer(DataContainer(a), DataContainer(b))
+        dc = DataContainer(b)
+        dc2 = DataContainer(c)
+
+        sub1 = bdc - dc # 2 - 4
+        self.assertIsInstance(sub1, BlockDataContainer)
+        np.testing.assert_almost_equal(sub1.get_item(0).as_array(), -2, decimal=5)
+
+        sub2 = dc - bdc # 4 - 2
+        self.assertIsInstance(sub2, BlockDataContainer)
+        np.testing.assert_almost_equal(sub2.get_item(0).as_array(), 2, decimal=5)
+
+        sub3 = dc2 - bdc2 # 3 - (2, 4)
+        self.assertIsInstance(sub3, BlockDataContainer)
+        np.testing.assert_almost_equal(sub3.get_item(0).as_array(), 1, decimal=5)
+        np.testing.assert_almost_equal(sub3.get_item(1).as_array(), -1, decimal=5)
+
+        div1 = bdc / dc # 2 / 4
+        self.assertIsInstance(div1, BlockDataContainer)
+        np.testing.assert_almost_equal(div1.get_item(0).as_array(), 0.5, decimal=5)
+
+        div2 = dc / bdc # 4 / 2
+        self.assertIsInstance(div2, BlockDataContainer)
+        np.testing.assert_almost_equal(div2.get_item(0).as_array(), 2, decimal=5)
+
+
 class TestOutParameter(BDCUnittest):
     def setUp(self):
         ig0 = ImageGeometry(2,3,4)

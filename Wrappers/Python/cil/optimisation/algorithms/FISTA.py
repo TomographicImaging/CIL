@@ -114,15 +114,19 @@ class ISTA(Algorithm):
 
     @property
     def step_size(self):
+        '''
+        Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
+        '''
+        
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            warnings.warn(
-                "Note the step-size is set by a step-size rule and could change wit each iteration")
-            return self.step_size_rule.get_step_size()
+            try: 
+                return self._step_size
+            except AttributeError:
+                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
 
     # Set default step size
-
     def _calculate_default_step_size(self):
         """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
@@ -135,7 +139,6 @@ class ISTA(Algorithm):
     def __init__(self, initial, f, g, step_size=None, preconditioner=None, **kwargs):
 
         super(ISTA, self).__init__(**kwargs)
-        self._step_size = step_size
         self.set_up(initial=initial, f=f, g=g, step_size=step_size,
                     preconditioner=preconditioner, **kwargs)
 
@@ -190,14 +193,14 @@ class ISTA(Algorithm):
                 self, self.gradient_update, out=self.gradient_update)
 
         try:
-            step_size = self.step_size_rule.get_step_size(self)
+            self._step_size = self.step_size_rule.get_step_size(self)
         except NameError:
             raise NameError(msg='`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 
-        self.x_old.sapyb(1., self.gradient_update, -step_size, out=self.x_old)
+        self.x_old.sapyb(1., self.gradient_update, -self._step_size, out=self.x_old)
 
         # proximal step
-        self.g.proximal(self.x_old, step_size, out=self.x)
+        self.g.proximal(self.x_old, self._step_size, out=self.x)
 
     def _update_previous_solution(self):
         """ Swaps the references to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
@@ -280,7 +283,7 @@ class FISTA(ISTA):
 
     Note
     -----
-    FISTA is also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' is an alias of 'FISTA'.
+    FISTA is sometimes also known as Accelerated Proximal Gradient Descent (APGD). Note that in CIL, 'APGD' with the default Nesterov momentum is equivalent to 'FISTA' but the 'APGD' algorithm gives more options for momentum. 
 
 
     Examples
@@ -348,11 +351,11 @@ class FISTA(ISTA):
             self.preconditioner.apply(
                 self, self.gradient_update, out=self.gradient_update)
 
-        step_size = self.step_size_rule.get_step_size(self)
+        self._step_size = self.step_size_rule.get_step_size(self)
 
-        self.y.sapyb(1., self.gradient_update, -step_size, out=self.y)
+        self.y.sapyb(1., self.gradient_update, -self._step_size, out=self.y)
 
-        self.g.proximal(self.y, step_size, out=self.x)
+        self.g.proximal(self.y, self._step_size, out=self.x)
 
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
 

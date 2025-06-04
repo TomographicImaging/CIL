@@ -24,7 +24,24 @@ import array_api_compat
 from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
 
 class AcquisitionData(DataContainer, Partitioner):
-    '''DataContainer for holding 2D or 3D sinogram'''
+    """
+    DataContainer for holding 2D or 3D sinogram
+    
+    Parameters
+    ----------
+    array : numpy.ndarray or DataContainer
+        The data array. Default None creates an empty array of size determined by the geometry.
+    deep_copy : bool, default is True
+        If True, the array will be deep copied. If False, the array will be shallow copied.
+    geometry : AcquisitionGeometry
+        The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.
+    
+    **kwargs:
+        dtype : numpy.dtype
+            Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. 
+            If an array is passed, dtype must match the dtype of the array.
+
+    """
     __container_priority__ = 1
 
     @property
@@ -50,10 +67,14 @@ class AcquisitionData(DataContainer, Partitioner):
                  geometry = None,
                  **kwargs):
 
-        
+        dtype = kwargs.get('dtype', None)
+        if dtype is not None and array is not None:
+            if dtype != array.dtype:
+                    raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
 
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
+        
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:

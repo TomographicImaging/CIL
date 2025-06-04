@@ -23,10 +23,13 @@ def expand_dims(array, axis):
     Notes:
     This function recursively expands the dimensions of the input array along the specified axes if a list or tuple of ints is provided.
     '''
+    print("axis", axis)
     xp = array_namespace(array)
     
     if isinstance(axis, int):
         return xp.expand_dims(array, axis=axis)
+    if len(axis) == 1:
+        return xp.expand_dims(array, axis=axis[0])
     axis = list(axis)
     ax = axis.pop(0)
     if len(axis) == 1:
@@ -53,8 +56,15 @@ def squeeze(array, axis=None):
     if axis is None:
         s = xp.nonzero(xp.asarray(array.shape) == 1)[0]
         axis = s.tolist()
+        if len(axis) == 1:
+            axis = axis[0]
+        elif len(axis) == 0:
+            return array
     if isinstance(axis, int):
         return xp.squeeze(array, axis=axis)
+    if len(axis) == 1:
+        return xp.squeeze(array, axis=axis[0])
+    
     # process from the largest axis to the smallest
     axis = list(axis)
     axis.sort(reverse=True)

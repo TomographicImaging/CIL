@@ -69,25 +69,6 @@ class ART(Algorithm):
 
         log.info("%s setting up", self.__class__.__name__)
 
-        warning = 0
-        if image_geometry is None:
-            warning += 1
-            msg = "an `image_geometry`"
-        if data is None:
-            warning += 10
-            if warning > 10:
-                msg += " and `data`"
-            else:
-                msg = "`data`"
-        if blocksize is None:
-            warning += 10
-            if warning > 10:
-                msg += " and `blocksize`"
-            else:
-                msg = "`blocksize`"
-        if warning > 0:
-            raise ValueError(f'You must pass {msg} to the ART algorithm')
-
         if initial is None:
             initial = image_geometry.allocate(0)
 
@@ -175,10 +156,22 @@ class OSSART(ART): # TODO: This is just an alias of the ART parent algorithm - d
     """
 
 
-def __init__(self, initial=None, image_geometry=None, data=None, blocksize=None, noneg=True, **kwargs):
+    def __init__(self, initial=None, image_geometry=None, data=None, blocksize=None, noneg=True, **kwargs):
+        
+        # Collect missing required parameters
+        missing = []
+        if image_geometry is None:
+            missing.append("`image_geometry`")
+        if data is None:
+            missing.append("`data`")
+        if blocksize is None:
+            missing.append("`blocksize`")
 
-    super(OSSART, self).__init__(initial=initial, image_geometry=image_geometry,
-                                 data=data, blocksize=blocksize, noneg=noneg, **kwargs)
+        if missing:
+            raise ValueError(f"You must pass {', '.join(missing)} to the OSSART algorithm")
+
+        super(OSSART, self).__init__(initial=initial, image_geometry=image_geometry,
+                                    data=data, blocksize=blocksize, noneg=noneg, **kwargs)
 
 
 class SIRT(ART):
@@ -204,6 +197,16 @@ class SIRT(ART):
     """
 
     def __init__(self, initial=None, image_geometry=None, data=None, noneg=True, **kwargs):
+        
+        # Collect missing required parameters
+        missing = []
+        if image_geometry is None:
+            missing.append("`image_geometry`")
+        if data is None:
+            missing.append("`data`")
+
+        if missing:
+            raise ValueError(f"You must pass {', '.join(missing)} to the SIRT algorithm")
 
         blocksize = len(data.geometry.angles)
 
@@ -234,5 +237,15 @@ class SART(ART):
 
     def __init__(self, initial=None, image_geometry=None, data=None, noneg=True, **kwargs):
 
+        # Collect missing required parameters
+        missing = []
+        if image_geometry is None:
+            missing.append("`image_geometry`")
+        if data is None:
+            missing.append("`data`")
+
+        if missing:
+            raise ValueError(f"You must pass {', '.join(missing)} to the SART algorithm")
+        
         super(SART, self).__init__(initial=initial, image_geometry=image_geometry,
                                    data=data, blocksize=1, noneg=noneg, **kwargs)

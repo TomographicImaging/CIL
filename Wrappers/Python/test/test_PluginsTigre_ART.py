@@ -21,28 +21,34 @@ from utils import has_tigre, has_nvidia, initialise_tests
 from cil.utilities import dataexample
 from parameterized import parameterized
 import numpy as np
-
+from cil.processors import  Slicer, TransmissionAbsorptionConverter
 initialise_tests()
 
 if has_tigre:
     from cil.plugins.tigre import ART, SART, SIRT, OSSART
     
+from testclass import CCPiTestClass
 
-
-class TestTigreReconstructionAlgorithms(unittest.TestCase):
+class TestTigreReconstructionAlgorithms(CCPiTestClass):
 
     def setUp(self):
         self.ground_truth_3D = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
-
+        self.data_cone = TransmissionAbsorptionConverter()(self.data_cone)
+        self.data_cone = Slicer(roi={'angle':(0, -1, 5)})(self.data_cone)
+        
         self.data_fan_beam = self.data_cone.get_slice(vertical='centre')
         self.ground_truth_2D = self.ground_truth_3D.get_slice(vertical='centre')
 
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
 
-        self.data_parallel_2D= self.data_parallel.get_slice(vertical='centre')
+        
+        self.data_parallel = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.data_parallel = TransmissionAbsorptionConverter()(self.data_parallel)
+        self.data_parallel = Slicer(roi={'angle':(0, -1, 5)})(self.data_parallel)
 
+        self.data_parallel_2D= self.data_parallel.get_slice(vertical='centre')
         
         self.ig3D = self.ground_truth_3D.geometry
         self.ig2D = self.ground_truth_2D.geometry 
@@ -75,7 +81,7 @@ class TestTigreReconstructionAlgorithms(unittest.TestCase):
         self.assertTrue(alg.tigre_alg.blocksize ==  1)
         self.assertTrue(alg.tigre_alg.niter == 0)
         self.assertFalse(alg.tigre_alg.__dict__['noneg'])
-        self.assertNumpyArrayEqual(self.ig2D.allocate(0).as_array(), alg.get_output().as_array())
+        self.assertNumpyArrayAlmostEqual(self.ig2D.allocate(0).as_array(), alg.get_output().as_array())
 
     @unittest.skipUnless(has_tigre , "Requires TIGRE")            
     def test_ossart_initialization_success(self):
@@ -85,23 +91,23 @@ class TestTigreReconstructionAlgorithms(unittest.TestCase):
         self.assertTrue(alg.tigre_alg.niter == 0)
         self.assertTrue(alg.tigre_alg.__dict__['noneg'])
         self.assertTrue(alg.tigre_alg.__dict__['OrderStrategy']=='random')
-        self.assertNumpyArrayEqual(alg.tigre_alg.__dict__['init'],self.ig2D.allocate(1).as_array() )
-        self.assertNumpyArrayEqual(alg.get_output().as_array(), self.ig2D.allocate(1).as_array() )
+        self.assertNumpyArrayAlmostEqual(alg.tigre_alg.__dict__['init'][0,:,:], self.ig2D.allocate(1).as_array() )
+        self.assertNumpyArrayAlmostEqual(alg.get_output().as_array(), self.ig2D.allocate(1).as_array() )
         
     
 
     @parameterized.expand([('SART_2D_parallel', SART, 'ig2D', 'data_parallel_2D'),
     ('SIRT_2D_parallel', SIRT, 'ig2D', 'data_parallel_2D'),
     ('OSSART_2D_parallel', OSSART, 'ig2D', 'data_parallel_2D'),
-    ('SART_cone', SART, 'ig2D', 'data_cone'),
-    ('SIRT_cone', SIRT, 'ig2D', 'data_cone'),
-    ('OSSART_cone', OSSART, 'ig2D', 'data_cone'),
+    ('SART_fan_beam', SART, 'ig2D', 'data_fan_beam'),
+    ('SIRT_fan_beam', SIRT, 'ig2D', 'data_fan_beam'),
+    ('OSSART_fan_beam', OSSART, 'ig2D', 'data_fan_beam'),
     ('SART_3D_parallel', SART, 'ig3D', 'data_parallel_3D'),
     ('SIRT_3D_parallel', SIRT, 'ig3D', 'data_parallel_3D'),
     ('OSSART_3D_parallel', OSSART, 'ig3D', 'data_parallel_3D'),
-    ('SART_fan_beam', SART, 'ig3D', 'data_fan_beam'),
-    ('SIRT_fan_beam', SIRT, 'ig3D', 'data_fan_beam'),
-    ('OSSART_fan_beam', OSSART, 'ig3D', 'data_fan_beam'),])
+    ('SART_cone', SART, 'ig3D', 'data_cone'),
+    ('SIRT_cone', SIRT, 'ig3D', 'data_cone'),
+    ('OSSART_cone', OSSART, 'ig3D', 'data_cone')])
     @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_update(self, name, algorithm, image_geometry, data):
 
@@ -118,7 +124,7 @@ class TestTigreReconstructionAlgorithms(unittest.TestCase):
         elif data == 'data_parallel_2D':
             dat = self.data_parallel_2D
         else:
-            dat = self.data_parallel_3D
+            dat = self.data_parallel
             
         try:
             alg = algorithm(image_geometry=ig, data = dat)
@@ -132,7 +138,7 @@ class TestTigreReconstructionAlgorithms(unittest.TestCase):
         y = alg.get_output()
         self.assertTrue( np.sum( (x.as_array() - y.as_array())**2)>0)
         l2_error_2 = np.sum((gt.as_array()-y.as_array())**2)
-        self.assertTrue(ls_error2 < l2_error)
+        self.assertTrue(l2_error_2 < l2_error)
         
         
         

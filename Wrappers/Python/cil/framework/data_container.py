@@ -26,23 +26,9 @@ from array_api_compat import array_namespace
 
 from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
+from .array_api_compat import squeeze as cil_squeeze
+from .array_api_compat import expand_dims as cil_expand_dims
 
-def squeeze_array(array):
-    '''squeezes the array, removing all singleton dimensions recursively
-    
-    Parameters
-    ----------
-    array : array-like
-        The array to squeeze
-    '''
-    xp = array_namespace(array)
-    # find and remove singleton dimensions
-    s = xp.nonzero(xp.asarray(array.shape) == 1)[0]
-    singletons = s.tolist()
-    if len(singletons) > 1:
-        # remove singleton dimension recursively
-        return squeeze_array(xp.squeeze(array, axis=singletons[0]))
-    return array
 
 
 class DataContainer(object):
@@ -264,50 +250,37 @@ class DataContainer(object):
         '''
         if id(array) == id(self.array):
             return
+        if issubclass(array.__class__ , DataContainer):
+            return self.fill(array.as_array(), **dimension)
         if dimension == {}:
-            if issubclass(array.__class__ , DataContainer):
-
-                try:
-                    if self.dimension_labels != array.dimension_labels:
-                        raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
-                except AttributeError:
-                    pass
-
-                if self.array.shape == array.shape:
-                    # numpy.copyto(self.array, array.array)
-                    xp = array_namespace(self.as_array())
-                    self.array.__setitem__(slice(None, None, None), array.array)
-                else:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting shape {0} got {1}'.format(
-                                     self.shape,array.shape))
-            else:
-                # raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
-                import warnings
-                warnings.filterwarnings('error')
-                xp = array_namespace(self.as_array())
-                self.array.__setitem__(slice(None, None, None), array)
-                warnings.resetwarnings()
+            # raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+            import warnings
+            warnings.filterwarnings('error')
+            xp = array_namespace(self.as_array())
+            self.array.__setitem__(slice(None, None, None), array)
+            warnings.resetwarnings()
         else:
             slices = []
-            where = 0
+            where = [] * self.number_of_dimensions
             for i,el in enumerate(self.dimension_labels):
                 for k,v in dimension.items():
                     if el == k:
                         slices.append(slice(v,v+1,None))
-                        where = i
+                        where[i] = 1
                     else:
                         slices.append(slice(None, None, None))
             # give new shape to the array to insert so that it fits
             # the shape of the target data
             try:
                  
-                xp = array_namespace(array)
-                xp.expand_dims(array, axis=where)
+                array = cil_expand_dims(array, axis=where)
                 self.array.__setitem__(tuple(slices), array)
-                xp.squeeze(array, axis=where)
+                array = cil_squeeze(array, axis=where)
 
             except AttributeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+                
+            except TypeError as ae:
                 self.array.__setitem__(tuple(slices), array)
                 
 

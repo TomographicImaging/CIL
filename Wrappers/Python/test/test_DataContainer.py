@@ -32,8 +32,11 @@ from utils import initialise_tests
 import array_api_compat
 from unittest_parametrize import param, parametrize, ParametrizedTestCase
 import numpy
-import torch
-
+try:
+    import torch
+except ImportError:
+    torch = None
+import unittest
 
 log = logging.getLogger(__name__)
 initialise_tests()
@@ -50,7 +53,8 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         return ds
-
+    
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
@@ -79,6 +83,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         ds1 = ds.clone()
         self.assertNotEqual(aid(ds), aid(ds1))
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
@@ -89,6 +94,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         self.assertEqual(x_np.ndim, x_cil.ndim)
         self.assertEqual(3, x_cil.ndim)
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
@@ -107,6 +113,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         data1 += 1
         self.assertFalse((data ==  data1).all())
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
@@ -146,6 +153,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         data_different_labels.geometry.set_labels([AcquisitionDimension("ANGLE"), AcquisitionDimension("CHANNEL") ])
         self.assertFalse(data == data_different_labels)
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
@@ -182,6 +190,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         data_different_labels.geometry.set_labels([ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
         self.assertFalse(data == data_different_labels)
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
@@ -221,6 +230,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         np.testing.assert_array_almost_equal(ds.as_array(), b)
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
@@ -1344,6 +1354,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
 
         np.testing.assert_array_equal(ds.as_array(), -a)
 
+    @unittest.skipIf(torch is None, "torch not available")
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),

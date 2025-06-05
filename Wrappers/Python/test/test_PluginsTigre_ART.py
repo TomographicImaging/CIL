@@ -125,7 +125,6 @@ class TestTigreReconstructionAlgorithms(CCPiTestClass):
             dat = self.data_parallel_2D
         else:
             dat = self.data_parallel
-            
         try:
             alg = algorithm(image_geometry=ig, data = dat)
         except ValueError: 
@@ -133,12 +132,13 @@ class TestTigreReconstructionAlgorithms(CCPiTestClass):
         
         
         x = alg.get_output()
+        self.assertEqual( np.sum( ( x.as_array())**2), 0) # check initialised to zero
         l2_error = np.sum((gt.as_array()-x.as_array())**2)
         alg.run(1)
         y = alg.get_output()
-        self.assertTrue( np.sum( (x.as_array() - y.as_array())**2)>0)
+        self.assertTrue( np.sum( ( y.as_array())**2)>0) # check that the algorithm has moved! 
         l2_error_2 = np.sum((gt.as_array()-y.as_array())**2)
-        self.assertTrue(l2_error_2 < l2_error)
+        self.assertTrue(l2_error_2 < l2_error) # check to see we get closer to the solution 
         
         
         

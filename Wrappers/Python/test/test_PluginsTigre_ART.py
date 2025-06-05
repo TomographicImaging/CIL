@@ -57,13 +57,13 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         argvalues=[(SART,), (SIRT,), (OSSART,)],
         ids=["SART", "SIRT", "OSSART"]
     )
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_missing_parameters_raises_error(self, alg):
         with self.assertRaises(ValueError) as context:
             alg()
         self.assertIn("You must pass", str(context.exception))
 
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_sirt_initialization_success(self):
         alg = SIRT(image_geometry=self.ig2D, data=self.data_parallel_2D)
         self.assertTrue(alg.configured)
@@ -71,7 +71,7 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         self.assertEqual(alg.tigre_alg.niter, 0)
         self.assertTrue(alg.tigre_alg.__dict__['noneg'])
 
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_sart_initialization_success(self):
         alg = SART(image_geometry=self.ig2D, data=self.data_parallel_2D, noneg=False)
         self.assertTrue(alg.configured)
@@ -80,8 +80,8 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         self.assertFalse(alg.tigre_alg.__dict__['noneg'])
         self.assertEqual(np.sum(np.abs(alg.get_output().as_array())),0)
         self.assertEqual(np.sum(np.abs(alg.tigre_alg.__dict__['init'][0, :, :])), 0)
-
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+        
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_ossart_initialization_success(self):
         alg = OSSART(initial=self.ig2D.allocate(1), image_geometry=self.ig2D, data=self.data_parallel_2D, blocksize=2, OrderStrategy='random')
         self.assertTrue(alg.configured)

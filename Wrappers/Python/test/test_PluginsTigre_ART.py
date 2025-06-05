@@ -52,12 +52,12 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         self.ig3D = self.ground_truth_3D.geometry
         self.ig2D = self.ground_truth_2D.geometry
 
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
     @parametrize(
         argnames="alg",
         argvalues=[(SART,), (SIRT,), (OSSART,)],
         ids=["SART", "SIRT", "OSSART"]
     )
+    @unittest.skipUnless(has_tigre, "Requires TIGRE")
     def test_missing_parameters_raises_error(self, alg):
         with self.assertRaises(ValueError) as context:
             alg()
@@ -91,7 +91,6 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         self.assertEqual(alg.tigre_alg.__dict__['OrderStrategy'], 'random')
         self.assertEqual(np.sum(np.abs(alg.tigre_alg.__dict__['init'][0, :, :])), np.sum(np.abs(self.ig2D.allocate(1).as_array())))
 
-    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     @parametrize(
         argnames="algorithm,image_geometry,data",
         argvalues=[
@@ -115,6 +114,7 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
             'SART_cone', 'SIRT_cone', 'OSSART_cone'
         ]
     )
+    @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
     def test_update(self, algorithm, image_geometry, data):
         ig = getattr(self, image_geometry)
         gt = self.ground_truth_2D if image_geometry == 'ig2D' else self.ground_truth_3D

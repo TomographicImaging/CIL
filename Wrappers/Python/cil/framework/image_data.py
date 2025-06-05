@@ -72,11 +72,6 @@ class ImageData(DataContainer):
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
 
-
-        labels = kwargs.get('dimension_labels', None)
-        if labels is not None and labels != geometry.dimension_labels:
-                raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype

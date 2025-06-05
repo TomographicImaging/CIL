@@ -290,13 +290,17 @@ class APGD(Algorithm):
 
     @property
     def step_size(self):
+        '''
+        Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
+        '''
+        
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            try:
+            try: 
                 return self._step_size
-            except NameError:
-                return NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. After running one update step, a step-size will be returned")
+            except AttributeError:
+                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
 
     @property
     def momentum(self):

@@ -80,9 +80,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(FillType["RANDOM_DEPRECATED"], dtype=numpy.float64)
+        noisy_data = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
 
-        d = ag.allocate(FillType["RANDOM_DEPRECATED"], dtype=numpy.float64)
+        d = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -112,8 +112,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(FillType["RANDOM_DEPRECATED"])
-        b = ig.allocate(FillType["RANDOM_DEPRECATED"])
+        u = ig.allocate(FillType["RANDOM"], seed=3)
+        b = ig.allocate(FillType["RANDOM"], seed=42)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -223,8 +223,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(FillType["RANDOM_DEPRECATED"], seed=1)
-        b = ig.allocate(FillType["RANDOM_DEPRECATED"], seed=2)
+        u = ig.allocate(FillType["RANDOM"], seed=1)
+        b = ig.allocate(FillType["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -332,11 +332,11 @@ class TestFunction(CCPiTestClass):
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
         #numpy.random.seed(1)
-        b = ig.allocate('random_deprecated', seed=1)
+        b = ig.allocate('random', seed=1)
 
         operator = 3 * IdentityOperator(ig)
 
-        u = ig.allocate('random_deprecated', seed=50)
+        u = ig.allocate('random', seed=50)
         f = 0.5 * L2NormSquared(b=b)
         func1 = OperatorCompositionFunction(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
@@ -357,8 +357,8 @@ class TestFunction(CCPiTestClass):
         mat = np.random.randn(M, N)
         operator = MatrixOperator(mat)
         vg = VectorGeometry(N)
-        b = vg.allocate('random_deprecated')
-        u = vg.allocate('random_deprecated')
+        b = vg.allocate('random', seed=2)
+        u = vg.allocate('random', seed=51)
 
         func1 = OperatorCompositionFunction(0.5 * L2NormSquared(b=b), operator)
         func2 = LeastSquares(operator, b, 0.5)
@@ -370,8 +370,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        u1 = ig.allocate('random_deprecated')
-        u2 = ig.allocate('random_deprecated')
+        u1 = ig.allocate('random', seed=3)
+        u2 = ig.allocate('random', seed=4)
 
         U = BlockDataContainer(u1, u2, shape=(2, 1))
 
@@ -390,8 +390,8 @@ class TestFunction(CCPiTestClass):
                                            U.power(2))
 
         z1 = f_no_scaled.proximal_conjugate(U, 1)
-        u3 = ig.allocate('random_deprecated')
-        u4 = ig.allocate('random_deprecated')
+        u3 = ig.allocate('random', seed=5)
+        u4 = ig.allocate('random', seed=6)
 
         z3 = BlockDataContainer(u3, u4, shape=(2, 1))
 
@@ -474,7 +474,7 @@ class TestFunction(CCPiTestClass):
         epsilon = 0.5
 
         f1 = SmoothMixedL21Norm(epsilon)
-        x = bg.allocate('random_deprecated', seed=10)
+        x = bg.allocate('random', seed=10)
 
         # check call
         res1 = f1(x)
@@ -512,9 +512,9 @@ class TestFunction(CCPiTestClass):
         M, N, K = 2, 3, 4
         ig = ImageGeometry(N, M, K)
 
-        u1 = ig.allocate('random_deprecated', seed=500)
-        g1 = ig.allocate('random_deprecated', seed=100)
-        b1 = ig.allocate('random_deprecated', seed=1000)
+        u1 = ig.allocate('random', seed=500)
+        g1 = ig.allocate('random', seed=100)
+        b1 = ig.allocate('random', seed=1000)
 
         # with no data
         with self.assertRaises(TypeError):
@@ -568,8 +568,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate('random_deprecated')
-        b = ig.allocate('random_deprecated')
+        u = ig.allocate('random', test=3)
+        b = ig.allocate('random', test=4)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -675,7 +675,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
                                                 ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)
 
-        u_out_no_out = ig.allocate('random_int_deprecated')
+        u_out_no_out = ig.allocate('random_int', seed=5)
         res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)
 
         res_out = ig.allocate()
@@ -688,8 +688,8 @@ class TestFunction(CCPiTestClass):
 
         tau = 0.1
 
-        u = ig1.allocate('random_deprecated')
-        b = ig1.allocate('random_deprecated')
+        u = ig1.allocate('random', seed=6)
+        b = ig1.allocate('random', seed=7)
 
         scalar = 0.5
         f_scaled = scalar * L2NormSquared(b=b)
@@ -705,7 +705,7 @@ class TestFunction(CCPiTestClass):
 
         # Tests for weighted L2NormSquared
         ig = ImageGeometry(voxel_num_x=3, voxel_num_y=3)
-        weight = ig.allocate('random_deprecated')
+        weight = ig.allocate('random', seed=8)
 
         f = WeightedL2NormSquared(weight=weight)
         x = ig.allocate(0.4)
@@ -745,7 +745,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)
 
-        b = ig.allocate('random_deprecated')
+        b = ig.allocate('random', seed=9)
         f1 = TranslateFunction(WeightedL2NormSquared(weight=weight), b)
         f2 = WeightedL2NormSquared(weight=weight, b=b)
         res1 = f1(x)
@@ -765,11 +765,11 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
 
         A = IdentityOperator(ig)
-        b = ig.allocate('random_deprecated')
-        x = ig.allocate('random_deprecated')
+        b = ig.allocate('random', seed=3)
+        x = ig.allocate('random', seed=4)
         c = numpy.float64(0.3)
 
-        weight = ig.allocate('random_deprecated')
+        weight = ig.allocate('random', seed=5)
 
         D = DiagonalOperator(weight)
         norm_weight = numpy.float64(D.norm())
@@ -817,11 +817,11 @@ class TestFunction(CCPiTestClass):
 
         ig2 = ImageGeometry(100, 100, 100)
         A = IdentityOperator(ig2)
-        b = ig2.allocate('random_deprecated')
-        x = ig2.allocate('random_deprecated')
+        b = ig2.allocate('random', seed=6)
+        x = ig2.allocate('random', seed=7)
         c = 0.3
 
-        weight = ig2.allocate('random_deprecated')
+        weight = ig2.allocate('random', seed=8)
 
         weight_operator = DiagonalOperator(weight.sqrt())
         tmp_A = CompositionOperator(weight_operator, A)
@@ -843,10 +843,10 @@ class TestFunction(CCPiTestClass):
     def test_Lipschitz(self):
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        b = ig.allocate('random_deprecated', seed=1)
+        b = ig.allocate('random', seed=1)
         operator = 3 * IdentityOperator(ig)
 
-        u = ig.allocate('random_int_deprecated', seed=50)
+        u = ig.allocate('random_int', seed=50)
         func2 = LeastSquares(operator, b, 0.5)
         assert func2.L != 2
         func2.L = 2
@@ -855,10 +855,10 @@ class TestFunction(CCPiTestClass):
     def test_Lipschitz2(self):
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        b = ig.allocate('random_deprecated', seed=1)
+        b = ig.allocate('random', seed=1)
         operator = 3 * IdentityOperator(ig)
 
-        u = ig.allocate('random_int_deprecated', seed=50)
+        u = ig.allocate('random_int', seed=50)
         func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = func1 + func2
@@ -869,10 +869,10 @@ class TestFunction(CCPiTestClass):
     def test_Lipschitz3(self):
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        b = ig.allocate('random_deprecated', seed=1)
+        b = ig.allocate('random', seed=1)
         operator = 3 * IdentityOperator(ig)
 
-        u = ig.allocate('random_int_deprecated', seed=50)
+        u = ig.allocate('random_int', seed=50)
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = TranslateFunction(func1, 3)
@@ -883,10 +883,10 @@ class TestFunction(CCPiTestClass):
     def test_Lipschitz4(self):
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        b = ig.allocate('random_deprecated', seed=1)
+        b = ig.allocate('random', seed=1)
         operator = 3 * IdentityOperator(ig)
 
-        u = ig.allocate('random_int_deprecated', seed=50)
+        u = ig.allocate('random_int', seed=50)
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         f3 = func1 + 3
@@ -918,7 +918,7 @@ class TestFunction(CCPiTestClass):
         ig = ag.get_ImageGeometry()
         bg = BlockGeometry(ig, ig)
 
-        b = ag.allocate('random_deprecated', seed=2)
+        b = ag.allocate('random', seed=2)
 
         func_geom_test_list = [
             (IndicatorBox(), ag),
@@ -937,7 +937,7 @@ class TestFunction(CCPiTestClass):
             self.proximal_conjugate_test(func, geom)
 
     def proximal_conjugate_test(self, function, geom):
-        x = geom.allocate('random_deprecated', seed=1)
+        x = geom.allocate('random', seed=1)
         tau = 1.0
         f = Function()
         f.proximal = function.proximal
@@ -968,7 +968,7 @@ class TestL1Norm (CCPiTestClass):
         f1 = L1Norm()
         N, M = 2,3
         geom = ImageGeometry(N, M)
-        x = geom.allocate('random_deprecated', seed=1)
+        x = geom.allocate('random', seed=1)
 
         weights = geom.allocate(1)
         f2 = L1Norm(weight=weights)
@@ -995,7 +995,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
         np.random.seed(1)
-        weights= geom.allocate('random_deprecated').abs()
+        weights= geom.allocate('random', seed=2).abs()
         w = weights.abs().sum()
         x=geom.allocate(1)
         f1 = L1Norm()
@@ -1006,7 +1006,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(f2(x), f1(weights))
 
         np.random.seed(1)
-        weights= geom.allocate('random_deprecated').abs()
+        weights= geom.allocate('random', seed=3).abs()
         w = weights.abs().sum()
         x=geom.allocate(2)
         b=geom.allocate(1)
@@ -1033,7 +1033,7 @@ class TestL1Norm (CCPiTestClass):
 
         geom = ImageGeometry(N, M, dtype=np.complex64)
         np.random.seed(1)
-        weights= geom.allocate('random_deprecated').abs()
+        weights= geom.allocate('random', seed=4).abs()
         w = weights.abs().sum()
         x=geom.allocate(2+3j)
         b=geom.allocate(1+3j)
@@ -1075,7 +1075,7 @@ class TestL1Norm (CCPiTestClass):
         N, M = 2,3
         geom = ImageGeometry(N, M)
 
-        weights = geom.allocate('random_deprecated').abs().as_array()
+        weights = geom.allocate('random', seed=3).abs().as_array()
         f2 = L1Norm(weight=weights)
 
         w = np.abs(weights).sum()
@@ -1194,8 +1194,8 @@ class TestL1Norm (CCPiTestClass):
         f1 = L1Norm()
         N, M = 2,3
         geom = ImageGeometry(N, M)
-        x = geom.allocate('random_deprecated', seed=1)
-        b = geom.allocate('random_deprecated', seed=2)
+        x = geom.allocate('random', seed=1)
+        b = geom.allocate('random', seed=2)
         f3=L1Norm(b=b)
         weights = geom.allocate(1)
 
@@ -1294,14 +1294,14 @@ class TestTotalVariation(unittest.TestCase):
         self.assertEqual(self.alpha * alpha, tv2.regularisation_parameter, msg="Failed at scaling regularisation parameter of already scaled TotalVariation")
 
     def test_call_real_isotropic(self):
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
 
         res1 = self.tv_iso(x_real)
         res2 = self.grad.direct(x_real).pnorm(2).sum()
         np.testing.assert_equal(res1, res2, err_msg="Error with isotropic TV calculation")
 
     def test_call_real_anisotropic(self):
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
 
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
@@ -1317,7 +1317,7 @@ class TestTotalVariation(unittest.TestCase):
             strong_convexity_constant=1e-4, warm_start=False)
 
         # check call
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
         res1 = TV_strongly_convex(x_real)
         res2 = TV_no_strongly_convex(
             x_real) + (TV_strongly_convex.strong_convexity_constant /
@@ -1325,7 +1325,7 @@ class TestTotalVariation(unittest.TestCase):
         np.testing.assert_allclose(res1, res2, atol=1e-3, err_msg='TV calculation with and without strong convexity not equal')
 
         # check proximal
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
         res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
 
         tmp_x_real = x_real.copy()
@@ -1348,7 +1348,7 @@ class TestTotalVariation(unittest.TestCase):
             strong_convexity_constant=1e-3)
 
         # check call
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
         res1 = FGP_TV_strongly_convex(x_real)
 
         res2 = FGP_TV_no_strongly_convex(
@@ -1357,7 +1357,7 @@ class TestTotalVariation(unittest.TestCase):
         np.testing.assert_allclose(res1, res2, atol=1e-3, err_msg='Failed at comparing FGP_TV call with and without strong convexity')
 
         # check proximal
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
         res1 = FGP_TV_no_strongly_convex.proximal(x_real, tau=1.0)
 
         tmp_x_real = x_real.copy()
@@ -1509,7 +1509,7 @@ class TestTotalVariation(unittest.TestCase):
 
     def test_non_scalar_tau_cil_tv(self):
 
-        x_real = self.ig_real.allocate('random_deprecated', seed=4)
+        x_real = self.ig_real.allocate('random', seed=4)
 
         # tau is an array filled with alpha = 0.15
         res1 = self.tv_iso.proximal(x_real, tau=self.alpha_arr)
@@ -1770,12 +1770,12 @@ class TestBlockFunction(unittest.TestCase):
     def setUp(self):
         # M, N = 50, 50
         # ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-        # b = ig.allocate('random_deprecated', seed=1)
+        # b = ig.allocate('random', seed=1)
 
         # print('Check call with IdentityOperator operator... OK\n')
         # operator = 3 * IdentityOperator(ig)
 
-        # u = ig.allocate('random_int_deprecated', seed = 50)
+        # u = ig.allocate('random_int', seed = 50)
         # func2 = LeastSquares(operator, b, 0.5)
         func1 = ConstantFunction(0.3)
         func2 = ConstantFunction(-1.0)

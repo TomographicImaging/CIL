@@ -80,9 +80,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(FillType["RANDOM"], dtype=numpy.float64)
+        noisy_data = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
 
-        d = ag.allocate(FillType["RANDOM"], dtype=numpy.float64)
+        d = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -112,8 +112,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(FillType["RANDOM"])
-        b = ig.allocate(FillType["RANDOM"])
+        u = ig.allocate(FillType["RANDOM"], seed=3)
+        b = ig.allocate(FillType["RANDOM"], seed=42)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -357,8 +357,8 @@ class TestFunction(CCPiTestClass):
         mat = np.random.randn(M, N)
         operator = MatrixOperator(mat)
         vg = VectorGeometry(N)
-        b = vg.allocate('random')
-        u = vg.allocate('random')
+        b = vg.allocate('random', seed=2)
+        u = vg.allocate('random', seed=51)
 
         func1 = OperatorCompositionFunction(0.5 * L2NormSquared(b=b), operator)
         func2 = LeastSquares(operator, b, 0.5)
@@ -370,8 +370,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        u1 = ig.allocate('random')
-        u2 = ig.allocate('random')
+        u1 = ig.allocate('random', seed=3)
+        u2 = ig.allocate('random', seed=4)
 
         U = BlockDataContainer(u1, u2, shape=(2, 1))
 
@@ -390,8 +390,8 @@ class TestFunction(CCPiTestClass):
                                            U.power(2))
 
         z1 = f_no_scaled.proximal_conjugate(U, 1)
-        u3 = ig.allocate('random')
-        u4 = ig.allocate('random')
+        u3 = ig.allocate('random', seed=5)
+        u4 = ig.allocate('random', seed=6)
 
         z3 = BlockDataContainer(u3, u4, shape=(2, 1))
 
@@ -568,8 +568,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate('random')
-        b = ig.allocate('random')
+        u = ig.allocate('random', test=3)
+        b = ig.allocate('random', test=4)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -675,7 +675,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
                                                 ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)
 
-        u_out_no_out = ig.allocate('random_int')
+        u_out_no_out = ig.allocate('random_int', seed=5)
         res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)
 
         res_out = ig.allocate()
@@ -688,8 +688,8 @@ class TestFunction(CCPiTestClass):
 
         tau = 0.1
 
-        u = ig1.allocate('random')
-        b = ig1.allocate('random')
+        u = ig1.allocate('random', seed=6)
+        b = ig1.allocate('random', seed=7)
 
         scalar = 0.5
         f_scaled = scalar * L2NormSquared(b=b)
@@ -705,7 +705,7 @@ class TestFunction(CCPiTestClass):
 
         # Tests for weighted L2NormSquared
         ig = ImageGeometry(voxel_num_x=3, voxel_num_y=3)
-        weight = ig.allocate('random')
+        weight = ig.allocate('random', seed=8)
 
         f = WeightedL2NormSquared(weight=weight)
         x = ig.allocate(0.4)
@@ -745,7 +745,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)
 
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=9)
         f1 = TranslateFunction(WeightedL2NormSquared(weight=weight), b)
         f2 = WeightedL2NormSquared(weight=weight, b=b)
         res1 = f1(x)
@@ -765,11 +765,11 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
 
         A = IdentityOperator(ig)
-        b = ig.allocate('random')
-        x = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
+        x = ig.allocate('random', seed=4)
         c = numpy.float64(0.3)
 
-        weight = ig.allocate('random')
+        weight = ig.allocate('random', seed=5)
 
         D = DiagonalOperator(weight)
         norm_weight = numpy.float64(D.norm())
@@ -817,11 +817,11 @@ class TestFunction(CCPiTestClass):
 
         ig2 = ImageGeometry(100, 100, 100)
         A = IdentityOperator(ig2)
-        b = ig2.allocate('random')
-        x = ig2.allocate('random')
+        b = ig2.allocate('random', seed=6)
+        x = ig2.allocate('random', seed=7)
         c = 0.3
 
-        weight = ig2.allocate('random')
+        weight = ig2.allocate('random', seed=8)
 
         weight_operator = DiagonalOperator(weight.sqrt())
         tmp_A = CompositionOperator(weight_operator, A)
@@ -995,7 +995,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=2).abs()
         w = weights.abs().sum()
         x=geom.allocate(1)
         f1 = L1Norm()
@@ -1006,7 +1006,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(f2(x), f1(weights))
 
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=3).abs()
         w = weights.abs().sum()
         x=geom.allocate(2)
         b=geom.allocate(1)
@@ -1033,7 +1033,7 @@ class TestL1Norm (CCPiTestClass):
 
         geom = ImageGeometry(N, M, dtype=np.complex64)
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=4).abs()
         w = weights.abs().sum()
         x=geom.allocate(2+3j)
         b=geom.allocate(1+3j)
@@ -1075,7 +1075,7 @@ class TestL1Norm (CCPiTestClass):
         N, M = 2,3
         geom = ImageGeometry(N, M)
 
-        weights = geom.allocate('random').abs().as_array()
+        weights = geom.allocate('random', seed=3).abs().as_array()
         f2 = L1Norm(weight=weights)
 
         w = np.abs(weights).sum()

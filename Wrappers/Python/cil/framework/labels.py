@@ -178,6 +178,10 @@ class FillType(StrEnum):
         Fill with random values.
     RANDOM_INT:
         Fill with random integers.
+    RANDOM_DEPRECATED:
+        Fill with random values using numpy.random.random_sample method
+    RANDOM_INT_DEPRECATED:
+        Fill with random integers using numpy.random.randint method
 
     Examples
     --------
@@ -186,6 +190,8 @@ class FillType(StrEnum):
     """
     RANDOM = auto()
     RANDOM_INT = auto()
+    RANDOM_DEPRECATED = auto()
+    RANDOM_INT_DEPRECATED = auto()
 
 
 class AngleUnit(StrEnum):

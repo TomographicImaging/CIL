@@ -73,7 +73,7 @@ class TestWavelets(CCPiTestClass):
         for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
             for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
                 with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
-                    x = dg.allocate('random_deprecated')
+                    x = dg.allocate('random', seed=3)
 
                     W = WaveletOperator(dg, wname=wname, level=level)
                     rg = W.range_geometry() # Range
@@ -94,7 +94,7 @@ class TestWavelets(CCPiTestClass):
         for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3']:
             for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
                 with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
-                    x = dg.allocate('random_deprecated', dtype='complex128')
+                    x = dg.allocate('random', seed=3, dtype='complex128')
 
                     W = WaveletOperator(dg, wname=wname, level=level)
                     rg = W.range_geometry() # Range
@@ -120,7 +120,7 @@ class TestWavelets(CCPiTestClass):
         for wname in ["bior3.5", "bior3.3", "rbio3.5", "rbio4.4"]:
             for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
                 with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
-                    x = dg.allocate('random_deprecated')
+                    x = dg.allocate('random', seed=3)
 
                     W = WaveletOperator(dg, wname=wname, level=level)
                     rg = W.range_geometry() # Range
@@ -144,7 +144,7 @@ class TestWavelets(CCPiTestClass):
         for wname in ["bior3.5", "bior3.3", "rbio3.5", "rbio4.4"]:
             for dg in [ImageGeometry(voxel_num_x=m, voxel_num_y=n), VectorGeometry(m), VectorGeometry(n)]:
                 with self.subTest(msg=f"{wname} transform failed for {dg.__class__.__name__} of size {dg.shape}", wname=wname, dg=dg):
-                    x = dg.allocate('random_deprecated')
+                    x = dg.allocate('random', seed=3)
 
                     W = WaveletOperator(dg, wname=wname, level=level, true_adjoint=False)
                     rg = W.range_geometry() # Range
@@ -211,8 +211,8 @@ class TestWavelets(CCPiTestClass):
 
         self.assertEqual(dg.shape, rg.shape, msg="Periodization convolution should require no padding")
 
-        x = dg.allocate('random_deprecated')
-        c = rg.allocate('random_deprecated')
+        x = dg.allocate('random', seed=3)
+        c = rg.allocate('random', seed=4)
 
         ip1 = c.dot(W.direct(x))
         ip2 = x.dot(W.adjoint(c))
@@ -222,12 +222,12 @@ class TestWavelets(CCPiTestClass):
     def test_wavelet_adjoint(self):
         m, n = 48, 64
         dg = ImageGeometry(voxel_num_x=m, voxel_num_y=n) # Domain
-        x = dg.allocate('random_deprecated')
+        x = dg.allocate('random', seed=3)
         for wname in ['haar', 'db2', 'db3', 'db4', 'sym2', 'sym3', 'coif2', 'coif3', 'bior3.5', 'bior3.3', 'rbio3.5', 'rbio3.3']:
             with self.subTest(msg=f"Failed for wavelet {wname}", wname=wname):
                 W = WaveletOperator(dg, wname=wname, level=2, bnd_cond='periodization') # Note: this is different from bnd_cond='periodic'
                 rg = W.range_geometry()
-                c = rg.allocate('random_deprecated')
+                c = rg.allocate('random', seed=4)
 
                 ip1 = c.dot(W.direct(x))
                 ip2 = x.dot(W.adjoint(c))
@@ -256,7 +256,7 @@ class TestWavelets(CCPiTestClass):
         W = WaveletOperator(dg, wname=wname, level=level)
         WN = L1Sparsity(W)
 
-        x = dg.allocate('random_deprecated')
+        x = dg.allocate('random', seed=3)
         Wx = W.direct(x)
 
         self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="L1Sparsity should be the sum of absolute values of the wavelet coefficients", places=5)
@@ -304,7 +304,7 @@ class TestWavelets(CCPiTestClass):
         self.assertEqual(W.is_orthogonal(), True)
         WN = L1Sparsity(W)
 
-        x = dg.allocate('random_deprecated', dtype='complex64')
+        x = dg.allocate('random', seed=3, dtype='complex64')
         Wx = W.direct(x)
 
         self.assertAlmostEqual(WN(x), np.sum(Wx.abs().as_array()), msg="L1Sparsity should be the sum of absolute values of the wavelet coefficients", places =5 )

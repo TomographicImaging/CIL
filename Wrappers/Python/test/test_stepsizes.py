@@ -20,7 +20,7 @@ class TestStepSizes(CCPiTestClass):
         step_size_test = ConstantStepSize(3)
         step_size_test.get_step_size = MagicMock(return_value=.1)
         f = LeastSquares(A=A, b=data, c=0.5)
-        alg = GD(initial=ig.allocate('random_deprecated', seed=10), f=f, step_size=step_size_test,
+        alg = GD(initial=ig.allocate('random', seed=10), f=f, step_size=step_size_test,
                   update_objective_interval=1)
 
         alg.run(5)
@@ -29,14 +29,14 @@ class TestStepSizes(CCPiTestClass):
 
         step_size_test = ConstantStepSize(3)
         step_size_test.get_step_size = MagicMock(return_value=.1)
-        alg = ISTA(initial=ig.allocate('random_deprecated', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
+        alg = ISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
                     update_objective_interval=1)
         alg.run(5)
         self.assertEqual(len(step_size_test.get_step_size.mock_calls), 5)
 
         step_size_test = ConstantStepSize(3)
         step_size_test.get_step_size = MagicMock(return_value=.1)
-        alg = FISTA(initial=ig.allocate('random_deprecated', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
+        alg = FISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), step_size=step_size_test,
                      update_objective_interval=1)
         alg.run(5)
         self.assertEqual(len(step_size_test.get_step_size.mock_calls), 5)
@@ -50,7 +50,7 @@ class TestStepSizeArmijo(CCPiTestClass):
     
     def setUp(self):
         self.ig = VectorGeometry(2)
-        self.data = self.ig.allocate('random_deprecated')
+        self.data = self.ig.allocate('random', seed=3)
         self.data.fill(np.array([3.5, 3.5]))
         self.A = MatrixOperator(np.diag([1., 1.]))
         self.f = LeastSquares(self.A, self.data)

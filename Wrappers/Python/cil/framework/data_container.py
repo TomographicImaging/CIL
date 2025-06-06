@@ -256,8 +256,8 @@ class DataContainer(object):
             This method does not use the global numpy.random.seed() so if a seed is 
             required it should be passed directly as a kwarg.
             To fill random numbers using the deprecated `numpy.random.random_sample`
-            and `numpy.random.randint` methods use `value='random_deprecated'` 
-            or `value='random_int_deprecated'` 
+            and `numpy.random.randint` methods use `array='random_deprecated'` 
+            or `array='random_int_deprecated'` 
         
         Example
         -------

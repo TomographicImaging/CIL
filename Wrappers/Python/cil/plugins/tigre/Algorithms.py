@@ -73,7 +73,7 @@ class ART(Algorithm):
             initial = image_geometry.allocate(0)
 
         tigre_initial = initial.copy().as_array()
-        self.ig = image_geometryu
+        self.ig = image_geometry
         self.ag = data.geometry
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
             self.ig, self.ag)

@@ -20,26 +20,26 @@ class TestPreconditioners(CCPiTestClass):
         A = IdentityOperator(ig)
         test_precon = MagicMock(None)
         f = LeastSquares(A=A, b=data, c=0.5)
-        alg = GD(initial=ig.allocate('random_deprecated', seed=10), f=f, preconditioner=test_precon,
+        alg = GD(initial=ig.allocate('random', seed=10), f=f, preconditioner=test_precon,
                  max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
         test_precon=Sensitivity(A)
         test_precon.apply = MagicMock(None)
-        alg = ISTA(initial=ig.allocate('random_deprecated', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
+        alg = ISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
                    max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
         test_precon = MagicMock(None)
-        alg = FISTA(initial=ig.allocate('random_deprecated', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
+        alg = FISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
                     max_iteration=100, update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
     def test_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random_deprecated')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
@@ -51,7 +51,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_sensitivity_calculation(self):
         ig = VectorGeometry(10)
-        data = ig.allocate('random_deprecated')
+        data = ig.allocate('random', seed=42)
         data.fill(np.array([1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]))
         A = MatrixOperator(
             np.diag([1/2, 1/2, 1/2, 1/2, 0., 0., 0., 0., 0., 0.]))
@@ -73,7 +73,7 @@ class TestPreconditioners(CCPiTestClass):
     def test_sensitivity_gd_against_sirt(self):
 
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random_deprecated', seed=4)
+        data = ig.allocate('random', seed=4)
         A = IdentityOperator(ig)
 
         sirt = SIRT(ig.allocate(0), A, data,   update_objective_interval=1)
@@ -105,7 +105,7 @@ class TestPreconditioners(CCPiTestClass):
     def test_sensitivity_ista_against_sirt(self):
 
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random_deprecated')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
 
         sirt = SIRT(ig.allocate(0), A, data, lower=0,
@@ -140,7 +140,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_adaptive_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random_deprecated')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         preconditioner = AdaptiveSensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
@@ -174,7 +174,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_adaptive_sensitivity_calculations(self):
         ig = VectorGeometry(10)
-        data = ig.allocate('random_deprecated')
+        data = ig.allocate('random', seed=42)
         data.fill(np.array([1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]))
         A = MatrixOperator(
             np.diag([1/2, 1/2, 1/2, 1/2, 0., 0., 0., 0., 0., 0.]))
@@ -217,7 +217,7 @@ class TestPreconditioners(CCPiTestClass):
         ig = ImageGeometry(7, 8, 4)
         data = ig.allocate(0.5)
         A = IdentityOperator(ig)
-        initial = ig.allocate('random_deprecated', seed=2)
+        initial = ig.allocate('random', seed=2)
 
         f = LeastSquares(A=A, b=data, c=0.5)
         g = IndicatorBox(lower=0, upper=1)
@@ -234,7 +234,7 @@ class TestPreconditioners(CCPiTestClass):
         
     def test_adaptive_sensitivity_gd_converges(self):
         ig = ImageGeometry(7, 8, 4)
-        data = ig.allocate('random_deprecated', seed=2)
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         initial = ig.allocate(0)
 
@@ -253,7 +253,7 @@ class TestPreconditioners(CCPiTestClass):
         ig = ImageGeometry(7, 8, 4)
         data = ig.allocate(0.5)
         A = IdentityOperator(ig)
-        initial = ig.allocate('random_deprecated', seed=2)
+        initial = ig.allocate('random', seed=2)
 
         f = LeastSquares(A=A, b=data, c=0.5)
         g = IndicatorBox(lower=0, upper=1)

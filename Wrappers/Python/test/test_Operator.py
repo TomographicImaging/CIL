@@ -54,7 +54,7 @@ class TestOperator(CCPiTestClass):
         Amat = numpy.random.randn(m, n)
         A = MatrixOperator(Amat)
 
-        b = vg.allocate('random_deprecated')
+        b = vg.allocate('random', seed=5)
 
         out1 = A.range_geometry().allocate()
         out2 = A.domain_geometry().allocate()
@@ -106,8 +106,8 @@ class TestOperator(CCPiTestClass):
     def test_DiagonalOperator(self):
         M = 3
         ig = ImageGeometry(M, M)
-        x = ig.allocate('random_deprecated',seed=100)
-        diag = ig.allocate('random_deprecated',seed=101)
+        x = ig.allocate('random',seed=100)
+        diag = ig.allocate('random',seed=101)
 
         # Set up example DiagonalOperator
         D = DiagonalOperator(diag)
@@ -128,8 +128,8 @@ class TestOperator(CCPiTestClass):
     def test_DiagonalOperator_complex(self):
         M = 3
         ig = ImageGeometry(M, M)
-        x = ig.allocate('random_deprecated',seed=100 ,dtype=numpy.complex64)
-        diag = ig.allocate('random_deprecated',seed=101 ,dtype=numpy.complex64)
+        x = ig.allocate('random',seed=100 ,dtype=numpy.complex64)
+        diag = ig.allocate('random',seed=101 ,dtype=numpy.complex64)
 
         # Set up example DiagonalOperator
         D = DiagonalOperator(diag)
@@ -149,7 +149,7 @@ class TestOperator(CCPiTestClass):
     def test_MaskOperator(self):
         M = 3
         ig = ImageGeometry(M, M)
-        x = ig.allocate('random_deprecated',seed=100)
+        x = ig.allocate('random',seed=100)
 
         mask = ig.allocate(True,dtype=bool)
         amask = mask.as_array()
@@ -172,8 +172,8 @@ class TestOperator(CCPiTestClass):
         channels = 4
         ig = ImageGeometry(M, M, channels=channels)
         igs = ImageGeometry(M, M)
-        x = ig.allocate('random_deprecated',seed=100)
-        diag = igs.allocate('random_deprecated',seed=101)
+        x = ig.allocate('random',seed=100)
+        diag = igs.allocate('random',seed=101)
 
         D = DiagonalOperator(diag)
         C = ChannelwiseOperator(D,channels)
@@ -248,14 +248,14 @@ class TestOperator(CCPiTestClass):
         Id = IdentityOperator(ig)
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
-        u = FD.domain_geometry().allocate('random_deprecated')
-        res = FD.domain_geometry().allocate(FillType["RANDOM_DEPRECATED"])
+        u = FD.domain_geometry().allocate('random', seed=5)
+        res = FD.domain_geometry().allocate(FillType["RANDOM"], seed=6)
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        res = Id.domain_geometry().allocate(FillType["RANDOM_DEPRECATED"])
+        res = Id.domain_geometry().allocate(FillType["RANDOM"], seed=7)
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -264,14 +264,14 @@ class TestOperator(CCPiTestClass):
 
         G = GradientOperator(ig)
 
-        u = G.range_geometry().allocate(FillType["RANDOM_DEPRECATED"])
+        u = G.range_geometry().allocate(FillType["RANDOM"], seed=8)
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
 
-        u = G.domain_geometry().allocate(FillType["RANDOM_DEPRECATED"])
+        u = G.domain_geometry().allocate(FillType["RANDOM"], seed=9)
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -280,7 +280,7 @@ class TestOperator(CCPiTestClass):
         # 2D
         M, N = 2, 3
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
-        x = ig.allocate('random_deprecated')
+        x = ig.allocate('random', seed=10)
 
         labels = ["horizontal_y", "horizontal_x"]
 
@@ -299,7 +299,7 @@ class TestOperator(CCPiTestClass):
         # 2D  + chan
         M, N, K = 2,3,4
         ig1 = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=K, voxel_size_x=0.1, voxel_size_y=0.4)
-        x = ig1.allocate('random_deprecated')
+        x = ig1.allocate('random', seed=11)
 
         labels = ["channel","horizontal_y", "horizontal_x"]
 
@@ -517,7 +517,7 @@ class TestOperator(CCPiTestClass):
         res1 = bg.allocate(0)
         proj_map.adjoint(x, out=res1)
 
-        res2=bg.allocate('random_deprecated')
+        res2=bg.allocate('random', seed=5)
         proj_map.adjoint(x, out=res2)
 
         # check if all indices return arrays filled with 0, except the input index
@@ -577,8 +577,8 @@ class TestGradients(CCPiTestClass):
 
         E1 = SymmetrisedGradientOperator(Grad.range_geometry())
         numpy.random.seed(1)
-        u1 = E1.domain_geometry().allocate('random_deprecated')
-        w1 = E1.range_geometry().allocate('random_deprecated', symmetry = True)
+        u1 = E1.domain_geometry().allocate('random', seed=5)
+        w1 = E1.range_geometry().allocate('random', seed=6)
 
         lhs = E1.direct(u1).dot(w1)
         rhs = u1.dot(E1.adjoint(w1))
@@ -594,9 +594,9 @@ class TestGradients(CCPiTestClass):
 
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         numpy.random.seed(1)
-        u2 = E2.domain_geometry().allocate('random_deprecated')
-        w2 = E2.range_geometry().allocate('random_deprecated', symmetry = True)
-    #
+        u2 = E2.domain_geometry().allocate('random', seed=5)
+        w2 = E2.range_geometry().allocate('random', seed=6)
+    
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
 
@@ -635,9 +635,9 @@ class TestGradients(CCPiTestClass):
 
         E3 = SymmetrisedGradientOperator(Grad3.range_geometry())
         numpy.random.seed(1)
-        u3 = E3.domain_geometry().allocate('random_deprecated')
-        w3 = E3.range_geometry().allocate('random_deprecated', symmetry = True)
-    #
+        u3 = E3.domain_geometry().allocate('random', seed=5)
+        w3 = E3.range_geometry().allocate('random', seed=6)
+    
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
 

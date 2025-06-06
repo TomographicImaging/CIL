@@ -2868,7 +2868,7 @@ class TestPaganinProcessor(unittest.TestCase):
             .set_panel([128,128],0.1)\
             .set_channels(4)
 
-        self.data_multichannel = ag.allocate('random_deprecated')
+        self.data_multichannel = ag.allocate('random', seed=3)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter

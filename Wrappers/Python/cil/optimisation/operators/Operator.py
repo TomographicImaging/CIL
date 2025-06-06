@@ -400,11 +400,11 @@ class LinearOperator(Operator):
         seed = kwargs.get('seed', 1)
 
         if range_init is None:
-            y = operator.range_geometry().allocate('random_deprecated', seed=seed + 10)
+            y = operator.range_geometry().allocate('random', seed=seed + 10)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random_deprecated', seed=seed)
+            x = operator.domain_geometry().allocate('random', seed=seed)
         else:
             x = domain_init
 

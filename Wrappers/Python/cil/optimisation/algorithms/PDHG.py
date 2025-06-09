@@ -340,7 +340,7 @@ class PDHG(Algorithm):
             self.x_old = self.operator.domain_geometry().allocate(0)
             self.y = self.operator.range_geometry().allocate(0)
         elif len(initial) == 1:
-            self.x_old = initial.copy()
+            self.x_old = initial[0].copy()
             self.y = self.operator.range_geometry().allocate(0)
         elif len(initial) == 2:
             self.x_old = initial[0].copy()

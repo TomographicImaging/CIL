@@ -72,3 +72,24 @@ def squeeze(array, axis=None):
     if len(axis) == 1:
         axis = axis[0]
     return squeeze(xp.squeeze(array, axis=ax), axis=axis)
+
+import pysnooper
+@pysnooper.snoop()
+def allclose(a, b, rtol=1e-5, atol=1e-6):
+    """
+    Check if two arrays are element-wise equal within a tolerance.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)[source]
+Returns True if two arrays are element-wise equal within a tolerance.
+
+The tolerance values are positive, typically very small numbers. 
+The relative difference (rtol * abs(b)) and the absolute difference atol are added together to compare against the absolute difference between a and b.
+    """
+    xp = array_namespace(a.as_array())
+    if array_namespace(b.as_array()) != xp:
+        raise TypeError('Can only compare arrays ' \
+        'with same namespace. Got {} and {}'.format(array_namespace(a), array_namespace(b)))
+    
+    diff = rtol * xp.abs(b) + atol
+    if xp.any(diff < xp.abs(a - b)):
+        print(f"Max difference: {diff.max()}")
+        return False
+    return True

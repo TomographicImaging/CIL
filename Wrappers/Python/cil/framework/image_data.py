@@ -113,8 +113,9 @@ class ImageData(DataContainer):
     def __eq__(self, other):
         '''
         Check if two ImageData objects are equal. This is done by checking if the geometry, data and dtype are equal.
-        Also, if the other object is a np.ndarray, it will check if the data and dtype are equal.
-        
+        Also, if the other object is a ndarray, it will check if the data and dtype are equal.
+        This will check equality as numpy allclose.
+
         Parameters
         ----------
         other: ImageData or np.ndarray
@@ -124,14 +125,17 @@ class ImageData(DataContainer):
         -------
         bool
             True if the two objects are equal, False otherwise.
-        '''
-
+        ''' 
+        from .array_api_compat import allclose as cil_allclose
         if isinstance(other, ImageData):
-            if np.array_equal(self.as_array(), other.as_array()) \
-                and self.geometry == other.geometry \
-                and self.dtype == other.dtype:
+            xp = array_namespace(self.array)
+            if self.geometry == other.geometry \
+                and self.dtype == other.dtype \
+                and self.shape == other.shape \
+                and cil_allclose(self.as_array(), other.as_array()):
                 return True 
-        elif np.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+            return False
+        elif self.dtype==other.dtype and cil_allclose(self.as_array(), other):
             return True
         else:
             return False

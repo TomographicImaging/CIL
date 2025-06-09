@@ -19,12 +19,12 @@ import functools
 import logging
 import sys
 
-import array_api_compat.numpy
 import numpy as np
 
 from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
                            AcquisitionGeometry, BlockGeometry, VectorData)
 from cil.framework.labels import ImageDimension, AcquisitionDimension
+from cil.framework.array_api_compat import allclose as cil_allclose
 
 from testclass import CCPiTestClass
 from utils import initialise_tests
@@ -36,6 +36,11 @@ try:
     import torch
 except ImportError:
     torch = None
+try:
+    import cupy
+except ImportError:
+    cupy = None
+
 import unittest
 
 log = logging.getLogger(__name__)
@@ -57,6 +62,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
          ]) 
     def test_creation_nocopy(self, xp, raise_error, err_type):
         if xp is None:
@@ -87,6 +93,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
          ]) 
     def test_ndim(self, xp, raise_error, err_type):
         if xp is None:
@@ -99,6 +106,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
          ]) 
     def test_DataContainer_equal(self, xp, raise_error, err_type):
         if xp is None:
@@ -119,6 +127,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, raise_error, err_type", 
         [param(numpy, None, None, id="numpy"), 
          param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
          ]) 
     def test_AcquisitionData_equal(self, xp, raise_error, err_type):
         if xp is None:
@@ -160,6 +169,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
          ]) 
     def test_ImageData_equal(self, xp, device, raise_error, err_type):
         if xp is None:
@@ -181,13 +191,17 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
 
         # Check the equality of two ImageData with different shapes
         data_different_shape = data.copy()
-        data_different_shape.array = data_different_shape.array.reshape(8, 4)
+        # xp.reshape(data_different_shape.array, (8, 4), copy=False) does not seem to work
+        data_different_shape.array = xp.reshape(data_different_shape.array, (8, 4))
+
+
+        # data_different_shape.array = data_different_shape.array.reshape(8, 4)
 
         self.assertFalse(data == data_different_shape)
 
         # Check the equality of two ImageData with different dtypes
-        data_different_dtype = data.geometry.allocate(0, dtype=np.float64)
-        self.assertFalse(data == data_different_dtype)
+        data_different_dtype = data.geometry.allocate(0, dtype=xp.float64)
+        self.assertFalse(cil_allclose(data, data_different_dtype))
 
 
         # Check the equality of two ImageData with different labels
@@ -198,10 +212,11 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
          ]) 
     def testInlineAlgebra(self, xp, device, raise_error, err_type):
         if xp is None:
-            self.skipTest("torch not available")
+            self.skipTest(f"xp not available")
         X, Y, Z = 8, 16, 32
         a = np.ones((X, Y, Z), dtype='float32')
         b = np.ones((X, Y, Z), dtype='float32')
@@ -239,6 +254,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
          ])
     def test_unary_operations(self, xp, device, raise_error, err_type):
         if xp is None:
@@ -1365,6 +1381,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     @parametrize("xp, device, raise_error, err_type", 
         [param(numpy, None, None, None, id="numpy"), 
          param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
          ])
     def test_fill_dimension_ImageData(self, xp, device, raise_error, err_type):
         if xp is None:

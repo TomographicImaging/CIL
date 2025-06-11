@@ -2187,7 +2187,7 @@ class AcquisitionGeometry(object):
 
             min_value : int, optional
                 The minimum value random integer to generate, only used if `value` 
-                is 'random_int'. Default is 0.
+                is 'random_int'. New since version 25.0.0. Default is 0.
             
             max_value : int, optional
                 The maximum value random integer to generate, only used if `value` 
@@ -2195,11 +2195,10 @@ class AcquisitionGeometry(object):
 
         Note
         ----
-            The methods used by 'random' or 'random_int' use `numpy.random.default_rng`.
+            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
             This method does not use the global numpy.random.seed() so if a seed is 
-            required it should be passed directly as a kwarg. 
-            To allocate random numbers using the deprecated `numpy.random.random_sample`
-            and `numpy.random.randint` methods use `value='random_deprecated'` 
+            required it should be passed directly as a kwarg.
+            To allocate random numbers using the earlier behaviour use `value='random_deprecated'` 
             or `value='random_int_deprecated'` 
 
         '''

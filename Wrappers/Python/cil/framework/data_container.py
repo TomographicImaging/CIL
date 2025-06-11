@@ -220,7 +220,7 @@ class DataContainer(object):
 
         Parameters
         ----------
-        array : DataContainer, numpy array, number or string, default=0
+        array : DataContainer, numpy array, number or string
             The value or method with which to fill the DataContainer. Accepts a 
             numpy array or DataContainer or a number to allocate a uniform array
             or a string specifying a method to fill with a random array: 'random' 
@@ -235,11 +235,11 @@ class DataContainer(object):
 
             seed : int, optional
                 A random seed to fix reproducibility, only used if `array` is a 
-                random method. Default is `None`.
+                `random method`. Default is `None`.
 
             min_value : int, optional, default=0
                 The minimum value random integer to generate, only used if `array` 
-                is 'random_int'. Default is 0.
+                is 'random_int'. New since version 25.0.0 Default is 0.
 
             max_value : int, optional, default=100
                 The maximum value random integer to generate, only used if `array` 
@@ -252,11 +252,10 @@ class DataContainer(object):
 
         Note
         ----
-            The methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
+            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
             This method does not use the global numpy.random.seed() so if a seed is 
             required it should be passed directly as a kwarg.
-            To fill random numbers using the deprecated `numpy.random.random_sample`
-            and `numpy.random.randint` methods use `array='random_deprecated'` 
+            To fill random numbers using the earlier behaviour use `array='random_deprecated'` 
             or `array='random_int_deprecated'` 
         
         Example

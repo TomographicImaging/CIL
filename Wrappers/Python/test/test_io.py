@@ -140,6 +140,8 @@ class TestZeissDataReader(unittest.TestCase):
         import shutil
         shutil.rmtree(self.data_dir)
         print (f"Deleted temp dir {self.data_dir}")
+        import cil
+        print(cil.utilities.dataexample.REMOTEDATA.CIL_DATA_DIR)
 
 
     def test_run_test(self):
@@ -148,7 +150,7 @@ class TestZeissDataReader(unittest.TestCase):
 
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
                      f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
-    def test_read_txm_recon_file(self):
+    def test_read_txm_recon_file_gpu(self):
         zreader = ZEISSDataReader()           
         zreader.set_up(file_name=test_3d_recon_file)
 
@@ -168,7 +170,7 @@ class TestZeissDataReader(unittest.TestCase):
 
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
                      f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
-    def test_read_and_reconstruct_2D(self):
+    def test_read_and_reconstruct_2D_gpu(self):
 
                 
         # reader = ZEISSDataReader()

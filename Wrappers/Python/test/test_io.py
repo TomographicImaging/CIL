@@ -65,7 +65,7 @@ has_file = False
 has_recon_file = False
 test_txrm_file = None
 test_3d_recon_file = None
-basedir = os.getenv("CIL_DATA_DIR", None)
+basedir = dataexample.REMOTEDATA.CIL_DATA_DIR
 if basedir is not None:
     dataexample.WALNUT.download_data(data_dir=basedir, prompt=False)
     test_txrm_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A.txrm")

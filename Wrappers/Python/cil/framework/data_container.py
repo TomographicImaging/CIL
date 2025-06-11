@@ -317,7 +317,7 @@ class DataContainer(object):
             seed = kwargs.pop("seed", None)
             
             if array == FillType.RANDOM_DEPRECATED:
-                warnings.warn("RANDOM_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+                warnings.warn("RANDOM_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
                 if seed is not None:
                     numpy.random.seed(seed)
                 if numpy.issubdtype(self.dtype, numpy.complexfloating):
@@ -327,7 +327,7 @@ class DataContainer(object):
                 self.array[index] = r
             
             elif array == FillType.RANDOM_INT_DEPRECATED:
-                warnings.warn("RANDOM_INT_DEPRECATED is deprecated", DeprecationWarning, stacklevel=2)
+                warnings.warn("RANDOM_INT_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.pop("max_value", 100)
@@ -340,10 +340,6 @@ class DataContainer(object):
 
             elif array == FillType.RANDOM:
                 
-                warnings.warn("The method used by 'random' has changed and now uses `numpy.random.default_rng`." \
-                    "\nThis method does not use the global numpy.random.seed() so if a seed is required it should be passed as a kwarg." \
-                    "\nTo fill random numbers using the old method (`numpy.random.random_sample`) use `array='random_deprecated'`.")
-
                 rng = numpy.random.default_rng(seed)
                 if numpy.issubdtype(self.dtype, numpy.complexfloating):
                     complex_example = numpy.array([1 + 1j], dtype=self.dtype)
@@ -355,10 +351,6 @@ class DataContainer(object):
 
             elif array == FillType.RANDOM_INT:
                 
-                warnings.warn("The method used by 'random_int' has changed and now uses `numpy.random.default_rng`." \
-                    "\nThis method does not use the global numpy.random.seed() so if a seed is required it should be passed as a kwarg." \
-                    "\nTo fill random numbers using the old method (`numpy.random.randint`) use `array='random_int_deprecated'`.")
-
                 rng = numpy.random.default_rng(seed)
                 max_value = kwargs.pop("max_value", 100)
                 min_value = kwargs.pop("min_value", 0)

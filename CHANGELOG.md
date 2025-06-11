@@ -42,8 +42,7 @@
     - `shape` setter in `DataContainer` and `ImageGeometry`
     - use of integer compression in `NEXUSDataWriter`
   - Changes that break backwards compatibility:
-      - Moved fill methods in `geometry.allocate()` to `DataContainer.fill()`, now the `RANDOM` and `RANDOM_INT` methods can be accessed from `allocate` or `fill` (#2037)
-      - Update `RANDOM` and `RANDOM_INT` `DataContainer.fill()` and `geometry.allocate()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED` (#2037)
+    - Updated `RANDOM` and `RANDOM_INT` `DataContainer.fill()` and `geometry.allocate()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED`. Random methods can now be accessed from `fill()` and `allocate()` (#2037)
 
 * 24.3.0
   - New features:

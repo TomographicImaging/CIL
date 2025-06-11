@@ -106,8 +106,7 @@ else:
 
 class TestZeissDataReader(unittest.TestCase):
     def setUp(self):
-        self.data_dir = tempfile.mkdtemp()
-        print (f"Creating temp dir {self.data_dir}")
+        pass
         
 
 
@@ -137,12 +136,7 @@ class TestZeissDataReader(unittest.TestCase):
         assert _geometry == geometry
 
     def tearDown(self):
-        import shutil
-        shutil.rmtree(self.data_dir)
-        print (f"Deleted temp dir {self.data_dir}")
-        import cil
-        print(cil.utilities.dataexample.REMOTEDATA.CIL_DATA_DIR)
-
+        pass
 
     def test_run_test(self):
         print("run test Zeiss Reader")

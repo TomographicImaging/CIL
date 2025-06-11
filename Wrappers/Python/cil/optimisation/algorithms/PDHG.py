@@ -42,7 +42,7 @@ class PDHG(Algorithm):
         Step size for the dual problem.
     tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
         Step size for the primal problem.
-    initial : List of DataContainer, optional, default is DataContainer of zeros for both primal and dual variables
+    initial : `DataContainer`, or List of `DataContainer`, optional, default is DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm.
     gamma_g : positive :obj:`float`, optional, default=None
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
@@ -323,7 +323,7 @@ class PDHG(Algorithm):
             Step size for the dual problem.
         tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
             Step size for the primal problem.
-        initial : List of DataContainer, optional, default is DataContainer of zeros for both primal and dual variables
+        initial : `DataContainer`, or List of DataContainer, optional, default is DataContainer of zeros for both primal and dual variables
             Initial point for the PDHG algorithm.       """
         log.info("%s setting up", self.__class__.__name__)
         # Triplet (f, g, K)
@@ -336,16 +336,24 @@ class PDHG(Algorithm):
         if self._check_convergence:
             self.check_convergence()
 
-        if initial is None:
-            self.x_old = self.operator.domain_geometry().allocate(0)
-            self.y = self.operator.range_geometry().allocate(0)
-        elif len(initial) == 1:
-            self.x_old = initial[0].copy()
-            self.y = self.operator.range_geometry().allocate(0)
-        elif len(initial) == 2:
-            self.x_old = initial[0].copy()
-            self.y = initial[1].copy()
+        if isinstance(initial, (tuple, list)):
+            if initial[0] is not None:
+                self.x_old = initial[0].copy()
+            else:
+                self.x_old = self.operator.domain_geometry().allocate(0)
+            
+            if len(initial) > 1 and initial[1] is not None:
+                self.y = initial[1].copy()
+            else:
+                self.y = self.operator.range_geometry().allocate(0)
 
+        else: 
+            self.y = self.operator.range_geometry().allocate(0)
+            if initial is None:
+                self.x_old = self.operator.domain_geometry().allocate(0)
+            else:
+                self.x_old = initial.copy()
+              
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)

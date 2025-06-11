@@ -113,7 +113,7 @@ class TestZeissDataReader(unittest.TestCase):
     
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
                      f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
-    def test_geometry(self):
+    def test_geometry_gpu(self):
         
         reader = ZEISSDataReader()           
         reader.set_up(file_name=test_txrm_file)

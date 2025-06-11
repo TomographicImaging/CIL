@@ -488,6 +488,9 @@ class TestRAW(unittest.TestCase):
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
+        import cil
+        data_dir = cil.utilities.dataexample.CILDATA.data_dir
+        
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 
 

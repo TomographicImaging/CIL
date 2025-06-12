@@ -42,8 +42,8 @@ class PDHG(Algorithm):
         Step size for the dual problem.
     tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
         Step size for the primal problem.
-    initial : `DataContainer`, or List of `DataContainer`, optional, default is DataContainer of zeros for both primal and dual variables
-        Initial point for the PDHG algorithm.
+    initial : `DataContainer`, or List of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
+        Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
     gamma_g : positive :obj:`float`, optional, default=None
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
     gamma_fconj : positive :obj:`float`, optional, default=None
@@ -323,9 +323,13 @@ class PDHG(Algorithm):
             Step size for the dual problem.
         tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
             Step size for the primal problem.
-        initial : `DataContainer`, or List of DataContainer, optional, default is DataContainer of zeros for both primal and dual variables
-            Initial point for the PDHG algorithm.       """
+        initial : `DataContainer`, or List of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
+            Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
+     
+        """   
         log.info("%s setting up", self.__class__.__name__)
+        
+        
         # Triplet (f, g, K)
         self.f = f
         self.g = g

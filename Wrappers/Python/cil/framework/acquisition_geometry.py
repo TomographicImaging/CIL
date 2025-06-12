@@ -2173,8 +2173,9 @@ class AcquisitionGeometry(object):
         :type dtype: numpy type, default numpy.float32
         '''
         dtype = kwargs.get('dtype', self.dtype)
-
-        out = AcquisitionData(geometry=self.copy(),
+        ng = self.copy()
+        ng.dtype = dtype
+        out = AcquisitionData(geometry=ng,
                               dtype=dtype,
                               suppress_warning=True)
 

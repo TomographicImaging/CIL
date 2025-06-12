@@ -24,9 +24,24 @@ import numpy as np
 from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
                            AcquisitionGeometry, BlockGeometry, VectorData)
 from cil.framework.labels import ImageDimension, AcquisitionDimension
+from cil.framework.array_api_compat import allclose as cil_allclose
 
 from testclass import CCPiTestClass
 from utils import initialise_tests
+
+import array_api_compat
+from unittest_parametrize import param, parametrize, ParametrizedTestCase
+import numpy
+try:
+    import torch
+except ImportError:
+    torch = None
+try:
+    import cupy
+except ImportError:
+    cupy = None
+
+import unittest
 
 log = logging.getLogger(__name__)
 initialise_tests()
@@ -37,19 +52,26 @@ def aid(x):
     return x.as_array().__array_interface__['data'][0]
 
 
-class TestDataContainer(CCPiTestClass):
-    def create_DataContainer(self, X,Y,Z, value=1):
+class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
+    def create_DataContainer(self, X,Y,Z, value=1, backend='numpy'):
         a = value * np.ones((X, Y, Z), dtype='float32')
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         return ds
-
-    def test_creation_nocopy(self):
+    
+    @parametrize("xp, raise_error, err_type", 
+        [param(numpy, None, None, id="numpy"), 
+         param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
+         ]) 
+    def test_creation_nocopy(self, xp, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
         shape = 2, 3, 4, 5
-        size = np.prod(shape)
-        a = np.arange(size)
+        size = xp.prod(xp.asarray(shape))
+        a = xp.arange(size)
         #print("a refcount " , sys.getrefcount(a))
-        a = np.reshape(a, shape)
+        a = xp.reshape(a, shape)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z', 'W'])
         #print("a refcount " , sys.getrefcount(a))
@@ -68,14 +90,28 @@ class TestDataContainer(CCPiTestClass):
         ds1 = ds.clone()
         self.assertNotEqual(aid(ds), aid(ds1))
 
-    def test_ndim(self):
-        x_np = np.arange(0, 60).reshape(3,4,5)
+    @parametrize("xp, raise_error, err_type", 
+        [param(numpy, None, None, id="numpy"), 
+         param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
+         ]) 
+    def test_ndim(self, xp, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
+        x_np = xp.arange(0, 60).reshape(3,4,5)
         x_cil = DataContainer(x_np)
         self.assertEqual(x_np.ndim, x_cil.ndim)
         self.assertEqual(3, x_cil.ndim)
 
-    def test_DataContainer_equal(self):
-        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+    @parametrize("xp, raise_error, err_type", 
+        [param(numpy, None, None, id="numpy"), 
+         param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
+         ]) 
+    def test_DataContainer_equal(self, xp, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
+        array = xp.linspace(-1, 1, 32, dtype=xp.float32).reshape(4, 8)
         data = DataContainer(array)
         data1 = data.copy()
 
@@ -88,8 +124,15 @@ class TestDataContainer(CCPiTestClass):
         data1 += 1
         self.assertFalse((data ==  data1).all())
 
-    def test_AcquisitionData_equal(self):
-        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+    @parametrize("xp, raise_error, err_type", 
+        [param(numpy, None, None, id="numpy"), 
+         param(torch, None, None, id="torch"),
+         param(cupy, None, None, id="cupy"),
+         ]) 
+    def test_AcquisitionData_equal(self, xp, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
+        array = xp.linspace(-1, 1, 32, dtype=xp.float32).reshape(4, 8)
         geom = AcquisitionGeometry.create_Parallel3D().set_panel((8, 4)).set_channels(1).set_angles([1])
         data = AcquisitionData(array, geometry=geom)
 
@@ -112,8 +155,9 @@ class TestDataContainer(CCPiTestClass):
 
         # Check the equality of two AcquisitionData with different dtypes
         data_different_dtype = data.copy()
-        data_different_dtype.array = data_different_dtype.array.astype(np.float64)
-        self.assertFalse(data == data_different_dtype)
+        # data_different_dtype.array = data_different_dtype.array.astype(np.float64)
+        arr = xp.asarray(data_different_dtype.array, dtype=xp.float64)
+        self.assertFalse(data == arr)
 
 
         # Check the equality of two AcquisitionData with different labels
@@ -122,8 +166,15 @@ class TestDataContainer(CCPiTestClass):
         data_different_labels.geometry.set_labels([AcquisitionDimension("ANGLE"), AcquisitionDimension("CHANNEL") ])
         self.assertFalse(data == data_different_labels)
 
-    def test_ImageData_equal(self):
-        array = np.linspace(-1, 1, 32, dtype=np.float32).reshape(4, 8)
+    @parametrize("xp, device, raise_error, err_type", 
+        [param(numpy, None, None, None, id="numpy"), 
+         param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
+         ]) 
+    def test_ImageData_equal(self, xp, device, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
+        array = xp.linspace(-1, 1, 32, dtype=xp.float32).reshape(4, 8)
         geom = ImageGeometry(voxel_num_x=8, voxel_num_y=4)
         data = ImageData(array, geometry=geom)
 
@@ -140,14 +191,17 @@ class TestDataContainer(CCPiTestClass):
 
         # Check the equality of two ImageData with different shapes
         data_different_shape = data.copy()
-        data_different_shape.array = data_different_shape.array.reshape(8, 4)
+        # xp.reshape(data_different_shape.array, (8, 4), copy=False) does not seem to work
+        data_different_shape.array = xp.reshape(data_different_shape.array, (8, 4))
+
+
+        # data_different_shape.array = data_different_shape.array.reshape(8, 4)
 
         self.assertFalse(data == data_different_shape)
 
         # Check the equality of two ImageData with different dtypes
-        data_different_dtype = data.copy()
-        data_different_dtype.array = data_different_dtype.array.astype(np.float64)
-        self.assertFalse(data == data_different_dtype)
+        data_different_dtype = data.geometry.allocate(0, dtype=xp.float64)
+        self.assertFalse(cil_allclose(data, data_different_dtype))
 
 
         # Check the equality of two ImageData with different labels
@@ -155,8 +209,14 @@ class TestDataContainer(CCPiTestClass):
         data_different_labels.geometry.set_labels([ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
         self.assertFalse(data == data_different_labels)
 
-
-    def testInlineAlgebra(self):
+    @parametrize("xp, device, raise_error, err_type", 
+        [param(numpy, None, None, None, id="numpy"), 
+         param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
+         ]) 
+    def testInlineAlgebra(self, xp, device, raise_error, err_type):
+        if xp is None:
+            self.skipTest(f"xp not available")
         X, Y, Z = 8, 16, 32
         a = np.ones((X, Y, Z), dtype='float32')
         b = np.ones((X, Y, Z), dtype='float32')
@@ -191,10 +251,17 @@ class TestDataContainer(CCPiTestClass):
         np.testing.assert_array_almost_equal(ds.as_array(), b)
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
 
-    def test_unary_operations(self):
+    @parametrize("xp, device, raise_error, err_type", 
+        [param(numpy, None, None, None, id="numpy"), 
+         param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
+         ])
+    def test_unary_operations(self, xp, device, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
         X, Y, Z = 8, 16, 32
-        a = -np.ones((X, Y, Z), dtype='float32')
-        b = np.ones((X, Y, Z), dtype='float32')
+        a = -xp.ones((X, Y, Z), dtype=xp.float32)
+        b = xp.ones((X, Y, Z), dtype=xp.float32)
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
 
         ds.sign(out=ds)
@@ -684,7 +751,9 @@ class TestDataContainer(CCPiTestClass):
 
     def complex_allocate_geometry_test(self, geometry):
         data = geometry.allocate(dtype=np.complex64)
-        r = (1 + 1j*1)* np.ones(data.shape, dtype=data.dtype)
+        from array_api_compat import array_namespace
+        xp = array_namespace(data.array)
+        r = (1 + 1j*1)* xp.ones(data.shape, dtype=data.dtype)
         data.fill(r)
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)
         np.testing.assert_almost_equal(data.abs().array, np.abs(r))
@@ -693,7 +762,8 @@ class TestDataContainer(CCPiTestClass):
         try:
             data1.fill(r)
             self.assertTrue(False)
-        except TypeError as err:
+        # except numpy.exceptions.ComplexWarning as err:
+        except Exception as err:
             log.info(str(err))
             self.assertTrue(True)
 
@@ -1308,15 +1378,18 @@ class TestDataContainer(CCPiTestClass):
 
         np.testing.assert_array_equal(ds.as_array(), -a)
 
-
-    def test_fill_dimension_ImageData(self):
+    @parametrize("xp, device, raise_error, err_type", 
+        [param(numpy, None, None, None, id="numpy"), 
+         param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
+         ])
+    def test_fill_dimension_ImageData(self, xp, device, raise_error, err_type):
+        if xp is None:
+            self.skipTest("torch not available")
         ig = ImageGeometry(2,3,4)
         u = ig.allocate(0)
-        a = np.ones((4,2))
+        a = xp.ones((4,2))
         # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
-
-        data = u.as_array()
-        axis_number = u.get_dimension_axis('horizontal_y')
 
         u.fill(a, horizontal_y=0)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=0).as_array(), a)

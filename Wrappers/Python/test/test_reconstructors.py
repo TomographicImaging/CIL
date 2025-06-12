@@ -20,9 +20,8 @@ import unittest
 from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 from scipy.fft  import fft, ifft
-from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
+from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, has_skimage, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
@@ -47,6 +46,8 @@ if has_astra:
 if has_matplotlib:
     import matplotlib.testing.compare as compare
 
+if has_skimage:
+    from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 
 class Test_Reconstructor(unittest.TestCase):
 
@@ -245,7 +246,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
             reconstructor.set_filter(filter[1:-1])
 
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_ipp and has_skimage, "TIGRE, IPP or SKIMAGE not installed")
     def test_get_filter_array(self):
 
         reconstructor = GenericFilteredBackProjection(self.ad3D)

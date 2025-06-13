@@ -39,7 +39,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         preconditioner = Sensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
@@ -51,7 +51,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_sensitivity_calculation(self):
         ig = VectorGeometry(10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         data.fill(np.array([1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]))
         A = MatrixOperator(
             np.diag([1/2, 1/2, 1/2, 1/2, 0., 0., 0., 0., 0., 0.]))
@@ -105,7 +105,7 @@ class TestPreconditioners(CCPiTestClass):
     def test_sensitivity_ista_against_sirt(self):
 
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
 
         sirt = SIRT(ig.allocate(0), A, data, lower=0,
@@ -140,7 +140,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_adaptive_sensitivity_init(self):
         ig = ImageGeometry(12, 13, 14)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         preconditioner = AdaptiveSensitivity(A)
         self.assertNumpyArrayAlmostEqual(preconditioner.operator.direct(
@@ -174,7 +174,7 @@ class TestPreconditioners(CCPiTestClass):
 
     def test_adaptive_sensitivity_calculations(self):
         ig = VectorGeometry(10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         data.fill(np.array([1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]))
         A = MatrixOperator(
             np.diag([1/2, 1/2, 1/2, 1/2, 0., 0., 0., 0., 0., 0.]))
@@ -234,7 +234,7 @@ class TestPreconditioners(CCPiTestClass):
         
     def test_adaptive_sensitivity_gd_converges(self):
         ig = ImageGeometry(7, 8, 4)
-        data = ig.allocate('random', seed=2)
+        data = ig.allocate('random', seed=42)
         A = IdentityOperator(ig)
         initial = ig.allocate(0)
 

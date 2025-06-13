@@ -80,7 +80,7 @@ class Test_Reconstructor(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -170,7 +170,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=4)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 
@@ -368,7 +368,7 @@ class Test_FDK(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=5)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 
@@ -476,7 +476,7 @@ class Test_FBP(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
 

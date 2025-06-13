@@ -80,10 +80,7 @@ class TestGD(CCPiTestClass):
     def test_GD(self):
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -112,7 +109,7 @@ class TestGD(CCPiTestClass):
         '''
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
@@ -199,7 +196,7 @@ class TestGD(CCPiTestClass):
         # b = initial.copy()
         # fill with random numbers
         # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -353,7 +350,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -454,9 +451,9 @@ class TestFISTA(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
-        b = ig.allocate(FillType["RANDOM"])
+        b = ig.allocate(FillType["RANDOM"], seed=3)
         # fill with random numbers
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=4)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -481,7 +478,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -743,7 +740,7 @@ class TestCGLS(CCPiTestClass):
         self.ig = ImageGeometry(10, 2)
         np.random.seed(2)
         self.initial = self.ig.allocate(1.)
-        self.data = self.ig.allocate('random')
+        self.data = self.ig.allocate('random', seed=3)
         self.operator = IdentityOperator(self.ig)
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                         update_objective_interval=2)
@@ -1041,7 +1038,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_step_sizes(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1128,7 +1125,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1161,7 +1158,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1199,7 +1196,7 @@ class TestPDHG(CCPiTestClass):
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1214,7 +1211,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_pdhg_theta(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1253,7 +1250,7 @@ class TestSIRT(CCPiTestClass):
         # set up with linear operator
         self.ig2 = ImageGeometry(3, 4, 5)
         self.initial2 = self.ig2.allocate(0.)
-        self.b2 = self.ig2.allocate('random')
+        self.b2 = self.ig2.allocate('random', seed=3)
         self.A2 = IdentityOperator(self.ig2)
 
     def tearDown(self):
@@ -1698,7 +1695,7 @@ class TestCallbacks(unittest.TestCase):
         ig = ImageGeometry(10, 2)
         np.random.seed(2)
         initial = ig.allocate(1.)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
         operator = IdentityOperator(ig)
         alg = CGLS(initial=initial, operator=operator, data=data,
                    update_objective_interval=2)

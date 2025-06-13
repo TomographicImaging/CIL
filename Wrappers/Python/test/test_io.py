@@ -63,18 +63,22 @@ if has_astra:
 
 has_file = False
 has_recon_file = False
-test_txrm_file = None
-test_3d_recon_file = None
 basedir = dataexample.REMOTEDATA.CIL_DATA_DIR
 if basedir is not None:
     dataexample.WALNUT.download_data(data_dir=basedir, prompt=False)
+
     test_txrm_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A.txrm")
+    # strip double quotes if they exist
+    test_txrm_file = test_txrm_file.strip('"')
+    test_txrm_file = os.path.abspath(test_txrm_file)
     has_file = os.path.isfile(test_txrm_file)
+    
     test_3d_recon_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A_recon.txm")
+    # strip double quotes if they exist
+    test_3d_recon_file = test_3d_recon_file.strip('"')
+    test_3d_recon_file = os.path.abspath(test_3d_recon_file)
+    has_recon_file = os.path.isfile(test_3d_recon_file)
 
-
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
-    and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
 logging.basicConfig(level=logging.WARNING)
@@ -87,29 +91,9 @@ log.info("has_file %s", has_file)
 if not has_file:
     log.info("This unittest requires the walnut Zeiss dataset saved in %s", basedir)
 
-if test_txrm_file is None:
-    has_file = False
-else:
-    # strip double quotes if they exist
-    test_txrm_file = test_txrm_file.strip('"')
-    test_txrm_file = os.path.abspath(test_txrm_file)
-    has_file = os.path.isfile(test_txrm_file)
-
-
-if test_3d_recon_file is None:
-    has_recon_file = False
-else:
-    # strip double quotes if they exist
-    test_3d_recon_file = test_3d_recon_file.strip('"')
-    test_3d_recon_file = os.path.abspath(test_3d_recon_file)
-    has_recon_file = os.path.isfile(test_3d_recon_file)
+  
 
 class TestZeissDataReader(unittest.TestCase):
-    def setUp(self):
-        pass
-        
-
-
     
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
                      f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
@@ -135,12 +119,6 @@ class TestZeissDataReader(unittest.TestCase):
         
         assert _geometry == geometry
 
-    def tearDown(self):
-        pass
-
-    def test_run_test(self):
-        print("run test Zeiss Reader")
-        self.assertTrue(True)
 
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
                      f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
@@ -162,17 +140,15 @@ class TestZeissDataReader(unittest.TestCase):
         assert _geometry == data3d.geometry
 
 
-    @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
-                     f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange ), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
     def test_read_and_reconstruct_2D_gpu(self):
 
-                
-        # reader = ZEISSDataReader()
-        # reader.set_up(file_name=test_3d_recon_file)
-        # gt = reader.read()
-
-        # recon2d = gt.get_slice(vertical='centre')
-
+        # Here we may read the TXM file that comes with the Walnut Zeiss dataset, extract
+        # the central slice and compare it with the FBP reconstruction from the data.
+        # However, https://github.com/TomographicImaging/CIL/issues/2175        
+        # So at the moment we just read the file and reconstruct it.
+        
         zreader = ZEISSDataReader()           
         zreader.set_up(file_name=test_txrm_file)
         data = zreader.read()
@@ -189,11 +165,6 @@ class TestZeissDataReader(unittest.TestCase):
         fbpalg.set_input(data2d)
 
         recfbp = fbpalg.get_output()
-        
-        # qm = mse(gt, recfbp)
-        # log.info("MSE %r", qm)
-
-        # np.testing.assert_almost_equal(qm, 0, decimal=3)
 
     def test_file_not_found_error(self):
         reader = ZEISSDataReader()           
@@ -201,7 +172,7 @@ class TestZeissDataReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             reader.set_up(file_name='no-file')
 
-    @unittest.skipIf(has_dxchange, f"Missing prerequisites: has_dxchange {has_dxchange}")
+    @unittest.skipIf(has_dxchange, f"This unit test runs only if dxchange is not installed: has_dxchange {has_dxchange}")
     def test_import_error(self):
         reader = ZEISSDataReader()
         with self.assertRaises(ImportError):
@@ -488,8 +459,7 @@ class TestRAW(unittest.TestCase):
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
-        import cil
-        data_dir = cil.utilities.dataexample.CILDATA.data_dir
+        data_dir = dataexample.CILDATA.data_dir
         
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 

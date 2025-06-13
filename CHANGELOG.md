@@ -23,6 +23,7 @@
     - Make install local env script work on windows (#2144)
     - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
     - Improved consistency of `step_size` property across GD, ISTA, FISTA and APGD algorithms (#2157)
+    - In PDHG algorithm, we now have options to initialise the dual variable, as well as the primal variable (#2169)
   - Testing:
     - Developers can now run the full CI matrix [via the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) (#2160)
     - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)

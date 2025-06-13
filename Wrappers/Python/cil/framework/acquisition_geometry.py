@@ -2164,7 +2164,7 @@ class AcquisitionGeometry(object):
 
         return geometry_new
 
-    def allocate(self, value=None, **kwargs):
+    def allocate(self, value=0, **kwargs):
         '''Allocates an AcquisitionData according to the geometry
         
         Parameters

@@ -29,6 +29,7 @@
     - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
     - Added tests for Normaliser processor
     - Update minimum cmake version to 3.5
+    - Added unit test for the `ZEISSDataReader` (#2098)
   - Dependencies:
     - Move from CMake to `pip install` (#2145)
     - matplotlib-base is an optional dependency, instead of required (#2093)

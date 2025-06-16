@@ -271,7 +271,7 @@ class TotalVariation(Function):
             tau *= strongly_convex_factor
 
         return solution
-
+    
     def _fista_on_dual_rof(self, x, tau, out=None):
         r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem
         of the Total Variation Denoising problem (ROF).
@@ -306,7 +306,10 @@ class TotalVariation(Function):
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
         if out is None:
-            out = self.gradient_operator.domain_geometry().allocate(0)
+            # out = self.gradient_operator.domain_geometry().allocate(0)
+            from cil.framework import ImageData
+            import cupy as cp
+            out = ImageData(cp.empty(x.shape, dtype=cp.float32), geometry=self.gradient_operator.domain_geometry().copy(), dtype=cp.float32)
 
         for k in range(self.iterations):
 

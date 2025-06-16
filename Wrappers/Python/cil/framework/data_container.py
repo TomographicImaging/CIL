@@ -490,7 +490,6 @@ class DataContainer(object):
         xp = array_namespace(self.array)
         return self.pixel_wise_binary(xp.minimum, x2=x2, out=out, *args, **kwargs)
 
-
     def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
         '''performs a*self + b * y. Can be done in-place
 

@@ -74,6 +74,8 @@ requirements:
     - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba
+    - zenodo_get >=1.6
+    - array-api-compat
 
   #optional packages with version dependancies
   run_constrained:

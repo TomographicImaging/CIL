@@ -21,6 +21,8 @@ import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities.errors import InPlaceError
 
+from array_api_compat import array_namespace
+
 class FiniteDifferenceOperator(LinearOperator):
 
     r'''
@@ -90,6 +92,7 @@ class FiniteDifferenceOperator(LinearOperator):
             raise InPlaceError(message="FiniteDifferenceOperator.direct cannot be used in place")
 
         x_asarr = x.as_array()
+        xp = array_namespace(x_asarr)
 
         outnone = False
         if out is None:
@@ -107,14 +110,14 @@ class FiniteDifferenceOperator(LinearOperator):
         if self.method == 'forward':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(1,-1))], \
                              out = outa[tuple(self.get_slice(1, -1))])
 
             if self.boundary_condition == 'Neumann':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))])
 
@@ -122,12 +125,12 @@ class FiniteDifferenceOperator(LinearOperator):
             elif self.boundary_condition == 'Periodic':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))])
 
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(-1,None))])
 
@@ -141,26 +144,26 @@ class FiniteDifferenceOperator(LinearOperator):
         elif self.method == 'backward':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])
 
             if self.boundary_condition == 'Neumann':
 
                     # right boundary
-                    np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
+                    xp.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))])
 
             elif self.boundary_condition == 'Periodic':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(0,1))])
 
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])
 
@@ -175,7 +178,7 @@ class FiniteDifferenceOperator(LinearOperator):
         elif self.method == 'centered':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])
 
@@ -184,13 +187,13 @@ class FiniteDifferenceOperator(LinearOperator):
             if self.boundary_condition == 'Neumann':
 
                 # left boundary
-                np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
+                xp.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(0,1))], \
                                  out = outa[tuple(self.get_slice(0, 1))])
                 outa[tuple(self.get_slice(0, 1))] /=2.
 
                 # left boundary
-                np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
+                xp.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))])
                 outa[tuple(self.get_slice(-1, None))] /=2.
@@ -199,14 +202,14 @@ class FiniteDifferenceOperator(LinearOperator):
                 pass
 
                # left boundary
-                np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
+                xp.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(-1,None))], \
                                  out = outa[tuple(self.get_slice(0, 1))])
                 outa[tuple(self.get_slice(0, 1))] /= 2.
 
 
                 # left boundary
-                np.subtract( x_asarr[tuple(self.get_slice(0, 1))], \
+                xp.subtract( x_asarr[tuple(self.get_slice(0, 1))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))])
                 outa[tuple(self.get_slice(-1, None))] /= 2.
@@ -235,6 +238,7 @@ class FiniteDifferenceOperator(LinearOperator):
         # Adjoint operation defined as
 
         x_asarr = x.as_array()
+        xp = array_namespace(x_asarr)
 
         outnone = False
         if out is None:
@@ -254,7 +258,7 @@ class FiniteDifferenceOperator(LinearOperator):
         if self.method == 'forward':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])
 
@@ -269,11 +273,11 @@ class FiniteDifferenceOperator(LinearOperator):
             elif self.boundary_condition == 'Periodic':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(0,1))])
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])
 
@@ -287,7 +291,7 @@ class FiniteDifferenceOperator(LinearOperator):
         elif self.method == 'backward':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(1,-1))], \
                              out = outa[tuple(self.get_slice(1, -1))])
 
@@ -303,12 +307,12 @@ class FiniteDifferenceOperator(LinearOperator):
             elif self.boundary_condition == 'Periodic':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))])
 
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(-1,None))])
 
@@ -323,7 +327,7 @@ class FiniteDifferenceOperator(LinearOperator):
         elif self.method == 'centered':
 
             # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+            xp.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])
             outa[tuple(self.get_slice(1, -1))] /= 2.0
@@ -332,13 +336,13 @@ class FiniteDifferenceOperator(LinearOperator):
             if self.boundary_condition == 'Neumann':
 
                 # left boundary
-                np.add(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.add(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(1,2))],
                             out = outa[tuple(self.get_slice(0,1))])
                 outa[tuple(self.get_slice(0,1))] /= 2.0
 
                 # right boundary
-                np.add(x_asarr[tuple(self.get_slice(-1,None))],\
+                xp.add(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])
 
@@ -348,13 +352,13 @@ class FiniteDifferenceOperator(LinearOperator):
             elif self.boundary_condition == 'Periodic':
 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(0,1))])
                 outa[tuple(self.get_slice(0,1))] /= 2.0
 
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                xp.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])
                 outa[tuple(self.get_slice(-1,None))] /= 2.0

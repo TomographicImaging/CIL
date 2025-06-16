@@ -163,7 +163,8 @@ class TotalVariation(Function):
                  isotropic=True,
                  split=False,
                  strong_convexity_constant=0,
-                 warm_start=True):
+                 warm_start=True, 
+                 indicator_accelerated=False):
 
         super(TotalVariation, self).__init__(L=None)
 
@@ -188,7 +189,7 @@ class TotalVariation(Function):
             upper = np.inf
         self.lower = lower
         self.upper = upper
-        self.projection_C = IndicatorBox(lower, upper).proximal
+        self.projection_C = IndicatorBox(lower, upper, accelerated=indicator_accelerated).proximal
 
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__
         self._gradient = None
@@ -270,7 +271,7 @@ class TotalVariation(Function):
             tau *= strongly_convex_factor
 
         return solution
-
+    
     def _fista_on_dual_rof(self, x, tau, out=None):
         r""" Runs the Fast Gradient Projection (FGP) algorithm to solve the dual problem
         of the Total Variation Denoising problem (ROF).
@@ -305,7 +306,10 @@ class TotalVariation(Function):
             tau.multiply(-self.regularisation_parameter, out=tau_reg_neg)
 
         if out is None:
-            out = self.gradient_operator.domain_geometry().allocate(0)
+            # out = self.gradient_operator.domain_geometry().allocate(0)
+            from cil.framework import ImageData
+            import cupy as cp
+            out = ImageData(cp.empty(x.shape, dtype=cp.float32), geometry=self.gradient_operator.domain_geometry().copy(), dtype=cp.float32)
 
         for k in range(self.iterations):
 

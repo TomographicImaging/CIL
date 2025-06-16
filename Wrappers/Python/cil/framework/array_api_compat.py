@@ -74,8 +74,6 @@ def squeeze(array, axis=None):
         axis = axis[0]
     return squeeze(xp.squeeze(array, axis=ax), axis=axis)
 
-import pysnooper
-@pysnooper.snoop()
 def allclose(a, b, rtol=1e-5, atol=1e-6):
     """
     Check if two arrays are element-wise equal within a tolerance.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)[source]

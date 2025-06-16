@@ -1,5 +1,6 @@
 # Updates to array API compatibility layer for CIL
 from array_api_compat import array_namespace
+import sys
 
 def expand_dims(array, axis):
     '''Expand dimensions of an array along specified axes.
@@ -93,3 +94,25 @@ The relative difference (rtol * abs(b)) and the absolute difference atol are add
         print(f"Max difference: {diff.max()}")
         return False
     return True
+
+def dtype_namespace(dtype):
+    """
+    Get the namespace of a given dtype.
+    
+    Parameters
+    ----------
+    dtype : data-type
+        The data type to check.
+        
+    Returns
+    -------
+    str
+        The namespace of the dtype.
+        
+    Raises
+    ------
+    TypeError
+        If the dtype is not recognized.
+    """
+    xp = sys.modules[dtype.__module__]
+    return xp

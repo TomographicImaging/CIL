@@ -19,6 +19,7 @@ import numpy as np
 
 from .data_container import DataContainer
 from .array_api_compat import squeeze as cil_squeeze 
+from .array_api_compat import dtype_namespace
 from .labels import ImageDimension, Backend
 
 from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
@@ -61,7 +62,7 @@ class ImageData(DataContainer):
     def dimension_labels(self, val):
         if val is not None:
             raise ValueError("Unable to set the dimension_labels directly. Use geometry.set_labels() instead")
-
+    
     def __init__(self,
                  array = None,
                  deep_copy=False,
@@ -75,9 +76,15 @@ class ImageData(DataContainer):
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
         # TODO: change
         if array is None:
-            # defaults to a np array
-            xp = np
-            dtype = kwargs.get('dtype', xp.float32)
+            dtype = kwargs.get('dtype', None)
+            if dtype is not None:
+                # tries to infer the namespace from the dtype
+                xp = dtype_namespace(dtype)
+            else:
+                # defaults to a np array
+                xp = np
+                dtype = np.float32
+                
             array = xp.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             # this is a reference so we might make a mess modifying both ends

@@ -480,7 +480,11 @@ class DataContainer(object):
 
     def maximum(self, x2, *args, **kwargs):
         xp = array_namespace(self.array)
-        return self.pixel_wise_binary(xp.maximum, x2, *args, **kwargs)
+        try:
+            return self.pixel_wise_binary(xp.maximum, x2, *args, **kwargs)
+        except TypeError as te:
+            tmp = xp.ones_like(self.as_array()) * x2
+            return self.pixel_wise_binary(xp.maximum, tmp, *args, **kwargs)
 
     def minimum(self,x2, out=None, *args, **kwargs):
         xp = array_namespace(self.array)
@@ -693,7 +697,12 @@ class DataContainer(object):
 
     def conjugate(self, *args,  **kwargs):
         xp = array_namespace(self.array)
-        return self.pixel_wise_unary(xp.conjugate, *args,  **kwargs)
+        try:
+            return self.pixel_wise_unary(xp.conjugate, *args,  **kwargs)
+        except AttributeError:
+            # torch has conj instead
+            import torch
+            return torch.conj(self.as_array())
 
     def exp(self, *args, **kwargs):
         '''Applies exp pixel-wise to the DataContainer'''

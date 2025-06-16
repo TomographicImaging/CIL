@@ -163,7 +163,8 @@ class TotalVariation(Function):
                  isotropic=True,
                  split=False,
                  strong_convexity_constant=0,
-                 warm_start=True):
+                 warm_start=True, 
+                 indicator_accelerated=False):
 
         super(TotalVariation, self).__init__(L=None)
 
@@ -188,7 +189,7 @@ class TotalVariation(Function):
             upper = np.inf
         self.lower = lower
         self.upper = upper
-        self.projection_C = IndicatorBox(lower, upper).proximal
+        self.projection_C = IndicatorBox(lower, upper, accelerated=indicator_accelerated).proximal
 
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__
         self._gradient = None

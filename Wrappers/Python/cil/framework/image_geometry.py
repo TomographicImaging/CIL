@@ -270,7 +270,7 @@ class ImageGeometry:
 
         if isinstance(value, Number):
             # it's created empty, so we make it 0
-            out.array.fill(value)
+            out.fill(value)
         elif value in FillType:
             if value == FillType.RANDOM:
                 seed = kwargs.get('seed', None)

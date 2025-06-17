@@ -438,11 +438,11 @@ class FluxNormaliser(Processor):
         
     def process(self, out=None):
         self._calculate_flux()
-        self._calculate_target()
-
         if 0 in self.flux:
             raise ValueError('Flux value can\'t be 0, provide a different flux\
                                 or region of interest with non-zero values')
+        
+        self._calculate_target()
 
         data = self.get_input()
         if out is None:

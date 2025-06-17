@@ -505,6 +505,11 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ag2.shape))
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
 
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = AcquisitionData(value=np.zeros((3,10,2,4)), geometry=ag2)
+
+
     def test_AcquisitionData_from_numpy(self):
         """
         Test the creation and manipulation of AcquisitionData from a numpy array.
@@ -546,6 +551,13 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ag)
         self.assertEqual(data.dtype, np.float32)
+
+    def test_ImageGeometry(self):
+        ig = ImageGeometry(2,2)
+
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = ImageData(value=np.array([[1, 2], [3, 4]]), geometry=ig)
 
 
     def test_ImageGeometry_allocate(self):

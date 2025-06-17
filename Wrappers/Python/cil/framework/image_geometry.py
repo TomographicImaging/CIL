@@ -264,8 +264,7 @@ class ImageGeometry:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
         out = ImageData(geometry=self.copy(),
-                            dtype=dtype,
-                            suppress_warning=True)
+                            dtype=dtype)
 
         if isinstance(value, Number):
             # it's created empty, so we make it 0

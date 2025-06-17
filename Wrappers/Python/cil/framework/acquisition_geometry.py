@@ -2175,8 +2175,7 @@ class AcquisitionGeometry(object):
         dtype = kwargs.get('dtype', self.dtype)
 
         out = AcquisitionData(geometry=self.copy(),
-                              dtype=dtype,
-                              suppress_warning=True)
+                              dtype=dtype)
 
         if isinstance(value, Number):
             # it's created empty, so we make it 0

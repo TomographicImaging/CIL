@@ -22,6 +22,7 @@ from cil.utilities import multiprocessing as cil_mp
 import numpy
 import logging
 import numba
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -212,11 +213,6 @@ class FluxNormaliser(Processor):
                 raise ValueError("Flux must be a scalar or array with length \
                                     \n = number of projections, found {} and {}"
                                     .format(flux_size_flat, data_size_flat))
-            
-        # check if flux array contains 0s
-        if 0 in self.flux:
-            raise ValueError('Flux value can\'t be 0, provide a different flux\
-                                or region of interest with non-zero values')
           
     def _calculate_target(self):
         '''
@@ -278,6 +274,12 @@ class FluxNormaliser(Processor):
         import matplotlib.pyplot as plt
 
         self._calculate_flux()
+
+        # check if flux array contains 0s
+        if 0 in self.flux:
+            warnings.warn('Flux value can\'t be 0, provide a different flux\
+                                or region of interest with non-zero values')
+
         if self.roi_slice is None:
             raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
         else:
@@ -436,6 +438,10 @@ class FluxNormaliser(Processor):
         
     def process(self, out=None):
         self._calculate_flux()
+        if 0 in self.flux:
+            raise ValueError('Flux value can\'t be 0, provide a different flux\
+                                or region of interest with non-zero values')
+        
         self._calculate_target()
 
         data = self.get_input()

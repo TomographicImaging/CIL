@@ -2165,13 +2165,44 @@ class AcquisitionGeometry(object):
         return geometry_new
 
     def allocate(self, value=0, **kwargs):
-        '''allocates an AcquisitionData according to the size expressed in the instance
+        '''Allocates an AcquisitionData according to the geometry
+        
+        Parameters
+        ----------
+        value : number or string, default=0
+            The value to allocate. Accepts a number to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random' allocates floats between 0 and 1, 'random_int' by default 
+            allocates integers between 0 and 100  or between provided `min_value` and 
+            `max_value`
+        
+        **kwargs:
+            dtype : numpy data type, optional
+                The data type to allocate if different from the geometry data type. 
+                Default None allocates an array with the geometry data type.
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
+            seed : int, optional
+                A random seed to fix reproducibility, only used if `value` is a random
+                method. Default is `None`.
+
+            min_value : int, optional
+                The minimum value random integer to generate, only used if `value` 
+                is 'random_int'. New since version 25.0.0. Default is 0.
+            
+            max_value : int, optional
+                The maximum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 100.
+
+        Note
+        ----
+            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
+            This method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as a kwarg.
+            To allocate random numbers using the earlier behaviour use `value='random_deprecated'` 
+            or `value='random_int_deprecated'` 
+
         '''
+<<<<<<< acqdata_kwargs
         dtype = kwargs.get('dtype', self.dtype)
 
         out = AcquisitionData(geometry=self.copy(),
@@ -2204,4 +2235,12 @@ class AcquisitionGeometry(object):
             pass
         else:
             raise ValueError(f'Value {value} unknown')
+=======
+        dtype = kwargs.pop('dtype', self.dtype)
+        
+        out = AcquisitionData(geometry=self.copy(), dtype=dtype)
+        if value is not None:
+            out.fill(value, **kwargs)
+
+>>>>>>> master
         return out

@@ -24,7 +24,6 @@ import numpy
 from .image_data import ImageData
 from .labels import ImageDimension, FillType
 
-
 class ImageGeometry:
     @property
     def CHANNEL(self):
@@ -250,47 +249,47 @@ class ImageGeometry:
 
         return repres
     def allocate(self, value=0, **kwargs):
-        '''allocates an ImageData according to the size expressed in the instance
+        '''Allocates an ImageData according to the geometry
 
-        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
-        :type value: number or string, default None allocates empty memory block, default 0
-        :param dtype: numerical type to allocate
-        :type dtype: numpy type, default numpy.float32
+        Parameters
+        ----------
+        value : number or string, default=0
+            The value to allocate. Accepts a number to allocate a uniform array, 
+            None to allocate an empty memory block, or a string to create a random 
+            array: 'random' allocates floats between 0 and 1, 'random_int' by default
+            allocates integers between 0 and 100  or between provided `min_value` and 
+            `max_value`
+        
+        **kwargs:
+            dtype : numpy data type, optional
+                The data type to allocate if different from the geometry data type. 
+                Default None allocates an array with the geometry data type.
+
+            seed : int, optional
+                A random seed to fix reproducibility, only used if `value` is a random
+                method. Default is `None`.
+
+            min_value : int, optional
+                The minimum value random integer to generate, only used if `value` 
+                is 'random_int'. New since version 25.0.0. Default is 0.
+            
+            max_value : int, optional
+                The maximum value random integer to generate, only used if `value` 
+                is 'random_int'. Default is 100.
+
+        Note
+        ----
+            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
+            This method does not use the global numpy.random.seed() so if a seed is 
+            required it should be passed directly as a kwarg.
+            To allocate random numbers using the earlier behaviour use `value='random_deprecated'` 
+            or `value='random_int_deprecated'` 
+
         '''
+        dtype = kwargs.pop('dtype', self.dtype)
 
-        dtype = kwargs.get('dtype', self.dtype)
+        out = ImageData(geometry=self.copy(), dtype=dtype)
+        if value is not None:
+            out.fill(value, **kwargs)
 
-        if kwargs.get('dimension_labels', None) is not None:
-            raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
-        out = ImageData(geometry=self.copy(),
-                            dtype=dtype)
-
-        if isinstance(value, Number):
-            # it's created empty, so we make it 0
-            out.array.fill(value)
-        elif value in FillType:
-            if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
-                    out.fill(r)
-                else:
-                    out.fill(numpy.random.random_sample(self.shape))
-
-            elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1.j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
-                else:
-                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32))
-        elif value is None:
-            pass
-        else:
-            raise ValueError(f'Value {value} unknown')
         return out

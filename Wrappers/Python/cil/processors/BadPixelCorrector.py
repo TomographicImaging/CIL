@@ -218,6 +218,221 @@ class BadPixelCorrector(DataProcessor):
             return out
 
     def _process_numpy(self, data, out):
+        try:
+            mask_arr = self.mask.as_array()
+        except:
+            mask_arr = self.mask
+        kernels, x, y = self._get_details_of_passes(mask_arr, out)
+
+        print("Number of passes: ", len(kernels))
+
+        self._bad_pix_correct_pixelwise(out, x, y, kernels)
+
+
+    def _get_details_of_passes(self, mask, proj):
+        print(mask)
+
+        from scipy.ndimage import binary_erosion, binary_dilation
+
+        #eroded_mask = ~binary_erosion(~mask)
+
+        kernels = []
+        coords_x = []
+        coords_y = []
+        proj_shape = np.shape(mask)
+        num_proj = proj.shape[0]
+
+
+        diag_weight = 1/np.sqrt(2)
+
+        if len(proj_shape)== 1:
+            pix_v = 1
+            pix_h = proj_shape[0]
+            weight_array = np.array([ 1,0,1])
+
+        else:
+            pix_v = proj_shape[0]
+            pix_h = proj_shape[1]
+            weight_array = np.array([diag_weight, 1, diag_weight, 1,0,1,diag_weight,1,diag_weight])
+
+
+        prev_erosion = mask
+
+        # proj_size = proj.size
+
+        # eroded_mask = binary_dilation(prev_erosion)
+        # print("Eroded mask: ",eroded_mask )
+        # current_pixel_map = ~prev_erosion & eroded_mask
+        current_pixel_map=True
+        eroded_mask=False
+
+        while not np.all(eroded_mask):
+            #eroded_mask = ~binary_erosion(~prev_erosion)
+            eroded_mask = binary_dilation(prev_erosion)
+            #print("Eroded mask: ", eroded_mask )
+            current_pixel_map = ~prev_erosion & eroded_mask
+
+            #print("Current pixel map: ", current_pixel_map)
+            #print("we'll check neighbours against: ", prev_erosion)
+
+            
+
+            # Coordinates of pixels to address in this iteration:
+            #if we raveled:
+            #masked_pixels = np.where(current_pixel_map.ravel() == True)[0]
+            #         y = int(np.floor(coord / pix_h))
+            #         x = int(coord  - y * pix_h)
+
+
+            y_coords, x_coords = np.where(current_pixel_map)
+
+            current_kernels = np.zeros(len(x_coords), dtype=np.uint8)
+
+            
+            for i, (x,y)  in enumerate(zip(x_coords,y_coords)):
+                bit_mask = 255
+
+                if x == 0:
+                    bit_mask = bit_mask & 107
+                if x == pix_h - 1:
+                    bit_mask = bit_mask & 214
+
+                if y == 0:
+                    bit_mask = bit_mask & 31
+                if y == pix_v -1:
+                    bit_mask = bit_mask & 248
+
+
+                # remove pixels if they're bad pixels that haven't been corrected in a previous iteration:
+
+
+                # print("Previous erosion: ", prev_erosion)
+
+                # could change this to not ravel:
+                prev_erosion_flat = prev_erosion
+                if (bit_mask & 1 << 7):
+                    if not (prev_erosion_flat[y - 1][x - 1]): # [y-1][x-1]
+                        bit_mask = bit_mask & ~(1 << 7)
+                if (bit_mask & 1 << 6):
+                    if not (prev_erosion_flat[y - 1][x]):
+                        bit_mask = bit_mask & ~(1 << 6)
+                if (bit_mask & 1 << 5):
+                    if not (prev_erosion_flat[y - 1][x + 1]):
+                        bit_mask = bit_mask & ~(1 << 5)
+                if (bit_mask & 1 << 4):
+                    if not (prev_erosion_flat[y][x - 1]):
+                        bit_mask = bit_mask & ~(1 << 4)
+                if (bit_mask & 1 << 3):
+                    if not (prev_erosion_flat[y][x + 1]):
+                        bit_mask = bit_mask & ~(1 << 3)
+                if (bit_mask & 1 << 2):
+                    if not (prev_erosion_flat[y + 1][x - 1]):
+                        bit_mask = bit_mask & ~(1 << 2)
+                if (bit_mask & 1 << 1):
+                    if not (prev_erosion_flat[y + 1][x]):
+                        bit_mask = bit_mask & ~(1 << 1)
+                if (bit_mask & 1):
+                    if not (prev_erosion_flat[y + 1][x + 1]):
+                        bit_mask = bit_mask & ~(1)
+
+
+                current_kernels[i] = bit_mask
+            coords_x.append(x_coords)
+            coords_y.append(y_coords)
+            kernels.append(current_kernels) # replace the appends
+
+            # now make the new current pixel map
+            prev_erosion = eroded_mask
+
+        #     print("the eroded mask: ", eroded_mask)
+            
+
+        # print("the kernels", kernels)
+
+        # print("k: ", [bin(x) for x in kernels[0]])
+
+        return kernels, coords_x, coords_y
+
+
+    def _bad_pix_correct_pixelwise(self, proj, coords_x, coords_y, kernels):
+        diag_weight = 1/np.sqrt(2)
+        num_proj = len(proj.geometry.angles)
+        num_channels = proj.geometry.channels
+        print(proj)
+        print(proj.dimension_labels)
+        # For each channel:
+        for l in range(0, num_channels):
+            if num_channels == 1:
+                current_channel = proj
+            else:
+                current_channel = proj.get_slice(channel=l)
+        # For each projection:
+            for k in range(0, num_proj):
+                if num_proj == 1:
+                    current_proj = current_channel
+                else:
+                    current_proj = proj.get_slice(angle=k)
+                current_proj = current_proj.array
+                # For each pass:
+                for j in range(0, len(kernels)):
+                    # For each bad pixel:
+                    for i in range(0, len(kernels[j])):
+                        kernel = kernels[j][i]
+                        x = coords_x[j][i]
+                        y = coords_y[j][i]
+
+                        accum_num = 0
+                        accum_denom = 0
+
+                        if (kernel & 1 << 7):
+                            accum_num += current_proj[y - 1][x - 1]
+                            accum_denom +=1
+
+                        if (kernel & 1 << 5):
+                            accum_num += current_proj[y - 1][x + 1]
+                            accum_denom +=1
+
+                        if (kernel & 1 << 2):
+                            accum_num += current_proj[y + 1][x - 1]
+                            accum_denom +=1
+
+                        if (kernel & 1 ):
+                            accum_num += current_proj[y + 1][x + 1]
+                            accum_denom +=1
+
+                        accum_denom*=diag_weight
+                        accum_num*=diag_weight
+
+
+                        if (kernel & 1 << 6):
+                            accum_num += current_proj[y - 1][x]
+                            accum_denom +=1
+
+                        if (kernel & 1 << 4):
+                            accum_num += current_proj[y][x - 1]
+                            accum_denom +=1
+
+                        if (kernel & 1 << 3):
+                            accum_num += current_proj[y][x + 1]
+                            accum_denom +=1
+
+                        if (kernel & 1 << 1):
+                            accum_num += current_proj[y + 1][x]
+                            accum_denom +=1
+
+                        mean = accum_num/accum_denom
+
+                        if num_channels>1 and num_proj>1:
+                            proj.array[l][k][y][x] = mean
+                        elif num_proj==1 and num_channels==1:
+                            proj.array[y][x] = mean
+                        elif num_proj==1:
+                            proj.array[l][y][x] = mean
+                        else:
+                            proj.array[k][y][x] = mean
+
+
+    def _process_numpy_old(self, data, out):
 
         # flat view of full array:
         out_flat = out.array.ravel()

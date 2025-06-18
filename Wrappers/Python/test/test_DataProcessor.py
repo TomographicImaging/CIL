@@ -180,7 +180,7 @@ class TestBinner_cillacc(unittest.TestCase):
 class TestBinner(unittest.TestCase):
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -447,7 +447,7 @@ class TestBinner(unittest.TestCase):
     def test_bin_array_consistency(self):
 
         ig = ImageGeometry(64,32,16,channels=8)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         roi = {'horizontal_x':(1,-1,16),'horizontal_y':(1,-1,8),'channel':(1,-1,2),'vertical':(1,-1,4)}
 
@@ -486,7 +486,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -534,7 +534,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -813,7 +813,7 @@ class TestSlicer(unittest.TestCase):
 
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -1125,7 +1125,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_image_data(self):
 
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -1165,7 +1165,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_acquisition_data(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -1691,7 +1691,7 @@ class TestPaddder(unittest.TestCase):
     def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         dim_order = ['channel','vertical','horizontal_y','horizontal_x']
 
         pad_width = {'horizontal_x':(3,4),'vertical':(5,6),'channel':(7,8)}
@@ -1841,7 +1841,7 @@ class TestPaddder(unittest.TestCase):
     def test_process_data(self):
 
         geometry = self.ig
-        data = geometry.allocate('random')
+        data = geometry.allocate('random', seed=42)
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
         proc.set_input(data)
@@ -1866,7 +1866,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.5)
 
-        data_in = self.ag.allocate('random')
+        data_in = self.ag.allocate('random', seed=42)
 
         data_gold = self.ag_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],:,v[0]:-v[1],h[0]:-h[1]] = data_in.array
@@ -1900,7 +1900,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
 
-        data_in = self.ig.allocate('random')
+        data_in = self.ig.allocate('random', seed=42)
 
         data_gold = self.ig_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data_in.array
@@ -2381,7 +2381,7 @@ class TestMaskGenerator(unittest.TestCase):
                         voxel_num_y=10)
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
 
-        data = IG.allocate('random')
+        data = IG.allocate('random', seed=42)
 
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
@@ -2482,9 +2482,7 @@ class TestMaskGenerator(unittest.TestCase):
                             voxel_num_y=200)
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
-        data = IG.allocate()
-        numpy.random.seed(10)
-        data.fill(numpy.random.rand(200,200))
+        data = IG.allocate('random', seed=2)
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
         data_as_data_container = DataContainer(data.as_array().copy())
@@ -2602,7 +2600,7 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
                                             accelerated=accelerated)
@@ -2654,7 +2652,7 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = AbsorptionTransmissionConverter(white_level=10)
         s.set_input(ad)
@@ -2679,8 +2677,8 @@ class TestMasker(unittest.TestCase):
                             voxel_num_y=5,
                             voxel_num_z=5)
         
-        self.data_2D_init = IG_2D.allocate('random')
-        self.data_3D_init = IG_3D.allocate('random')
+        self.data_2D_init = IG_2D.allocate('random', seed=42)
+        self.data_3D_init = IG_3D.allocate('random', seed=42)
 
         self.data_2D = self.data_2D_init.copy()
         self.data_3D = self.data_3D_init.copy()
@@ -2870,7 +2868,7 @@ class TestPaganinProcessor(unittest.TestCase):
             .set_panel([128,128],0.1)\
             .set_channels(4)
 
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=3)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3167,7 +3165,7 @@ class TestFluxNormaliser(unittest.TestCase):
             .set_angles(numpy.linspace(0,360,360,endpoint=False))\
             .set_panel([128,128],0.1)\
             .set_channels(4)
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=42)
         self.data_slice = self.data_parallel.get_slice(vertical=1)
         self.data_reorder = self.data_cone.copy()
         self.data_reorder.reorder(['angle','horizontal','vertical'])

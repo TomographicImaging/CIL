@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev58+g1173388f6 documentation</title>
+    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev59+gb03249480 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=1baa774a"></script>
+    <script src="../../../../_static/documentation_options.js?v=92b71a7a"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev58+g1173388f6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev59+gb03249480';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev58+g1173388f6" />
+  <meta name="docsearch:version" content="24.3.1.dev59+gb03249480" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -2670,46 +2670,49 @@
 <div class="viewcode-block" id="AcquisitionGeometry.allocate">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.allocate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;allocates an AcquisitionData according to the size expressed in the instance</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Allocates an AcquisitionData according to the geometry</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : number or string, default=0</span>
+<span class="sd">            The value to allocate. Accepts a number to allocate a uniform array, </span>
+<span class="sd">            None to allocate an empty memory block, or a string to create a random </span>
+<span class="sd">            array: &#39;random&#39; allocates floats between 0 and 1, &#39;random_int&#39; by default </span>
+<span class="sd">            allocates integers between 0 and 100  or between provided `min_value` and </span>
+<span class="sd">            `max_value`</span>
+<span class="sd">        </span>
+<span class="sd">        **kwargs:</span>
+<span class="sd">            dtype : numpy data type, optional</span>
+<span class="sd">                The data type to allocate if different from the geometry data type. </span>
+<span class="sd">                Default None allocates an array with the geometry data type.</span>
 
-<span class="sd">        :param value: accepts numbers to allocate an uniform array, or a string as &#39;random&#39; or &#39;random_int&#39; to create a random array or None.</span>
-<span class="sd">        :type value: number or string, default None allocates empty memory block</span>
-<span class="sd">        :param dtype: numerical type to allocate</span>
-<span class="sd">        :type dtype: numpy type, default numpy.float32</span>
+<span class="sd">            seed : int, optional</span>
+<span class="sd">                A random seed to fix reproducibility, only used if `value` is a random</span>
+<span class="sd">                method. Default is `None`.</span>
+
+<span class="sd">            min_value : int, optional</span>
+<span class="sd">                The minimum value random integer to generate, only used if `value` </span>
+<span class="sd">                is &#39;random_int&#39;. New since version 25.0.0. Default is 0.</span>
+<span class="sd">            </span>
+<span class="sd">            max_value : int, optional</span>
+<span class="sd">                The maximum value random integer to generate, only used if `value` </span>
+<span class="sd">                is &#39;random_int&#39;. Default is 100.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">            Since v25.0.0 the methods used by &#39;random&#39; or &#39;random_int&#39; use `numpy.random.default_rng`. </span>
+<span class="sd">            This method does not use the global numpy.random.seed() so if a seed is </span>
+<span class="sd">            required it should be passed directly as a kwarg.</span>
+<span class="sd">            To allocate random numbers using the earlier behaviour use `value=&#39;random_deprecated&#39;` </span>
+<span class="sd">            or `value=&#39;random_int_deprecated&#39;` </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        
+        <span class="n">out</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">out</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-                              <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                              <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-            <span class="c1"># it&#39;s created empty, so we make it 0</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">FillType</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
-                    <span class="n">r</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM_INT</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-                <span class="n">max_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_value&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
-                    <span class="n">r</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">max_value</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">max_value</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">r</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">max_value</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Value </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1"> unknown&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 </div>
 

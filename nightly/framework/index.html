@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 24.3.1.dev58+g1173388f6 documentation</title>
+    <title>Framework &#8212; CIL 24.3.1.dev59+gb03249480 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../_static/documentation_options.js?v=1baa774a"></script>
+    <script src="../_static/documentation_options.js?v=92b71a7a"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev58+g1173388f6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev59+gb03249480';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev58+g1173388f6" />
+  <meta name="docsearch:version" content="24.3.1.dev59+gb03249480" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -748,15 +748,41 @@ default = [‘channel’,’angle’,’vertical’,’horizontal’]</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.allocate">
 <span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">allocate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.allocate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.allocate" title="Link to this definition">#</a></dt>
-<dd><p>allocates an AcquisitionData according to the size expressed in the instance</p>
+<dd><p>Allocates an AcquisitionData according to the geometry</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default None allocates empty memory block</em>) – accepts numbers to allocate an uniform array, or a string as ‘random’ or ‘random_int’ to create a random array or None.</p></li>
-<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default numpy.float32</em>) – numerical type to allocate</p></li>
+<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default=0</em>) – The value to allocate. Accepts a number to allocate a uniform array,
+None to allocate an empty memory block, or a string to create a random
+array: ‘random’ allocates floats between 0 and 1, ‘random_int’ by default
+allocates integers between 0 and 100  or between provided <cite>min_value</cite> and
+<cite>max_value</cite></p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt>dtype<span class="classifier">numpy data type, optional</span></dt><dd><p>The data type to allocate if different from the geometry data type.
+Default None allocates an array with the geometry data type.</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>value</cite> is a random
+method. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>value</cite>
+is ‘random_int’. New since version 25.0.0. Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>value</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To allocate random numbers using the earlier behaviour use <cite>value=’random_deprecated’</cite>
+or <cite>value=’random_int_deprecated’</cite></p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -795,15 +821,41 @@ in <code class="code docutils literal notranslate"><span class="pre">Acquisition
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.ImageGeometry.allocate">
 <span class="sig-name descname"><span class="pre">allocate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_geometry/#ImageGeometry.allocate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageGeometry.allocate" title="Link to this definition">#</a></dt>
-<dd><p>allocates an ImageData according to the size expressed in the instance</p>
+<dd><p>Allocates an ImageData according to the geometry</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default None allocates empty memory block</em><em>, </em><em>default 0</em>) – accepts numbers to allocate an uniform array, or a string as ‘random’ or ‘random_int’ to create a random array or None.</p></li>
-<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default numpy.float32</em>) – numerical type to allocate</p></li>
+<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default=0</em>) – The value to allocate. Accepts a number to allocate a uniform array,
+None to allocate an empty memory block, or a string to create a random
+array: ‘random’ allocates floats between 0 and 1, ‘random_int’ by default
+allocates integers between 0 and 100  or between provided <cite>min_value</cite> and
+<cite>max_value</cite></p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt>dtype<span class="classifier">numpy data type, optional</span></dt><dd><p>The data type to allocate if different from the geometry data type.
+Default None allocates an array with the geometry data type.</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>value</cite> is a random
+method. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>value</cite>
+is ‘random_int’. New since version 25.0.0. Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>value</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To allocate random numbers using the earlier behaviour use <cite>value=’random_deprecated’</cite>
+or <cite>value=’random_int_deprecated’</cite></p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -952,23 +1004,55 @@ any dimension_labels of the DataContainer or their indices</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.fill">
-<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dimension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/data_container/#DataContainer.fill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.fill" title="Link to this definition">#</a></dt>
-<dd><p>fills the internal data array with the DataContainer, numpy array or number provided</p>
+<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/data_container/#DataContainer.fill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.fill" title="Link to this definition">#</a></dt>
+<dd><p>Fills the internal data array with a DataContainer, numpy array, number
+or using a random fill method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em>, </em><em>numpy array</em><em> or </em><em>number</em>) – number, numpy array or DataContainer to copy into the DataContainer</p></li>
-<li><p><strong>dimension</strong> – dictionary, optional</p></li>
+<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy array</em><em>, </em><em>number</em><em> or </em><em>string</em>) – The value or method with which to fill the DataContainer. Accepts a
+numpy array or DataContainer or a number to allocate a uniform array
+or a string specifying a method to fill with a random array: ‘random’
+allocates floats between 0 and 1, ‘random_int’ by default allocates
+integers between 0 and 100  or between provided <cite>min_value</cite> and <cite>max_value</cite>.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>dimension<span class="classifier">int, optional</span></dt><dd><p>An optional named parameter to specify in which axis the fill should
+happen. The name passed must match one of the DataContainer
+dimension_labels and the axis must be an int</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>array</cite> is a
+<cite>random method</cite>. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional, default=0</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. New since version 25.0.0 Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional, default=100</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
-<p>if the passed numpy array points to the same array that is contained in the DataContainer,
-it just returns</p>
-<p>In case a DataContainer or subclass is passed, there will be a check of the geometry,
-if present, and the array will be resorted if the data is not in the appropriate order.</p>
-<p>User may pass a named parameter to specify in which axis the fill should happen:</p>
-<p>dc.fill(some_data, vertical=1, horizontal_x=32)
-will copy the data in some_data into the data container.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the passed numpy array points to the same array that is contained
+in the DataContainer, the DataContainer is not updated, and None is returned.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To fill random numbers using the earlier behaviour use <cite>array=’random_deprecated’</cite>
+or <cite>array=’random_int_deprecated’</cite></p>
+</div>
+<p class="rubric">Example</p>
+<p>This example shows how to pass a dimension to specify an axis to fill
+&gt;&gt;&gt; from cil.framework import DataContainer
+&gt;&gt;&gt; DC = DataContainer(old_data)
+&gt;&gt;&gt; DC.fill(new_data, vertical=1, horizontal_x=32)
+will copy the data in new_data into the data container.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1223,23 +1307,55 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.fill">
-<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dimension</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.fill" title="Link to this definition">#</a></dt>
-<dd><p>fills the internal data array with the DataContainer, numpy array or number provided</p>
+<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.AcquisitionData.fill" title="Link to this definition">#</a></dt>
+<dd><p>Fills the internal data array with a DataContainer, numpy array, number
+or using a random fill method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em>, </em><em>numpy array</em><em> or </em><em>number</em>) – number, numpy array or DataContainer to copy into the DataContainer</p></li>
-<li><p><strong>dimension</strong> – dictionary, optional</p></li>
+<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy array</em><em>, </em><em>number</em><em> or </em><em>string</em>) – The value or method with which to fill the DataContainer. Accepts a
+numpy array or DataContainer or a number to allocate a uniform array
+or a string specifying a method to fill with a random array: ‘random’
+allocates floats between 0 and 1, ‘random_int’ by default allocates
+integers between 0 and 100  or between provided <cite>min_value</cite> and <cite>max_value</cite>.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt><a href="#id6"><span class="problematic" id="id7">**</span></a>dimension<span class="classifier">int, optional</span></dt><dd><p>An optional named parameter to specify in which axis the fill should
+happen. The name passed must match one of the DataContainer
+dimension_labels and the axis must be an int</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>array</cite> is a
+<cite>random method</cite>. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional, default=0</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. New since version 25.0.0 Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional, default=100</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
-<p>if the passed numpy array points to the same array that is contained in the DataContainer,
-it just returns</p>
-<p>In case a DataContainer or subclass is passed, there will be a check of the geometry,
-if present, and the array will be resorted if the data is not in the appropriate order.</p>
-<p>User may pass a named parameter to specify in which axis the fill should happen:</p>
-<p>dc.fill(some_data, vertical=1, horizontal_x=32)
-will copy the data in some_data into the data container.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the passed numpy array points to the same array that is contained
+in the DataContainer, the DataContainer is not updated, and None is returned.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To fill random numbers using the earlier behaviour use <cite>array=’random_deprecated’</cite>
+or <cite>array=’random_int_deprecated’</cite></p>
+</div>
+<p class="rubric">Example</p>
+<p>This example shows how to pass a dimension to specify an axis to fill
+&gt;&gt;&gt; from cil.framework import DataContainer
+&gt;&gt;&gt; DC = DataContainer(old_data)
+&gt;&gt;&gt; DC.fill(new_data, vertical=1, horizontal_x=32)
+will copy the data in new_data into the data container.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1591,23 +1707,55 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.ImageData.fill">
-<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dimension</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.fill" title="Link to this definition">#</a></dt>
-<dd><p>fills the internal data array with the DataContainer, numpy array or number provided</p>
+<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.ImageData.fill" title="Link to this definition">#</a></dt>
+<dd><p>Fills the internal data array with a DataContainer, numpy array, number
+or using a random fill method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em>, </em><em>numpy array</em><em> or </em><em>number</em>) – number, numpy array or DataContainer to copy into the DataContainer</p></li>
-<li><p><strong>dimension</strong> – dictionary, optional</p></li>
+<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy array</em><em>, </em><em>number</em><em> or </em><em>string</em>) – The value or method with which to fill the DataContainer. Accepts a
+numpy array or DataContainer or a number to allocate a uniform array
+or a string specifying a method to fill with a random array: ‘random’
+allocates floats between 0 and 1, ‘random_int’ by default allocates
+integers between 0 and 100  or between provided <cite>min_value</cite> and <cite>max_value</cite>.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt><a href="#id12"><span class="problematic" id="id13">**</span></a>dimension<span class="classifier">int, optional</span></dt><dd><p>An optional named parameter to specify in which axis the fill should
+happen. The name passed must match one of the DataContainer
+dimension_labels and the axis must be an int</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>array</cite> is a
+<cite>random method</cite>. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional, default=0</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. New since version 25.0.0 Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional, default=100</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
-<p>if the passed numpy array points to the same array that is contained in the DataContainer,
-it just returns</p>
-<p>In case a DataContainer or subclass is passed, there will be a check of the geometry,
-if present, and the array will be resorted if the data is not in the appropriate order.</p>
-<p>User may pass a named parameter to specify in which axis the fill should happen:</p>
-<p>dc.fill(some_data, vertical=1, horizontal_x=32)
-will copy the data in some_data into the data container.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the passed numpy array points to the same array that is contained
+in the DataContainer, the DataContainer is not updated, and None is returned.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To fill random numbers using the earlier behaviour use <cite>array=’random_deprecated’</cite>
+or <cite>array=’random_int_deprecated’</cite></p>
+</div>
+<p class="rubric">Example</p>
+<p>This example shows how to pass a dimension to specify an axis to fill
+&gt;&gt;&gt; from cil.framework import DataContainer
+&gt;&gt;&gt; DC = DataContainer(old_data)
+&gt;&gt;&gt; DC.fill(new_data, vertical=1, horizontal_x=32)
+will copy the data in new_data into the data container.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1876,23 +2024,55 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.VectorData.fill">
-<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dimension</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.fill" title="Link to this definition">#</a></dt>
-<dd><p>fills the internal data array with the DataContainer, numpy array or number provided</p>
+<span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.fill" title="Link to this definition">#</a></dt>
+<dd><p>Fills the internal data array with a DataContainer, numpy array, number
+or using a random fill method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>subclasses</em><em>, </em><em>numpy array</em><em> or </em><em>number</em>) – number, numpy array or DataContainer to copy into the DataContainer</p></li>
-<li><p><strong>dimension</strong> – dictionary, optional</p></li>
+<li><p><strong>array</strong> (<a class="reference internal" href="#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>numpy array</em><em>, </em><em>number</em><em> or </em><em>string</em>) – The value or method with which to fill the DataContainer. Accepts a
+numpy array or DataContainer or a number to allocate a uniform array
+or a string specifying a method to fill with a random array: ‘random’
+allocates floats between 0 and 1, ‘random_int’ by default allocates
+integers between 0 and 100  or between provided <cite>min_value</cite> and <cite>max_value</cite>.</p></li>
+<li><p><strong>**kwargs</strong> – <dl class="simple">
+<dt><a href="#id18"><span class="problematic" id="id19">**</span></a>dimension<span class="classifier">int, optional</span></dt><dd><p>An optional named parameter to specify in which axis the fill should
+happen. The name passed must match one of the DataContainer
+dimension_labels and the axis must be an int</p>
+</dd>
+<dt>seed<span class="classifier">int, optional</span></dt><dd><p>A random seed to fix reproducibility, only used if <cite>array</cite> is a
+<cite>random method</cite>. Default is <cite>None</cite>.</p>
+</dd>
+<dt>min_value<span class="classifier">int, optional, default=0</span></dt><dd><p>The minimum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. New since version 25.0.0 Default is 0.</p>
+</dd>
+<dt>max_value<span class="classifier">int, optional, default=100</span></dt><dd><p>The maximum value random integer to generate, only used if <cite>array</cite>
+is ‘random_int’. Default is 100.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
-<p>if the passed numpy array points to the same array that is contained in the DataContainer,
-it just returns</p>
-<p>In case a DataContainer or subclass is passed, there will be a check of the geometry,
-if present, and the array will be resorted if the data is not in the appropriate order.</p>
-<p>User may pass a named parameter to specify in which axis the fill should happen:</p>
-<p>dc.fill(some_data, vertical=1, horizontal_x=32)
-will copy the data in some_data into the data container.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the passed numpy array points to the same array that is contained
+in the DataContainer, the DataContainer is not updated, and None is returned.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since v25.0.0 the methods used by ‘random’ or ‘random_int’ use <cite>numpy.random.default_rng</cite>.
+This method does not use the global numpy.random.seed() so if a seed is
+required it should be passed directly as a kwarg.
+To fill random numbers using the earlier behaviour use <cite>array=’random_deprecated’</cite>
+or <cite>array=’random_int_deprecated’</cite></p>
+</div>
+<p class="rubric">Example</p>
+<p>This example shows how to pass a dimension to specify an axis to fill
+&gt;&gt;&gt; from cil.framework import DataContainer
+&gt;&gt;&gt; DC = DataContainer(old_data)
+&gt;&gt;&gt; DC.fill(new_data, vertical=1, horizontal_x=32)
+will copy the data in new_data into the data container.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2137,8 +2317,8 @@ represents a column vector of <code class="code docutils literal notranslate"><s
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id16"><span class="problematic" id="id17">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id18"><span class="problematic" id="id19">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id24"><span class="problematic" id="id25">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id26"><span class="problematic" id="id27">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -2488,6 +2668,18 @@ generator will not be seeded.</p></li>
 <dt class="sig sig-object py" id="cil.framework.labels.FillType.RANDOM_INT">
 <span class="sig-name descname"><span class="pre">RANDOM_INT</span></span><a class="headerlink" href="#cil.framework.labels.FillType.RANDOM_INT" title="Link to this definition">#</a></dt>
 <dd><p>Fill with random integers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cil.framework.labels.FillType.RANDOM_DEPRECATED">
+<span class="sig-name descname"><span class="pre">RANDOM_DEPRECATED</span></span><a class="headerlink" href="#cil.framework.labels.FillType.RANDOM_DEPRECATED" title="Link to this definition">#</a></dt>
+<dd><p>Fill with random values using numpy.random.random_sample method</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cil.framework.labels.FillType.RANDOM_INT_DEPRECATED">
+<span class="sig-name descname"><span class="pre">RANDOM_INT_DEPRECATED</span></span><a class="headerlink" href="#cil.framework.labels.FillType.RANDOM_INT_DEPRECATED" title="Link to this definition">#</a></dt>
+<dd><p>Fill with random integers using numpy.random.randint method</p>
 </dd></dl>
 
 <p class="rubric">Examples</p>

@@ -2202,6 +2202,7 @@ class AcquisitionGeometry(object):
             or `value='random_int_deprecated'` 
 
         '''
+
         dtype = kwargs.pop('dtype', self.dtype)
         
         out = AcquisitionData(geometry=self.copy(), dtype=dtype)

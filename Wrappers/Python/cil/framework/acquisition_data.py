@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
+import warnings
 
 from .labels import AcquisitionDimension, Backend
 from .data_container import DataContainer
@@ -66,7 +67,7 @@ class AcquisitionData(DataContainer, Partitioner):
                  geometry = None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', None)
+        dtype = kwargs.pop('dtype', None)
         if dtype is not None and array is not None:
             if dtype != array.dtype:
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
@@ -75,7 +76,7 @@ class AcquisitionData(DataContainer, Partitioner):
             raise AttributeError("AcquisitionData requires a geometry")
         
 
-        labels = kwargs.get('dimension_labels', None)
+        labels = kwargs.pop('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
@@ -98,6 +99,9 @@ class AcquisitionData(DataContainer, Partitioner):
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def __eq__(self, other):
         '''

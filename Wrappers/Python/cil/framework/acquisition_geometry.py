@@ -2202,45 +2202,11 @@ class AcquisitionGeometry(object):
             or `value='random_int_deprecated'` 
 
         '''
-<<<<<<< acqdata_kwargs
-        dtype = kwargs.get('dtype', self.dtype)
 
-        out = AcquisitionData(geometry=self.copy(),
-                              dtype=dtype)
-
-        if isinstance(value, Number):
-            # it's created empty, so we make it 0
-            out.array.fill(value)
-        elif value in FillType:
-            if value == FillType.RANDOM:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
-                    out.fill(r)
-                else:
-                    out.fill(numpy.random.random_sample(self.shape))
-            elif value == FillType.RANDOM_INT:
-                seed = kwargs.get('seed', None)
-                if seed is not None:
-                    numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
-                if numpy.iscomplexobj(out.array):
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32) + 1j*numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                else:
-                    r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(numpy.asarray(r, dtype=dtype))
-        elif value is None:
-            pass
-        else:
-            raise ValueError(f'Value {value} unknown')
-=======
         dtype = kwargs.pop('dtype', self.dtype)
         
         out = AcquisitionData(geometry=self.copy(), dtype=dtype)
         if value is not None:
             out.fill(value, **kwargs)
 
->>>>>>> master
         return out

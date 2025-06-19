@@ -62,7 +62,7 @@ dependencies = [
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
-    "numpy>=1.23",
+    "numpy>=1.23, <2.0.0",
     "olefile>=0.46",
     "pillow",
     "pywavelets",

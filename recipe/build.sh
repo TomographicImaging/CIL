@@ -13,4 +13,4 @@ export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}"
 if test "${GIT_DESCRIBE_NUMBER}" != "0"; then
   export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}.dev${GIT_DESCRIBE_NUMBER}+${GIT_DESCRIBE_HASH}"
 fi
-pip install . --no-deps -Ccmake.args="${extra_args}"
+uv pip install . --no-deps

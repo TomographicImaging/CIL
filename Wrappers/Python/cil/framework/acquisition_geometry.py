@@ -199,11 +199,6 @@ class SystemConfiguration:
     def acquisition_type(self, val):
         self._acquisition_type = AcquisitionType(val).validate()
 
-    @property
-    def volume_centre(self):
-        return self._volume_centre
-
-
 
     def __init__(self, dof: int, geometry, units='units', number_vectors=1):
         self.acquisition_type = AcquisitionType(f"{dof}D") | AcquisitionType(geometry)
@@ -1253,97 +1248,11 @@ class Cone3D_SOUV(SystemConfiguration):
     detector_direction_y_set : array_like
         N 3D vectors describing the direction of the detector_y (x,y,z)
     volume_centre_position : array_like, optional
-        A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). If
-        not provided, the volume centre will be estimated as the mean of the midpoints of the
-        lines connecting the source and detector positions.
+        A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). Default is [0,0,0].
     units : str
         Label the units of distance used for the configuration
 
     '''
-
-    def estimate_volume_centre(self):
-        """
-        Method to estimate the volume centre as the mean of the midpoints of the lines connecting the source and detector positions.
-
-        `lineSegClosestPoints` function adapted from: https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
-        Returns
-        -------
-        numpy.ndarray
-            A 3D vector describing the estimated position of the centre of the reconstructed volume
-
-        """
-        def clamp(n, smallest, largest):
-                return max(smallest, min(n, largest))
-
-        # The function below has been adapted from:
-        # https://zalo.github.io/blog/closest-point-between-segments/
-        def lineSegClosestPoints(a, u, b, v):
-            """
-            Function to find the closest points between two line segments
-
-            Adapted from: https://zalo.github.io/blog/closest-point-between-segments/
-
-            Parameters
-            ----------
-            a : array_like
-                The starting point of the first line segment
-            u : array_like
-                The direction of the first line segment
-            b : array_like
-                The starting point of the second line segment
-            v : array_like
-                The direction of the second line segment
-            """
-            r = b - a
-
-            ru = numpy.dot(r, u)
-            rv = numpy.dot(r, v)
-            uu = numpy.dot(u, u)
-            uv = numpy.dot(u, v)
-            vv = numpy.dot(v, v)
-
-            det = uu*vv - uv*uv
-
-            # if det is too close to 0, then they're parallel
-            # you can work out a way to handle this case
-
-            # compute optimal values for s and t
-            s = (ru*vv - rv*uv)/det
-            t = (ru*uv - rv*uu)/det
-
-            # constrain values s and t so that they describe points on the segments
-            s = clamp(s, 0, 1)
-            t = clamp(t, 0, 1)
-
-            # convert value s for segA into the corresponding closest value t for segB
-            # and vice versa
-            S = (t*uv + ru)/uu
-            T = (s*uv - rv)/vv
-
-            # constrain
-            S = clamp(S, 0, 1)
-            T = clamp(T, 0, 1)
-
-            return a + S*u, b + T*v
-
-        if self.num_positions == 1:
-            return self.source[0].position
-        
-        points = numpy.zeros(((self.num_positions - 1) * 2, 3))
-        for i in range(self.num_positions - 1):
-            a = self.source[i+0].position
-            b = self.source[i+1].position
-
-            u = self.detector[i + 0].position - self.source[i + 0].position
-            v = self.detector[i + 1].position - self.source[i + 1].position
-            
-            A, B = lineSegClosestPoints(a, u, b, v)
-            
-            points[i * 2 + 0] = A
-            points[i * 2 + 1] = B
-
-        return [points[:, 0].mean(), points[:, 1].mean(), points[:, 2].mean()]
-
 
     def __init__ (self, source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units='units'):
 
@@ -1364,11 +1273,7 @@ class Cone3D_SOUV(SystemConfiguration):
             self.detector[i].position = detector_position_set[i]
             self.detector[i].set_direction(detector_direction_x_set[i], detector_direction_y_set[i])
 
-        #reconstructed volume centre
-        if volume_centre_position is None:
-            self.volume_centre.position = self.estimate_volume_centre()
-        else:
-            self.volume_centre.position = volume_centre_position
+        self.volume_centre.position = volume_centre_position
 
 
     def system_description(self):
@@ -1894,12 +1799,10 @@ class AcquisitionGeometry(object):
 
     @property
     def num_projections(self):
-        # Using the traditional geometry set with rotation angles
-        if self.geom_type != "cone_souv":
-            return len(self.angles);
-        # Using the per-projection SOUV geometry
+        if self.geom_type & AcquisitionType.CONE_SOUV:
+            return self.config.system.num_positions
         else:
-            return self.config.system.num_positions;
+            return len(self.angles)
 
     @property
     def pixel_num_h(self):
@@ -2468,7 +2371,7 @@ class AcquisitionGeometry(object):
         return AG
 
     @staticmethod
-    def create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=None, units='units distance'):
+    def create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=[0,0,0], units='units distance'):
         """
         Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.
 
@@ -2486,8 +2389,7 @@ class AcquisitionGeometry(object):
         detector_direction_y_set : array_like
             N 3D vectors describing the direction of the detector_y (x,y,z).
         volume_centre_position : array_like, optional
-            A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). 
-            If no position is given, it will be computed automatically.
+            A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). Default is [0,0,0].
         units : str
             Label the units of distance used for the configuration. These should be consistent for the geometry and panel.
 
@@ -2497,6 +2399,7 @@ class AcquisitionGeometry(object):
             An AcquisitionGeometry object.
 
         """
+
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
         AG.config.system = Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units)

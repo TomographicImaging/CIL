@@ -377,11 +377,11 @@ class FDK(GenericFilteredBackProjection):
     supported_backends = ['tigre']
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-        #call parent initialiser
-        super().__init__(input, image_geometry, filter, backend='tigre')
 
         if not AcquisitionType.CONE & input.geometry.geom_type:
             raise TypeError("This reconstructor is for cone-beam data only.")
+
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
 
     def _calculate_weights(self, acquisition_geometry):
@@ -486,12 +486,11 @@ class FBP(GenericFilteredBackProjection):
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
-        super().__init__(input, image_geometry, filter, backend)
-        self.set_split_processing(False)
-
         if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
-
+        
+        super().__init__(input, image_geometry, filter, backend)
+        self.set_split_processing(False)
 
     def set_split_processing(self, slices_per_chunk=0):
         """

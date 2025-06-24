@@ -43,17 +43,23 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     sinogram_geometry = sinogram_geometry_in.copy()
 
-    sinogram_geometry.config.system.align_reference_frame('cil')
+    # Only needed when using the traditional geometry set with rotation angles 
+    if sinogram_geometry.geom_type != 'cone_souv':
+        
+        sinogram_geometry.config.system.align_reference_frame('cil')
+        angles = sinogram_geometry.config.angles
 
+        #get units
+        degrees = angles.angle_unit == AngleUnit.DEGREE
 
-    angles = sinogram_geometry.config.angles
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
+    
+    # Translation vector that will modify the centre of the reconstructed volume
+    # (by defalut, no translation)
+    translation = [0.0, 0.0, 0.0]
 
-    #get units
-    degrees = angles.angle_unit == AngleUnit.DEGREE
-
-    if AcquisitionType.DIM2 & sinogram_geometry.dimension:
+    if sinogram_geometry.dimension == '2D':
         #create a 3D astra geom from 2D CIL geometry
         volume_geometry_temp = volume_geometry.copy()
         volume_geometry_temp.voxel_num_z = 1
@@ -85,7 +91,9 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             src[1] = system.source.position[1]
             projector = 'cone_vec'
 
-    else:
+    # Only needed when using the traditional geometry set with rotation angles 
+    elif sinogram_geometry.geom_type != 'cone_souv':
+
         volume_geometry_temp = volume_geometry.copy()
 
         row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
@@ -100,33 +108,65 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         if sinogram_geometry.geom_type == 'parallel':
             src = system.ray.direction.reshape(3,1)
             projector = 'parallel3d_vec'
-        else:
+        elif sinogram_geometry.geom_type != 'cone_souv':
             src = system.source.position.reshape(3,1)
             projector = 'cone_vec'
+    # Use the per-projection geometry
+    else:
+        volume_geometry_temp = volume_geometry.copy()
+
+        # roi 
+        current_centre = [volume_geometry_temp.center_x, volume_geometry_temp.center_y, volume_geometry_temp.center_z]
+
+        # Compute a translation vector that will modify the centre of the reconstructed volume
+        translation = np.array(system.volume_centre.position)
+
+        projector = 'cone_vec'
 
     #Build for astra 3D only
-    vectors = np.zeros((angles.num_positions, 12))
+    # Use the traditional geometry set with rotation angles
+    if sinogram_geometry.geom_type != 'cone_souv':
+        vectors = np.zeros((angles.num_positions, 12))
 
-    for i, theta in enumerate(angles.angle_data):
-        ang = - angles.initial_angle - theta
+        for i, theta in enumerate(angles.angle_data):
+            ang = - angles.initial_angle - theta
 
-        rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=degrees)
+            rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=degrees)
 
-        vectors[i, :3]  = rotation_matrix.dot(src).reshape(3)
-        vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)
-        vectors[i, 6:9] = rotation_matrix.dot(row).reshape(3)
-        vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)
+            vectors[i, :3]  = rotation_matrix.dot(src).reshape(3)
+            vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)
+            vectors[i, 6:9] = rotation_matrix.dot(row).reshape(3)
+            vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)
+    # Use the per-projection geometry
+    else:
+        vectors = np.zeros((system.num_positions, 12))
+
+        sign_h = 1
+        sign_v = 1
+
+        if 'right' in panel.origin:
+            sign_h = -1
+        if 'top' in panel.origin:
+            sign_v = -1
+
+        #for i, (src, det, row, col) in enumerate(zip(system.source.position_set, system.detector.position_set, system.detector.direction_x_set, system.detector.direction_y_set)):
+        for i in range(system.num_positions):
+            vectors[i, :3] = system.source[i].position
+            vectors[i, 3:6]  = system.detector[i].position
+            vectors[i, 6:9] = sign_h * system.detector[i].direction_x * panel.pixel_size[0]
+            vectors[i, 9:]  = sign_v * system.detector[i].direction_y * panel.pixel_size[1]
+
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
                                     volume_geometry_temp.voxel_num_x,
                                     volume_geometry_temp.voxel_num_z,
-                                    volume_geometry_temp.get_min_x(),
-                                    volume_geometry_temp.get_max_x(),
-                                    volume_geometry_temp.get_min_y(),
-                                    volume_geometry_temp.get_max_y(),
-                                    volume_geometry_temp.get_min_z(),
-                                    volume_geometry_temp.get_max_z()
+                                    volume_geometry_temp.get_min_x() + translation[0],
+                                    volume_geometry_temp.get_max_x() + translation[0],
+                                    volume_geometry_temp.get_min_y() + translation[1],
+                                    volume_geometry_temp.get_max_y() + translation[1],
+                                    volume_geometry_temp.get_min_z() + translation[2],
+                                    volume_geometry_temp.get_max_z() + translation[2]
                                     )
 
 

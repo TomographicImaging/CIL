@@ -81,3 +81,13 @@ class Test_Parallel2D_FBP_CPU(unittest.TestCase, TestCommon_FBP_SIM):
         self.Parallel2D()
         self.tolerance_fbp = 1e-3
         self.tolerance_fbp_roi = 1e-3
+
+
+class Test_Cone3DSOUV_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3DSOUV()
+        self.tolerance_fbp = 1e-3
+        self.tolerance_fbp_roi = 1e-3

@@ -573,7 +573,7 @@ class FBP(GenericFilteredBackProjection):
         if self.slices_per_chunk:
             if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
-            elif self.acquisition_geometry.system_description != 'simple' or self.acquisition_geometry.system_description != 'offset':
+            elif self.acquisition_geometry.system_description != 'simple' and self.acquisition_geometry.system_description != 'offset':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")

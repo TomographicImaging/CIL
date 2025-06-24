@@ -1842,7 +1842,10 @@ class AcquisitionGeometry(object):
 
     @property
     def angles(self):
-        return self.config.angles.angle_data
+        if self.config.system.geometry & AcquisitionType.CONE_SOUV:
+            return None
+        else:
+            return self.config.angles.angle_data
 
     @property
     def dist_source_center(self):
@@ -2463,7 +2466,7 @@ class AcquisitionGeometry(object):
         For CONE3d_SOUV geometries, the magnification of the volume centre is calculated for each projection and the mean is used.
         """
 
-        if self.config.system.geometry == "cone_souv":
+        if self.config.system.geometry & AcquisitionType.CONE_SOUV:
             mag = self.magnification.mean()
         else:
             mag = self.magnification

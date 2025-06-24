@@ -379,7 +379,7 @@ class FDK(GenericFilteredBackProjection):
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
 
         if not AcquisitionType.CONE & input.geometry.geom_type:
-            raise TypeError("This reconstructor is for cone-beam data only.")
+            raise TypeError(f"This reconstructor can only be used with standard cone-beam data, got {input.geometry.geom_type}.")
 
         super().__init__(input, image_geometry, filter, backend='tigre')
 
@@ -573,7 +573,7 @@ class FBP(GenericFilteredBackProjection):
         if self.slices_per_chunk:
             if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
-            elif self.acquisition_geometry.system_description == 'advanced':
+            elif self.acquisition_geometry.system_description != 'simple' or self.acquisition_geometry.system_description != 'offset':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")

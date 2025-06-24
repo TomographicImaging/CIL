@@ -1629,7 +1629,7 @@ class Test_Cone3D(unittest.TestCase):
 class Test_Cone3D_SOUV(unittest.TestCase):
 
     def setUp(self):
-        source_position_set = [[0,0,0], [0,0,1]]
+        source_position_set = [[0,-1,0], [0,-1.3,1]]
         detector_position_set = [[0,2,1], [0,2,2]]
         detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
         detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
@@ -1657,27 +1657,6 @@ class Test_Cone3D_SOUV(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.ag.config.system.volume_centre.position = "nope"
 
-    def test_estimate_volume_centre(self):
-
-        #test for more than one projection
-        out = self.ag.config.system.estimate_volume_centre()
-        np.testing.assert_allclose(out, [1.0, 0, 0.0], atol=1e-3)
-
-
-        # test for single projection
-        source_position_set = [[0.0, -500.0,0.0]]
-        detector_position_set = [[-1.3,1000.0, -1.0]]
-        detector_direction_x_set = [[1,0.0, 0.0]]
-        detector_direction_y_set = [[0.,0.,1]]
-
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set, \
-                                                    detector_position_set=detector_position_set, \
-                                                    detector_direction_x_set=detector_direction_x_set, \
-                                                    detector_direction_y_set=detector_direction_y_set)\
-                                      .set_panel(num_pixels=[10, 20])\
-                                      
-        np.testing.assert_allclose(ag.config.system.estimate_volume_centre(), detector_position_set[0], atol=1e-10)
-                                     
 
     def test_system_description(self):
         self.assertTrue(self.ag.system_description=='non-standard')

@@ -1103,7 +1103,7 @@ class show_SOUV_geometry_vectors(show_base):
 
         # Only applicable for AcquisitionGeometry
         if not isinstance(acquisition_geometry, AcquisitionGeometry):
-            raise ValueError(f"The data type of `acquisition_geometry` must be \"<class 'cil.framework.framework.AcquisitionGeometry'>\". It is \"{type(acquisition_geometry)}\", which is not currently supported by this function.")
+            raise ValueError(f"The data type of `acquisition_geometry` must be \"<class 'cil.framework.AcquisitionGeometry'>\". It is \"{type(acquisition_geometry)}\", which is not currently supported by this function.")
 
         # Only applicable for cone_souv geometry type
         if acquisition_geometry.geom_type != AcquisitionType.CONE_SOUV:

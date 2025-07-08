@@ -56,7 +56,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     panel = sinogram_geometry.config.panel
     
     # Translation vector that will modify the centre of the reconstructed volume
-    # (by defalut, no translation)
+    # (by default, no translation)
     translation = [0.0, 0.0, 0.0]
 
     if sinogram_geometry.dimension == '2D':

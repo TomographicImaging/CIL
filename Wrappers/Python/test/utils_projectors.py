@@ -22,7 +22,7 @@ from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry
 from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
-from cil.utilities.display import show2D
+
 
 class SimData(object):
 

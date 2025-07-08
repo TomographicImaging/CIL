@@ -1762,7 +1762,6 @@ class AcquisitionGeometry(object):
 
 
     #for backwards compatibility
-    #for backwards compatibility
     @property
     def ANGLE(self):
         warnings.warn("use AcquisitionDimension.Angle instead", DeprecationWarning, stacklevel=2)

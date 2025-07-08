@@ -16,9 +16,9 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 if(APPLE)
-  cmake_minimum_required(VERSION 3.16)
+  cmake_minimum_required(VERSION 3.16...4.0)
 else()
-  cmake_minimum_required(VERSION 3.5)
+  cmake_minimum_required(VERSION 3.5...4.0)
 endif()
 
 if(NOT SKBUILD_PROJECT_NAME)

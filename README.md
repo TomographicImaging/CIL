@@ -47,6 +47,21 @@ CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/
 1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `https://software.repos.intel.com/python/conda` channel.
 2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
 
+#### Binary packages and dependencies
+
+While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [environment-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml). The following table tries to resume the tested versions of CIL and its dependencies.
+
+| Package | Tested Version |  Recommended conda channel | Compatible Version |
+|----------|----------|----------|----|
+| Python | 3.10, 3.11, 3.12 |  conda-forge | [PSLF](https://docs.python.org/3/license.html) |
+| Numpy |  >1.23 and <2.0.0 |  conda-forge | [BSD](https://numpy.org/doc/stable/license.html)|
+| Optional | | | | 
+| IPP | 2021.12 | https://software.repos.intel.com/python/conda| [Intel Simplified Software License](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
+| ASTRA | 2.1 |  astra-toolbox | [GPLv3](https://github.com/astra-toolbox/astra-toolbox?tab=GPL-3.0-1-ov-file#readme) |
+| TIGRE | 2.6 |  ccpi | [BSD](https://github.com/CERN/TIGRE?tab=BSD-3-Clause-1-ov-file#readme) |
+| CCPi-Regularisation |  24.0.1 | ccpi | [Apache v2](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit?tab=Apache-2.0-1-ov-file#readme) |
+| TomoPhantom | 22.0.0 | ccpi | [Apache v2](https://github.com/dkazanc/TomoPhantom?tab=Apache-2.0-1-ov-file#readme) |
+
 ### Docker
 
 Finally, CIL can be run via a Jupyter Notebook enabled Docker container:

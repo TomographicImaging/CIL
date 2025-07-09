@@ -1757,7 +1757,7 @@ class AcquisitionGeometry(object):
 
     `AcquisitionGeometry.create_Cone3D()`
 
-    `AcquisitionGeometry.create_SOUV()`
+    `AcquisitionGeometry.create_Cone3D_Flex()`
     """
 
 

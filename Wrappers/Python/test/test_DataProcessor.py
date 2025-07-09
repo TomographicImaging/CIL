@@ -390,7 +390,7 @@ class TestBinner(unittest.TestCase):
         detector_position_set=[[0,0,0]]
         detector_direction_x_set=[[1, 0, 0]]
         detector_direction_y_set=[[0, 0, 1]]
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
 
         roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
@@ -1080,7 +1080,7 @@ class TestSlicer(unittest.TestCase):
         detector_position_set=[[0,0,0]]
         detector_direction_x_set=[[1, 0, 0]]
         detector_direction_y_set=[[0, 0, 1]]
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
 
         roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
@@ -1606,7 +1606,7 @@ class TestCofR_image_sharpness(unittest.TestCase):
         detector_position_set=[[0,0,0]]
         detector_direction_x_set=[[1, 0, 0]]
         detector_direction_y_set=[[0, 0, 1]]
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
         data = ag.allocate('random')
 
         #mock the _configure_FBP method to bypass the backprojector setup
@@ -1872,7 +1872,7 @@ class TestPadder(unittest.TestCase):
         detector_position_set=[[0,0,0]]
         detector_direction_x_set=[[1, 0, 0]]
         detector_direction_y_set=[[0, 0, 1]]
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
         proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
 

@@ -43,7 +43,7 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
     """
     sinogram_geometry = sinogram_geometry_in.copy()
 
-    if sinogram_geometry.geom_type == AcquisitionType.CONE_SOUV:
+    if sinogram_geometry.geom_type == AcquisitionType.CONE_FLEX:
         raise ValueError('Cone-SOUV geometry is not supported by this function, use convert_geometry_to_astra_vec_3D instead')
 
     sinogram_geometry.config.system.align_reference_frame('cil')

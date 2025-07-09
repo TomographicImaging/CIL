@@ -1069,6 +1069,10 @@ class show_geometry(show_base):
 
 
     def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+        
+        if AcquisitionType.CONE_FLEX & acquisition_geometry.geom_type:
+            raise NotImplementedError("The `cone_flex` geometry type is not supported by show_geometry. Use `show_system_positions` instead.")
+
         if AcquisitionType.DIM2 & acquisition_geometry.dimension:
             elevation = 90
             azimuthal = 0
@@ -1077,12 +1081,11 @@ class show_geometry(show_base):
         self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
 
 
-
-class show_SOUV_geometry_vectors(show_base):
+class show_system_positions(show_base):
     '''
     Displays four plots to show i) the source position, 
-    ii) the imager centre, iii) the imager x-direction, and 
-    iv) the imager y-direction for each projection.
+    ii) the detector centre, iii) the detector x-direction, and 
+    iv) the detector y-direction for each projection.
 
 
     Parameters
@@ -1105,9 +1108,9 @@ class show_SOUV_geometry_vectors(show_base):
         if not isinstance(acquisition_geometry, AcquisitionGeometry):
             raise ValueError(f"The data type of `acquisition_geometry` must be \"<class 'cil.framework.AcquisitionGeometry'>\". It is \"{type(acquisition_geometry)}\", which is not currently supported by this function.")
 
-        # Only applicable for cone_souv geometry type
-        if acquisition_geometry.geom_type != AcquisitionType.CONE_SOUV:
-            raise ValueError(f"The geometry type of `acquisition_geometry` must be \"cone_souv\". It is \"{acquisition_geometry.geom_type}\", which is not currently supported by this function.")
+        # Only applicable for cone_flex geometry type
+        if acquisition_geometry.geom_type != AcquisitionType.CONE_FLEX:
+            raise ValueError(f"The geometry type of `acquisition_geometry` must be \"cone_flex\". It is \"{acquisition_geometry.geom_type}\", which is not currently supported by this function.")
 
         self.figure = self._draw(acquisition_geometry, figsize, fontsize)
 
@@ -1135,7 +1138,7 @@ class show_SOUV_geometry_vectors(show_base):
 
         i = 1; j = 0
         x += 3; y += 3; z += 3
-        self.axs[j,i].set_title("Imager Center")
+        self.axs[j,i].set_title("Detector Center")
 
         x_pos = np.array([vec.position[0] for vec in system.detector])
         y_pos = np.array([vec.position[1] for vec in system.detector])
@@ -1150,7 +1153,7 @@ class show_SOUV_geometry_vectors(show_base):
 
         i = 0; j = 1
         x += 3; y += 3; z += 3
-        self.axs[j,i].set_title("Imager X-direction")
+        self.axs[j,i].set_title("Detector X-direction")
 
         x_pos = np.array([vec.direction_x[0] for vec in system.detector])
         y_pos = np.array([vec.direction_x[1] for vec in system.detector])
@@ -1166,7 +1169,7 @@ class show_SOUV_geometry_vectors(show_base):
 
         i = 1; j = 1
         x += 3; y += 3; z += 3
-        self.axs[j,i].set_title("Imager Y-direction")
+        self.axs[j,i].set_title("Detector Y-direction")
 
         x_pos = np.array([vec.direction_y[0] for vec in system.detector])
         y_pos = np.array([vec.direction_y[1] for vec in system.detector])

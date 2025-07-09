@@ -247,7 +247,7 @@ class AcquisitionType(Flag):
     CONE = auto()
     DIM2 = auto()
     DIM3 = auto()
-    CONE_SOUV = auto()
+    CONE_FLEX = auto()
 
     def validate(self):
         """
@@ -269,7 +269,7 @@ class AcquisitionType(Flag):
         """
         Returns the label for the geometry type
         """
-        return self & (self.PARALLEL | self.CONE | self.CONE_SOUV)
+        return self & (self.PARALLEL | self.CONE | self.CONE_FLEX)
 
     @classmethod
     def _missing_(cls, value):

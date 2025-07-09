@@ -25,6 +25,11 @@ import io
 import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
 
+from utils import has_matplotlib
+
+if has_matplotlib:
+    from cil.utilities.display import show_geometry
+
 initialise_tests()
 
 class Test_AcquisitionGeometry(unittest.TestCase):
@@ -158,13 +163,13 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
 
 
-    def test_create_CONE3D_SOUV(self):
+    def test_create_Cone3D_Flex(self):
         source_position_set = [[0.1, -500.0,0.2], [0.3, -499.0,0.4]]
         detector_position_set = [[-1.3,1000.0, -1.0], [-1.4,1004.0, -0.08]]
         detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
         detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
 
-        ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set, \
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
                                                     detector_position_set=detector_position_set, \
                                                     detector_direction_x_set=detector_direction_x_set, \
                                                     detector_direction_y_set=detector_direction_y_set,
@@ -184,7 +189,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_array_equal(ag.config.system.volume_centre.position, [-1,-2,-3])
 
 
-    def test_create_CONE3D_SOUV_invalid_values(self):
+    def test_create_Cone3D_Flex_invalid_values(self):
         source_position_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
         detector_position_set = [[0.0, 0.0, 1], [1, 0.0, 0.0]]
         detector_direction_x_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
@@ -201,7 +206,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         for invalid_value in invalid_values:
             try:
                 with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                    ag = AcquisitionGeometry.create_Cone3D_Flex(
                         source_position_set=invalid_value,
                         detector_position_set=detector_position_set,
                         detector_direction_x_set=detector_direction_x_set,
@@ -213,7 +218,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
             try:
                 with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                    ag = AcquisitionGeometry.create_Cone3D_Flex(
                         source_position_set=source_position_set,
                         detector_position_set=invalid_value,
                         detector_direction_x_set=detector_direction_x_set,
@@ -225,7 +230,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
             try:
                 with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                    ag = AcquisitionGeometry.create_Cone3D_Flex(
                         source_position_set=source_position_set,
                         detector_position_set=detector_position_set,
                         detector_direction_x_set=invalid_value,
@@ -237,7 +242,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
             try:
                 with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_SOUV(
+                    ag = AcquisitionGeometry.create_Cone3D_Flex(
                         source_position_set=source_position_set,
                         detector_position_set=detector_position_set,
                         detector_direction_x_set=detector_direction_x_set,
@@ -1626,7 +1631,7 @@ class Test_Cone3D(unittest.TestCase):
         out = AG.config.system.calculate_centre_of_rotation()
         np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
 
-class Test_Cone3D_SOUV(unittest.TestCase):
+class Test_Cone3D_Flex(unittest.TestCase):
 
     def setUp(self):
         source_position_set = [[0,-1,0], [0,-1.3,1]]
@@ -1634,7 +1639,7 @@ class Test_Cone3D_SOUV(unittest.TestCase):
         detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
         detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
 
-        self.ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set, \
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
                                                     detector_position_set=detector_position_set, \
                                                     detector_direction_x_set=detector_direction_x_set, \
                                                     detector_direction_y_set=detector_direction_y_set)\
@@ -1685,6 +1690,27 @@ class Test_Cone3D_SOUV(unittest.TestCase):
 
     def test_calculate_magnification(self):
         pass
+
+    @unittest.skipUnless(has_matplotlib, "matplotlib is not installed")
+    def test_show_geometry(self):
+        with self.assertRaises(NotImplementedError):
+            show_geometry(self.ag)
+
+    def test_set_centre_of_rotation(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.set_centre_of_rotation(1)
+
+    def test_get_centre_of_rotation(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.get_centre_of_rotation()
+    
+    def test_set_centre_of_rotation_by_slice(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.set_centre_of_rotation_by_slice(1)
+
+    def test_set_angles(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.set_angles([0, 1])
 
 
 class TestSubset(unittest.TestCase):

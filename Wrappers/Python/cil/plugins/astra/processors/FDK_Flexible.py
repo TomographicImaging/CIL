@@ -68,7 +68,7 @@ class FDK_Flexible(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))
 
-        if self.sinogram_geometry.geom_type != 'cone' and self.sinogram_geometry.geom_type != 'cone_souv':
+        if self.sinogram_geometry.geom_type != 'cone' and self.sinogram_geometry.geom_type != 'cone_flex':
             raise ValueError("Expected input data to be cone beam geometry , got {0}"\
                  .format(self.sinogram_geometry.geom_type))
 

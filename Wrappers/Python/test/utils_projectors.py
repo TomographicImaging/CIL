@@ -130,7 +130,7 @@ class SimData(object):
             det_dir_x_set[i] = RotationMatrix.dot(det_dir_x)
             det_dir_y_set[i] = RotationMatrix.dot(det_dir_y)
 
-        ag_new = AcquisitionGeometry.create_Cone3D_SOUV(src_pos_set, det_pos_set, det_dir_x_set, det_dir_y_set)
+        ag_new = AcquisitionGeometry.create_Cone3D_Flex(src_pos_set, det_pos_set, det_dir_x_set, det_dir_y_set)
         ag_new.set_panel([self.acq_data.geometry.pixel_num_h, self.acq_data.geometry.pixel_num_v], [self.acq_data.geometry.pixel_size_h, self.acq_data.geometry.pixel_size_v], origin='bottom-left')
         ag_new.set_labels(self.acq_data.dimension_labels)
 
@@ -363,7 +363,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         '''
 
         self.test_geometries=[]
-        ag_test_1 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+        ag_test_1 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])
         ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
@@ -372,7 +372,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
 
 
-        ag_test_2 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+        ag_test_2 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[2,2])
         ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
@@ -380,7 +380,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         norm_2 = 8
         self.test_geometries.append((ag_test_2, ig_test_2, norm_2))
 
-        ag_test_3 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+        ag_test_3 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])
         ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
@@ -388,7 +388,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         norm_3 = 2
         self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
 
-        ag_test_4 = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-1000,0]],detector_position_set=[[0,1000,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+        ag_test_4 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,1000,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])
         ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
@@ -447,7 +447,7 @@ class TestCommon_ProjectionOperator(object):
                                             .set_labels(['horizontal'])
 
     def Cone3DSOUV(self):
-        self.ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=[[0,-100000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-100000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
                                             .set_labels(['vertical','horizontal'])
         
@@ -514,7 +514,7 @@ class TestCommon_ProjectionOperator(object):
         Op = self.ProjectionOperator(ig, self.ag, **self.PO_args)
         bp = Op.adjoint(data)
 
-        if self.ag.geom_type == 'cone' or self.ag.geom_type == 'cone_souv':
+        if self.ag.geom_type == 'cone' or self.ag.geom_type == 'cone_flex':
             #as cone beam res is not perfect grid
             np.testing.assert_allclose(bp.array, res, atol=1e-3)
         else:

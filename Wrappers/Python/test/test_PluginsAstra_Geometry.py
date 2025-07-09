@@ -446,7 +446,7 @@ class TestGeometry_Cone3D(unittest.TestCase):
             detector_direction_y_set.append(rotation_matrix.dot([0,0,1]))
 
 
-        self.ag_souv = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=source_position_set,\
+        self.ag_souv = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set,\
                                                          detector_position_set=detector_position_set,\
                                                          detector_direction_x_set=detector_direction_x_set,\
                                                          detector_direction_y_set=detector_direction_y_set)\
@@ -600,7 +600,7 @@ class TestGeometry_Cone3D(unittest.TestCase):
 
 
 
-class TestGeometry_Cone3D_SOUV(unittest.TestCase):
+class TestGeometry_Cone3D_Flex(unittest.TestCase):
     def setUp(self):
         self.pixels_x = 128
         self.pixels_y = 3
@@ -637,7 +637,7 @@ class TestGeometry_Cone3D_SOUV(unittest.TestCase):
             detector_direction_y = np.cross(self.detector_direction_x_set[i], vec[i])
             self.detector_direction_y_set.append(detector_direction_y / np.linalg.norm(detector_direction_y))
 
-        self.ag = AcquisitionGeometry.create_Cone3D_SOUV(source_position_set=self.source_position_set,\
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=self.source_position_set,\
                                                          detector_position_set=self.detector_position_set,\
                                                          detector_direction_x_set=self.detector_direction_x_set,\
                                                          detector_direction_y_set=self.detector_direction_y_set) \

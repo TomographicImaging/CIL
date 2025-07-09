@@ -44,7 +44,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     sinogram_geometry = sinogram_geometry_in.copy()
 
     # Only needed when using the traditional geometry set with rotation angles 
-    if sinogram_geometry.geom_type != 'cone_souv':
+    if sinogram_geometry.geom_type != 'cone_flex':
         
         sinogram_geometry.config.system.align_reference_frame('cil')
         angles = sinogram_geometry.config.angles
@@ -92,7 +92,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             projector = 'cone_vec'
 
     # Only needed when using the traditional geometry set with rotation angles 
-    elif sinogram_geometry.geom_type != 'cone_souv':
+    elif sinogram_geometry.geom_type != 'cone_flex':
 
         volume_geometry_temp = volume_geometry.copy()
 
@@ -108,7 +108,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         if sinogram_geometry.geom_type == 'parallel':
             src = system.ray.direction.reshape(3,1)
             projector = 'parallel3d_vec'
-        elif sinogram_geometry.geom_type != 'cone_souv':
+        elif sinogram_geometry.geom_type != 'cone_flex':
             src = system.source.position.reshape(3,1)
             projector = 'cone_vec'
     # Use the per-projection geometry
@@ -125,7 +125,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     #Build for astra 3D only
     # Use the traditional geometry set with rotation angles
-    if sinogram_geometry.geom_type != 'cone_souv':
+    if sinogram_geometry.geom_type != 'cone_flex':
         vectors = np.zeros((angles.num_positions, 12))
 
         for i, theta in enumerate(angles.angle_data):

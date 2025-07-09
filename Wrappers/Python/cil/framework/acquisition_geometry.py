@@ -200,14 +200,14 @@ class SystemConfiguration:
         self._acquisition_type = AcquisitionType(val).validate()
 
 
-    def __init__(self, dof: int, geometry, units='units', number_vectors=1):
+    def __init__(self, dof: int, geometry, units='units', num_vectors=1):
         self.acquisition_type = AcquisitionType(f"{dof}D") | AcquisitionType(geometry)
-        self._num_vectors = number_vectors
+        self._num_vectors = num_vectors
         self.units = units
 
-        if AcquisitionType.CONE_SOUV & self.geometry:
-            self.source = [PositionVector(dof) for _ in range(number_vectors)]
-            self.detector = [Detector2D(dof) for _ in range(number_vectors)]
+        if AcquisitionType.CONE_FLEX & self.geometry:
+            self.source = [PositionVector(dof) for _ in range(num_vectors)]
+            self.detector = [Detector2D(dof) for _ in range(num_vectors)]
             self.volume_centre = PositionVector(dof)
 
         else:
@@ -284,7 +284,7 @@ class SystemConfiguration:
     def update_reference_frame(self):
         r'''Transforms the system origin to the rotation_axis position, or the volume centre for per-projection geometry
         '''
-        if self.acquisition_type & AcquisitionType.CONE_SOUV:
+        if self.acquisition_type & AcquisitionType.CONE_FLEX:
             self.set_origin(self.volume_centre.position)
         else:
             self.set_origin(self.rotation_axis.position)
@@ -295,7 +295,7 @@ class SystemConfiguration:
         '''
         translation = origin.copy()
 
-        if self.acquisition_type & AcquisitionType.CONE_SOUV:
+        if self.acquisition_type & AcquisitionType.CONE_FLEX:
             for i in range(self._num_vectors):
                 self.source[i].position -= translation
                 self.detector[i].position -= translation
@@ -1234,7 +1234,7 @@ class Cone3D(SystemConfiguration):
         self.rotation_axis.direction = p2_on_plane - p1_on_plane
 
 
-class Cone3D_SOUV(SystemConfiguration):
+class Cone3D_Flex(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
 
     Parameters
@@ -1257,7 +1257,7 @@ class Cone3D_SOUV(SystemConfiguration):
     def __init__ (self, source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units='units'):
 
         self.num_positions = len(source_position_set)
-        super(Cone3D_SOUV, self).__init__(dof=3, geometry = 'cone_souv', units=units, number_vectors= self.num_positions)
+        super(Cone3D_Flex, self).__init__(dof=3, geometry = 'cone_flex', units=units, num_vectors= self.num_positions)
 
         # Check that all input sets have the same length
         if not (len(detector_position_set) == self.num_positions and
@@ -1286,7 +1286,7 @@ class Cone3D_SOUV(SystemConfiguration):
 
         """Returns the 2D system configuration corresponding to the centre slice
         """
-        raise NotImplementedError("This method is not implemented for Cone3D_SOUV")
+        raise NotImplementedError("This method is not implemented for Cone3D_Flex")
 
     def __str__(self):
         def csv(val):
@@ -1662,13 +1662,13 @@ class Configuration(object):
                     \n\tAcquisitionGeometry.create_Cone3D()\
                     \n\tAcquisitionGeometry.create_Parallel2D()\
                     \n\tAcquisitionGeometry.create_Cone3D()\
-                    \n\tAcquisitionGeometry.create_Cone3D_SOUV()")
+                    \n\tAcquisitionGeometry.create_Cone3D_Flex()")
             return False
 
         configured = True
 
-        # cone_souv geometry does not use angles as it uses per-projection geometries
-        if self.angles is None and self.system.geometry != "cone_souv":
+        # cone_flex geometry does not use angles as it uses per-projection geometries
+        if self.angles is None and self.system.geometry != "cone_flex":
             print("Please configure angular data using the set_angles() method")
             configured = False
         if self.panel is None:
@@ -1798,7 +1798,7 @@ class AcquisitionGeometry(object):
 
     @property
     def num_projections(self):
-        if self.geom_type & AcquisitionType.CONE_SOUV:
+        if self.geom_type & AcquisitionType.CONE_FLEX:
             return self.config.system.num_positions
         else:
             return len(self.angles)
@@ -1841,7 +1841,7 @@ class AcquisitionGeometry(object):
 
     @property
     def angles(self):
-        if self.config.system.geometry & AcquisitionType.CONE_SOUV:
+        if self.geom_type & AcquisitionType.CONE_FLEX:
             return None
         else:
             return self.config.angles.angle_data
@@ -1851,11 +1851,11 @@ class AcquisitionGeometry(object):
         """
         Calculate and return the distance from the source to the center of the volume.
 
-        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances 
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The distance from the source to the center for `cone3d_souv` geometry.
+            numpy.ndarray: The distance from the source to the center for `Cone3D_Flex` geometry.
             float: The distance from the source to the center for other geometries.
         """
         out = self.config.system.calculate_magnification()
@@ -1866,11 +1866,11 @@ class AcquisitionGeometry(object):
         """
         Calculate and return the distance from the center of the volume to the detector.
 
-        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances 
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The distance from center of the volume to the detector for `cone3d_souv` geometry.
+            numpy.ndarray: The distance from center of the volume to the detector for `Cone3D_Flex` geometry.
             float: The distance from the center of the volume to the detector for other geometries.
         """
         out = self.config.system.calculate_magnification()
@@ -1881,11 +1881,11 @@ class AcquisitionGeometry(object):
         """
         Calculate and return the magnification of the system.
 
-        For `cone3d_souv` geometry, this method returns a NumPy ndarray with the distances 
+        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances 
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The magnification factor for `CONE3D_SOUV` geometry.
+            numpy.ndarray: The magnification factor for `Cone3D_Flex` geometry.
             float: The magnification factor for other geometries.
         """
         out = self.config.system.calculate_magnification()
@@ -1897,7 +1897,7 @@ class AcquisitionGeometry(object):
 
     @property
     def shape(self):
-        if self.config.system.geometry != "cone_souv":
+        if self.config.system.geometry != "cone_flex":
             shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
                         AcquisitionDimension.ANGLE: self.config.angles.num_positions,
                         AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
@@ -1917,7 +1917,7 @@ class AcquisitionGeometry(object):
         labels_default = AcquisitionDimension.get_order_for_engine("cil")
 
         # We are using angles, not per-projection geometry
-        if self.config.system.geometry != "cone_souv":
+        if self.config.system.geometry != "cone_flex":
             shape_default = [self.config.channels.num_channels,
                                 self.config.angles.num_positions,
                                 self.config.panel.num_pixels[1],
@@ -2146,6 +2146,9 @@ class AcquisitionGeometry(object):
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry
         '''
+        if AcquisitionType.CONE_FLEX & self.geom_type:
+            raise NotImplementedError("Angles cannot be set for Cone3D_Flex geometry.")
+        
         self.config.angles = Angles(angles, initial_angle, angle_unit)
         return self
 
@@ -2373,7 +2376,7 @@ class AcquisitionGeometry(object):
         return AG
 
     @staticmethod
-    def create_Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=[0,0,0], units='units distance'):
+    def create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position=[0,0,0], units='units distance'):
         """
         Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.
 
@@ -2404,7 +2407,7 @@ class AcquisitionGeometry(object):
 
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
-        AG.config.system = Cone3D_SOUV(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units)
+        AG.config.system = Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set, volume_centre_position, units)
         return AG
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -2462,10 +2465,10 @@ class AcquisitionGeometry(object):
 
         Note
         ----
-        For CONE3d_SOUV geometries, the magnification of the volume centre is calculated for each projection and the mean is used.
+        For Cone3D_Flex geometries, the magnification of the volume centre is calculated for each projection and the mean is used.
         """
 
-        if self.config.system.geometry & AcquisitionType.CONE_SOUV:
+        if self.config.system.geometry & AcquisitionType.CONE_FLEX:
             mag = self.magnification.mean()
         else:
             mag = self.magnification

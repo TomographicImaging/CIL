@@ -384,7 +384,7 @@ class TestBinner(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
-    def test_process_acquisition_geometry_cone3Dsouv(self):
+    def test_process_acquisition_geometry_cone3DFlex(self):
  
         source_position_set=[[0,-100000,0]]
         detector_position_set=[[0,0,0]]
@@ -1074,21 +1074,47 @@ class TestSlicer(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
-    def test_process_acquisition_geometry_cone3Dsouv(self):
+    def test_process_acquisition_geometry_cone3DFlex(self):
  
-        source_position_set=[[0,-100000,0]]
-        detector_position_set=[[0,0,0]]
-        detector_direction_x_set=[[1, 0, 0]]
-        detector_direction_y_set=[[0, 0, 1]]
+        source_position_set=[[0,-100000,0], [0,-90000,0], [0,-90000,1], [0,-80000,0]]
+        detector_position_set=[[0,0,0], [0,0,1], [0,0,2], [0,0,3]]
+        detector_direction_x_set=[[1, 0, 0], [0.5, 0, 0], [1, 0, 0], [0.8,0,0]]
+        detector_direction_y_set=[[0, 0, 1], [0,0,0.8], [0,0,1.1], [0,0,1.2]]
         ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
 
-
-        roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
-
-        proc = Slicer(roi=roi)
+        roi_invalid = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
 
         with self.assertRaises(NotImplementedError):
+            proc = Slicer(roi=roi_invalid)
             proc.set_input(ag)
+        
+        roi_valid =  {'angle':(1,3,2)}
+
+        slicer = Slicer(roi=roi_valid)
+        sliced = slicer(ag)
+
+        expected_source_position_set = source_position_set[1:3:2]
+        expected_detector_position_set = detector_position_set[1:3:2]
+        expected_detector_direction_x_set = detector_direction_x_set[1:3:2]
+        expected_detector_direction_y_set = detector_direction_y_set[1:3:2]
+        expected_num_positions = len(expected_source_position_set)
+
+        expected_acq_geometry = AcquisitionGeometry.create_Cone3D_Flex(
+            expected_source_position_set, expected_detector_position_set, expected_detector_direction_x_set, expected_detector_direction_y_set)
+        expected_acq_geometry.set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        numpy.testing.assert_allclose(expected_source_position_set, [x.position for x in sliced.config.system.source])
+        numpy.testing.assert_allclose(expected_num_positions, sliced.config.system.num_positions)
+        self.assertEqual(expected_acq_geometry, sliced)
+
+        roi_channels = {'channel':(1,3,2)}
+
+        slicer = Slicer(roi=roi_channels)
+        sliced = slicer(ag)
+        ag_expected = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(1)
+
+        self.assertEqual(ag_expected, sliced)
+
        
 
     def test_process_image_geometry(self):
@@ -1600,7 +1626,7 @@ class TestCofR_xcorrelation(unittest.TestCase):
 
 class TestCofR_image_sharpness(unittest.TestCase):
     
-    def test_process_acquisition_geometry_cone3Dsouv(self):
+    def test_process_acquisition_geometry_cone3DFlex(self):
  
         source_position_set=[[0,-100000,0]]
         detector_position_set=[[0,0,0]]
@@ -1866,7 +1892,7 @@ class TestPadder(unittest.TestCase):
         self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
-    def test_process_acquisition_geometry_cone3Dsouv(self):
+    def test_process_acquisition_geometry_cone3DFlex(self):
  
         source_position_set=[[0,-100000,0]]
         detector_position_set=[[0,0,0]]

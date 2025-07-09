@@ -1310,10 +1310,23 @@ class Cone3D_Flex(SystemConfiguration):
         if not isinstance(other, self.__class__):
             return False
 
-        if numpy.allclose(self.source.position_set, other.source.position_set) \
-        and numpy.allclose(self.detector.position_set, other.detector.position_set)\
-        and numpy.allclose(self.detector.direction_x_set, other.detector.direction_x_set)\
-        and numpy.allclose(self.detector.direction_y_set, other.detector.direction_y_set)\
+        current_source = [self.source[i].position for i in range(self.num_positions)]
+        other_source = [other.source[i].position for i in range(other.num_positions)]
+
+        current_detector_pos = [self.detector[i].position for i in range(self.num_positions)]
+        other_detector_pos = [other.detector[i].position for i in range(other.num_positions)]
+
+        current_detector_direction_x = [self.detector[i].direction_x for i in range(self.num_positions)]
+        other_detector_direction_x = [other.detector[i].direction_x for i in range(other.num_positions)]
+
+        current_detector_direction_y = [self.detector[i].direction_y for i in range(self.num_positions)]
+        other_detector_direction_y = [other.detector[i].direction_y for i in range(other.num_positions)]
+
+        if self.num_positions == other.num_positions \
+        and numpy.allclose(current_source, other_source) \
+        and numpy.allclose(current_detector_pos, other_detector_pos) \
+        and numpy.allclose(current_detector_direction_x, other_detector_direction_x) \
+        and numpy.allclose(current_detector_direction_y, other_detector_direction_y) \
         and numpy.allclose(self.volume_centre.position, other.volume_centre.position):
 
             return True
@@ -2500,17 +2513,32 @@ class AcquisitionGeometry(object):
             if hasattr(geometry_new.config.channels,'channel_labels'):
                 geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel]
 
-        if angle is not None:
-            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
 
-        if vertical is not None:
-            if AcquisitionType.PARALLEL & geometry_new.geom_type or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
-                geometry_new = geometry_new.get_centre_slice()
-            else:
-                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
+        if geometry_new.geom_type & AcquisitionType.CONE_FLEX:
+            # if channel is not None:
+            #     raise ValueError("Cannot subset Cone3D_Flex geometry by channel. Expected channel = None. Got channel = {0}".format(channel))
+            if vertical is not None:
+                raise ValueError("Cannot subset Cone3D_Flex geometry by vertical. Expected vertical = None. Got vertical = {0}".format(vertical))
+            if horizontal is not None:
+                raise ValueError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
+            if angle is not None:
+                geometry_new.config.system.num_positions = 1
+                geometry_new.config.system.source = self.config.system.source[angle]
+                geometry_new.config.system.detector = self.config.system.detector[angle]
 
-        if horizontal is not None:
-            raise ValueError("Cannot calculate system geometry for a horizontal slice")
+        else:
+ 
+            if angle is not None:
+                geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
+
+            if vertical is not None:
+                if AcquisitionType.PARALLEL & geometry_new.geom_type or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
+                    geometry_new = geometry_new.get_centre_slice()
+                else:
+                    raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
+
+            if horizontal is not None:
+                raise ValueError("Cannot calculate system geometry for a horizontal slice")
 
         return geometry_new
 

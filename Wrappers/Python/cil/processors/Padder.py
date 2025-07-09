@@ -428,7 +428,7 @@ class Padder(DataProcessor):
                             ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
 
         if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError("Cone-SOUV geometry is not supported by this processor")
+            raise NotImplementedError("Cone-Flex geometry is not supported by this processor")
 
         if self._data_array:
             if data.dtype != np.float32:

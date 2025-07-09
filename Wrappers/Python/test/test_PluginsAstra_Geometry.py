@@ -446,7 +446,7 @@ class TestGeometry_Cone3D(unittest.TestCase):
             detector_direction_y_set.append(rotation_matrix.dot([0,0,1]))
 
 
-        self.ag_souv = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set,\
+        self.ag_Flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set,\
                                                          detector_position_set=detector_position_set,\
                                                          detector_direction_x_set=detector_direction_x_set,\
                                                          detector_direction_y_set=detector_direction_y_set)\
@@ -560,12 +560,12 @@ class TestGeometry_Cone3D(unittest.TestCase):
 
 
     @unittest.skipUnless(has_astra, "Requires ASTRA")
-    def test_convert_geometry_souv(self):
+    def test_convert_geometry_Flex(self):
         """
-        Checks the SOUV convention agrees with the standard cone geometry 3D
+        Checks the Flex convention agrees with the standard cone geometry 3D
         """
 
-        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_souv)
+        astra_vol, astra_sino = convert_geometry_to_astra_vec_3D(self.ig, self.ag_Flex)
         self.assertEqual(astra_sino['type'], 'cone_vec')
 
         vectors = np.zeros((3,12),dtype='float64')

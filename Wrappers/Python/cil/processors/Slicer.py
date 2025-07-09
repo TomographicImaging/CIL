@@ -147,9 +147,6 @@ class Slicer(DataProcessor):
             raise TypeError('Processor supports following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
 
-        if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError("Cone-SOUV geometry is not supported by this processor")
-
         if self._data_array:
             if data.dtype != np.float32:
                 raise TypeError("Expected float32")
@@ -160,6 +157,9 @@ class Slicer(DataProcessor):
         for key in self._roi_input.keys():
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
+            if key not in ['angle', 'channel']:
+                if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX:
+                    raise NotImplementedError("Cone-Flex geometry is not supported by this processor for slicing along any dimension other than 'angles' or 'channels'")
 
         return True
 
@@ -317,8 +317,16 @@ class Slicer(DataProcessor):
                 geometry_new.set_channels(num_channels=n_elements)
 
             elif axis == 'angle':
-
-                geometry_new.config.angles.angle_data = self._get_angles(roi)
+                if self._geometry.geom_type & AcquisitionType.CONE_FLEX:
+                    geometry_new.config.system.num_positions = int(np.ceil((roi.stop - roi.start )/ roi.step))
+                    print(roi.stop, roi.start, roi.step)
+                    geometry_new.config.system.source = self._geometry.config.system.source[roi.start:roi.stop:roi.step]
+                    geometry_new.config.system.detector = self._geometry.config.system.detector[roi.start:roi.stop:roi.step]
+                    print("Number of positions: ", geometry_new.config.system.num_positions)
+                    print("Source positions: ", len(geometry_new.config.system.source))
+                    print("Detector positions: ", len(geometry_new.config.system.detector))
+                else:
+                    geometry_new.config.angles.angle_data = self._get_angles(roi)
 
             elif axis == 'horizontal':
                 pixel_offset = ((self._shape_in[i] -1 - self._pixel_indices[i][1]) - self._pixel_indices[i][0])*0.5
@@ -408,6 +416,9 @@ class Slicer(DataProcessor):
         else:
             new_geometry = None
 
+        print("New geometry: ", new_geometry)
+        print("Shape out: ", self._shape_out)
+
         # return if just acting on geometry
         if not self._data_array:
             return new_geometry
@@ -416,6 +427,7 @@ class Slicer(DataProcessor):
         if out is None:
             if new_geometry is not None:
                 data_out = new_geometry.allocate(None)
+                print("New geometry shape: ", data_out.shape)
             else:
                 processed_array = np.empty(self._shape_out,dtype=np.float32)
                 data_out = DataContainer(processed_array,False, self._labels_out)

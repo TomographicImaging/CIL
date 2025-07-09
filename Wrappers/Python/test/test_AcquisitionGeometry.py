@@ -1643,10 +1643,7 @@ class Test_Cone3D_Flex(unittest.TestCase):
                                                     detector_position_set=detector_position_set, \
                                                     detector_direction_x_set=detector_direction_x_set, \
                                                     detector_direction_y_set=detector_direction_y_set)\
-                                     .set_panel(num_pixels=[10, 20])\
-
-
-  
+                                     .set_panel(num_pixels=[10, 20]).set_channels(4)\
 
 
     def test_set_volume_centre(self):
@@ -1686,7 +1683,43 @@ class Test_Cone3D_Flex(unittest.TestCase):
         self.assertIn("Average system magnification:", out)
 
     def test_eq(self):
-        pass
+        AG = self.ag
+        AG2 = AG.copy()
+        self.assertTrue(AG == AG2)
+
+        #test not equal
+        AG3 = AG2.copy()
+        AG3.config.panel.pixel_size = [10,10]
+        self.assertFalse(AG == AG3)
+
+        AG4 = AG2.copy()
+        AG4.config.panel.num_pixels = [1,2]
+        self.assertFalse(AG == AG4)
+
+        # AG5 = AG2.copy()
+        # AG5.config.channels.channel_labels = ['d','b','c','d']
+        # self.assertFalse(AG == AG5)
+
+        AG6 = AG2.copy()
+        AG6.config.system.num_positions = 1
+        self.assertFalse(AG == AG6)
+
+        AG7 = AG2.copy()
+        AG7.config.system.source[1].position = [-100, -100, -100]
+        self.assertFalse(AG == AG7)
+
+        AG8 = AG2.copy()
+        AG8.config.system.volume_centre.position = [1,1,1]
+        self.assertFalse(AG == AG8)
+
+        AG9 = AG2.copy()
+        AG9.config.system.detector[0].position = [1,1,1]
+        self.assertFalse(AG == AG9)
+
+        AG10 = AG2.copy()
+        AG10.config.system.detector[0].set_direction( [0,0,1], [1,0,0]) 
+        self.assertFalse(AG == AG10)
+
 
     def test_calculate_magnification(self):
         pass

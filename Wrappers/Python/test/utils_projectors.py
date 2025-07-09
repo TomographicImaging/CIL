@@ -90,7 +90,7 @@ class SimData(object):
         self._get_roi_3D()
 
 
-    def Cone3DSOUV(self):
+    def Cone3DFlex(self):
 
         self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
@@ -102,7 +102,7 @@ class SimData(object):
 
         self.ig = self.img_data.geometry
 
-        # convert geometry to SOUV
+        # convert geometry to Flex
         system = self.acq_data.geometry.config.system
         src = system.source.position
         det_pos = system.detector.position
@@ -357,7 +357,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         norm_3 = 2
         self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
 
-    def Cone3DSOUV(self):
+    def Cone3DFlex(self):
         '''
             These are all single cone beam projection geometries. Pixels of  1, 2, 0.5, 0.5, Voxels of 1, 2, 0.5, 0.25
         '''
@@ -446,7 +446,7 @@ class TestCommon_ProjectionOperator(object):
                                             .set_angles([0])\
                                             .set_labels(['horizontal'])
 
-    def Cone3DSOUV(self):
+    def Cone3DFlex(self):
         self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-100000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
                                             .set_labels(['vertical','horizontal'])
@@ -618,7 +618,7 @@ class TestCommon_FBP_SIM(SimData):
         FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
         reco = FBP(self.acq_data)
 
-        #show2D([reco, self.gold_roi]).save('test0_souv.png')
+        #show2D([reco, self.gold_roi]).save('test0_Flex.png')
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
 
         if AcquisitionType.DIM3 & self.ag.dimension:

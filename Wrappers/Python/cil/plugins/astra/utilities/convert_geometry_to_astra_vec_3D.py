@@ -59,9 +59,10 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
     # (by default, no translation)
     translation = [0.0, 0.0, 0.0]
 
+    volume_geometry_temp = volume_geometry.copy()
+
     if sinogram_geometry.dimension == '2D':
         #create a 3D astra geom from 2D CIL geometry
-        volume_geometry_temp = volume_geometry.copy()
         volume_geometry_temp.voxel_num_z = 1
 
         volume_geometry_temp.voxel_size_z = volume_geometry_temp.voxel_size_x
@@ -93,9 +94,6 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     # Only needed when using the traditional geometry set with rotation angles 
     elif sinogram_geometry.geom_type != 'cone_flex':
-
-        volume_geometry_temp = volume_geometry.copy()
-
         row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
         col = panel.pixel_size[1] * system.detector.direction_y.reshape(3,1)
         det = system.detector.position.reshape(3, 1)
@@ -113,8 +111,6 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             projector = 'cone_vec'
     # Use the per-projection geometry
     else:
-        volume_geometry_temp = volume_geometry.copy()
-
         # roi 
         current_centre = [volume_geometry_temp.center_x, volume_geometry_temp.center_y, volume_geometry_temp.center_z]
 

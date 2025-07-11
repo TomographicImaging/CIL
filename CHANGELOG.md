@@ -24,6 +24,7 @@
     - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
     - Improved consistency of `step_size` property across GD, ISTA, FISTA and APGD algorithms (#2157)
     - In PDHG algorithm, we now have options to initialise the dual variable, as well as the primal variable (#2169)
+    - Allow FluxNormaliser.preview_configuration() even if flux contains zeros (#2177)
   - Testing:
     - Developers can now run the full CI matrix [via the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) (#2160)
     - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
@@ -44,6 +45,8 @@
     - `axpby` (alias of `sapyb`)
     - `shape` setter in `DataContainer` and `ImageGeometry`
     - use of integer compression in `NEXUSDataWriter`
+  - Changes that break backwards compatibility:
+    - Updated `RANDOM` and `RANDOM_INT` `DataContainer.fill()` and `geometry.allocate()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED`. Random methods can now be accessed from `fill()` and `allocate()` (#2037)
 
 * 24.3.0
   - New features:

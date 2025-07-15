@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Satwik Pani (Washington University in St. Louis)
 if(APPLE)
   cmake_minimum_required(VERSION 3.16)
 else()

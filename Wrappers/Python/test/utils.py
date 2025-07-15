@@ -134,6 +134,14 @@ else:
     has_matplotlib = True
 system_state['has_matplotlib'] = has_matplotlib
 
+#has_skimage
+module_info = importlib.util.find_spec("skimage")
+if module_info is None:
+    has_skimage = False
+else:
+    has_skimage = True
+system_state['has_skimage']= has_skimage
+
 #has_zenodo_get
 module_info = importlib.util.find_spec("zenodo_get")
 if module_info is None:

@@ -33,6 +33,7 @@ from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
+from cil.processors import BadPixelCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
@@ -1667,8 +1668,9 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
-class TestPaddder(unittest.TestCase):
 
+class TestPadder(unittest.TestCase):
+    
     def setUp(self):
 
         self.ag = AcquisitionGeometry.create_Parallel3D(detector_position=[-0.1, 0.,-0.2]).set_angles([0,90,180,270]).set_panel([16,16],[0.1,0.1]).set_channels(4)
@@ -2855,7 +2857,190 @@ class TestMasker(unittest.TestCase):
                 x, y, z = mask_coord
                 data_test[mask_coord] = (data_test[x-1, y, z] + data_test[x+1, y, z]) / 2
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
+
+
+class TestBadPixelCorrector(unittest.TestCase):
+    def setUp(self):
+        self.test_mask = numpy.array([[True, False, True], [False, False, False], [True, False, True]])
+        a = numpy.array([[6.0,4.0,6.0], [4,0,4], [6,4,6]])
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
+        ad = AcquisitionData(array=a, geometry=ag)
+        self.data_3D = ad
+
+    # Test todos:
+    # check of inputs and errors
+    # test when shapes dont match
+    # test with a mask that is a data container (not just np array)
+    def test_mask_is_none(self):
+        with self.assertRaises(ValueError):
+            BadPixelCorrector(None)(self.data_3D)
+
+
+    def test_mask_invalid_type(self):
+        with self.assertRaises(TypeError):
+            BadPixelCorrector("invalid_mask")(self.data_3D)
+
+    def test_data_invalid_type(self):
+        data = "invalid_data"
+        with self.assertRaises(TypeError):
+            BadPixelCorrector(self.test_mask).check_input(data)
+
+    def test_data_missing_horizontal_dimension(self):
+        self.data_3D.geometry.dimension_labels = ['vertical', 'angle']
+        with self.assertRaises(ValueError):
+            BadPixelCorrector(self.test_mask).check_input(self.data_3D)
+
+    def test_horizontal_not_last_dimension(self):
+        self.data_3D.geometry.dimension_labels = ['horizontal', 'vertical']
+        with self.assertRaises(ValueError):
+            BadPixelCorrector(self.test_mask).check_input(self.data_3D)
+    
+    def test_BadPix_2D(self):
+        a = numpy.array([6.0,0.0,4.0])
+        mask = numpy.array([True, False, True])
+
+        ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), [6.0, 5.0, 4.0])
+
+        # Now need example where a is 2D and we set angles
+        a = numpy.array([[6.0,0,6.0], [4,0,4], [6,0,4]])
+        mask = numpy.array([True, False, True])
+
+        ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0,1,2])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), [[6.0,6.0,6.0], [4,4,4], [6,5,4]])
+
+
+    def test_BadPix_3D(self):
+        a = numpy.array([[6.0,4.0,6.0], [4,0,4], [6,4,6]])
+        mask = numpy.array([[True, True, True], [True, False, True], [True, True, True]])
+
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        masked_pix_value = (4*4+6*4/numpy.sqrt(2))/(4+4*1/numpy.sqrt(2))
+
+        expected_out_array = a.copy()
+        expected_out_array[1,1] = masked_pix_value
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), expected_out_array)
+
+        # Note the ordering of how we loop through the pixels does not affect the results.
+        # In the following 2 examples we have the same input data but flipped:
+        a = numpy.array([[3.,0.,3.0], [0.,0.,0], [1.,0.,1.]])
+        mask = numpy.array([[True, False, True], [False, False, False], [True, False, True]])
+
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        expected_out_array = numpy.array([[3.,3.,3.], [2.,2.,2.], [1.,1.,1.]])
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), expected_out_array)
+
+        a = numpy.array([[1.,0.,1.0], [0.,0.,0], [3.,0.,3.]])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        expected_out_array = numpy.array([[1.,1.,1.], [2.,2.,2.], [3.,3.,3.]])
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), expected_out_array)
+
+        # Example with Angles
+
+        proj1 = [[4.0,4.0,4.0], [4,0,4], [4,4,4]]
+        proj2 = [[5.0,5.0,5.0], [5,0,5], [5,5,5]]
+
+        proj1_expected = [[4,4,4], [4,4,4], [4,4,4]]
+        proj2_expected = [[5.0,5.0,5.0], [5,5,5], [5,5,5]]
+
+        a = numpy.array([proj1, proj2])
+        mask = numpy.array([[True, True, True], [True, False, True], [True, True, True]])
+
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([3,3]).set_angles([0,1])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        expected_out_array = numpy.array([proj1_expected, proj2_expected])
+
+        # Check the result
+        numpy.testing.assert_array_equal(corrected_data.as_array(), expected_out_array)
+
+    def test_BadPix_on_data_with_channels(self):
+        a = numpy.array([[6.0,0.0,4.0], [5.0,0,3]])
+        mask = numpy.array([True, False, True])
+
+        ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -1000], detector_position=[0, 1000]).set_panel(3).set_angles([0]).set_channels(2)
+        ad = AcquisitionData(array=a, geometry=ag)
+
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+        # Check the result
+
+        expected_out_array = numpy.array([[6.0,5.0,4.0], [5.0,4.0,3.0]])
+
+        numpy.testing.assert_array_equal(corrected_data.as_array(), expected_out_array)
+
+
+    def test_BadPix_3D_with_masked_pixels_without_neighbours(self):
+        a = numpy.array([[0,0,1.,1.], [0.,0.,2.,2.], [4.,3.,0.,0.], [4.,3.,0.,0.]])
+        mask = numpy.array([[False,False,True,True], [False, False, True, True], [True, True, False, False], [True, True, False, False]])
+
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,0, -1000], detector_position=[0,0, 1000]).set_panel([4,4]).set_angles([0])
+        ad = AcquisitionData(array=a, geometry=ag)
+
+        # Create a BadPixelCorrector processor
+        bad_pixel_corrector = BadPixelCorrector(mask)
+        # Apply the processor to the data
+        corrected_data = bad_pixel_corrector(ad)
+
+        expected_out_array = numpy.array([[2.5,        1.41421356, 1.,         1.      ],
+                                            [3.58578644, 2.5,        2.,         2.      ],
+                                            [4.,         3.,         2.5,        2.        ],
+                                            [4.,         3.,         3.,         2.5       ]])
+        
+        # Check the result
+        numpy.testing.assert_array_almost_equal(corrected_data.as_array(), expected_out_array, decimal=6)
+        
 
 
 class TestPaganinProcessor(unittest.TestCase):

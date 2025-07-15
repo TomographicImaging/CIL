@@ -24,6 +24,7 @@ import re
 import io
 import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
+import warnings
 
 from utils import has_matplotlib
 
@@ -555,7 +556,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertFalse(AG == AG3)
 
         AG3 = AG2.copy()
-        AG3.config.channels.channel_labels = ['d','b','c','d']
+        AG3.set_channels(1)
         self.assertFalse(AG == AG3)
 
         AG3 = AG2.copy()
@@ -1687,38 +1688,37 @@ class Test_Cone3D_Flex(unittest.TestCase):
         AG2 = AG.copy()
         self.assertTrue(AG == AG2)
 
-        #test not equal
-        AG3 = AG2.copy()
-        AG3.config.panel.pixel_size = [10,10]
-        self.assertFalse(AG == AG3)
+        AG2 = AG.copy()
+        AG2.config.panel.pixel_size = [10,10]
+        self.assertFalse(AG == AG2, "Pixel size should not be equal")
 
-        AG4 = AG2.copy()
-        AG4.config.panel.num_pixels = [1,2]
-        self.assertFalse(AG == AG4)
+        AG2 = AG.copy()
+        AG2.config.panel.num_pixels = [1,2]
+        self.assertFalse(AG == AG2, "Number of pixels should not be equal")
 
-        # AG5 = AG2.copy()
-        # AG5.config.channels.channel_labels = ['d','b','c','d']
-        # self.assertFalse(AG == AG5)
+        AG2 = AG.copy()
+        AG2.set_channels(6)
+        self.assertFalse(AG == AG2)
 
-        AG6 = AG2.copy()
-        AG6.config.system.num_positions = 1
-        self.assertFalse(AG == AG6)
+        AG2 = AG.copy()
+        AG2.config.system.num_positions = 1
+        self.assertFalse(AG == AG2)
 
-        AG7 = AG2.copy()
-        AG7.config.system.source[1].position = [-100, -100, -100]
-        self.assertFalse(AG == AG7)
+        AG2 = AG.copy()
+        AG2.config.system.source[1].position = [-100, -100, -100]
+        self.assertFalse(AG == AG2)
 
-        AG8 = AG2.copy()
-        AG8.config.system.volume_centre.position = [1,1,1]
-        self.assertFalse(AG == AG8)
+        AG2 = AG.copy()
+        AG2.config.system.volume_centre.position = [1,1,1]
+        self.assertFalse(AG == AG2)
 
-        AG9 = AG2.copy()
-        AG9.config.system.detector[0].position = [1,1,1]
-        self.assertFalse(AG == AG9)
+        AG2 = AG.copy()
+        AG2.config.system.detector[0].position = [1,1,1]
+        self.assertFalse(AG == AG2)
 
-        AG10 = AG2.copy()
-        AG10.config.system.detector[0].set_direction( [0,0,1], [1,0,0]) 
-        self.assertFalse(AG == AG10)
+        AG2 = AG.copy()
+        AG2.config.system.detector[0].set_direction( [0,0,1], [1,0,0]) 
+        self.assertFalse(AG == AG2)
 
 
     def test_calculate_magnification(self):
@@ -1741,9 +1741,47 @@ class Test_Cone3D_Flex(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.ag.set_centre_of_rotation_by_slice(1)
 
-    def test_set_angles(self):
+    def test_get_centre_slice(self):
         with self.assertRaises(NotImplementedError):
-            self.ag.set_angles([0, 1])
+            self.ag.get_centre_slice()
+
+    def test_get_slice_angle(self):
+
+       # np.testing.assert_allclose(self.ag.config.system.detector[1].direction_x, np.asarray([1,0.02,0.0]))
+        angle_slice = self.ag.get_slice(angle=1)
+        self.assertEqual(angle_slice.num_projections, 1)
+        self.assertEqual(angle_slice.channels, 4)
+        np.testing.assert_allclose(angle_slice.config.system.source[0].position, np.asarray([0,-1.3,1]))
+        np.testing.assert_allclose(angle_slice.config.system.detector[0].position, np.asarray([0,2,2]))
+        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_x, np.asarray([1,0.02,0.0]), rtol=1e-3)
+        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_y, np.asarray([0,0.0,1]))
+        self.assertEqual(len(angle_slice.config.system.source), 1)
+
+    def test_get_slice_channel(self):
+        channel_slice = self.ag.get_slice(channel=1)
+        self.assertEqual(channel_slice.num_projections, 2)
+        self.assertEqual(channel_slice.channels, 1)
+        print(channel_slice.config.system.source[0].position, [0,-1,0])
+        print(type(channel_slice.config.system.source[0].position))
+
+        np.testing.assert_allclose(channel_slice.config.system.source[0].position, np.asarray([0,-1,0]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].position, np.asarray([0,2,1]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_x, np.asarray([1,0.0, 0.0]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_y, np.asarray([0.,0.,1]))
+        self.assertEqual(len(channel_slice.config.system.source), 2)
+
+    def test_get_slice_vertical(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.get_slice(vertical=0)
+
+    def test_get_slice_horizontal(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.get_slice(horizontal=0)
+
+    def test_set_angles(self):
+        with self.assertWarns(UserWarning):
+            a = self.ag.set_angles([0, 1])
+            self.assertTrue(a==self.ag)
 
 
 class TestSubset(unittest.TestCase):

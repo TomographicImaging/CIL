@@ -2131,7 +2131,7 @@ class AcquisitionGeometry(object):
 
         if AcquisitionType.DIM2 & self.dimension:
             if offset2 is not None:
-                warnings.warn("2D so offset2 is ingored", UserWarning, stacklevel=2)
+                warnings.warn("2D so offset2 is ignored", UserWarning, stacklevel=2)
             self.set_centre_of_rotation(offset1)
 
         if offset2 is None or offset1 == offset2:
@@ -2160,9 +2160,9 @@ class AcquisitionGeometry(object):
         :rtype: AcquisitionGeometry
         '''
         if AcquisitionType.CONE_FLEX & self.geom_type:
-            raise NotImplementedError("Angles cannot be set for Cone3D_Flex geometry.")
-        
-        self.config.angles = Angles(angles, initial_angle, angle_unit)
+            warnings.warn("Angles cannot be set for Cone3D_Flex geometry.", UserWarning, stacklevel=2)
+        else:
+            self.config.angles = Angles(angles, initial_angle, angle_unit)
         return self
 
     def set_panel(self, num_pixels, pixel_size=(1,1), origin='bottom-left'):
@@ -2515,16 +2515,14 @@ class AcquisitionGeometry(object):
 
 
         if geometry_new.geom_type & AcquisitionType.CONE_FLEX:
-            # if channel is not None:
-            #     raise ValueError("Cannot subset Cone3D_Flex geometry by channel. Expected channel = None. Got channel = {0}".format(channel))
             if vertical is not None:
-                raise ValueError("Cannot subset Cone3D_Flex geometry by vertical. Expected vertical = None. Got vertical = {0}".format(vertical))
+                raise NotImplementedError("Cannot subset Cone3D_Flex geometry by vertical. Expected vertical = None. Got vertical = {0}".format(vertical))
             if horizontal is not None:
-                raise ValueError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
+                raise NotImplementedError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
             if angle is not None:
                 geometry_new.config.system.num_positions = 1
-                geometry_new.config.system.source = self.config.system.source[angle]
-                geometry_new.config.system.detector = self.config.system.detector[angle]
+                geometry_new.config.system.source = [self.config.system.source[angle]]
+                geometry_new.config.system.detector = [self.config.system.detector[angle]]
 
         else:
  

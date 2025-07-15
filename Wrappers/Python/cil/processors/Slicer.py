@@ -319,12 +319,8 @@ class Slicer(DataProcessor):
             elif axis == 'angle':
                 if self._geometry.geom_type & AcquisitionType.CONE_FLEX:
                     geometry_new.config.system.num_positions = int(np.ceil((roi.stop - roi.start )/ roi.step))
-                    print(roi.stop, roi.start, roi.step)
                     geometry_new.config.system.source = self._geometry.config.system.source[roi.start:roi.stop:roi.step]
                     geometry_new.config.system.detector = self._geometry.config.system.detector[roi.start:roi.stop:roi.step]
-                    print("Number of positions: ", geometry_new.config.system.num_positions)
-                    print("Source positions: ", len(geometry_new.config.system.source))
-                    print("Detector positions: ", len(geometry_new.config.system.detector))
                 else:
                     geometry_new.config.angles.angle_data = self._get_angles(roi)
 

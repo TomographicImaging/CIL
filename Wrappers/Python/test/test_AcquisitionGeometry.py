@@ -1638,13 +1638,39 @@ class Test_Cone3D_Flex(unittest.TestCase):
         source_position_set = [[0,-1,0], [0,-1.3,1]]
         detector_position_set = [[0,2,1], [0,2,2]]
         detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
-        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+        detector_direction_y_set = [[0.,0.,4], [0,0.0,3]]
 
         self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
                                                     detector_position_set=detector_position_set, \
                                                     detector_direction_x_set=detector_direction_x_set, \
                                                     detector_direction_y_set=detector_direction_y_set)\
                                      .set_panel(num_pixels=[10, 20]).set_channels(4)\
+
+
+    def test_set_source_position(self):
+        np.testing.assert_allclose(self.ag.config.system.source[0].position, [0, -1, 0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.source[1].position, [0, -1.3, 1], atol=1e-10)
+
+    def test_set_detector_position(self):
+        np.testing.assert_allclose(self.ag.config.system.detector[0].position, [0, 2, 1], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].position, [0, 2, 2], atol=1e-10)
+    
+    def test_set_detector_direction_x(self):
+        # The detector direction x vectors will have been normalised:
+        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_x, [1, 0.0, 0.0], atol=1e-10)
+
+        expected_direction_x = [1, 0.02, 0.0]
+        # Normalise the expected direction_x vector
+        norm_expected_direction_x = expected_direction_x / np.linalg.norm(expected_direction_x)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].direction_x, norm_expected_direction_x, atol=1e-10)
+
+    def test_set_detector_direction_y(self):
+        # The detector direction y vectors will have been normalised:
+        expected_direction_y = [0, 0.0, 4]
+        # Normalise the expected direction_y vector
+        norm_expected_direction_y = expected_direction_y / np.linalg.norm(expected_direction_y)
+        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_y, norm_expected_direction_y, atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].direction_y, norm_expected_direction_y, atol=1e-10)
 
 
     def test_set_volume_centre(self):
@@ -1746,14 +1772,13 @@ class Test_Cone3D_Flex(unittest.TestCase):
             self.ag.get_centre_slice()
 
     def test_get_slice_angle(self):
-
-       # np.testing.assert_allclose(self.ag.config.system.detector[1].direction_x, np.asarray([1,0.02,0.0]))
         angle_slice = self.ag.get_slice(angle=1)
         self.assertEqual(angle_slice.num_projections, 1)
         self.assertEqual(angle_slice.channels, 4)
         np.testing.assert_allclose(angle_slice.config.system.source[0].position, np.asarray([0,-1.3,1]))
         np.testing.assert_allclose(angle_slice.config.system.detector[0].position, np.asarray([0,2,2]))
-        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_x, np.asarray([1,0.02,0.0]), rtol=1e-3)
+        normalised_direction_x = np.asarray([1,0.02,0.0]) / np.linalg.norm(np.asarray([1,0.02,0.0]))
+        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_x, np.asarray(normalised_direction_x))
         np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_y, np.asarray([0,0.0,1]))
         self.assertEqual(len(angle_slice.config.system.source), 1)
 

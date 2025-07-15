@@ -113,6 +113,43 @@ Rendered
 Building documentation locally
 ------------------------------
 
+Folder layout:
+
+- `README.md` - "QUICK START" rendered to `https://github.com/TomographicImaging/CIL`
+- `.github/`
+
+  - `workflows/`
+
+    - `README.md` - "CI" rendered to `https://github.com/TomographicImaging/CIL/tree/master/.github/workflows`
+
+- `docs/`
+
+  - `pages/` - landing (jekyll) source pages
+
+    - `_config.yml` - jekyll config file
+    - `_data/`
+
+      - `navigation.yml` - Header section
+      - `services.yml` - "Contact" footer section
+      - `network.yml` - "Thanks" footer section
+
+    - `XXX.md` - "WEBSITE" rendered to `https://tomographicimaging.github.io/CIL/XXX`
+
+  - `source/` - docs (sphinx) source pages
+
+    - `conf.py` - sphinx config file
+    - `XXX.rst` - "DOCS" rendered to `https://tomographicimaging.github.io/CIL/nightly/XXX`
+
+  - `docs_environment.yml` - sphinx dependencies
+  - `Gemfile*` - jekyll dependencies
+  - `Makefile` - common build scripts
+
+    - `mkdemos.py` - downloads demo notebooks to `source/demos/*.ipynb` & creates `source/demos.rst`
+
+      - `demos-template.rst`
+
+    - `mkversions.py` - creates `versions.json` used but sphinx docs version switcher
+
 The easiest way to test documentation changes is to open a pull request and `download the rendered documentation from the CI <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 
 Alternatively, to build the docs locally, you will need a working ``cil`` installation.

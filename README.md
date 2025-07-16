@@ -137,10 +137,14 @@ bash ./scripts/create_local_env_for_cil_development.sh -t
 And then install CIL in to this environment using `pip`.
 
 Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the
-appropriate dependencies on any OS, using the following command:
+appropriate dependencies, using the following command:
 
 ```sh
 conda env create -f ./scripts/requirements-test.yml
+```
+or, on windows:
+```sh
+conda env create -f ./scripts/requirements-test-windows.yml
 ```
 
 #### Build CIL

@@ -39,7 +39,6 @@ test:
 requirements:
   build:
     - python
-    - numpy {{ numpy }}
     - pip
     - setuptools >=64
     - setuptools_scm >=8
@@ -58,7 +57,7 @@ requirements:
 
   run:
     - python
-    - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
+    - numpy >=1.23, <2.0.0
     - scipy >=1.4.0
     - h5py
     - pillow

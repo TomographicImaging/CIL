@@ -142,7 +142,7 @@ appropriate dependencies, using the following command:
 ```sh
 conda env create -f ./scripts/requirements-test.yml
 ```
-or 
+or, on windows:
 ```sh
 conda env create -f ./scripts/requirements-test-windows.yml
 ```

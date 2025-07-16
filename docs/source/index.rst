@@ -68,6 +68,7 @@ Table of Contents
    plugins
    developer_guide
    demos
+   usershowcase
 
 .. Indices and tables
 .. ==================

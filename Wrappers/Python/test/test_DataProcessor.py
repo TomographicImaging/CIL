@@ -1637,7 +1637,7 @@ class TestCentreOfRotation_cone3D_Flex(unittest.TestCase):
     def test_image_sharpness_acquisition_geometry_cone3DFlex(self):
         #mock the _configure_FBP method to bypass the backprojector setup
         with patch.object(CofR_image_sharpness, '_configure_FBP', return_value=None):
-        corr = CofR_image_sharpness()
+            corr = CofR_image_sharpness()
 
         with self.assertRaises(ValueError):
             corr.set_input(self.data)

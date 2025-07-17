@@ -17,9 +17,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Satwik Pani (Washington University in St. Louis)
 if(APPLE)
-  cmake_minimum_required(VERSION 3.16)
+  cmake_minimum_required(VERSION 3.16...4.1)
 else()
-  cmake_minimum_required(VERSION 3.5)
+  cmake_minimum_required(VERSION 3.5...4.1)
 endif()
 
 if(NOT SKBUILD_PROJECT_NAME)

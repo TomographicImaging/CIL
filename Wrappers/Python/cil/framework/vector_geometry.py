@@ -23,18 +23,21 @@ import numpy
 
 from .labels import FillType
 
-class VectorGeometry:
-    '''Geometry describing VectorData to contain 1D array'''
+
+class BackwardCompat(type):
     @property
-    def RANDOM(self):
+    def RANDOM(cls):
         warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM
 
     @property
-    def RANDOM_INT(self):
+    def RANDOM_INT(cls):
         warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM_INT
 
+
+class VectorGeometry:
+    '''Geometry describing VectorData to contain 1D array'''
     @property
     def dtype(self):
         return self._dtype

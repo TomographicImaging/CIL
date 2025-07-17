@@ -24,36 +24,40 @@ import numpy
 from .image_data import ImageData
 from .labels import ImageDimension, FillType
 
-class ImageGeometry:
+
+class BackwardCompat(type):
     @property
-    def CHANNEL(self):
+    def CHANNEL(cls):
         warnings.warn("use ImageDimension.CHANNEL instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.CHANNEL
 
     @property
-    def HORIZONTAL_X(self):
+    def HORIZONTAL_X(cls):
         warnings.warn("use ImageDimension.HORIZONTAL_X instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.HORIZONTAL_X
 
     @property
-    def HORIZONTAL_Y(self):
+    def HORIZONTAL_Y(cls):
         warnings.warn("use ImageDimension.HORIZONTAL_Y instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.HORIZONTAL_Y
 
     @property
-    def RANDOM(self):
+    def RANDOM(cls):
         warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM
+
     @property
-    def RANDOM_INT(self):
+    def RANDOM_INT(cls):
         warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM_INT
 
     @property
-    def VERTICAL(self):
+    def VERTICAL(cls):
         warnings.warn("use ImageDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
         return ImageDimension.VERTICAL
 
+
+class ImageGeometry(metaclass=BackwardCompat):
     @property
     def shape(self):
         shape_dict = {ImageDimension.CHANNEL: self.channels,

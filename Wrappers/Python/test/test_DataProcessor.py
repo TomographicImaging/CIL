@@ -1624,23 +1624,29 @@ class TestCofR_xcorrelation(unittest.TestCase):
             processor.set_input(data_limited)           
 
 
-class TestCofR_image_sharpness(unittest.TestCase):
-    
-    def test_process_acquisition_geometry_cone3DFlex(self):
- 
+class TestCentreOfRotation_cone3D_Flex(unittest.TestCase):
+
+    def setUp(self):
         source_position_set=[[0,-100000,0]]
         detector_position_set=[[0,0,0]]
         detector_direction_x_set=[[1, 0, 0]]
         detector_direction_y_set=[[0, 0, 1]]
         ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
-        data = ag.allocate('random')
+        self.data = ag.allocate('random')
 
+    def test_image_sharpness_acquisition_geometry_cone3DFlex(self):
         #mock the _configure_FBP method to bypass the backprojector setup
         with patch.object(CofR_image_sharpness, '_configure_FBP', return_value=None):
-            corr = CofR_image_sharpness()
+        corr = CofR_image_sharpness()
 
         with self.assertRaises(ValueError):
-            corr.set_input(data)
+            corr.set_input(self.data)
+
+    def test_x_corr_acquisition_geometry_cone3DFlex(self):
+        corr = CofR_xcorrelation()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(self.data)
 
 
 class TestCentreOfRotation_parallel(unittest.TestCase):

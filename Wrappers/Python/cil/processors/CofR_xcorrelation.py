@@ -65,7 +65,7 @@ class CofR_xcorrelation(Processor):
         if data.geometry == None:
             raise Exception('Geometry is not defined.')
 
-        if data.geometry.geom_type == 'cone':
+        if data.geometry.geom_type == 'cone' or (data.geometry.geom_type & AcquisitionType.CONE_FLEX):
             raise ValueError("Only parallel-beam data is supported with this algorithm")
 
         if data.geometry.channels > 1:

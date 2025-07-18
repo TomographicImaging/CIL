@@ -800,6 +800,24 @@ class TestDataContainer(CCPiTestClass):
         self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
                  AcquisitionDimension["ANGLE"]], list(ss2.geometry.dimension_labels))
 
+        source_position_set=[[0,-100000,0], [0,100000,0]]
+        detector_position_set=[[0,0,0], [0,0,0]]
+        detector_direction_x_set=[[1, 0, 0], [1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1], [0, 0, 1]]
+        ag_flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ad_flex = ag_flex.allocate()
+
+        ad_flex.reorder(new_order)
+        self.assertListEqual(new_order, list(ad_flex.dimension_labels))
+
+        ss3 = ad_flex.get_slice(angle=0)
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                 AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"]], list(ss3.geometry.dimension_labels))
+
+        ss4 = ad_flex.get_slice(channel=0)
+        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
+                    AcquisitionDimension["VERTICAL"], AcquisitionDimension["ANGLE"]], list(ss4.geometry.dimension_labels))
+
 
     def test_ImageDataSubset(self):
         new_order = ['horizontal_x', 'channel', 'horizontal_y']

@@ -1069,9 +1069,124 @@ class show_geometry(show_base):
 
 
     def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+        
+        if AcquisitionType.CONE_FLEX & acquisition_geometry.geom_type:
+            raise NotImplementedError("The `cone_flex` geometry type is not supported by show_geometry. Use `show_system_positions` instead.")
+
         if AcquisitionType.DIM2 & acquisition_geometry.dimension:
             elevation = 90
             azimuthal = 0
 
         self.display = _ShowGeometry(acquisition_geometry, image_geometry)
         self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
+
+
+class show_system_positions(show_base):
+    '''
+    Displays four plots to show i) the source position, 
+    ii) the detector centre, iii) the detector x-direction, and 
+    iv) the detector y-direction for each projection.
+
+
+    Parameters
+    ----------
+    acquisition_geometry: AcquisitionGeometry
+        CIL acquisition geometry
+    figsize: tuple (x, y)
+        Set figure size (inches), default (10,10)
+    fontsize: int
+        Set fontsize, default 10
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        returns a matplotlib.pyplot figure object
+    '''
+    def __init__(self, acquisition_geometry:AcquisitionGeometry, figsize=(10,10), fontsize=10):
+
+        # Only applicable for AcquisitionGeometry
+        if not isinstance(acquisition_geometry, AcquisitionGeometry):
+            raise ValueError(f"The data type of `acquisition_geometry` must be \"<class 'cil.framework.AcquisitionGeometry'>\". It is \"{type(acquisition_geometry)}\", which is not currently supported by this function.")
+
+        # Only applicable for cone_flex geometry type
+        if acquisition_geometry.geom_type != AcquisitionType.CONE_FLEX:
+            raise ValueError(f"The geometry type of `acquisition_geometry` must be \"cone_flex\". It is \"{acquisition_geometry.geom_type}\", which is not currently supported by this function.")
+
+        self.figure = self._draw(acquisition_geometry, figsize, fontsize)
+
+    def _draw(self, acquisition_geometry, figsize, fontsize):
+
+        # Plot the data
+        self.fig, self.axs = plt.subplots(2, 2, figsize=figsize)
+        system  = acquisition_geometry.config.system
+
+        x_axis_values = np.arange(acquisition_geometry.num_projections)
+        i = 0; j = 0
+        x = 0; y = 1; z = 2
+        self.axs[j,i].set_title("Source position")
+
+        x_pos = np.array([vec.position[0] for vec in system.source])
+        y_pos = np.array([vec.position[1] for vec in system.source])
+        z_pos = np.array([vec.position[2] for vec in system.source])
+
+        self.axs[j,i].plot(x_axis_values, x_pos, label="X axis")
+        self.axs[j,i].plot(x_axis_values, y_pos, label="Y axis")
+        self.axs[j,i].plot(x_axis_values, z_pos, label="Z axis")
+        self.axs[j,i].legend(fontsize=fontsize)
+        # self.axs[j,i].set_xlabel("Projection #")
+        self.axs[j,i].set_ylabel("Position")
+
+        i = 1; j = 0
+        x += 3; y += 3; z += 3
+        self.axs[j,i].set_title("Detector Center")
+
+        x_pos = np.array([vec.position[0] for vec in system.detector])
+        y_pos = np.array([vec.position[1] for vec in system.detector])
+        z_pos = np.array([vec.position[2] for vec in system.detector])
+
+        self.axs[j,i].plot(x_axis_values, x_pos, label="X axis")
+        self.axs[j,i].plot(x_axis_values, y_pos, label="Y axis")
+        self.axs[j,i].plot(x_axis_values, z_pos, label="Z axis")
+        self.axs[j,i].legend(fontsize=fontsize)
+        # self.axs[j,i].set_xlabel("Projection #")
+        # self.axs[j,i].set_ylabel("Position in (cm)")
+
+        i = 0; j = 1
+        x += 3; y += 3; z += 3
+        self.axs[j,i].set_title("Detector X-direction")
+
+        x_pos = np.array([vec.direction_x[0] for vec in system.detector])
+        y_pos = np.array([vec.direction_x[1] for vec in system.detector])
+        z_pos = np.array([vec.direction_x[2] for vec in system.detector])
+
+        self.axs[j,i].plot(x_axis_values, x_pos, label="X axis")
+        self.axs[j,i].plot(x_axis_values, y_pos, label="Y axis")
+        self.axs[j,i].plot(x_axis_values, z_pos, label="Z axis")
+
+        self.axs[j,i].legend(fontsize=fontsize)
+        self.axs[j,i].set_xlabel("Projection #")
+        self.axs[j,i].set_ylabel("Position")
+
+        i = 1; j = 1
+        x += 3; y += 3; z += 3
+        self.axs[j,i].set_title("Detector Y-direction")
+
+        x_pos = np.array([vec.direction_y[0] for vec in system.detector])
+        y_pos = np.array([vec.direction_y[1] for vec in system.detector])
+        z_pos = np.array([vec.direction_y[2] for vec in system.detector])
+
+        self.axs[j,i].plot(x_axis_values, x_pos, label="X axis")
+        self.axs[j,i].plot(x_axis_values, y_pos, label="Y axis")
+        self.axs[j,i].plot(x_axis_values, z_pos, label="Z axis")
+        self.axs[j,i].legend(fontsize=fontsize)
+        self.axs[j,i].set_xlabel("Projection #")
+        # self.axs[j,i].set_ylabel("Position in (mm)")
+
+        # Resize the text
+        for ax in self.axs.flatten():
+            for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] + ax.get_xticklabels() + ax.get_yticklabels()):
+                item.set_fontsize(fontsize)
+
+        plt.tight_layout()
+        fig2 = plt.gcf()
+        return fig2

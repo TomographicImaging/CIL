@@ -1919,7 +1919,7 @@ class AcquisitionGeometry(object):
         # We are using per-projection geometry, not angles
         else:
             shape_dict = {AcquisitionDimension.CHANNEL: self.config.channels.num_channels,
-                        AcquisitionDimension.ANGLE: self.config.system.num_positions,
+                        AcquisitionDimension.PROJECTION: self.config.system.num_positions,
                         AcquisitionDimension.VERTICAL: self.config.panel.num_pixels[1],
                         AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
 
@@ -2199,12 +2199,20 @@ class AcquisitionGeometry(object):
     def set_labels(self, labels=None):
         r'''This method configures the dimension labels of an AcquisitionGeometry object.
 
-        :param labels:  The order of the dimensions describing the data.\
-                        Expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
-                        default = ['channel','angle','vertical','horizontal']
-        :type labels: list, optional
-        :return: returns a configured AcquisitionGeometry object
-        :rtype: AcquisitionGeometry
+        Parameters
+        ----------
+
+        labels:  list of strings
+            The order of the dimensions describing the data.
+            For most geometries expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
+            default = ['channel','angle','vertical','horizontal']
+            For Cone3D_Flex geometries expects a list containing at least one of the unique labels: 'channel' 'projection' 'vertical' 'horizontal'
+            default = ['channel', 'projection', 'vertical', 'horizontal']
+
+        Returns
+        --------
+        self: AcquisitionGeometry
+            a configured AcquisitionGeometry object
         '''
         self.dimension_labels = labels
         return self
@@ -2504,7 +2512,7 @@ class AcquisitionGeometry(object):
         return str(self.config)
 
 
-    def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
+    def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None, projection=None):
         '''
         Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.
         '''
@@ -2521,10 +2529,12 @@ class AcquisitionGeometry(object):
                 raise NotImplementedError("Cannot subset Cone3D_Flex geometry by vertical. Expected vertical = None. Got vertical = {0}".format(vertical))
             if horizontal is not None:
                 raise NotImplementedError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
-            if angle is not None:
+            if projection is not None:
                 geometry_new.config.system.num_positions = 1
                 geometry_new.config.system.source = [self.config.system.source[angle]]
                 geometry_new.config.system.detector = [self.config.system.detector[angle]]
+            if angle is not None:
+                raise ValueError("Angle dimension does not exist for Cone3D_Flex geometry, perhaps you meant to use 'projection'?")
 
         else:
  
@@ -2539,6 +2549,9 @@ class AcquisitionGeometry(object):
 
             if horizontal is not None:
                 raise ValueError("Cannot calculate system geometry for a horizontal slice")
+
+            if projection is not None:
+                raise ValueError("Projecton dimension does not exist for Cone3D_Flex geometry, perhaps you meant to use 'angle'?")
 
         return geometry_new
 

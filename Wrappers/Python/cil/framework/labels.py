@@ -93,6 +93,8 @@ class _DimensionBase:
         order = cls._default_order(engine)
         if geometry is None:
             return order
+        elif geometry.geom_type & AcquisitionType.CONE_FLEX:
+            order = [label for label in order if label not 'angle' else 'projection']
         return tuple(label for label in order if label in geometry.dimension_labels)
 
     @classmethod
@@ -157,6 +159,7 @@ class AcquisitionDimension(_DimensionBase, StrEnum):
     ANGLE = auto()
     VERTICAL = auto()
     HORIZONTAL = auto()
+    PROJECTION = auto()
 
     @classmethod
     def _default_order(cls, engine: str) -> tuple:

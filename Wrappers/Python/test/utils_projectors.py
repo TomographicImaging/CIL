@@ -19,8 +19,32 @@
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
-from cil.framework import AcquisitionGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 from cil.framework.labels import AcquisitionDimension, AcquisitionType
+
+def create_cone_flex_default_ig(ag):
+    '''
+    Create a default ImageGeometry for Cone3D_Flex geometries.
+    This makes use of the mean magnification value to scale the pixel size when determining the voxel size.
+
+    Parameters
+    ----------
+    ag: AcquisitionGeometry
+        Must be a Cone3D_Flex AcquisitionGeometry
+    
+    Returns
+    -------
+    ImageGeometry
+    '''
+    mag = ag.config.system.calculate_magnification()[2]
+    mean_mag = np.mean(mag)
+    num_voxel_xy = int(np.ceil(ag.config.panel.num_pixels[0]))
+    voxel_size_xy = ag.config.panel.pixel_size[0] / mean_mag
+
+    num_voxel_z = int(np.ceil(ag.config.panel.num_pixels[1]))
+    voxel_size_z = ag.config.panel.pixel_size[1] / mean_mag
+    ig = ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z)
+    return ig
 
 
 
@@ -367,7 +391,7 @@ class TestCommon_ProjectionOperator_TOY(object):
                                             .set_panel([16,16],[1,1])
         ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        ig_test_1 = ag_test_1.get_ImageGeometry()
+        ig_test_1 = create_cone_flex_default_ig(ag_test_1)
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
 
@@ -376,14 +400,14 @@ class TestCommon_ProjectionOperator_TOY(object):
                                             .set_panel([16,16],[2,2])
         ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
-        ig_test_2 = ag_test_2.get_ImageGeometry()
+        ig_test_2 = create_cone_flex_default_ig(ag_test_2)
         norm_2 = 8
         self.test_geometries.append((ag_test_2, ig_test_2, norm_2))
 
         ag_test_3 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])
         ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
-        ig_test_3 = ag_test_3.get_ImageGeometry()
+        ig_test_3 = create_cone_flex_default_ig(ag_test_3)
 
         norm_3 = 2
         self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
@@ -391,7 +415,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,1000,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])
         ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
-        ig_test_4 = ag_test_4.get_ImageGeometry()
+        ig_test_4 = create_cone_flex_default_ig(ag_test_4)
 
         norm_4 = 1
         self.test_geometries.append((ag_test_4, ig_test_4, norm_4))
@@ -413,7 +437,6 @@ class TestCommon_ProjectionOperator_TOY(object):
             res = LinearOperator.dot_test(Op, tolerance=self.tolerance_linearity)
             self.assertTrue(res, "Geometry: {0} Dot-test out of tolerance {1}".format(count, self.tolerance_linearity))
             count +=1
-
 
 
 class TestCommon_ProjectionOperator(object):
@@ -473,7 +496,11 @@ class TestCommon_ProjectionOperator(object):
             checker = checker[0]
             res = res[0]
 
-        ig = self.ag.get_ImageGeometry()
+        if self.ag.geom_type & AcquisitionType.CONE_FLEX:
+            ig = create_cone_flex_default_ig(self.ag)
+        else:
+            ig = self.ag.get_ImageGeometry()
+        
         volume = ig.allocate(0)
 
         volume.fill(res)
@@ -482,7 +509,6 @@ class TestCommon_ProjectionOperator(object):
         fp = Op.direct(volume)
 
         np.testing.assert_allclose(fp.array, checker, atol = self.tolerance_fp)
-
 
     def test_backward_projector(self):
 
@@ -506,7 +532,11 @@ class TestCommon_ProjectionOperator(object):
             checker = checker[0]
             res = res[0]
 
-        ig = self.ag.get_ImageGeometry()
+        if self.ag.geom_type & AcquisitionType.CONE_FLEX:
+            ig = create_cone_flex_default_ig(self.ag)
+        else:
+            ig = self.ag.get_ImageGeometry()
+        
         data = self.ag.allocate(0)
 
         data.fill(checker)
@@ -573,9 +603,10 @@ class TestCommon_ProjectionOperator_SIM(SimData):
     def test_input_arguments(self):
 
         #default image_geometry, named parameter acquisition_geometry
-        Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
-        fp = Op.direct(self.img_data)
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
+        if not (self.ag.geom_type & AcquisitionType.CONE_FLEX):
+            Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
+            fp = Op.direct(self.img_data)
+            np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
 
 
 class TestCommon_FBP_SIM(SimData):
@@ -628,11 +659,13 @@ class TestCommon_FBP_SIM(SimData):
 
 
     def test_input_arguments(self):
+        # default image_geometry, named parameter acquisition_geometry
+        # No default ig for cone_flex so we skip this test in this case
+        if not (self.ag.geom_type & AcquisitionType.CONE_FLEX): 
+            FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
-        #default image_geometry, named parameter acquisition_geometry
-        FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
-        reco = FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
 class TestCommon_ProjectionOperatorBlockOperator(object):
     # def setUp(self):

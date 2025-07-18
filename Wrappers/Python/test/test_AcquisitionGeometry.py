@@ -1748,7 +1748,23 @@ class Test_Cone3D_Flex(unittest.TestCase):
 
 
     def test_calculate_magnification(self):
-        pass
+        source_position_set = [[0,-1,0], [0,-1,0], [0,-2,0]]
+        detector_position_set = [[0,2,1], [0,5,1], [0, 2,1]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.0, 0], [1,0,0]]
+        detector_direction_y_set = [[0.,0.,4], [0,0.0,3], [0,0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[10, 10])
+                                     
+        expected_mag = [abs((detector_position_set[0][1]-source_position_set[0][1])/source_position_set[0][1]), 
+            abs((detector_position_set[1][1]-source_position_set[1][1])/source_position_set[1][1]), 
+            abs((detector_position_set[2][1]-source_position_set[2][1])/source_position_set[2][1])]
+
+
+        np.testing.assert_array_equal(np.asarray(expected_mag), np.asarray(ag.config.system.calculate_magnification()[2]))
 
     @unittest.skipUnless(has_matplotlib, "matplotlib is not installed")
     def test_show_geometry(self):

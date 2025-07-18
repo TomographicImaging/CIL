@@ -29,6 +29,8 @@ if has_astra:
     from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
     from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D
 
+from utils_projectors import create_cone_flex_default_ig
+
 
 class TestGeometry_Parallel2D(unittest.TestCase):
     def setUp(self):
@@ -644,7 +646,7 @@ class TestGeometry_Cone3D_Flex(unittest.TestCase):
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.pixels_x, self.pixels_y), (0.1,0.2))
         
-        self.ig = self.ag.get_ImageGeometry()
+        self.ig = create_cone_flex_default_ig(self.ag)
 
   
 

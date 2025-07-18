@@ -1737,7 +1737,8 @@ class Configuration(object):
             repres += str(self.system)
             repres += str(self.panel)
             repres += str(self.channels)
-            repres += str(self.angles)
+            if self.angles is not None:
+                repres += str(self.angles)
 
             repres += "Distances in units: {}".format(self.units)
 
@@ -2017,7 +2018,7 @@ class AcquisitionGeometry(object):
         if hasattr(self.config.system, 'calculate_centre_of_rotation'):
             offset_distance, angle_rad = self.config.system.calculate_centre_of_rotation()
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
 
         if distance_units == 'default':
             offset = offset_distance
@@ -2478,13 +2479,14 @@ class AcquisitionGeometry(object):
 
         Note
         ----
-        For Cone3D_Flex geometries, the magnification of the volume centre is calculated for each projection and the mean is used.
+        For Cone3D_Flex geometries, you must create an ImageGeometry yourself, there is no automatic creation.
         """
 
         if self.config.system.geometry & AcquisitionType.CONE_FLEX:
-            mag = self.magnification.mean()
-        else:
-            mag = self.magnification
+            raise NotImplementedError("For Cone3D_Flex geometries, you must create an ImageGeometry yourself, there is no automatic creation.")
+
+        
+        mag = self.magnification
 
         num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
         voxel_size_xy = self.config.panel.pixel_size[0] / (resolution * mag)

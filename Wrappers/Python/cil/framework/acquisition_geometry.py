@@ -1944,6 +1944,7 @@ class AcquisitionGeometry(object):
                                 self.config.panel.num_pixels[1],
                                 self.config.panel.num_pixels[0]
                                 ]
+            labels_default = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in labels_default]
 
         try:
             labels = self._dimension_labels
@@ -2531,8 +2532,8 @@ class AcquisitionGeometry(object):
                 raise NotImplementedError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
             if projection is not None:
                 geometry_new.config.system.num_positions = 1
-                geometry_new.config.system.source = [self.config.system.source[angle]]
-                geometry_new.config.system.detector = [self.config.system.detector[angle]]
+                geometry_new.config.system.source = [self.config.system.source[projection]]
+                geometry_new.config.system.detector = [self.config.system.detector[projection]]
             if angle is not None:
                 raise ValueError("Angle dimension does not exist for Cone3D_Flex geometry, perhaps you meant to use 'projection'?")
 

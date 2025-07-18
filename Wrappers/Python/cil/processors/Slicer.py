@@ -157,9 +157,14 @@ class Slicer(DataProcessor):
         for key in self._roi_input.keys():
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
-            if key not in ['angle', 'channel']:
-                if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX:
-                    raise NotImplementedError("Cone-Flex geometry is not supported by this processor for slicing along any dimension other than 'angles' or 'channels'")
+            if isinstance(self._geometry , (AcquisitionGeometry)):
+                if self._geometry.geom_type & AcquisitionType.CONE_FLEX:
+                    if key not in ['projection', 'channel']:
+                        raise NotImplementedError("Cone-Flex geometry is not supported by this processor for slicing along any dimension other than 'projection' or 'channel'")
+                else:
+                    if key == 'projection':
+                        raise ValueError("'projection' axis does not exist for this geometry, perhaps you meant to use 'angle'?")
+
 
         return True
 
@@ -317,12 +322,13 @@ class Slicer(DataProcessor):
                 geometry_new.set_channels(num_channels=n_elements)
 
             elif axis == 'angle':
-                if self._geometry.geom_type & AcquisitionType.CONE_FLEX:
-                    geometry_new.config.system.num_positions = int(np.ceil((roi.stop - roi.start )/ roi.step))
-                    geometry_new.config.system.source = self._geometry.config.system.source[roi.start:roi.stop:roi.step]
-                    geometry_new.config.system.detector = self._geometry.config.system.detector[roi.start:roi.stop:roi.step]
-                else:
-                    geometry_new.config.angles.angle_data = self._get_angles(roi)
+                geometry_new.config.angles.angle_data = self._get_angles(roi)
+
+            elif axis == 'projection':
+                geometry_new.config.system.num_positions = int(np.ceil((roi.stop - roi.start )/ roi.step))
+                geometry_new.config.system.source = self._geometry.config.system.source[roi.start:roi.stop:roi.step]
+                geometry_new.config.system.detector = self._geometry.config.system.detector[roi.start:roi.stop:roi.step]
+                
 
             elif axis == 'horizontal':
                 pixel_offset = ((self._shape_in[i] -1 - self._pixel_indices[i][1]) - self._pixel_indices[i][0])*0.5

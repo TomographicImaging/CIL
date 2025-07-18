@@ -171,7 +171,10 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        axis = self.dimension_labels.index('angle')
+        try:
+            axis = self.dimension_labels.index('angle')
+        except:
+            axis = self.dimension_labels.index('projection')
 
         for i in range(num_batches):
             out[i].fill(

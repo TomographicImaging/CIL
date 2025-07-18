@@ -807,7 +807,13 @@ class TestDataContainer(CCPiTestClass):
         ag_flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
         ad_flex = ag_flex.allocate()
 
-        ad_flex.reorder(new_order)
+
+        # check it fails if we try to use a list containing 'ANGLE':
+        with self.assertRaises(ValueError):
+            ad_flex.reorder(new_order)
+
+        new_order[3] = AcquisitionDimension["PROJECTION"]
+
         self.assertListEqual(new_order, list(ad_flex.dimension_labels))
 
         ss3 = ad_flex.get_slice(angle=0)
@@ -816,7 +822,7 @@ class TestDataContainer(CCPiTestClass):
 
         ss4 = ad_flex.get_slice(channel=0)
         self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
-                    AcquisitionDimension["VERTICAL"], AcquisitionDimension["ANGLE"]], list(ss4.geometry.dimension_labels))
+                    AcquisitionDimension["VERTICAL"], AcquisitionDimension["PROJECTION"]], list(ss4.geometry.dimension_labels))
 
 
     def test_ImageDataSubset(self):

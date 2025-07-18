@@ -223,7 +223,7 @@ class PaganinProcessor(Processor):
 
         target_shape = (
             data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
-            data.get_dimension_size('angle') if 'angle' in data.dimension_labels else 1,
+            data.geometry.num_projections,
             data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
             data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
             
@@ -247,7 +247,7 @@ class PaganinProcessor(Processor):
         
         # loop over the channels
         for j in range(data.geometry.channels):
-            # loop over the angles
+            # loop over the projections
             for i in tqdm(range(target_shape[1])):
                 padded_buffer[:] = 0
                 padded_buffer[buffer_slice] = data.array[j, i, :, :]

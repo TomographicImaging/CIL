@@ -24,6 +24,7 @@ import re
 import io
 import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
+from cil.framework.labels import AcquisitionDimension
 import warnings
 
 from utils import has_matplotlib
@@ -1788,23 +1789,24 @@ class Test_Cone3D_Flex(unittest.TestCase):
             self.ag.get_centre_slice()
 
     def test_get_slice_angle(self):
-        angle_slice = self.ag.get_slice(angle=1)
-        self.assertEqual(angle_slice.num_projections, 1)
-        self.assertEqual(angle_slice.channels, 4)
-        np.testing.assert_allclose(angle_slice.config.system.source[0].position, np.asarray([0,-1.3,1]))
-        np.testing.assert_allclose(angle_slice.config.system.detector[0].position, np.asarray([0,2,2]))
+        with self.assertRaises(ValueError):
+            self.ag.get_slice(angle=0)
+
+    def test_get_slice_projection(self):
+        projection_slice = self.ag.get_slice(projection=1)
+        self.assertEqual(projection_slice.num_projections, 1)
+        self.assertEqual(projection_slice.channels, 4)
+        np.testing.assert_allclose(projection_slice.config.system.source[0].position, np.asarray([0,-1.3,1]))
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].position, np.asarray([0,2,2]))
         normalised_direction_x = np.asarray([1,0.02,0.0]) / np.linalg.norm(np.asarray([1,0.02,0.0]))
-        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_x, np.asarray(normalised_direction_x))
-        np.testing.assert_allclose(angle_slice.config.system.detector[0].direction_y, np.asarray([0,0.0,1]))
-        self.assertEqual(len(angle_slice.config.system.source), 1)
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].direction_x, np.asarray(normalised_direction_x))
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].direction_y, np.asarray([0,0.0,1]))
+        self.assertEqual(len(projection_slice.config.system.source), 1)
 
     def test_get_slice_channel(self):
         channel_slice = self.ag.get_slice(channel=1)
         self.assertEqual(channel_slice.num_projections, 2)
         self.assertEqual(channel_slice.channels, 1)
-        print(channel_slice.config.system.source[0].position, [0,-1,0])
-        print(type(channel_slice.config.system.source[0].position))
-
         np.testing.assert_allclose(channel_slice.config.system.source[0].position, np.asarray([0,-1,0]))
         np.testing.assert_allclose(channel_slice.config.system.detector[0].position, np.asarray([0,2,1]))
         np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_x, np.asarray([1,0.0, 0.0]))
@@ -1823,6 +1825,11 @@ class Test_Cone3D_Flex(unittest.TestCase):
         with self.assertWarns(UserWarning):
             a = self.ag.set_angles([0, 1])
             self.assertTrue(a==self.ag)
+
+    def test_default_labels(self):
+        expected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.PROJECTION, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+        for x,y in zip(expected_labels, self.ag.dimension_labels):
+            self.assertEqual(x,y)
 
 
 class TestSubset(unittest.TestCase):

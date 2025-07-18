@@ -21,7 +21,6 @@ try:
 except ImportError: # Python<3.11
     from enum import EnumMeta as EnumType
 
-
 class _StrEnumMeta(EnumType):
     """Python<3.12 requires this in a metaclass (rather than directly in StrEnum)"""
     def __contains__(self, item: str) -> bool:
@@ -89,12 +88,18 @@ class _DimensionBase:
         ----------
         geometry: ImageGeometry | AcquisitionGeometry
             If unspecified, the default order is returned.
+        
+        Notes
+        -----
+        In the case that geometry is None, the default order assumes the geometry is not CONE_FLEX, so includes the label 'angle'.
+        This then needs to be manually replaced with 'projection'.
+
         """
         order = cls._default_order(engine)
         if geometry is None:
             return order
         elif geometry.geom_type & AcquisitionType.CONE_FLEX:
-            order = [label for label in order if label not 'angle' else 'projection']
+            order = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in order]
         return tuple(label for label in order if label in geometry.dimension_labels)
 
     @classmethod

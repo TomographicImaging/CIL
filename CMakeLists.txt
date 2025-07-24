@@ -15,16 +15,21 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Richard Brown (University College London)
-
+# Satwik Pani (Washington University in St. Louis)
 if(APPLE)
-  cmake_minimum_required(VERSION 3.16)
+  cmake_minimum_required(VERSION 3.16...4.1)
 else()
-  cmake_minimum_required(VERSION 3.5)
+  cmake_minimum_required(VERSION 3.5...4.1)
 endif()
 
-project(cil LANGUAGES CXX)
+if(NOT SKBUILD_PROJECT_NAME)
+  set(SKBUILD_PROJECT_NAME cil)
+endif()
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
+cmake_policy(PUSH)
+
+cmake_policy(SET CMP0074 NEW)
 if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
 endif()
@@ -45,4 +50,5 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 add_subdirectory(src/Core)
-add_subdirectory(Wrappers/Python)
+
+cmake_policy(POP)

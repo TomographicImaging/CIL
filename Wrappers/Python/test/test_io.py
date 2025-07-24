@@ -61,16 +61,24 @@ if has_astra:
     from cil.plugins.astra import FBP
 
 
-# change basedir to point to the location of the walnut dataset which can
-# be downloaded from https://zenodo.org/record/4822516
-# basedir = os.path.abspath('/home/edo/scratch/Data/Walnut/valnut_2014-03-21_643_28/tomo-A/')
-basedir = data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
-filename = os.path.join(basedir, "valnut_tomo-A.txrm")
-has_file = os.path.isfile(filename)
+has_file = False
+has_recon_file = False
+basedir = dataexample.REMOTEDATA.CIL_DATA_DIR
+if basedir is not None:
+    dataexample.WALNUT.download_data(data_dir=basedir, prompt=False)
 
+    test_txrm_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A.txrm")
+    # strip double quotes if they exist
+    test_txrm_file = test_txrm_file.strip('"')
+    test_txrm_file = os.path.abspath(test_txrm_file)
+    has_file = os.path.isfile(test_txrm_file)
+    
+    test_3d_recon_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A_recon.txm")
+    # strip double quotes if they exist
+    test_3d_recon_file = test_3d_recon_file.strip('"')
+    test_3d_recon_file = os.path.abspath(test_3d_recon_file)
+    has_recon_file = os.path.isfile(test_3d_recon_file)
 
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
-    and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
 logging.basicConfig(level=logging.WARNING)
@@ -81,91 +89,94 @@ log.info("has_olefile %s", has_olefile)
 log.info("has_dxchange %s", has_dxchange)
 log.info("has_file %s", has_file)
 if not has_file:
-    log.info("This unittest requires the walnut Zeiss dataset saved in %s", data_dir)
+    log.info("This unittest requires the walnut Zeiss dataset saved in %s", basedir)
 
+  
 
 class TestZeissDataReader(unittest.TestCase):
-    def setUp(self):
-        if has_file:
-            self.reader = ZEISSDataReader()
-            angle_unit = AngleUnit["RADIAN"]
+    
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
+    def test_geometry_gpu(self):
+        
+        reader = ZEISSDataReader()           
+        reader.set_up(file_name=test_txrm_file)
 
-            self.reader.set_up(file_name=filename,
-                               angle_unit=angle_unit)
-            data = self.reader.read()
-            if data.geometry is None:
-                raise AssertionError("WTF")
-            # Choose the number of voxels to reconstruct onto as number of detector pixels
-            N = data.geometry.pixel_num_h
-
-            # Geometric magnification
-            mag = (np.abs(data.geometry.dist_center_detector) + \
-                np.abs(data.geometry.dist_source_center)) / \
-                np.abs(data.geometry.dist_source_center)
-
-            # Voxel size is detector pixel size divided by mag
-            voxel_size_h = data.geometry.pixel_size_h / mag
-            voxel_size_v = data.geometry.pixel_size_v / mag
-
-            self.mag = mag
-            self.N = N
-            self.voxel_size_h = voxel_size_h
-            self.voxel_size_v = voxel_size_v
-
-            self.data = data
+        geometry = reader.get_geometry()
+        # print (geometry)
+        assert geometry is not None
+        assert geometry.geom_type == 'CONE'
+        assert geometry.dimension == '3D'
+        
+        from cil.framework import AcquisitionGeometry
+        metadata = reader.get_metadata()
+        _geometry = AcquisitionGeometry.create_Cone3D(
+                [0,-metadata['dist_source_center'],0],[0,metadata['dist_center_detector'],0] \
+                ) \
+                    .set_panel([metadata['image_width'], metadata['image_height']],\
+                        pixel_size=[metadata['detector_pixel_size']/1000,metadata['detector_pixel_size']/1000])\
+                    .set_angles(metadata['thetas'],angle_unit=AngleUnit.RADIAN)
+        
+        assert _geometry == geometry
 
 
-    def tearDown(self):
-        pass
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
+                     f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
+    def test_read_txm_recon_file_gpu(self):
+        zreader = ZEISSDataReader()           
+        zreader.set_up(file_name=test_3d_recon_file)
+
+        metadata = zreader.get_metadata()
+        
+        _geometry = ImageGeometry(voxel_num_x=metadata['image_width'], 
+                                  voxel_num_y=metadata['image_height'],
+                                  voxel_num_z=metadata['number_of_images'],
+                                  voxel_size_x=metadata['pixel_size'],
+                                  voxel_size_y=metadata['pixel_size'],
+                                  voxel_size_z=metadata['pixel_size'],
+                                 )
+        data3d = zreader.read()
+
+        assert _geometry == data3d.geometry
 
 
-    def test_run_test(self):
-        print("run test Zeiss Reader")
-        self.assertTrue(True)
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange ), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
+    def test_read_and_reconstruct_2D_gpu(self):
 
-
-    @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
-    def test_read_and_reconstruct_2D(self):
+        # Here we may read the TXM file that comes with the Walnut Zeiss dataset, extract
+        # the central slice and compare it with the FBP reconstruction from the data.
+        # However, https://github.com/TomographicImaging/CIL/issues/2175        
+        # So at the moment we just read the file and reconstruct it.
+        
+        zreader = ZEISSDataReader()           
+        zreader.set_up(file_name=test_txrm_file)
+        data = zreader.read()
 
         # get central slice
-        data2d = self.data.subset(vertical='centre')
-        # d512 = self.data.subset(vertical=512)
-        # data2d.fill(d512.as_array())
+        data2d = data.get_slice(vertical='centre')
         # neg log
         data2d.log(out=data2d)
         data2d *= -1
 
         ig2d = data2d.geometry.get_ImageGeometry()
-        # Construct the appropriate ImageGeometry
-        ig2d = ImageGeometry(voxel_num_x=self.N,
-                            voxel_num_y=self.N,
-                            voxel_size_x=self.voxel_size_h,
-                            voxel_size_y=self.voxel_size_h)
-        if data2d.geometry is None:
-            raise AssertionError('What? None?')
+        assert data2d.geometry is not None, "data2d geometry is None"
         fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
 
         recfbp = fbpalg.get_output()
 
-        wget.download('https://www.ccpi.ac.uk/sites/www.ccpi.ac.uk/files/walnut_slice512.nxs',
-                      out=data_dir)
-        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
-        reader = NEXUSDataReader()
-        reader.set_up(file_name=fname)
-        gt = reader.read()
-
-        qm = mse(gt, recfbp)
-        log.info("MSE %r", qm)
-
-        np.testing.assert_almost_equal(qm, 0, decimal=3)
-        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
-        os.remove(fname)
-
     def test_file_not_found_error(self):
+        reader = ZEISSDataReader()           
+        
         with self.assertRaises(FileNotFoundError):
-            reader = ZEISSDataReader(file_name='no-file')
+            reader.set_up(file_name='no-file')
 
+    @unittest.skipIf(has_dxchange, f"This unit test runs only if dxchange is not installed: has_dxchange {has_dxchange}")
+    def test_import_error(self):
+        reader = ZEISSDataReader()
+        with self.assertRaises(ImportError):
+            reader.set_up(file_name=test_txrm_file)
 
 class TestTIFF(unittest.TestCase):
     def setUp(self) -> None:
@@ -448,6 +459,8 @@ class TestRAW(unittest.TestCase):
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
+        data_dir = dataexample.CILDATA.data_dir
+        
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 
 

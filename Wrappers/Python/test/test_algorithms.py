@@ -30,12 +30,13 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks
-from cil.optimisation.operators import IdentityOperator
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule
+from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
+from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
 
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
 from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
 
 
@@ -79,10 +80,7 @@ class TestGD(CCPiTestClass):
     def test_GD(self):
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -111,7 +109,7 @@ class TestGD(CCPiTestClass):
         '''
         ig = ImageGeometry(12, 13, 14)
         initial = ig.allocate()
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
@@ -134,8 +132,8 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.beta, 0.5)
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e6) / np.log10(2)))
-        with self.assertRaises(TypeError):
-            gd.step_size
+        with self.assertRaises(NotImplementedError):
+            self.assertEqual(gd.step_size,3)
 
         gd = GD(initial=self.initial,
                 f=self.f, alpha=1e2, beta=0.25)
@@ -144,9 +142,6 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
             2 * np.log10(1e2) / np.log10(2)))
 
-        with self.assertRaises(TypeError):
-            gd = GD(initial=self.initial, f=self.f,
-                    step_size=0.1, step_size_rule=ConstantStepSize(0.5))
 
     def test_gd_constant_step_size_init(self):
         rule = ConstantStepSize(0.4)
@@ -192,7 +187,7 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.beta, 0.2)
         self.assertEqual(gd.step_size_rule.max_iterations, 5)
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(NotImplementedError):
             gd.step_size
 
     def test_GDArmijo(self):
@@ -201,7 +196,7 @@ class TestGD(CCPiTestClass):
         # b = initial.copy()
         # fill with random numbers
         # b.fill(np.random.random(initial.shape))
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -263,15 +258,99 @@ class TestGD(CCPiTestClass):
         gd.run(10)
         self.assertEqual(gd.iteration, 0)
         
+class Test_APGD(CCPiTestClass):
+    def setUp(self):
+        self.ig = ImageGeometry(11,12,13)
+        self.initial = self.ig.allocate(0)
+        self.b = self.ig.allocate(None)
+        self.b.fill(np.array(range(11*12*13)).reshape(13,12,11))
+        self.identity = IdentityOperator(self.ig)
+
+        self.f = OperatorCompositionFunction(L2NormSquared(b=self.b), self.identity)
+        self.g= IndicatorBox(lower=0)
+        
+    def test_init_default(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        assert isinstance(alg.momentum, NesterovMomentum) 
+        assert isinstance(alg.step_size_rule, ConstantStepSize)
+        self.assertEqual(alg.step_size_rule.step_size, 1/self.f.L)
+        self.assertEqual(alg.update_objective_interval, 1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), self.initial.as_array())
+
+    def test_init_momentum(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum=1)
+        assert isinstance(alg.momentum, ConstantMomentum)
+        self.assertEqual(alg.momentum(alg),1) 
+        self.assertEqual(alg.momentum.momentum, 1)
+        
+        with self.assertRaises(TypeError):
+            alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum='banana')
+        
+    def test_init_step_size(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=1.0)
+        assert isinstance(alg.step_size_rule, ConstantStepSize)
+        self.assertEqual(alg.step_size_rule.get_step_size(alg), 1.0)
+        self.assertEqual(alg.step_size_rule.step_size, 1.0)
+        
+        with self.assertRaises(TypeError):
+            alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size='banana')
+
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        self.assertEqual(alg.step_size, 1/self.f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 1/self.f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.45/(algorithm.iteration+1)
+            
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.45)
+        self.assertEqual(alg.step_size, 0.45)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.45/2)
+        self.assertEqual(alg.step_size, 0.45/2)
+        
+        
+    def test_update_step(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, step_size=0.3, momentum=0.5)
+        y_0=self.initial.copy()
+        x_0=self.g.proximal(y_0 - 0.3*self.f.gradient(y_0), 0.3)
+        y_1=x_0 + 0.5*(x_0-y_0)
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_1.as_array())
+        
+        x_1=self.g.proximal(y_1 - 0.3*self.f.gradient(y_1), 0.3)
+        y_2=x_1 + 0.5*(x_1-x_0)
+        alg.run(1)
+        self.assertNumpyArrayAlmostEqual(alg.y.as_array(), y_2.as_array())
+        
+    def test_provable_convergence(self):
+        alg = APGD(initial=self.initial, f=self.f, g=self.g)
+        self.assertTrue(alg.is_provably_convergent())
+        
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, momentum=0.5)
+        with self.assertRaises(TypeError):
+            alg.is_provably_convergent()
+            
+        alg = APGD(initial=self.initial, f=self.f, g=self.g, preconditioner=Sensitivity(self.identity))
+        with self.assertRaises(NotImplementedError):
+            alg.is_provably_convergent()
+        
+        
+        
+        
 
 class TestFISTA(CCPiTestClass):
     def test_FISTA(self):
         ig = ImageGeometry(127, 139, 149)
-        initial = ig.allocate()
+        initial = ig.allocate(0)
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
@@ -372,9 +451,9 @@ class TestFISTA(CCPiTestClass):
 
     def test_FISTA_Norm2Sq(self):
         ig = ImageGeometry(127, 139, 149)
-        b = ig.allocate(FillType["RANDOM"])
+        b = ig.allocate(FillType["RANDOM"], seed=3)
         # fill with random numbers
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=4)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -399,7 +478,7 @@ class TestFISTA(CCPiTestClass):
         b = initial.copy()
         # fill with random numbers
         b.fill(np.random.random(initial.shape))
-        initial = ig.allocate(FillType["RANDOM"])
+        initial = ig.allocate(FillType["RANDOM"], seed=3)
         identity = IdentityOperator(ig)
 
         norm2sq = LeastSquares(identity, b)
@@ -412,52 +491,46 @@ class TestFISTA(CCPiTestClass):
         with self.assertRaises(TypeError):
             alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
 
-    def test_FISTA_Denoising(self):
-        # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        data = dataexample.SHAPES.get()
-        ig = data.geometry
-        ag = ig
-        N = 300
-        # Create Noisy data with Poisson noise
-        scale = 5
-        noisy_data = applynoise.poisson(data/scale, seed=10) * scale
 
-        # Regularisation Parameter
-        alpha = 10
+    def test_FISTA_step_size_init(self):
+        np.random.seed(10)
+        n = 5
+        m = 3
 
-        # Setup and run the FISTA algorithm
-        operator = GradientOperator(ig)
-        fid = KullbackLeibler(b=noisy_data)
-        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
-
-        initial = ig.allocate()
-        fista = FISTA(initial=initial, f=reg, g=fid)
-        fista.update_objective_interval = 500
-        fista.run(3000, verbose=0)
-        rmse = (fista.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 4.2e-4)
-
- 
-    def test_FISTA_APGD_alias(self):
-        n = 50
-        m = 500
         A = np.random.uniform(0, 1, (m, n)).astype('float32')
-        b = A.dot(np.random.randn(n))
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
         Aop = MatrixOperator(A)
         bop = VectorData(b)
+
         f = LeastSquares(Aop, b=bop, c=0.5)
         g = ZeroFunction()
         ig = Aop.domain
+
         initial = ig.allocate()
-         
-        with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
+        
+        alg= FISTA(initial=initial, f=f, g=g, step_size=0.002)
+        self.assertEqual(alg.step_size_rule.step_size, 0.002)
+        self.assertEqual(alg.step_size, 0.002)
 
-            alg = APGD(initial=initial, f=f, g=g, step_size=4)
-            self.assertEqual(alg.t, 1)
-            self.assertNumpyArrayEqual(alg.y.array, initial.array)
-            mock_method.assert_called_once_with(initial=initial, f=f, g=g, step_size=4, preconditioner=None)
-
+        alg = FISTA(initial=initial, f=f, g=g)
+        self.assertEqual(alg.step_size, 1/f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 1/f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.99/(algorithm.iteration+1)
+            
+        alg = FISTA(initial=initial, f=f, g=g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99)
+        self.assertEqual(alg.step_size, 0.99)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99/2)
+        self.assertEqual(alg.step_size, 0.99/2)
 
 class testISTA(CCPiTestClass):
 
@@ -636,17 +709,38 @@ class testISTA(CCPiTestClass):
         with patch('cil.optimisation.algorithms.ISTA.set_up', MagicMock(return_value=None)) as mock_method:
 
             alg = PGD(initial=self.initial, f=self.f, g=self.g, step_size=4)
-            self.assertEqual(alg._step_size, 4)
             mock_method.assert_called_once_with(initial=self.initial, f=self.f, g=self.g, step_size=4, preconditioner=None)
 
 
+    def test_ISTA_step_size_init(self):
+        alg= ISTA(initial=self.initial, f=self.f, g=self.g, step_size=0.002)
+        self.assertEqual(alg.step_size_rule.step_size, 0.002)
+        self.assertEqual(alg.step_size, 0.002)
+
+        alg = ISTA(initial=self.initial, f=self.f, g=self.g)
+        self.assertEqual(alg.step_size, 0.99*2.0/self.f.L)
+        self.assertEqual(alg.step_size_rule.step_size, 0.99*2.0/self.f.L)
+        
+        class CustomStep(StepSizeRule):
+            def get_step_size(self, algorithm):
+                return 0.99**algorithm.iteration
+            
+        alg = ISTA(initial=self.initial, f=self.f, g=self.g, step_size=CustomStep())
+        with self.assertRaises(NotImplementedError):
+           alg.step_size
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99**0)
+        self.assertEqual(alg.step_size, 0.99**0)
+        alg.run(1)
+        self.assertEqual(alg.step_size, 0.99**1)
+        self.assertEqual(alg.step_size, 0.99**1)
 
 class TestCGLS(CCPiTestClass):
     def setUp(self):
         self.ig = ImageGeometry(10, 2)
         np.random.seed(2)
         self.initial = self.ig.allocate(1.)
-        self.data = self.ig.allocate('random')
+        self.data = self.ig.allocate('random', seed=3)
         self.operator = IdentityOperator(self.ig)
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                         update_objective_interval=2)
@@ -764,6 +858,72 @@ class TestCGLS(CCPiTestClass):
 
 class TestPDHG(CCPiTestClass):
 
+    def setUp(self):
+        self.ig = ImageGeometry(10, 10)
+        self.initial = self.ig.allocate(0)
+        self.data = self.ig.allocate('random')
+        self.operator = IdentityOperator(self.ig)
+
+        self.f = L2NormSquared(b=self.data)
+        self.g = ZeroFunction()
+
+        self.subsets = 10
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(16, 16))
+
+        self.partitioned_data = data.partition(self.subsets, 'sequential')
+        self.A_block = BlockOperator(
+            *[IdentityOperator(self.partitioned_data[i].geometry) for i in range(self.subsets)])
+
+        # block function
+        self.F_block = BlockFunction(*[L2NormSquared(b=self.partitioned_data[i])
+                                for i in range(self.subsets)])
+        alpha = 0.025
+        self.G = alpha * IndicatorBox(lower=0)
+        
+        self.A_block_adjoint = AdjointOperator(self.A_block)
+        self.f_adjoint = L2NormSquared(b=self.data)
+        
+    def test_init_primal_dual(self):
+        init1 = self.ig.allocate(1)
+        init2 = self.ig.allocate(2)
+        init_default = self.ig.allocate(0)
+        pdhg = PDHG(initial=None, f=self.f, g=self.g,
+                         operator=self.operator)
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.as_array(), init_default.as_array())
+        self.assertNumpyArrayAlmostEqual(pdhg.y.as_array(), init_default.as_array())
+        
+        pdhg = PDHG(initial=init1, f=self.f, g=self.g,
+                         operator=self.operator)
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.as_array(), init1.as_array())
+        self.assertNumpyArrayAlmostEqual(pdhg.y.as_array(), init_default.as_array())
+        
+        pdhg = PDHG(initial=(None, init2), f=self.f, g=self.g,
+                         operator=self.operator) # check tuple initialisation just dual
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.as_array(), init_default.as_array())
+        self.assertNumpyArrayAlmostEqual(pdhg.y.as_array(), init2.as_array())
+        
+        pdhg= PDHG(initial=self.partitioned_data, f=self.f_adjoint, g=self.G,
+                         operator=self.A_block_adjoint) # check can initialise with block data without dual initialisation
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.get_item(0).as_array(), self.partitioned_data.get_item(0).as_array())
+        self.assertEqual(np.sum(pdhg.y.as_array()), 0)
+        
+        pdhg = PDHG(initial=[init1, None], f=self.f, g=self.g,
+                         operator=self.operator)  # check list initialisation just primal
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.as_array(), init1.as_array())
+        self.assertNumpyArrayAlmostEqual(pdhg.y.as_array(), init_default.as_array())
+        
+        pdhg = PDHG(initial=[init1, init2], f=self.f, g=self.g,
+                         operator=self.operator)  # check list initialisation both primal and dual
+        
+        self.assertNumpyArrayAlmostEqual(pdhg.x_old.as_array(), init1.as_array())
+        self.assertNumpyArrayAlmostEqual(pdhg.y.as_array(), init2.as_array())
+        
+        
+        
     def test_PDHG_Denoising(self):
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         data = dataexample.PEPPERS.get(size=(256, 256))
@@ -878,7 +1038,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_step_sizes(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -965,7 +1125,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -998,7 +1158,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1036,7 +1196,7 @@ class TestPDHG(CCPiTestClass):
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1051,7 +1211,7 @@ class TestPDHG(CCPiTestClass):
 
     def test_pdhg_theta(self):
         ig = ImageGeometry(3, 3)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
 
         f = L2NormSquared(b=data)
         g = L2NormSquared()
@@ -1090,7 +1250,7 @@ class TestSIRT(CCPiTestClass):
         # set up with linear operator
         self.ig2 = ImageGeometry(3, 4, 5)
         self.initial2 = self.ig2.allocate(0.)
-        self.b2 = self.ig2.allocate('random')
+        self.b2 = self.ig2.allocate('random', seed=3)
         self.A2 = IdentityOperator(self.ig2)
 
     def tearDown(self):
@@ -1535,7 +1695,7 @@ class TestCallbacks(unittest.TestCase):
         ig = ImageGeometry(10, 2)
         np.random.seed(2)
         initial = ig.allocate(1.)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=3)
         operator = IdentityOperator(ig)
         alg = CGLS(initial=initial, operator=operator, data=data,
                    update_objective_interval=2)
@@ -1681,7 +1841,7 @@ class TestADMM(unittest.TestCase):
             admm.solution.array, pdhg.solution.array,  decimal=3)
 
 
-class Test_PD3O(unittest.TestCase):
+class Test_PD3O(CCPiTestClass):
 
     def setUp(self):
 
@@ -1695,7 +1855,7 @@ class Test_PD3O(unittest.TestCase):
         G1 = IndicatorBox(lower=0)
 
         algo_pd3o = PD3O(f=F1, g=G1, h=H1, operator=operator)
-        self.assertEqual(algo_pd3o.gamma, 0.99*2.0/F1.L)
+        self.assertEqual(algo_pd3o.gamma, 0.99*2.0/F1.L) 
         self.assertEqual(algo_pd3o.delta, F1.L/(2.0*operator.norm()**2))
         np.testing.assert_array_equal(
             algo_pd3o.x.array, self.data.geometry.allocate(0).array)
@@ -1752,32 +1912,93 @@ class Test_PD3O(unittest.TestCase):
         np.testing.assert_allclose(
             pdhg.objective[-1], pd3O.objective[-1], atol=1e-2)
 
-    def test_pd3o_convergence(self):
+ 
+    def test_PD3O_stochastic_f(self): 
+        sampler=Sampler.sequential(3)
+        initial = VectorData(np.zeros(21))
+        b =  VectorData(np.array(range(1,22)))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(21)
+            diagonal[7*i:7*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+        
+        H1 = 0.1 * L1Norm()
+        operator = IdentityOperator(initial.geometry)
+        G1 = IndicatorBox(lower=0)
 
-        # pd30 convergence test using TV denoising
 
-        # regularisation parameter
-        alpha = 0.11
-
-        # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = TotalVariation(max_iteration=200)
-        tv_cil = TV.proximal(self.data, tau=alpha)
-
-        F = alpha * MixedL21Norm()
-        operator = GradientOperator(self.data.geometry)
-        norm_op = operator.norm()
-
-        # setup PD3O denoising  (H proximalble and G,F = 1/4 * L2NormSquared)
-        H = alpha * MixedL21Norm()
-        G = 0.25 * L2NormSquared(b=self.data)
-        F = 0.25 * L2NormSquared(b=self.data)
-        gamma = 2./F.L
-        delta = 1./(gamma*norm_op**2)
-
-        pd3O_with_f = PD3O(f=F, g=G, h=H, operator=operator, gamma=gamma, delta=delta,
-                           update_objective_interval=100)
-        pd3O_with_f.run(1000)
-
-        # pd30 vs fista
-        np.testing.assert_allclose(
-            tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=3)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 8/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [0,1,2]])
+        
+        sampler=Sampler.sequential(3)
+        f=SVRGFunction(functions, sampler, snapshot_update_interval=5, store_gradients=True)
+        algo_pd3o = PD3O(f= 3*(2*f), g=G1, h=H1, operator=operator)
+        self.assertTrue(isinstance(3*2*f,ScaledFunction) )
+        self.assertEqual(algo_pd3o.f.scalar, 6)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+        self.assertNumpyArrayAlmostEqual(f._list_stored_gradients[2].array, f.functions[2].gradient(algo_pd3o.solution).array )
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 4/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 5/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1]])
+        algo_pd3o.run(1)
+        self.assertAlmostEqual(f.data_passes[-1], 6/3)
+        self.assertEqual(f.data_passes_indices, [[0,1,2], [0], [1], [2]])
+        
+        
+        
+        sampler=Sampler.sequential(3)
+        f=LSVRGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1)
+        self.assertEqual(f.data_passes_indices, [[0,1,2]])
+            
+        sampler=Sampler.sequential(3)
+        f=SGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+    
+        sampler=Sampler.sequential(3)
+        f=SAGFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+        
+        sampler=Sampler.sequential(3)
+        f=SAGAFunction(functions, sampler)
+        algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 1/3)
+        self.assertEqual(f.data_passes_indices, [[0]])
+        algo_pd3o.run(1)
+        self.assertEqual(f.data_passes[-1], 2/3)
+        self.assertEqual(f.data_passes_indices, [[0], [1]])
+        

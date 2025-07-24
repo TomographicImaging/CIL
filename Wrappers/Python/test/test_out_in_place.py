@@ -97,7 +97,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
         weight_ls = ig.allocate('random', seed=2)
 
         A = IdentityOperator(ig)
-        b_ig = ig.allocate('random')
+        b_ig = ig.allocate('random', seed=3)
         c = numpy.float64(0.3)
         bg = BlockGeometry(ig, ig)
         # [(function, geometry, test_proximal, test_proximal_conjugate, test_gradient), ...]

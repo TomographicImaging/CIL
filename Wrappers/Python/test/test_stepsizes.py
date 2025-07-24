@@ -50,7 +50,7 @@ class TestStepSizeArmijo(CCPiTestClass):
     
     def setUp(self):
         self.ig = VectorGeometry(2)
-        self.data = self.ig.allocate('random')
+        self.data = self.ig.allocate('random', seed=3)
         self.data.fill(np.array([3.5, 3.5]))
         self.A = MatrixOperator(np.diag([1., 1.]))
         self.f = LeastSquares(self.A, self.data)

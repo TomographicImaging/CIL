@@ -18,7 +18,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import BlockGeometry, ImageGeometry
+from cil.framework import BlockGeometry, ImageGeometry, cilacc
 import logging
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -258,7 +258,7 @@ class Gradient_numpy(LinearOperator):
                     out.fill(tmp)
                 else:
                     out += tmp
-            return out 
+            return out
         else:
             tmp = self.domain_geometry().allocate()
             for i, axis_index in enumerate(self.ind):
@@ -267,20 +267,7 @@ class Gradient_numpy(LinearOperator):
                 tmp += self.FD.adjoint(x.get_item(i))
             return tmp
 
-import ctypes, platform
-from ctypes import util
-# check for the extension
-if platform.system() == 'Linux':
-    dll = 'libcilacc.so'
-elif platform.system() == 'Windows':
-    dll_file = 'cilacc.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libcilacc.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
-
-cilacc = ctypes.cdll.LoadLibrary(dll)
+import ctypes
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 
@@ -457,7 +444,7 @@ class Gradient_C(LinearOperator):
         status = self.fd(out_p, *args)
         if status != 0:
             raise RuntimeError('Call to C gradient operator failed')
-    
+
         out.fill(ndout)
 
         #reset input data
@@ -466,4 +453,3 @@ class Gradient_C(LinearOperator):
                 ndx[i]*= el
 
         return out
-

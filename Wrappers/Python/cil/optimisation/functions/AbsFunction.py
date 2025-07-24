@@ -154,7 +154,7 @@ def _take_abs_input(func):
         rgeo = x.geometry.copy()
         rgeo.dtype = real_dtype
         r = rgeo.allocate(0)
-        r.fill(np.abs(x.array).astype(real_dtype))
+        r.fill(np.abs(x.as_array()).astype(real_dtype))
         fval = func(r, *args, **kwargs)
         return fval
     return _take_abs_decorator

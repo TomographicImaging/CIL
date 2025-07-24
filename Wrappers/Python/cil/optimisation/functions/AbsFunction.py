@@ -127,7 +127,7 @@ class FunctionOfAbs(Function):
         Returns
         -------
         float:
-
+        The value of the convex conjugate of the function at x.
         '''
 
         if self._lower_semi:

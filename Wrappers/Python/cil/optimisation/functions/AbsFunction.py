@@ -134,7 +134,7 @@ class FunctionOfAbs(Function):
             conv_abs = _take_abs_input(self._function.convex_conjugate)
             return conv_abs(self._function, x)
         else:
-            warnings.warn('Convex conjugate is not properly for this function, returning 0 for compatibility with optimisation algorithms')
+            warnings.warn('Convex conjugate is not defined for this function, returning 0 for compatibility with optimisation algorithms')
             return 0.0
 
     def gradient(self, x):

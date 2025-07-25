@@ -1966,6 +1966,12 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
+            if self.config.system.geometry & AcquisitionType.CONE_FLEX:
+                if AcquisitionDimension.ANGLE in val:
+                    raise ValueError("Cannot set dimension_labels with AcquisitionDimension.ANGLE for Cone3D_Flex geometry. Use PROJECTION instead.")
+            elif AcquisitionDimension.PROJECTION in val:
+                raise ValueError("Cannot set dimension_labels with AcquisitionDimension.PROJECTION for geometries that use angles. Use ANGLE instead.")
+                
             self._dimension_labels = tuple(map(AcquisitionDimension, val))
 
     @property

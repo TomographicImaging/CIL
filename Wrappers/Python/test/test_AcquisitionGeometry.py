@@ -1632,6 +1632,19 @@ class Test_Cone3D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
         np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+    
+    def test_set_dimension_labels(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0]).set_angles([0,1]).set_panel(num_pixels=[10, 20]).set_channels(4)
+        unexpected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.PROJECTION, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        with self.assertRaises(ValueError):
+            AG.dimension_labels = unexpected_labels
+        
+        acceptable_labels = [AcquisitionDimension.ANGLE, AcquisitionDimension.CHANNEL,AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        AG.dimension_labels = acceptable_labels
+
+        self.assertEqual(list(AG.dimension_labels), acceptable_labels)
 
 class Test_Cone3D_Flex(unittest.TestCase):
 
@@ -1830,6 +1843,18 @@ class Test_Cone3D_Flex(unittest.TestCase):
         expected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.PROJECTION, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
         for x,y in zip(expected_labels, self.ag.dimension_labels):
             self.assertEqual(x,y)
+
+    def test_set_dimension_labels(self):
+        unexpected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.ANGLE, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        with self.assertRaises(ValueError):
+            self.ag.dimension_labels = unexpected_labels
+        
+        acceptable_labels = [AcquisitionDimension.PROJECTION, AcquisitionDimension.CHANNEL,AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        self.ag.dimension_labels = acceptable_labels
+
+        self.assertEqual(list(self.ag.dimension_labels), acceptable_labels)
 
 
 class TestSubset(unittest.TestCase):

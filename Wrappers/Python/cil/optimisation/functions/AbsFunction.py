@@ -77,7 +77,7 @@ class FunctionOfAbs(Function):
         .. math:: \text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)
 
         This is accomplished by calculating a bounded proximal map and making a change of phase,
-        :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ \Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i angl(z))`,
+        :math:`prox_G(z) = prox^+_H(r) \circ \Phi` where  :math:`z = r \circ \Phi`, :math:`r = abs(z)`, :math:`\Phi = \exp(i \angle(z))`,
         and :math:`\circ` is element-wise product.  Also define :math:`prox^+` to be the proximal map of :math:`H`  in which the minimisation carried out over the positive orthant.
 
 

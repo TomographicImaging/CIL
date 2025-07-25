@@ -156,7 +156,10 @@ class SimData(object):
 
         ag_new = AcquisitionGeometry.create_Cone3D_Flex(src_pos_set, det_pos_set, det_dir_x_set, det_dir_y_set)
         ag_new.set_panel([self.acq_data.geometry.pixel_num_h, self.acq_data.geometry.pixel_num_v], [self.acq_data.geometry.pixel_size_h, self.acq_data.geometry.pixel_size_v], origin='bottom-left')
-        ag_new.set_labels(self.acq_data.dimension_labels)
+        # Flex geometry has the same labels except uses PROJECTION instead of ANGLE:
+        new_labels = list(self.acq_data.dimension_labels)
+        new_labels[1] = AcquisitionDimension.PROJECTION
+        ag_new.set_labels(new_labels)
 
         self.ag = ag_new
         self._get_roi_3D()

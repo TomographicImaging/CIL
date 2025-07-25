@@ -98,8 +98,13 @@ class _DimensionBase:
         order = cls._default_order(engine)
         if geometry is None:
             return order
-        elif geometry.geom_type & AcquisitionType.CONE_FLEX:
-            order = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in order]
+
+        try:
+            if geometry.geom_type & AcquisitionType.CONE_FLEX:
+                order = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in order]
+        except AttributeError:
+            # if geometry is an ImageGeometry, it does not have a geom_type attribute and we also don't need to adjust the labels
+            pass
         return tuple(label for label in order if label in geometry.dimension_labels)
 
     @classmethod

@@ -200,10 +200,10 @@ class Test_get_slice(unittest.TestCase):
                                                     detector_position_set=detector_position_set, \
                                                     detector_direction_x_set=detector_direction_x_set, \
                                                     detector_direction_y_set=detector_direction_y_set)\
-                                     .set_panel(num_pixels=[5,4]).set_channels(6).set_labels(['channel','angle','vertical','horizontal'])
+                                     .set_panel(num_pixels=[5,4]).set_channels(6).set_labels(['channel','projection','vertical','horizontal'])
 
         data = ag.allocate('random')
-        data_new = data.get_slice(angle=1)
+        data_new = data.get_slice(projection=1)
         self.assertEqual(data_new.shape,(6, 4, 5))
         self.assertEqual(data_new.geometry.dimension_labels,('channel','vertical','horizontal'))
 
@@ -387,7 +387,6 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
     def test_AcquisitionDataSubset1f(self):
-
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
@@ -395,27 +394,23 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
 
     def test_AcquisitionDataSubset1g(self):
-
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
 
     def test_AcquisitionDataSubset1h(self):
-
         data = self.ag_cone.allocate()
         sub = data.get_slice(vertical = 'centre')
         self.assertTrue( sub.geometry.shape == (4,3,20))
 
     def test_AcquisitionDataSubset1i(self):
-
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(vertical = sliceme, force=True)
         self.assertTrue( sub.shape == (4, 3, 20))
 
     def test_AcquisitionDataSubset1j(self):
-
         data = self.ag.allocate()
         sub = data.get_slice(angle = 0)
         sub = sub.get_slice(vertical = 0)
@@ -425,14 +420,12 @@ class TestSubset(unittest.TestCase):
 
     def test_AcquisitionDataSubset1k(self):
         data = self.ag_flex.allocate()
-        sub = data.get_slice(angle=0)
-        print(sub.shape, sub.dimension_labels)
+        sub = data.get_slice(projection=0)
         self.assertTrue( sub.geometry.shape == (4, 2, 20))
 
 
     def test_AcquisitionDataSubset1l(self):
         data = self.ag_flex.allocate()
-        sub = data.get_slice(angle = 0)
+        sub = data.get_slice(projection = 0)
         sub = sub.get_slice(channel = 0)
-        print(sub.shape, sub.dimension_labels)
         self.assertTrue(sub.shape == (2, 20))

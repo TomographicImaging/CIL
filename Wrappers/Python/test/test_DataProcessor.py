@@ -1088,7 +1088,7 @@ class TestSlicer(unittest.TestCase):
             proc = Slicer(roi=roi_invalid)
             proc.set_input(ag)
         
-        roi_valid =  {'angle':(1,3,2)}
+        roi_valid =  {'projection':(1,3,2)}
 
         slicer = Slicer(roi=roi_valid)
         sliced = slicer(ag)
@@ -3274,6 +3274,13 @@ class TestFluxNormaliser(unittest.TestCase):
                         [[7,8,9],[7,8,9],[7,8,9]]])
         self.data_simple = AcquisitionData(arr, geometry=ag)
 
+        source_position_set=[[0,-100000,0]]*3
+        detector_position_set=[[0,0,0]]*3
+        detector_direction_x_set=[[1, 0, 0]]*3
+        detector_direction_y_set=[[0, 0, 1]]*3
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.cone_flex  = AcquisitionData(arr, geometry=cone_flex_ag)
+
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
 
@@ -3298,6 +3305,11 @@ class TestFluxNormaliser(unittest.TestCase):
         processor = FluxNormaliser()
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
+
+        # check there's a not implemented error if cone flex geom is used:
+        processor = FluxNormaliser(flux=[1,2,3])
+        with self.assertRaises(NotImplementedError):
+            processor.check_input(self.cone_flex)
 
     def test_calculate_flux(self):
         # check there is an error if flux array size is not equal to the number of angles in data

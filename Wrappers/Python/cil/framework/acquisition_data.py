@@ -125,10 +125,10 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             return False
 
-    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
+    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, projection=None, force=False): # CHANGES ORDER OF KWARGS BREAKING BACKWARD COMPATIBILITY
         '''Returns a new dataset of a single slice in the requested direction.'''
         try:
-            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal, projection=projection)
         except ValueError:
             if force:
                 geometry_new = None
@@ -143,13 +143,13 @@ class AcquisitionData(DataContainer, Partitioner):
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
             ind0 = int(numpy.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal, projection=projection)
 
             if w2 > 0:
-                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal, projection=projection)
                 out = out * (1 - w2) + out2 * w2
         else:
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal, projection=projection)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out

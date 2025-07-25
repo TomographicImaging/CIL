@@ -778,10 +778,11 @@ class TestDataContainer(CCPiTestClass):
 
         # expected dimension_labels
 
-        self.assertListEqual([AcquisitionDimension["CHANNEL"] ,
+        default_order = [AcquisitionDimension["CHANNEL"] ,
                  AcquisitionDimension["ANGLE"] , AcquisitionDimension["VERTICAL"] ,
-                 AcquisitionDimension["HORIZONTAL"]],
-                              list(sgeometry.dimension_labels))
+                 AcquisitionDimension["HORIZONTAL"]]
+
+        self.assertListEqual(default_order, list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
@@ -812,17 +813,18 @@ class TestDataContainer(CCPiTestClass):
         with self.assertRaises(ValueError):
             ad_flex.reorder(new_order)
 
-        new_order[3] = AcquisitionDimension["PROJECTION"]
+        # By default, flex geometry has 'projection' label instead of 'angle'
+        default_order[1] = AcquisitionDimension["PROJECTION"]
 
-        self.assertListEqual(new_order, list(ad_flex.dimension_labels))
+        print("FLEX DIMS: ", ad_flex.dimension_labels)
 
-        ss3 = ad_flex.get_slice(angle=0)
-        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
-                 AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"]], list(ss3.geometry.dimension_labels))
+        self.assertListEqual(default_order, list(ad_flex.dimension_labels))
+
+        ss3 = ad_flex.get_slice(projection=0)
+        self.assertListEqual([AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"], AcquisitionDimension["HORIZONTAL"]], list(ss3.geometry.dimension_labels))
 
         ss4 = ad_flex.get_slice(channel=0)
-        self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
-                    AcquisitionDimension["VERTICAL"], AcquisitionDimension["PROJECTION"]], list(ss4.geometry.dimension_labels))
+        self.assertListEqual([AcquisitionDimension["PROJECTION"], AcquisitionDimension["VERTICAL"], AcquisitionDimension["HORIZONTAL"]], list(ss4.geometry.dimension_labels))
 
 
     def test_ImageDataSubset(self):

@@ -44,7 +44,7 @@ class FunctionOfAbs(Function):
     In the case that :math:`H` is lower semi-continuous, convex, non-decreasing and finite at the origin, (and thus `assume_lower_semi` is set to `True` in the `init`) the convex conjugate is also defined.  
     The gradient is not defined for this function.
     
-For reference: see https://doi.org/10.48550/arXiv.2410.22161
+    For reference: see https://doi.org/10.48550/arXiv.2410.22161
 
     Parameters
     ----------

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.block &#8212; CIL 24.3.1.dev60+gc7da0cdd7 documentation</title>
+    <title>cil.framework.block &#8212; CIL 24.3.1.dev65+gb23202dff documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../../../../_static/documentation_options.js?v=06d321c7"></script>
+    <script src="../../../../_static/documentation_options.js?v=cceb303f"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev60+gc7da0cdd7';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev65+gb23202dff';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev60+gc7da0cdd7" />
+  <meta name="docsearch:version" content="24.3.1.dev65+gb23202dff" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -496,19 +496,21 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">FillType</span>
 
 
-<div class="viewcode-block" id="BlockGeometry">
-<a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BlockGeometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BackwardCompat</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM_INT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM_INT</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM_INT instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM_INT</span>
 
+
+<div class="viewcode-block" id="BlockGeometry">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockGeometry</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">BackwardCompat</span><span class="p">):</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span>
@@ -813,7 +815,7 @@
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">            </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 

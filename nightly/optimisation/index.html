@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev65+gb23202dff documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev66+g981604e19 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
 
-    <script src="../_static/documentation_options.js?v=cceb303f"></script>
+    <script src="../_static/documentation_options.js?v=99e3bb6b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev65+gb23202dff';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev66+g981604e19';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev65+gb23202dff" />
+  <meta name="docsearch:version" content="24.3.1.dev66+g981604e19" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -454,6 +454,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mixed-l11-norm">Mixed L11 norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#total-variation">Total variation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#function-of-absolute-value">Function of Absolute Value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#approximate-gradient-base-class">Approximate Gradient base class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stochastic-gradient-function">Stochastic Gradient function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sag-function">SAG function</a></li>
@@ -7325,6 +7326,137 @@ For more information, see <span id="id25">[<a class="reference internal" href="#
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gradient_operator</span></span><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.gradient_operator" title="Link to this definition">#</a></dt>
 <dd><p>GradientOperator is created if it is not instantiated yet. The domain of the <cite>_gradient</cite>,
 is created in the <cite>__call__</cite> and <cite>proximal</cite> methods.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="function-of-absolute-value">
+<h3>Function of Absolute Value<a class="headerlink" href="#function-of-absolute-value" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></span><span class="sig-name descname"><span class="pre">FunctionOfAbs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function.Function"><span class="pre">Function</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_lower_semi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/AbsFunction/#FunctionOfAbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs" title="Link to this definition">#</a></dt>
+<dd><p>A function which acts on the absolute value of the complex-valued input,</p>
+<div class="math notranslate nohighlight">
+\[G(z) = H(abs(z))\]</div>
+<p>This function is initialised with another CIL function, <span class="math notranslate nohighlight">\(H\)</span> in the above formula. When this function is called, first the absolute value of the input is taken, and then the input is passed to the provided function.</p>
+<p>Included in this class is the proximal map for FunctionOfAbs.  From this, the proximal conjugate is also available from the parent CIL Function class, which is valid for this function.
+In the case that <span class="math notranslate nohighlight">\(H\)</span> is lower semi-continuous, convex, non-decreasing and finite at the origin, (and thus <cite>assume_lower_semi</cite> is set to <cite>True</cite> in the <cite>init</cite>) the convex conjugate is also defined.
+The gradient is not defined for this function.</p>
+<p>For reference: see <a class="reference external" href="https://doi.org/10.48550/arXiv.2410.22161">https://doi.org/10.48550/arXiv.2410.22161</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – Function acting on a real input, <span class="math notranslate nohighlight">\(H\)</span> in the above formula.</p></li>
+<li><p><strong>assume_lower_semi</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, assume that the function is lower semi-continuous, convex, non-decreasing and finite at the origin.
+This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
+If False, the convex conjugate returned as 0. This is to ensure compatibility with Algorithms such as PDHG.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.proximal">
+<span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.data_container.DataContainer"><span class="pre">DataContainer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.data_container.DataContainer"><span class="pre">DataContainer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.data_container.DataContainer"><span class="pre">DataContainer</span></a></span></span><a class="reference internal" href="../_modules/cil/optimisation/functions/AbsFunction/#FunctionOfAbs.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.proximal" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal map of function <span class="math notranslate nohighlight">\(\tau G\)</span>  evaluated at x</p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau G}(x) = \underset{z}{\text{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau G(z)\]</div>
+<p>This is accomplished by calculating a bounded proximal map and making a change of phase,
+<span class="math notranslate nohighlight">\(prox_G(z) = prox^+_H(r) \circ \Phi\)</span> where  <span class="math notranslate nohighlight">\(z = r \circ \Phi\)</span>, <span class="math notranslate nohighlight">\(r = abs(z)\)</span>, <span class="math notranslate nohighlight">\(\Phi = \exp(i \angle(z))\)</span>,
+and <span class="math notranslate nohighlight">\(\circ\)</span> is element-wise product.  Also define <span class="math notranslate nohighlight">\(prox^+\)</span> to be the proximal map of <span class="math notranslate nohighlight">\(H\)</span>  in which the minimisation carried out over the positive orthant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input to the function</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>) – The scalar multiplying the function in the proximal map</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>) – DataContainer to store the result of the proximal map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the proximal map of the function at x with scalar <span class="math notranslate nohighlight">\(\tau\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.convex_conjugate">
+<span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.data_container.DataContainer"><span class="pre">DataContainer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/cil/optimisation/functions/AbsFunction/#FunctionOfAbs.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.convex_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Evaluation of the function G* at x, where G* is the convex conjugate of function G,</p>
+<div class="math notranslate nohighlight">
+\[G^{*}(x^{*}) = \underset{x}{\sup} \langle x^{*}, x \rangle - G(x)\]</div>
+<p>If <span class="math notranslate nohighlight">\(H\)</span> is lower semi-continuous, convex, non-decreasing
+finite at the origin, then <span class="math notranslate nohighlight">\(G^*(z*) = H^+(|z*|)\)</span>, where the monotone conjugate <span class="math notranslate nohighlight">\(g^+\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[H^+(z^*) =sup {(z, z^*) - H(z) : z &gt;= O}\]</div>
+<p>The monotone conjugate will therefore be less than or equal to the convex conjugate,
+since it is taken over a smaller set.  It is not available directly, but may coincide with
+the convex conjugate, which is therefore the best estimate we have.  This is only valid for
+real x. In other cases, a general convex conjugate is not available or defined.</p>
+<p>For reference see:  Convex Analysis, R. Tyrrell Rocakfellar, pp110-111.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input to the function</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>float</em></p></li>
+<li><p><em>The value of the convex conjugate of the function at x.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/AbsFunction/#FunctionOfAbs.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.gradient" title="Link to this definition">#</a></dt>
+<dd><p>Gradient of the function at x is not defined for this function.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.L">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.L" title="Link to this definition">#</a></dt>
+<dd><p>Lipschitz of the gradient of function f.</p>
+<p>L is positive real number, such that <span class="math notranslate nohighlight">\(\|f'(x) - f'(y)\| \leq L\|x-y\|\)</span>, assuming <span class="math notranslate nohighlight">\(f: IG \rightarrow \mathbb{R}\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.centered_at">
+<span class="sig-name descname"><span class="pre">centered_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.centered_at" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Returns a translated function, namely if we have a function <span class="math notranslate nohighlight">\(F(x)\)</span> the center is at the origin.</dt><dd><p>TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</span> and the center is at point b.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>center</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The point to center the function at.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The translated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.functions.FunctionOfAbs.proximal_conjugate">
+<span class="sig-name descname"><span class="pre">proximal_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.functions.FunctionOfAbs.proximal_conjugate" title="Link to this definition">#</a></dt>
+<dd><p>Returns the proximal operator of the convex conjugate of function <span class="math notranslate nohighlight">\(\tau F\)</span> evaluated at <span class="math notranslate nohighlight">\(x^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\text{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})\]</div>
+<p>Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate <span class="math notranslate nohighlight">\(F^{*}\)</span></p>
+<div class="math notranslate nohighlight">
+\[\text{prox}_{\tau F^{*}}(x) = x - \tau\text{prox}_{\tau^{-1} F}(\tau^{-1}x)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>)</p></li>
+<li><p><strong>tau</strong> (<em>scalar</em>)</p></li>
+<li><p><strong>out</strong> (<em>return DataContainer</em><em>, </em><em>if None a new DataContainer is returned</em><em>, </em><em>default None.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataContainer, the value of the proximal operator of the convex conjugate at point <span class="math notranslate nohighlight">\(x\)</span> for scalar <span class="math notranslate nohighlight">\(\tau\)</span> or None if <cite>out</cite>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

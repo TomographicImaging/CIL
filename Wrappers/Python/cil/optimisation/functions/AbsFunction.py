@@ -44,7 +44,7 @@ class FunctionOfAbs(Function):
     In the case that :math:`H` is lower semi-continuous, convex, non-decreasing and finite at the origin, (and thus `assume_lower_semi` is set to `True` in the `init`) the convex conjugate is also defined.  
     The gradient is not defined for this function.
     
-
+For reference: see https://doi.org/10.48550/arXiv.2410.22161
 
     Parameters
     ----------
@@ -55,10 +55,6 @@ class FunctionOfAbs(Function):
         This allows the convex conjugate to be calculated as the monotone conjugate, which is less than or equal to the convex conjugate.
         If False, the convex conjugate returned as 0. This is to ensure compatibility with Algorithms such as PDHG.
 
-    Reference
-    ---------
-    For further details see https://doi.org/10.48550/arXiv.2410.22161
-    
     '''
 
     def __init__(self, function: Function, assume_lower_semi: bool=False):

@@ -92,8 +92,8 @@ class _DimensionBase:
         Notes
         -----
         In the case that geometry is None, the default order assumes the geometry is not CONE_FLEX, so includes the label 'angle'.
-        This then needs to be manually replaced with 'projection'.
-
+        If you have CONE_FLEX geometry and geometry=None, the returned order then needs to be manually replaced with 'projection',
+        or instead pass the geometry to this method to get the correct labels.
         """
         order = cls._default_order(engine)
         if geometry is None:

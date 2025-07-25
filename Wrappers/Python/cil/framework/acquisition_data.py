@@ -125,7 +125,7 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             return False
 
-    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, projection=None, force=False): # CHANGES ORDER OF KWARGS BREAKING BACKWARD COMPATIBILITY
+    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, projection=None, force=False):
         '''Returns a new dataset of a single slice in the requested direction.'''
         try:
             geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal, projection=projection)

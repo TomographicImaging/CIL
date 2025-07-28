@@ -1,4 +1,6 @@
 * XX.X
+  - New features:
+    - Added `FunctionOfAbs` class (#1976)
   - Bug fixes:
     - Fix deprecation warning for rtol and atol in GD (#2056)
     - Removed the deprecated usage of run method in test_SIRF.py (#2070)

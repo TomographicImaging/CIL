@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Joshua DM Hellier (University of Manchester) [refactorer]
 import copy
 import math
 import warnings
@@ -1758,7 +1759,39 @@ class Configuration(object):
         return False
 
 
-class AcquisitionGeometry(object):
+class BackwardCompat(type):
+    @property
+    def ANGLE(cls):
+        warnings.warn("use AcquisitionDimension.Angle instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.ANGLE
+
+    @property
+    def CHANNEL(cls):
+        warnings.warn("use AcquisitionDimension.Channel instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.CHANNEL
+
+    @property
+    def DEGREE(cls):
+        warnings.warn("use AngleUnit.DEGREE", DeprecationWarning, stacklevel=2)
+        return AngleUnit.DEGREE
+
+    @property
+    def HORIZONTAL(cls):
+        warnings.warn("use AcquisitionDimension.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.HORIZONTAL
+
+    @property
+    def RADIAN(cls):
+        warnings.warn("use AngleUnit.RADIAN instead", DeprecationWarning, stacklevel=2)
+        return AngleUnit.RADIAN
+
+    @property
+    def VERTICAL(cls):
+        warnings.warn("use AcquisitionDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
+        return AcquisitionDimension.VERTICAL
+
+
+class AcquisitionGeometry(metaclass=BackwardCompat):
     """This class holds the AcquisitionGeometry of the system.
 
     Please initialise the AcquisitionGeometry using the static methods:
@@ -1773,39 +1806,6 @@ class AcquisitionGeometry(object):
 
     `AcquisitionGeometry.create_Cone3D_Flex()`
     """
-
-
-    #for backwards compatibility
-    @property
-    def ANGLE(self):
-        warnings.warn("use AcquisitionDimension.Angle instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimension.ANGLE
-
-    @property
-    def CHANNEL(self):
-        warnings.warn("use AcquisitionDimension.Channel instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimension.CHANNEL
-
-    @property
-    def DEGREE(self):
-        warnings.warn("use AngleUnit.DEGREE", DeprecationWarning, stacklevel=2)
-        return AngleUnit.DEGREE
-
-    @property
-    def HORIZONTAL(self):
-        warnings.warn("use AcquisitionDimension.HORIZONTAL instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimension.HORIZONTAL
-
-    @property
-    def RADIAN(self):
-        warnings.warn("use AngleUnit.RADIAN instead", DeprecationWarning, stacklevel=2)
-        return AngleUnit.RADIAN
-
-    @property
-    def VERTICAL(self):
-        warnings.warn("use AcquisitionDimension.VERTICAL instead", DeprecationWarning, stacklevel=2)
-        return AcquisitionDimension.VERTICAL
-    
     @property
     def geom_type(self):
         return self.config.system.geometry

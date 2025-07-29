@@ -96,18 +96,17 @@ class L1Norm(Function):
 
     In the weighted case, :math:`w` is an array of non-negative weights.
 
-    a) .. math:: F(x) = ||x||_{L^1(w)}
-    b) .. math:: F(x) = ||x - b||_{L^1(w)}
+    c) .. math:: F(x) = ||x||_{L^1(w)}
+    d) .. math:: F(x) = ||x - b||_{L^1(w)}
 
     with :math:`||x||_{L^1(w)} = || x  w||_1 = \sum_{i=1}^{n} |x_i| w_i`.
 
     Parameters
     -----------
-
-        weight: DataContainer, numpy ndarray, default None
-            Array of non-negative weights. If :code:`None` returns the L1 Norm.
-        b: DataContainer, default None
-            Translation of the function.
+    weight: DataContainer, numpy ndarray, default None
+        Array of non-negative weights. If :code:`None` returns the L1 Norm.
+    b: DataContainer, default None
+        Translation of the function.
 
     """
     def __init__(self, b=None, weight=None):
@@ -118,83 +117,95 @@ class L1Norm(Function):
             self.function = _WeightedL1Norm(b=b, weight=weight)
 
     def __call__(self, x):
-        r"""Returns the value of the L1Norm function at x.
+        r"""Returns the value of the L1Norm function at :math:`x`.
 
         .. math:: f(x) = ||x - b||_{L^1(w)}
+
+        Parameters
+        -----------
+        x : DataContainer
+            where to evaluate the function
+    
+        Returns
+        --------
+        float
+            The value of the function at :math:`x`
+            
         """
         return self.function(x)
 
     def convex_conjugate(self, x):
-        r"""Returns the value of the convex conjugate of the L1 Norm function at x.
+        r"""Returns the value of the convex conjugate of the L1 Norm function at :math:`x`.
 
 
-    This is the indicator of the unit :math:`L^{\infty}` norm:
-
-
-    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
-    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle
-
-
-    .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
-        = \begin{cases}
-        0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
-        \infty, \mbox{otherwise}
-        \end{cases}
-
-    In the weighted case the convex conjugate is the indicator of the unit
-    :math:`L^{\infty}(w^{-1})` norm.
-
-    See:
-    https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
-
-    a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
-    b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
-
-    with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of 0/0 are defined to be 1..
-
-    Parameters
-    -----------
-
-    x : DataContainer
-        where to evaluate the convex conjugate of the L1 Norm function.
-
-    Returns
-    --------
-    the value of the convex conjugate of the WeightedL1Norm function at x: DataContainer.
+        This is the indicator of the unit :math:`L^{\infty}` norm:
+    
+    
+        a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
+        b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + \langle x^{*},b\rangle
+    
+    
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})
+            = \begin{cases}
+            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+    
+        In the weighted case the convex conjugate is the indicator of the unit
+        :math:`L^{\infty}(w^{-1})` norm.
+    
+        See:
+        https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight
+    
+        c) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
+        d) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
+    
+        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of :math:`\frac{0}{0}` are defined to be 1.
+    
+        Parameters
+        -----------
+        x : DataContainer
+            where to evaluate the convex conjugate of the L1 Norm function.
+    
+        Returns
+        --------
+        float
+            The value of the convex conjugate of the WeightedL1Norm function at :math:`x`
 
         """
         return self.function.convex_conjugate(x)
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter `tau`.
+        r"""Returns the value of the proximal operator of the L1 Norm function at :math:`x` with scaling parameter :math:`\tau`.
 
 
-    Consider the following cases:
-
-    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b
-
-    where,
-
-    .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
-
-    The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
-    by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
-
-    a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)
-    b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b
-
-
-    Parameters
-    -----------
-    x: DataContainer
-    tau: float, real,  ndarray, DataContainer
-    out: DataContainer, default None
-        If not None, the result will be stored in this object.
-
-    Returns
-    --------
-    The value of the proximal operator of the L1 norm function at x: DataContainer.
+        Consider the following cases:
+    
+        a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_\tau(x)
+        b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_\tau(x - b) + b
+    
+        where,
+    
+        .. math :: \mathrm{ShrinkOperator}_\tau(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+    
+        The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"
+        by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf
+    
+        c) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_{\tau*w}(x)
+        d) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_{\tau*w}(x - b) + b
+    
+    
+        Parameters
+        -----------
+        x: DataContainer
+        tau: float, real,  ndarray, DataContainer
+        out: DataContainer, default None
+            If not None, the result will be stored in this object.
+    
+        Returns
+        --------
+        float
+            The value of the proximal operator of the L1 norm function at :math:`x`.
 
         """
             
@@ -319,11 +330,11 @@ class MixedL11Norm(Function):
 
         r"""Returns the value of the proximal operator of the MixedL11Norm function at x.
 
-        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
+        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x)
 
         where,
 
-        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}
 
         """
 

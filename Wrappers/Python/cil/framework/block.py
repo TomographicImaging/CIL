@@ -25,17 +25,19 @@ from ..utilities.multiprocessing import NUM_THREADS
 from .labels import FillType
 
 
-class BlockGeometry(object):
+class BackwardCompat(type):
     @property
-    def RANDOM(self):
+    def RANDOM(cls):
         warnings.warn("use FillType.RANDOM instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM
 
     @property
-    def RANDOM_INT(self):
+    def RANDOM_INT(cls):
         warnings.warn("use FillType.RANDOM_INT instead", DeprecationWarning, stacklevel=2)
         return FillType.RANDOM_INT
 
+
+class BlockGeometry(metaclass=BackwardCompat):
     @property
     def dtype(self):
         return tuple(i.dtype for i in self.geometries)
@@ -302,7 +304,7 @@ class BlockDataContainer(object):
         other : number, DataContainer or subclasses or BlockDataContainer
         out : BlockDataContainer, optional
             Provides a placeholder for the result
-            
+
         '''
         return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 

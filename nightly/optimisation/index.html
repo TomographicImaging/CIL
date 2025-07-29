@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 24.3.1.dev66+g981604e19 documentation</title>
+    <title>Optimisation framework &#8212; CIL 24.3.1.dev67+g05ad49b05 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=005327348bbd87ef69dc" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=005327348bbd87ef69dc" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=005327348bbd87ef69dc"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=648e7a60bc4f0e8412b5"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../_static/documentation_options.js?v=99e3bb6b"></script>
+    <script src="../_static/documentation_options.js?v=8023b424"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev66+g981604e19';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev67+g05ad49b05';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev66+g981604e19" />
+  <meta name="docsearch:version" content="24.3.1.dev67+g05ad49b05" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -6138,7 +6138,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 </li>
 </ol>
 <p>In the weighted case, <span class="math notranslate nohighlight">\(w\)</span> is an array of non-negative weights.</p>
-<ol class="loweralpha">
+<ol class="loweralpha" start="3">
 <li><div class="math notranslate nohighlight">
 \[F(x) = ||x||_{L^1(w)}\]</div>
 </li>
@@ -6158,7 +6158,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.functions.L1Norm.convex_conjugate">
 <span class="sig-name descname"><span class="pre">convex_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Norm/#L1Norm.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.convex_conjugate" title="Link to this definition">#</a></dt>
-<dd><p>Returns the value of the convex conjugate of the L1 Norm function at x.</p>
+<dd><p>Returns the value of the convex conjugate of the L1 Norm function at <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <p>This is the indicator of the unit <span class="math notranslate nohighlight">\(L^{\infty}\)</span> norm:</p>
 <ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
@@ -6178,7 +6178,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 <span class="math notranslate nohighlight">\(L^{\infty}(w^{-1})\)</span> norm.</p>
 <p>See:
 <a class="reference external" href="https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight">https://math.stackexchange.com/questions/1533217/convex-conjugate-of-l1-norm-function-with-weight</a></p>
-<ol class="loweralpha">
+<ol class="loweralpha" start="3">
 <li><div class="math notranslate nohighlight">
 \[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})\]</div>
 </li>
@@ -6186,16 +6186,16 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 \[F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle\]</div>
 </li>
 </ol>
-<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span> and possible cases of 0/0 are defined to be 1..</p>
+<p>with <span class="math notranslate nohighlight">\(\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}\)</span> and possible cases of <span class="math notranslate nohighlight">\(\frac{0}{0}\)</span> are defined to be 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – where to evaluate the convex conjugate of the L1 Norm function.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>the value of the convex conjugate of the WeightedL1Norm function at x</strong></p>
+<dd class="field-even"><p>The value of the convex conjugate of the WeightedL1Norm function at <span class="math notranslate nohighlight">\(x\)</span></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataContainer.</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -6203,27 +6203,27 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.functions.L1Norm.proximal">
 <span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Norm/#L1Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.L1Norm.proximal" title="Link to this definition">#</a></dt>
-<dd><p>Returns the value of the proximal operator of the L1 Norm function at x with scaling parameter <cite>tau</cite>.</p>
+<dd><p>Returns the value of the proximal operator of the L1 Norm function at <span class="math notranslate nohighlight">\(x\)</span> with scaling parameter <span class="math notranslate nohighlight">\(\tau\)</span>.</p>
 <p>Consider the following cases:</p>
 <ol class="loweralpha">
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x)\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_\tau(x)\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_\tau(x - b) + b\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_\tau(x - b) + b\]</div>
 </li>
 </ol>
 <p>where,</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+\[\mathrm{ShrinkOperator}_\tau(x) = sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
 <p>The weighted case follows from Example 6.23 in Chapter 6 of “First-Order Methods in Optimization”
 by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam.org/books/mo25/mo25_ch6.pdf">https://archive.siam.org/books/mo25/mo25_ch6.pdf</a></p>
-<ol class="loweralpha">
+<ol class="loweralpha" start="3">
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x)\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_{\tau*w}(x)\]</div>
 </li>
 <li><div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}_{\tau*w}(x - b) + b\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_{\tau*w}(x - b) + b\]</div>
 </li>
 </ol>
 <dl class="field-list simple">
@@ -6235,10 +6235,10 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>The value of the proximal operator of the L1 norm function at x</strong></p>
+<dd class="field-even"><p>The value of the proximal operator of the L1 norm function at <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataContainer.</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -7109,10 +7109,10 @@ by Amir Beck, SIAM 2017 <a class="reference external" href="https://archive.siam
 <span class="sig-name descname"><span class="pre">proximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/functions/L1Norm/#MixedL11Norm.proximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.MixedL11Norm.proximal" title="Link to this definition">#</a></dt>
 <dd><p>Returns the value of the proximal operator of the MixedL11Norm function at x.</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x)\]</div>
 <p>where,</p>
 <div class="math notranslate nohighlight">
-\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
+\[\mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}\]</div>
 </dd></dl>
 
 <dl class="py method">
@@ -10391,8 +10391,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=005327348bbd87ef69dc"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=005327348bbd87ef69dc"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -160,7 +160,7 @@ class L1Norm(Function):
         c) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*})
         d) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{L^\infty(w^{-1})}\leq 1\}}(x^{*}) + \langle x^{*},b\rangle
     
-        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of :math:`\frac{0}{0} are defined to be 1.
+        with :math:`\|x\|_{L^\infty(w^{-1})} = \max_{i} \frac{|x_i|}{w_i}` and possible cases of :math:`\frac{0}{0}` are defined to be 1.
     
         Parameters
         -----------
@@ -176,7 +176,7 @@ class L1Norm(Function):
         return self.function.convex_conjugate(x)
 
     def proximal(self, x, tau, out=None):
-        r"""Returns the value of the proximal operator of the L1 Norm function at :math:`x` with scaling parameter :math:`tau`.
+        r"""Returns the value of the proximal operator of the L1 Norm function at :math:`x` with scaling parameter :math:`\tau`.
 
 
         Consider the following cases:

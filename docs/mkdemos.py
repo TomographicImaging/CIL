@@ -40,9 +40,18 @@ def download_notebooks(urls):
         for url in nb_urls :
             notebook = Path(urlparse(url).path)
             nb_urls.set_description(notebook.stem)
-            with urlopen(url) as response:
-                (SOURCE / NBDIR / notebook.name).write_bytes(response.read())
-            notebooks.append(f"    {NBDIR}/{notebook.stem}")
+            dest_path = SOURCE / NBDIR / notebook.name
+            try:
+                with urlopen(url) as response:
+                    dest_path.write_bytes(response.read())
+            
+            except Exception as e:
+                print(f"Warning: Could not download {url}. Error: {e}")
+                if not dest_path.exists():
+                    print(f"  No existing file found for {notebook.name}, skipping.")
+                    continue  # Skip adding to the list if no file exists
+
+                notebooks.append(f"    {NBDIR}/{notebook.stem}")
     return "\n".join(notebooks)
 
 notebooks_load = download_notebooks(NOTEBOOKS_load_links)

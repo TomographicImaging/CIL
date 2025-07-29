@@ -14,6 +14,7 @@
     - Updated documentation for the ChannelWiseOperator including new example (#2096)
     - Updated documentation for LADMM (#2015)
     - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
+    - Tidied up documentation of `L1Norm` (#2186)
   - Enhancements:
     - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036)
     - Made the call to next() in algorithm iteration loop explicit (#2069)

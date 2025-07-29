@@ -101,7 +101,14 @@ class Partitioner(object):
         ags = []
         for mask in indices:
             ag = self.geometry.copy()
-            ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
+            try:
+                ag.config.angles.angle_data = numpy.take(self.geometry.angles, mask, axis=0)
+            except IndexError:
+                # If the geometry doesn't have angles we assume it is Cone3D_Flex geometry
+                ag.config.system.source = numpy.take(self.geometry.config.system.source, mask, axis=0)
+                ag.config.system.detector = numpy.take(self.geometry.config.system.detector, mask, axis=0)
+                ag.config.system.num_positions = len(ag.config.system.source)
+
             ags.append(ag)
         return BlockGeometry(*ags)
 
@@ -171,7 +178,10 @@ class Partitioner(object):
 
         # copy data
         out = blk_geo.allocate(None)
-        axis = self.dimension_labels.index('angle')
+        try:
+            axis = self.dimension_labels.index('angle')
+        except:
+            axis = self.dimension_labels.index('projection')
 
         for i in range(num_batches):
             out[i].fill(

@@ -1827,6 +1827,27 @@ class Test_Cone3D_Flex(unittest.TestCase):
 
 class TestSubset(unittest.TestCase):
     def setUp(self) -> None:
+        source_position_set = []
+        detector_position_set = []
+        for x in range(9):
+            source_position_set.append([0, x, 0])
+            detector_position_set.append([0, -x, 0])
+
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.0, 0], [1,0,0]]*3
+        detector_direction_y_set = [[0.,0.,4], [0,0.0,3], [0,0,1]]*3
+        ag_flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                            detector_position_set=detector_position_set, \
+                                            detector_direction_x_set=detector_direction_x_set, \
+                                            detector_direction_y_set=detector_direction_y_set)\
+                                .set_panel(num_pixels=[10, 10])
+        data_flex = ag_flex.allocate(None)
+        for i in range(ag_flex.num_projections):
+            data_flex.array[i] = i
+        self.ad_flex = data_flex
+        self.original_source_position_set = source_position_set.copy()
+        self.original_detector_position_set = detector_position_set.copy()
+
+
         return super().setUp()
     def tearDown(self) -> None:
         return super().tearDown()
@@ -1903,6 +1924,60 @@ class TestSubset(unittest.TestCase):
         self.AcquisitionGeometry_split_to_BlockGeometry(data, 'sequential', 1)
         self.AcquisitionGeometry_split_to_BlockGeometry(data, 'staggered', 1)
         self.AcquisitionGeometry_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+
+    def test_AcquisitionData_cone_flex_split_to_BlockGeometry_and_BlockDataContainer(self):
+
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(self.ad_flex, 'sequential', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(self.ad_flex, 'staggered', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(self.ad_flex, Partitioner.RANDOM_PERMUTATION, 1)
+
+    def test_AcquisitionData_cone_flex_split_to_BlockGeometry_and_BlockDataContainer_2D_order1(self):
+        data = self.ad_flex.copy()
+        data.reorder(['angle','horizontal', 'vertical'])
+
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+    def test_AcquisitionData_split_to_BlockGeometry_and_BlockDataContainer_2D_order2(self):
+        data = self.ad_flex.copy()
+        data.reorder(['horizontal','angle', 'vertical'])
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, 'sequential', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, 'staggered', 1)
+        self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
+
+
+    def AcquisitionGeometryFlex_split_to_BlockGeometry(self, data, method, seed):
+        num_batches = 4
+        np.random.seed(seed)
+        datasplit = data.partition(num_batches, method)
+        bg = datasplit.geometry
+        ag = data.geometry
+        num_indices = ag.num_projections
+
+
+        gold = [ np.zeros(num_indices, dtype=bool) for _ in range(num_batches) ]
+        if method == Partitioner.SEQUENTIAL:
+            gold_source = [[ag.config.system.source[i].position for i in range(0,3)], [ag.config.system.source[i].position for i in range (3,5)], [ag.config.system.source[i].position for i in range(5,7)], [ag.config.system.source[i].position for i in range(7,9)]]
+            gold_detector = [[ag.config.system.detector[i].position for i in range(0,3)], [ag.config.system.detector[i].position for i in range (3,5)], [ag.config.system.detector[i].position for i in range(5,7)], [ag.config.system.detector[i].position for i in range(7,9)]]
+
+        elif method == Partitioner.STAGGERED:
+            gold_source = [[ag.config.system.source[i].position for i in range(0,9,4)], [ag.config.system.source[i].position for i in range (1,9,4)], [ag.config.system.source[i].position for i in range(2,9,4)], [ag.config.system.source[i].position for i in range(3,9,4)]]
+            gold_detector = [[ag.config.system.detector[i].position for i in range(0,9,4)], [ag.config.system.detector[i].position for i in range (1,9,4)], [ag.config.system.detector[i].position for i in range(2,9,4)], [ag.config.system.detector[i].position for i in range(3,9,4)]]
+
+        elif method == Partitioner.RANDOM_PERMUTATION:
+            # with seed==1
+            gold_source = [[ag.config.system.source[i].position for i in [8, 2, 6]], [ag.config.system.source[i].position for i in [7, 1]], [ag.config.system.source[i].position for i in [0, 4]], [ag.config.system.source[i].position for i in [3, 5]]]
+            gold_detector = [[ag.config.system.detector[i].position for i in [8, 2, 6]], [ag.config.system.detector[i].position for i in [7, 1]], [ag.config.system.detector[i].position for i in [0, 4]], [ag.config.system.detector[i].position for i in [3, 5]]]
+
+
+        for i, geo in enumerate(bg):
+            current_source = [geo.config.system.source[i].position for i in range(geo.num_projections)]
+            current_detector_pos = [geo.config.system.detector[i].position for i in range(geo.num_projections)]
+            np.testing.assert_allclose(current_source, np.asarray(gold_source[i]))
+            np.testing.assert_allclose(current_detector_pos, np.asarray(gold_detector[i]))
+
 
     def AcquisitionGeometry_split_to_BlockGeometry(self, data, method, seed):
         num_batches = 4

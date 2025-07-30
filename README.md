@@ -18,16 +18,16 @@ Binary installation of CIL can be achieved with `conda`.
 
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
-Install a new environment using:
+Install a new minimal environment with CIL using:
 
 ```sh
-conda env create -f https://raw.githubusercontent.com/TomographicImaging/Build-scripts/refs/heads/main/env_files/cil_env.yml
+conda create --name cil -c conda-forge -c ccpi cil=24.3.0 
 ```
 
-To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
+To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) and do X-Ray CT reconstructions, install the environment with:
 
 ```sh
-conda env create -f https://raw.githubusercontent.com/TomographicImaging/Build-scripts/refs/heads/main/env_files/cil_demos_env.yml
+conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.3.0 ipp=2021.12 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
 ```
 
 where:
@@ -39,6 +39,14 @@ where:
 - `tomophantom` can generate phantoms to use as test data [Tomophantom](https://github.com/dkazanc/TomoPhantom)
 - `ipykernel`  provides the IPython kernel for Jupyter (allowing jupyter notebooks to be run)
 - `ipywidgets` enables visulisation tools within jupyter noteboooks
+
+Users may chose to omit any of the optional dependencies in the above command.
+
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies, see table below: 
+
+```sh
+conda env create -f https://raw.githubusercontent.com/TomographicImaging/Build-scripts/refs/heads/main/env_files/cil_demos_env.yml
+```
 
 ### Dependencies
 

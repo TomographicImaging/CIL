@@ -18,13 +18,13 @@ Binary installation of CIL can be achieved with `conda`.
 
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
-Install a new environment using:
+Install a new minimal environment with CIL using:
 
 ```sh
-conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.3.0 ipp=2021.12
+conda create --name cil -c conda-forge -c ccpi cil=24.3.0 
 ```
 
-To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
+To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) and do X-Ray CT reconstructions, install the environment with:
 
 ```sh
 conda create --name cil -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi cil=24.3.0 ipp=2021.12 astra-toolbox=*=cuda* tigre ccpi-regulariser tomophantom ipykernel ipywidgets scikit-image
@@ -40,12 +40,35 @@ where:
 - `ipykernel`  provides the IPython kernel for Jupyter (allowing jupyter notebooks to be run)
 - `ipywidgets` enables visulisation tools within jupyter noteboooks
 
+Users may chose to omit any of the optional dependencies in the above command.
+
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies, see table below: 
+
+```sh
+conda env create -f https://raw.githubusercontent.com/TomographicImaging/Build-scripts/refs/heads/main/env_files/cil_demos_env.yml
+```
+
 ### Dependencies
 
 CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/1070) `recon` module requires:
 
 1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `https://software.repos.intel.com/python/conda` channel.
 2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
+
+#### Binary packages and dependencies
+
+While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [environment-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies.
+
+| Package | Tested Version |  Recommended conda channel | License |
+|----------|----------|----------|----|
+| Python | 3.10, 3.11, 3.12 |  conda-forge | [PSLF](https://docs.python.org/3/license.html) |
+| Numpy |  >=1.23 and <2.0.0 |  conda-forge | [BSD](https://numpy.org/doc/stable/license.html)|
+| **Optional dependencies** ||| 
+| IPP | 2021.12 | https://software.repos.intel.com/python/conda| [Intel Simplified Software License](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
+| ASTRA | 2.1 |  astra-toolbox | [GPLv3](https://github.com/astra-toolbox/astra-toolbox?tab=GPL-3.0-1-ov-file#readme) |
+| TIGRE | 2.6 |  ccpi | [BSD](https://github.com/CERN/TIGRE?tab=BSD-3-Clause-1-ov-file#readme) |
+| CCPi-Regularisation |  24.0.1 | ccpi | [Apache v2](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit?tab=Apache-2.0-1-ov-file#readme) |
+| TomoPhantom | 22.0.0 | ccpi | [Apache v2](https://github.com/dkazanc/TomoPhantom?tab=Apache-2.0-1-ov-file#readme) |
 
 ### Docker
 

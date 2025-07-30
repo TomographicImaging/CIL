@@ -27,4 +27,5 @@ from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter
 from .Masker import Masker
 from .Padder import Padder
 from .PaganinProcessor import PaganinProcessor
+from .BadPixelCorrector import BadPixelCorrector
 from .FluxNormaliser import FluxNormaliser

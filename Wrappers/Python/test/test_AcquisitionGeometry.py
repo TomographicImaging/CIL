@@ -1947,7 +1947,6 @@ class TestSubset(unittest.TestCase):
         self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, 'staggered', 1)
         self.AcquisitionGeometryFlex_split_to_BlockGeometry(data, Partitioner.RANDOM_PERMUTATION, 1)
 
-
     def AcquisitionGeometryFlex_split_to_BlockGeometry(self, data, method, seed):
         num_batches = 4
         np.random.seed(seed)

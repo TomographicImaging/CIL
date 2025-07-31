@@ -2966,6 +2966,13 @@ class TestPaganinProcessor(unittest.TestCase):
 
         self.data_multichannel = ag.allocate('random', seed=3)
 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.data_cone_flex  = cone_flex_ag.allocate('random', seed=3)
+
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
 
@@ -3017,6 +3024,8 @@ class TestPaganinProcessor(unittest.TestCase):
             data.reorder('astra')
             with self.assertRaises(ValueError):
                 processor.set_input(data)
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone_flex)
 
 
     def test_PaganinProcessor_set_geometry(self):

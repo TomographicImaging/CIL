@@ -18,7 +18,7 @@
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.framework.labels import AcquisitionDimension
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
 import numpy as np
 from scipy.fft import fft2
@@ -201,6 +201,9 @@ class PaganinProcessor(Processor):
     def check_input(self, data):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
+        
+        if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("Processor not implemented for CONE_FLEX geometry.")
         
         if data.dtype!=np.float32:
             raise TypeError('Processor only support dtype=float32')

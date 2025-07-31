@@ -319,11 +319,18 @@ class GenericFilteredBackProjection(Reconstructor):
         weights_ptr = self._weights.ctypes.data_as(c_float_p)
 
         ag = acquistion_data.geometry
-        if ag.dimension_labels == ('angle','vertical','horizontal'):
+
+        if ag.geom_type & AcquisitionType.CONE_FLEX:
+            projection_label = 'projection'
+        else:
+            projection_label = 'angle'
+
+
+        if ag.dimension_labels == (projection_label,'vertical','horizontal'):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('vertical','angle','horizontal'):
+        elif ag.dimension_labels == ('vertical',projection_label,'horizontal'):
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('angle','horizontal'):
+        elif ag.dimension_labels == (projection_label,'horizontal'):
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)
         elif ag.dimension_labels == ('vertical','horizontal'):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)

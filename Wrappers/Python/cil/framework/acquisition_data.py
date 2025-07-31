@@ -18,7 +18,7 @@
 # Joshua DM Hellier (University of Manchester) [refactorer]
 import numpy
 
-from .labels import AcquisitionDimension, Backend
+from .labels import AcquisitionDimension, Backend, AcquisitionType
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
@@ -74,7 +74,6 @@ class AcquisitionData(DataContainer, Partitioner):
 
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
-        
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -125,11 +124,30 @@ class AcquisitionData(DataContainer, Partitioner):
             return True
         else:
             return False
+        
+    def _get_slice_with_projection(self, channel=None, projection=None, vertical=None, horizontal=None, force=False):
+        '''
+        get_slice for geometries with 'projection' dimension label
+        '''
+        kwargs = {'channel':channel, 'projection':projection, 'vertical':vertical, 'horizontal':horizontal, 'force':force}
+        return self._get_slice(**kwargs)
+        
+    def _get_slice_with_angle(self, channel=None, angle=None, vertical=None, horizontal=None, force=False):
+        '''
+        get_slice for geometries with 'angle' dimension label
+        '''
+        kwargs = {'channel':channel, 'angle':angle, 'vertical':vertical, 'horizontal':horizontal, 'force':force}
+        return self._get_slice(**kwargs)
 
-    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
-        '''Returns a new dataset of a single slice in the requested direction.'''
+
+    def _get_slice(self, **kwargs):
+        '''
+        Functionality of get_slice
+        '''
+
+        force = kwargs.pop('force')
         try:
-            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            geometry_new = self.geometry.get_slice(**kwargs)
         except ValueError:
             if force:
                 geometry_new = None
@@ -138,24 +156,54 @@ class AcquisitionData(DataContainer, Partitioner):
 
         #get new data
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
-        if vertical == 'centre':
+        if kwargs.get('vertical') == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
 
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
             ind0 = int(numpy.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            kwargs['vertical'] = ind0
+            out = DataContainer.get_slice(self, **kwargs)
 
             if w2 > 0:
-                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                kwargs['vertical'] = ind0 +  1
+                out2 = DataContainer.get_slice(self, **kwargs)
                 out = out * (1 - w2) + out2 * w2
         else:
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            out = DataContainer.get_slice(self, **kwargs)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+        
+    
+    def get_slice(self, *args, **kwargs):
+        '''
+        Returns a new AcquisitionData of a single slice in the requested direction. Will only return slices where the geometry is reconstructable.
+
+        Parameters
+        ----------
+        channel: int, optional
+            index on channel dimension to slice on. If None, does not slice on this dimension
+        projection or angle: int, optional
+            index on projection or angle dimension to slice on - `projection` is the dimension label used for Cone3D_Flex geometry,`angle` is used for all other geometries.
+            If None, does not slice on this dimension
+        vertical: int, optional
+            index on vertical dimension to slice on. If None, does not slice on this dimension.
+        horizontal: int, optional
+            index on horizontal dimension to slice on. If None, does not slice on this dimension.
+
+        Returns
+        -------
+        AcquisitionData
+            The sliced AcquisitionData
+        '''
+
+        if self.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            return self._get_slice_with_projection(*args, **kwargs)
+        else:
+            return self._get_slice_with_angle(*args, **kwargs)
 
     def reorder(self, order):
         '''

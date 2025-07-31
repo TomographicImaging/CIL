@@ -452,7 +452,7 @@ class TestGeometry_Cone3D(unittest.TestCase):
                                                          detector_position_set=detector_position_set,\
                                                          detector_direction_x_set=detector_direction_x_set,\
                                                          detector_direction_y_set=detector_direction_y_set)\
-                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_labels(['vertical', 'projection','horizontal'])\
                                       .set_panel((pixels_x,pixels_y), (0.1,0.2))
         
 
@@ -643,7 +643,7 @@ class TestGeometry_Cone3D_Flex(unittest.TestCase):
                                                          detector_position_set=self.detector_position_set,\
                                                          detector_direction_x_set=self.detector_direction_x_set,\
                                                          detector_direction_y_set=self.detector_direction_y_set) \
-                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_labels(['vertical', 'projection','horizontal'])\
                                       .set_panel((self.pixels_x, self.pixels_y), (0.1,0.2))
         
         self.ig = create_cone_flex_default_ig(self.ag)

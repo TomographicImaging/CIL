@@ -83,6 +83,8 @@ class Test_Reconstructor(unittest.TestCase):
         self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
+        self.ad2D = self.ag.allocate('random', seed=3)
+
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_defaults(self):
         reconstructor = Reconstructor(self.ad3D)

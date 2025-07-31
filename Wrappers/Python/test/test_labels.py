@@ -65,7 +65,7 @@ class Test_Lables(unittest.TestCase):
             self.assertIn(getattr(AngleUnit, i), AngleUnit)
 
     def test_acquisition_type(self):
-        for i in ('PARALLEL', 'CONE', 'DIM2', 'DIM3'):
+        for i in ('PARALLEL', 'CONE', 'DIM2', 'DIM3', 'CONE_FLEX'):
             self.assertIn(i, AcquisitionType)
             self.assertIn(i.lower(), AcquisitionType)
             self.assertIn(getattr(AcquisitionType, i), AcquisitionType)

@@ -21,7 +21,6 @@ try:
 except ImportError: # Python<3.11
     from enum import EnumMeta as EnumType
 
-
 class _StrEnumMeta(EnumType):
     """Python<3.12 requires this in a metaclass (rather than directly in StrEnum)"""
     def __contains__(self, item: str) -> bool:
@@ -89,10 +88,23 @@ class _DimensionBase:
         ----------
         geometry: ImageGeometry | AcquisitionGeometry
             If unspecified, the default order is returned.
+        
+        Notes
+        -----
+        In the case that geometry is None, the default order assumes the geometry is not CONE_FLEX, so includes the label 'angle'.
+        If you have CONE_FLEX geometry and geometry=None, the returned order then needs to be manually replaced with 'projection',
+        or instead pass the geometry to this method to get the correct labels.
         """
         order = cls._default_order(engine)
         if geometry is None:
             return order
+
+        try:
+            if geometry.geom_type & AcquisitionType.CONE_FLEX:
+                order = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in order]
+        except AttributeError:
+            # if geometry is an ImageGeometry, it does not have a geom_type attribute and we also don't need to adjust the labels
+            pass
         return tuple(label for label in order if label in geometry.dimension_labels)
 
     @classmethod
@@ -157,6 +169,7 @@ class AcquisitionDimension(_DimensionBase, StrEnum):
     ANGLE = auto()
     VERTICAL = auto()
     HORIZONTAL = auto()
+    PROJECTION = auto()
 
     @classmethod
     def _default_order(cls, engine: str) -> tuple:
@@ -247,6 +260,7 @@ class AcquisitionType(Flag):
     CONE = auto()
     DIM2 = auto()
     DIM3 = auto()
+    CONE_FLEX = auto()
 
     def validate(self):
         """
@@ -268,7 +282,7 @@ class AcquisitionType(Flag):
         """
         Returns the label for the geometry type
         """
-        return self & (self.PARALLEL | self.CONE)
+        return self & (self.PARALLEL | self.CONE | self.CONE_FLEX)
 
     @classmethod
     def _missing_(cls, value):

@@ -108,8 +108,7 @@ class Partitioner(object):
 
     def partition(self, num_batches, mode, seed=None):
         '''Partition the data into ``num_batches`` batches using the specified ``mode``.
-
-
+        
         The modes are
 
         1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.
@@ -134,6 +133,10 @@ class Partitioner(object):
         BlockDataContainer
             Block of `AcquisitionData` objects containing the data requested in each batch
 
+        Note
+        ----
+        This only works on datasets with an 'angle' dimension, and is not currently implemented for Cone3D_Flex geometry.
+
         Example
         -------
 
@@ -144,6 +147,11 @@ class Partitioner(object):
         3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1
 
         '''
+        if 'angle' not in self.dimension_labels:
+            raise NotImplementedError(f"Partitioner only partitions on the `angle` dimension \
+                and therefore can only be used on datasets with an 'angle' dimension. \
+                Dimensions provided: {self.dimension_labels}")
+        
         if mode == Partitioner.SEQUENTIAL:
             return self._partition_deterministic(num_batches, stagger=False)
         elif mode == Partitioner.STAGGERED:

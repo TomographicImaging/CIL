@@ -17,6 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.processors import Slicer
+from cil.framework import AcquisitionData
+from cil.framework.labels import AcquisitionType
 import numpy as np
 
 try:
@@ -179,6 +181,8 @@ class Binner(Slicer):
         """
         Bin the data array
         """
+        if isinstance(dc_in, AcquisitionData) and dc_in.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("Cone-Flex geometry is not supported by this processor")
         if self._accelerated:
             self._bin_array_acc(dc_in.array, dc_out.array)
         else:

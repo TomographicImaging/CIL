@@ -185,10 +185,12 @@ class DataContainer(object):
 
     def reorder(self, order):
         '''
-        reorders the data in memory as requested.
+        Reorders the data in memory as requested. This is an in-place operation.
 
-        :param order: ordered list of labels from self.dimension_labels
-        :type order: list, sting
+        Parameters
+        ----------
+        order: list or string
+            ordered list of labels from self.dimension_labels
         '''
         try:
             if len(order) != len(self.shape):

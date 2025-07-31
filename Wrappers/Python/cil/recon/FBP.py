@@ -319,11 +319,18 @@ class GenericFilteredBackProjection(Reconstructor):
         weights_ptr = self._weights.ctypes.data_as(c_float_p)
 
         ag = acquistion_data.geometry
-        if ag.dimension_labels == ('angle','vertical','horizontal'):
+
+        if ag.geom_type & AcquisitionType.CONE_FLEX:
+            projection_label = 'projection'
+        else:
+            projection_label = 'angle'
+
+
+        if ag.dimension_labels == (projection_label,'vertical','horizontal'):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('vertical','angle','horizontal'):
+        elif ag.dimension_labels == ('vertical',projection_label,'horizontal'):
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
-        elif ag.dimension_labels == ('angle','horizontal'):
+        elif ag.dimension_labels == (projection_label,'horizontal'):
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)
         elif ag.dimension_labels == ('vertical','horizontal'):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape)
@@ -377,11 +384,11 @@ class FDK(GenericFilteredBackProjection):
     supported_backends = ['tigre']
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-        #call parent initialiser
-        super().__init__(input, image_geometry, filter, backend='tigre')
 
         if not AcquisitionType.CONE & input.geometry.geom_type:
-            raise TypeError("This reconstructor is for cone-beam data only.")
+            raise TypeError(f"This reconstructor can only be used with standard cone-beam data, got {input.geometry.geom_type}.")
+
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
 
     def _calculate_weights(self, acquisition_geometry):
@@ -486,12 +493,11 @@ class FBP(GenericFilteredBackProjection):
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
-        super().__init__(input, image_geometry, filter, backend)
-        self.set_split_processing(False)
-
         if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
-
+        
+        super().__init__(input, image_geometry, filter, backend)
+        self.set_split_processing(False)
 
     def set_split_processing(self, slices_per_chunk=0):
         """
@@ -574,7 +580,7 @@ class FBP(GenericFilteredBackProjection):
         if self.slices_per_chunk:
             if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
-            elif self.acquisition_geometry.system_description == 'advanced':
+            elif self.acquisition_geometry.system_description != 'simple' and self.acquisition_geometry.system_description != 'offset':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")

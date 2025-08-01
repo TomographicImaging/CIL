@@ -208,8 +208,9 @@ When running the test, each parameterized case is shown as a distinct result:
 GitHub Actions CI
 -----------------
 
-If you open a pull request, continuous integration & deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. For more information please see the `GHA README <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
+If you open a pull request, continuous integration & deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. Note that the ``test-cuda`` job uses `unittest -k <https://docs.python.org/3/library/unittest.html#cmdoption-unittest-k>`_ flags to detect GPU test names.
 
+For more information please see the `GHA README <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 
 Contributions guidelines
 ========================

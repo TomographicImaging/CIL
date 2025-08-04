@@ -163,6 +163,23 @@ class Detector2D(PositionVector):
             raise AttributeError
 
     def set_direction(self, x, y):
+        """
+        Sets the direction_x and direction_y attributes of the detector.
+        
+        Parameters
+        ----------
+        x : array-like
+            The direction vector for the x-axis of the detector.
+        
+        y : array-like
+            The direction vector for the y-axis of the detector.
+        
+        Raises
+        ------
+        ValueError
+            If the vectors are not orthogonal or if they do not have the correct length.
+
+        """
         self.length_check(x)
         x = ComponentDescription.create_unit_vector(x)
 
@@ -170,9 +187,12 @@ class Detector2D(PositionVector):
         y = ComponentDescription.create_unit_vector(y)
 
         dot_product = x.dot(y)
-        if not numpy.isclose(dot_product, 0):
-            raise ValueError("vectors detector.direction_x and detector.direction_y must be orthogonal")
 
+        if abs(dot_product) > 1e-4:
+            angle_deg = numpy.degrees(numpy.arccos(dot_product))
+            raise ValueError(
+                "Vectors detector.direction_x and detector.direction_y must be orthogonal. Angle error: {:.4f} degrees (divergence: {:.2f} pixels over 100 pixels)".format(angle_deg, abs(dot_product)*100)
+            )
         self._direction_y = y
         self._direction_x = x
 

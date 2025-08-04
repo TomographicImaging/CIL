@@ -187,7 +187,7 @@ class AcquisitionData(DataContainer, Partitioner):
         channel: int, optional
             index on channel dimension to slice on. If None, does not slice on this dimension
         projection or angle: int, optional
-            index on projection or angle dimension to slice on - `projection` is the dimension label used for Cone3D_Flex geometry,`angle` is used for all other geometries.
+            index on projection or angle dimension to slice on - `projection` is the dimension label used for Cone3D_Flex geometry, `angle` is used for all other geometries.
             If None, does not slice on this dimension
         vertical: int, optional
             index on vertical dimension to slice on. If None, does not slice on this dimension.

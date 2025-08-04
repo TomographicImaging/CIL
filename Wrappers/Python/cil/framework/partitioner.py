@@ -148,7 +148,7 @@ class Partitioner(object):
 
         '''
         if 'angle' not in self.dimension_labels:
-            raise NotImplementedError(f"Partitioner only partitions on the `angle` dimension \
+            raise NotImplementedError(f"Currently, Partitioner only partitions on the `angle` dimension \
                 and therefore can only be used on datasets with an 'angle' dimension. \
                 Dimensions provided: {self.dimension_labels}")
         

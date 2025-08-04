@@ -303,7 +303,7 @@ class SystemConfiguration:
         return axis_rotation
 
     def update_reference_frame(self):
-        r'''Transforms the system origin to the rotation_axis position, or the volume centre for per-projection geometry
+        r'''Transforms the system origin to the rotation_axis position, or the volume centre for Cone3D_Flex geometry
         '''
         if self.acquisition_type & AcquisitionType.CONE_FLEX:
             self.set_origin(self.volume_centre.position)
@@ -1889,8 +1889,8 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The distance from the source to the center for `Cone3D_Flex` geometry.
-            float: The distance from the source to the center for other geometries.
+            float or numpy.ndarray: The distance from the source to the center or an array of distances.
+            
         """
         out = self.config.system.calculate_magnification()
         return out[0]
@@ -1904,8 +1904,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The distance from center of the volume to the detector for `Cone3D_Flex` geometry.
-            float: The distance from the center of the volume to the detector for other geometries.
+            float or numpy.ndarray: The distance from the centre of the volume to the center or an array of distances.
         """
         out = self.config.system.calculate_magnification()
         return out[1]
@@ -1919,8 +1918,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         for each position. For other geometries, it returns a single float value.
 
         Returns:
-            numpy.ndarray: The magnification factor for `Cone3D_Flex` geometry.
-            float: The magnification factor for other geometries.
+            float or numpy.ndarray: The magnification factor or an array of magnifications.
         """
         out = self.config.system.calculate_magnification()
         return out[2]

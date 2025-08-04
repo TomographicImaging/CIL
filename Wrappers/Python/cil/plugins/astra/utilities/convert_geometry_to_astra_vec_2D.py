@@ -20,7 +20,7 @@
 import astra
 import numpy as np
 from cil.framework.labels import AngleUnit
-from cil.framework.labels import AcquisitionType, AcquisitionType
+from cil.framework.labels import AcquisitionType
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 

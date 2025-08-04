@@ -51,7 +51,7 @@ class NEXUSDataWriter(object):
         self.file_name = file_name
 
         if isinstance(self.data, AcquisitionData) and self.data.geometry.geom_type & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError('CONE_FLEX geometry is not supported by NEXUSDataWriter')
+            raise NotImplementedError('Currently, CONE_FLEX geometry is not supported by NEXUSDataWriter')
 
 
         if ((data is not None) and (file_name is not None)):

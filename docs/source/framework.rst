@@ -27,34 +27,49 @@ The :code:`AcquisitionGeometry` class holds the system acquisition parameters.
 
 .. autoclass:: cil.framework.AcquisitionGeometry
 
-We create the appropriate :code:`AcquisitionGeometry` for our data by using the static methods:
+We create the appropriate :code:`AcquisitionGeometry` for our data. This gives us an acquisition geometry object configured with the spatial geometry of the system.
 
 Parallel2D Geometry
 -------------------
+Geometry for a 2D parallel beam circular. This describes circular-scan data from a single row of detector pixels for parallel beam data i.e. synchrotron data.
+
 .. automethod:: cil.framework.AcquisitionGeometry.create_Parallel2D
 
 Parallel3D Geometry
 -------------------
+Geometry for a 3D parallel beam system. This describes circular-scan data from a 2D array of detector pixels for parallel beam data i.e. synchrotron data.
 .. automethod:: cil.framework.AcquisitionGeometry.create_Parallel3D
 
 Cone2D Geometry (Fanbeam)
 -------------------------
+Geometry for a 2D cone-beam system. This describes circular-scan data from a single row of detector pixels for cone/fan-beam data i.e. micro-CT data.
 .. automethod:: cil.framework.AcquisitionGeometry.create_Cone2D
 
 Cone3D Geometry
 ---------------
+Geometry for a 3D cone-beam system. This describes circular-scan data from a 2D array of detector pixels for cone/fan-beam data i.e. micro-CT data.
 .. automethod:: cil.framework.AcquisitionGeometry.create_Cone3D
+
+Cone3D_Flex Geometry
+---------------
+Geometry for a 3D cone-beam system with flexible detector and source positions. This geometry allows for different detector and source positions for each radiograph.
+.. automethod:: cil.framework.AcquisitionGeometry.create_Cone3D_Flex
+
 
 
 Configure the geometry
 ----------------------
-This gives us an acquisition geometry object configured with the spatial geometry of the system.
 
-It is then necessary to configure the panel, angular data and dimension labels:
-
-.. automethod:: cil.framework.AcquisitionGeometry.set_panel
+For circular geometries, we must set the angles of the projections. This is not necessary for Cone3D_Flex geometries, as the rotation is described by the system geometry
 .. automethod:: cil.framework.AcquisitionGeometry.set_angles
+
+It is necessary to configure the panel of the system. This is applied to all the projections in the geometry:
+.. automethod:: cil.framework.AcquisitionGeometry.set_panel
+
+Set the order of the dimension labels that describe how the data is stored in memory:
 .. automethod:: cil.framework.AcquisitionGeometry.set_labels
+
+Set the number of channels for the data, this can be used to add an additional dimension to the data for multi-spectral data:
 .. automethod:: cil.framework.AcquisitionGeometry.set_channels
 
 

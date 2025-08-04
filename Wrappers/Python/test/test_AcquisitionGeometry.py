@@ -207,52 +207,63 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         for invalid_value in invalid_values:
             try:
-                with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_Flex(
-                        source_position_set=invalid_value,
-                        detector_position_set=detector_position_set,
-                        detector_direction_x_set=detector_direction_x_set,
-                        detector_direction_y_set=detector_direction_y_set
-                    )
-            except AssertionError as e:
-                print(f"Test failed for source_position_set={invalid_value}: {e}")
-                raise
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=invalid_value,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for source_position_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for source_position_set={invalid_value}")
 
             try:
-                with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_Flex(
-                        source_position_set=source_position_set,
-                        detector_position_set=invalid_value,
-                        detector_direction_x_set=detector_direction_x_set,
-                        detector_direction_y_set=detector_direction_y_set
-                    )
-            except AssertionError as e:
-                print(f"Test failed for detector_position_set={invalid_value}: {e}")
-                raise
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=invalid_value,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_position_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_position_set={invalid_value}")
+
 
             try:
-                with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_Flex(
-                        source_position_set=source_position_set,
-                        detector_position_set=detector_position_set,
-                        detector_direction_x_set=invalid_value,
-                        detector_direction_y_set=detector_direction_y_set
-                    )
-            except AssertionError as e:
-                print(f"Test failed for detector_direction_x_set={invalid_value}: {e}")
-                raise
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=invalid_value,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_direction_x_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_direction_x_set={invalid_value}")
+
 
             try:
-                with self.assertRaises(ValueError) as cm:
-                    ag = AcquisitionGeometry.create_Cone3D_Flex(
-                        source_position_set=source_position_set,
-                        detector_position_set=detector_position_set,
-                        detector_direction_x_set=detector_direction_x_set,
-                        detector_direction_y_set=invalid_value
-                    )
-            except AssertionError as e:
-                print(f"Test failed for detector_direction_y_set={invalid_value}: {e}")
-                raise
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=invalid_value
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_direction_x_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_direction_x_set={invalid_value}")
+
 
     def test_shift_detector_origin_bottom_left(self):
         initial_position = np.array([2.5, -1.3, 10.2])
@@ -1786,19 +1797,19 @@ class Test_Cone3D_Flex(unittest.TestCase):
             show_geometry(self.ag)
 
     def test_set_centre_of_rotation(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(TypeError):
             self.ag.set_centre_of_rotation(1)
 
     def test_get_centre_of_rotation(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(TypeError):
             self.ag.get_centre_of_rotation()
     
     def test_set_centre_of_rotation_by_slice(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(TypeError):
             self.ag.set_centre_of_rotation_by_slice(1)
 
     def test_get_centre_slice(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(TypeError):
             self.ag.get_centre_slice()
 
     def test_get_slice_angle(self):
@@ -1835,14 +1846,12 @@ class Test_Cone3D_Flex(unittest.TestCase):
         np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_y, np.asarray([0.,0.,1]))
         self.assertEqual(len(channel_slice.config.system.source), 2)
 
-
-
     def test_get_slice_vertical(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ValueError):
             self.ag.get_slice(vertical=0)
 
     def test_get_slice_horizontal(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ValueError):
             self.ag.get_slice(horizontal=0)
 
     def test_set_angles(self):

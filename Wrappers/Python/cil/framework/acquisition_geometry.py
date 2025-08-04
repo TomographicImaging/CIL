@@ -1307,7 +1307,7 @@ class Cone3D_Flex(SystemConfiguration):
 
         """Returns the 2D system configuration corresponding to the centre slice
         """
-        raise NotImplementedError("This method is not implemented for Cone3D_Flex")
+        raise TypeError('Cone3D_Flex does not support get_centre_slice(). Use the Cone3D or Cone2D classes for 2D slices.')
 
     def __str__(self):
         def csv(val):
@@ -1945,26 +1945,18 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
         
         return tuple(shape_dict[label] for label in self.dimension_labels)
-
+       
     @property
     def dimension_labels(self):
-        labels_default = AcquisitionDimension.get_order_for_engine("cil")
 
-        # We are using angles, not per-projection geometry
-        if self.config.system.geometry != "cone_flex":
-            shape_default = [self.config.channels.num_channels,
-                                self.config.angles.num_positions,
-                                self.config.panel.num_pixels[1],
-                                self.config.panel.num_pixels[0]
-                                ]
-        # We are using per-projection geometry, not angles
-        else:
-            shape_default = [self.config.channels.num_channels,
-                                self.config.system.num_positions,
-                                self.config.panel.num_pixels[1],
-                                self.config.panel.num_pixels[0]
-                                ]
-            labels_default = [label if label != AcquisitionDimension.ANGLE else AcquisitionDimension.PROJECTION for label in labels_default]
+        labels_default = list(AcquisitionDimension.get_order_for_engine("cil"))
+        if self.config.system.geometry & AcquisitionType.CONE_FLEX:
+            labels_default[labels_default.index(AcquisitionDimension.ANGLE)] = AcquisitionDimension.PROJECTION
+
+        shape_default = [self.config.channels.num_channels,
+                        self.num_projections,
+                        self.config.panel.num_pixels[1],
+                        self.config.panel.num_pixels[0]]
 
         try:
             labels = self._dimension_labels
@@ -1973,7 +1965,6 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         labels = list(labels)
 
         #remove from list labels where len == 1
-        #
         for i, x in enumerate(shape_default):
             if x == 0 or x==1:
                 try:
@@ -2045,7 +2036,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         if hasattr(self.config.system, 'calculate_centre_of_rotation'):
             offset_distance, angle_rad = self.config.system.calculate_centre_of_rotation()
         else:
-            raise NotImplementedError()
+            raise TypeError("Cannot get centre of rotation for this geometry. Please use a geometry that supports this method.")
 
         if distance_units == 'default':
             offset = offset_distance
@@ -2104,8 +2095,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         """
 
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
-            raise NotImplementedError()
-
+            raise TypeError("Cannot set centre of rotation for this geometry. Please use a geometry that supports this method.")
 
         angle_units = AngleUnit(angle_units)
 
@@ -2155,7 +2145,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
 
         if not hasattr(self.config.system, 'set_centre_of_rotation'):
-            raise NotImplementedError()
+            raise TypeError("Cannot set centre of rotation for this geometry. Please use a geometry that supports this method.")
 
         if AcquisitionType.DIM2 & self.dimension:
             if offset2 is not None:
@@ -2231,9 +2221,9 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
         labels:  list of strings, optional
             The order of the dimensions describing the data.
-            For most geometries expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
+            For most geometries expects a list containing at least one of the unique labels: 'channel', 'angle', 'vertical', 'horizontal'.
             default = ['channel','angle','vertical','horizontal']
-            For Cone3D_Flex geometries expects a list containing at least one of the unique labels: 'channel' 'projection' 'vertical' 'horizontal'
+            For Cone3D_Flex geometries expects a list containing at least one of the unique labels: 'channel', 'projection', 'vertical', 'horizontal'.
             default = ['channel', 'projection', 'vertical', 'horizontal']
 
         Returns
@@ -2518,9 +2508,8 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         """
 
         if self.config.system.geometry & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError("For Cone3D_Flex geometries, you must create an ImageGeometry yourself, there is no automatic creation.")
+            raise TypeError("Cannot create ImageGeometry for this geometry. Please use a geometry that supports this method.")
 
-        
         mag = self.magnification
 
         num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
@@ -2538,82 +2527,100 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
     def __str__ (self):
         return str(self.config)
 
-    def _get_slice_with_angle(self, channel=None, angle=None, vertical=None, horizontal=None):
+    def _get_slice(self, **kwargs):
         '''
         get_slice for geometry with 'angle' dimension label
         '''
         geometry_new = self.copy()
 
-        if channel is not None:
+        if kwargs.get("channel", None) is not None:
             geometry_new.config.channels.num_channels = 1
             if hasattr(geometry_new.config.channels,'channel_labels'):
-                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel]
+                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[kwargs.get("channel")]
 
-        if angle is not None:
-            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
+        if kwargs.get("angle", None) is not None:
+            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[kwargs.get("angle")]
 
-        if vertical is not None:
-            if AcquisitionType.PARALLEL & geometry_new.geom_type or vertical == 'centre' or abs(geometry_new.pixel_num_v/2 - vertical) < 1e-6:
-                geometry_new = geometry_new.get_centre_slice()
-            else:
-                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
-
-        if horizontal is not None:
-            raise ValueError("Cannot calculate system geometry for a horizontal slice")
-
-
-        return geometry_new
-
-    def _get_slice_with_projection(self, channel=None, projection=None, vertical=None, horizontal=None):
-        '''
-        get_slice for geometry with 'projection' dimension label
-        ''' 
-
-        geometry_new = self.copy()
-
-        if channel is not None:
-            geometry_new.config.channels.num_channels = 1
-            if hasattr(geometry_new.config.channels,'channel_labels'):
-                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel]
-        if projection is not None:
+        if kwargs.get("projection", None)  is not None:
             geometry_new.config.system.num_positions = 1
-            geometry_new.config.system.source = [self.config.system.source[projection]]
-            geometry_new.config.system.detector = [self.config.system.detector[projection]]
-        if vertical is not None:
-            raise NotImplementedError("Cannot subset Cone3D_Flex geometry by vertical. Expected vertical = None. Got vertical = {0}".format(vertical))
-        if horizontal is not None:
-            raise NotImplementedError("Cannot subset Cone3D_Flex geometry by horizontal. Expected horizontal = None. Got horizontal = {0}".format(horizontal))
+            geometry_new.config.system.source = [self.config.system.source[kwargs.get("projection", None)]]
+            geometry_new.config.system.detector = [self.config.system.detector[kwargs.get("projection", None)]]
+
+        if kwargs.get("vertical", None) is not None:
+            if AcquisitionType.PARALLEL & geometry_new.geom_type:
+                geometry_new = geometry_new.get_centre_slice()
+            elif AcquisitionType.CONE:
+                if kwargs.get("vertical") == 'centre' or abs(geometry_new.pixel_num_v/2 - kwargs.get("vertical")) < 1e-6:
+                    geometry_new = geometry_new.get_centre_slice()
+                else:
+                    raise ValueError("Cannot return an off-centre vertical slice for this geometry. Expected vertical = 'centre' or None. Got vertical = {0}".format(kwargs.get("vertical")))
+            else:
+                raise ValueError("Cannot return vertical slice for this geometry. Expected vertical = None. Got vertical = {0}".format(kwargs.get("vertical")))
+
+        if kwargs.get("horizontal", None)  is not None:
+            raise ValueError("Cannot return horizontal slice for this geometry. Expected horizontal = None. Got horizontal = {0}".format(kwargs.get("horizontal")))
+
 
         return geometry_new
 
+        
     def get_slice(self, *args, **kwargs):
         '''
-        Returns a new AcquisitionGeometry of a single slice in the requested direction. Will only return reconstructable geometries.
+        Returns a new AcquisitionGeometry of a single slice in the requested direction.
 
         Parameters
         ----------
         channel: int, optional
-            index on channel dimension to slice on. If None, does not slice on this dimension
-        projection or angle: int, optional
-            index on projection or angle dimension to slice on - `projection` is the dimension label used for Cone3D_Flex geometry,`angle` is used for all other geometries.
-            If None, does not slice on this dimension
-        vertical: int, optional
-            index on vertical dimension to slice on. If None, does not slice on this dimension.
+            index on channel dimension to slice on. If None, does not slice on this dimension.
+        angle or projection: int, optional
+            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+            - For CONE_FLEX geometry, use 'projection'.
+            - For all other geometries, use 'angle'.
+        vertical: int, str, optional
+            If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
         horizontal: int, optional
             index on horizontal dimension to slice on. If None, does not slice on this dimension.
 
         Returns
         -------
-        geometry_new: AcquisitionGeometry
-            The sliced AcquisitionGeometry
+        AcquisitionGeometry
+            A new AcquisitionGeometry object containing the requested slice.
 
+        Notes
+        -----
+        If there is an even number of slices in the vertical dimension and 'centre' is requested, the slice returned will be the average of the two middle slices.
         '''
 
-        if self.geom_type & AcquisitionType.CONE_FLEX:
-            return self._get_slice_with_projection(*args, **kwargs)
-        else:
-            return self._get_slice_with_angle(*args, **kwargs)
-        
+        for key in kwargs:
+            if self.geom_type == AcquisitionType.CONE_FLEX and key == 'angle':
+                raise TypeError(f"Cannot use 'angle' for Cone3D_Flex geometry. Use 'projection' instead.")
+            elif self.geom_type != AcquisitionType.CONE_FLEX and key == 'projection':
+                raise TypeError(f"Cannot use 'projection' for geometries that use angles. Use 'angle' instead.")
+            elif key not in AcquisitionDimension:
+                raise TypeError(f"'{key}' not in allowed labels {AcquisitionDimension}.")
+            
+        if args:
+            warnings.warn("Positional arguments for get_slice are deprecated. Use keyword arguments instead.", DeprecationWarning, stacklevel=2)
+            
+            num_args = len(args)
+
+            if num_args > 0:
+                kwargs['channel'] = args[0]
+
+            if num_args > 1:
+                if self.geom_type & AcquisitionType.CONE_FLEX:
+                    kwargs['projection'] = args[1]
+                else:
+                    kwargs['angle'] = args[1]
+
+            if num_args > 2:
+                kwargs['vertical'] = args[2]
+
+            if num_args > 3:
+                kwargs['horizontal'] = args[3]
+
+        return self._get_slice(**kwargs)
+    
 
     def allocate(self, value=0, **kwargs):
         '''Allocates an AcquisitionData according to the geometry

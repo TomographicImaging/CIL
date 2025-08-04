@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
 import numpy
+import warnings
 
 from .labels import AcquisitionDimension, Backend, AcquisitionType
 from .data_container import DataContainer
@@ -125,27 +126,12 @@ class AcquisitionData(DataContainer, Partitioner):
         else:
             return False
         
-    def _get_slice_with_projection(self, channel=None, projection=None, vertical=None, horizontal=None, force=False):
-        '''
-        get_slice for geometries with 'projection' dimension label
-        '''
-        kwargs = {'channel':channel, 'projection':projection, 'vertical':vertical, 'horizontal':horizontal, 'force':force}
-        return self._get_slice(**kwargs)
-        
-    def _get_slice_with_angle(self, channel=None, angle=None, vertical=None, horizontal=None, force=False):
-        '''
-        get_slice for geometries with 'angle' dimension label
-        '''
-        kwargs = {'channel':channel, 'angle':angle, 'vertical':vertical, 'horizontal':horizontal, 'force':force}
-        return self._get_slice(**kwargs)
-
-
     def _get_slice(self, **kwargs):
         '''
         Functionality of get_slice
         '''
 
-        force = kwargs.pop('force')
+        force = kwargs.pop('force', False)
         try:
             geometry_new = self.geometry.get_slice(**kwargs)
         except ValueError:
@@ -180,30 +166,67 @@ class AcquisitionData(DataContainer, Partitioner):
     
     def get_slice(self, *args, **kwargs):
         '''
-        Returns a new AcquisitionData of a single slice in the requested direction. Will only return slices where the geometry is reconstructable.
+        Returns a new AcquisitionData of a single slice in the requested direction.
 
         Parameters
         ----------
         channel: int, optional
-            index on channel dimension to slice on. If None, does not slice on this dimension
-        projection or angle: int, optional
-            index on projection or angle dimension to slice on - `projection` is the dimension label used for Cone3D_Flex geometry,`angle` is used for all other geometries.
-            If None, does not slice on this dimension
-        vertical: int, optional
-            index on vertical dimension to slice on. If None, does not slice on this dimension.
+            index on channel dimension to slice on. If None, does not slice on this dimension.
+        angle or projection: int, optional
+            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+            - For CONE_FLEX geometry, use 'projection'.
+            - For all other geometries, use 'angle'.
+        vertical: int, str, optional
+            If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
         horizontal: int, optional
             index on horizontal dimension to slice on. If None, does not slice on this dimension.
+        force: bool, default False
+            If True, will return a DataContainer instead of an AcquisitionData when the requested slice is not reconstructable.
 
         Returns
         -------
         AcquisitionData
-            The sliced AcquisitionData
+            A new AcquisitionData object containing the requested slice.
+        DataContainer
+            If `force=True` and the slice is not reconstructable, a DataContainer will be returned instead.
+
+        Notes
+        -----
+        If there is an even number of slices in the vertical dimension and 'centre' is requested, the slice returned will be the average of the two middle slices.
         '''
 
-        if self.geometry.geom_type & AcquisitionType.CONE_FLEX:
-            return self._get_slice_with_projection(*args, **kwargs)
-        else:
-            return self._get_slice_with_angle(*args, **kwargs)
+        for key in kwargs:
+            if self.geometry.geom_type == AcquisitionType.CONE_FLEX and key == 'angle':
+                raise TypeError(f"Cannot use 'angle' for Cone3D_Flex geometry. Use 'projection' instead.")
+            elif self.geometry.geom_type != AcquisitionType.CONE_FLEX and key == 'projection':
+                raise TypeError(f"Cannot use 'projection' for geometries that use angles. Use 'angle' instead.")
+            elif key not in AcquisitionDimension and key != 'force':
+                raise TypeError(f"'{key}' not in allowed labels {AcquisitionDimension}.")
+            
+        if args:
+            warnings.warn("Positional arguments for get_slice are deprecated. Use keyword arguments instead.", DeprecationWarning, stacklevel=2)
+            
+            num_args = len(args)
+
+            if num_args > 0:
+                kwargs['channel'] = args[0]
+
+            if num_args > 1:
+                if self.geometry.geom_type & AcquisitionType.CONE_FLEX:
+                    kwargs['projection'] = args[1]
+                else:
+                    kwargs['angle'] = args[1]
+
+            if num_args > 2:
+                kwargs['vertical'] = args[2]
+
+            if num_args > 3:
+                kwargs['horizontal'] = args[3]
+
+            if num_args > 4:
+                kwargs['force'] = args[4]
+
+        return self._get_slice(**kwargs)
 
     def reorder(self, order):
         '''

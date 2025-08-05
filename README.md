@@ -31,16 +31,16 @@ While building the CIL package we test with specific versions of dependencies. T
 
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|
-| [Python](https://www.python.org/) | >=3.10,<=3.12 |  `conda-forge::python>=3.10,<=3.12` | | [PSLF](https://docs.python.org/3/license.html) |
-| [Numpy](https://github.com/numpy/numpy) |  >=1.23,<2.0.0 |  `conda-forge::numpy>=1.23,<2.0.0` | | [BSD](https://numpy.org/doc/stable/license.html)|
-| **Optional dependencies** |||| 
-| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `conda install -c https://software.repos.intel.com/python/conda ipp=2021.12`| The Intel Integrated Performance Primitives Library (required for the CIL recon class) |[Intel Simplified Software License](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 |  CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. |[GPLv3](https://github.com/astra-toolbox/astra-toolbox?tab=GPL-3.0-1-ov-file#readme) |
-| [TIGRE](https://github.com/CERN/TIGRE) | 2.6 |  `ccpi::tigre=2.6` | CT projectors, FBP and FDK. |[BSD](https://github.com/CERN/TIGRE?tab=BSD-3-Clause-1-ov-file#readme) |
-| [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) |  24.0.1 | `ccpi::ccpi-regulariser=24.0.1` | Toolbox of regularisation methods. |[Apache v2](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit?tab=Apache-2.0-1-ov-file#readme) |
-| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | 22.0.0 | `ccpi::tomophantom=22.0.0` |  Generates phantoms to use as test data. |[Apache v2](https://github.com/dkazanc/TomoPhantom?tab=Apache-2.0-1-ov-file#readme) |
-| [ipykernel](https://github.com/ipython/ipykernel) |    |  `conda-forge::ipykernel` | Provides the IPython kernel to run Jupyter notebooks | [BSD](https://github.com/ipython/ipykernel?tab=BSD-3-Clause-1-ov-file) |
-| [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) |    |  `conda-forge::ipywidgets` | Enables visulisation tools within jupyter noteboooks | [BSD](https://github.com/jupyter-widgets/ipywidgets?tab=BSD-3-Clause-1-ov-file) |
+| [Python](https://www.python.org/) | 3.10 - 3.12 | `"python>=3.10,<=3.12"` || [PSLF](https://docs.python.org/3/license.html) |
+| [Numpy](https://github.com/numpy/numpy) | 1.23 - 1.26 | `"numpy>=1.23,<2"` || [BSD](https://numpy.org/doc/stable/license.html) |
+| **Optional dependencies** ||||
+| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class) | [Intel Simplified Software License](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
+| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 | CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. | [GPLv3](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
+| [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
+| [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 24.0.1 | `ccpi::ccpi-regulariser=24.0.1` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
+| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | 22 | `ccpi::tomophantom=22` | Generates phantoms to use as test data. | [Apache v2](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
+| [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks | [BSD](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
+| [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks | [BSD](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
 
 We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
 

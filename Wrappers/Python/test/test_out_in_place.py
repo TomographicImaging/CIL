@@ -28,7 +28,7 @@ from cil.framework.labels import AcquisitionType
 
 from cil.optimisation.operators import IdentityOperator, WaveletOperator
 from cil.optimisation.functions import  KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage, L1Sparsity, BlockFunction
-from cil.optimisation.operators import LinearOperator, MatrixOperator  
+from cil.optimisation.operators import LinearOperator, MatrixOperator
 
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 from cil.optimisation.operators import BlockOperator,\
@@ -38,7 +38,7 @@ from cil.optimisation.functions import  KullbackLeibler, WeightedL2NormSquared, 
     L1Norm, L2NormSquared, MixedL21Norm, LeastSquares, \
     SmoothMixedL21Norm, OperatorCompositionFunction, \
      IndicatorBox, TotalVariation,  SumFunction, SumScalarFunction, \
-    WeightedL2NormSquared, MixedL11Norm, ZeroFunction
+    WeightedL2NormSquared, MixedL11Norm, ZeroFunction, FunctionOfAbs
 
 from cil.processors import AbsorptionTransmissionConverter, Binner, CentreOfRotationCorrector, MaskGenerator, Masker, Normaliser, Padder, \
 RingRemover, Slicer, TransmissionAbsorptionConverter, PaganinProcessor, FluxNormaliser
@@ -68,7 +68,7 @@ if has_astra and has_nvidia:
     from cil.plugins.astra.operators import ProjectionOperator as AstraProjector
 if has_tigre and has_nvidia:
     from cil.plugins.tigre import ProjectionOperator as TigreProjector
-    
+
 
 
 
@@ -87,6 +87,9 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
         ag.set_panel(10)
 
         ig = ag.get_ImageGeometry()
+        
+        ig_complex = ig.copy()
+        ig_complex.dtype = np.complex128
 
         scalar = 4
 
@@ -127,13 +130,13 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
             (MixedL11Norm(), bg, True, True, False),
             (BlockFunction(L1Norm(),L2NormSquared()), bg, True, True, False),
             (BlockFunction(L2NormSquared(),L2NormSquared()), bg, True, True, True),
-            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False)
-
-
+            (L1Sparsity(WaveletOperator(ig)), ig, True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start= False), assume_lower_semi=True), ig , True, True, False),
+            (FunctionOfAbs(TotalVariation(backend='numpy', warm_start= False), assume_lower_semi=True), ig_complex , True, True, False)             
         ]
 
         np.random.seed(5)
-        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32)]
+        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32) ]
 
     def get_result(self, function, method, x, *args):
         try:
@@ -181,7 +184,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
                 self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in func."+method+'(x, *args, out=data) where func is  ' + function.__class__.__name__+ '. ')
                 self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case func."+method+'(data, *args, out=out) where func is  ' + function.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
                 self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed returning with `out` in ret = func.{method}(x, *args, out=data) where func is {function.__class__.__name__}")
-            
+
             except InPlaceError:
                 pass
         except NotImplementedError:
@@ -262,12 +265,12 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             (BlurringOperator(PSF,ig), ig),
             (FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann') , ig),
             (FiniteDifferenceOperator(ig, direction = 0) , ig)]
-            
+
 
 
         self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
         self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.array(range(0,65400, 6540), dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]
-    
+
     def get_result(self, operator, method, x, *args):
         try:
             input=x.copy() #To check that it isn't changed after function calls
@@ -294,7 +297,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
                 except InPlaceError:
                     pass
-            except NotImplementedError: 
+            except NotImplementedError:
                 raise NotImplementedError(operator.__class__.__name__+" raises a NotImplementedError for "+method)
 
 
@@ -310,7 +313,7 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
             self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed using return and `out` in ret = operator.{method}(x, *args, out=data) where func is {operator.__class__.__name__}")
-            
+
         except (InPlaceError, NotImplementedError):
             pass
 
@@ -346,31 +349,31 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
         data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get(size= (20, 16,16))
 
         data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size= (20, 16,16))
-        
+
         absorption_cone = TransmissionAbsorptionConverter()(data_cone)
         absorption_parallel = TransmissionAbsorptionConverter()(data_parallel)
-        
+
 
         self.operator_geom_test_list = [] # Contains (operator, domain_geom, range_geom, data_order)
-        #Note that we only test one astra and one tigre projection operator. This is because there is also tests in test/utils_projectors.py: TestCommon_ProjectionOperator_SIM and TestCommon_ProjectionOperatorBlockOperator. 
-        
+        #Note that we only test one astra and one tigre projection operator. This is because there is also tests in test/utils_projectors.py: TestCommon_ProjectionOperator_SIM and TestCommon_ProjectionOperatorBlockOperator.
+
         if has_astra and has_nvidia:
             absorption_cone.reorder(order='astra')
-            
-            A_cone_astra = AstraProjector(image_geometry=ground_truth.geometry, 
+
+            A_cone_astra = AstraProjector(image_geometry=ground_truth.geometry,
                         acquisition_geometry=absorption_cone.geometry)
             self.operator_geom_test_list.append((A_cone_astra, 'astra'))
-        
-            
+
+
         if has_tigre and has_nvidia:
             absorption_parallel.reorder(order='tigre')
-            
+
             A_parallel_tigre = TigreProjector(image_geometry=ground_truth.geometry,
                             acquisition_geometry=absorption_parallel.geometry)
             self.operator_geom_test_list.append((A_parallel_tigre, 'tigre'))
 
-    
-        
+
+
 
 
     def get_result(self, operator, method, x, *args):
@@ -399,7 +402,7 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
             self.assertDataArraysInContainerAllClose(desired_result, out2, rtol=1e-5, msg= "Calculation failed using `out` in operator."+method+'(x, *args, out=data) where func is  ' + operator.__class__.__name__+ '. ')
             self.assertDataArraysInContainerAllClose(input, x,  rtol=1e-5, msg= "In case operator."+method+'(data, *args, out=out) where operator is  ' + operator.__class__.__name__+ 'the input data has been incorrectly affected by the calculation. ')
             self.assertDataArraysInContainerAllClose(desired_result, ret, rtol=1e-5, msg= f"Calculation failed using return and `out` in ret = operator.{method}(x, *args, out=data) where func is {operator.__class__.__name__}")
-            
+
         except (InPlaceError, NotImplementedError):
             pass
 
@@ -411,7 +414,7 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
 
     def test_adjoint_out(self):
         for operator, data_order in self.operator_geom_test_list:
-            
+
             data=operator.range_geometry().allocate('random', seed=2)
             data.reorder(data_order)
             result=self.get_result(operator, 'adjoint', data)
@@ -419,8 +422,8 @@ class TestProjectionOperatorOutAndInPlace(CCPiTestClass):
 
 class TestProcessorOutandInPlace(CCPiTestClass):
     def setUp(self):
-        
-        self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),  
+
+        self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),
                           np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)),
                           np.random.uniform(0,1,(10,20)).astype(np.float64)]
 
@@ -443,13 +446,13 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         ag_cone_3D.set_panel([20,2], pixel_size=0.1)
 
         ag = AcquisitionGeometry.create_Parallel3D(detector_position=[0, 150, 0], units='mm').set_panel([20,2], pixel_size=0.1).set_angles(angles)
-        
+
         self.geometry_test_list = [ag_parallel_2D, ag_parallel_3D, ag_cone_2D, ag_cone_3D]
 
 
     def fail(self, error_message):
         raise NotImplementedError(error_message)
-    
+
     def out_check(self, processor, data, data_array_index, *args):
         """
         - Test to check the processor gives the same result using the out argument
@@ -482,7 +485,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         except Exception as e:
             error_message = '\nFor processor: ' + processor.__class__.__name__ + \
             '\nOn data_array index: ' + str(data_array_index) +\
-            '\nFor geometry type: \n' + str(data.geometry) 
+            '\nFor geometry type: \n' + str(data.geometry)
             raise type(e)(error_message + '\n\n' + str(e))
 
     def in_place_check(self, processor, data, data_array_index, *args):
@@ -515,7 +518,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         except Exception as e:
             error_message = '\nFor processor: ' + processor.__class__.__name__ + \
             '\nOn data_array index: ' + str(data_array_index) +\
-            '\nFor geometry type: \n' + str(data.geometry) 
+            '\nFor geometry type: \n' + str(data.geometry)
             raise type(e)(error_message + '\n\n' + str(e))
 
     def test_out(self):
@@ -537,13 +540,13 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     data.fill(data_array)
                 else:
                     data.fill(np.repeat(data_array[:,None, :], repeats=2, axis=1))
-                # Add new Processors here 
+                # Add new Processors here
                 processor_list = [
                     TransmissionAbsorptionConverter(min_intensity=0.01),
                     AbsorptionTransmissionConverter(),
                     RingRemover(info=False),
-                    Slicer(roi={'horizontal':(None,None,None),'angle':(None,None,None)}), 
-                    Slicer(roi={'horizontal':(1,3,2),'angle':(None,4,2)}), 
+                    Slicer(roi={'horizontal':(None,None,None),'angle':(None,None,None)}),
+                    Slicer(roi={'horizontal':(1,3,2),'angle':(None,4,2)}),
                     Binner(roi={'horizontal':(None,None,None),'angle':(None,None,None)}),
                     Binner(roi={'horizontal':(1,None,2),'angle':(None,4,2)}),
                     Padder(pad_width=0),
@@ -554,15 +557,15 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     PaganinProcessor(),
                     FluxNormaliser(flux=1)
                     ]
-                
+
                 for processor in processor_list:
                     self.out_check(processor, data, i)
                     self.in_place_check(processor, data, i)
-   
+
     def test_centre_of_rotation_xcorrelation_out(self):
         """
-        Test the output of the centre of rotation xcorrelation processor 
-        These tests are performed separately because the processor returns 
+        Test the output of the centre of rotation xcorrelation processor
+        These tests are performed separately because the processor returns
         changes to the geometry rather than the data
         """
         # CentreOfRotationCorrector.xcorrelation() works on parallel beam data only
@@ -584,7 +587,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                 try:
                     processor.set_input(input)
                     out3 = processor.get_output(out=out2)
-                    
+
                     numpy.testing.assert_allclose(out1.geometry.config.system.rotation_axis.position, out2.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
                     numpy.testing.assert_allclose(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
                     self.assertDataArraysInContainerAllClose(out2, out3,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor incorrectly supresses the output. ")
@@ -592,7 +595,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                     processor.set_input(data)
                     processor.get_output(out=data)
                     numpy.testing.assert_array_equal(out1.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=data) where func is  " + processor.__class__.__name__+ ".")
-                    
+
                 except (InPlaceError, NotImplementedError):
                     print("out_test_for_geometry test not implemented for  " + processor.__class__.__name__)
                     pass
@@ -606,17 +609,17 @@ class TestProcessorOutandInPlace(CCPiTestClass):
                         self.assertDataArraysInContainerAllClose(out1, data, rtol=1e-5, msg= "In place calculation failed for processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ "." )
                 except (InPlaceError, NotImplementedError):
                     print("in_place_test test not implemented for  " + processor.__class__.__name__)
-    
+
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_centre_of_rotation_image_sharpness_out(self):
+    def test_centre_of_rotation_image_sharpness_out_tigre(self):
         """
-        Test the output of the centre of rotation image_sharpness processor 
-        These tests are performed separately because the processor returns 
+        Test the output of the centre of rotation image_sharpness processor
+        These tests are performed separately because the processor returns
         changes to the geometry rather than the data
         """
         # Here we need to use real data rather than random data otherwise the processor fails
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        
+
         processor = Binner(roi={'horizontal':(0,-1,2),'vertical':(0,-1,2), 'angle':(0,-1,2)})
         processor.set_input(data)
         data = processor.get_output()
@@ -632,7 +635,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
         try:
             processor.set_input(input)
             out3 = processor.get_output(out=out2)
-            
+
             numpy.testing.assert_allclose(out1.geometry.config.system.rotation_axis.position, out2.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=out) where func is  " + processor.__class__.__name__+ ".")
             numpy.testing.assert_allclose(input.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position,  err_msg= "In case processor.set_input(data), processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the input data has been incorrectly affected by the calculation. ")
             self.assertDataArraysInContainerAllClose(out2, out3,  rtol=1e-5, msg= "In case processor.set_input(data), output=processor.get_output(out=data) where processor is  " + processor.__class__.__name__+ " the processor incorrectly supresses the output. ")
@@ -640,7 +643,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             processor.set_input(data)
             processor.get_output(out=data)
             numpy.testing.assert_array_equal(out1.geometry.config.system.rotation_axis.position, data.geometry.config.system.rotation_axis.position, err_msg= "Calculation failed using processor.set_input(data), processor.get_output(out=data) where func is  " + processor.__class__.__name__+ ".")
-            
+
         except (InPlaceError, NotImplementedError):
             self.fail("out_test_for_geometry test not implemented for  " + processor.__class__.__name__)
             pass

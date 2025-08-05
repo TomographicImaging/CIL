@@ -99,7 +99,7 @@ class TIFFWriter(object):
                data = None,
                file_name = None,
                counter_offset = 0,
-               compression=0):
+               compression=None):
 
         self.data_container = data
         file_name = os.path.abspath(file_name)

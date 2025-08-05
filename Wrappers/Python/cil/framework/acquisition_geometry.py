@@ -2288,7 +2288,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Parameters
         ----------
         source_position : array_like
-            A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis.
+            A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis, see notes.
         detector_position : array_like
             A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis.
         detector_direction_x : array_like, optional
@@ -2376,7 +2376,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Parameters
         ----------
         source_position : array_like
-            A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis.
+            A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis, see notes.
         detector_position : array_like
             A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis.
         detector_direction_x : array_like, optional
@@ -2405,7 +2405,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin. 
         The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.
 
-        If these values are left as default then the source and detector should lie along the y-axis.
+        If these values are left as default then the source and detector should lie along the y-axis such as `(0,-100,0)`.
         """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)

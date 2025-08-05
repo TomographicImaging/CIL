@@ -45,7 +45,7 @@ Users may chose to omit any of the optional dependencies in the above command.
 We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies, see table below: 
 
 ```sh
-conda env create -f https://raw.githubusercontent.com/TomographicImaging/Build-scripts/refs/heads/main/env_files/cil_demos_env.yml
+conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
 ```
 
 ### Dependencies

@@ -235,7 +235,7 @@ Partitioner
 
 This method partitions an instance of tomography :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
 
-The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` and takes in an `AquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AquisitionData` object with the batch of data and corresponding geometry. 
+The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` and takes in an `AcquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AcquisitionData` object with the batch of data and corresponding geometry. 
 We consider a **batch** to be a subset of the :code:`AcquisitionData` and the verb, **to partition**, to be the act of splitting into batches. 
  
 

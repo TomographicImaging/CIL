@@ -198,7 +198,40 @@ class Detector2D(PositionVector):
 
 
 class SystemConfiguration:
-    '''This is a generic class to hold the description of a tomography system'''
+    """
+    This class defines the configuration of a tomography system, including the geometry and acquisition type.
+    It provides methods to describe the system, set the origin, and calculate magnification.
+
+    Parameters
+    ----------
+    dof : int
+        The degrees of freedom of the system i.e 2 (2D) or 3 (3D) acquisition.
+    geometry : AcquisitionType
+        The geometry of the system, such as PARALLEL or CONE_FLEX.
+    units : str, optional
+        The units of distance used for the configuration, default is 'units'.
+    num_vectors : int, optional
+        The number of vectors in the system, default is 1.
+
+    Notes
+    -----
+    SystemConfiguration is an abstract class that should be subclassed to implement specific system configurations.
+    It provides a framework for defining the system's geometry and acquisition type, and includes methods for
+    calculating properties such as magnification and system description.
+
+    Attributes
+    ----------
+    SYSTEM_SIMPLE : str
+        This indicates that the geometry matches the default definitions and represents an ideal configuration with no offsets or rotations.
+    SYSTEM_OFFSET : str
+        This indicates that the geometry matches the default definitions but may have detector translation (parallel) or rotation-axis translation (cone or parallel).
+    SYSTEM_ADVANCED : str
+        This indicates that the geometries rotation axis and detector vertical direction are not parallel, or the rotation axis is not perpendicular to the ray direction.
+    SYSTEM_NONSTANDARD : str
+        This indicates that the geometry is not a standard configuration, e.g. a cone flex geometry with multiple sources or detectors.
+
+    """    
+
     SYSTEM_SIMPLE = 'simple'
     SYSTEM_OFFSET = 'offset'
     SYSTEM_ADVANCED = 'advanced'
@@ -343,12 +376,17 @@ class SystemConfiguration:
         raise NotImplementedError
 
     def system_description(self):
-        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
-            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
-            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
-        '''
-        raise NotImplementedError
+        """
+        Returns a string describing the system configuration.
+        This method should be overridden in subclasses to provide specific descriptions.
 
+        Returns
+        -------
+        str
+            A string describing the system configuration.
+        
+        """
+        raise NotImplementedError
     def copy(self):
         '''returns a copy of SystemConfiguration'''
         return copy.deepcopy(self)
@@ -2264,11 +2302,13 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         ----
         The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
 
+        The default position of the detector is [0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.
+
         The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.
 
         The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.
 
-        If these values are left as default then the source and detector should lie along the y-axis.
+        The default direction of the ray is [0,1] which means that the ray is assumed to be pointing in the y direction.
         """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
@@ -2290,7 +2330,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         source_position : array_like
             A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis, see notes.
         detector_position : array_like
-            A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis.
+            A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis, see notes.
         detector_direction_x : array_like, optional
             A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].
         rotation_axis_position : array_like, optional
@@ -2311,7 +2351,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
         The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.
 
-        If these values are left as default then the source and detector should lie along the y-axis.
+        If these values are left as default then the source and detector should lie along the y-axis such as `(0,-100)`.
         """
         AG = AcquisitionGeometry()
         AG.config = Configuration(units)
@@ -2352,6 +2392,8 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         -----
         The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.
 
+        The default position of the detector is [0,0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.
+
         The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector 
         is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.
 
@@ -2378,7 +2420,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         source_position : array_like
             A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis, see notes.
         detector_position : array_like
-            A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis.
+            A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis, see notes.
         detector_direction_x : array_like, optional
             A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].
         detector_direction_y : array_like, optional

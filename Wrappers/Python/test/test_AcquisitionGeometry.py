@@ -25,8 +25,6 @@ import io
 import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
 from cil.framework.labels import AcquisitionDimension
-import warnings
-
 from utils import has_matplotlib
 
 if has_matplotlib:
@@ -565,6 +563,10 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG3 = AG2.copy()
         AG3.config.panel.num_pixels = [1,2]
+        self.assertFalse(AG == AG3)
+
+        AG3 = AG2.copy()
+        AG3.config.channels.channel_labels = ['d','b','c','d']
         self.assertFalse(AG == AG3)
 
         AG3 = AG2.copy()
@@ -1660,38 +1662,38 @@ class Test_Cone3D(unittest.TestCase):
 class Test_Cone3D_Flex(unittest.TestCase):
 
     def setUp(self):
-        source_position_set = [[0,-1,0], [0,-1.3,1]]
-        detector_position_set = [[0,2,1], [0,2,2]]
-        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
-        detector_direction_y_set = [[0.,0.,4], [0,0.0,3]]
+        self.source_position_set = [[0,-1,0], [0,-1.3,1]]
+        self.detector_position_set = [[0,2,1], [0,2,2]]
+        self.detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        self.detector_direction_y_set = [[0.,0.,4], [0,0.0,3]]
 
-        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
-                                                    detector_position_set=detector_position_set, \
-                                                    detector_direction_x_set=detector_direction_x_set, \
-                                                    detector_direction_y_set=detector_direction_y_set)\
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=self.source_position_set, \
+                                                    detector_position_set=self.detector_position_set, \
+                                                    detector_direction_x_set=self.detector_direction_x_set, \
+                                                    detector_direction_y_set=self.detector_direction_y_set)\
                                      .set_panel(num_pixels=[10, 20]).set_channels(4)\
 
 
     def test_set_source_position(self):
-        np.testing.assert_allclose(self.ag.config.system.source[0].position, [0, -1, 0], atol=1e-10)
-        np.testing.assert_allclose(self.ag.config.system.source[1].position, [0, -1.3, 1], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.source[0].position, self.source_position_set[0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.source[1].position, self.source_position_set[1], atol=1e-10)
 
     def test_set_detector_position(self):
-        np.testing.assert_allclose(self.ag.config.system.detector[0].position, [0, 2, 1], atol=1e-10)
-        np.testing.assert_allclose(self.ag.config.system.detector[1].position, [0, 2, 2], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[0].position,self.detector_position_set[0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].position, self.detector_position_set[1], atol=1e-10)
     
     def test_set_detector_direction_x(self):
         # The detector direction x vectors will have been normalised:
-        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_x, [1, 0.0, 0.0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_x, self.detector_direction_x_set[0], atol=1e-10)
 
-        expected_direction_x = [1, 0.02, 0.0]
+        expected_direction_x = self.detector_direction_x_set[1]
         # Normalise the expected direction_x vector
         norm_expected_direction_x = expected_direction_x / np.linalg.norm(expected_direction_x)
         np.testing.assert_allclose(self.ag.config.system.detector[1].direction_x, norm_expected_direction_x, atol=1e-10)
 
     def test_set_detector_direction_y(self):
         # The detector direction y vectors will have been normalised:
-        expected_direction_y = [0, 0.0, 4]
+        expected_direction_y = self.detector_direction_y_set[0]
         # Normalise the expected direction_y vector
         norm_expected_direction_y = expected_direction_y / np.linalg.norm(expected_direction_y)
         np.testing.assert_allclose(self.ag.config.system.detector[0].direction_y, norm_expected_direction_y, atol=1e-10)
@@ -1837,14 +1839,8 @@ class Test_Cone3D_Flex(unittest.TestCase):
         np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_y, np.asarray([0.,0.,1]))
         self.assertEqual(len(channel_slice.config.system.source), 2)
 
-        channel_slice = self.ag.get_slice(1)
-        self.assertEqual(channel_slice.num_projections, 2)
-        self.assertEqual(channel_slice.channels, 1)
-        np.testing.assert_allclose(channel_slice.config.system.source[0].position, np.asarray([0,-1,0]))
-        np.testing.assert_allclose(channel_slice.config.system.detector[0].position, np.asarray([0,2,1]))
-        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_x, np.asarray([1,0.0, 0.0]))
-        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_y, np.asarray([0.,0.,1]))
-        self.assertEqual(len(channel_slice.config.system.source), 2)
+        channel_slice2 = self.ag.get_slice(1)  
+        self.assertEqual(channel_slice, channel_slice2)
 
     def test_get_slice_vertical(self):
         with self.assertRaises(ValueError):

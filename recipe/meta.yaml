@@ -16,6 +16,8 @@ build:
 
 test:
   requires:
+    - python
+    - pip
     - python-wget
     - cvxpy                   # [linux]
     - scikit-image
@@ -32,45 +34,37 @@ test:
 
   commands:
     - pip install unittest-parametrize
-    - python -m unittest discover -v -s Wrappers/Python/test  # [win]
-    - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
-
+    - python -m unittest discover -v -s Wrappers/Python/test
 
 requirements:
   build:
-    - python
-    - pip
-    - setuptools >=64
-    - setuptools_scm >=8
-    - cmake         # [not osx]
-    - cmake >=3.16  # [osx]
-    - libgcc-ng     # [linux]
-    - libstdcxx-ng  # [linux]
-    - _openmp_mutex # [linux]
-    - openmp        # [osx]
-    - vc 14         # [win]
-    - ninja         # [not win]
+    - cmake >=3.16
+    - ninja
+    - {{ compiler('cxx') }}
+
+  host:
+    - llvm-openmp
     - ipp-include {{ ipp_version }}
     - ipp-devel {{ ipp_version }}
     - ipp {{ ipp_version }}
+    - python >=3.10,<3.13
+    - pip
+    - setuptools >=64
+    - setuptools_scm >=8
     - scikit-build-core >=0.10
 
   run:
     - python
-    - numpy >=1.23, <2.0.0
+    - llvm-openmp
+    - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
+    - numpy >=1.23,<2
     - scipy >=1.4.0
     - h5py
     - pillow
-    - libgcc-ng     # [linux]
-    - libstdcxx-ng  # [linux]
-    - _openmp_mutex # [linux]
-    - openmp        # [osx]
-    - vc 14         # [win]
     - dxchange
     - olefile >=0.46
     - pywavelets
     - cil-data >=22
-    - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
     - tqdm
     - numba
 

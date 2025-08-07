@@ -18,7 +18,7 @@
 # https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import Processor, AcquisitionData
-from cil.framework.labels import AcquisitionDimension
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 
 import numpy as np
 from scipy.fft import fft2
@@ -202,6 +202,9 @@ class PaganinProcessor(Processor):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
         
+        if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("Processor not implemented for CONE_FLEX geometry.")
+        
         if data.dtype!=np.float32:
             raise TypeError('Processor only support dtype=float32')
         
@@ -223,7 +226,7 @@ class PaganinProcessor(Processor):
 
         target_shape = (
             data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
-            data.get_dimension_size('angle') if 'angle' in data.dimension_labels else 1,
+            data.geometry.num_projections,
             data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
             data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
             
@@ -247,7 +250,7 @@ class PaganinProcessor(Processor):
         
         # loop over the channels
         for j in range(data.geometry.channels):
-            # loop over the angles
+            # loop over the projections
             for i in tqdm(range(target_shape[1])):
                 padded_buffer[:] = 0
                 padded_buffer[buffer_slice] = data.array[j, i, :, :]

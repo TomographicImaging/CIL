@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>Developers’ Guide &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -209,23 +209,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -611,7 +601,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">==</span> <span class="s1">&#39;advanced&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only default image geometries can be processed in chunks `set_split_processing`&quot;</span><span class="p">)</span>

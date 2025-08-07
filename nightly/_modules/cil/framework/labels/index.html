@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.labels &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>cil.framework.labels &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../../../../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -206,23 +206,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -492,7 +482,6 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="c1"># Python&lt;3.11</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnumMeta</span> <span class="k">as</span> <span class="n">EnumType</span>
 
-
 <span class="k">class</span><span class="w"> </span><span class="nc">_StrEnumMeta</span><span class="p">(</span><span class="n">EnumType</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Python&lt;3.12 requires this in a metaclass (rather than directly in StrEnum)&quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -560,10 +549,23 @@
 <span class="sd">        ----------</span>
 <span class="sd">        geometry: ImageGeometry | AcquisitionGeometry</span>
 <span class="sd">            If unspecified, the default order is returned.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        In the case that geometry is None, the default order assumes the geometry is not CONE_FLEX, so includes the label &#39;angle&#39;.</span>
+<span class="sd">        If you have CONE_FLEX geometry and geometry=None, the returned order then needs to be manually replaced with &#39;projection&#39;,</span>
+<span class="sd">        or instead pass the geometry to this method to get the correct labels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">order</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_order</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">order</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span> <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">ANGLE</span> <span class="k">else</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">PROJECTION</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">order</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># if geometry is an ImageGeometry, it does not have a geom_type attribute and we also don&#39;t need to adjust the labels</span>
+            <span class="k">pass</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">label</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">order</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
@@ -633,6 +635,7 @@
     <span class="n">ANGLE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">VERTICAL</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">HORIZONTAL</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">PROJECTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_default_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
@@ -732,6 +735,7 @@
     <span class="n">CONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">DIM2</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">DIM3</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">CONE_FLEX</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
 <div class="viewcode-block" id="AcquisitionType.validate">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.labels.AcquisitionType.validate">[docs]</a>
@@ -756,7 +760,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the label for the geometry type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONE</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_missing_</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

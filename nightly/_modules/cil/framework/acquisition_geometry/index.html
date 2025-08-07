@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../../../../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -206,23 +206,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -634,6 +624,23 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the direction_x and direction_y attributes of the detector.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : array-like</span>
+<span class="sd">            The direction vector for the x-axis of the detector.</span>
+<span class="sd">        </span>
+<span class="sd">        y : array-like</span>
+<span class="sd">            The direction vector for the y-axis of the detector.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the vectors are not orthogonal or if they do not have the correct length.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length_check</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">create_unit_vector</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
@@ -641,18 +648,55 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">create_unit_vector</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
         <span class="n">dot_product</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dot_product</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vectors detector.direction_x and detector.direction_y must be orthogonal&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">:</span>
+            <span class="n">angle_deg</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot_product</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Vectors detector.direction_x and detector.direction_y must be orthogonal. Angle error: </span><span class="si">{:.4f}</span><span class="s2"> degrees (divergence: </span><span class="si">{:.2f}</span><span class="s2"> pixels over 100 pixels)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">angle_deg</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_direction_y</span> <span class="o">=</span> <span class="n">y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_direction_x</span> <span class="o">=</span> <span class="n">x</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SystemConfiguration</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;This is a generic class to hold the description of a tomography system&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class defines the configuration of a tomography system, including the geometry and acquisition type.</span>
+<span class="sd">    It provides methods to describe the system, set the origin, and calculate magnification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dof : int</span>
+<span class="sd">        The degrees of freedom of the system i.e 2 (2D) or 3 (3D) acquisition.</span>
+<span class="sd">    geometry : AcquisitionType</span>
+<span class="sd">        The geometry of the system, such as PARALLEL or CONE_FLEX.</span>
+<span class="sd">    units : str, optional</span>
+<span class="sd">        The units of distance used for the configuration, default is &#39;units&#39;.</span>
+<span class="sd">    num_vectors : int, optional</span>
+<span class="sd">        The number of vectors in the system, default is 1.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    SystemConfiguration is an abstract class that should be subclassed to implement specific system configurations.</span>
+<span class="sd">    It provides a framework for defining the system&#39;s geometry and acquisition type, and includes methods for</span>
+<span class="sd">    calculating properties such as magnification and system description.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    SYSTEM_SIMPLE : str</span>
+<span class="sd">        This indicates that the geometry matches the default definitions and represents an ideal configuration with no offsets or rotations.</span>
+<span class="sd">    SYSTEM_OFFSET : str</span>
+<span class="sd">        This indicates that the geometry matches the default definitions but may have detector translation (parallel) or rotation-axis translation (cone or parallel).</span>
+<span class="sd">    SYSTEM_ADVANCED : str</span>
+<span class="sd">        This indicates that the geometries rotation axis and detector vertical direction are not parallel, or the rotation axis is not perpendicular to the ray direction.</span>
+<span class="sd">    SYSTEM_NONSTANDARD : str</span>
+<span class="sd">        This indicates that the geometry is not a standard configuration, e.g. a cone flex geometry with multiple sources or detectors.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>    
+
     <span class="n">SYSTEM_SIMPLE</span> <span class="o">=</span> <span class="s1">&#39;simple&#39;</span>
     <span class="n">SYSTEM_OFFSET</span> <span class="o">=</span> <span class="s1">&#39;offset&#39;</span>
     <span class="n">SYSTEM_ADVANCED</span> <span class="o">=</span> <span class="s1">&#39;advanced&#39;</span>
+    <span class="n">SYSTEM_NONSTANDARD</span> <span class="o">=</span> <span class="s1">&#39;non-standard&#39;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -670,21 +714,29 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_type</span> <span class="o">=</span> <span class="n">AcquisitionType</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dof</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units&#39;</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dof</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="n">num_vectors</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_type</span> <span class="o">=</span> <span class="n">AcquisitionType</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dof</span><span class="si">}</span><span class="s2">D&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">AcquisitionType</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_vectors</span> <span class="o">=</span> <span class="n">num_vectors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
 
-        <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ray</span> <span class="o">=</span> <span class="n">DirectionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vectors</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detector2D</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vectors</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span> <span class="o">=</span> <span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">Detector1D</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="o">=</span> <span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">Detector2D</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="o">=</span> <span class="n">PositionDirectionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ray</span> <span class="o">=</span> <span class="n">DirectionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">Detector1D</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="o">=</span> <span class="n">PositionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">Detector2D</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="o">=</span> <span class="n">PositionDirectionVector</span><span class="p">(</span><span class="n">dof</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements the string representation of the system configuration</span>
@@ -745,21 +797,30 @@
         <span class="k">return</span> <span class="n">axis_rotation</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update_reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotation_axis position</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the rotation_axis position, or the volume centre for Cone3D_Flex geometry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_origin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Transforms the system origin to the input origin</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">translation</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;source&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_vectors</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;source&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">translation</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_centre_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the 2D system configuration corresponding to the centre slice</span>
@@ -776,12 +837,17 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">system_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,</span>
-<span class="sd">            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets</span>
-<span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string describing the system configuration.</span>
+<span class="sd">        This method should be overridden in subclasses to provide specific descriptions.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string describing the system configuration.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a copy of SystemConfiguration&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1688,6 +1754,149 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">p2_on_plane</span> <span class="o">-</span> <span class="n">p1_on_plane</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">Cone3D_Flex</span><span class="p">(</span><span class="n">SystemConfiguration</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This class creates the SystemConfiguration of a cone beam 3D tomographic system</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source_position_set : array_like</span>
+<span class="sd">        N 3D vectors describing the position of the source (x,y,z)</span>
+<span class="sd">    detector_position_set : array_like</span>
+<span class="sd">        N 3D vectors describing the position of the centre of the detector (x,y,z)</span>
+<span class="sd">    detector_direction_x_set : array_like</span>
+<span class="sd">        N 3D vectors describing the direction of the detector_x (x,y,z)</span>
+<span class="sd">    detector_direction_y_set : array_like</span>
+<span class="sd">        N 3D vectors describing the direction of the detector_y (x,y,z)</span>
+<span class="sd">    volume_centre_position : array_like, optional</span>
+<span class="sd">        A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). Default is [0,0,0].</span>
+<span class="sd">    units : str</span>
+<span class="sd">        Label the units of distance used for the configuration</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_position_set</span><span class="p">,</span> <span class="n">detector_position_set</span><span class="p">,</span> <span class="n">detector_direction_x_set</span><span class="p">,</span> <span class="n">detector_direction_y_set</span><span class="p">,</span> <span class="n">volume_centre_position</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units&#39;</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_position_set</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Cone3D_Flex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dof</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">geometry</span> <span class="o">=</span> <span class="s1">&#39;cone_flex&#39;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span> <span class="n">num_vectors</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)</span>
+
+        <span class="c1"># Check that all input sets have the same length</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detector_position_set</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">detector_direction_x_set</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">detector_direction_y_set</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All input sets must have the same length. Got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="si">}</span><span class="s2"> source positions, </span><span class="se">\</span>
+<span class="s2">                            </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">detector_position_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> detector positions, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">detector_direction_x_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> detector direction x vectors, </span><span class="se">\</span>
+<span class="s2">                            and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">detector_direction_y_set</span><span class="p">)</span><span class="si">}</span><span class="s2"> detector direction y vectors.&quot;</span><span class="p">)</span>
+    
+        <span class="c1"># Validate and convert the input arrays</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">source_position_set</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">detector_position_set</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_direction</span><span class="p">(</span><span class="n">detector_direction_x_set</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">detector_direction_y_set</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">volume_centre_position</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">system_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the system configuration type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_NONSTANDARD</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_centre_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the 2D system configuration corresponding to the centre slice</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cone3D_Flex does not support get_centre_slice(). Use the Cone3D or Cone2D classes for 2D slices.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">csv</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array2string</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;Per-projection 3D Cone-beam tomography</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;System configuration:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Number of projections: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">num_show</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Source positions 0-</span><span class="si">{</span><span class="n">num_show</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">csv</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">num_show</span><span class="p">)])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Detector positions 0-</span><span class="si">{</span><span class="n">num_show</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">csv</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">num_show</span><span class="p">)])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Detector directions x 0-</span><span class="si">{</span><span class="n">num_show</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">csv</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">num_show</span><span class="p">)])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Detector directions y 0-</span><span class="si">{</span><span class="n">num_show</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">csv</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">num_show</span><span class="p">)])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Volume centre position: </span><span class="si">{</span><span class="n">csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Average system magnification: </span><span class="si">{</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calculate_magnification</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">repres</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">current_source</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+        <span class="n">other_source</span> <span class="o">=</span> <span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+
+        <span class="n">current_detector_pos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+        <span class="n">other_detector_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+
+        <span class="n">current_detector_direction_x</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+        <span class="n">other_detector_direction_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+
+        <span class="n">current_detector_direction_y</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+        <span class="n">other_detector_direction_y</span> <span class="o">=</span> <span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">direction_y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">num_positions</span> \
+        <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="n">other_source</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">current_detector_pos</span><span class="p">,</span> <span class="n">other_detector_pos</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">current_detector_direction_x</span><span class="p">,</span> <span class="n">other_detector_direction_x</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">current_detector_direction_y</span><span class="p">,</span> <span class="n">other_detector_direction_y</span><span class="p">)</span> \
+        <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span><span class="p">):</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_magnification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the magnification for each position.</span>
+
+<span class="sd">        This method calculates the magnification of the volume_centre point for each projection in </span>
+<span class="sd">        the acquisition geometry. </span>
+
+<span class="sd">        It computes the distances from the source to the volume_centre and from the volume_centre to the detector, </span>
+<span class="sd">        and then uses these distances to determine the magnification.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of numpy.ndarray</span>
+<span class="sd">            A list containing three numpy arrays:</span>
+<span class="sd">            - dist_source_center: The distances from the source to the center for each position.</span>
+<span class="sd">            - dist_center_detector: The distances from the center to the detector for each position.</span>
+<span class="sd">            - magnification: The magnification factors for each position.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dist_center_detector</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)</span>
+        <span class="n">dist_source_center</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)</span>
+        <span class="n">magnification</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_positions</span><span class="p">):</span>
+            <span class="n">ab</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_centre</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+            <span class="n">dist_source_center</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">)))</span>
+
+            <span class="n">ab_unit</span> <span class="o">=</span> <span class="n">ab</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">))</span>
+
+            <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span>
+
+            <span class="c1">#perpendicular distance between source and detector centre</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ab_unit</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+            <span class="n">source_to_detector</span><span class="o">=</span> <span class="n">sd</span> <span class="o">/</span> <span class="n">ratio</span>
+            <span class="n">dist_center_detector</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_to_detector</span> <span class="o">-</span> <span class="n">dist_source_center</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> 
+            <span class="n">magnification</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist_center_detector</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">dist_source_center</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="p">)</span> <span class="o">/</span> <span class="n">dist_source_center</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> 
+
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">dist_source_center</span><span class="p">,</span> <span class="n">dist_center_detector</span><span class="p">,</span> <span class="n">magnification</span><span class="p">]</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">Panel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This is a class describing the panel of the system.</span>
 
@@ -1985,11 +2194,14 @@
 <span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Parallel2D()</span><span class="se">\</span>
 <span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Cone3D()</span><span class="se">\</span>
 <span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Parallel2D()</span><span class="se">\</span>
-<span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Cone3D()&quot;</span><span class="p">)</span>
+<span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Cone3D()</span><span class="se">\</span>
+<span class="s2">                    </span><span class="se">\n\t</span><span class="s2">AcquisitionGeometry.create_Cone3D_Flex()&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># cone_flex geometry does not use angles as it uses per-projection geometries</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="s2">&quot;cone_flex&quot;</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please configure angular data using the set_angles() method&quot;</span><span class="p">)</span>
             <span class="n">configured</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2045,7 +2257,8 @@
             <span class="n">repres</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
             <span class="n">repres</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="p">)</span>
             <span class="n">repres</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">repres</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
 
             <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Distances in units: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 
@@ -2111,6 +2324,8 @@
 <span class="sd">    `AcquisitionGeometry.create_Parallel3D()`</span>
 
 <span class="sd">    `AcquisitionGeometry.create_Cone3D()`</span>
+
+<span class="sd">    `AcquisitionGeometry.create_Cone3D_Flex()`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">geom_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2118,7 +2333,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">num_positions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">pixel_num_h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2158,20 +2376,51 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dist_source_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate and return the distance from the source to the center of the volume.</span>
+
+<span class="sd">        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances </span>
+<span class="sd">        for each position. For other geometries, it returns a single float value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float or numpy.ndarray: The distance from the source to the center or an array of distances.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">calculate_magnification</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
+ 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dist_center_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate and return the distance from the center of the volume to the detector.</span>
+
+<span class="sd">        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances </span>
+<span class="sd">        for each position. For other geometries, it returns a single float value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float or numpy.ndarray: The distance from the centre of the volume to the center or an array of distances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">calculate_magnification</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">magnification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate and return the magnification of the system.</span>
+
+<span class="sd">        For `Cone3D_Flex` geometry, this method returns a NumPy ndarray with the distances </span>
+<span class="sd">        for each position. For other geometries, it returns a single float value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float or numpy.ndarray: The magnification factor or an array of magnifications.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">calculate_magnification</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
@@ -2181,22 +2430,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="s2">&quot;cone_flex&quot;</span><span class="p">:</span>
+            <span class="n">shape_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">num_positions</span><span class="p">,</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+        <span class="c1"># We are using per-projection geometry, not angles</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shape_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">PROJECTION</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">num_positions</span><span class="p">,</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
 
-        <span class="n">shape_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
-                      <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">num_positions</span><span class="p">,</span>
-                      <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                      <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+        
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
-
+       
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">labels_default</span> <span class="o">=</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s2">&quot;cil&quot;</span><span class="p">)</span>
+
+        <span class="n">labels_default</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s2">&quot;cil&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="n">labels_default</span><span class="p">[</span><span class="n">labels_default</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">ANGLE</span><span class="p">)]</span> <span class="o">=</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">PROJECTION</span>
 
         <span class="n">shape_default</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">num_positions</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                            <span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_projections</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_labels</span>
@@ -2205,7 +2464,6 @@
         <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
 
         <span class="c1">#remove from list labels where len == 1</span>
-        <span class="c1">#</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shape_default</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">x</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -2218,6 +2476,12 @@
     <span class="nd">@dimension_labels</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">ANGLE</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot set dimension_labels with AcquisitionDimension.ANGLE for Cone3D_Flex geometry. Use PROJECTION instead.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">PROJECTION</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot set dimension_labels with AcquisitionDimension.PROJECTION for geometries that use angles. Use ANGLE instead.&quot;</span><span class="p">)</span>
+                
             <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_labels</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
 
     <span class="nd">@property</span>
@@ -2271,7 +2535,7 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;calculate_centre_of_rotation&#39;</span><span class="p">):</span>
             <span class="n">offset_distance</span><span class="p">,</span> <span class="n">angle_rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">calculate_centre_of_rotation</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot get centre of rotation for this geometry. Please use a geometry that supports this method.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">distance_units</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="n">offset_distance</span>
@@ -2330,8 +2594,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;set_centre_of_rotation&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot set centre of rotation for this geometry. Please use a geometry that supports this method.&quot;</span><span class="p">)</span>
 
         <span class="n">angle_units</span> <span class="o">=</span> <span class="n">AngleUnit</span><span class="p">(</span><span class="n">angle_units</span><span class="p">)</span>
 
@@ -2381,11 +2644,11 @@
 
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="s1">&#39;set_centre_of_rotation&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot set centre of rotation for this geometry. Please use a geometry that supports this method.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">offset2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;2D so offset2 is ingored&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;2D so offset2 is ignored&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="n">offset1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">offset2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">offset1</span> <span class="o">==</span> <span class="n">offset2</span><span class="p">:</span>
@@ -2415,7 +2678,10 @@
 <span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
 <span class="sd">        :rtype: AcquisitionGeometry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">Angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="p">,</span> <span class="n">angle_unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Angles cannot be set for Cone3D_Flex geometry.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">Angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">initial_angle</span><span class="p">,</span> <span class="n">angle_unit</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
@@ -2460,12 +2726,20 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">set_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This method configures the dimension labels of an AcquisitionGeometry object.</span>
 
-<span class="sd">        :param labels:  The order of the dimensions describing the data.\</span>
-<span class="sd">                        Expects a list containing at least one of the unique labels: &#39;channel&#39; &#39;angle&#39; &#39;vertical&#39; &#39;horizontal&#39;</span>
-<span class="sd">                        default = [&#39;channel&#39;,&#39;angle&#39;,&#39;vertical&#39;,&#39;horizontal&#39;]</span>
-<span class="sd">        :type labels: list, optional</span>
-<span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
-<span class="sd">        :rtype: AcquisitionGeometry</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        labels:  list of strings, optional</span>
+<span class="sd">            The order of the dimensions describing the data.</span>
+<span class="sd">            For most geometries expects a list containing at least one of the unique labels: &#39;channel&#39;, &#39;angle&#39;, &#39;vertical&#39;, &#39;horizontal&#39;.</span>
+<span class="sd">            default = [&#39;channel&#39;,&#39;angle&#39;,&#39;vertical&#39;,&#39;horizontal&#39;]</span>
+<span class="sd">            For Cone3D_Flex geometries expects a list containing at least one of the unique labels: &#39;channel&#39;, &#39;projection&#39;, &#39;vertical&#39;, &#39;horizontal&#39;.</span>
+<span class="sd">            default = [&#39;channel&#39;, &#39;projection&#39;, &#39;vertical&#39;, &#39;horizontal&#39;]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        self: AcquisitionGeometry</span>
+<span class="sd">            a configured AcquisitionGeometry object</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">labels</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -2475,21 +2749,44 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel2D">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a parallel beam 2D tomographic system</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.</span>
 
-<span class="sd">        :param ray_direction: A 2D vector describing the x-ray direction (x,y)</span>
-<span class="sd">        :type ray_direction: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)</span>
-<span class="sd">        :type detector_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_direction_x: A 2D vector describing the direction of the detector_x (x,y)</span>
-<span class="sd">        :type detector_direction_x: list, tuple, ndarray</span>
-<span class="sd">        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)</span>
-<span class="sd">        :type rotation_axis_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel</span>
-<span class="sd">        :type units: string</span>
-<span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
-<span class="sd">        :rtype: AcquisitionGeometry</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.</span>
+<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+
+<span class="sd">        See notes for default directions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ray_direction : array_like, optional</span>
+<span class="sd">            A 2D vector describing the x-ray direction (x,y). Default is [0,1].</span>
+<span class="sd">        detector_position : array_like, optional</span>
+<span class="sd">            A 2D vector describing the position of the centre of the detector (x,y). Default is [0,0].</span>
+<span class="sd">        detector_direction_x : array_like, optional</span>
+<span class="sd">            A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].</span>
+<span class="sd">        rotation_axis_position : array_like, optional</span>
+<span class="sd">            A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            An AcquisitionGeometry object.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</span>
+
+<span class="sd">        The default position of the detector is [0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.</span>
+
+<span class="sd">        The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.</span>
+
+<span class="sd">        The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.</span>
+
+<span class="sd">        The default direction of the ray is [0,1] which means that the ray is assumed to be pointing in the y direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel2D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
@@ -2500,21 +2797,42 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone2D">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a cone beam 2D tomographic system</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the AcquisitionGeometry for a cone beam 2D tomographic system.</span>
 
-<span class="sd">        :param source_position: A 2D vector describing the position of the source (x,y)</span>
-<span class="sd">        :type source_position: list, tuple, ndarray</span>
-<span class="sd">        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)</span>
-<span class="sd">        :type detector_position: list, tuple, ndarray</span>
-<span class="sd">        :param detector_direction_x: A 2D vector describing the direction of the detector_x (x,y)</span>
-<span class="sd">        :type detector_direction_x: list, tuple, ndarray</span>
-<span class="sd">        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)</span>
-<span class="sd">        :type rotation_axis_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel</span>
-<span class="sd">        :type units: string</span>
-<span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
-<span class="sd">        :rtype: AcquisitionGeometry</span>
-<span class="sd">     &#39;&#39;&#39;</span>
+<span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.</span>
+<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+
+<span class="sd">        See notes for default directions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source_position : array_like</span>
+<span class="sd">            A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis, see notes.</span>
+<span class="sd">        detector_position : array_like</span>
+<span class="sd">            A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis, see notes.</span>
+<span class="sd">        detector_direction_x : array_like, optional</span>
+<span class="sd">            A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].</span>
+<span class="sd">        rotation_axis_position : array_like, optional</span>
+<span class="sd">            A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            An AcquisitionGeometry object.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</span>
+
+<span class="sd">        The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.</span>
+
+<span class="sd">        The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.</span>
+
+<span class="sd">        If these values are left as default then the source and detector should lie along the y-axis such as `(0,-100)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
@@ -2525,25 +2843,48 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Parallel3D">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a parallel beam 3D tomographic system</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the AcquisitionGeometry for a parallel beam 3D tomographic system.</span>
 
-<span class="sd">        :param ray_direction: A 3D vector describing the x-ray direction (x,y,z)</span>
-<span class="sd">        :type ray_direction: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)</span>
-<span class="sd">        :type detector_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_direction_x: A 3D vector describing the direction of the detector_x (x,y,z)</span>
-<span class="sd">        :type detector_direction_x: list, tuple, ndarray</span>
-<span class="sd">        :param detector_direction_y: A 3D vector describing the direction of the detector_y (x,y,z)</span>
-<span class="sd">        :type detector_direction_y: list, tuple, ndarray</span>
-<span class="sd">        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)</span>
-<span class="sd">        :type rotation_axis_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)</span>
-<span class="sd">        :type rotation_axis_direction: list, tuple, ndarray, optional</span>
-<span class="sd">        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel</span>
-<span class="sd">        :type units: string</span>
-<span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
-<span class="sd">        :rtype: AcquisitionGeometry</span>
-<span class="sd">     &#39;&#39;&#39;</span>
+<span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.</span>
+<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ray_direction : array_like, optional</span>
+<span class="sd">            A 3D vector describing the x-ray direction (x,y,z). Default is [0,1,0].</span>
+<span class="sd">        detector_position : array_like, optional</span>
+<span class="sd">            A 3D vector describing the position of the centre of the detector (x,y,z). Default is [0,0,0].</span>
+<span class="sd">        detector_direction_x : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].</span>
+<span class="sd">        detector_direction_y : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].</span>
+<span class="sd">        rotation_axis_position : array_like, optional</span>
+<span class="sd">            A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].</span>
+<span class="sd">        rotation_axis_direction : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            An AcquisitionGeometry object.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</span>
+
+<span class="sd">        The default position of the detector is [0,0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.</span>
+
+<span class="sd">        The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector </span>
+<span class="sd">        is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.</span>
+
+<span class="sd">        The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin. </span>
+<span class="sd">        The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.</span>
+
+<span class="sd">        The default direction of the ray is [0,1,0] which means that the ray is assumed to be pointing in the y direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Parallel3D</span><span class="p">(</span><span class="n">ray_direction</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
@@ -2554,28 +2895,87 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone3D">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;This creates the AcquisitionGeometry for a cone beam 3D tomographic system</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the AcquisitionGeometry for a cone beam 3D tomographic system.</span>
 
-<span class="sd">        :param source_position: A 3D vector describing the position of the source (x,y,z)</span>
-<span class="sd">        :type source_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)</span>
-<span class="sd">        :type detector_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param detector_direction_x: A 3D vector describing the direction of the detector_x (x,y,z)</span>
-<span class="sd">        :type detector_direction_x: list, tuple, ndarray</span>
-<span class="sd">        :param detector_direction_y: A 3D vector describing the direction of the detector_y (x,y,z)</span>
-<span class="sd">        :type detector_direction_y: list, tuple, ndarray</span>
-<span class="sd">        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)</span>
-<span class="sd">        :type rotation_axis_position: list, tuple, ndarray, optional</span>
-<span class="sd">        :param rotation_axis_direction: A 3D vector describing the direction of the axis of rotation (x,y,z)</span>
-<span class="sd">        :type rotation_axis_direction: list, tuple, ndarray, optional</span>
-<span class="sd">        :param units: Label the units of distance used for the configuration, these should be consistent for the geometry and panel</span>
-<span class="sd">        :type units: string</span>
-<span class="sd">        :return: returns a configured AcquisitionGeometry object</span>
-<span class="sd">        :rtype: AcquisitionGeometry</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.</span>
+<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source_position : array_like</span>
+<span class="sd">            A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis, see notes.</span>
+<span class="sd">        detector_position : array_like</span>
+<span class="sd">            A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis, see notes.</span>
+<span class="sd">        detector_direction_x : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].</span>
+<span class="sd">        detector_direction_y : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].</span>
+<span class="sd">        rotation_axis_position : array_like, optional</span>
+<span class="sd">            A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].</span>
+<span class="sd">        rotation_axis_direction : array_like, optional</span>
+<span class="sd">            A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            An AcquisitionGeometry object.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</span>
+
+<span class="sd">        The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector </span>
+<span class="sd">        is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.</span>
+
+<span class="sd">        The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin. </span>
+<span class="sd">        The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.</span>
+
+<span class="sd">        If these values are left as default then the source and detector should lie along the y-axis such as `(0,-100,0)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
         <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="p">,</span> <span class="n">detector_position</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="p">,</span> <span class="n">detector_direction_y</span><span class="p">,</span> <span class="n">rotation_axis_position</span><span class="p">,</span> <span class="n">rotation_axis_direction</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AG</span></div>
+
+
+<div class="viewcode-block" id="AcquisitionGeometry.create_Cone3D_Flex">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.create_Cone3D_Flex">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_Cone3D_Flex</span><span class="p">(</span><span class="n">source_position_set</span><span class="p">,</span> <span class="n">detector_position_set</span><span class="p">,</span> <span class="n">detector_direction_x_set</span><span class="p">,</span> <span class="n">detector_direction_y_set</span><span class="p">,</span> <span class="n">volume_centre_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;units distance&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.</span>
+
+<span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method.</span>
+<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source_position_set : array_like</span>
+<span class="sd">            N 3D vectors describing the position of the source (x,y,z).</span>
+<span class="sd">        detector_position_set : array_like</span>
+<span class="sd">            N 3D vectors describing the position of the centre of the detector (x,y,z).</span>
+<span class="sd">        detector_direction_x_set : array_like</span>
+<span class="sd">            N 3D vectors describing the direction of the detector_x (x,y,z).</span>
+<span class="sd">        detector_direction_y_set : array_like</span>
+<span class="sd">            N 3D vectors describing the direction of the detector_y (x,y,z).</span>
+<span class="sd">        volume_centre_position : array_like, optional</span>
+<span class="sd">            A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). Default is [0,0,0].</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            An AcquisitionGeometry object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AG</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="p">()</span>
+        <span class="n">AG</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">AG</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">Cone3D_Flex</span><span class="p">(</span><span class="n">source_position_set</span><span class="p">,</span> <span class="n">detector_position_set</span><span class="p">,</span> <span class="n">detector_direction_x_set</span><span class="p">,</span> <span class="n">detector_direction_y_set</span><span class="p">,</span> <span class="n">volume_centre_position</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">AG</span></div>
 
 
@@ -2620,14 +3020,36 @@
 <div class="viewcode-block" id="AcquisitionGeometry.get_ImageGeometry">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_ImageGeometry">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_ImageGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a default configured ImageGeometry object based on the AcquisitionGeomerty&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an ImageGeometry object that corresponds to the AcquisitionGeometry object. The voxel numbers are calculated from </span>
+<span class="sd">        the resolution and the pixel sizes of the panel. The voxel sizes are calculated from the resolution and the magnification of the system.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        resolution : float, optional</span>
+<span class="sd">            The resolution of the ImageGeometry object. Defaults to 1.0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ImageGeometry</span>
+<span class="sd">            The ImageGeometry object that corresponds to the AcquisitionGeometry object.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For Cone3D_Flex geometries, you must create an ImageGeometry yourself, there is no automatic creation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot create ImageGeometry for this geometry. Please use a geometry that supports this method.&quot;</span><span class="p">)</span>
+
+        <span class="n">mag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">magnification</span>
 
         <span class="n">num_voxel_xy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">resolution</span><span class="p">))</span>
-        <span class="n">voxel_size_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">resolution</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">magnification</span><span class="p">)</span>
+        <span class="n">voxel_size_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">resolution</span> <span class="o">*</span> <span class="n">mag</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM3</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
             <span class="n">num_voxel_z</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">resolution</span><span class="p">))</span>
-            <span class="n">voxel_size_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">resolution</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">magnification</span><span class="p">)</span>
+            <span class="n">voxel_size_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">resolution</span> <span class="o">*</span> <span class="n">mag</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num_voxel_z</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">voxel_size_z</span> <span class="o">=</span> <span class="mi">1</span>
@@ -2638,34 +3060,103 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="AcquisitionGeometry.get_slice">
-<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_slice">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.</span>
+<span class="sd">        get_slice for geometry with &#39;angle&#39; dimension label</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span><span class="s1">&#39;channel_labels&#39;</span><span class="p">):</span>
-                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">channel_labels</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">channel_labels</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+                <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">channel_labels</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">channel_labels</span><span class="p">[</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="p">[</span><span class="n">angle</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="p">[</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">vertical</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">geom_type</span> <span class="ow">or</span> <span class="n">vertical</span> <span class="o">==</span> <span class="s1">&#39;centre&#39;</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">geometry_new</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">vertical</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;projection&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">num_positions</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;projection&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]]</span>
+            <span class="n">geometry_new</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="p">[</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;projection&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]]</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
                 <span class="n">geometry_new</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">get_centre_slice</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;centre&#39;</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">geometry_new</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+                    <span class="n">geometry_new</span> <span class="o">=</span> <span class="n">geometry_new</span><span class="o">.</span><span class="n">get_centre_slice</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot return an off-centre vertical slice for this geometry. Expected vertical = &#39;centre&#39; or None. Got vertical = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">)))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only subset centre slice geometry on cone-beam data. Expected vertical = &#39;centre&#39;. Got vertical = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertical</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot return vertical slice for this geometry. Expected vertical = None. Got vertical = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">)))</span>
 
-        <span class="k">if</span> <span class="n">horizontal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot calculate system geometry for a horizontal slice&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot return horizontal slice for this geometry. Expected horizontal = None. Got horizontal = </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;horizontal&quot;</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="n">geometry_new</span></div>
 
+        <span class="k">return</span> <span class="n">geometry_new</span>
+
+        
+<div class="viewcode-block" id="AcquisitionGeometry.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.get_slice">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a new AcquisitionGeometry of a single slice in the requested direction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int, optional</span>
+<span class="sd">            index on channel dimension to slice on. If None, does not slice on this dimension.</span>
+<span class="sd">        angle or projection: int, optional</span>
+<span class="sd">            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:</span>
+<span class="sd">            - For CONE_FLEX geometry, use &#39;projection&#39;.</span>
+<span class="sd">            - For all other geometries, use &#39;angle&#39;.</span>
+<span class="sd">        vertical: int, str, optional</span>
+<span class="sd">            If int, index on vertical dimension to slice on. If str, can be &#39;centre&#39; to return the slice at the center of the vertical dimension.</span>
+<span class="sd">        horizontal: int, optional</span>
+<span class="sd">            index on horizontal dimension to slice on. If None, does not slice on this dimension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionGeometry</span>
+<span class="sd">            A new AcquisitionGeometry object containing the requested slice.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If there is an even number of slices in the vertical dimension and &#39;centre&#39; is requested, the slice returned will be the average of the two middle slices.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot use &#39;angle&#39; for Cone3D_Flex geometry. Use &#39;projection&#39; instead.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;projection&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot use &#39;projection&#39; for geometries that use angles. Use &#39;angle&#39; instead.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AcquisitionDimension</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; not in allowed labels </span><span class="si">{</span><span class="n">AcquisitionDimension</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Positional arguments for get_slice are deprecated. Use keyword arguments instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            
+            <span class="n">num_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    
 
 <div class="viewcode-block" id="AcquisitionGeometry.allocate">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionGeometry.allocate">[docs]</a>
@@ -2715,6 +3206,7 @@
 
         <span class="k">return</span> <span class="n">out</span></div>
 </div>
+
 
 </pre></div>
 

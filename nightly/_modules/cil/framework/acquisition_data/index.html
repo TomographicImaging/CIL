@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_data &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>cil.framework.acquisition_data &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../../../../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -206,23 +206,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -488,8 +478,9 @@
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 <span class="c1"># Joshua DM Hellier (University of Manchester) [refactorer]</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">Backend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">AcquisitionType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.data_container</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.partitioner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Partitioner</span>
 
@@ -547,7 +538,6 @@
 
         <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;AcquisitionData requires a geometry&quot;</span><span class="p">)</span>
-        
 
         <span class="n">labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dimension_labels&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">labels</span> <span class="o">!=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
@@ -598,13 +588,15 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Functionality of get_slice</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="AcquisitionData.get_slice">
-<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData.get_slice">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns a new dataset of a single slice in the requested direction.&#39;&#39;&#39;</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="n">vertical</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="n">horizontal</span><span class="p">)</span>
+            <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
                 <span class="n">geometry_new</span> <span class="o">=</span> <span class="kc">None</span>
@@ -613,24 +605,93 @@
 
         <span class="c1">#get new data</span>
         <span class="c1">#if vertical = &#39;centre&#39; slice convert to index and subset, this will interpolate 2 rows to get the center slice value</span>
-        <span class="k">if</span> <span class="n">vertical</span> <span class="o">==</span> <span class="s1">&#39;centre&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;centre&#39;</span><span class="p">:</span>
             <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
 
             <span class="n">centre_slice_pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
             <span class="n">ind0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">centre_slice_pos</span><span class="p">))</span>
             <span class="n">w2</span> <span class="o">=</span> <span class="n">centre_slice_pos</span> <span class="o">-</span> <span class="n">ind0</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="n">ind0</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="n">horizontal</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind0</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">w2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">out2</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="n">ind0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="n">horizontal</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind0</span> <span class="o">+</span>  <span class="mi">1</span>
+                <span class="n">out2</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">out2</span> <span class="o">*</span> <span class="n">w2</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="n">vertical</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="n">horizontal</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">geometry_new</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+    
+<div class="viewcode-block" id="AcquisitionData.get_slice">
+<a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData.get_slice">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a new AcquisitionData of a single slice in the requested direction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int, optional</span>
+<span class="sd">            index on channel dimension to slice on. If None, does not slice on this dimension.</span>
+<span class="sd">        angle or projection: int, optional</span>
+<span class="sd">            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:</span>
+<span class="sd">            - For CONE_FLEX geometry, use &#39;projection&#39;.</span>
+<span class="sd">            - For all other geometries, use &#39;angle&#39;.</span>
+<span class="sd">        vertical: int, str, optional</span>
+<span class="sd">            If int, index on vertical dimension to slice on. If str, can be &#39;centre&#39; to return the slice at the center of the vertical dimension.</span>
+<span class="sd">        horizontal: int, optional</span>
+<span class="sd">            index on horizontal dimension to slice on. If None, does not slice on this dimension.</span>
+<span class="sd">        force: bool, default False</span>
+<span class="sd">            If True, will return a DataContainer instead of an AcquisitionData when the requested slice is not reconstructable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AcquisitionData</span>
+<span class="sd">            A new AcquisitionData object containing the requested slice.</span>
+<span class="sd">        DataContainer</span>
+<span class="sd">            If `force=True` and the slice is not reconstructable, a DataContainer will be returned instead.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If there is an even number of slices in the vertical dimension and &#39;centre&#39; is requested, the slice returned will be the average of the two middle slices.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">==</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot use &#39;angle&#39; for Cone3D_Flex geometry. Use &#39;projection&#39; instead.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;projection&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot use &#39;projection&#39; for geometries that use angles. Use &#39;angle&#39; instead.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AcquisitionDimension</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;force&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; not in allowed labels </span><span class="si">{</span><span class="n">AcquisitionDimension</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Positional arguments for get_slice are deprecated. Use keyword arguments instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            
+            <span class="n">num_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;angle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_slice</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AcquisitionData.reorder">

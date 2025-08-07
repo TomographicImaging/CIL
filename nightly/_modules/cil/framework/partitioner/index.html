@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.partitioner &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>cil.framework.partitioner &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../../../../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -206,23 +206,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -583,8 +573,7 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Partitioner.partition">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Partition the data into ``num_batches`` batches using the specified ``mode``.</span>
-
-
+<span class="sd">        </span>
 <span class="sd">        The modes are</span>
 
 <span class="sd">        1. ``sequential`` - The data will be partitioned into ``num_batches`` batches of sequential indices.</span>
@@ -609,6 +598,10 @@
 <span class="sd">        BlockDataContainer</span>
 <span class="sd">            Block of `AcquisitionData` objects containing the data requested in each batch</span>
 
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This only works on datasets with an &#39;angle&#39; dimension, and is not currently implemented for Cone3D_Flex geometry.</span>
+
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
 
@@ -619,6 +612,11 @@
 <span class="sd">        3. [[8, 2, 6], [7, 1], [0, 4], [3, 5]] with ``random_permutation`` and seed 1</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Currently, Partitioner only partitions on the `angle` dimension </span><span class="se">\</span>
+<span class="s2">                and therefore can only be used on datasets with an &#39;angle&#39; dimension. </span><span class="se">\</span>
+<span class="s2">                Dimensions provided: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">SEQUENTIAL</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_deterministic</span><span class="p">(</span><span class="n">num_batches</span><span class="p">,</span> <span class="n">stagger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">STAGGERED</span><span class="p">:</span>

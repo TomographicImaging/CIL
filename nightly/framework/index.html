@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 24.3.1.dev70+g86e0ee33b documentation</title>
+    <title>Framework &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../_static/documentation_options.js?v=c8e56990"></script>
+    <script src="../_static/documentation_options.js?v=7a7adc72"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev70+g86e0ee33b';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev70+g86e0ee33b" />
+  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -209,23 +209,13 @@
   </a>
 </li>
 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../demos/">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../demos/">
     Tutorials
   </a>
 </li>
 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -410,11 +400,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Framework</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#acquisitiongeometry">AcquisitionGeometry</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cil.framework.AcquisitionGeometry"><code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#parallel2d-geometry">Parallel2D Geometry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#parallel3d-geometry">Parallel3D Geometry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cone2d-geometry-fanbeam">Cone2D Geometry (Fanbeam)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cone3d-geometry">Cone3D Geometry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#configure-the-geometry">Configure the geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-the-geometry-object">Create the geometry object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-the-geometry-object">Configure the geometry object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#use-the-geometry">Use the geometry</a></li>
 </ul>
 </li>
@@ -540,109 +527,189 @@
 <p><cite>AcquisitionGeometry.create_Cone2D()</cite></p>
 <p><cite>AcquisitionGeometry.create_Parallel3D()</cite></p>
 <p><cite>AcquisitionGeometry.create_Cone3D()</cite></p>
+<p><cite>AcquisitionGeometry.create_Cone3D_Flex()</cite></p>
 </dd></dl>
 
-<p>We create the appropriate <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> for our data by using the static methods:</p>
+<section id="create-the-geometry-object">
+<h3>Create the geometry object<a class="headerlink" href="#create-the-geometry-object" title="Link to this heading">#</a></h3>
+<p>We create the appropriate <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> for our data. This gives us an acquisition geometry object configured with the spatial geometry of the system.
+The following methods are available to create the geometry object, use the one that matches your data acquisition system.</p>
 <section id="parallel2d-geometry">
-<h3>Parallel2D Geometry<a class="headerlink" href="#parallel2d-geometry" title="Link to this heading">#</a></h3>
+<h4>Parallel2D Geometry<a class="headerlink" href="#parallel2d-geometry" title="Link to this heading">#</a></h4>
+<p>Geometry for a 2D parallel beam system. This describes circular-scan data from a single row of detector pixels for parallel beam data i.e. synchrotron data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Parallel2D">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel2D" title="Link to this definition">#</a></dt>
-<dd><p>This creates the AcquisitionGeometry for a parallel beam 2D tomographic system</p>
+<dd><p>Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.</p>
+<p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
+In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
+<p>See notes for default directions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ray_direction</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 2D vector describing the x-ray direction (x,y)</p></li>
-<li><p><strong>detector_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the centre of the detector (x,y)</p></li>
-<li><p><strong>detector_direction_x</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 2D vector describing the direction of the detector_x (x,y)</p></li>
-<li><p><strong>rotation_axis_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the axis of rotation (x,y)</p></li>
-<li><p><strong>units</strong> (<em>string</em>) – Label the units of distance used for the configuration, these should be consistent for the geometry and panel</p></li>
+<li><p><strong>ray_direction</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the x-ray direction (x,y). Default is [0,1].</p></li>
+<li><p><strong>detector_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the centre of the detector (x,y). Default is [0,0].</p></li>
+<li><p><strong>detector_direction_x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].</p></li>
+<li><p><strong>rotation_axis_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
+<dd class="field-even"><p>An AcquisitionGeometry object.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</p>
+<p>The default position of the detector is [0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.</p>
+<p>The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.</p>
+<p>The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.</p>
+<p>The default direction of the ray is [0,1] which means that the ray is assumed to be pointing in the y direction.</p>
+</div>
 </dd></dl>
 
 </section>
 <section id="parallel3d-geometry">
-<h3>Parallel3D Geometry<a class="headerlink" href="#parallel3d-geometry" title="Link to this heading">#</a></h3>
+<h4>Parallel3D Geometry<a class="headerlink" href="#parallel3d-geometry" title="Link to this heading">#</a></h4>
+<p>Geometry for a 3D parallel beam system. This describes circular-scan data from a 2D array of detector pixels for parallel beam data i.e. synchrotron data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Parallel3D">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel3D" title="Link to this definition">#</a></dt>
-<dd><p>This creates the AcquisitionGeometry for a parallel beam 3D tomographic system</p>
+<dd><p>Creates the AcquisitionGeometry for a parallel beam 3D tomographic system.</p>
+<p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
+In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ray_direction</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the x-ray direction (x,y,z)</p></li>
-<li><p><strong>detector_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the centre of the detector (x,y,z)</p></li>
-<li><p><strong>detector_direction_x</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 3D vector describing the direction of the detector_x (x,y,z)</p></li>
-<li><p><strong>detector_direction_y</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 3D vector describing the direction of the detector_y (x,y,z)</p></li>
-<li><p><strong>rotation_axis_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the axis of rotation (x,y,z)</p></li>
-<li><p><strong>rotation_axis_direction</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the axis of rotation (x,y,z)</p></li>
-<li><p><strong>units</strong> (<em>string</em>) – Label the units of distance used for the configuration, these should be consistent for the geometry and panel</p></li>
+<li><p><strong>ray_direction</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the x-ray direction (x,y,z). Default is [0,1,0].</p></li>
+<li><p><strong>detector_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the centre of the detector (x,y,z). Default is [0,0,0].</p></li>
+<li><p><strong>detector_direction_x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].</p></li>
+<li><p><strong>detector_direction_y</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].</p></li>
+<li><p><strong>rotation_axis_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].</p></li>
+<li><p><strong>rotation_axis_direction</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
+<dd class="field-even"><p>An AcquisitionGeometry object.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</p>
+<p>The default position of the detector is [0,0,0] which means that the detector is assumed to be at the origin. This represents a virtual detector, and may not be the actual position of the detector in a real system.</p>
+<p>The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector
+is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.</p>
+<p>The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin.
+The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.</p>
+<p>The default direction of the ray is [0,1,0] which means that the ray is assumed to be pointing in the y direction.</p>
 </dd></dl>
 
 </section>
 <section id="cone2d-geometry-fanbeam">
-<h3>Cone2D Geometry (Fanbeam)<a class="headerlink" href="#cone2d-geometry-fanbeam" title="Link to this heading">#</a></h3>
+<h4>Cone2D Geometry (Fanbeam)<a class="headerlink" href="#cone2d-geometry-fanbeam" title="Link to this heading">#</a></h4>
+<p>Geometry for a 2D cone-beam system. This describes circular-scan data from a single row of detector pixels for cone/fan-beam data i.e. micro-CT data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone2D">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone2D" title="Link to this definition">#</a></dt>
-<dd><p>This creates the AcquisitionGeometry for a cone beam 2D tomographic system</p>
+<dd><p>Creates the AcquisitionGeometry for a cone beam 2D tomographic system.</p>
+<p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
+In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
+<p>See notes for default directions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>source_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 2D vector describing the position of the source (x,y)</p></li>
-<li><p><strong>detector_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 2D vector describing the position of the centre of the detector (x,y)</p></li>
-<li><p><strong>detector_direction_x</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 2D vector describing the direction of the detector_x (x,y)</p></li>
-<li><p><strong>rotation_axis_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the axis of rotation (x,y)</p></li>
-<li><p><strong>units</strong> (<em>string</em>) – Label the units of distance used for the configuration, these should be consistent for the geometry and panel</p></li>
+<li><p><strong>source_position</strong> (<em>array_like</em>) – A 2D vector describing the position of the source (x,y). With the default directions, this should lie along the y-axis, see notes.</p></li>
+<li><p><strong>detector_position</strong> (<em>array_like</em>) – A 2D vector describing the position of the centre of the detector (x,y). With the default directions, this should lie along the y-axis, see notes.</p></li>
+<li><p><strong>detector_direction_x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the direction of the detector_x (x,y). Default is [1,0].</p></li>
+<li><p><strong>rotation_axis_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 2D vector describing the position of the axis of rotation (x,y). Default is [0,0].</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
+<dd class="field-even"><p>An AcquisitionGeometry object.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</p>
+<p>The default direction of the detector_x is [1,0]. This means that the detector is assumed to be pointing in the x direction.</p>
+<p>The rotation axis position is [0,0] which means that the rotation axis is assumed to be at the origin.</p>
+<p>If these values are left as default then the source and detector should lie along the y-axis such as <cite>(0,-100)</cite>.</p>
+</div>
 </dd></dl>
 
 </section>
 <section id="cone3d-geometry">
-<h3>Cone3D Geometry<a class="headerlink" href="#cone3d-geometry" title="Link to this heading">#</a></h3>
+<h4>Cone3D Geometry<a class="headerlink" href="#cone3d-geometry" title="Link to this heading">#</a></h4>
+<p>Geometry for a 3D cone-beam system. This describes circular-scan data from a 2D array of detector pixels for cone/fan-beam data i.e. micro-CT data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone3D">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D" title="Link to this definition">#</a></dt>
-<dd><p>This creates the AcquisitionGeometry for a cone beam 3D tomographic system</p>
+<dd><p>Creates the AcquisitionGeometry for a cone beam 3D tomographic system.</p>
+<p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
+In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>source_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the source (x,y,z)</p></li>
-<li><p><strong>detector_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the centre of the detector (x,y,z)</p></li>
-<li><p><strong>detector_direction_x</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 3D vector describing the direction of the detector_x (x,y,z)</p></li>
-<li><p><strong>detector_direction_y</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em>) – A 3D vector describing the direction of the detector_y (x,y,z)</p></li>
-<li><p><strong>rotation_axis_position</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the axis of rotation (x,y,z)</p></li>
-<li><p><strong>rotation_axis_direction</strong> (<em>list</em><em>, </em><em>tuple</em><em>, </em><em>ndarray</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the axis of rotation (x,y,z)</p></li>
-<li><p><strong>units</strong> (<em>string</em>) – Label the units of distance used for the configuration, these should be consistent for the geometry and panel</p></li>
+<li><p><strong>source_position</strong> (<em>array_like</em>) – A 3D vector describing the position of the source (x,y,z). With the default directions, this should lie along the y-axis, see notes.</p></li>
+<li><p><strong>detector_position</strong> (<em>array_like</em>) – A 3D vector describing the position of the centre of the detector (x,y,z). With the default directions, this should lie along the y-axis, see notes.</p></li>
+<li><p><strong>detector_direction_x</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the detector_x (x,y,z). Default is [1,0,0].</p></li>
+<li><p><strong>detector_direction_y</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the detector_y (x,y,z). Default is [0,0,1].</p></li>
+<li><p><strong>rotation_axis_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the axis of rotation (x,y,z). Default is [0,0,0].</p></li>
+<li><p><strong>rotation_axis_direction</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the direction of the axis of rotation (x,y,z). Default is [0,0,1].</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
+<dd class="field-even"><p>An AcquisitionGeometry object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The geometry is configured with default directions. The geometry can be customised but ensure that the directions are consistent.</p>
+<p>The default direction of the detector_x is [1,0,0] and the default direction of the detector_y [0,0,1]. This means that the detector
+is assumed to be in the x-z plane with the detector_x direction pointing in the x direction and the detector_y direction pointing in the z direction.</p>
+<p>The rotation axis position is [0,0,0] which means that the rotation axis is assumed to be at the origin.
+The rotation axis direction is [0,0,1] which means that the rotation axis is assumed to be pointing in the z direction.</p>
+<p>If these values are left as default then the source and detector should lie along the y-axis such as <cite>(0,-100,0)</cite>.</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="cone3d-flex-geometry">
+<h4>Cone3D_Flex Geometry<a class="headerlink" href="#cone3d-flex-geometry" title="Link to this heading">#</a></h4>
+<p>Geometry for a 3D cone-beam system with flexible detector and source positions. This geometry allows for different detector and source positions for each radiograph.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone3D_Flex">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D_Flex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_centre_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D_Flex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D_Flex" title="Link to this definition">#</a></dt>
+<dd><p>Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.</p>
+<p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method.
+In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_position_set</strong> (<em>array_like</em>) – N 3D vectors describing the position of the source (x,y,z).</p></li>
+<li><p><strong>detector_position_set</strong> (<em>array_like</em>) – N 3D vectors describing the position of the centre of the detector (x,y,z).</p></li>
+<li><p><strong>detector_direction_x_set</strong> (<em>array_like</em>) – N 3D vectors describing the direction of the detector_x (x,y,z).</p></li>
+<li><p><strong>detector_direction_y_set</strong> (<em>array_like</em>) – N 3D vectors describing the direction of the detector_y (x,y,z).</p></li>
+<li><p><strong>volume_centre_position</strong> (<em>array_like</em><em>, </em><em>optional</em>) – A 3D vector describing the position of the centre of the reconstructed volume (x,y,z). Default is [0,0,0].</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Label the units of distance used for the configuration. These should be consistent for the geometry and panel.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An AcquisitionGeometry object.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
@@ -651,31 +718,13 @@
 </dd></dl>
 
 </section>
-<section id="configure-the-geometry">
-<h3>Configure the geometry<a class="headerlink" href="#configure-the-geometry" title="Link to this heading">#</a></h3>
-<p>This gives us an acquisition geometry object configured with the spatial geometry of the system.</p>
-<p>It is then necessary to configure the panel, angular data and dimension labels:</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_panel">
-<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bottom-left'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_panel" title="Link to this definition">#</a></dt>
-<dd><p>This method configures the panel information of an AcquisitionGeometry object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_pixels</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel</p></li>
-<li><p><strong>pixel_size</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>, </em><em>optional</em>) – pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel</p></li>
-<li><p><strong>origin</strong> (<em>string</em><em>, </em><em>default 'bottom-left'</em>) – the position of pixel 0 (the data origin) of the panel ‘top-left’, ‘top-right’, ‘bottom-left’, ‘bottom-right’</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
-</dd>
-</dl>
-</dd></dl>
-
+</section>
+<section id="configure-the-geometry-object">
+<h3>Configure the geometry object<a class="headerlink" href="#configure-the-geometry-object" title="Link to this heading">#</a></h3>
+<p>Once the geometry is created, we must configure it further. The following methods are available to set the parameters of the geometry.</p>
+<section id="set-the-angles-of-the-projections">
+<h4>Set the angles of the projections<a class="headerlink" href="#set-the-angles-of-the-projections" title="Link to this heading">#</a></h4>
+<p>For circular geometries, we must set the angles of the projections. This is not necessary for Cone3D_Flex geometries, as the rotation is described by the system geometry</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_angles">
 <span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degree'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_angles" title="Link to this definition">#</a></dt>
@@ -697,14 +746,21 @@
 </dl>
 </dd></dl>
 
+</section>
+<section id="set-the-detector-parameters">
+<h4>Set the detector parameters<a class="headerlink" href="#set-the-detector-parameters" title="Link to this heading">#</a></h4>
+<p>It is necessary to configure the panel of the system. This is applied to all the projections in the geometry:</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_labels">
-<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_labels" title="Link to this definition">#</a></dt>
-<dd><p>This method configures the dimension labels of an AcquisitionGeometry object.</p>
+<dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_panel">
+<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bottom-left'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_panel" title="Link to this definition">#</a></dt>
+<dd><p>This method configures the panel information of an AcquisitionGeometry object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>labels</strong> (<em>list</em><em>, </em><em>optional</em>) – The order of the dimensions describing the data.Expects a list containing at least one of the unique labels: ‘channel’ ‘angle’ ‘vertical’ ‘horizontal’
-default = [‘channel’,’angle’,’vertical’,’horizontal’]</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_pixels</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel</p></li>
+<li><p><strong>pixel_size</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>, </em><em>optional</em>) – pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel</p></li>
+<li><p><strong>origin</strong> (<em>string</em><em>, </em><em>default 'bottom-left'</em>) – the position of pixel 0 (the data origin) of the panel ‘top-left’, ‘top-right’, ‘bottom-left’, ‘bottom-right’</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>returns a configured AcquisitionGeometry object</p>
@@ -715,6 +771,35 @@ default = [‘channel’,’angle’,’vertical’,’horizontal’]</p>
 </dl>
 </dd></dl>
 
+</section>
+<section id="set-the-dimension-labels">
+<h4>Set the dimension labels<a class="headerlink" href="#set-the-dimension-labels" title="Link to this heading">#</a></h4>
+<p>Set the order of the dimension labels, this describe how the data is stored in memory:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_labels">
+<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_labels" title="Link to this definition">#</a></dt>
+<dd><p>This method configures the dimension labels of an AcquisitionGeometry object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>list</em><em> of </em><em>strings</em><em>, </em><em>optional</em>) – The order of the dimensions describing the data.
+For most geometries expects a list containing at least one of the unique labels: ‘channel’, ‘angle’, ‘vertical’, ‘horizontal’.
+default = [‘channel’,’angle’,’vertical’,’horizontal’]
+For Cone3D_Flex geometries expects a list containing at least one of the unique labels: ‘channel’, ‘projection’, ‘vertical’, ‘horizontal’.
+default = [‘channel’, ‘projection’, ‘vertical’, ‘horizontal’]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – a configured AcquisitionGeometry object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="set-the-number-of-channels">
+<h4>Set the number of channels<a class="headerlink" href="#set-the-number-of-channels" title="Link to this heading">#</a></h4>
+<p>Set the number of channels for the data, this can be used to add an additional dimension to the data for multi-spectral data:</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.set_channels">
 <span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">set_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.set_channels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.set_channels" title="Link to this definition">#</a></dt>
@@ -736,13 +821,34 @@ default = [‘channel’,’angle’,’vertical’,’horizontal’]</p>
 </dd></dl>
 
 </section>
+</section>
 <section id="use-the-geometry">
 <h3>Use the geometry<a class="headerlink" href="#use-the-geometry" title="Link to this heading">#</a></h3>
 <p>We can use this geometry to generate related objects. Including a 2D slice <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, an <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> container, and a default <code class="code docutils literal notranslate"><span class="pre">ImageGeometry</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.get_slice">
-<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.get_slice" title="Link to this definition">#</a></dt>
-<dd><p>Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.</p>
+<span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.get_slice" title="Link to this definition">#</a></dt>
+<dd><p>Returns a new AcquisitionGeometry of a single slice in the requested direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>channel</strong> (<em>int</em><em>, </em><em>optional</em>) – index on channel dimension to slice on. If None, does not slice on this dimension.</p></li>
+<li><p><strong>projection</strong> (<em>angle or</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+- For CONE_FLEX geometry, use ‘projection’.
+- For all other geometries, use ‘angle’.</p></li>
+<li><p><strong>vertical</strong> (<em>int</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If int, index on vertical dimension to slice on. If str, can be ‘centre’ to return the slice at the center of the vertical dimension.</p></li>
+<li><p><strong>horizontal</strong> (<em>int</em><em>, </em><em>optional</em>) – index on horizontal dimension to slice on. If None, does not slice on this dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new AcquisitionGeometry object containing the requested slice.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry">AcquisitionGeometry</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If there is an even number of slices in the vertical dimension and ‘centre’ is requested, the slice returned will be the average of the two middle slices.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -788,7 +894,23 @@ or <cite>value=’random_int_deprecated’</cite></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.get_ImageGeometry">
 <span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">get_ImageGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.get_ImageGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.get_ImageGeometry" title="Link to this definition">#</a></dt>
-<dd><p>returns a default configured ImageGeometry object based on the AcquisitionGeomerty</p>
+<dd><p>Returns an ImageGeometry object that corresponds to the AcquisitionGeometry object. The voxel numbers are calculated from
+the resolution and the pixel sizes of the panel. The voxel sizes are calculated from the resolution and the magnification of the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resolution</strong> (<em>float</em><em>, </em><em>optional</em>) – The resolution of the ImageGeometry object. Defaults to 1.0.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ImageGeometry object that corresponds to the AcquisitionGeometry object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry">ImageGeometry</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For Cone3D_Flex geometries, you must create an ImageGeometry yourself, there is no automatic creation.</p>
+</div>
 </dd></dl>
 
 </section>
@@ -994,10 +1116,10 @@ any dimension_labels of the DataContainer or their indices</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.reorder">
 <span class="sig-name descname"><span class="pre">reorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/data_container/#DataContainer.reorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer.reorder" title="Link to this definition">#</a></dt>
-<dd><p>reorders the data in memory as requested.</p>
+<dd><p>Reorders the data in memory as requested. This is an in-place operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>order</strong> (<em>list</em><em>, </em><em>sting</em>) – ordered list of labels from self.dimension_labels</p>
+<dd class="field-odd"><p><strong>order</strong> (<em>list</em><em> or </em><em>string</em>) – ordered list of labels from self.dimension_labels</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1393,8 +1515,30 @@ any dimension_labels of the DataContainer or their indices</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.get_slice">
-<span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_data/#AcquisitionData.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionData.get_slice" title="Link to this definition">#</a></dt>
-<dd><p>Returns a new dataset of a single slice in the requested direction.</p>
+<span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_data/#AcquisitionData.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionData.get_slice" title="Link to this definition">#</a></dt>
+<dd><p>Returns a new AcquisitionData of a single slice in the requested direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>channel</strong> (<em>int</em><em>, </em><em>optional</em>) – index on channel dimension to slice on. If None, does not slice on this dimension.</p></li>
+<li><p><strong>projection</strong> (<em>angle or</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+- For CONE_FLEX geometry, use ‘projection’.
+- For all other geometries, use ‘angle’.</p></li>
+<li><p><strong>vertical</strong> (<em>int</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If int, index on vertical dimension to slice on. If str, can be ‘centre’ to return the slice at the center of the vertical dimension.</p></li>
+<li><p><strong>horizontal</strong> (<em>int</em><em>, </em><em>optional</em>) – index on horizontal dimension to slice on. If None, does not slice on this dimension.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, will return a DataContainer instead of an AcquisitionData when the requested slice is not reconstructable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>AcquisitionData</em> – A new AcquisitionData object containing the requested slice.</p></li>
+<li><p><em>DataContainer</em> – If <cite>force=True</cite> and the slice is not reconstructable, a DataContainer will be returned instead.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If there is an even number of slices in the vertical dimension and ‘centre’ is requested, the slice returned will be the average of the two middle slices.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1526,6 +1670,10 @@ generator will not be seeded.</p></li>
 <dd class="field-odd"><p><a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer">BlockDataContainer</a></p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This only works on datasets with an ‘angle’ dimension, and is not currently implemented for Cone3D_Flex geometry.</p>
+</div>
 <p class="rubric">Example</p>
 <p>Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:</p>
 <ol class="arabic simple">
@@ -2220,10 +2368,10 @@ Default is None</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.VectorData.reorder">
 <span class="sig-name descname"><span class="pre">reorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.framework.VectorData.reorder" title="Link to this definition">#</a></dt>
-<dd><p>reorders the data in memory as requested.</p>
+<dd><p>Reorders the data in memory as requested. This is an in-place operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>order</strong> (<em>list</em><em>, </em><em>sting</em>) – ordered list of labels from self.dimension_labels</p>
+<dd class="field-odd"><p><strong>order</strong> (<em>list</em><em> or </em><em>string</em>) – ordered list of labels from self.dimension_labels</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2500,7 +2648,7 @@ methods of DataContainer and subclasses.</p>
 <section id="partitioner">
 <h2>Partitioner<a class="headerlink" href="#partitioner" title="Link to this heading">#</a></h2>
 <p>This method partitions an instance of tomography <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> into a number of batches. For example, to use with a stochastic optimisation method.</p>
-<p>The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the <cite>mode</cite> and takes in an <cite>AquisitionData</cite> object and outputs a <cite>BlockDataContainer</cite> where each element in the block is  <cite>AquisitionData</cite> object with the batch of data and corresponding geometry.
+<p>The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the <cite>mode</cite> and takes in an <cite>AcquisitionData</cite> object and outputs a <cite>BlockDataContainer</cite> where each element in the block is  <cite>AcquisitionData</cite> object with the batch of data and corresponding geometry.
 We consider a <strong>batch</strong> to be a subset of the <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and the verb, <strong>to partition</strong>, to be the act of splitting into batches.</p>
 <p>For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
@@ -2575,6 +2723,10 @@ generator will not be seeded.</p></li>
 <dd class="field-odd"><p><a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer">BlockDataContainer</a></p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This only works on datasets with an ‘angle’ dimension, and is not currently implemented for Cone3D_Flex geometry.</p>
+</div>
 <p class="rubric">Example</p>
 <p>Partitioning a list of ints [0, 1, 2, 3, 4, 5, 6, 7, 8] into 4 batches will return:</p>
 <ol class="arabic simple">
@@ -2650,6 +2802,11 @@ generator will not be seeded.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.HORIZONTAL">
 <span class="sig-name descname"><span class="pre">HORIZONTAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.HORIZONTAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.PROJECTION">
+<span class="sig-name descname"><span class="pre">PROJECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'projection'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.PROJECTION" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

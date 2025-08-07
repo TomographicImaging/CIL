@@ -1,7 +1,8 @@
 * XX.X
   - New features:
     - Added `FunctionOfAbs` class (#1976)
-    - Added `Cone3D_Flex` geometry with `ASTRA` backend support for `ProjectionOperator` and `FBP`. This allows users to reconstruct non-cicular trajectories. (#2039)
+    - Added `Cone3D_Flex` geometry as a CIL acquisition geometry type. This allows users to reconstruct non-circular trajectories. (#2039)
+    - Added `ASTRA` backend support for `ProjectionOperator` and `FBP` to use `Cone3D_Flex` geometry. (#2039)
     - Added `show_system_positions` for visualisation of `Cone3D_Flex` geometries. (#2039)
   - Bug fixes:
     - Fix deprecation warning for rtol and atol in GD (#2056)

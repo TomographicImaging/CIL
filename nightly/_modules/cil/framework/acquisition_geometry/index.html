@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
+    <title>cil.framework.acquisition_geometry &#8212; CIL 24.3.1.dev72+g59c294ff1 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=7a7adc72"></script>
+    <script src="../../../../_static/documentation_options.js?v=e46b6026"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev72+g59c294ff1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
+  <meta name="docsearch:version" content="24.3.1.dev72+g59c294ff1" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -2753,7 +2753,7 @@
 <span class="sd">        Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.</span>
 
 <span class="sd">        After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.</span>
-<span class="sd">        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
+<span class="sd">        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.</span>
 
 <span class="sd">        See notes for default directions.</span>
 
@@ -3107,10 +3107,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        channel: int, optional</span>
 <span class="sd">            index on channel dimension to slice on. If None, does not slice on this dimension.</span>
-<span class="sd">        angle or projection: int, optional</span>
+<span class="sd">        angle/projection: int, optional</span>
 <span class="sd">            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:</span>
-<span class="sd">            - For CONE_FLEX geometry, use &#39;projection&#39;.</span>
-<span class="sd">            - For all other geometries, use &#39;angle&#39;.</span>
+<span class="sd">            For CONE_FLEX geometry, use &#39;projection&#39;.</span>
+<span class="sd">            For all other geometries, use &#39;angle&#39;.</span>
 <span class="sd">        vertical: int, str, optional</span>
 <span class="sd">            If int, index on vertical dimension to slice on. If str, can be &#39;centre&#39; to return the slice at the center of the vertical dimension.</span>
 <span class="sd">        horizontal: int, optional</span>

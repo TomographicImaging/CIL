@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 24.3.1.dev71+geea4c50eb documentation</title>
+    <title>Framework &#8212; CIL 24.3.1.dev72+g59c294ff1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../_static/documentation_options.js?v=7a7adc72"></script>
+    <script src="../_static/documentation_options.js?v=e46b6026"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev71+geea4c50eb';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev72+g59c294ff1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev71+geea4c50eb" />
+  <meta name="docsearch:version" content="24.3.1.dev72+g59c294ff1" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -542,7 +542,7 @@ The following methods are available to create the geometry object, use the one t
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel2D" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
-In addition,`set_channels()` can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
+In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
 <p>See notes for default directions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -833,9 +833,9 @@ default = [‘channel’, ‘projection’, ‘vertical’, ‘horizontal’]</p
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>channel</strong> (<em>int</em><em>, </em><em>optional</em>) – index on channel dimension to slice on. If None, does not slice on this dimension.</p></li>
-<li><p><strong>projection</strong> (<em>angle or</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
-- For CONE_FLEX geometry, use ‘projection’.
-- For all other geometries, use ‘angle’.</p></li>
+<li><p><strong>angle/projection</strong> (<em>int</em><em>, </em><em>optional</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+For CONE_FLEX geometry, use ‘projection’.
+For all other geometries, use ‘angle’.</p></li>
 <li><p><strong>vertical</strong> (<em>int</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If int, index on vertical dimension to slice on. If str, can be ‘centre’ to return the slice at the center of the vertical dimension.</p></li>
 <li><p><strong>horizontal</strong> (<em>int</em><em>, </em><em>optional</em>) – index on horizontal dimension to slice on. If None, does not slice on this dimension.</p></li>
 </ul>
@@ -1521,9 +1521,9 @@ any dimension_labels of the DataContainer or their indices</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>channel</strong> (<em>int</em><em>, </em><em>optional</em>) – index on channel dimension to slice on. If None, does not slice on this dimension.</p></li>
-<li><p><strong>projection</strong> (<em>angle or</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
-- For CONE_FLEX geometry, use ‘projection’.
-- For all other geometries, use ‘angle’.</p></li>
+<li><p><strong>angle/projection</strong> (<em>int</em><em>, </em><em>optional</em>) – index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+For CONE_FLEX geometry, use ‘projection’.
+For all other geometries, use ‘angle’.</p></li>
 <li><p><strong>vertical</strong> (<em>int</em><em>, </em><em>str</em><em>, </em><em>optional</em>) – If int, index on vertical dimension to slice on. If str, can be ‘centre’ to return the slice at the center of the vertical dimension.</p></li>
 <li><p><strong>horizontal</strong> (<em>int</em><em>, </em><em>optional</em>) – index on horizontal dimension to slice on. If None, does not slice on this dimension.</p></li>
 <li><p><strong>force</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, will return a DataContainer instead of an AcquisitionData when the requested slice is not reconstructable.</p></li>

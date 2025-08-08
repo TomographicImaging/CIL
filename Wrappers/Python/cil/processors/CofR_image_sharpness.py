@@ -287,13 +287,13 @@ class CofR_image_sharpness(Processor):
             sampling_points = np.mgrid[-self.initial_binning*new_half_panel:self.initial_binning*new_half_panel+1:self.initial_binning]
             initial_coordinates = np.mgrid[-half_panel:half_panel+1:1]
 
-            new_geom = data.geometry.copy()
+            new_geom = data_temp.geometry.copy()
             new_geom.config.panel.num_pixels[0] = num_pix_new
             new_geom.config.panel.pixel_size[0] *= self.initial_binning
             data_binned = new_geom.allocate()
 
-            for i in range(data.shape[0]):
-                data_binned.fill(np.interp(sampling_points, initial_coordinates, data.array[i,:]),angle=i)
+            for i in range(data_temp.shape[0]):
+                data_binned.fill(np.interp(sampling_points, initial_coordinates, data_temp.array[i,:]),angle=i)
 
             #filter
             data_binned_filtered = data_binned.copy()

@@ -172,10 +172,10 @@ class AcquisitionData(DataContainer, Partitioner):
         ----------
         channel: int, optional
             index on channel dimension to slice on. If None, does not slice on this dimension.
-        angle or projection: int, optional
+        angle/projection: int, optional
             index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
-            - For CONE_FLEX geometry, use 'projection'.
-            - For all other geometries, use 'angle'.
+            For CONE_FLEX geometry, use 'projection'.
+            For all other geometries, use 'angle'.
         vertical: int, str, optional
             If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
         horizontal: int, optional

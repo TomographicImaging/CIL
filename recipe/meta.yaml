@@ -8,11 +8,6 @@ source:
 build:
   preserve_egg_dir: False
   number: {{ GIT_DESCRIBE_NUMBER }}
-  missing_dso_whitelist:
-    - /lib64/libc.so.6            # [linux]
-    - /lib64/libm.so.6            # [linux]
-    - /lib64/libpthread.so.0      # [linux]
-    - /lib64/ld-linux-x86-64.so.2 # [linux]
 
 test:
   requires:
@@ -21,12 +16,12 @@ test:
     - python-wget
     - cvxpy                   # [linux]
     - scikit-image
-    - tomophantom=2.0.0       # [linux]
-    - tigre=2.6
+    - tomophantom 2.0.0       # [linux]
+    - tigre 2.6
     - packaging
-    - ccpi-regulariser=24.0.1 # [not osx]
-    - astra-toolbox=2.1=cuda* # [not osx]
-    - matplotlib-base >=3.3.0
+    - ccpi-regulariser 24.0.1 # [not osx]
+    - astra-toolbox 2.1 cuda* # [not osx]
+    - matplotlib-base >=3.3
     - zenodo_get >=1.6
 
   source_files:
@@ -43,10 +38,10 @@ requirements:
     - {{ compiler('cxx') }}
 
   host:
-    - llvm-openmp
+    - libgomp      # [linux]
+    - llvm-openmp  # [osx]
     - ipp-include {{ ipp_version }}
     - ipp-devel {{ ipp_version }}
-    - ipp {{ ipp_version }}
     - python >=3.10,<3.13
     - pip
     - setuptools >=64
@@ -55,10 +50,9 @@ requirements:
 
   run:
     - python
-    - llvm-openmp
-    - {{ pin_compatible('ipp', min_pin='x.x', max_pin='x.x') }}
+    - ipp {{ ipp_version }}
     - numpy >=1.23,<2
-    - scipy >=1.4.0
+    - scipy >=1.4
     - h5py
     - pillow
     - dxchange

@@ -20,28 +20,28 @@ dependencies:
   # base (vis. recipe/conda_build_config.yaml)
   - python >=3.10,<3.13
   - numpy >=1.23,<2
-  - llvm-openmp
-  - ccpi::cil-data
-  - ccpi::tigre=2.6
-  - ccpi::ccpi-regulariser=24.0.1
-  - ccpi::tomophantom=2.0.0
-  - astra-toolbox=2.1=cuda*
+  - libgomp      # [linux]
+  - ccpi::cil-data >=22
+  - ccpi::tigre 2.6
+  - ccpi::ccpi-regulariser 24.0.1
+  - ccpi::tomophantom 2.0.0
+  - astra-toolbox 2.1 cuda*
   - cvxpy
   - python-wget
   - scikit-image
   - packaging
   - cmake >=3.16
   - setuptools >=64
-  - ipp-include=2021.12
-  - ipp-devel=2021.12
-  - ipp=2021.12
+  - ipp-include 2021.12
+  - ipp-devel 2021.12
+  - ipp 2021.12
   - ipywidgets
-  - scipy
-  - matplotlib-base
+  - scipy >=1.4
+  - matplotlib-base >=3.3
   - h5py
   - pillow
   - dxchange
-  - olefile
+  - olefile >=0.46
   - pywavelets
   - numba
   - tqdm

@@ -85,6 +85,8 @@ class Test_Reconstructor_tigre(unittest.TestCase):
         self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
+        self.ad2D = self.ag.allocate('random', seed=3)
+
     def test_defaults(self):
         reconstructor = Reconstructor(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))

@@ -24,6 +24,11 @@ import re
 import io
 import sys
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, Partitioner, SystemConfiguration
+from cil.framework.labels import AcquisitionDimension
+from utils import has_matplotlib
+
+if has_matplotlib:
+    from cil.utilities.display import show_geometry
 
 initialise_tests()
 
@@ -156,6 +161,106 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_allclose(AG.config.system.detector.direction_y, detector_direction_y, rtol=1E-6)
         np.testing.assert_allclose(AG.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
         np.testing.assert_allclose(AG.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
+
+
+    def test_create_Cone3D_Flex(self):
+        source_position_set = [[0.1, -500.0,0.2], [0.3, -499.0,0.4]]
+        detector_position_set = [[-1.3,1000.0, -1.0], [-1.4,1004.0, -0.08]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set,
+                                                    volume_centre_position=[-1,-2,-3])
+
+        def get_unit_vec(x):
+            x = np.array(x)
+            return x / np.linalg.norm(x)
+        
+        # check the values
+        for i in range(len(source_position_set)):
+            np.testing.assert_array_equal(ag.config.system.source[i].position, source_position_set[i])
+            np.testing.assert_array_equal(ag.config.system.detector[i].position, detector_position_set[i])
+            np.testing.assert_array_equal(ag.config.system.detector[i].direction_x, get_unit_vec(detector_direction_x_set[i]))
+            np.testing.assert_array_equal(ag.config.system.detector[i].direction_y, get_unit_vec(detector_direction_y_set[i]))
+
+        np.testing.assert_array_equal(ag.config.system.volume_centre.position, [-1,-2,-3])
+
+
+    def test_create_Cone3D_Flex_invalid_values(self):
+        source_position_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
+        detector_position_set = [[0.0, 0.0, 1], [1, 0.0, 0.0]]
+        detector_direction_x_set = [[1, 0.0, 0.0], [0.0, 0.0, 1]]
+        detector_direction_y_set = [[0.0, 1, 0.0], [0.0, 1, 0.0]]
+
+        invalid_values = [
+            "not a list",          # Not a list
+            [1, 2, 3],             # List of integers, not lists/arrays
+            [[1,2],[3,4],[5,6]],      # List of lists of incorrect length
+            [[1, 2, 3], [3, 4]],   # Lists of incorrect length
+            [[1,2], "not a list"], # List with invalid value
+        ]
+
+        for invalid_value in invalid_values:
+            try:
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=invalid_value,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for source_position_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for source_position_set={invalid_value}")
+
+            try:
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=invalid_value,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_position_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_position_set={invalid_value}")
+
+
+            try:
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=invalid_value,
+                    detector_direction_y_set=detector_direction_y_set
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_direction_x_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_direction_x_set={invalid_value}")
+
+
+            try:
+                ag = AcquisitionGeometry.create_Cone3D_Flex(
+                    source_position_set=source_position_set,
+                    detector_position_set=detector_position_set,
+                    detector_direction_x_set=detector_direction_x_set,
+                    detector_direction_y_set=invalid_value
+                )
+            except ValueError:
+                pass  # Expected, test passes for this input
+            except Exception as err:
+                raise AssertionError(f"Unexpected exception for detector_direction_x_set={invalid_value}: {err}")
+            else:
+                raise AssertionError(f"No exception raised for detector_direction_x_set={invalid_value}")
 
 
     def test_shift_detector_origin_bottom_left(self):
@@ -462,6 +567,10 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG3 = AG2.copy()
         AG3.config.channels.channel_labels = ['d','b','c','d']
+        self.assertFalse(AG == AG3)
+
+        AG3 = AG2.copy()
+        AG3.set_channels(1)
         self.assertFalse(AG == AG3)
 
         AG3 = AG2.copy()
@@ -1536,6 +1645,233 @@ class Test_Cone3D(unittest.TestCase):
         AG.config.system.set_centre_of_rotation(*gold)
         out = AG.config.system.calculate_centre_of_rotation()
         np.testing.assert_allclose(out, gold, err_msg="Failed tilted detector x B")
+    
+    def test_set_dimension_labels(self):
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0]).set_angles([0,1]).set_panel(num_pixels=[10, 20]).set_channels(4)
+        unexpected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.PROJECTION, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        with self.assertRaises(ValueError):
+            AG.dimension_labels = unexpected_labels
+        
+        acceptable_labels = [AcquisitionDimension.ANGLE, AcquisitionDimension.CHANNEL,AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        AG.dimension_labels = acceptable_labels
+
+        self.assertEqual(list(AG.dimension_labels), acceptable_labels)
+
+class Test_Cone3D_Flex(unittest.TestCase):
+
+    def setUp(self):
+        self.source_position_set = [[0,-1,0], [0,-1.3,1]]
+        self.detector_position_set = [[0,2,1], [0,2,2]]
+        self.detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        self.detector_direction_y_set = [[0.,0.,4], [0,0.0,3]]
+
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=self.source_position_set, \
+                                                    detector_position_set=self.detector_position_set, \
+                                                    detector_direction_x_set=self.detector_direction_x_set, \
+                                                    detector_direction_y_set=self.detector_direction_y_set)\
+                                     .set_panel(num_pixels=[10, 20]).set_channels(4)\
+
+
+    def test_set_source_position(self):
+        np.testing.assert_allclose(self.ag.config.system.source[0].position, self.source_position_set[0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.source[1].position, self.source_position_set[1], atol=1e-10)
+
+    def test_set_detector_position(self):
+        np.testing.assert_allclose(self.ag.config.system.detector[0].position,self.detector_position_set[0], atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].position, self.detector_position_set[1], atol=1e-10)
+    
+    def test_set_detector_direction_x(self):
+        # The detector direction x vectors will have been normalised:
+        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_x, self.detector_direction_x_set[0], atol=1e-10)
+
+        expected_direction_x = self.detector_direction_x_set[1]
+        # Normalise the expected direction_x vector
+        norm_expected_direction_x = expected_direction_x / np.linalg.norm(expected_direction_x)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].direction_x, norm_expected_direction_x, atol=1e-10)
+
+    def test_set_detector_direction_y(self):
+        # The detector direction y vectors will have been normalised:
+        expected_direction_y = self.detector_direction_y_set[0]
+        # Normalise the expected direction_y vector
+        norm_expected_direction_y = expected_direction_y / np.linalg.norm(expected_direction_y)
+        np.testing.assert_allclose(self.ag.config.system.detector[0].direction_y, norm_expected_direction_y, atol=1e-10)
+        np.testing.assert_allclose(self.ag.config.system.detector[1].direction_y, norm_expected_direction_y, atol=1e-10)
+
+
+    def test_set_volume_centre(self):
+        self.ag.config.system.volume_centre.position = [0.1, -0.04, 0.2]
+        np.testing.assert_allclose(self.ag.config.system.volume_centre.position, [0.1, -0.04, 0.2], atol=1e-10)
+
+        self.ag.config.system.volume_centre.position = [0, 0, 0]
+        np.testing.assert_allclose(self.ag.config.system.volume_centre.position, [0, 0, 0], atol=1e-10)
+
+        with self.assertRaises(ValueError):
+            self.ag.config.system.volume_centre.position = [0.1, -0.04]
+
+        with self.assertRaises(ValueError):
+            self.ag.config.system.volume_centre.position = "nope"
+
+
+    def test_system_description(self):
+        self.assertTrue(self.ag.system_description=='non-standard')
+
+    def test_get_centre_slice(self):
+        with self.assertRaises(NotImplementedError):
+            self.ag.config.system.get_centre_slice()
+
+    def test_str(self):
+
+        out = str(self.ag.config.system)
+
+        # Check for specific substrings
+        self.assertIn("Per-projection 3D Cone-beam tomography", out)
+        self.assertIn("System configuration", out)
+        self.assertIn(f"Number of projections: {self.ag.num_projections}", out)
+        self.assertIn("Source positions", out)
+        self.assertIn("Detector positions", out)
+        self.assertIn("Detector directions x", out)
+        self.assertIn("Detector directions y", out)
+        self.assertIn("Volume centre position:", out)
+        self.assertIn("Average system magnification:", out)
+
+    def test_eq(self):
+        AG = self.ag
+        AG2 = AG.copy()
+        self.assertTrue(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.panel.pixel_size = [10,10]
+        self.assertFalse(AG == AG2, "Pixel size should not be equal")
+
+        AG2 = AG.copy()
+        AG2.config.panel.num_pixels = [1,2]
+        self.assertFalse(AG == AG2, "Number of pixels should not be equal")
+
+        AG2 = AG.copy()
+        AG2.set_channels(6)
+        self.assertFalse(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.system.num_positions = 1
+        self.assertFalse(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.system.source[1].position = [-100, -100, -100]
+        self.assertFalse(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.system.volume_centre.position = [1,1,1]
+        self.assertFalse(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.system.detector[0].position = [1,1,1]
+        self.assertFalse(AG == AG2)
+
+        AG2 = AG.copy()
+        AG2.config.system.detector[0].set_direction( [0,0,1], [1,0,0]) 
+        self.assertFalse(AG == AG2)
+
+
+    def test_calculate_magnification(self):
+        source_position_set = [[0,-1,0], [0,-1,0], [0,-2,0]]
+        detector_position_set = [[0,2,1], [0,5,1], [0, 2,1]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.0, 0], [1,0,0]]
+        detector_direction_y_set = [[0.,0.,4], [0,0.0,3], [0,0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[10, 10])
+                                     
+        expected_mag = [abs((detector_position_set[0][1]-source_position_set[0][1])/source_position_set[0][1]), 
+            abs((detector_position_set[1][1]-source_position_set[1][1])/source_position_set[1][1]), 
+            abs((detector_position_set[2][1]-source_position_set[2][1])/source_position_set[2][1])]
+
+
+        np.testing.assert_array_equal(np.asarray(expected_mag), np.asarray(ag.config.system.calculate_magnification()[2]))
+
+    @unittest.skipUnless(has_matplotlib, "matplotlib is not installed")
+    def test_show_geometry(self):
+        with self.assertRaises(NotImplementedError):
+            show_geometry(self.ag)
+
+    def test_set_centre_of_rotation(self):
+        with self.assertRaises(TypeError):
+            self.ag.set_centre_of_rotation(1)
+
+    def test_get_centre_of_rotation(self):
+        with self.assertRaises(TypeError):
+            self.ag.get_centre_of_rotation()
+    
+    def test_set_centre_of_rotation_by_slice(self):
+        with self.assertRaises(TypeError):
+            self.ag.set_centre_of_rotation_by_slice(1)
+
+    def test_get_centre_slice(self):
+        with self.assertRaises(TypeError):
+            self.ag.get_centre_slice()
+
+    def test_get_slice_angle(self):
+        with self.assertRaises(TypeError):
+            self.ag.get_slice(angle=0)
+
+    def test_get_slice_projection(self):
+        projection_slice = self.ag.get_slice(projection=1)
+        self.assertEqual(projection_slice.num_projections, 1)
+        self.assertEqual(projection_slice.channels, 4)
+        np.testing.assert_allclose(projection_slice.config.system.source[0].position, np.asarray([0,-1.3,1]))
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].position, np.asarray([0,2,2]))
+        normalised_direction_x = np.asarray([1,0.02,0.0]) / np.linalg.norm(np.asarray([1,0.02,0.0]))
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].direction_x, np.asarray(normalised_direction_x))
+        np.testing.assert_allclose(projection_slice.config.system.detector[0].direction_y, np.asarray([0,0.0,1]))
+        self.assertEqual(len(projection_slice.config.system.source), 1)
+
+    def test_get_slice_channel(self):
+        channel_slice = self.ag.get_slice(channel=1)
+        self.assertEqual(channel_slice.num_projections, 2)
+        self.assertEqual(channel_slice.channels, 1)
+        np.testing.assert_allclose(channel_slice.config.system.source[0].position, np.asarray([0,-1,0]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].position, np.asarray([0,2,1]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_x, np.asarray([1,0.0, 0.0]))
+        np.testing.assert_allclose(channel_slice.config.system.detector[0].direction_y, np.asarray([0.,0.,1]))
+        self.assertEqual(len(channel_slice.config.system.source), 2)
+
+        channel_slice2 = self.ag.get_slice(1)  
+        self.assertEqual(channel_slice, channel_slice2)
+
+    def test_get_slice_vertical(self):
+        with self.assertRaises(ValueError):
+            self.ag.get_slice(vertical=0)
+
+    def test_get_slice_horizontal(self):
+        with self.assertRaises(ValueError):
+            self.ag.get_slice(horizontal=0)
+
+    def test_set_angles(self):
+        with self.assertWarns(UserWarning):
+            a = self.ag.set_angles([0, 1])
+            self.assertTrue(a==self.ag)
+
+    def test_default_labels(self):
+        expected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.PROJECTION, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+        for x,y in zip(expected_labels, self.ag.dimension_labels):
+            self.assertEqual(x,y)
+
+    def test_set_dimension_labels(self):
+        unexpected_labels=[AcquisitionDimension.CHANNEL, AcquisitionDimension.ANGLE, AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        with self.assertRaises(ValueError):
+            self.ag.dimension_labels = unexpected_labels
+        
+        acceptable_labels = [AcquisitionDimension.PROJECTION, AcquisitionDimension.CHANNEL,AcquisitionDimension.VERTICAL, AcquisitionDimension.HORIZONTAL]
+
+        self.ag.dimension_labels = acceptable_labels
+
+        self.assertEqual(list(self.ag.dimension_labels), acceptable_labels)
+
 
 class TestSubset(unittest.TestCase):
     def setUp(self) -> None:

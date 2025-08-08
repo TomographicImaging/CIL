@@ -2276,7 +2276,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.
 
         After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
-        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
 
         See notes for default directions.
 
@@ -2612,10 +2612,10 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         ----------
         channel: int, optional
             index on channel dimension to slice on. If None, does not slice on this dimension.
-        angle or projection: int, optional
+        angle/projection: int, optional
             index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
-            - For CONE_FLEX geometry, use 'projection'.
-            - For all other geometries, use 'angle'.
+            For CONE_FLEX geometry, use 'projection'.
+            For all other geometries, use 'angle'.
         vertical: int, str, optional
             If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
         horizontal: int, optional

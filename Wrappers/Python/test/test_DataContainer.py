@@ -505,9 +505,10 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ag2.shape))
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
 
+        extra_arg = "not a real arg"
         with self.assertWarns(UserWarning):
             # assert raises warning if kwarg value unused 
-            data = AcquisitionData(value=np.zeros((3,10,2,4)), geometry=ag2)
+            data = AcquisitionData(extra_arg=extra_arg, geometry=ag2)
 
 
     def test_AcquisitionData_from_numpy(self):

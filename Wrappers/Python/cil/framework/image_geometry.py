@@ -292,8 +292,9 @@ class ImageGeometry(metaclass=BackwardCompat):
         '''
         dtype = kwargs.pop('dtype', self.dtype)
 
+
         out = ImageData(geometry=self.copy(), dtype=dtype)
         if value is not None:
             out.fill(value, **kwargs)
-
+        
         return out

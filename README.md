@@ -46,6 +46,10 @@ We maintain an environment file with the required packages to run the [CIL demos
 
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
+
+Or for a CPU-only environment which will work for a limited number of [CIL demos](https://github.com/TomographicImaging/CIL-Demos)
+```sh
+conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos_cpu.yml
 ```
 
 ### Docker

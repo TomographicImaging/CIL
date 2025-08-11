@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
+import warnings
 
 from .data_container import DataContainer
 from .labels import ImageDimension, Backend
@@ -64,7 +65,7 @@ class ImageData(DataContainer):
                  geometry=None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', None)
+        dtype = kwargs.pop('dtype', None)
         if dtype is not None and array is not None:
             if dtype != array.dtype:
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
@@ -94,6 +95,9 @@ class ImageData(DataContainer):
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
 
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
+
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def __eq__(self, other):
         '''

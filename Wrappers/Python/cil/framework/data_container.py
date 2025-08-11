@@ -15,6 +15,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Joshua DM Hellier (University of Manchester) [refactorer]
+# Nicholas Whyatt (UKRI-STFC) [refactorer]
 import copy
 import ctypes
 import warnings
@@ -183,10 +185,12 @@ class DataContainer(object):
 
     def reorder(self, order):
         '''
-        reorders the data in memory as requested.
+        Reorders the data in memory as requested. This is an in-place operation.
 
-        :param order: ordered list of labels from self.dimension_labels
-        :type order: list, sting
+        Parameters
+        ----------
+        order: list or string
+            ordered list of labels from self.dimension_labels
         '''
         try:
             if len(order) != len(self.shape):

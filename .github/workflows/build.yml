@@ -125,7 +125,7 @@ jobs:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa anaconda-client
+    - run: conda install boa conda-verify anaconda-client
     - name: conda build & test
       working-directory: recipe
       run: |

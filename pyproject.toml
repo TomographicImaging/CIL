@@ -68,7 +68,6 @@ dependencies = [
     "pywavelets",
     "scipy>=1.4.0",
     "tqdm",
-    "zenodo_get>=1.6",
 ]
 [project.optional-dependencies]
 plugins = [
@@ -83,11 +82,12 @@ gpu = [
 test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
     "cvxpy",
-    "matplotlib>=3.3.0",
+    "matplotlib-base>=3.3",
     "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",
+    "zenodo_get>=1.6",
 ]
 docs = [
   "jinja2",

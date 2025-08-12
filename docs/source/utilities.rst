@@ -37,9 +37,6 @@ A set of simulated volumes and CT data
 .. autoclass:: cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA
    :members:
 
-.. autoclass:: cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA
-   :members:
-
 
 A CT dataset from the Diamond Light Source
 ------------------------------------------

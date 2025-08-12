@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.display &#8212; CIL 24.3.1.dev73+gd1ffe05ff documentation</title>
+    <title>cil.utilities.display &#8212; CIL 24.3.1.dev74+g8ab1113ab documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
 
-    <script src="../../../../_static/documentation_options.js?v=e3828731"></script>
+    <script src="../../../../_static/documentation_options.js?v=a57490b1"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev73+gd1ffe05ff';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.3.1.dev74+g8ab1113ab';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="24.3.1.dev73+gd1ffe05ff" />
+  <meta name="docsearch:version" content="24.3.1.dev74+g8ab1113ab" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -477,6 +477,7 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 <span class="c1"># Kyle Pidgeon (UKRI-STFC)</span>
+<span class="c1"># Hussam Alhassan (UKRI-STFC)</span>
 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.lines</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mlines</span>
@@ -1219,7 +1220,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">handles</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
@@ -1268,7 +1269,10 @@
 
         <span class="c1">#plt.show() creates a new figure so we save a copy to return</span>
         <span class="n">fig2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">fig2</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">display_world</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1524,7 +1528,8 @@
 <span class="sd">        Set figure size (inches), default (10,10)</span>
 <span class="sd">    fontsize: int</span>
 <span class="sd">        Set fontsize, default 10</span>
-
+<span class="sd">    show: bool</span>
+<span class="sd">        Show Matplotlib figure window, default=True</span>
 <span class="sd">        </span>
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -1537,18 +1542,19 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">azimuthal</span><span class="o">=-</span><span class="mi">35</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">azimuthal</span><span class="o">=-</span><span class="mi">35</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span> <span class="o">&amp;</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The `cone_flex` geometry type is not supported by show_geometry. Use `show_system_positions` instead.&quot;</span><span class="p">)</span>
+
 
         <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
             <span class="n">elevation</span> <span class="o">=</span> <span class="mi">90</span>
             <span class="n">azimuthal</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">_ShowGeometry</span><span class="p">(</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">azimuthal</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="n">view_distance</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span></div>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="n">elevation</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">azimuthal</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="n">view_distance</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">show_system_positions</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
@@ -1660,6 +1666,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="n">fig2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fig2</span>
+
 </pre></div>
 
                 </article>

@@ -13,6 +13,12 @@ jobs:
         numpy-version: [1.25]
         os: [Windows, Linux]
     steps:
+    - if: matrix.os == 'Windows'
+      run: |
+        curl -fsSL -o Git-installer.exe https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe
+        Git-installer.exe /VERYSILENT /NORESTART
+        del Git-installer.exe
+      shell: cmd
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
     - id: reqs

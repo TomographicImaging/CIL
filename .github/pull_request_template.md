@@ -21,8 +21,6 @@ Please read and adhere to the [developer guide](https://tomographicimaging.githu
 
 <!-- please IGNORE the below if you aren't a CIL team member
 
-blame GH for this text: https://github.com/orgs/community/discussions/81319
-
 ## Changes
 
 
@@ -41,8 +39,5 @@ blame GH for this text: https://github.com/orgs/community/discussions/81319
 - [ ] I have implemented unit tests that cover any new or modified functionality
 - [ ] CHANGELOG.md has been updated with any functionality change
 - [ ] Request review from all relevant developers
-- [ ] Change pull request label to 'Waiting for review'
-
-
 
 --->

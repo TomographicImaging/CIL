@@ -74,13 +74,6 @@ requirements:
     - tqdm
     - numba
 
-  #optional packages with version dependancies
-  run_constrained:
-    - tomophantom=2.0.0
-    - astra-toolbox>=1.9.9.dev5,<=2.1
-    - tigre>=2.4,<=2.6
-    - ccpi-regulariser=24.0.1
-    - ipywidgets
 
 about:
   home: https://TomographicImaging.github.io/CIL

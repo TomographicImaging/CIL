@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Kyle Pidgeon (UKRI-STFC)
+# Hussam Alhassan (UKRI-STFC)
 
 
 import matplotlib.lines as mlines

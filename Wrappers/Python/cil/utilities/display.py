@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Kyle Pidgeon (UKRI-STFC)
+# Hussam Alhassan (UKRI-STFC)
 
 
 import matplotlib.lines as mlines
@@ -752,7 +753,7 @@ class _ShowGeometry(object):
         self.handles = []
         self.labels = []
 
-    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(10,10), fontsize=10, show=True):
 
         self.fig = plt.figure(figsize=figsize)
         self.ax = self.fig.add_subplot(111, projection='3d')
@@ -801,7 +802,10 @@ class _ShowGeometry(object):
 
         #plt.show() creates a new figure so we save a copy to return
         fig2 = plt.gcf()
-        plt.show()
+
+        if show:
+            plt.show()
+
         return fig2
 
     def display_world(self):
@@ -1055,7 +1059,8 @@ class show_geometry(show_base):
         Set figure size (inches), default (10,10)
     fontsize: int
         Set fontsize, default 10
-
+    show: bool
+        Show Matplotlib figure window, default=True
         
     Note
     ----
@@ -1068,18 +1073,19 @@ class show_geometry(show_base):
     '''
 
 
-    def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
-        
+
+    def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10, show=True):
         if AcquisitionType.CONE_FLEX & acquisition_geometry.geom_type:
             raise NotImplementedError("The `cone_flex` geometry type is not supported by show_geometry. Use `show_system_positions` instead.")
+
 
         if AcquisitionType.DIM2 & acquisition_geometry.dimension:
             elevation = 90
             azimuthal = 0
 
         self.display = _ShowGeometry(acquisition_geometry, image_geometry)
-        self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
 
+        self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize, show=show)
 
 class show_system_positions(show_base):
     '''
@@ -1190,3 +1196,4 @@ class show_system_positions(show_base):
         plt.tight_layout()
         fig2 = plt.gcf()
         return fig2
+

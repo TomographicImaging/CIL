@@ -505,6 +505,12 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ag2.shape))
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
 
+        extra_arg = "not a real arg"
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = AcquisitionData(extra_arg=extra_arg, geometry=ag2)
+
+
     def test_AcquisitionData_from_numpy(self):
         """
         Test the creation and manipulation of AcquisitionData from a numpy array.
@@ -546,6 +552,13 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ag)
         self.assertEqual(data.dtype, np.float32)
+
+    def test_ImageGeometry(self):
+        ig = ImageGeometry(2,2)
+
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = ImageData(value=np.array([[1, 2], [3, 4]]), geometry=ig)
 
 
     def test_ImageGeometry_allocate(self):
@@ -778,10 +791,11 @@ class TestDataContainer(CCPiTestClass):
 
         # expected dimension_labels
 
-        self.assertListEqual([AcquisitionDimension["CHANNEL"] ,
+        default_order = [AcquisitionDimension["CHANNEL"] ,
                  AcquisitionDimension["ANGLE"] , AcquisitionDimension["VERTICAL"] ,
-                 AcquisitionDimension["HORIZONTAL"]],
-                              list(sgeometry.dimension_labels))
+                 AcquisitionDimension["HORIZONTAL"]]
+
+        self.assertListEqual(default_order, list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
@@ -799,6 +813,31 @@ class TestDataContainer(CCPiTestClass):
         ss2 = sino.get_slice(vertical = 0, channel=0)
         self.assertListEqual([AcquisitionDimension["HORIZONTAL"] ,
                  AcquisitionDimension["ANGLE"]], list(ss2.geometry.dimension_labels))
+
+        source_position_set=[[0,-100000,0], [0,100000,0]]
+        detector_position_set=[[0,0,0], [0,0,0]]
+        detector_direction_x_set=[[1, 0, 0], [1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1], [0, 0, 1]]
+        ag_flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        ad_flex = ag_flex.allocate()
+
+
+        # check it fails if we try to use a list containing 'ANGLE':
+        with self.assertRaises(ValueError):
+            ad_flex.reorder(new_order)
+
+        # By default, flex geometry has 'projection' label instead of 'angle'
+        default_order[1] = AcquisitionDimension["PROJECTION"]
+
+        print("FLEX DIMS: ", ad_flex.dimension_labels)
+
+        self.assertListEqual(default_order, list(ad_flex.dimension_labels))
+
+        ss3 = ad_flex.get_slice(projection=0)
+        self.assertListEqual([AcquisitionDimension["CHANNEL"] , AcquisitionDimension["VERTICAL"], AcquisitionDimension["HORIZONTAL"]], list(ss3.geometry.dimension_labels))
+
+        ss4 = ad_flex.get_slice(channel=0)
+        self.assertListEqual([AcquisitionDimension["PROJECTION"], AcquisitionDimension["VERTICAL"], AcquisitionDimension["HORIZONTAL"]], list(ss4.geometry.dimension_labels))
 
 
     def test_ImageDataSubset(self):

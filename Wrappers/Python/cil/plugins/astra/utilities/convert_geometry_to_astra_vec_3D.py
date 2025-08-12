@@ -22,16 +22,39 @@ import numpy as np
 from cil.framework.labels import AcquisitionType, AngleUnit
 
 def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
-
     """
     Converts CIL 2D and 3D geometries to ASTRA 3D vector Geometries.
+
+    Selects the appropriate conversion function based on the type of CIL acquisition geometry.
 
     Parameters
     ----------
     volume_geometry : ImageGeometry
         A description of the area/volume to reconstruct
+    sinogram_geometry_in : AcquisitionGeometry
+        A description of the acquisition data
 
-    sinogram_geometry : AcquisitionGeometry
+    Returns
+    -------
+    astra_volume_geom, astra_projection_geom
+        The ASTRA vol_geom and proj_geom
+    """
+
+    if sinogram_geometry_in.geom_type == AcquisitionType.CONE_FLEX:
+        return convert_flex_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in)
+    
+    return convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in)
+
+
+def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
+    """
+    Converts CIL 2D and 3D circular geometries to ASTRA 3D vector Geometries.
+
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+    sinogram_geometry_in : AcquisitionGeometry
         A description of the acquisition data
 
     Returns
@@ -40,22 +63,22 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         The ASTRA vol_geom and proj_geom
 
     """
-
+    if sinogram_geometry_in.geom_type not in [AcquisitionType.PARALLEL, AcquisitionType.CONE]:
+        raise ValueError(f"Unsupported geometry type: {sinogram_geometry_in.geom_type}. Only {AcquisitionType.PARALLEL} and {AcquisitionType.CONE}  geometries are supported.")
+    
     sinogram_geometry = sinogram_geometry_in.copy()
+    volume_geometry_temp = volume_geometry.copy()
 
     sinogram_geometry.config.system.align_reference_frame('cil')
-
-
     angles = sinogram_geometry.config.angles
+    degrees = angles.angle_unit == AngleUnit.DEGREE
+
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
-
-    #get units
-    degrees = angles.angle_unit == AngleUnit.DEGREE
+    
 
     if AcquisitionType.DIM2 & sinogram_geometry.dimension:
         #create a 3D astra geom from 2D CIL geometry
-        volume_geometry_temp = volume_geometry.copy()
         volume_geometry_temp.voxel_num_z = 1
 
         volume_geometry_temp.voxel_size_z = volume_geometry_temp.voxel_size_x
@@ -86,8 +109,6 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
             projector = 'cone_vec'
 
     else:
-        volume_geometry_temp = volume_geometry.copy()
-
         row = panel.pixel_size[0] * system.detector.direction_x.reshape(3,1)
         col = panel.pixel_size[1] * system.detector.direction_y.reshape(3,1)
         det = system.detector.position.reshape(3, 1)
@@ -100,9 +121,10 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         if sinogram_geometry.geom_type == 'parallel':
             src = system.ray.direction.reshape(3,1)
             projector = 'parallel3d_vec'
-        else:
+        elif sinogram_geometry.geom_type != 'cone_flex':
             src = system.source.position.reshape(3,1)
             projector = 'cone_vec'
+  
 
     #Build for astra 3D only
     vectors = np.zeros((angles.num_positions, 12))
@@ -115,7 +137,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
         vectors[i, :3]  = rotation_matrix.dot(src).reshape(3)
         vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)
         vectors[i, 6:9] = rotation_matrix.dot(row).reshape(3)
-        vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)
+        vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)    
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
@@ -127,6 +149,65 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
                                     volume_geometry_temp.get_max_y(),
                                     volume_geometry_temp.get_min_z(),
                                     volume_geometry_temp.get_max_z()
+                                    )
+
+
+    return vol_geom, proj_geom
+
+
+def convert_flex_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
+    """
+    Converts CIL CONE_FLEX geometries to ASTRA 3D vector Geometries.
+
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    Returns
+    -------
+    astra_volume_geom, astra_projection_geom
+        The ASTRA vol_geom and proj_geom
+
+    """
+
+    if sinogram_geometry_in.geom_type != AcquisitionType.CONE_FLEX:
+        raise ValueError(f"Unsupported geometry type: {sinogram_geometry_in.geom_type}. Only {AcquisitionType.CONE_FLEX} geometries are supported.")
+    
+
+    system = sinogram_geometry_in.config.system
+    panel = sinogram_geometry_in.config.panel
+     
+    sign_h = 1
+    sign_v = 1
+
+    if 'right' in panel.origin:
+        sign_h = -1
+    if 'top' in panel.origin:
+        sign_v = -1
+
+    projector = 'cone_vec'
+    vectors = np.zeros((system.num_positions, 12))
+
+    for i in range(system.num_positions):
+        vectors[i, :3] = system.source[i].position
+        vectors[i, 3:6]  = system.detector[i].position
+        vectors[i, 6:9] = sign_h * system.detector[i].direction_x * panel.pixel_size[0]
+        vectors[i, 9:]  = sign_v * system.detector[i].direction_y * panel.pixel_size[1]
+
+    proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
+    vol_geom = astra.create_vol_geom(volume_geometry.voxel_num_y,
+                                    volume_geometry.voxel_num_x,
+                                    volume_geometry.voxel_num_z,
+                                    volume_geometry.get_min_x() + system.volume_centre.position[0],
+                                    volume_geometry.get_max_x() + system.volume_centre.position[0],
+                                    volume_geometry.get_min_y() + system.volume_centre.position[1],
+                                    volume_geometry.get_max_y() + system.volume_centre.position[1],
+                                    volume_geometry.get_min_z() + system.volume_centre.position[2],
+                                    volume_geometry.get_max_z() + system.volume_centre.position[2]
                                     )
 
 

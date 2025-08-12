@@ -138,7 +138,6 @@ class Test_reorder(unittest.TestCase):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
         new_order = ['horizontal_y','channel','horizontal_y']
-        # print (len(new_order))
         try:
             data.reorder(new_order)
             assert False, "should have found a repeated label"
@@ -191,6 +190,25 @@ class Test_get_slice(unittest.TestCase):
         self.assertEqual(data_new.geometry.dimension_labels,('channel','angle','horizontal'))
         numpy.testing.assert_allclose(data_new.array, (data.array[:,:,1,:] +data.array[:,:,2,:])/2 )
 
+
+        source_position_set = [[0,-1,0], [0,-1.3,1]]
+        detector_position_set = [[0,2,1], [0,2,2]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[5,4]).set_channels(6).set_labels(['channel','projection','vertical','horizontal'])
+
+        data = ag.allocate('random')
+        data_new = data.get_slice(projection=1)
+        self.assertEqual(data_new.shape,(6, 4, 5))
+        self.assertEqual(data_new.geometry.dimension_labels,('channel','vertical','horizontal'))
+
+
+
 class TestSubset(unittest.TestCase):
     def setUp(self):
         self.ig = ImageGeometry(2,3,4,channels=5)
@@ -205,6 +223,17 @@ class TestSubset(unittest.TestCase):
                                     .set_angles(angles)\
                                     .set_channels(4)\
                                     .set_panel((20,2))
+
+        source_position_set = [[0,-1,0], [0,-1.3,1]]
+        detector_position_set = [[0,2,1], [0,2,2]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        self.ag_flex = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[20,2]).set_channels(4)\
 
 
     def test_ImageDataAllocate1a(self):
@@ -358,7 +387,6 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
     def test_AcquisitionDataSubset1f(self):
-
         data = self.ag.allocate()
         #self.assertTrue( data.shape == (4,20,2,3))
         sliceme = 1
@@ -366,30 +394,38 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
 
     def test_AcquisitionDataSubset1g(self):
-
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
 
     def test_AcquisitionDataSubset1h(self):
-
         data = self.ag_cone.allocate()
         sub = data.get_slice(vertical = 'centre')
         self.assertTrue( sub.geometry.shape == (4,3,20))
 
     def test_AcquisitionDataSubset1i(self):
-
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.get_slice(vertical = sliceme, force=True)
         self.assertTrue( sub.shape == (4, 3, 20))
 
     def test_AcquisitionDataSubset1j(self):
-
         data = self.ag.allocate()
         sub = data.get_slice(angle = 0)
         sub = sub.get_slice(vertical = 0)
         sub = sub.get_slice(horizontal = 0, force=True)
 
         self.assertTrue( sub.shape == (4,))
+
+    def test_AcquisitionDataSubset1k(self):
+        data = self.ag_flex.allocate()
+        sub = data.get_slice(projection=0)
+        self.assertTrue( sub.geometry.shape == (4, 2, 20))
+
+
+    def test_AcquisitionDataSubset1l(self):
+        data = self.ag_flex.allocate()
+        sub = data.get_slice(projection = 0)
+        sub = sub.get_slice(channel = 0)
+        self.assertTrue(sub.shape == (2, 20))

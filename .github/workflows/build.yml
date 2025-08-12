@@ -24,11 +24,12 @@ on:
 jobs:
   test-cuda:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: [self-hosted, python, cuda]
+    runs-on: [self-hosted, '${{ matrix.os }}']
     strategy:
       matrix:
         python-version: [3.11]
         numpy-version: [1.25]
+        os: [Windows, Linux]
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
@@ -38,6 +39,7 @@ jobs:
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
         sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+      shell: bash
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -52,14 +54,17 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test
+        python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test
+      env:
+        TESTS_FORCE_GPU: 1
+        CIL_DATA_DIR: ${{ matrix.os == 'Linux' && '/opt/runner/hostedtoolcache/cil' || 'C:\\actions-runner\\hostedtoolcache\\cil' }}
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
-      shell: bash
       run: |
         sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
         source ~/.profile
         conda env remove -n "${{ steps.reqs.outputs.envname }}"
+      shell: bash
   test:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-22.04

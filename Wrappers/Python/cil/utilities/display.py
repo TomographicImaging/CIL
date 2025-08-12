@@ -420,6 +420,8 @@ class show2D(show_base):
         Sets the number of columns of subplots to display
     size: tuple
         Figure size in inches
+    show: bool
+        Show Matplotlib figure window, default=True
 
         
     Note
@@ -1059,9 +1061,6 @@ class show_geometry(show_base):
         Set figure size (inches), default (10,10)
     fontsize: int
         Set fontsize, default 10
-    show: bool
-        Show Matplotlib figure window, default=True
-
         
     Note
     ----

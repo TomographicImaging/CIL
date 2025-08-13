@@ -34,7 +34,6 @@
     - Allow FluxNormaliser.preview_configuration() even if flux contains zeros (#2177)
     - Check if kwargs are used in AcquisitionData and ImageData initialisation (#2178)
     - Added a flag to `show_geometry` that allows for disabling the call to `plt.show()` (#2195)
-
   - Testing:
     - Developers can now run the full CI matrix [via the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) (#2160)
     - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
@@ -55,6 +54,7 @@
     - `axpby` (alias of `sapyb`)
     - `shape` setter in `DataContainer` and `ImageGeometry`
     - use of integer compression in `NEXUSDataWriter`
+    - `suppress_warning` internally passed as an unused kwarg to ImageData and AcquisitionData (#2206)
   - Changes that break backwards compatibility:
     - Updated `RANDOM` and `RANDOM_INT` `DataContainer.fill()` and `geometry.allocate()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED`. Random methods can now be accessed from `fill()` and `allocate()` (#2037)
 

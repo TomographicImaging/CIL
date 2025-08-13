@@ -1,0 +1,752 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 25.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=648e7a60bc4f0e8412b5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
+
+    <script src="../../../../../_static/documentation_options.js?v=f58eb662"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/functions/SAGFunction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.0" />
+  
+    
+    <script src="../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script src="../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../../">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/">Tutorials</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">cil.optimisation.functions.SAGFunction</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for cil.optimisation.functions.SAGFunction</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2024 The University of Manchester</span>
+<span class="c1"># </span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1"># </span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1"># </span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1"># </span>
+<span class="c1"># Authors:</span>
+<span class="c1"># - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+<span class="c1"># - Daniel Deidda (National Physical Laboratory, UK)</span>
+<span class="c1"># - Claire Delplancke (Electricite de France, Research and Development)</span>
+<span class="c1"># - Ashley Gillman (Australian e-Health Res. Ctr., CSIRO, Brisbane, Queensland, Australia)</span>
+<span class="c1"># - Zeljko Kereta (Department of Computer Science, University College London, UK)</span>
+<span class="c1"># - Evgueni Ovtchinnikov (STFC - UKRI)</span>
+<span class="c1"># - Georg Schramm (Department of Imaging and Pathology, Division of Nuclear Medicine, KU Leuven, Leuven, Belgium)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ApproximateGradientSumFunction</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApproximateGradientSumFunction</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="SAGFunction">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SAGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
+<span class="sd">    </span>
+<span class="sd">    .. math ::</span>
+<span class="sd">                \sum_{i=0}^{n-1} g_i^k \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
+<span class="sd">                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\</span>
+<span class="sd">                                                                            g_i^{k-1},\text{ otherwise }</span>
+<span class="sd">                                                                            \end{cases}</span>
+
+<span class="sd">        </span>
+<span class="sd">            </span>
+<span class="sd">    </span>
+<span class="sd">    The idea is that by incorporating a memory of previous gradient values the SAG method can achieve a faster convergence rate than black-box stochastic gradient methods. </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Reference: Schmidt, M., Le Roux, N. and Bach, F., 2017. Minimizing finite sums with the stochastic average gradient. Mathematical Programming, 162, pp.83-112. https://doi.org/10.1007/s10107-016-1030-6. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    functions : `list`  of functions</span>
+<span class="sd">        A list of functions: :math:`f_{0}, f_{1}, ..., f_{n-1}`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions (equivalently the length of the list `n`) must be strictly greater than 1. </span>
+<span class="sd">    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in :math:`{0,...,n-1}`.</span>
+<span class="sd">        This sampler is called each time `gradient` is called and sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`. </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ------</span>
+<span class="sd">    </span>
+<span class="sd">    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`.  If this method is not called, the gradients are initialised with zeros. </span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ------  </span>
+
+<span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
+<span class="sd">    </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warm_start_just_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
+
+
+        
+
+<div class="viewcode-block" id="SAGFunction.approximate_gradient">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.approximate_gradient">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">approximate_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">function_num</span><span class="p">,</span>  <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; SAG approximate gradient, calculated at the point :math:`x` and updated using the function index given by `function_num`.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : DataContainer (e.g. ImageData object)</span>
+<span class="sd">            Element in the domain of the `functions`</span>
+<span class="sd">        function_num: `int` </span>
+<span class="sd">            Between 0 and the number of functions in the list  </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Initialise the stored gradients on the first call of gradient unless using warm start.  </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="mi">0</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span> <span class="o">=</span> <span class="mi">0</span><span class="o">*</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_num</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_num</span><span class="o">&lt;</span><span class="mi">0</span> <span class="p">:</span> <span class="c1"># check the sampler and raise an error if needed</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sampler has produced the index </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">function_num</span><span class="si">}</span><span class="s2"> which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] &quot;</span><span class="p">)</span>
+
+            
+        <span class="c1"># Calculate the gradient of the sampled function at the current iterate </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">function_num</span><span class="p">]</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span><span class="p">)</span>
+
+        
+        <span class="c1"># Calculate the difference between the new gradient of the sampled function and the stored one</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>
+            <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span><span class="p">[</span><span class="n">function_num</span><span class="p">],</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the  approximate gradient</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_approx_gradient</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="c1"># Update the stored gradients </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span><span class="p">[</span><span class="n">function_num</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span><span class="p">)</span>
+        
+        <span class="c1"># Calculate the stored full gradient</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>
+            <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>  
+                <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
+
+        <span class="k">return</span> <span class="n">out</span> 
+    
+<div class="viewcode-block" id="SAGFunction.warm_start_approximate_gradients">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.warm_start_approximate_gradients">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warm_start_approximate_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0 = \nabla f_i(x_0)` for initial point :math:`x_0`. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        initial: DataContainer,</span>
+<span class="sd">            The initial point to warmstart the calculation</span>
+<span class="sd">            </span>
+<span class="sd">        Note</span>
+<span class="sd">        ------</span>
+<span class="sd">        When using SAG or SAGA with a deterministic algorithm, you should warm start the SAG-SAGA Function with the same initial point that you initialise the algorithm</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">fi</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span> <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_data_passes_indices</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampled_grad</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  </span>
+<span class="sd">        This is overwritten from the base class to first check to see if the approximate gradient was warm started and, if it was, ensure that the first element of `data_passes_indices` contains each index used to warm start and the index used in the first call to `gradient`. Thus the length of `data_passes_indices` is always equal to the number of calls to `gradient`. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_passes_indices</span><span class="p">[:]</span>  
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span><span class="p">:</span>  
+            <span class="n">a</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+            <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">a</span>  
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+    
+<div class="viewcode-block" id="SAGAFunction">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGAFunction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SAGAFunction</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
+<span class="sd">    </span>
+<span class="sd">    .. math ::</span>
+<span class="sd">                 n\left(g_{i_k}^{k}-g_{i_k}^{k-1}\right)+\sum_{i=0}^{n-1} g_i^{k-1} \qquad \text{where} \qquad g_i^k= \begin{cases}</span>
+<span class="sd">                                                                            \nabla f_i(x_k), \text{ if } i=i_k\\</span>
+<span class="sd">                                                                            g_i^{k-1},\text{ otherwise}</span>
+<span class="sd">                                                                            \end{cases}</span>
+<span class="sd">                                                                        </span>
+<span class="sd">         </span>
+<span class="sd">    SAGA improves on the theory behind SAG and SVRG, with better theoretical convergence rates. Compared to SAG it is an unbiased estimator. </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ------</span>
+<span class="sd">    Compared with the literature, we do not divide by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.</span>
+
+
+<span class="sd">    Note  </span>
+<span class="sd">    ------  </span>
+
+<span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ------</span>
+<span class="sd">    Reference: Defazio, A., Bach, F. and Lacoste-Julien, S., 2014. SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives. Advances in neural information processing systems, 27. https://proceedings.neurips.cc/paper_files/paper/2014/file/ede7e2b6d13a41ddf9f4bdef84fdc737-Paper.pdf</span>
+<span class="sd">   </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    functions : `list`  of functions</span>
+<span class="sd">                A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth function with an implemented :func:`~Function.gradient` method. Each function must have the same domain. The number of functions must be strictly greater than 1. </span>
+<span class="sd">    sampler: An instance of one of the :meth:`~optimisation.utilities.sampler` classes which has a `next` function implemented and a `num_indices` property.</span>
+<span class="sd">        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  The `num_indices` must match the number of functions provided. Default is `Sampler.random_with_replacement(len(functions))`. </span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. </span>
+
+<span class="sd">  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SAGAFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: &quot;&quot;&quot;</span>
+
+        <span class="c1"># Due to the convention that we follow: without the 1/n factor</span>
+        <span class="n">out</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>  
+
+        <span class="k">return</span> <span class="n">out</span> </div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

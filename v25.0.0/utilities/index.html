@@ -1,0 +1,1316 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Utilities &#8212; CIL 25.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=648e7a60bc4f0e8412b5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
+
+    <script src="../_static/documentation_options.js?v=f58eb662"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'utilities';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="CIL Plugins" href="../plugins/" />
+    <link rel="prev" title="Recon" href="../recon/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../recon/">Recon</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#test-datasets">Test datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#a-set-of-simulated-volumes-and-ct-data">A set of simulated volumes and CT data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-ct-dataset-from-the-diamond-light-source">A CT dataset from the Diamond Light Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulated-image-data">Simulated image data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remote-data">Remote data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#walnut">Walnut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usb">USB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#korn">KORN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sandstone">SANDSTONE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-cil.utilities.quality_measures">Image Quality metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cil.utilities.quality_measures.mse"><code class="docutils literal notranslate"><span class="pre">mse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cil.utilities.quality_measures.mae"><code class="docutils literal notranslate"><span class="pre">mae()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cil.utilities.quality_measures.psnr"><code class="docutils literal notranslate"><span class="pre">psnr()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#visualisation">Visualisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#show2d-display-2d-slices">show2D - Display 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show1d-display-1d-slices">show1D - Display 1D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-geometry-display-system-geometry">show_geometry - Display system geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#islicer-interactive-display-of-2d-slices">islicer - interactive display of 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#link-islicer-link-islicer-objects-by-index">link_islicer - link islicer objects by index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/">Tutorials</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/utilities.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Utilities</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h1>
+<p>By default, CIL will look for small (built-in) data in <cite>{sys.prefix}/share/cil</cite>,
+and larger remote (downloadable) data in the <cite>CIL_DATA_DIR</cite> environment variable (if present).</p>
+<section id="test-datasets">
+<h2>Test datasets<a class="headerlink" href="#test-datasets" title="Link to this heading">#</a></h2>
+<p>A range of small test datasets to generate and use</p>
+<section id="a-set-of-simulated-volumes-and-ct-data">
+<h3>A set of simulated volumes and CT data<a class="headerlink" href="#a-set-of-simulated-volumes-and-ct-data" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">SIMULATED_CONE_BEAM_DATA</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SIMULATED_CONE_BEAM_DATA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SIMULATED_CONE_BEAM_DATA.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get" title="Link to this definition">#</a></dt>
+<dd><p>A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The simulated spheres dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">SIMULATED_PARALLEL_BEAM_DATA</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SIMULATED_PARALLEL_BEAM_DATA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SIMULATED_PARALLEL_BEAM_DATA.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get" title="Link to this definition">#</a></dt>
+<dd><p>A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The simulated spheres dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="a-ct-dataset-from-the-diamond-light-source">
+<h3>A CT dataset from the Diamond Light Source<a class="headerlink" href="#a-ct-dataset-from-the-diamond-light-source" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">SYNCHROTRON_PARALLEL_BEAM_DATA</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SYNCHROTRON_PARALLEL_BEAM_DATA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SYNCHROTRON_PARALLEL_BEAM_DATA.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get" title="Link to this definition">#</a></dt>
+<dd><p>A DLS dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the data directory</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The DLS dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="simulated-image-data">
+<h3>Simulated image data<a class="headerlink" href="#simulated-image-data" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.TestData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">TestData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#TestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.TestData" title="Link to this definition">#</a></dt>
+<dd><p>Class to return test data</p>
+<p>provides 6 dataset:
+BOAT = ‘boat.tiff’
+CAMERA = ‘camera.png’
+PEPPERS = ‘peppers.tiff’
+RESOLUTION_CHART = ‘resolution_chart.tiff’
+SIMPLE_PHANTOM_2D = ‘hotdog’
+SHAPES =  ‘shapes.png’
+RAINBOW = ‘rainbow.png’</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.TestData.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">which</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#TestData.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.TestData.load" title="Link to this definition">#</a></dt>
+<dd><p>Return a test data of the requested image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>which</strong> (<em>str</em>) – Image selector: BOAT, CAMERA, PEPPERS, RESOLUTION_CHART, SIMPLE_PHANTOM_2D, SHAPES, RAINBOW</p></li>
+<li><p><strong>size</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The size of the returned ImageData. If None default will be used for each image type</p></li>
+<li><p><strong>scale</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The scale of the data values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The simulated spheres volume</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.TestData.random_noise">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#TestData.random_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.TestData.random_noise" title="Link to this definition">#</a></dt>
+<dd><p>Function to add noise to input image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – input dataset, DataContainer of numpy.ndarray</p></li>
+<li><p><strong>mode</strong> – type of noise</p></li>
+<li><p><strong>seed</strong> – seed for random number generator</p></li>
+<li><p><strong>clip</strong> – should clip the data.</p></li>
+</ul>
+</dd>
+</dl>
+<p>See <a class="github reference external" href="https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py">scikit-image/scikit-image</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.TestData.scikit_random_noise">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scikit_random_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#TestData.scikit_random_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.TestData.scikit_random_noise" title="Link to this definition">#</a></dt>
+<dd><p>Function to add random noise of various types to a floating-point image.
+:param image: Input image data. Will be converted to float.
+:type image: ndarray
+:param mode: One of the following strings, selecting the type of noise to add:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>‘gaussian’  Gaussian-distributed additive noise.</p></li>
+<li><dl class="simple">
+<dt>‘localvar’  Gaussian-distributed additive noise, with specified</dt><dd><p>local variance at each point of <cite>image</cite>.</p>
+</dd>
+</dl>
+</li>
+<li><p>‘poisson’   Poisson-distributed noise generated from the data.</p></li>
+<li><p>‘salt’      Replaces random pixels with 1.</p></li>
+<li><dl class="simple">
+<dt>‘pepper’    Replaces random pixels with 0 (for unsigned images) or</dt><dd><p>-1 (for signed images).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘s&amp;p’       Replaces random pixels with either 1 or <cite>low_val</cite>, where</dt><dd><p><cite>low_val</cite> is 0 for unsigned images or -1 for signed
+images.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘speckle’   Multiplicative noise using out = image + n*image, where</dt><dd><p>n is uniform noise with specified mean &amp; variance.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – If provided, this will set the random seed before generating noise,
+for valid pseudo-random comparisons.</p></li>
+<li><p><strong>clip</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True (default), the output will be clipped after noise applied
+for modes <cite>‘speckle’</cite>, <cite>‘poisson’</cite>, and <cite>‘gaussian’</cite>. This is
+needed to maintain the proper image data range. If False, clipping
+is not applied, and the output may extend beyond the range [-1, 1].</p></li>
+<li><p><strong>mean</strong> (<em>float</em><em>, </em><em>optional</em>) – Mean of random distribution. Used in ‘gaussian’ and ‘speckle’.
+Default : 0.</p></li>
+<li><p><strong>var</strong> (<em>float</em><em>, </em><em>optional</em>) – Variance of random distribution. Used in ‘gaussian’ and ‘speckle’.
+Note: variance = (standard deviation) ** 2. Default : 0.01</p></li>
+<li><p><strong>local_vars</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Array of positive floats, same shape as <cite>image</cite>, defining the local
+variance at every image point. Used in ‘localvar’.</p></li>
+<li><p><strong>amount</strong> (<em>float</em><em>, </em><em>optional</em>) – Proportion of image pixels to replace with noise on range [0, 1].
+Used in ‘salt’, ‘pepper’, and ‘salt &amp; pepper’. Default : 0.05</p></li>
+<li><p><strong>salt_vs_pepper</strong> (<em>float</em><em>, </em><em>optional</em>) – Proportion of salt vs. pepper noise for ‘s&amp;p’ on range [0, 1].
+Higher values represent more salt. Default : 0.5 (equal amounts)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – Output floating-point image data on range [0, 1] or [-1, 1] if the
+input <cite>image</cite> was unsigned or signed, respectively.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Speckle, Poisson, Localvar, and Gaussian noise may generate noise outside
+the valid image range. The default is to clip (not alias) these values,
+but they may be preserved by setting <cite>clip=False</cite>. Note that in this case
+the output may contain values outside the ranges [0, 1] or [-1, 1].
+Use this option with care.
+Because of the prevalence of exclusively positive floating-point images in
+intermediate calculations, it is not possible to intuit if an input is
+signed based on dtype alone. Instead, negative values are explicitly
+searched for. Only if found does this function assume signed input.
+Unexpected results only occur in rare, poorly exposes cases (e.g. if all
+values are above 50 percent gray in a signed <cite>image</cite>). In this event,
+manually scaling the input to the positive domain will solve the problem.
+The Poisson distribution is only defined for positive integers. To apply
+this noise type, the number of unique values in the image is found and
+the next round power of two is used to scale up the floating-point result,
+after which it is scaled back down to the floating-point image range.
+To generate Poisson noise against a signed image, the signed image is
+temporarily converted to an unsigned image in the floating point domain,
+Poisson noise is generated, then it is returned to the original range.</p>
+<p>This function is adapted from scikit-image.
+<a class="github reference external" href="https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py">scikit-image/scikit-image</a></p>
+<p>Copyright (C) 2019, the scikit-image team
+All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Redistributions of source code must retain the above copyright</dt><dd><p>notice, this list of conditions and the following disclaimer.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Redistributions in binary form must reproduce the above copyright</dt><dd><p>notice, this list of conditions and the following disclaimer in
+the documentation and/or other materials provided with the
+distribution.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Neither the name of skimage nor the names of its contributors may be</dt><dd><p>used to endorse or promote products derived from this software without
+specific prior written permission.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>THIS SOFTWARE IS PROVIDED BY THE AUTHOR <a href="#id1"><span class="problematic" id="id2">``</span></a>AS IS’’ AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="remote-data">
+<h3>Remote data<a class="headerlink" href="#remote-data" title="Link to this heading">#</a></h3>
+<p>Remote data classes can be used to access specific datasets from zenodo. These
+datasets are not packaged as part of CIL, instead the <cite>download_data(data_dir)</cite>
+method can be used to download the dataset to a chosen data directory then loaded
+from that data directory using <cite>get(data_dir)</cite>.</p>
+</section>
+<section id="walnut">
+<h3>Walnut<a class="headerlink" href="#walnut" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.WALNUT">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">WALNUT</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#WALNUT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.WALNUT" title="Link to this definition">#</a></dt>
+<dd><p>A microcomputed tomography dataset of a walnut from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a></p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">WALNUT</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">WALNUT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.WALNUT.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#WALNUT.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.get" title="Link to this definition">#</a></dt>
+<dd><p>Get the microcomputed tomography dataset of a walnut from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a>
+This function returns the raw projection data from the .txrm file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The walnut dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.WALNUT.download_data">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.WALNUT.download_data" title="Link to this definition">#</a></dt>
+<dd><p>Download a dataset from a remote repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="usb">
+<h3>USB<a class="headerlink" href="#usb" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.USB">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">USB</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#USB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.USB" title="Link to this definition">#</a></dt>
+<dd><p>A microcomputed tomography dataset of a usb memory stick from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a></p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">USB</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">USB</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.USB.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#USB.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.USB.get" title="Link to this definition">#</a></dt>
+<dd><p>Get the microcomputed tomography dataset of a usb memory stick from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a>
+This function returns the raw projection data from the .txrm file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the directory where the dataset is stored. Data can be downloaded with dataexample.WALNUT.download_data(data_dir)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The usb dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.USB.download_data">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.USB.download_data" title="Link to this definition">#</a></dt>
+<dd><p>Download a dataset from a remote repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="korn">
+<h3>KORN<a class="headerlink" href="#korn" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.KORN">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">KORN</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#KORN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.KORN" title="Link to this definition">#</a></dt>
+<dd><p>A microcomputed tomography dataset of a sunflower seeds in a box from <a class="reference external" href="https://zenodo.org/records/6874123">https://zenodo.org/records/6874123</a></p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">KORN</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">KORN</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.KORN.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#KORN.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.KORN.get" title="Link to this definition">#</a></dt>
+<dd><p>Get the microcomputed tomography dataset of a sunflower seeds in a box from <a class="reference external" href="https://zenodo.org/records/6874123">https://zenodo.org/records/6874123</a>
+This function returns the raw projection data from the .xtekct file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the directory where the dataset is stored. Data can be downloaded with dataexample.KORN.download_data(data_dir)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The korn dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.KORN.download_data">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.KORN.download_data" title="Link to this definition">#</a></dt>
+<dd><p>Download a dataset from a remote repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="sandstone">
+<h3>SANDSTONE<a class="headerlink" href="#sandstone" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SANDSTONE">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">SANDSTONE</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SANDSTONE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE" title="Link to this definition">#</a></dt>
+<dd><p>A synchrotron x-ray tomography dataset of sandstone from <a class="reference external" href="https://zenodo.org/records/4912435">https://zenodo.org/records/4912435</a>
+A small subset of the data containing selected projections and 4 slices of the reconstruction</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SANDSTONE.get">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#SANDSTONE.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.get" title="Link to this definition">#</a></dt>
+<dd><p>Get the synchrotron x-ray tomography dataset of sandstone from <a class="reference external" href="https://zenodo.org/records/4912435">https://zenodo.org/records/4912435</a>
+A small subset of the data containing selected projections and 4 slices of the reconstruction
+:param data_dir: The path to the directory where the dataset is stored. Data can be downloaded with dataexample.SANDSTONE.download_data(data_dir)
+:type data_dir: str
+:param file: The slices or projections to return, specify the path to the file within the data_dir
+:type file: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The selected sandstone dataset</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.dataexample.SANDSTONE.download_data">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.dataexample.SANDSTONE.download_data" title="Link to this definition">#</a></dt>
+<dd><p>Download a dataset from a remote repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_dir</strong> (<em>str</em>) – The path to the data directory where the downloaded data should be stored.
+If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="module-cil.utilities.quality_measures">
+<span id="image-quality-metrics"></span><h2>Image Quality metrics<a class="headerlink" href="#module-cil.utilities.quality_measures" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="cil.utilities.quality_measures.mse">
+<span class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></span><span class="sig-name descname"><span class="pre">mse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/quality_measures/#mse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mse" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the mean squared error of two images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dc1</strong> (<cite>DataContainer</cite>) – One image to be compared</p></li>
+<li><p><strong>dc2</strong> (<cite>DataContainer</cite>) – Second image to be compared</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A number, the mean squared error of the two images</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cil.utilities.quality_measures.mae">
+<span class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></span><span class="sig-name descname"><span class="pre">mae</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/quality_measures/#mae"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.mae" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the Mean Absolute error of two images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dc1</strong> (<cite>DataContainer</cite>) – One image to be compared</p></li>
+<li><p><strong>dc2</strong> (<cite>DataContainer</cite>) – Second image to be compared</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A number with the mean absolute error between the two images.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cil.utilities.quality_measures.psnr">
+<span class="sig-prename descclassname"><span class="pre">cil.utilities.quality_measures.</span></span><span class="sig-name descname"><span class="pre">psnr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ground_truth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrupted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/quality_measures/#psnr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.quality_measures.psnr" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the Peak signal to noise ratio (PSNR) between the two images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ground_truth</strong> (<cite>DataContainer</cite>) – The reference image</p></li>
+<li><p><strong>corrupted</strong> (<cite>DataContainer</cite>) – The image to be evaluated</p></li>
+<li><p><strong>data_range</strong> (<em>scalar value</em><em>, </em><em>default=None</em>) – PSNR scaling factor, the dynamic range of the images (i.e., the difference between the maximum the and minimum allowed values). We take the maximum value in the ground truth array.</p></li>
+<li><p><strong>mask</strong> (array or <cite>DataContainer</cite> with the same dimensions as the <cite>dc1</cite> and <cite>dc2</cite>) – The pixelwise operation only considers values where the mask is True or NonZero..</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A number, the peak signal to noise ration between the two images.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="visualisation">
+<h2>Visualisation<a class="headerlink" href="#visualisation" title="Link to this heading">#</a></h2>
+<section id="show2d-display-2d-slices">
+<h3>show2D - Display 2D slices<a class="headerlink" href="#show2d-display-2d-slices" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.display.show2D">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.display.</span></span><span class="sig-name descname"><span class="pre">show2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datacontainers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower-left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">15)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/display/#show2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.display.show2D" title="Link to this definition">#</a></dt>
+<dd><p>This plots 2D slices from cil DataContainer types.</p>
+<p>Plots 1 or more 2D plots in an (n x num_cols) matrix.
+Can plot multiple slices from one 3D dataset, or compare multiple datasets
+Inputs can be single arguments or list of arguments that will be sequentially applied to subplots
+If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datacontainers</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>list</em><em> of  </em><em>ImageData / AcquisitionData</em><em>, </em><a class="reference internal" href="../optimisation/#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – The DataContainers to be displayed</p></li>
+<li><p><strong>title</strong> (<em>string</em><em>, </em><em>list</em><em> of </em><em>strings</em><em>, </em><em>optional</em>) – The title for each figure</p></li>
+<li><p><strong>slice_list</strong> (<em>tuple</em><em>, </em><em>int</em><em>, </em><em>list</em><em> of </em><em>tuples</em><em>, </em><em>list</em><em> of </em><em>ints</em><em>, </em><em>optional</em>) – The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].</p></li>
+<li><p><strong>fix_range</strong> (<em>boolean</em><em>, </em><em>tuple</em><em>, </em><em>list</em><em> of </em><em>tuples</em>) – Sets the display range of the data. <cite>True</cite> sets all plots to the global (min, max).</p></li>
+<li><p><strong>axis_labels</strong> (<em>tuple</em><em>, </em><em>list</em><em> of </em><em>tuples</em><em>, </em><em>optional</em>) – The axis labels for each figure e.g. (‘x’,’y’)</p></li>
+<li><p><strong>origin</strong> (<em>string</em><em>, </em><em>list</em><em> of </em><em>strings</em>) – Sets the display origin. ‘lower/upper-left/right’</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em>, </em><em>list</em><em> or </em><em>tuple</em><em> of </em><em>strings</em>) – Sets the colour map of the plot (see matplotlib.pyplot). If passed a list or tuple of the
+length of datacontainers, allows to set a different color map for each datacontainer.</p></li>
+<li><p><strong>num_cols</strong> (<em>int</em>) – Sets the number of columns of subplots to display</p></li>
+<li><p><strong>size</strong> (<em>tuple</em>) – Figure size in inches</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.display.show2D.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show2D.save" title="Link to this definition">#</a></dt>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
+<p>matplotlib kwargs can be passed, refer to documentation
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="show1d-display-1d-slices">
+<h3>show1D - Display 1D slices<a class="headerlink" href="#show1d-display-1d-slices" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.display.show1D">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.display.</span></span><span class="sig-name descname"><span class="pre">show1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_styles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">3)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/display/#show1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.display.show1D" title="Link to this definition">#</a></dt>
+<dd><p>Displays the 1D line profile of a N-dimensional dataset along a specified axis.</p>
+<p>If multiple slices are provided, a plot will be generated for each slice.</p>
+<p>If multiple datasets are provided, the same slice will be applied to each dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray i.e. DataContainer</em><em>, </em><em>numpy.ndarray</em><em> or </em><em>a list</em><em> of </em><em>ndarrays</em>) – The data to be sliced and plotted. If a list of DataContainers is passed, they must all have the same shape.</p></li>
+<li><p><strong>slice_list</strong> (<em>list</em><em> of </em><em>tuples</em><em>, or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>tuple</em><em>, </em><em>optional.</em>) – Describes the slice to be taken from the data to extract a 1D vector. If None, the centre line of each axis will be displayed.
+Each slice should be a list of tuples, where each tuple is a (axis, index). Each axis can be described as a string or integer representing the axis to slice along.
+To plot multiple slices, pass a list of slices.</p></li>
+<li><p><strong>dataset_labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Overrides the default legend labels for each dataset displayed in the plot legend. Must be a list of strings equal to the number of datasets.</p></li>
+<li><p><strong>title</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Overrides the default title for each plot. Must be a list of strings equal to the number of plots.</p></li>
+<li><p><strong>line_colours</strong> (<em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default=None</em>) – Overrides the default colour(s) for each line plot. Must be a list of colours equal to the number of datasets.</p></li>
+<li><p><strong>line_styles</strong> (<em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>list</em><em> of </em><em>{&quot;-&quot;</em><em>,</em><em>&quot;--&quot;</em><em>,</em><em>&quot;-.&quot;</em><em>,</em><em>&quot;:&quot;}</em><em>, </em><em>default=None</em>) – Overrides the default line style(s) for each line plot. Must be a list of styles equal to the number of datasets.</p></li>
+<li><p><strong>axis_labels</strong> (<em>tuple</em><em> of </em><em>str</em><em>, </em><em>list</em><em> of </em><em>tuples</em><em>, </em><em>optional</em>) – Overrides the default axis labels in the form (x_axis_label, y_axis_label). Must be a single tuple or a list of tuples equal to the number of plots.</p></li>
+<li><p><strong>size</strong> (<em>tuple</em><em>, </em><em>default=</em><em>(</em><em>8</em><em>,</em><em>3</em><em>)</em>) – The size of each sub-plot in the figure.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p class="rubric">Examples</p>
+<p>This example uses a 3D dataset with no slicing information provided. The function
+displays 3 subplots with the centre line profile shown along each axis.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following example shows a single line profile from a 3D dataset along the vertical axis.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The following example shows multiple line profiles from a 3D dataset along the vertical axis.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">62</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">61</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">67</span><span class="p">),(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)]])</span>
+</pre></div>
+</div>
+<p>The following example plots the same line profile from two datasets on the same plot.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data2</span> <span class="o">=</span> <span class="n">data</span><span class="o">*</span><span class="mf">0.9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">],</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The following example shows the case where the input data is a numpy array.
+The slice_list can be provided as (axis, index), where axis is an integer.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>To save the figure, use the <cite>save</cite> method.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.display.show1D.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show1D.save" title="Link to this definition">#</a></dt>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
+<p>matplotlib kwargs can be passed, refer to documentation
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="show-geometry-display-system-geometry">
+<h3>show_geometry - Display system geometry<a class="headerlink" href="#show-geometry-display-system-geometry" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.display.show_geometry">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.display.</span></span><span class="sig-name descname"><span class="pre">show_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azimuthal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/display/#show_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.display.show_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Displays a schematic of the acquisition geometry
+for 2D geometries elevation and azimuthal cannot be changed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – CIL acquisition geometry</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>optional</em>) – CIL image geometry</p></li>
+<li><p><strong>elevation</strong> (<em>float</em>) – Camera elevation in degrees, 3D geometries only, default=20</p></li>
+<li><p><strong>azimuthal</strong> (<em>float</em>) – Camera azimuthal in degrees, 3D geometries only, default=-35</p></li>
+<li><p><strong>view_distance</strong> (<em>float</em>) – Camera view distance, default=10</p></li>
+<li><p><strong>grid</strong> (<em>boolean</em>) – Show figure axis, default=False</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em> (</em><em>x</em><em>, </em><em>y</em><em>)</em>) – Set figure size (inches), default (10,10)</p></li>
+<li><p><strong>fontsize</strong> (<em>int</em>) – Set fontsize, default 10</p></li>
+<li><p><strong>show</strong> (<em>bool</em>) – Show Matplotlib figure window, default=True</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show_geometry</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.display.show_geometry.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.utilities.display.show_geometry.save" title="Link to this definition">#</a></dt>
+<dd><p>Saves the image using matplotlib.figure.savefig(). Default format is png if no extension is provided.</p>
+<p>matplotlib kwargs can be passed, refer to documentation
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="islicer-interactive-display-of-2d-slices">
+<h3>islicer - interactive display of 2D slices<a class="headerlink" href="#islicer-interactive-display-of-2d-slices" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.jupyter.islicer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.jupyter.</span></span><span class="sig-name descname"><span class="pre">islicer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower-left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">play_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/jupyter/#islicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.jupyter.islicer" title="Link to this definition">#</a></dt>
+<dd><p>Creates an interactive slider that slices a 3D volume along an axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><em>numpy.ndarray</em>) – A 3-dimensional dataset from which 2-dimensional slices will be
+shown</p></li>
+<li><p><strong>direction</strong> (<em>int</em>) – Axis to slice on. Can be 0,1,2 or the axis label, default 0</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>list</em><em> of </em><em>str</em><em> or </em><em>tuple</em><em> of </em><em>str</em><em>, </em><em>default=''</em>) – Title for the display</p></li>
+<li><p><strong>slice_number</strong> (<em>int</em><em>, </em><em>optional</em>) – Start slice number (default is None, which results in the center
+slice being shown initially)</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em> or </em><em>matplotlib.colors.Colormap</em><em>, </em><em>default='gray'</em>) – Set the colour map</p></li>
+<li><p><strong>minmax</strong> (<em>tuple</em>) – Colorbar (min, max) values, default None (uses the min, max of
+values in <cite>data</cite>)</p></li>
+<li><p><strong>size</strong> (<em>int</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – Specify the figure size in inches. If <cite>int</cite> this specifies the
+width, and scales the height in order to keep the standard
+<cite>matplotlib</cite> aspect ratio, default None (use the default matplotlib
+figure size)</p></li>
+<li><p><strong>axis_labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – The axis labels to use for each of the 3 dimensions in the data
+(default is None, resulting in labels extracted from the data, or
+[‘X’,’Y’,’Z’] if no labels are present)</p></li>
+<li><p><strong>origin</strong> (<em>{'lower-left'</em><em>, </em><em>'upper-left'</em><em>, </em><em>'lower-right'</em><em>, </em><em>'upper-right'}</em>) – Sets the display origin</p></li>
+<li><p><strong>play_interval</strong> (<em>int</em><em>, </em><em>default=500</em>) – The interval of time (in ms) a slice is selected for when iterating
+through a set of them</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>box</strong> – The top-level widget container.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ipywidgets.Box</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="link-islicer-link-islicer-objects-by-index">
+<h3>link_islicer - link islicer objects by index<a class="headerlink" href="#link-islicer-link-islicer-objects-by-index" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.jupyter.link_islicer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.jupyter.</span></span><span class="sig-name descname"><span class="pre">link_islicer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/jupyter/#link_islicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.jupyter.link_islicer" title="Link to this definition">#</a></dt>
+<dd><p>Links islicer’s slice-selection widgets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*args</strong> (<em>tuple</em><em> of </em><em>ipywidgets.Box</em>) – The widget containers returned from <cite>islicer</cite>, from which the slice
+selection sliders will be extracted and linked.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../recon/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Recon</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../plugins/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CIL Plugins</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

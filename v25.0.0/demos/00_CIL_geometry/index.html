@@ -1,0 +1,1132 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>A detailed look at CIL geometry &#8212; CIL 25.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=648e7a60bc4f0e8412b5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
+
+    <script src="../../_static/documentation_options.js?v=f58eb662"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/00_CIL_geometry';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
+    <link rel="prev" title="Load and visualise data with NikonDataReader" href="../NikonDataReader/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.0" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../#load-and-visualise-data">Load and visualise data</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../#geometry">Geometry</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">A detailed look at CIL geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../#advanced-topics">Advanced topics</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/00_CIL_geometry.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">A detailed look at CIL geometry</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2021 - 2022 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2021 - 2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:    Gemma Fardell (UKRI-STFC)</span>
+<span class="c1">#                   Edoardo Pasca (UKRI-STFC)</span>
+<span class="c1">#                   Laura Murgatroyd (UKRI-STFC)</span>
+</pre></div>
+</div>
+</div>
+<section id="A-detailed-look-at-CIL-geometry">
+<h1>A detailed look at CIL geometry<a class="headerlink" href="#A-detailed-look-at-CIL-geometry" title="Link to this heading">#</a></h1>
+<p>CIL holds your CT data in specialised data-containers, <code class="docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and <code class="docutils literal notranslate"><span class="pre">ImageData</span></code>.</p>
+<p>Each of these has an associated <code class="docutils literal notranslate"><span class="pre">geometry</span></code> which contains the meta-data describing your set-up.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> describes the acquisition data and parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> describes the image data (i.e., the reconstruction volume)</p></li>
+</ul>
+<p>The data-readers provided by CIL (Nikon, Zeiss and diamond nexus readers) will read in your data and return you a fully configured acquisition data with the acquisition geometry already configured, however if you read in a stack of tiffs or want to tweak the parameters this is simple to create by hand.</p>
+<section id="The-structure-of-an-AcquisitionGeometry">
+<h2>The structure of an AcquisitionGeometry<a class="headerlink" href="#The-structure-of-an-AcquisitionGeometry" title="Link to this heading">#</a></h2>
+<p>An instance of an <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, <code class="docutils literal notranslate"><span class="pre">ag</span></code>, holds the configuration of the system, in <code class="docutils literal notranslate"><span class="pre">config</span></code> which is subdivided in to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.system</span></code> - The position and orientations of the <code class="docutils literal notranslate"><span class="pre">source</span></code>/<code class="docutils literal notranslate"><span class="pre">ray</span></code>, <code class="docutils literal notranslate"><span class="pre">rotation_axis</span></code> and <code class="docutils literal notranslate"><span class="pre">detector</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.panel</span></code> - The number of pixels, the size of pixels, and the position of pixel 0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.angles</span></code> - The number of angles, the unit of the angles (default is degrees)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.config.channels</span></code> - The number of channels</p></li>
+</ul>
+</section>
+<section id="Create-a-simple-AcquisitionGeometry">
+<h2>Create a simple AcquisitionGeometry<a class="headerlink" href="#Create-a-simple-AcquisitionGeometry" title="Link to this heading">#</a></h2>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> methods to describe circular trajectory parallel-beam or cone-beam 2D or 3D data.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag</span> <span class="pre">=</span> <span class="pre">AcquisitionGeometry.create_Parallel2D()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag</span> <span class="pre">=</span> <span class="pre">AcquisitionGeometry.create_Parallel3D()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag</span> <span class="pre">=</span> <span class="pre">AcquisitionGeometry.create_Cone2D(source_position,</span> <span class="pre">detector_position)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag</span> <span class="pre">=</span> <span class="pre">AcquisitionGeometry.create_Cone3D(source_position,</span> <span class="pre">detector_position)</span></code></p></li>
+</ul>
+<p>This notebook will step though each in turn and show you how to describe both simple and complex geometries with offsets and rotations.</p>
+<p>No matter which type of geometry you create you will also need to describe the panel and projection angles.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_panel(num_pixels,</span> <span class="pre">pixel_size)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_angles(angles,</span> <span class="pre">angle_unit)</span></code></p></li>
+</ul>
+<p>For multi-channel data you need to add the number of channels.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_channels(num_channels)</span></code></p></li>
+</ul>
+<p>And you will also need to describe the order your data is stored in using the relavent labels from the CIL default labels: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ag.set_labels(['angle','vertical','horizontal'])</span></code></p></li>
+</ul>
+<section id="A-Note-on-CIL-AcquisitionGeometry:">
+<h3>A Note on CIL AcquisitionGeometry:<a class="headerlink" href="#A-Note-on-CIL-AcquisitionGeometry:" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The geometry is described by a right-handed cooridinate system</p></li>
+<li><p>Positive angles describe the object rotating anti-clockwise when viewed from above</p></li>
+</ul>
+</section>
+<section id="Parallel-geometry">
+<h3>Parallel geometry<a class="headerlink" href="#Parallel-geometry" title="Link to this heading">#</a></h3>
+<p>Parallel beams of X-rays are emitted onto 1D (single pixel row) or 2D detector array. This geometry is common for synchrotron sources.</p>
+<p>We describe the system, and then set the panel and angle data. Note that for 3D geometry we need to describe a 2D panel where <code class="docutils literal notranslate"><span class="pre">num_pixels=[X,Y]</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parallel_2D_geometry</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel2D</span><span class="p">()</span>\
+
+                                          <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+
+                                          <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+
+<span class="n">parallel_3D_geometry</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel3D</span><span class="p">()</span>\
+
+                                          <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+
+                                          <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Both 2D and 3D parallel-beam geometries are displayed below. Note that the detector position has been set, this is not necessary to describe and reconstruct the data, but it makes the displayed images clearer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">show_geometry()</span></code> can be used to display the configured geometry and will be used here extensively. You can also print the geometry to obtain a detailed description. If <code class="docutils literal notranslate"><span class="pre">show_geometry</span></code> is not passed an <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> it will show the default geometry associated with the <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code></p>
+<p>An example creating a 2D parallel-beam geometry:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_geometry</span>
+
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel2D</span><span class="p">(</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_7_0.png" src="../../_images/demos_00_CIL_geometry_7_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2D Parallel-beam tomography
+System configuration:
+        Ray direction: [0., 1.]
+        Rotation axis position: [0., 0.]
+        Detector position: [ 0., 10.]
+        Detector direction x: [1., 0.]
+Panel configuration:
+        Number of pixels: [10  1]
+        Pixel size: [1. 1.]
+        Pixel origin: bottom-left
+Channel configuration:
+        Number of channels: 1
+Acquisition description:
+        Number of positions: 180
+        Angles 0-9 in degrees: [0., 1., 2., 3., 4., 5., 6., 7., 8., 9.]
+        Angles 170-179 in degrees: [170., 171., 172., 173., 174., 175., 176., 177., 178., 179.]
+        Full angular array can be accessed with acquisition_data.geometry.angles
+Distances in units: units distance
+</pre></div></div>
+</div>
+<p>An example creating a 3D parallel-beam geometry:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel3D</span><span class="p">(</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_9_0.png" src="../../_images/demos_00_CIL_geometry_9_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd90912d890&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Fan-beam-geometry">
+<h3>Fan-beam geometry<a class="headerlink" href="#Fan-beam-geometry" title="Link to this heading">#</a></h3>
+<p>A single point-like X-ray source emits a cone-beam onto a single row of detector pixels. The beam is typically collimated to imaging field of view. Collimation greatly reduce amount of scatter radiation reaching the detector. Fan-beam geometry is used when scattering has significant influence on image quality or single-slice reconstruction is sufficient.</p>
+<p>We describe the system, and then set the panel and angle data.</p>
+<p>For fan-beam data the source and detector positions are required. As default we place them along the Y-axis where the rotation-axis is on the origin. They are specified as <code class="docutils literal notranslate"><span class="pre">[x,y]</span></code> coordinates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cone_2D_geometry</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+
+                                      <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+
+                                      <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_11_0.png" src="../../_images/demos_00_CIL_geometry_11_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd9097b70d0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Cone-beam-geometry">
+<h3>Cone-beam geometry<a class="headerlink" href="#Cone-beam-geometry" title="Link to this heading">#</a></h3>
+<p>A single point-like X-ray source emits a cone-beam onto 2D detector array. Cone-beam geometry is mainly used in lab-based CT instruments.</p>
+<p>We describe the system, and then set the panel and angle data.</p>
+<p>For cone-beam data the source and detector positions are required. As default we place them along the Y-axis where the rotation-axis is on the origin and aligned in the Z-direction. They are specified as <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code> coordinates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cone_3D_geometry</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+
+                                      <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+
+                                      <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_13_0.png" src="../../_images/demos_00_CIL_geometry_13_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd9096c4810&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Create-an-offset-AcquisitionGeometry">
+<h2>Create an offset AcquisitionGeometry<a class="headerlink" href="#Create-an-offset-AcquisitionGeometry" title="Link to this heading">#</a></h2>
+<p>It is unusual to have a perfectly aligned CT system. One of the most common offsets is the rotation-axis. If this offset is described by the <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> then it will be accounted for in the reconstruction. This saves having to pad your data to account for this.</p>
+<p>To specify the offset, you could either add an x-component to the <code class="docutils literal notranslate"><span class="pre">source_position</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_position</span></code> or you can offset the rotation axis from the origin using <code class="docutils literal notranslate"><span class="pre">rotation_axis_position</span></code>.</p>
+<p>As with the <code class="docutils literal notranslate"><span class="pre">source_position</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_position</span></code> this is the <code class="docutils literal notranslate"><span class="pre">rotation_axis_position</span></code> is specified in 2D with a 2D vector <code class="docutils literal notranslate"><span class="pre">[X,Y]</span></code> or 3D with a 3D vector <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code></p>
+<p>Below we offset the rotation axis by -0.5 in X by setting <code class="docutils literal notranslate"><span class="pre">rotation_axis_position=[-0.5,0]</span></code>. You can see the rotation axis position is no longer a point on the source-to-detector vector.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span>
+                                       <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_16_0.png" src="../../_images/demos_00_CIL_geometry_16_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd909615710&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Create-a-more-complex-AcquisitionGeometry">
+<h2>Create a more complex AcquisitionGeometry<a class="headerlink" href="#Create-a-more-complex-AcquisitionGeometry" title="Link to this heading">#</a></h2>
+<p>We can also set up rotations in the system. These are configured with vectors describing the direction.</p>
+<p>For example a detector yaw can be described by using <code class="docutils literal notranslate"><span class="pre">detector_direction_x=[X,Y]</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span>
+                                       <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.1</span><span class="p">]</span>
+                                       <span class="p">)</span>\
+     <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>\
+     <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_18_0.png" src="../../_images/demos_00_CIL_geometry_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd909819dd0&gt;
+</pre></div></div>
+</div>
+<p>You can set <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code>, <code class="docutils literal notranslate"><span class="pre">detector_direction_x</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_direction_y</span></code> by specifying a 3D directional vector <code class="docutils literal notranslate"><span class="pre">[X,Y,Z]</span></code>.</p>
+<p>For 3D datasets detector roll is commonly corrected with a dual-slice centre of rotation algorithm. You can specify <code class="docutils literal notranslate"><span class="pre">detector_direction_x</span></code> and <code class="docutils literal notranslate"><span class="pre">detector_direction_y</span></code> - ensuring they are ortogonal vectors.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                                       <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1</span><span class="p">],</span><span class="n">detector_direction_y</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.9</span><span class="p">]</span>
+                                      <span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">2048</span><span class="p">,</span><span class="mi">2048</span><span class="p">],</span> <span class="n">pixel_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_20_0.png" src="../../_images/demos_00_CIL_geometry_20_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd9096335d0&gt;
+</pre></div></div>
+</div>
+<p>In 3D datasets we can tilt the rotation axis to describe laminograpy geometry by changing <code class="docutils literal notranslate"><span class="pre">rotation_axis_direction</span></code></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">2048</span><span class="p">,</span><span class="mi">2048</span><span class="p">],</span> <span class="n">pixel_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_22_0.png" src="../../_images/demos_00_CIL_geometry_22_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd9090a06d0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="The-structure-of-an-ImageGeometry">
+<h2>The structure of an ImageGeometry<a class="headerlink" href="#The-structure-of-an-ImageGeometry" title="Link to this heading">#</a></h2>
+<p>ImageGeometry holds the description of the reconstruction volume. It holds:</p>
+<ul class="simple">
+<li><p>The number of voxels in X, Y, Z: <code class="docutils literal notranslate"><span class="pre">voxel_num_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_num_y</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_num_z</span></code></p></li>
+<li><p>The size of voxels in X, Y, Z: <code class="docutils literal notranslate"><span class="pre">voxel_size_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_size_y</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_size_z</span></code></p></li>
+<li><p>The offset of the volume from the rotation axis in voxels: <code class="docutils literal notranslate"><span class="pre">center_x</span></code>, <code class="docutils literal notranslate"><span class="pre">center_y</span></code>, <code class="docutils literal notranslate"><span class="pre">center_z</span></code></p></li>
+<li><p>The number of channels for multi-channel data</p></li>
+</ul>
+<p>You will also need to describe the order your data is stored in using the relevent labels from the CIL. The default labels are: <code class="docutils literal notranslate"><span class="pre">channel</span></code>, <code class="docutils literal notranslate"><span class="pre">vertical</span></code>, <code class="docutils literal notranslate"><span class="pre">horizontal_y</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal_x</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ig.set_labels(['vertical','horizontal_y','horizontal_x'])</span></code></p></li>
+</ul>
+</section>
+<section id="Create-a-simple-ImageGeometry">
+<h2>Create a simple ImageGeometry<a class="headerlink" href="#Create-a-simple-ImageGeometry" title="Link to this heading">#</a></h2>
+<p>To create a default ImageGeometry you can use: <code class="docutils literal notranslate"><span class="pre">ig</span> <span class="pre">=</span> <span class="pre">ag.get_ImageGeometry()</span></code></p>
+<p>This creates an ImageGeometry with:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_num_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_num_y</span></code> equal to the number of horizontal pixels of the panel</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_num_z</span></code> equal to the number of vertical pixels of the panel</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_size_x</span></code>, <code class="docutils literal notranslate"><span class="pre">voxel_size_y</span></code> is given by the horizontal pixel size divided by magnification</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voxel_size_z</span></code> is given by the vertical pixel size divided by magnification</p></li>
+</ul>
+<p>You can pass a resolution argument: <code class="docutils literal notranslate"><span class="pre">ig</span> <span class="pre">=</span> <span class="pre">ag.get_ImageGeometry(resolution)</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">resolution=0.5</span></code> double the size of your voxels, and half the number of voxels in each dimension</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolution=2</span></code> half the size of your voxels, and double the number of voxels in each dimension</p></li>
+</ul>
+<section id="A-Note-on-CIL-ImageGeometry:">
+<h3>A Note on CIL ImageGeometry:<a class="headerlink" href="#A-Note-on-CIL-ImageGeometry:" title="Link to this heading">#</a></h3>
+<p>At 0 degrees <code class="docutils literal notranslate"><span class="pre">horizontal_y</span></code> is aligned with the Y axis, and <code class="docutils literal notranslate"><span class="pre">horizontal_x</span></code> with the X axis.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">2048</span><span class="p">,</span><span class="mi">2048</span><span class="p">],</span> <span class="n">pixel_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - default&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - 0.5x resolution&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - 2x resolution&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ImageGeometry - default
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x2048,y2048,z2048
+voxel_size : x0.1,y0.1,z0.1
+center : x0,y0,z0
+
+ImageGeometry - 0.5x resolution
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x1024,y1024,z1024
+voxel_size : x0.2,y0.2,z0.2
+center : x0,y0,z0
+
+ImageGeometry - 2x resolution
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x4096,y4096,z4096
+voxel_size : x0.05,y0.05,z0.05
+center : x0,y0,z0
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Create-a-custom-ImageGeometry">
+<h2>Create a custom ImageGeometry<a class="headerlink" href="#Create-a-custom-ImageGeometry" title="Link to this heading">#</a></h2>
+<p>You can create your own ImageGeometry with: <code class="docutils literal notranslate"><span class="pre">ig</span> <span class="pre">=</span> <span class="pre">ImageGeometry(...)</span></code></p>
+<p>Giving you full control over the parameters.</p>
+<p>You can also change the members directly to reduce the reconstructed volume to exclude empty space.</p>
+<p>Using the previous example, we now can specify a smaller region of interest to reconstruct. We can offset the region of interest from the origin by specifiying the physical distance.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">2048</span><span class="p">,</span><span class="mi">2048</span><span class="p">],</span> <span class="n">pixel_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - default&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - RoI&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ImageGeometry - Offset RoI&quot;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">center_z</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1024</span> <span class="o">*</span> <span class="n">ig</span><span class="o">.</span><span class="n">voxel_size_z</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ImageGeometry - default
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_28_1.png" src="../../_images/demos_00_CIL_geometry_28_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ImageGeometry - RoI
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_28_3.png" src="../../_images/demos_00_CIL_geometry_28_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ImageGeometry - Offset RoI
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_00_CIL_geometry_28_5.png" src="../../_images/demos_00_CIL_geometry_28_5.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fd908d4c890&gt;
+</pre></div></div>
+</div>
+<p>We can also create an <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> directly.</p>
+<p>Here we create our ig independently of an <code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, by first importing <code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code> from <code class="docutils literal notranslate"><span class="pre">cil.framework</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
+
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">voxel_num_z</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">voxel_size_x</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">voxel_size_y</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">voxel_size_z</span><span class="o">=</span><span class="mf">0.2</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../NikonDataReader/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Load and visualise data with NikonDataReader</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../deriv2_cgls/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1D inverse problem demo using deriv2 from regtools</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

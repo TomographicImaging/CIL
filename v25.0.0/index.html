@@ -1,0 +1,841 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to CIL’s documentation! &#8212; CIL 25.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=648e7a60bc4f0e8412b5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=648e7a60bc4f0e8412b5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5" />
+
+    <script src="_static/documentation_options.js?v=f58eb662"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex/" />
+    <link rel="search" title="Search" href="search/" />
+    <link rel="next" title="Introduction" href="introduction/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.0" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="/">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="demos/">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="#">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos/">Tutorials</a></li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/index.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="welcome-to-cil-s-documentation">
+<h1>Welcome to CIL’s documentation!<a class="headerlink" href="#welcome-to-cil-s-documentation" title="Link to this heading">#</a></h1>
+<p>The aim of this package is to enable rapid prototyping of optimisation-based
+reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image, while being
+powerful enough to be employed on real scale problems.</p>
+<p>Firstly, it provides a framework to handle acquisition and reconstruction
+data and metadata; it also provides a basic input/output package to read data
+from different sources, e.g. Nikon X-Radia, NeXus.</p>
+<p>Secondly, it provides an object-oriented framework for defining mathematical
+operators and functions as well a collection of useful example operators and
+functions. Both smooth and non-smooth functions can be used.</p>
+<p>Further, it provides a number of high-level generic implementations of
+optimisation algorithms to solve generically formulated optimisation problems
+constructed from operator and function objects.</p>
+<section id="demos-and-examples">
+<h2>Demos and Examples<a class="headerlink" href="#demos-and-examples" title="Link to this heading">#</a></h2>
+<p>A number of demos can be found in the <a class="reference external" href="https://github.com/vais-ral/CIL-Demos">CIL-Demos</a> repository.</p>
+<p>For detailed information refer to our articles and the repositories
+with the code to reproduce the article’s results.</p>
+</section>
+<section id="cite-this-work">
+<h2>Cite this work<a class="headerlink" href="#cite-this-work" title="Link to this heading">#</a></h2>
+<p>If you use this software please consider citing one or both of the articles below.</p>
+<p>1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging
+<a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">https://doi.org/10.1098/rsta.2020.0192</a> . Phil. Trans. R. Soc. A 20200192.
+The code to reproduce the article results. <a class="github reference external" href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I">TomographicImaging/Paper-2021-RSTA-CIL-Part-I</a></p>
+<p>2. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
+tomography <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">https://doi.org/10.1098/rsta.2020.0193</a> Phil. Trans. R. Soc. A 20200193.
+The code to reproduce the article results. <a class="github reference external" href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II">TomographicImaging/Paper-2021-RSTA-CIL-Part-II</a></p>
+</section>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound" id="mastertoc">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction/">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction/#ct-geometry">CT Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="introduction/#parallel-geometry">Parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction/#fan-beam-geometry">Fan-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="introduction/#cone-beam-geometry">Cone-beam geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="introduction/#multi-channel-data">Multi channel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction/#block-framework">Block Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="framework/">Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="framework/#acquisitiongeometry">AcquisitionGeometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.AcquisitionGeometry"><code class="docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#create-the-geometry-object">Create the geometry object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#configure-the-geometry-object">Configure the geometry object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#use-the-geometry">Use the geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#imagegeometry">ImageGeometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.ImageGeometry"><code class="docutils literal notranslate"><span class="pre">ImageGeometry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#blockgeometry">BlockGeometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.BlockGeometry"><code class="docutils literal notranslate"><span class="pre">BlockGeometry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#data-containers">Data Containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#datacontainer">DataContainer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#acquisitiondata">AcquisitionData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#imagedata">ImageData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#vectordata">VectorData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#blockdatacontainer">BlockDataContainer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#partitioner">Partitioner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.Partitioner"><code class="docutils literal notranslate"><span class="pre">Partitioner</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#labels">Labels</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.labels.ImageDimension"><code class="docutils literal notranslate"><span class="pre">ImageDimension</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.labels.AcquisitionDimension"><code class="docutils literal notranslate"><span class="pre">AcquisitionDimension</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.labels.FillType"><code class="docutils literal notranslate"><span class="pre">FillType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.labels.AngleUnit"><code class="docutils literal notranslate"><span class="pre">AngleUnit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.labels.AcquisitionType"><code class="docutils literal notranslate"><span class="pre">AcquisitionType</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework/#dataprocessor">DataProcessor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.DataProcessor"><code class="docutils literal notranslate"><span class="pre">DataProcessor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework/#cil.framework.Processor"><code class="docutils literal notranslate"><span class="pre">Processor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="io/">Read/ write AcquisitionData and ImageData</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="io/#nexus">NeXuS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.NEXUSDataReader"><code class="docutils literal notranslate"><span class="pre">NEXUSDataReader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.NEXUSDataWriter"><code class="docutils literal notranslate"><span class="pre">NEXUSDataWriter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io/#nikon">Nikon</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.NikonDataReader"><code class="docutils literal notranslate"><span class="pre">NikonDataReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io/#zeiss">ZEISS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.ZEISSDataReader"><code class="docutils literal notranslate"><span class="pre">ZEISSDataReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io/#tiff-reader-writer">TIFF Reader/Writer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.TIFFStackReader"><code class="docutils literal notranslate"><span class="pre">TIFFStackReader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.TIFFWriter"><code class="docutils literal notranslate"><span class="pre">TIFFWriter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io/#raw-file-writer">RAW File Writer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.RAWFileWriter"><code class="docutils literal notranslate"><span class="pre">RAWFileWriter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io/#hdf5-utilities">HDF5 Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="io/#cil.io.utilities.HDF5_utilities"><code class="docutils literal notranslate"><span class="pre">HDF5_utilities</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation/">Optimisation framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#algorithms-deterministic">Algorithms (Deterministic)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#base-class">Base class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#gd">GD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#cgls">CGLS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#sirt">SIRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#ista-pgd">ISTA/PGD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#fista">FISTA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#apgd">APGD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#pdhg">PDHG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#ladmm">LADMM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#pd3o">PD3O</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#algorithms-stochastic">Algorithms (Stochastic)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#spdhg">SPDHG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#approximate-gradient-methods">Approximate gradient methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#stochastic-gradient-descent-example">Stochastic Gradient Descent Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#note">Note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#memory-requirements">Memory requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#operators">Operators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#operator-base-classes">Operator base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#trivial-operators">Trivial operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#gradientoperator">GradientOperator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#waveletoperator">WaveletOperator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#base-classes">Base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#simple-functions">Simple functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#composition-of-operator-and-a-function">Composition of operator and a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#indicator-box">Indicator box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#kullbackleibler">KullbackLeibler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#l1-norm">L1 Norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#l2-norm-squared">L2 Norm Squared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#least-squares">Least Squares</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#l1-sparsity">L1 Sparsity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#mixed-l21-norm">Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#mixed-l11-norm">Mixed L11 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#total-variation">Total variation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#function-of-absolute-value">Function of Absolute Value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#approximate-gradient-base-class">Approximate Gradient base class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#stochastic-gradient-function">Stochastic Gradient function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#sag-function">SAG function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#saga-function">SAGA function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#stochastic-variance-reduced-gradient-function">Stochastic Variance Reduced Gradient Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#loopless-stochastic-variance-reduced-gradient-function">Loopless Stochastic Variance Reduced Gradient Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#samplers">Samplers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#callbacks">Callbacks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#step-size-methods">Step size methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#preconditioners">Preconditioners</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation/#block-framework">Block Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#blockdatacontainer">BlockDataContainer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#cil.framework.BlockDataContainer"><code class="docutils literal notranslate"><span class="pre">BlockDataContainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#block-function">Block Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#cil.optimisation.functions.BlockFunction"><code class="docutils literal notranslate"><span class="pre">BlockFunction</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation/#block-operator">Block Operator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#cil.optimisation.operators.BlockOperator"><code class="docutils literal notranslate"><span class="pre">BlockOperator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation/#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="processors/">Processors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processors/#data-manipulation">Data Manipulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors/#data-slicer">Data Slicer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#data-binner">Data Binner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#data-padder">Data Padder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#mask-generator-from-data">Mask Generator from Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#data-masking">Data Masking</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processors/#pre-processors">Pre-processors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors/#centre-of-rotation-corrector">Centre Of Rotation Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#data-normaliser">Data Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#flux-normaliser">Flux Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#ring-remover">Ring Remover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors/#paganin-processor">Paganin Processor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recon/">Recon</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recon/#analytical-reconstruction">Analytical Reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recon/#fbp-reconstructor-for-parallel-beam-geometry">FBP - Reconstructor for parallel-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recon/#fdk-reconstructor-for-cone-beam-geometry">FDK - Reconstructor for cone-beam geometry</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities/">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/#test-datasets">Test datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#a-set-of-simulated-volumes-and-ct-data">A set of simulated volumes and CT data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#a-ct-dataset-from-the-diamond-light-source">A CT dataset from the Diamond Light Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#simulated-image-data">Simulated image data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#remote-data">Remote data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#walnut">Walnut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#usb">USB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#korn">KORN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#sandstone">SANDSTONE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/#module-cil.utilities.quality_measures">Image Quality metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#cil.utilities.quality_measures.mse"><code class="docutils literal notranslate"><span class="pre">mse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#cil.utilities.quality_measures.mae"><code class="docutils literal notranslate"><span class="pre">mae()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#cil.utilities.quality_measures.psnr"><code class="docutils literal notranslate"><span class="pre">psnr()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/#visualisation">Visualisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#show2d-display-2d-slices">show2D - Display 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#show1d-display-1d-slices">show1D - Display 1D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#show-geometry-display-system-geometry">show_geometry - Display system geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#islicer-interactive-display-of-2d-slices">islicer - interactive display of 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities/#link-islicer-link-islicer-objects-by-index">link_islicer - link islicer objects by index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins/">CIL Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins/#ccpi-regularisation">CCPi Regularisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#total-variation">Total variation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#other-regularisation-functions">Other regularisation functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/#tomophantom">TomoPhantom</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#cil.plugins.TomoPhantom.get_ImageData"><code class="docutils literal notranslate"><span class="pre">get_ImageData()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/#tigre">TIGRE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#fbp">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#projection-operator">Projection Operator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/#astra">ASTRA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#id6">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/#id7">Projection Operator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/">Developers’ Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#creator">Creator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#setter-methods-and-properties">Setter methods and properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#other-methods">Other methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/#logging-and-warning">Logging and warning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#building-documentation-locally">Building documentation locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#notebooks-gallery">Notebooks gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/#testing">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#parametrized-tests">Parametrized Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/#github-actions-ci">GitHub Actions CI</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/#contributions-guidelines">Contributions guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos/">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demos/#load-and-visualise-data">Load and visualise data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/ZeissDataReader/">Load and visualise data with ZeissDataReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/NikonDataReader/">Load and visualise data with NikonDataReader</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/#geometry">Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/00_CIL_geometry/">A detailed look at CIL geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/#advanced-topics">Advanced topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/callback_demonstration/">CIL Callbacks How To</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="contacts">
+<h2>Contacts<a class="headerlink" href="#contacts" title="Link to this heading">#</a></h2>
+<p>Please refer to the main <a class="reference external" href="https://www.ccpi.ac.uk">CCPi website</a> for up-to-date information.</p>
+<p>The CIL developers may be contacted:</p>
+<ul class="simple">
+<li><p>by joining the <a class="reference external" href="https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL">devel mailing list</a></p></li>
+<li><p>on the CIL’s GitHub repository page <a class="github reference external" href="https://github.com/TomographicImaging/CIL">TomographicImaging/CIL</a> or</p></li>
+<li><p>on the CIL Discord channel <a class="reference external" href="https://discord.gg/9NTWu9MEGq">https://discord.gg/9NTWu9MEGq</a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="introduction/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Introduction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=648e7a60bc4f0e8412b5"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=648e7a60bc4f0e8412b5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

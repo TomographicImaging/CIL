@@ -271,7 +271,7 @@ class ZEISSDataReader(object):
                     (int(self._metadata['x-shifts'][num]),int(self._metadata['y-shifts'][num])), \
                     axis=(1,0))
 
-            acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._geometry.copy(),suppress_warning=True)
+            acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._geometry.copy())
             return acq_data
         else:
             ig_data = ImageData(array=data, deep_copy=False, geometry=self._geometry.copy())

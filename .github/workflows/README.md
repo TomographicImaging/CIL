@@ -7,7 +7,7 @@ The jobs are:
 
 - `test-cuda`
   + uses our self-hosted (STFC Cloud) CUDA-enabled runners to run GPU tests
-  + `TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test`
+  + `TESTS_FORCE_GPU=1 python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test`
 - `test`
   + uses default (GitHub-hosted) runners to run tests on the min & max supported Python & NumPy versions
   + `python -m unittest discover -v ./Wrappers/Python/test`

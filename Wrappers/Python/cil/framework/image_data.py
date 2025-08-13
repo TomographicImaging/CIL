@@ -155,7 +155,7 @@ class ImageData(DataContainer):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new)
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):

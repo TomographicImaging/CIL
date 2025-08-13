@@ -16,17 +16,15 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Andrew Shartis (UES, Inc.)
-
-
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
 import logging
+import warnings
 
 
-
-class ZEISSDataReader(object):
+class ZEISSDataReader:
 
     '''
     Create a reader for ZEISS files
@@ -157,7 +155,9 @@ class ZEISSDataReader(object):
             self._setup_image_geometry()
 
     def read_metadata(self):
-        import dxchange
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "pkg_resources is deprecated", UserWarning)
+            import dxchange
         import olefile
         # Read one image to get the metadata
         _,metadata = dxchange.read_txrm(self.file_name,((0,1),(None),(None)))
@@ -255,7 +255,9 @@ class ZEISSDataReader(object):
         '''
         Reads projections and return Acquisition (TXRM) or Image (TXM) Data container
         '''
-        import dxchange
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "pkg_resources is deprecated", UserWarning)
+            import dxchange
         # Load projections or slices from file
         slice_range = None
         if self._roi:

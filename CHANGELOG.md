@@ -54,7 +54,7 @@
     - `axpby` (alias of `sapyb`)
     - `shape` setter in `DataContainer` and `ImageGeometry`
     - use of integer compression in `NEXUSDataWriter`
-    - `suppress_warning` internally passed as an unused kwarg to ImageData and AcquisitionData (#2206)
+    - Removed unused kwargs passed to ImageData and AcquisitionData, including `suppress_warning` (#2206)
   - Changes that break backwards compatibility:
     - Updated `RANDOM` and `RANDOM_INT` `DataContainer.fill()` and `geometry.allocate()` methods to use numpy default random number generator, old methods can be accessed with `RANDOM_DEPRECATED` AND `RANDOM_INT_DEPRECATED`. Random methods can now be accessed from `fill()` and `allocate()` (#2037)
 

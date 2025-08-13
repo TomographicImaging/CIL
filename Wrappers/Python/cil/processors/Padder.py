@@ -18,6 +18,7 @@
 
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer, AcquisitionGeometry
+from cil.framework.labels import AcquisitionType
 import numpy as np
 import weakref
 
@@ -411,10 +412,10 @@ class Padder(DataProcessor):
 
     def check_input(self, data):
 
-        if isinstance(data, (ImageData,AcquisitionData)):
+        if isinstance(data, (ImageData, AcquisitionData)):
             self._data_array = True
             self._geometry = data.geometry
-
+            
         elif isinstance(data, DataContainer):
             self._data_array = True
             self._geometry = None
@@ -422,10 +423,12 @@ class Padder(DataProcessor):
         elif isinstance(data, (ImageGeometry, AcquisitionGeometry)):
             self._data_array = False
             self._geometry = data
-
         else:
             raise TypeError('Processor supports following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n - DataContainer\n - ImageGeometry\n - AcquisitionGeometry')
+
+        if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("Cone-Flex geometry is not supported by this processor")
 
         if self._data_array:
             if data.dtype != np.float32:

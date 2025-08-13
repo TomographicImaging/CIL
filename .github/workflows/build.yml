@@ -52,7 +52,7 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k gpu -k GPU ./Wrappers/Python/test
+        TESTS_FORCE_GPU=1 CIL_DATA_DIR=/opt/runner/hostedtoolcache/cil python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       shell: bash
@@ -121,19 +121,19 @@ jobs:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
+    - run: conda install boa anaconda-client
     - name: conda build & test
       working-directory: recipe
       run: |
-        conda install boa
         conda mambabuild . -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
     - uses: actions/upload-artifact@v4
       with:
         name: cil-package-py${{ matrix.python-version }}-np${{ matrix.numpy-version }}
         path: recipe/linux-64/cil*
     - name: anaconda upload -c ccpi
-      if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
+      if: >
+        (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) && matrix.numpy-version == '1.26'
       run: |
-        conda install anaconda-client
         anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} recipe/linux-64/cil*
     - name: conda upload -c tomography.stfc.ac.uk/conda
       if: startsWith(github.ref, 'refs/tags')

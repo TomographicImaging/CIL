@@ -51,6 +51,7 @@ conda_args=(create --name="$name"
   cmake'>=3.16'
   dxchange
   h5py
+  llvm-openmp
   ipp'>=2021.10'
   ipp-devel'>=2021.10'
   ipp-include'>=2021.10'

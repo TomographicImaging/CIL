@@ -15,13 +15,10 @@
 
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Tomas Kulhanek (STFC)
 
-#creates pairs of versions using zip_keys, lists must be the same length
 ipp_version:
   - '2021.12'
 python:
   - 3.10
   - 3.11
   - 3.12
-

@@ -1,6 +1,9 @@
 * XX.X
   - New features:
     - Added `FunctionOfAbs` class (#1976)
+    - Added `Cone3D_Flex` geometry as a CIL acquisition geometry type. This allows users to reconstruct non-circular trajectories. (#2039)
+    - Added `ASTRA` backend support for `ProjectionOperator` and `FBP` to use `Cone3D_Flex` geometry. (#2039)
+    - Added `show_system_positions` for visualisation of `Cone3D_Flex` geometries. (#2039)
   - Bug fixes:
     - Fix deprecation warning for rtol and atol in GD (#2056)
     - Removed the deprecated usage of run method in test_SIRF.py (#2070)
@@ -10,6 +13,7 @@
     - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
     - Copy geometry in the creation of a DataContainer (#2108)
     - Fix order of operations for subtraction and division between a BlockDataContainer and DataContainer (#2133)
+    - Update default compression for TIFFWriter setup (#2197)
   - Documentation:
     - Updated documentation for the ChannelWiseOperator including new example (#2096)
     - Updated documentation for LADMM (#2015)
@@ -28,6 +32,9 @@
     - Improved consistency of `step_size` property across GD, ISTA, FISTA and APGD algorithms (#2157)
     - In PDHG algorithm, we now have options to initialise the dual variable, as well as the primal variable (#2169)
     - Allow FluxNormaliser.preview_configuration() even if flux contains zeros (#2177)
+    - Check if kwargs are used in AcquisitionData and ImageData initialisation (#2178)
+    - Added a flag to `show_geometry` that allows for disabling the call to `plt.show()` (#2195)
+
   - Testing:
     - Developers can now run the full CI matrix [via the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) (#2160)
     - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)

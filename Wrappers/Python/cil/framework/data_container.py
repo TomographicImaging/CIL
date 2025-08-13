@@ -731,10 +731,16 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
+
+            if self.geometry is None:
+                return type(self)(out,
+                    deep_copy=False,
+                    dimension_labels=self.dimension_labels)
+            
             return type(self)(out,
                        deep_copy=False,
-                       dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
+        
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()

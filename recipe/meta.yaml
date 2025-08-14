@@ -23,6 +23,8 @@ test:
     - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
+    - dxchange
+    - olefile >=0.46
 
   source_files:
     - ./Wrappers/Python/test
@@ -55,8 +57,6 @@ requirements:
     - scipy >=1.4
     - h5py
     - pillow
-    - dxchange
-    - olefile >=0.46
     - pywavelets
     - cil-data >=22
     - tqdm

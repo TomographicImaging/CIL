@@ -87,6 +87,8 @@ jobs:
       python-version: ${{ steps.matrix.outputs.python-version }}
       numpy-version: ${{ steps.matrix.outputs.numpy-version }}
       os: ${{ steps.matrix.outputs.os }}
+      include: ${{ steps.matrix.outputs.include }}
+      include-numpy: ${{ steps.matrix.outputs.include-numpy }}
     steps:
     - id: matrix
       run: |
@@ -94,14 +96,24 @@ jobs:
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23, 1.24, 1.25, 1.26]" >> $GITHUB_OUTPUT
           echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
+          include_max=true
         else
           echo "python-version=['3.10']" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23]" >> $GITHUB_OUTPUT
           if ${{ github.ref == 'refs/heads/master' }}; then
             echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
+            include_max=true
           else
             echo "os=['ubuntu']" >> $GITHUB_OUTPUT
+            include_max=false
           fi
+        fi
+        if $include_max; then
+          echo "include=[{'python-version': 3.12, 'os': 'ubuntu'}, {'python-version': 3.12, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+          echo "include-numpy=[{'python-version': 3.12, 'numpy-version': 1.26, 'os': 'ubuntu'}, {'python-version': 3.12, 'numpy-version': 1.26, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+        else
+          echo "include=[]" >> $GITHUB_OUTPUT
+          echo "include-numpy=[]" >> $GITHUB_OUTPUT
         fi
   conda-build:
     defaults: {run: {shell: 'bash -el {0}'}}
@@ -111,9 +123,7 @@ jobs:
       matrix:
         python-version: ${{ fromJson(needs.conda-matrix.outputs.python-version) }}
         os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
-        include:
-        - {python-version: 3.12, os: ubuntu}
-        - {python-version: 3.12, os: windows}
+        include: ${{ fromJson(needs.conda-matrix.outputs.include) }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -146,9 +156,7 @@ jobs:
         python-version: ${{ fromJson(needs.conda-matrix.outputs.python-version) }}
         numpy-version: ${{ fromJson(needs.conda-matrix.outputs.numpy-version) }}
         os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
-        include:
-        - {python-version: 3.12, numpy-version: 1.26, os: ubuntu}
-        - {python-version: 3.12, numpy-version: 1.26, os: windows}
+        include: ${{ fromJson(needs.conda-matrix.outputs.include-numpy) }}
     steps:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3

@@ -385,8 +385,8 @@ class TestDataContainer(CCPiTestClass):
     def test_exp_log(self):
         a0 = np.ones(2*3*4)
 
-        ds0 = DataContainer(np.reshape(a0,(2,3,4)), suppress_warning=True)
-        # ds1 = DataContainer(np.reshape(a1,(2,3,4)), suppress_warning=True)
+        ds0 = DataContainer(np.reshape(a0,(2,3,4)))
+        # ds1 = DataContainer(np.reshape(a1,(2,3,4)))
         b = ds0.exp().log()
         np.testing.assert_allclose(ds0.as_array(), b.as_array())
 
@@ -505,6 +505,12 @@ class TestDataContainer(CCPiTestClass):
         self.assertNumpyArrayEqual(np.asarray(data.shape), np.asarray(ag2.shape))
         self.assertNumpyArrayEqual(np.asarray(data.shape), data.as_array().shape)
 
+        extra_arg = "not a real arg"
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = AcquisitionData(extra_arg=extra_arg, geometry=ag2)
+
+
     def test_AcquisitionData_from_numpy(self):
         """
         Test the creation and manipulation of AcquisitionData from a numpy array.
@@ -546,6 +552,13 @@ class TestDataContainer(CCPiTestClass):
         self.assertEqual(data.shape, (2, 3, 4))
         self.assertEqual(data.geometry, ag)
         self.assertEqual(data.dtype, np.float32)
+
+    def test_ImageGeometry(self):
+        ig = ImageGeometry(2,2)
+
+        with self.assertWarns(UserWarning):
+            # assert raises warning if kwarg value unused 
+            data = ImageData(value=np.array([[1, 2], [3, 4]]), geometry=ig)
 
 
     def test_ImageGeometry_allocate(self):

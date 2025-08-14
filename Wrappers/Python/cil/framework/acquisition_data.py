@@ -68,7 +68,7 @@ class AcquisitionData(DataContainer, Partitioner):
                  geometry = None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', None)
+        dtype = kwargs.pop('dtype', None)
         if dtype is not None and array is not None:
             if dtype != array.dtype:
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
@@ -76,7 +76,7 @@ class AcquisitionData(DataContainer, Partitioner):
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
 
-        labels = kwargs.get('dimension_labels', None)
+        labels = kwargs.pop('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
@@ -99,6 +99,9 @@ class AcquisitionData(DataContainer, Partitioner):
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def __eq__(self, other):
         '''
@@ -161,7 +164,7 @@ class AcquisitionData(DataContainer, Partitioner):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new)
         
     
     def get_slice(self, *args, **kwargs):
@@ -172,10 +175,10 @@ class AcquisitionData(DataContainer, Partitioner):
         ----------
         channel: int, optional
             index on channel dimension to slice on. If None, does not slice on this dimension.
-        angle or projection: int, optional
+        angle/projection: int, optional
             index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
-            - For CONE_FLEX geometry, use 'projection'.
-            - For all other geometries, use 'angle'.
+            For CONE_FLEX geometry, use 'projection'.
+            For all other geometries, use 'angle'.
         vertical: int, str, optional
             If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
         horizontal: int, optional

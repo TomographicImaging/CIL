@@ -66,10 +66,8 @@ jobs:
     strategy:
       matrix:
         include:
-        - python-version: '3.10'
-          numpy-version: 1.23
-        - python-version: 3.12
-          numpy-version: 1.26
+        - {python-version: '3.10', numpy-version: 1.23}
+        - {python-version: 3.12, numpy-version: 1.26}
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
@@ -88,60 +86,72 @@ jobs:
     outputs:
       python-version: ${{ steps.matrix.outputs.python-version }}
       numpy-version: ${{ steps.matrix.outputs.numpy-version }}
+      os: ${{ steps.matrix.outputs.os }}
     steps:
     - id: matrix
       run: |
-        if ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags') || github.event_name == 'workflow_dispatch' }}; then
+        if ${{ startsWith(github.ref, 'refs/tags') || github.event_name == 'workflow_dispatch' }}; then
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23, 1.24, 1.25, 1.26]" >> $GITHUB_OUTPUT
+          echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
         else
           echo "python-version=['3.10']" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23]" >> $GITHUB_OUTPUT
+          if ${{ github.ref == 'refs/heads/master' }}; then
+            echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
+          else
+            echo "os=['ubuntu']" >> $GITHUB_OUTPUT
+          fi
         fi
   conda:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
     needs: conda-matrix
     strategy:
       matrix:
         python-version: ${{ fromJson(needs.conda-matrix.outputs.python-version) }}
         numpy-version: ${{ fromJson(needs.conda-matrix.outputs.numpy-version) }}
+        os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
         include:
-        - python-version: 3.12
-          numpy-version: 1.26
+        - {python-version: 3.12, numpy-version: 1.26, os: ubuntu}
+        - {python-version: 3.12, numpy-version: 1.26, os: windows}
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
+    - if: matrix.os == 'windows'
+      uses: ilammy/msvc-dev-cmd@v1
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa anaconda-client
+    - run: conda install boa conda-verify anaconda-client
     - name: conda build & test
       working-directory: recipe
       run: |
         conda mambabuild . -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
     - uses: actions/upload-artifact@v4
       with:
-        name: cil-package-py${{ matrix.python-version }}-np${{ matrix.numpy-version }}
-        path: recipe/linux-64/cil*
+        name: cil-package-${{ matrix.os }}-py${{ matrix.python-version }}-np${{ matrix.numpy-version }}
+        path: recipe/*/cil-*.tar.bz2
     - name: anaconda upload -c ccpi
       if: >
         (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) && matrix.numpy-version == '1.26'
       run: |
-        anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} recipe/linux-64/cil*
+        anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} recipe/*/cil-*.tar.bz2
     - name: conda upload -c tomography.stfc.ac.uk/conda
       if: startsWith(github.ref, 'refs/tags')
       run: |
         echo '${{ secrets.STFC_SSH_KEY }}' > ./key
         chmod 600 ./key
-        rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -P recipe/linux-64/cil* \
-          '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}/linux-64/'
+        for plat in linux-64 win-64; do
+          rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -P recipe/$plat/cil-*.tar.bz2 \
+            '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}/$plat/'
+        done
   conda-reindex:
     if: startsWith(github.ref, 'refs/tags')
     needs: conda

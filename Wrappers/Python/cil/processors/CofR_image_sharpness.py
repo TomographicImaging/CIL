@@ -345,7 +345,7 @@ class CofR_image_sharpness(Processor):
         log.info("Return new dataset with centred geometry")
 
         if out is None:
-            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
+            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry)
         else:
             out.geometry = new_geometry
             return out

@@ -16,19 +16,25 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import DataProcessor
+from cil.recon import Reconstructor
 from cil.plugins.tigre import CIL2TIGREGeometry
 import tigre.algorithms as algs
 from cil.framework import ImageData
 import logging
 import numpy as np
-
+import warnings
 from cil.framework.labels import AcquisitionDimension
 
 log = logging.getLogger(__name__)
 
-
-class tigre_algo_wrapper(DataProcessor):
+try:
+    from tigre.utilities.gpu import GpuIds
+    has_gpu_sel = True
+except ModuleNotFoundError:
+    has_gpu_sel = False
+    
+    
+class tigre_algo_wrapper(Reconstructor):
 
     def __init__(self, name=None,  initial=None, image_geometry=None,  data=None, niter=0,  **kwargs):
         """
@@ -68,11 +74,23 @@ class tigre_algo_wrapper(DataProcessor):
         of CIL geometries to TIGRE geometries and prepares the data for the specified algorithm.
         The `name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
 
+        Note
+        ----
+        We are aware that running the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to incorrect restults in the TV denoising step, particularly when using more than one GPU. https://github.com/CERN/TIGRE/issues/681
+        You can change the gpuids by passing the `gpuids` keyword argument, for example:
+        ```python
+        from tigre.utilities.gpu import GpuIds
+        gpuids = GpuIds()
+        gpuids.devices = [0]  # Specify the GPU device IDs you want to use
+        algo = tigre_algo_wrapper(name='fista', initial=initial_image, image_geometry=image_geom, data=acquisition_data, niter=10, gpuids=gpuids)
+        ```
+        
+        
         Example
         -------
         >>> from cil.plugins.tigre import tigre_algo_wrapping 
         >>> algo = tigre_algo_wrapper(name='SART', initial=initial_image, image_geometry=image_geom, data=acquisition_data, niter=10)
-        >>> reconstructed_image, quality = algo.process()
+        >>> reconstructed_image, quality = algo.run()
 
         """
 
@@ -90,29 +108,42 @@ class tigre_algo_wrapper(DataProcessor):
         if initial is None:
             initial = image_geometry.allocate(0)
 
-        tigre_initial = initial.copy().as_array()
-        ig = image_geometry
+        self.tigre_initial = initial.copy().as_array()
+        self.ig = image_geometry
         ag = data.geometry
-        tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
-            ig, ag)
-        tigre_projections = data.as_array()
+        self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
+            self.ig, ag)
+        self.tigre_geom.check_geo(self.tigre_angles)
+        self.tigre_projections = data.as_array()
+        
+        if self.tigre_projections.ndim == 2:
+            if any( a==name for a in ['ista', 'fista', 'sart_tv', 'ossart_tv']):
+                warnings.warn(
+                    "We are aware that the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to incorrect results in the TV denoising step, particularly when using more than one GPU.", UserWarning, stacklevel=2)
 
-        # TODO: Not sure when this is used/ if it is needed
+
         if data.dimension_labels[0] != AcquisitionDimension.ANGLE:
-            tigre_projections = np.expand_dims(tigre_projections, axis=0)
+            self.tigre_projections = np.expand_dims(self.tigre_projections, axis=0)
 
-        if tigre_geom.is2D:
-            tigre_projections = np.expand_dims(tigre_projections, axis=1)
-            tigre_initial = np.expand_dims(tigre_initial, axis=0)
+        if self.tigre_geom.is2D:
+            self.tigre_projections = np.expand_dims(self.tigre_projections, axis=1)
+            self.tigre_initial = np.expand_dims(self.tigre_initial, axis=0)
+            
+        self.tigre_algo = getattr(algs, name)
+        self.niter = niter
+        self.kwargs = kwargs
+        if has_gpu_sel:
+            self.gpuids = self.kwargs.pop('gpuids', None)
+            if self.gpuids is None: 
+                self.gpuids =  GpuIds()
+            log.info("Using GPU ids:", self.gpuids)
+            
 
-        tigre_algo = getattr(algs, name)
-
-        super(tigre_algo_wrapper, self).__init__(ig=image_geometry, ag=data.geometry, tigre_algo=tigre_algo,
-                                                 tigre_geom=tigre_geom, tigre_angles=tigre_angles, tigre_projections=tigre_projections, tigre_initial=tigre_initial, niter=niter, kwargs=kwargs)
+        super(tigre_algo_wrapper, self).__init__(data, image_geometry=self.ig, backend='tigre')
 
         log.info("%s configured", self.__class__.__name__)
 
-    def process(self, out=None):
+    def run(self, out=None):
         """
         Run the specified TIGRE algorithm with the provided parameters.
 
@@ -131,15 +162,25 @@ class tigre_algo_wrapper(DataProcessor):
         """
 
         log.info("%s passing to the tigre algorithm", self.__class__.__name__)
-
-        result = self.tigre_algo(
-            self.tigre_projections,
-            self.tigre_geom,
-            self.tigre_angles,
-            init=self.tigre_initial,
-            niter=self.niter,
-            **self.kwargs
-        )
+        if has_gpu_sel:
+            result = self.tigre_algo(
+                proj=self.tigre_projections,
+                geo=self.tigre_geom,
+                angles=self.tigre_angles,
+                init=self.tigre_initial,
+                niter=self.niter,
+                gpuids=self.gpuids,
+                **self.kwargs
+            )
+        else:
+            result = self.tigre_algo(
+                proj=self.tigre_projections,
+                geo=self.tigre_geom,
+                angles=self.tigre_angles,
+                init=self.tigre_initial,
+                niter=self.niter,
+                **self.kwargs
+            )
 
         img = result[0] if isinstance(result, tuple) else result
 

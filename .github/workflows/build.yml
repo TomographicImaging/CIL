@@ -5,7 +5,7 @@ on:
   push:
 jobs:
   test-cuda:
-    defaults: {run: {shell: "${{ matrix.os == 'Windows' && '\"C:\\Program Files\\Git\\bin\\bash.exe\" -el {0}' || 'bash -el {0}' }}"}}
+    defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: [self-hosted, '${{ matrix.os }}']
     strategy:
       matrix:
@@ -15,6 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
+    - if: matrix.os == 'Windows'
+      run: |
+        echo|set /p="C:\Program Files\Git\bin" | more /P >> %GITHUB_PATH%
+      shell: cmd
     - id: reqs
       name: set requirements
       run: |

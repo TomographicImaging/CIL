@@ -5,7 +5,7 @@ on:
   push:
 jobs:
   test-cuda:
-    defaults: {run: {shell: 'bash -el {0}'}}
+    defaults: {run: {shell: "${{ matrix.os == 'Windows' && 'cmd /C CALL {0}' || 'bash -el {0}' }}"}}
     runs-on: [self-hosted, '${{ matrix.os }}']
     strategy:
       matrix:
@@ -18,6 +18,7 @@ jobs:
     - if: matrix.os == 'Windows'
       run: |
         echo|set /p="C:\Program Files\Git\bin" | more /P >> %GITHUB_PATH%
+        echo|set /p="CONDA=C:\Windows\ServiceProfiles\NetworkService\miniconda3" | more /P >> %GITHUB_ENV%
       shell: cmd
     - id: reqs
       name: set requirements
@@ -25,6 +26,7 @@ jobs:
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
         sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+      shell: bash
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

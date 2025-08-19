@@ -19,6 +19,7 @@ jobs:
       name: Setup Windows
       run: |
         echo|set /p="C:\Program Files\Git\bin" | more /P >> %GITHUB_PATH%
+        echo|set /p="C:\Program Files\NVIDIA Corporation\NVSMI" | more /P >> %GITHUB_PATH%
         echo|set /p="CONDA=C:\Windows\ServiceProfiles\NetworkService\miniconda3" | more /P >> %GITHUB_ENV%
       shell: cmd
     - id: reqs

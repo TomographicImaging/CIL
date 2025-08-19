@@ -50,9 +50,10 @@ jobs:
       name: Post Run conda-incubator/setup-miniconda@v3
       run: |
         if test ${{ matrix.os }} = Linux; then
-          sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
-          source ~/.profile
-          conda env remove -n "${{ steps.reqs.outputs.envname }}"
+          _profile=~/.profile
         else
-          rm -rf $CONDA/envs/"${{ steps.reqs.outputs.envname }}"
+          _profile=~/.bash_profile
         fi
+        sed -i '/${{ steps.reqs.outputs.envname }}/d' $_profile
+        source $_profile
+        conda remove -n "${{ steps.reqs.outputs.envname }}" --all -C --offline

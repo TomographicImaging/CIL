@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
     - if: matrix.os == 'Windows'
+      name: Setup Windows
       run: |
         echo|set /p="C:\Program Files\Git\bin" | more /P >> %GITHUB_PATH%
         echo|set /p="CONDA=C:\Windows\ServiceProfiles\NetworkService\miniconda3" | more /P >> %GITHUB_ENV%
@@ -47,6 +48,8 @@ jobs:
     - if: always()
       name: Post Run conda-incubator/setup-miniconda@v3
       run: |
-        sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
-        source ~/.profile
+        if test -f ~/.profile; then
+          sed -i '/${{ steps.reqs.outputs.envname }}/d' ~/.profile
+          source ~/.profile
+        fi
         conda env remove -n "${{ steps.reqs.outputs.envname }}"

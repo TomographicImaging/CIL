@@ -11,7 +11,6 @@ build:
 
 test:
   requires:
-    - python
     - pip
     - python-wget
     - cvxpy                   # [linux]
@@ -20,7 +19,7 @@ test:
     - tigre 2.6
     - packaging
     - ccpi-regulariser 24.0.1 # [not osx]
-    - astra-toolbox 2.1 cuda* # [not osx]
+    - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
 
@@ -30,6 +29,8 @@ test:
   commands:
     - pip install unittest-parametrize
     - python -m unittest discover -v -s Wrappers/Python/test
+
+{% set ipp_version = '2021.12' %}
 
 requirements:
   build:
@@ -42,14 +43,14 @@ requirements:
     - llvm-openmp  # [osx]
     - ipp-include {{ ipp_version }}
     - ipp-devel {{ ipp_version }}
-    - python >=3.10,<3.13
+    - python x.x
     - pip
     - setuptools >=64
     - setuptools_scm >=8
     - scikit-build-core >=0.10
 
   run:
-    - python
+    - {{ pin_compatible('python', min_pin='x.x') }}
     - ipp {{ ipp_version }}
     - numpy >=1.23,<2
     - scipy >=1.4

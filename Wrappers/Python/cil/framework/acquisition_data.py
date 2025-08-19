@@ -164,7 +164,7 @@ class AcquisitionData(DataContainer, Partitioner):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new)
         
     
     def get_slice(self, *args, **kwargs):

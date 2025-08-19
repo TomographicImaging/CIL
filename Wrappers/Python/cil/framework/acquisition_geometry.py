@@ -2321,7 +2321,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Creates the AcquisitionGeometry for a cone beam 2D tomographic system.
 
         After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
-        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
 
         See notes for default directions.
 
@@ -2364,7 +2364,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Creates the AcquisitionGeometry for a parallel beam 3D tomographic system.
 
         After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
-        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
 
         Parameters
         ----------
@@ -2413,7 +2413,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Creates the AcquisitionGeometry for a cone beam 3D tomographic system.
 
         After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method and the angles must be set using the `set_angles()` method.
-        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
 
         Parameters
         ----------
@@ -2460,7 +2460,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.
 
         After creating the AcquisitionGeometry object, the panel must be set using the `set_panel()` method.
-        In addition,`set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
+        In addition, `set_channels()` can be used to set the number of channels and their labels. `set_labels()` can be used to set the order of the dimensions describing the data.
 
         Parameters
         ----------

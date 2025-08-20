@@ -42,6 +42,7 @@ jobs:
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
+        python -c "import astra; astra.test_CUDA()"
         python -m unittest discover -v -k tigre -k TIGRE -k astra -k ASTRA -k Astra -k gpu -k GPU ./Wrappers/Python/test
       env:
         TESTS_FORCE_GPU: 1

@@ -18,7 +18,10 @@
 
 from cil.recon import Reconstructor
 from cil.plugins.tigre import CIL2TIGREGeometry
-import tigre.algorithms as algs
+try:
+    import tigre.algorithms as algs
+except ImportError:
+    raise ImportError("TIGRE is not installed. Please install it to use this module.")
 from cil.framework import ImageData
 import logging
 import numpy as np

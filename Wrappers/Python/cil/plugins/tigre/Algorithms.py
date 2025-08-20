@@ -17,9 +17,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.recon import Reconstructor
-from cil.plugins.tigre import CIL2TIGREGeometry
 try:
     import tigre.algorithms as algs
+    from cil.plugins.tigre import CIL2TIGREGeometry
 except ImportError:
     raise ImportError("TIGRE is not installed. Please install it to use this module.")
 from cil.framework import ImageData

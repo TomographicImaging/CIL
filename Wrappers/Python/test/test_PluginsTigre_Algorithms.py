@@ -17,7 +17,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import unittest
 from utils import has_tigre, has_nvidia, initialise_tests
-from cil.plugins.tigre import tigre_algo_wrapper, ProjectionOperator
 
 from cil.utilities.dataexample import (
     SIMULATED_PARALLEL_BEAM_DATA,
@@ -37,9 +36,9 @@ import warnings
     
 from testclass import CCPiTestClass
 
-
-from tigre.utilities.gpu import GpuIds
-
+if has_tigre:
+    from tigre.utilities.gpu import GpuIds
+    from cil.plugins.tigre import tigre_algo_wrapper
 
 class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase):
 

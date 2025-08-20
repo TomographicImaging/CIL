@@ -102,8 +102,7 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         if qual is not None:
             self.assertTrue(isinstance(qual, (float, int, np.ndarray)))
 
-    @unittest.skipUnless(has_tigre, "Requires TIGRE")
-    @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
+    
     @parametrize(
         ("name", "kwargs", "expect_warning", "geometry_type"),
         [
@@ -127,6 +126,8 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
             ("ossart_tv", {"tvlambda": 0.005}, True, "parallel_2d"),
         ]
     )
+    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
     def test_tigre_algorithms_with_geometries(self, name, kwargs, expect_warning, geometry_type):
         ig, absorption, _ = self.get_geometry_data(geometry_type)
         

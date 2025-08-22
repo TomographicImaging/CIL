@@ -38,7 +38,7 @@ from testclass import CCPiTestClass
 
 if has_tigre:
     from tigre.utilities.gpu import GpuIds
-    from cil.plugins.tigre import tigre_algo_wrapper
+    from cil.plugins.tigre import ProjectionOperator, tigre_algo_wrapper
 
 class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase):
 

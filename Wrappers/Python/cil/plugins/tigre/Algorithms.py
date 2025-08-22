@@ -36,6 +36,7 @@ try:
 except ModuleNotFoundError:
     has_gpu_sel = False
     
+import weakref
     
 class tigre_algo_wrapper(Reconstructor):
 
@@ -112,10 +113,10 @@ class tigre_algo_wrapper(Reconstructor):
             initial = image_geometry.allocate(0)
 
         self.tigre_initial = initial.copy().as_array()
-        self.ig = image_geometry
+        ig = image_geometry
         ag = data.geometry
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
-            self.ig, ag)
+            ig, ag)
         self.tigre_geom.check_geo(self.tigre_angles)
         self.tigre_projections = data.as_array()
         
@@ -141,11 +142,30 @@ class tigre_algo_wrapper(Reconstructor):
                 self.gpuids =  GpuIds()
             log.info("Using GPU ids:", self.gpuids)
             
+        self._input = None  
 
-        super(tigre_algo_wrapper, self).__init__(data, image_geometry=self.ig, backend='tigre')
+        super(tigre_algo_wrapper, self).__init__(data, image_geometry=ig, backend='tigre')
 
         log.info("%s configured", self.__class__.__name__)
 
+    def set_input(self, input):
+        """
+        When called by the parent class during initialisation, sets the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.
+        When called after initialisation, raises NotImplementedError as changing the input is not currently supported.
+        Parameters
+        ----------
+        input : AcquisitionData
+            A dataset with a compatible geometry
+        """
+        if self._input is None:
+            if input.geometry != self.acquisition_geometry:
+                raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
+            else:
+                self._input = weakref.ref(input)
+                
+        else:
+            raise NotImplementedError("Setting the input after initialisation is not currently supported.")
+    
     def run(self, out=None):
         """
         Run the specified TIGRE algorithm with the provided parameters.
@@ -190,7 +210,7 @@ class tigre_algo_wrapper(Reconstructor):
         quality = result[1] if len(result) > 1 else None
 
         if out is None:
-            out = self.ig.allocate(0)
+            out = self._image_geometry.allocate(0)
 
         out.fill(img)
 

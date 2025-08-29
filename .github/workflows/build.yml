@@ -66,10 +66,8 @@ jobs:
     strategy:
       matrix:
         include:
-        - python-version: '3.10'
-          numpy-version: 1.23
-        - python-version: 3.12
-          numpy-version: 1.26
+        - {python-version: '3.10', numpy-version: 1.23}
+        - {python-version: 3.12, numpy-version: 1.26}
     steps:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
@@ -88,69 +86,119 @@ jobs:
     outputs:
       python-version: ${{ steps.matrix.outputs.python-version }}
       numpy-version: ${{ steps.matrix.outputs.numpy-version }}
+      os: ${{ steps.matrix.outputs.os }}
+      include: ${{ steps.matrix.outputs.include }}
+      include-numpy: ${{ steps.matrix.outputs.include-numpy }}
     steps:
     - id: matrix
       run: |
-        if ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags') || github.event_name == 'workflow_dispatch' }}; then
+        if ${{ startsWith(github.ref, 'refs/tags') || github.event_name == 'workflow_dispatch' }}; then
           echo "python-version=['3.10', 3.11]" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23, 1.24, 1.25, 1.26]" >> $GITHUB_OUTPUT
+          echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
+          include_max=true
         else
           echo "python-version=['3.10']" >> $GITHUB_OUTPUT
           echo "numpy-version=[1.23]" >> $GITHUB_OUTPUT
+          if ${{ github.ref == 'refs/heads/master' }}; then
+            echo "os=['ubuntu', 'windows']" >> $GITHUB_OUTPUT
+            include_max=true
+          else
+            echo "os=['ubuntu']" >> $GITHUB_OUTPUT
+            include_max=false
+          fi
         fi
-  conda:
+        if $include_max; then
+          echo "include=[{'python-version': 3.12, 'os': 'ubuntu'}, {'python-version': 3.12, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+          echo "include-numpy=[{'python-version': 3.12, 'numpy-version': 1.26, 'os': 'ubuntu'}, {'python-version': 3.12, 'numpy-version': 1.26, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+        else
+          echo "include=[]" >> $GITHUB_OUTPUT
+          echo "include-numpy=[]" >> $GITHUB_OUTPUT
+        fi
+  conda-build:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
     needs: conda-matrix
     strategy:
       matrix:
         python-version: ${{ fromJson(needs.conda-matrix.outputs.python-version) }}
-        numpy-version: ${{ fromJson(needs.conda-matrix.outputs.numpy-version) }}
-        include:
-        - python-version: 3.12
-          numpy-version: 1.26
+        os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
+        include: ${{ fromJson(needs.conda-matrix.outputs.include) }}
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
+    - if: matrix.os == 'windows'
+      uses: ilammy/msvc-dev-cmd@v1
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa anaconda-client
-    - name: conda build & test
-      working-directory: recipe
-      run: |
-        conda mambabuild . -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} --numpy=${{ matrix.numpy-version }} --output-folder .
+    - run: conda install boa conda-verify
+    - name: conda build
+      run: >
+        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
+        --no-test --output-folder dist recipe
     - uses: actions/upload-artifact@v4
       with:
-        name: cil-package-py${{ matrix.python-version }}-np${{ matrix.numpy-version }}
-        path: recipe/linux-64/cil*
-    - name: anaconda upload -c ccpi
-      if: >
-        (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) && matrix.numpy-version == '1.26'
-      run: |
-        anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} recipe/linux-64/cil*
-    - name: conda upload -c tomography.stfc.ac.uk/conda
-      if: startsWith(github.ref, 'refs/tags')
-      run: |
-        echo '${{ secrets.STFC_SSH_KEY }}' > ./key
-        chmod 600 ./key
-        rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -P recipe/linux-64/cil* \
-          '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}/linux-64/'
-  conda-reindex:
-    if: startsWith(github.ref, 'refs/tags')
-    needs: conda
-    runs-on: ubuntu-22.04
+        name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
+        path: dist/*/cil-*.tar.bz2
+  conda-test:
+    defaults: {run: {shell: 'bash -el {0}'}}
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
+    needs: [conda-matrix, conda-build]
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(needs.conda-matrix.outputs.python-version) }}
+        numpy-version: ${{ fromJson(needs.conda-matrix.outputs.numpy-version) }}
+        os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
+        include: ${{ fromJson(needs.conda-matrix.outputs.include-numpy) }}
     steps:
-    - name: conda index tomography.stfc.ac.uk/conda
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        mamba-version: "*"
+        channels: conda-forge
+        conda-remove-defaults: "true"
+    - run: conda install boa
+    - uses: actions/download-artifact@v4
+      with:
+        name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
+        path: dist
+    - name: conda test
+      run: >
+        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
+        --test dist/*/cil-*.tar.bz2 --extra-deps numpy=${{ matrix.numpy-version }}
+  conda-upload:
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
+    defaults: {run: {shell: 'bash -el {0}', working-directory: dist}}
+    runs-on: ubuntu-22.04
+    needs: conda-test
+    steps:
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        mamba-version: "*"
+        channels: conda-forge
+        conda-remove-defaults: "true"
+    - uses: actions/download-artifact@v4
+      with: {pattern: cil-py*-*, path: dist, merge-multiple: true}
+    - run: conda install anaconda-client
+    - name: anaconda upload -c ccpi
+      run: >
+        anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force
+        --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} */cil-*.tar.bz2
+    - if: startsWith(github.ref, 'refs/tags')
+      name: conda upload -c tomography.stfc.ac.uk/conda
       run: |
         echo '${{ secrets.STFC_SSH_KEY }}' > ./key
         chmod 600 ./key
+        rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -R */cil-*.tar.bz2 '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}'
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
           'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
@@ -256,6 +304,6 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
   pass:
-    needs: [test-cuda, test, conda, docs, docker]
+    needs: [test-cuda, test, conda-test, docs, docker]
     runs-on: ubuntu-22.04
     steps: [{run: echo success}]

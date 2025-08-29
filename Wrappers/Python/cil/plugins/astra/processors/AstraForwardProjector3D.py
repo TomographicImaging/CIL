@@ -114,7 +114,7 @@ class AstraForwardProjector3D(DataProcessor):
         arr_out = np.squeeze(arr_out)
 
         if out is None:
-            out = AcquisitionData(arr_out, deep_copy=False, geometry=self.sinogram_geometry.copy(), suppress_warning=True)
+            out = AcquisitionData(arr_out, deep_copy=False, geometry=self.sinogram_geometry.copy())
         else:
             out.fill(arr_out)
         return out

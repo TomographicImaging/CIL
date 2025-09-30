@@ -1,4 +1,6 @@
-* XX.X.X
+* M.m.p
+  - Added support for numpy 2
+  - Added support for python 3.13
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
 

@@ -18,7 +18,8 @@
 
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.functions import ZeroFunction, ScaledFunction, SGFunction, SVRGFunction, LSVRGFunction, SAGAFunction, SAGFunction, ApproximateGradientSumFunction
+from cil.optimisation.functions import ZeroFunction, ScaledFunction, SVRGFunction, LSVRGFunction, ApproximateGradientSumFunction
+from cil.utilities import dtype_like
 import logging
 import warnings
 
@@ -80,7 +81,7 @@ class FunctionWrappingForPD3O():
 
     def __call__(self, x):
         res = self.f(x)
-        return res.dtype.type(self.scalar) * res
+        return dtype_like(self.scalar, res) * res
 
     @property
     def L(self):

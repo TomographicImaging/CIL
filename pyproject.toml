@@ -75,7 +75,7 @@ plugins = [
     #"tomophantom==2.0.0", # [linux] # missing from PyPI
 ]
 gpu = [
-    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
+    "astra-toolbox>=1.9.9.dev5,<=2.4", # [not osx]
     #"tigre>=2.4,<=2.6", # missing from PyPI
 ]
 [dependency-groups]

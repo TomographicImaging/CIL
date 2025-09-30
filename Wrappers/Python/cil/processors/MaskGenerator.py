@@ -197,13 +197,13 @@ class MaskGenerator(DataProcessor):
                                 "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
         return True
-    
+
     def check_output(self, out):
         if out is not None:
             if out.array.dtype != bool:
                 raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(out.array.dtype, bool))
-        
+
         return True
 
 
@@ -286,7 +286,7 @@ class MaskGenerator(DataProcessor):
             # if global mean
             else:
 
-                 mask[numpy.abs(arr - numpy.mean(arr)) > self.threshold_factor * numpy.std(arr)] = 0
+                 mask[numpy.abs(arr - numpy.mean(arr)) > arr.dtype.type(self.threshold_factor) * numpy.std(arr)] = 0
 
         elif self.mode == 'median':
 
@@ -308,13 +308,13 @@ class MaskGenerator(DataProcessor):
 
                 tmp = numpy.abs(arr - numpy.tile((numpy.median(arr, axis=axis_index))[slice_obj], tile_par))
                 median_absolute_dev = numpy.tile((numpy.median(tmp, axis=axis_index))[slice_obj], tile_par)
-                mask[tmp > self.threshold_factor * c * median_absolute_dev] = 0
+                mask[tmp > arr.dtype.type(self.threshold_factor * c) * median_absolute_dev] = 0
 
             # if global median
             else:
 
                 tmp = numpy.abs(arr - numpy.median(arr))
-                mask[tmp > self.threshold_factor * c * numpy.median(tmp)] = 0
+                mask[tmp > arr.dtype.type(self.threshold_factor * c) * numpy.median(tmp)] = 0
 
         elif self.mode == 'movmean':
 
@@ -327,14 +327,14 @@ class MaskGenerator(DataProcessor):
                 mean_array = ndimage.generic_filter(arr, numpy.mean, size=kernel, mode='reflect')
                 std_array = ndimage.generic_filter(arr, numpy.std, size=kernel, mode='reflect')
 
-                mask[numpy.abs(arr - mean_array) > self.threshold_factor * std_array] = 0
+                mask[numpy.abs(arr - mean_array) > arr.dtype.type(self.threshold_factor) * std_array] = 0
 
             # if global movmean
             else:
                 mean_array = ndimage.generic_filter(arr, numpy.mean, size=(self.window,)*ndim, mode='reflect')
                 std_array = ndimage.generic_filter(arr, numpy.std, size=(self.window,)*ndim, mode='reflect')
 
-                mask[numpy.abs(arr - mean_array) > self.threshold_factor * std_array] = 0
+                mask[numpy.abs(arr - mean_array) > arr.dtype.type(self.threshold_factor) * std_array] = 0
 
         elif self.mode == 'movmedian':
 
@@ -356,7 +356,7 @@ class MaskGenerator(DataProcessor):
                 median_array = ndimage.median_filter(arr, footprint=kernel_shape, mode='reflect')
 
                 tmp = abs(arr - median_array)
-                mask[tmp > self.threshold_factor * c * ndimage.median_filter(tmp, footprint=kernel_shape, mode='reflect')] = 0
+                mask[tmp > arr.dtype.type(self.threshold_factor * c) * ndimage.median_filter(tmp, footprint=kernel_shape, mode='reflect')] = 0
 
             # if global movmedian
             else:
@@ -365,7 +365,7 @@ class MaskGenerator(DataProcessor):
                 median_array = ndimage.median_filter(arr, size=kernel_shape, mode='reflect')
 
                 tmp = abs(arr - median_array)
-                mask[tmp > self.threshold_factor * c * ndimage.median_filter(tmp, size=kernel_shape, mode='reflect')] = 0
+                mask[tmp > arr.dtype.type(self.threshold_factor * c) * ndimage.median_filter(tmp, size=kernel_shape, mode='reflect')] = 0
 
         else:
             raise ValueError('Mode not recognised. One of the following is expected: ' + \
@@ -381,7 +381,7 @@ class MaskGenerator(DataProcessor):
             out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=geometry, dimension_labels=data.dimension_labels)
         else:
             out.fill(mask)
-        
+
         return out
 
     def _parse_threshold_value(self, arr, quantile=False):

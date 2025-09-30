@@ -9,6 +9,7 @@
     - improve `tqdm` notebook support (#2241)
     - Added support for numpy 2
     - Added support for python 3.13
+    - Added support for astra-toolbox 2.4
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
 

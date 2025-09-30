@@ -19,7 +19,7 @@ test:
     - tigre 2.6
     - packaging
     - ccpi-regulariser 24.0.1 # [not osx]
-    - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
+    - astra-toolbox >=2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
     - dxchange

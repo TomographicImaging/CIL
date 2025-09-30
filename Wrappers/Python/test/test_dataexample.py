@@ -153,6 +153,7 @@ class TestTestData(CCPiTestClass):
 
         self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
 
+@unittest.skipUnless(has_zenodo_get, "zenodo_get not installed")
 class TestRemoteData(unittest.TestCase):
 
     def setUp(self):

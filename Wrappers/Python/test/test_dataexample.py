@@ -169,7 +169,6 @@ class TestRemoteData(unittest.TestCase):
             
     @patch('cil.utilities.dataexample.input', return_value='y')
     @patch('zenodo_get.zenodo_get', side_effect=mock_zenodo_get)
-    @unittest.skipUnless(has_zenodo_get, "zenodo_get not installed")
     def test_download_data_input_y(self, mock_zenodo_get, input):
         '''
         Test the download_data function, when the user input is 'y' to 'are you sure you want to download data'

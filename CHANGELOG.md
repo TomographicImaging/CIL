@@ -1,6 +1,7 @@
 * M.m.p
   - Added support for numpy 2
   - Added support for python 3.13
+  - Added support for astra-toolbox 2.4
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
 

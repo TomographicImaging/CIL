@@ -31,8 +31,8 @@ While building the CIL package we test with specific versions of dependencies. T
 
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|
-| [Python](https://www.python.org/) | 3.10 - 3.12 | `"python>=3.10,<=3.12"` || [PSF-2.0](https://docs.python.org/3/license.html) |
-| [Numpy](https://github.com/numpy/numpy) | 1.23 - 1.26 | `"numpy>=1.23,<2"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
+| [Python](https://www.python.org/) | 3.10 - 3.13 | `"python>=3.10,<=3.13"` || [PSF-2.0](https://docs.python.org/3/license.html) |
+| [Numpy](https://github.com/numpy/numpy) | 1.23 - 2.3 | `"numpy>=1.23,<=2.3"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
 | [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
 | [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 | CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
@@ -43,7 +43,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
 |[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
 
-We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above:
 
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml

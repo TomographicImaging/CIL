@@ -7,6 +7,8 @@
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - improve `tqdm` notebook support (#2241)
+    - Added support for numpy 2
+    - Added support for python 3.13
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
 

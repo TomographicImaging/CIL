@@ -54,7 +54,7 @@ requirements:
   run:
     - {{ pin_compatible('python', min_pin='x.x') }}
     - ipp {{ ipp_version }}
-    - numpy >=1.23,<2
+    - numpy >=1.23,<3
     - scipy >=1.4
     - h5py
     - pillow

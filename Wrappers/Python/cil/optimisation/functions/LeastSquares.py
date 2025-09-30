@@ -18,7 +18,7 @@
 
 from cil.optimisation.operators import LinearOperator, DiagonalOperator
 from cil.optimisation.functions import Function
-from cil.framework import DataContainer
+from cil.utilities import dtype_like
 import warnings
 from numbers import Number
 import numpy as np
@@ -75,10 +75,10 @@ class LeastSquares(Function):
         y.subtract(self.b, out = y)
 
         if self.weight is None:
-            return y.dtype.type(self.c) * y.dot(y)
+            return dtype_like(self.c, y) * y.dot(y)
         else:
             wy = self.weight.multiply(y)
-            return y.dtype.type(self.c) * y.dot(wy)
+            return dtype_like(self.c, y) * y.dot(wy)
 
     def gradient(self, x, out=None):
 

@@ -16,13 +16,10 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import warnings
-
 from numbers import Number
 import numpy as np
-from functools import reduce
 from cil.utilities.errors import InPlaceError
+from cil.utilities import dtype_like
 
 
 class Function(object):
@@ -436,7 +433,7 @@ class ScaledFunction(Function):
         DataContainer, the value of the scaled function.
         """
         res = self.function(x)
-        return res.dtype.type(self.scalar) * res
+        return dtype_like(self.scalar, res) * res
 
     def convex_conjugate(self, x):
         r"""Returns the convex conjugate of the scaled function.
@@ -463,7 +460,7 @@ class ScaledFunction(Function):
         if id(tmp) == id(x):
             x.multiply(self.scalar, out=x)
 
-        return val.dtype.type(self.scalar) * val
+        return dtype_like(self.scalar, val) * val
 
     def gradient(self, x, out=None):
         r"""Returns the gradient of the scaled function evaluated at :math:`x`.

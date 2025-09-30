@@ -75,10 +75,10 @@ class LeastSquares(Function):
         y.subtract(self.b, out = y)
 
         if self.weight is None:
-            return self.c * y.dot(y)
+            return y.dtype.type(self.c) * y.dot(y)
         else:
             wy = self.weight.multiply(y)
-            return self.c * y.dot(wy)
+            return y.dtype.type(self.c) * y.dot(wy)
 
     def gradient(self, x, out=None):
 
@@ -121,11 +121,11 @@ class LeastSquares(Function):
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
-            self._L = 2.0 * np.abs(self.c) * (self.A.norm()**2)
+            self._L = 2 * np.abs(self.c) * (self.A.norm()**2)
         except AttributeError as ae:
             if self.A.is_linear():
                 Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self._L = 2.0 * np.abs(self.c) * (Anorm*Anorm)
+                self._L = 2 * np.abs(self.c) * (Anorm*Anorm)
             else:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))

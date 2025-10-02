@@ -174,25 +174,30 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
-        Returns a new ImageGeometry of a single slice of in the requested direction.
+        Returns a new ImageGeometry of a single slice in the requested direction.
         '''
+
         geometry_new = self.copy()
         if channel is not None:
-            geometry_new.channels = 1
-
-            try:
-                geometry_new.channel_labels = [self.channel_labels[channel]]
-            except:
-                geometry_new.channel_labels = None
+            raise NotImplementedError("Slicing over channels not implemented for ImageGeometry")
 
         if vertical is not None:
-            geometry_new.voxel_num_z = 0
+            geometry_new.voxel_num_z = 1
+            if vertical != 'centre':
+                voxel_offset = (self.voxel_num_z)/2 - (vertical+0.5)
+                geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
 
         if horizontal_y is not None:
-            geometry_new.voxel_num_y = 0
+            geometry_new.voxel_num_y = 1
+            if horizontal_y != 'centre':
+                voxel_offset = (self.voxel_num_y)/2 - (horizontal_y +0.5)
+                geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
 
         if horizontal_x is not None:
-            geometry_new.voxel_num_x = 0
+            geometry_new.voxel_num_x = 1
+            if horizontal_x != 'centre':
+                voxel_offset = (self.voxel_num_x)/2 - (horizontal_x+0.5)
+                geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
 
         return geometry_new
 

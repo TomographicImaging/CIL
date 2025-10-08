@@ -1680,7 +1680,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
-        corr = CentreOfRotationCorrector.image_sharpness(search_range=10, backend='tigre')
+        corr = CentreOfRotationCorrector.image_sharpness(search_range=20, backend='tigre')
         corr.set_input(self.data_DLS)
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)

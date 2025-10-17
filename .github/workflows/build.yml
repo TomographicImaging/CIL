@@ -149,7 +149,7 @@ jobs:
         path: dist/*/cil-*.tar.bz2
   conda-test:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || '2022' }}
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
     needs: [conda-matrix, conda-build]
     strategy:
       matrix:

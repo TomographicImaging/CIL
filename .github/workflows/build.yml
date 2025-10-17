@@ -133,7 +133,7 @@ jobs:
     - if: matrix.os == 'windows'
       uses: ilammy/msvc-dev-cmd@v1
       with:
-        sdk: 20250825.1.0
+        sdk: 10.0.20348
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

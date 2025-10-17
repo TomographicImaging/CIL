@@ -132,6 +132,8 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - if: matrix.os == 'windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        sdk: 20250825.1.0
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}

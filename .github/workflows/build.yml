@@ -117,7 +117,7 @@ jobs:
         fi
   conda-build:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || '2022' }}
     needs: conda-matrix
     strategy:
       matrix:

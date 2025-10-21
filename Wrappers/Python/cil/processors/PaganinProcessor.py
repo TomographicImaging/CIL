@@ -246,7 +246,6 @@ class PaganinProcessor(Processor):
         
         # pre-calculate the scaling factor
         scaling_factor = -(1/self.mu)
-        mag2 = self.magnification ** 2
         
         # loop over the channels
         for j in range(data.geometry.channels):
@@ -257,7 +256,6 @@ class PaganinProcessor(Processor):
 
                 if self.full_retrieval==True:
                     # apply the filter in fourier space, apply log and scale
-                    padded_buffer*=mag2
                     fI = fft2(padded_buffer)
                     iffI = ifft2(fI*self.filter).real
                     np.log(iffI, out=padded_buffer)
@@ -469,13 +467,16 @@ class PaganinProcessor(Processor):
             self.alpha = override_filter['alpha']
         else:
             self._calculate_alpha()
+            
+            
+        pixel_size_dmag = self.pixel_size/self.magnification
 
         # create the Fourier mesh
         kx,ky = np.meshgrid(
             np.arange(-self.filter_Nx/2, self.filter_Nx/2, 1, dtype=np.float64)
-            * (2*np.pi)/(self.filter_Nx*self.pixel_size),
+            * (2*np.pi)/(self.filter_Nx*pixel_size_dmag),
             np.arange(-self.filter_Ny/2, self.filter_Ny/2, 1, dtype=np.float64)
-            * (2*np.pi)/(self.filter_Ny*self.pixel_size),
+            * (2*np.pi)/(self.filter_Ny*pixel_size_dmag),
             sparse=False,
             indexing='ij'
             )
@@ -484,9 +485,9 @@ class PaganinProcessor(Processor):
         if self.filter_type == 'paganin_method':
             self.filter =  ifftshift(1/(1. + self.alpha*(kx**2 + ky**2)))
         elif self.filter_type == 'generalised_paganin_method':
-            self.filter =  ifftshift(1/(1. - (2*self.alpha/self.pixel_size**2)
-                                        *(np.cos(self.pixel_size*kx)
-                                          + np.cos(self.pixel_size*ky) -2)))
+            self.filter =  ifftshift(1/(1. - (2*self.alpha/pixel_size_dmag**2)
+                                        *(np.cos(pixel_size_dmag*kx)
+                                          + np.cos(pixel_size_dmag*ky) -2)))
         else:
             raise ValueError("filter_type not recognised: got {0} expected one\
                               of 'paganin_method' or \
@@ -504,7 +505,7 @@ class PaganinProcessor(Processor):
         Function to calculate alpha, a constant defining the Paganin filter
         strength
         '''
-        self.alpha = self.propagation_distance*self.delta/self.mu
+        self.alpha = self.propagation_distance*self.delta/self.mu/self.magnification
 
     def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''

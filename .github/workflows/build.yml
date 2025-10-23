@@ -146,7 +146,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
-        path: dist/*/cil-*.tar.bz2
+        path: dist/*/cil-*
   conda-test:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
@@ -173,7 +173,7 @@ jobs:
     - name: conda test
       run: >
         conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
-        --test dist/*/cil-*.tar.bz2 --extra-deps numpy=${{ matrix.numpy-version }}
+        --test dist/*/cil-* --extra-deps numpy=${{ matrix.numpy-version }}
   conda-upload:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
     defaults: {run: {shell: 'bash -el {0}', working-directory: dist}}
@@ -192,13 +192,13 @@ jobs:
     - name: anaconda upload -c ccpi
       run: >
         anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force
-        --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} */cil-*.tar.bz2
+        --label ${{ startsWith(github.ref, 'refs/tags') && 'main' || 'dev' }} */cil-*
     - if: startsWith(github.ref, 'refs/tags')
       name: conda upload -c tomography.stfc.ac.uk/conda
       run: |
         echo '${{ secrets.STFC_SSH_KEY }}' > ./key
         chmod 600 ./key
-        rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -R */cil-*.tar.bz2 '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}'
+        rsync -e 'ssh -o StrictHostKeyChecking=no -i ./key' -R */cil-* '${{ secrets.STFC_SSH_HOST }}:${{ secrets.STFC_SSH_CONDA_DIR }}'
         ssh -o StrictHostKeyChecking=no -i ./key ${{ secrets.STFC_SSH_HOST }} \
           'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:

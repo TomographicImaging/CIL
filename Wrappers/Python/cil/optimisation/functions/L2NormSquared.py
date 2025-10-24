@@ -179,11 +179,7 @@ class WeightedL2NormSquared(Function):
 
     def convex_conjugate(self, x):
         r"""Returns the value of the convex conjugate of the WeightedL2NormSquared function at x."""
-        tmp = 0
-        if self.b is not None:
-            tmp = x.dot(self.b)
-
-        return (1./4) * (x/self.weight.sqrt()).squared_norm() + tmp
+        return 0.25 * (x/self.weight.sqrt()).squared_norm() + (x.dot(self.b) if self.b is not None else 0)
 
     def proximal(self, x, tau, out=None):
         r"""Returns the value of the proximal operator of the WeightedL2NormSquared function at x."""

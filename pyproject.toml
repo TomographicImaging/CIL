@@ -62,7 +62,7 @@ dependencies = [
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
-    "numpy>=1.23, <2.0.0",
+    "numpy>=1.23,<3",
     "olefile>=0.46",
     "pillow",
     "pywavelets",
@@ -80,7 +80,7 @@ gpu = [
 ]
 [dependency-groups]
 test = [
-    #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
+    #"ccpi-regulariser=25.0.0", # [not osx] # missing from PyPI
     "cvxpy",
     "matplotlib-base>=3.3",
     "packaging",

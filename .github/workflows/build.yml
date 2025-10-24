@@ -138,7 +138,7 @@ jobs:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa conda-verify
+    - run: mamba install boa conda-verify
     - name: conda build
       run: >
         conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
@@ -165,7 +165,7 @@ jobs:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa
+    - run: mamba install boa
     - uses: actions/download-artifact@v4
       with:
         name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
@@ -188,7 +188,7 @@ jobs:
         conda-remove-defaults: "true"
     - uses: actions/download-artifact@v4
       with: {pattern: cil-py*-*, path: dist, merge-multiple: true}
-    - run: conda install anaconda-client
+    - run: mamba install anaconda-client
     - name: anaconda upload -c ccpi
       run: >
         anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force
@@ -211,7 +211,11 @@ jobs:
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
-      with: {python-version: 3.11}
+      with:
+        python-version: 3.12
+        mamba-version: "*"
+        channels: conda-forge
+        conda-remove-defaults: "true"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
@@ -219,9 +223,9 @@ jobs:
         cache-version: 0
     - name: install dependencies
       run: |
-        conda install -c conda-forge -yq conda-merge
+        mamba install -c conda-forge -yq conda-merge
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
-        conda env update -n test
+        mamba env update -n test --file environment.yml
         conda list
     - run: pip install ..
     - name: checkout docs

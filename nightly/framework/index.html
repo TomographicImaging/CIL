@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 25.0.1.dev5+ga0c520477 documentation</title>
+    <title>Framework &#8212; CIL 25.0.1.dev6+ge07c16652 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=94b85a9962aff05bf6f7" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=94b85a9962aff05bf6f7" />
 
-    <script src="../_static/documentation_options.js?v=245b4caf"></script>
+    <script src="../_static/documentation_options.js?v=9ac3e8c3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev5+ga0c520477';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev6+ge07c16652';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev5+ga0c520477" />
+  <meta name="docsearch:version" content="25.0.1.dev6+ge07c16652" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -2744,7 +2744,7 @@ generator will not be seeded.</p></li>
 <p>Classes which define the accepted labels</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">ImageDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#ImageDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.ImageDimension" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">ImageDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#ImageDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.ImageDimension" title="Link to this definition">#</a></dt>
 <dd><p>Available dimension labels for image data.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">,</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">])</span>
@@ -2775,7 +2775,7 @@ generator will not be seeded.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension" title="Link to this definition">#</a></dt>
 <dd><p>Available dimension labels for acquisition data.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span>
@@ -2813,7 +2813,7 @@ generator will not be seeded.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.FillType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">FillType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#FillType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.FillType" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">FillType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#FillType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.FillType" title="Link to this definition">#</a></dt>
 <dd><p>Available fill types for image data.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.FillType.RANDOM">
@@ -2848,7 +2848,7 @@ generator will not be seeded.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AngleUnit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AngleUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AngleUnit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AngleUnit" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AngleUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AngleUnit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AngleUnit" title="Link to this definition">#</a></dt>
 <dd><p>Available units for angles.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angle_data</span><span class="p">,</span> <span class="n">angle_units</span><span class="o">=</span><span class="n">AngleUnit</span><span class="o">.</span><span class="n">DEGREE</span><span class="p">)</span>
@@ -2869,7 +2869,7 @@ generator will not be seeded.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionType" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionType" title="Link to this definition">#</a></dt>
 <dd><p>Available acquisition types &amp; dimensions.</p>
 <p>WARNING: It’s best to use strings rather than integers to initialise.
 &gt;&gt;&gt; AcquisitionType(3) == AcquisitionType(2 | 1) == AcquisitionType.CONE|PARALLEL != AcquisitionType(‘3D’)</p>

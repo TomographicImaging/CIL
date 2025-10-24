@@ -17,6 +17,7 @@
     - Update to TomoPhantom v3.0 (#2287)
     - Handle regularisation toolkit CPU only package error message (#2302)
     - Added support for numpy 2
+      - Update to CCPi-Regularisation toolkit 25.0.0
     - Added support for python 3.13
     - Added support for astra-toolbox 2.4
   - Documentation:

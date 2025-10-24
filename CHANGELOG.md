@@ -1,5 +1,6 @@
 * M.m.p
   - Added support for numpy 2
+    - Update to CCPi-Regularisation toolkit 25.0.0
   - Added support for python 3.13
   - Added support for astra-toolbox 2.4
   - Bug fixes:

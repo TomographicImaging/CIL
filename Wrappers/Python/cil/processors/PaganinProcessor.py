@@ -467,8 +467,8 @@ class PaganinProcessor(Processor):
             self.alpha = override_filter['alpha']
         else:
             self._calculate_alpha()
-            
-            
+           
+	# calculate pixel size at sample plane, used for defining fourier mesh
         pixel_size_dmag = self.pixel_size/self.magnification
 
         # create the Fourier mesh

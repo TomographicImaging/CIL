@@ -15,7 +15,7 @@ class VolumeShrinker(object):
     connected components.   
     """
 
-    def run(self, data, auto=True, threshold='Otsu', buffer=None, manual_limits=None):
+    def run(self, data, auto=True, threshold='Otsu', buffer=None, mask_radius=None, manual_limits=None):
         """
         Parameters
         ----------
@@ -30,6 +30,10 @@ class VolumeShrinker(object):
         buffer: float, optional
             Add a buffer around the automatically detected limits, expressed as 
             a percentage of the axis size.
+
+        mask_radius: float, optional
+            Radius of circular mask to apply on the reconstructed volume, before
+            automatically cropping the recontruction volume. Default is None.
 
         manual_limits : dict, optional
             The limits {'axis_name1':(min, max), 'axis_name2':(min, max)}
@@ -53,8 +57,9 @@ class VolumeShrinker(object):
 
         fbp = FBP(ig, ag)
         recon = fbp(data_binned)
-        recon.apply_circular_mask(0.9)
-
+        if mask_radius is not None:
+            recon.apply_circular_mask(mask_radius)
+            
         if auto:
             bounds = self.reduce_reconstruction_volume(recon, binning, threshold, buffer)
         else:

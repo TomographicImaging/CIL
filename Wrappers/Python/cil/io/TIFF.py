@@ -535,9 +535,9 @@ class TIFFStackReader(object):
 
     def _return_appropriate_data(self, data, geometry):
         if isinstance (geometry, ImageGeometry):
-            return ImageData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return ImageData(data, deep_copy=True, geometry=geometry.copy())
         elif isinstance (geometry, AcquisitionGeometry):
-            return AcquisitionData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return AcquisitionData(data, deep_copy=True, geometry=geometry.copy())
         else:
             raise TypeError("Unsupported Geometry type. Expected ImageGeometry or AcquisitionGeometry, got {}"\
                 .format(type(geometry)))

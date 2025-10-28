@@ -21,7 +21,7 @@ We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda
 Install a new minimal environment with CIL using:
 
 ```sh
-conda create --name cil -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=24.3.0
+conda create --name cil -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
 ```
 A number of additional dependencies are required for specific functionality in CIL, these should be added to your environment as necessary. See the dependency table below for details.
 
@@ -41,6 +41,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [2.0.0](https://github.com/dkazanc/TomoPhantom/releases/tag/v2.0.0) | `ccpi::tomophantom=2.0.0` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
 | [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
 | [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
+|[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
 
 We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
 

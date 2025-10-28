@@ -293,12 +293,9 @@ class CofR_image_sharpness(Processor):
             data_binned = new_geom.allocate()
 
             for i in range(data.shape[0]):
-                data_binned.fill(np.interp(sampling_points, initial_coordinates, data.array[i,:]),angle=i)
+                data_binned.fill(np.interp(sampling_points, initial_coordinates, data_temp.array[i,:]),angle=i)
 
-            #filter
-            data_binned_filtered = data_binned.copy()
-            data_binned_filtered.fill(scipy.ndimage.sobel(data_binned.as_array(), axis=1, mode='reflect', cval=0.0))
-            data_processed = data_binned_filtered
+            data_processed = data_binned
         else:
             data_processed = data_filtered
 
@@ -348,7 +345,7 @@ class CofR_image_sharpness(Processor):
         log.info("Return new dataset with centred geometry")
 
         if out is None:
-            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
+            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry)
         else:
             out.geometry = new_geometry
             return out

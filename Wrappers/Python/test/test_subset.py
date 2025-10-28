@@ -327,26 +327,26 @@ class TestSubset(unittest.TestCase):
         sub = self.ig.get_slice(vertical = 1)
         self.assertTrue( sub.shape == (2,5,3,1))
 
-        self.assertEqual(sub.voxel_centre_x,0)
-        self.assertEqual(sub.voxel_centre_y,0)
-        self.assertEqual(sub.voxel_centre_z,-0.5)
+        self.assertEqual(sub.center_x,0)
+        self.assertEqual(sub.center_y,0)
+        self.assertEqual(sub.center_z,-0.5)
 
     def test_ImageGeometrySubset2a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
         ImageDimension["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         sub = self.ig.get_slice(horizontal_x = 1)
-        self.assertTrue( sub.shape == (1, 5,3,4))
-        self.assertEqual(sub.voxel_centre_x,-0.5)
-        self.assertEqual(sub.voxel_centre_y,0)
-        self.assertEqual(sub.voxel_centre_z,0)
+        self.assertTrue(sub.shape == (1, 5,3,4))
+        self.assertEqual(sub.center_x,0.5)
+        self.assertEqual(sub.center_y,0)
+        self.assertEqual(sub.center_z,0)
 
     def test_ImageGeometrySubset3a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
         ImageDimension["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
-        with self.assertRaises(NotImplementedError):
-            self.ig.get_slice(channel = 1)
+        sub = self.ig.get_slice(channel = 1)
+        self.assertTrue(sub.shape == (2,1,3,4))
 
     def test_ImageGeometrySubset5a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"]]

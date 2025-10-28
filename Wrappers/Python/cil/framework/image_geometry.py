@@ -99,7 +99,7 @@ class ImageGeometry(metaclass=BackwardCompat):
         labels = list(labels)
 
         for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
+            if x == 0:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -166,7 +166,7 @@ class ImageGeometry(metaclass=BackwardCompat):
         self.center_y = center_y
         self.center_z = center_z
         self.channels = channels
-        self.channel_labels = None
+        self.channel_labels = None# check if None, single channel geom
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
         self.dtype = kwargs.get('dtype', numpy.float32)
@@ -175,11 +175,38 @@ class ImageGeometry(metaclass=BackwardCompat):
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
         Returns a new ImageGeometry of a single slice in the requested direction.
+
+        Parameters
+        ----------
+        channel : int, optional
+            The channel index to slice. Default is None (no slicing).
+        vertical : int or 'centre', optional
+            The vertical index to slice. Default is None (no slicing).
+        horizontal_x : int or 'centre', optional
+            The horizontal x index to slice. Default is None (no slicing).
+        horizontal_y : int or 'centre', optional
+            The horizontal y index to slice. Default is None (no slicing).
+        Returns
+        -------
+        geometry_new : ImageGeometry
+            A new ImageGeometry object representing the sliced geometry.
+
+        Note
+        ----
+        Slicing on vertical, horizontal_x or horizontal_y with 'centre' will return the
+        central slice in that dimension.
+        Slicing on channels returns a geometry with a single channel, however the channel label is not
+        typically stored in the geometry.
         '''
 
         geometry_new = self.copy()
         if channel is not None:
-            raise NotImplementedError("Slicing over channels not implemented for ImageGeometry")
+            geometry_new.channels = 1
+            try:
+                geometry_new.channel_labels = [self.channel_labels[channel]]
+            except:
+                geometry_new.channel_labels = None
+
 
         if vertical is not None:
             geometry_new.voxel_num_z = 1

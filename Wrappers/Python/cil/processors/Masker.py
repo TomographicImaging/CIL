@@ -164,7 +164,7 @@ class Masker(DataProcessor):
 
         if not (data.shape == self.mask.shape):
             raise Exception("Mask and Data must have the same shape." +
-                            "{} != {}".format(self.mask.mask, data.shape))
+                            "{} != {}".format(self.mask.shape, data.shape))
 
         if hasattr(self.mask, 'dimension_labels') and data.dimension_labels != self.mask.dimension_labels:
             raise Exception("Mask and Data must have the same dimension labels." +

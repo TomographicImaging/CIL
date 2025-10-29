@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Adam Doherty (UCL)
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, ImageGeometry, DataContainer
 import numpy

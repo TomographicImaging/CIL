@@ -12,7 +12,7 @@ The jobs are:
   + uses default (GitHub-hosted) runners to run tests on the min & max supported Python & NumPy versions
   + `python -m unittest discover -v ./Wrappers/Python/test`
 - `conda`
-  + uses `mambabuild` to build the conda package (saved as a build artifact named `cil-package`)
+  + uses `mambabuild` to build the conda package (saved as a build artifact named `cil-py3.m-OS`)
 - `docs`
   + uses `docs/docs_environment.yml` plus `make -C docs` to build the documentation (saved as a build artifact named `DocumentationHTML`)
   + renders to the `gh-pages` branch on `master` (nightly) pushes or on tag (release) pushes
@@ -42,9 +42,9 @@ When opening or modifying a pull request to `master`, two variants are built and
 It looks for conda-build dependencies in the channels listed [here](./build.yml#L118). If you add any new dependencies, the appropriate channels need to be added to this line.
 
 > [!TIP]
-> The `conda` job builds the `*.tar.bz2` package and uploads it as an artifact called `cil-package`.
+> The `conda` job builds the `*.tar.bz2` package and uploads it as an artifact called `cil-py3.m-OS`.
 > It can be found by going to the "Actions" tab, and selecting the appropriate run of `.github/workflows/build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the "Summary" for the run of the action, there is an "Artifact" section at the bottom of the page.
-> Clicking on `cil-package` allows you to download a zip folder containing the `*.tar.bz2` file.
+> Clicking on `cil-py3.m-OS` allows you to download a zip folder containing the `*.tar.bz2` file.
 
 ### docs
 

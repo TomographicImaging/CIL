@@ -33,12 +33,16 @@ class TestImageGeometry(unittest.TestCase):
     def test_get_slice_vertical(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
         ImageDimension["VERTICAL"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        sub = self.ig.get_slice(vertical = 1)
+        ig = self.ig.copy()
+        ig.set_labels(non_default_dimension_labels)
+        ig.voxel_size_z = 5.5
+        sub = ig.get_slice(vertical = 1)
         self.assertTrue( sub.shape == (2,5,3))
+        self.assertEqual(sub.voxel_size_z,5.5)
         self.assertEqual(sub.center_x,0)
         self.assertEqual(sub.center_y,0)
-        self.assertEqual(sub.center_z,-0.5)
+        self.assertEqual(sub.center_z,-0.5*sub.voxel_size_z)
+ 
 
     def test_get_slice_horizontal_x(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],

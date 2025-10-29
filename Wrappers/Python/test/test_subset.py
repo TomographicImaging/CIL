@@ -305,6 +305,12 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(horizontal_y = 1)
         self.assertTrue( sub.shape == (2,))
 
+    def test_ImageDataCentreSubset(self):
+        data = self.ig.allocate()
+        sub = data.get_centre_slice()
+        sub2 = data.get_slice(vertical='centre')
+        self.assertTrue( sub == sub2)
+
     def test_ImageDataSubset1b(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
         ImageDimension["VERTICAL"]]
@@ -316,55 +322,8 @@ class TestSubset(unittest.TestCase):
 
     def test_ImageDataSubset1c(self):
         data = self.ig.allocate()
-        # TODO sort out changed behaviour here
         sub = data.get_slice(channel=0,horizontal_x=0,horizontal_y=0)
         self.assertTrue( sub.shape == (4,))
-
-    def test_ImageGeometrySubset1a(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
-        ImageDimension["VERTICAL"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        sub = self.ig.get_slice(vertical = 1)
-        self.assertTrue( sub.shape == (2,5,3))
-        self.assertEqual(sub.center_x,0)
-        self.assertEqual(sub.center_y,0)
-        self.assertEqual(sub.center_z,-0.5)
-
-    def test_ImageGeometrySubset2a(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
-        ImageDimension["VERTICAL"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        sub = self.ig.get_slice(horizontal_x = 1)
-        self.assertTrue(sub.shape == (5,3,4))
-        self.assertEqual(sub.center_x,0.5)
-        self.assertEqual(sub.center_y,0)
-        self.assertEqual(sub.center_z,0)
-
-    def test_ImageGeometrySubset3a(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
-        ImageDimension["VERTICAL"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        sub = self.ig.get_slice(channel = 1)
-        self.assertTrue(sub.shape == (2,3,4))
-
-    def test_ImageGeometrySubset5a(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        sub = self.ig.get_slice(horizontal_y = 1)
-        self.assertTrue( sub.shape == (2,))
-
-    def test_ImageGeometrySubset1b(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
-        ImageDimension["VERTICAL"]]
-        self.ig.set_labels(non_default_dimension_labels)
-        new_dimension_labels = [ImageDimension["HORIZONTAL_Y"], ImageDimension["CHANNEL"], ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_X"]]
-        self.ig.set_labels(new_dimension_labels)
-        self.assertTrue( self.ig.shape == (3,5,4,2))
-
-    def test_ImageGeometrySubset1c(self):
-        sub = self.ig.get_slice(horizontal_x=0,horizontal_y=0)
-        self.assertTrue( sub.shape == (5,4))
-
 
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
@@ -481,3 +440,9 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(projection = 0)
         sub = sub.get_slice(channel = 0)
         self.assertTrue(sub.shape == (2, 20))
+
+    def test_AcquisitionDataCentreSubset(self):
+        data = self.ig.allocate()
+        sub = data.get_centre_slice()
+        sub2 = data.get_slice(vertical='centre')
+        self.assertTrue( sub == sub2)

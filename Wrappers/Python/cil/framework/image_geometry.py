@@ -286,12 +286,11 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         if self.voxel_num_z > 0:
             repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         else:
             repres += "voxel_num : x{0},y{1}\n".format(self.voxel_num_x, self.voxel_num_y)
-            repres += "voxel_size : x{0},y{1}\n".format(self.voxel_size_x, self.voxel_size_y)
-            repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
+        
+        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
 
         return repres
     def allocate(self, value=0, **kwargs):

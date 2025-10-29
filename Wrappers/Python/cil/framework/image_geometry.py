@@ -166,7 +166,7 @@ class ImageGeometry(metaclass=BackwardCompat):
         self.center_y = center_y
         self.center_z = center_z
         self.channels = channels
-        self.channel_labels = None# check if None, single channel geom
+        self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
         self.dtype = kwargs.get('dtype', numpy.float32)
@@ -286,11 +286,12 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         if self.voxel_num_z > 0:
             repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         else:
             repres += "voxel_num : x{0},y{1}\n".format(self.voxel_num_x, self.voxel_num_y)
-        
-        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+            repres += "voxel_size : x{0},y{1}\n".format(self.voxel_size_x, self.voxel_size_y)
+            repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
     def allocate(self, value=0, **kwargs):

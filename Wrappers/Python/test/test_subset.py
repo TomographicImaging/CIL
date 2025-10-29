@@ -442,7 +442,7 @@ class TestSubset(unittest.TestCase):
         self.assertTrue(sub.shape == (2, 20))
 
     def test_AcquisitionDataCentreSubset(self):
-        data = self.ig.allocate()
+        data = self.ag_flex.allocate()
         sub = data.get_centre_slice()
         sub2 = data.get_slice(vertical='centre')
         self.assertTrue( sub == sub2)

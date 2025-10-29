@@ -156,6 +156,13 @@ class ImageData(DataContainer):
             return out
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new)
+        
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageData of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
+
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):

@@ -99,7 +99,7 @@ class ImageGeometry(metaclass=BackwardCompat):
         labels = list(labels)
 
         for i, x in enumerate(shape_default):
-            if x == 0:
+            if x == 0 or x==1:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
@@ -211,6 +211,10 @@ class ImageGeometry(metaclass=BackwardCompat):
         if vertical is not None:
             geometry_new.voxel_num_z = 1
             if vertical != 'centre':
+                if vertical == 0:
+                    warnings.warn("Slicing vertical at index 0 results in a geometry \
+                                  offset along the vertical axis. If you do not require an offset ImageGeometry, set vertical='centre",
+                                  UserWarning)
                 voxel_offset = (self.voxel_num_z)/2 - (vertical+0.5)
                 geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
 
@@ -227,6 +231,12 @@ class ImageGeometry(metaclass=BackwardCompat):
                 geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
 
         return geometry_new
+    
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageGeometry of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []

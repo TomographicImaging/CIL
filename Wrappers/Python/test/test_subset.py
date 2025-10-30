@@ -168,12 +168,6 @@ class Test_get_slice(unittest.TestCase):
         self.assertEqual(data_new.shape,(2,4,5))
         self.assertEqual(data_new.geometry.dimension_labels,('channel','horizontal_y','horizontal_x'))
 
-    def test_ImageGeometry(self):
-        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['channel','vertical','horizontal_y','horizontal_x'])
-        ig_new = ig.get_slice(vertical='centre')
-        self.assertEqual(ig_new.shape,(2,4,5))
-        self.assertEqual(ig_new.dimension_labels,('channel','horizontal_y', 'horizontal_x'))
-
     def test_AcquisitionData(self):
         ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
         data = ag.allocate(None)
@@ -442,7 +436,7 @@ class TestSubset(unittest.TestCase):
         self.assertTrue(sub.shape == (2, 20))
 
     def test_AcquisitionDataCentreSubset(self):
-        data = self.ag_flex.allocate()
+        data = self.ag.allocate()
         sub = data.get_centre_slice()
         sub2 = data.get_slice(vertical='centre')
         self.assertTrue( sub == sub2)

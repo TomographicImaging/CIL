@@ -127,7 +127,7 @@ class ImageData(DataContainer):
     
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
-        Returns a new ImageData of a single slice of in the requested direction.
+        Returns a new ImageData of a single slice in the requested direction.
         '''
         try:
             geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
@@ -156,6 +156,13 @@ class ImageData(DataContainer):
             return out
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new)
+        
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageData of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
+
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):

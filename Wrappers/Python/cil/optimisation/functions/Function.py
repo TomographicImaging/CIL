@@ -16,13 +16,10 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import warnings
-
 from numbers import Number
 import numpy as np
-from functools import reduce
 from cil.utilities.errors import InPlaceError
+from cil.utilities import dtype_like
 
 
 class Function(object):
@@ -319,10 +316,7 @@ class SumFunction(Function):
         .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
 
         """
-        ret = 0.
-        for f in self.functions:
-            ret += f(x)
-        return ret
+        return sum(f(x) for f in self.functions)
 
     def gradient(self, x, out=None):
         r"""Returns the value of the sum of the gradient of functions evaluated at :math:`x`, if all of them are differentiable.
@@ -438,7 +432,8 @@ class ScaledFunction(Function):
         --------
         DataContainer, the value of the scaled function.
         """
-        return self.scalar * self.function(x)
+        res = self.function(x)
+        return dtype_like(self.scalar, res) * res
 
     def convex_conjugate(self, x):
         r"""Returns the convex conjugate of the scaled function.
@@ -465,7 +460,7 @@ class ScaledFunction(Function):
         if id(tmp) == id(x):
             x.multiply(self.scalar, out=x)
 
-        return self.scalar * val
+        return dtype_like(self.scalar, val) * val
 
     def gradient(self, x, out=None):
         r"""Returns the gradient of the scaled function evaluated at :math:`x`.

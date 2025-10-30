@@ -415,7 +415,7 @@ class Padder(DataProcessor):
         if isinstance(data, (ImageData, AcquisitionData)):
             self._data_array = True
             self._geometry = data.geometry
-            
+
         elif isinstance(data, DataContainer):
             self._data_array = True
             self._geometry = None
@@ -467,7 +467,7 @@ class Padder(DataProcessor):
 
 
     def _set_up(self):
-        
+
         data = self.get_input()
         offset = 4-data.ndim
 
@@ -543,7 +543,7 @@ class Padder(DataProcessor):
                 self._processed_dims[i] = 1
                 self._shape_out_full[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
 
-        self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
+        self._shape_out = tuple(i for i in self._shape_out_full if i > 1)
 
 
     def _process_acquisition_geometry(self):

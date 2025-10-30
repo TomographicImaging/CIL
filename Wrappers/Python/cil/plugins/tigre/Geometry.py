@@ -37,7 +37,8 @@ class CIL2TIGREGeometry(object):
             angles *= (np.pi/180.)
 
         #convert CIL to TIGRE angles s
-        angles = -(angles + np.pi/2 +tg.theta )
+        angles += np.pi/2 + tg.theta
+        angles *= -1
 
         #angles in range -pi->pi
         for i, a in enumerate(angles):

@@ -18,7 +18,7 @@ Binary installation of CIL can be achieved with `conda`.
 
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
-We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table below: 
 
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
@@ -27,6 +27,11 @@ Or for a CPU-only environment which will work for a limited number of [CIL demos
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos_cpu.yml
 ```
+If you prefer to give the environment your own name, include `-n <env_name>` in the above command. To activate the environment run
+```
+conda activate <env_name>
+```
+where `<env_name>` is `cil_demos`, `cil_demos_cpu` or whatever name you specified above.
 
 If you prefer to install a minimal environment with CIL you can use:
 

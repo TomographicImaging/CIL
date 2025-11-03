@@ -17,8 +17,7 @@ channels:
   - nvidia
   - https://software.repos.intel.com/python/conda
 dependencies:
-  # base (vis. recipe/conda_build_config.yaml)
-  - python >=3.10,<3.13
+  - python >=3.10
   - numpy >=1.23,<2
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6

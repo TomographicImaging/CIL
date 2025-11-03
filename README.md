@@ -18,7 +18,17 @@ Binary installation of CIL can be achieved with `conda`.
 
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
-Install a new minimal environment with CIL using:
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
+
+```sh
+conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
+```
+Or for a CPU-only environment which will work for a limited number of [CIL demos](https://github.com/TomographicImaging/CIL-Demos)
+```sh
+conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos_cpu.yml
+```
+
+If you prefer to install a minimal environment with CIL you can use:
 
 ```sh
 conda create --name cil -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
@@ -42,16 +52,10 @@ While building the CIL package we test with specific versions of dependencies. T
 | [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
 | [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
 |[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
+|--|--| **CT data readers** |--|--|
+|[olefile](https://github.com/decalage2/olefile)|>= 0.46|`olefile>=0.46`|Package to process Microsoft OLE2 files, used to read ZEISS data files.|[BSD-style (custom)](https://github.com/decalage2/olefile?tab=License-1-ov-file)|
+|[dxchange](https://github.com/data-exchange/dxchange)||`dxchange`|Provides an interface with TomoPy for loading tomography data.|[BSD-style (custom)](https://github.com/data-exchange/dxchange?tab=License-1-ov-file)|
 
-We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table above: 
-
-```sh
-conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
-```
-Or for a CPU-only environment which will work for a limited number of [CIL demos](https://github.com/TomographicImaging/CIL-Demos)
-```sh
-conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos_cpu.yml
-```
 
 ### Docker
 

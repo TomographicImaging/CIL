@@ -62,7 +62,7 @@ jobs:
         conda env remove -n "${{ steps.reqs.outputs.envname }}"
   test:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
@@ -82,7 +82,7 @@ jobs:
     - name: test
       run: python -m unittest discover -v ./Wrappers/Python/test
   conda-matrix:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       python-version: ${{ steps.matrix.outputs.python-version }}
       numpy-version: ${{ steps.matrix.outputs.numpy-version }}
@@ -117,7 +117,7 @@ jobs:
         fi
   conda-build:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || '2022' }}
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '24.04' || '2022' }}
     needs: conda-matrix
     strategy:
       matrix:
@@ -149,7 +149,7 @@ jobs:
         path: dist/*/cil-*.tar.bz2
   conda-test:
     defaults: {run: {shell: 'bash -el {0}'}}
-    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '22.04' || 'latest' }}
+    runs-on: ${{ matrix.os }}-${{ matrix.os == 'ubuntu' && '24.04' || '2022' }}
     needs: [conda-matrix, conda-build]
     strategy:
       matrix:
@@ -177,7 +177,7 @@ jobs:
   conda-upload:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
     defaults: {run: {shell: 'bash -el {0}', working-directory: dist}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: conda-test
     steps:
     - uses: actions/checkout@v4
@@ -188,7 +188,7 @@ jobs:
         conda-remove-defaults: "true"
     - uses: actions/download-artifact@v4
       with: {pattern: cil-py*-*, path: dist, merge-multiple: true}
-    - run: conda install anaconda-client
+    - run: mamba install anaconda-client
     - name: anaconda upload -c ccpi
       run: >
         anaconda -v -t ${{ secrets.CCPI_CONDA_TOKEN }} upload --force
@@ -203,7 +203,7 @@ jobs:
           'bash -lic "conda index --bz2 --zst --run-exports --channeldata --rss -n ccpi ${{ secrets.STFC_SSH_CONDA_DIR }}"'
   docs:
     defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -211,7 +211,11 @@ jobs:
         submodules: recursive
         ref: ${{ github.event.pull_request.head.sha || github.ref }} # fix SHA
     - uses: conda-incubator/setup-miniconda@v3
-      with: {python-version: 3.11}
+      with:
+        python-version: 3.12
+        mamba-version: "*"
+        channels: conda-forge
+        conda-remove-defaults: "true"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
@@ -219,9 +223,9 @@ jobs:
         cache-version: 0
     - name: install dependencies
       run: |
-        conda install -c conda-forge -yq conda-merge
+        mamba install -c conda-forge -yq conda-merge
         conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
-        conda env update -n test
+        mamba env update -n test --file environment.yml
         conda list
     - run: pip install ..
     - name: checkout docs
@@ -253,7 +257,7 @@ jobs:
         dir: docs/build
         nojekyll: true
   docker:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -305,5 +309,5 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
   pass:
     needs: [test-cuda, test, conda-test, docs, docker]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps: [{run: echo success}]

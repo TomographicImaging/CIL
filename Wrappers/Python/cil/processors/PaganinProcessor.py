@@ -116,16 +116,17 @@ class PaganinProcessor(Processor):
         - :math:`T`, is the sample thickness,
         - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear
           attenuation coefficient where :math:`\beta` is the complex part of the
-          material refractive index and :math:`\lambda=\frac{hc}{E}` is the probe
-          wavelength,
+          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the 
+          probe wavelength,
         - :math:`I_{norm}` is the input image which is expected to be the
           normalised transmission data,
         - :math:`\Delta` is the propagation distance. In cone-beam geometry, 
-          :math:`\Delta` is scaled by the magnification :math:`M`,
+          :math:`\Delta` is scaled by the magnification :math:`M` as described 
+          in [1],
         - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining
           the strength of the filter to be applied in Fourier space where
           :math:`\delta` is the real part of the deviation of the material
-          refractive index from 1.
+          refractive index from 1 [2].
         - :math:`k_x, k_y = \left ( \frac{2\pi p}{N_xW}, \frac{2\pi q}{N_yW}
           \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier
           mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with
@@ -134,7 +135,7 @@ class PaganinProcessor(Processor):
 
     A generalised form of the Paganin phase retrieval method can be called
     using :code:`filter_type='generalised_paganin_method'`, which uses the
-    form of the algorithm described in [2]
+    form of the algorithm described in [3]
 
     .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{
         \mathcal{F}\left (I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2

@@ -12,8 +12,8 @@ from tqdm import tqdm
 
 # URLS of the notebooks to render
 NOTEBOOKS_load_links = [
-    # "https://tomography.stfc.ac.uk/how-tos/ZeissDataReader.ipynb",
-    # "https://tomography.stfc.ac.uk/how-tos/NikonDataReader.ipynb"
+    "https://tomography.stfc.ac.uk/how-tos/ZeissDataReader.ipynb",
+    "https://tomography.stfc.ac.uk/how-tos/NikonDataReader.ipynb"
 ]
 
 NOTEBOOKS_geometry_links = [

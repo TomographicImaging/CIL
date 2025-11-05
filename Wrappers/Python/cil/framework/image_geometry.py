@@ -178,13 +178,13 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         Parameters
         ----------
-        channel : int, optional
+        channel : int or 'centre', optional
             The channel index to slice. Default is None (no slicing).
         vertical : int or 'centre', optional
             The vertical index to slice. Default is None (no slicing).
-        horizontal_x : int or 'centre', optional
+        horizontal_x : int, optional
             The horizontal x index to slice. Default is None (no slicing).
-        horizontal_y : int or 'centre', optional
+        horizontal_y : int, optional
             The horizontal y index to slice. Default is None (no slicing).
         Returns
         -------
@@ -193,8 +193,7 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         Note
         ----
-        Slicing on vertical, horizontal_x or horizontal_y with 'centre' will return the
-        central slice in that dimension.
+        Slicing on vertical with 'centre' will return the central slice in that dimension.
         Slicing on channels returns a geometry with a single channel, however the channel label is not
         typically stored in the geometry.
         '''
@@ -206,7 +205,6 @@ class ImageGeometry(metaclass=BackwardCompat):
                 geometry_new.channel_labels = [self.channel_labels[channel]]
             except:
                 geometry_new.channel_labels = None
-
 
         if vertical is not None:
             geometry_new.voxel_num_z = 1
@@ -220,15 +218,13 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         if horizontal_y is not None:
             geometry_new.voxel_num_y = 1
-            if horizontal_y != 'centre':
-                voxel_offset = (self.voxel_num_y)/2 - (horizontal_y +0.5)
-                geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
+            voxel_offset = (self.voxel_num_y)/2 - (horizontal_y +0.5)
+            geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
 
         if horizontal_x is not None:
             geometry_new.voxel_num_x = 1
-            if horizontal_x != 'centre':
-                voxel_offset = (self.voxel_num_x)/2 - (horizontal_x+0.5)
-                geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
+            voxel_offset = (self.voxel_num_x)/2 - (horizontal_x+0.5)
+            geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
 
         return geometry_new
     

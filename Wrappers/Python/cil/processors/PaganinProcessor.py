@@ -506,7 +506,7 @@ class PaganinProcessor(Processor):
         Function to calculate alpha, a constant defining the Paganin filter
         strength
         '''
-        self.alpha = self.propagation_distance*self.delta/self.mu/self.magnification
+        self.alpha = (self.propagation_distance/self.magnification)*self.delta/self.mu
 
     def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''

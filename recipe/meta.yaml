@@ -69,6 +69,8 @@ requirements:
     - astra-toolbox >=1.9.9.dev5
     - tigre >=2.4
     - ccpi-regulariser >=24.0.1
+    - olefile >=0.46
+    - zenodo_get >=1.6
 
 about:
   home: https://TomographicImaging.github.io/CIL

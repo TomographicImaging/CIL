@@ -108,35 +108,37 @@ class PaganinProcessor(Processor):
     al. [1] to retrieve the sample thickness
 
     .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left
-        (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 +
+        (\frac{\mathcal{F}\left ( I_{norm}(x, y,z = \Delta) \right )}{1 +
           \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),
 
     where
 
         - :math:`T`, is the sample thickness,
         - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear
-        attenuation coefficient where :math:`\beta` is the complex part of the
-        material refractive index and :math:`\lambda=\frac{hc}{E}` is the probe
-        wavelength,
-        - :math:`M` is the magnification at the detector,
+          attenuation coefficient where :math:`\beta` is the complex part of the
+          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the 
+          probe wavelength,
         - :math:`I_{norm}` is the input image which is expected to be the
-        normalised transmission data,
-        - :math:`\Delta` is the propagation distance,
+          normalised transmission data,
+        - :math:`\Delta` is the propagation distance. In cone-beam geometry, 
+          :math:`\Delta` is scaled by the magnification :math:`M` as described 
+          in [1],
         - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining
-        the strength of the filter to be applied in Fourier space where
-        :math:`\delta` is the real part of the deviation of the material
-        refractive index from 1
+          the strength of the filter to be applied in Fourier space where
+          :math:`\delta` is the real part of the deviation of the material
+          refractive index from 1 [2].
         - :math:`k_x, k_y = \left ( \frac{2\pi p}{N_xW}, \frac{2\pi q}{N_yW}
-        \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier
-        mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with
-        size :math:`N_x, N_y` and pixel size :math:`W`.
+          \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier
+          mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with
+          size :math:`N_x, N_y` and pixel size :math:`W`. In cone-beam geometry,
+          the pixel size is scaled by the magnification :math:`M`.
 
     A generalised form of the Paganin phase retrieval method can be called
     using :code:`filter_type='generalised_paganin_method'`, which uses the
-    form of the algorithm described in [2]
+    form of the algorithm described in [3]
 
     .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{
-        \mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2
+        \mathcal{F}\left (I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2
         \alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )}  \right )
         \right )
 
@@ -505,7 +507,7 @@ class PaganinProcessor(Processor):
         Function to calculate alpha, a constant defining the Paganin filter
         strength
         '''
-        self.alpha = self.propagation_distance*self.delta/self.mu/self.magnification
+        self.alpha = (self.propagation_distance/self.magnification)*self.delta/self.mu
 
     def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''

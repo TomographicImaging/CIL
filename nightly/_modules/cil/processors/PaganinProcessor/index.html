@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.PaganinProcessor &#8212; CIL 25.0.1.dev9+g956fe87aa documentation</title>
+    <title>cil.processors.PaganinProcessor &#8212; CIL 25.0.1.dev10+g65b66c568 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=94b85a9962aff05bf6f7" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=94b85a9962aff05bf6f7" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=94b85a9962aff05bf6f7"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=94b85a9962aff05bf6f7" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=94b85a9962aff05bf6f7" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fba4900"></script>
+    <script src="../../../../_static/documentation_options.js?v=26565082"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev9+g956fe87aa';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev10+g65b66c568';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -58,7 +58,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev9+g956fe87aa" />
+  <meta name="docsearch:version" content="25.0.1.dev10+g65b66c568" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -571,35 +571,37 @@
 <span class="sd">    al. [1] to retrieve the sample thickness</span>
 
 <span class="sd">    .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left</span>
-<span class="sd">        (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 +</span>
+<span class="sd">        (\frac{\mathcal{F}\left ( I_{norm}(x, y,z = \Delta) \right )}{1 +</span>
 <span class="sd">          \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),</span>
 
 <span class="sd">    where</span>
 
 <span class="sd">        - :math:`T`, is the sample thickness,</span>
 <span class="sd">        - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear</span>
-<span class="sd">        attenuation coefficient where :math:`\beta` is the complex part of the</span>
-<span class="sd">        material refractive index and :math:`\lambda=\frac{hc}{E}` is the probe</span>
-<span class="sd">        wavelength,</span>
-<span class="sd">        - :math:`M` is the magnification at the detector,</span>
+<span class="sd">          attenuation coefficient where :math:`\beta` is the complex part of the</span>
+<span class="sd">          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the </span>
+<span class="sd">          probe wavelength,</span>
 <span class="sd">        - :math:`I_{norm}` is the input image which is expected to be the</span>
-<span class="sd">        normalised transmission data,</span>
-<span class="sd">        - :math:`\Delta` is the propagation distance,</span>
+<span class="sd">          normalised transmission data,</span>
+<span class="sd">        - :math:`\Delta` is the propagation distance. In cone-beam geometry, </span>
+<span class="sd">          :math:`\Delta` is scaled by the magnification :math:`M` as described </span>
+<span class="sd">          in [1],</span>
 <span class="sd">        - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining</span>
-<span class="sd">        the strength of the filter to be applied in Fourier space where</span>
-<span class="sd">        :math:`\delta` is the real part of the deviation of the material</span>
-<span class="sd">        refractive index from 1</span>
+<span class="sd">          the strength of the filter to be applied in Fourier space where</span>
+<span class="sd">          :math:`\delta` is the real part of the deviation of the material</span>
+<span class="sd">          refractive index from 1 [2].</span>
 <span class="sd">        - :math:`k_x, k_y = \left ( \frac{2\pi p}{N_xW}, \frac{2\pi q}{N_yW}</span>
-<span class="sd">        \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier</span>
-<span class="sd">        mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with</span>
-<span class="sd">        size :math:`N_x, N_y` and pixel size :math:`W`.</span>
+<span class="sd">          \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier</span>
+<span class="sd">          mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with</span>
+<span class="sd">          size :math:`N_x, N_y` and pixel size :math:`W`. In cone-beam geometry,</span>
+<span class="sd">          the pixel size is scaled by the magnification :math:`M`.</span>
 
 <span class="sd">    A generalised form of the Paganin phase retrieval method can be called</span>
 <span class="sd">    using :code:`filter_type=&#39;generalised_paganin_method&#39;`, which uses the</span>
-<span class="sd">    form of the algorithm described in [2]</span>
+<span class="sd">    form of the algorithm described in [3]</span>
 
 <span class="sd">    .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{</span>
-<span class="sd">        \mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2</span>
+<span class="sd">        \mathcal{F}\left (I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2</span>
 <span class="sd">        \alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )}  \right )</span>
 <span class="sd">        \right )</span>
 
@@ -709,7 +711,6 @@
         
         <span class="c1"># pre-calculate the scaling factor</span>
         <span class="n">scaling_factor</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
-        <span class="n">mag2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">magnification</span> <span class="o">**</span> <span class="mi">2</span>
         
         <span class="c1"># loop over the channels</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
@@ -720,7 +721,6 @@
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_retrieval</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
                     <span class="c1"># apply the filter in fourier space, apply log and scale</span>
-                    <span class="n">padded_buffer</span><span class="o">*=</span><span class="n">mag2</span>
                     <span class="n">fI</span> <span class="o">=</span> <span class="n">fft2</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">)</span>
                     <span class="n">iffI</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">iffI</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">padded_buffer</span><span class="p">)</span>
@@ -938,13 +938,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">override_filter</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_alpha</span><span class="p">()</span>
+           
+	<span class="c1"># calculate pixel size at sample plane, used for defining fourier mesh</span>
+        <span class="n">pixel_size_dmag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">magnification</span>
 
         <span class="c1"># create the Fourier mesh</span>
         <span class="n">kx</span><span class="p">,</span><span class="n">ky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">),</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span><span class="o">*</span><span class="n">pixel_size_dmag</span><span class="p">),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Ny</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_Ny</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Ny</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">),</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Ny</span><span class="o">*</span><span class="n">pixel_size_dmag</span><span class="p">),</span>
             <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span>
             <span class="p">)</span>
@@ -953,9 +956,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="o">==</span> <span class="s1">&#39;paganin_method&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span>  <span class="n">ifftshift</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">kx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ky</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="o">==</span> <span class="s1">&#39;generalised_paganin_method&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span>  <span class="n">ifftshift</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-                                        <span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">*</span><span class="n">kx</span><span class="p">)</span>
-                                          <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">*</span><span class="n">ky</span><span class="p">)</span> <span class="o">-</span><span class="mi">2</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span>  <span class="n">ifftshift</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">/</span><span class="n">pixel_size_dmag</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                                        <span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pixel_size_dmag</span><span class="o">*</span><span class="n">kx</span><span class="p">)</span>
+                                          <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pixel_size_dmag</span><span class="o">*</span><span class="n">ky</span><span class="p">)</span> <span class="o">-</span><span class="mi">2</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;filter_type not recognised: got </span><span class="si">{0}</span><span class="s2"> expected one</span><span class="se">\</span>
 <span class="s2">                              of &#39;paganin_method&#39; or </span><span class="se">\</span>
@@ -973,7 +976,7 @@
 <span class="sd">        Function to calculate alpha, a constant defining the Paganin filter</span>
 <span class="sd">        strength</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">propagation_distance</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">propagation_distance</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">magnification</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_energy_to_wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energy_units</span><span class="p">,</span> <span class="n">return_units</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -1055,8 +1058,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=94b85a9962aff05bf6f7"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=94b85a9962aff05bf6f7"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

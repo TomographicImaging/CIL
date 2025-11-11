@@ -29,7 +29,7 @@ class LSQR(Algorithm):
 
     
     r"""
-    Least Squares QR (LSQR) algorithm.
+    Least Squares with QR factorisation (LSQR) algorithm.
 
     The LSQR algorithm is used to solve large-scale linear systems and least-squares problems, particularly when the matrix is sparse or implicitly defined.
 
@@ -61,7 +61,7 @@ class LSQR(Algorithm):
     https://web.stanford.edu/group/SOL/software/lsqr/
     """
 
-    def __init__(self, initial=None, operator=None, data=None, alpha=None, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, alpha=0, **kwargs):
         """
         Initialise the LSQR algorithm.
 
@@ -83,10 +83,7 @@ class LSQR(Algorithm):
 
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
-        if alpha is None:
-            self.regalpha = 0
-        else:
-            self.regalpha = alpha 
+        self.regalpha = alpha 
 
         if initial is not None and operator is not None and data is not None:
             self.set_up(initial=initial, operator=operator, data=data)
@@ -95,7 +92,7 @@ class LSQR(Algorithm):
 
 
     def set_up(self, initial, operator, data):
-        r"""
+        """
         Set up the LSQR algorithm with the problem definition.
 
         Parameters
@@ -107,8 +104,6 @@ class LSQR(Algorithm):
         data : DataContainer
             Measured data.
         """
-
-        
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy() #1 domain
         self.operator = operator
@@ -141,12 +136,7 @@ class LSQR(Algorithm):
 
 
     def update(self):
-        
-        """
-        Perform a single iteration of the LSQR algorithm.
-        """
-
-
+        """Perform a single iteration of the LSQR algorithm."""
         # Update u in GKB
         self.operator.direct(self.v, out=self.tmp_range)
         self.tmp_range.sapyb(1.,  self.u,-self.alpha, out=self.u)

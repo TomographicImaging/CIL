@@ -3098,7 +3098,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
 
         self.data_cone.geometry.config.units='m'
         processor.set_input(self.data_cone)
@@ -3111,8 +3111,8 @@ class TestPaganinProcessor(unittest.TestCase):
         self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
         
         kx,ky = numpy.meshgrid( 
-            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
-            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
             sparse=False, 
             indexing='ij'
             )
@@ -3128,7 +3128,7 @@ class TestPaganinProcessor(unittest.TestCase):
         processor.filter_Nx = Nx
         processor.filter_Ny = Ny
         processor._create_filter()
-        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        filter = ifftshift(1/(1. - (2*alpha/(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification)**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*ky) -2)))
         numpy.testing.assert_allclose(processor.filter, filter)
 
         # check unknown method raises error
@@ -3153,7 +3153,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
         self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
         self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
         self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))

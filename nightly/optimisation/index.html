@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 25.0.1.dev10+g65b66c568 documentation</title>
+    <title>Optimisation framework &#8212; CIL 25.0.1.dev11+g21355fe32 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../_static/documentation_options.js?v=26565082"></script>
+    <script src="../_static/documentation_options.js?v=f7685a78"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev10+g65b66c568';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev11+g21355fe32';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,7 +63,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev10+g65b66c568" />
+  <meta name="docsearch:version" content="25.0.1.dev11+g21355fe32" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -406,6 +406,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#base-class">Base class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gd">GD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgls">CGLS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lsqr">LSQR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sirt">SIRT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ista-pgd">ISTA/PGD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fista">FISTA</a></li>
@@ -1200,6 +1201,215 @@ print to screen of the status of the optimisation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.CGLS.verbose_output">
 <span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.CGLS.verbose_output" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="lsqr">
+<h3>LSQR<a class="headerlink" href="#lsqr" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">LSQR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/LSQR/#LSQR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LSQR" title="Link to this definition">#</a></dt>
+<dd><p>Least Squares with QR factorisation (LSQR) algorithm.</p>
+<p>The LSQR algorithm is used to solve large-scale linear systems and least-squares problems, particularly when the matrix is sparse or implicitly defined.</p>
+<p>Solves the problem:</p>
+<div class="math notranslate nohighlight">
+\[\min_x \|Ax - b\|_2^2\]</div>
+<p>Optionally, with Tikhonov regularisation:</p>
+<div class="math notranslate nohighlight">
+\[\min_x \|Ax - b\|_2^2 + \alpha^2 \|x\|_2^2\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Linear operator representing the forward model.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Initial guess for the solution. If not provided, a zero-initialised container is used.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Measured data (right-hand side of the equation).</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Non-negative regularisation parameter. If zero, standard LSQR is used.</p></li>
+<li><p><strong>Reference</strong></p></li>
+<li><p><strong>---------</strong></p></li>
+<li><p><strong>https</strong> (<em>//web.stanford.edu/group/SOL/software/lsqr/</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.set_up">
+<span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/LSQR/#LSQR.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.set_up" title="Link to this definition">#</a></dt>
+<dd><p>Set up the LSQR algorithm with the problem definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess for the solution.</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Linear operator representing the forward model.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Measured data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/LSQR/#LSQR.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.update" title="Link to this definition">#</a></dt>
+<dd><p>Perform a single iteration of the LSQR algorithm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.update_objective">
+<span class="sig-name descname"><span class="pre">update_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/LSQR/#LSQR.update_objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.update_objective" title="Link to this definition">#</a></dt>
+<dd><p>Update the objective function value (residual norm squared).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.get_last_loss">
+<span class="sig-name descname"><span class="pre">get_last_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.get_last_loss" title="Link to this definition">#</a></dt>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.get_last_objective">
+<span class="sig-name descname"><span class="pre">get_last_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.get_last_objective" title="Link to this definition">#</a></dt>
+<dd><p>Returns the last stored value of the loss function. “Loss” is an alias for “objective value”. If <cite>update_objective_interval</cite> is 1 it is the value of the objective at the current iteration. If update_objective_interval &gt; 1 it is the last stored value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_all</strong> (<em>Boolean</em><em>, </em><em>default is False</em>) – If True, returns all the stored loss functions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last stored value of the loss function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.get_output" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current solution</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.is_provably_convergent">
+<span class="sig-name descname"><span class="pre">is_provably_convergent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.is_provably_convergent" title="Link to this definition">#</a></dt>
+<dd><p>Check if the algorithm is convergent based on the provable convergence criterion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Outcome of the convergence check</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.iterations">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterations</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.iterations" title="Link to this definition">#</a></dt>
+<dd><p>returns the iterations at which the objective has been evaluated</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.loss">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.loss" title="Link to this definition">#</a></dt>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.max_iteration">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_iteration</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.max_iteration" title="Link to this definition">#</a></dt>
+<dd><p>gets the maximum number of iterations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.max_iteration_stop_criterion">
+<span class="sig-name descname"><span class="pre">max_iteration_stop_criterion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.max_iteration_stop_criterion" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.objective">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.objective" title="Link to this definition">#</a></dt>
+<dd><p>returns a list of the values of the objective (alias of loss) during the iteration</p>
+<p>The length of this list may be shorter than the number of iterations run when the <cite>update_objective_interval</cite> &gt; 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.objective_to_dict">
+<span class="sig-name descname"><span class="pre">objective_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.objective_to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Internal function to save and print objective functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.objective_to_string">
+<span class="sig-name descname"><span class="pre">objective_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.objective_to_string" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#cil.optimisation.utilities.callbacks.Callback" title="cil.optimisation.utilities.callbacks.Callback"><span class="pre">Callback</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.run" title="Link to this definition">#</a></dt>
+<dd><p>run upto <code class="code docutils literal notranslate"><span class="pre">iterations</span></code> with callbacks/logging.</p>
+<p>For a demonstration of callbacks see <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb">https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>default is None</em>) – Number of iterations to run. If a positive infinity is passed, the algorithm will run indefinitely until a callback raises <cite>StopIteration</cite>.</p></li>
+<li><p><strong>callbacks</strong> (list of callables, default is Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>) – List of callables which are passed the current Algorithm object each iteration. Defaults to <code class="code docutils literal notranslate"><span class="pre">[ProgressCallback(verbose)]</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<em>0=quiet</em><em>, </em><em>1=info</em><em>, </em><em>2=debug</em>) – Passed to the default callback to determine the verbosity of the printed output.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.should_stop">
+<span class="sig-name descname"><span class="pre">should_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.should_stop" title="Link to this definition">#</a></dt>
+<dd><p>default stopping criterion: number of iterations</p>
+<p>The user can change this in concrete implementation of iterative algorithms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.solution">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solution</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.solution" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current solution.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.update_objective_interval">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_objective_interval</span></span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.update_objective_interval" title="Link to this definition">#</a></dt>
+<dd><p>gets the update_objective_interval</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.verbose_header">
+<span class="sig-name descname"><span class="pre">verbose_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.verbose_header" title="Link to this definition">#</a></dt>
+<dd><p>Do not use: this is being deprecated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.verbose_output">
+<span class="sig-name descname"><span class="pre">verbose_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.verbose_output" title="Link to this definition">#</a></dt>
 <dd><p>Do not use: this is being deprecated</p>
 </dd></dl>
 

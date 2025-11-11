@@ -1,0 +1,1273 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Simulation_and_CPU_reconstruction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR" href="../memory_profiling_sandstone/" />
+    <link rel="prev" title="CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL" href="../013_Anisotropic_regularisation_FILD_measurements/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Import-modules">Import modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/Simulation_and_CPU_reconstruction.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2024</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Jack S. Callaghan (Bangor University, UK)</span>
+<span class="c1">#   Reviewed by:  Margaret Duff (STFC-UKRI), Franck Vidal (STFC-UKRI)</span>
+</pre></div>
+</div>
+</div>
+<section id="Simulation-using-gVXR-and-CPU-reconstruction-using-CIL-of-a-twisted-hexagonal-object-with-helical-flow-channels">
+<h1>Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels<a class="headerlink" href="#Simulation-using-gVXR-and-CPU-reconstruction-using-CIL-of-a-twisted-hexagonal-object-with-helical-flow-channels" title="Link to this heading">#</a></h1>
+<p>This notebook is used to simulate X-ray CT scan projections and perform reconstruction on the simulated data.</p>
+<p>The scan object is a twisted hexagonal geometry with helical flow channels (object.stl), and the scan parameters are taken from an existing scan (scan_param.xml). The scan parameters in this example are extracted from a <a class="reference external" href="https://www.diondo.com/en/produkte/diondo-d5">Diondo d5</a> XCT scanner.</p>
+<p>The aim is to create a dataset of projections similar to the experiment to:</p>
+<ul class="simple">
+<li><p>practice the reconstruction methods</p></li>
+<li><p>prepare the scripting for data import and processing when the raw projection data arrives</p></li>
+</ul>
+<p>gVXR is used to simulate the projections, then the data is written to unsigned 16-bit raw format, which is then read in again and reconstructed, without a GPU,using CIL.</p>
+<p>This notebook differs from a previous gVXR notebook <a class="reference external" href="https://github.com/JSCallaghan/CIL-User-Showcase/blob/main/006_gVXR2CIL/CBCT-acquisition-with-noise-and-reconstruction.ipynb">https://github.com/JSCallaghan/CIL-User-Showcase/blob/main/006_gVXR2CIL/CBCT-acquisition-with-noise-and-reconstruction.ipynb</a> in that it demonstrates</p>
+<ul class="simple">
+<li><p>imaging a single material object created from an stl file</p></li>
+<li><p>reading in and using scan parameters for on existing scan xml file</p></li>
+<li><p>saving and then importing and processing raw projection data</p></li>
+<li><p>reconstructing using CIL SIRT and CGLS iterative algorithms using CPU projectors.</p></li>
+</ul>
+<section id="Installation">
+<h2>Installation<a class="headerlink" href="#Installation" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/TomographicImaging/CIL">environment: CIL CPU</a> &gt; conda create –name cilCPU -c conda-forge -c <a class="reference external" href="https://software.repos.intel.com/python/conda">https://software.repos.intel.com/python/conda</a> -c ccpi cil=24.2.0 ipp=2021.12 astra-toolbox=<em>=py</em> ipykernel ipywidgets</p></li>
+<li><p><a class="reference external" href="https://gvirtualxray.fpvidal.net/">package: gVXR</a> &gt; pip install –upgrade gvxr</p></li>
+<li><p><a class="reference external" href="https://github.com/K3D-tools/K3D-jupyter">package: k3d</a> &gt; conda install -c conda-forge k3d</p></li>
+</ul>
+</section>
+<section id="Import-modules">
+<h2>Import modules<a class="headerlink" href="#Import-modules" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CIL - tested on version 24.2.0</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_geometry</span><span class="p">,</span> <span class="n">show2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.jupyter</span><span class="w"> </span><span class="kn">import</span> <span class="n">islicer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAWFileWriter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGLS</span><span class="p">,</span> <span class="n">SIRT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+
+<span class="c1"># gvxr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">k3d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gvxrPython3</span><span class="w"> </span><span class="kn">import</span> <span class="n">gvxr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gvxrPython3.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise</span>
+
+<span class="c1"># other</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">cmapRecon</span> <span class="o">=</span> <span class="s2">&quot;inferno&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+24.2.0
+spekpy is not install, you won&#39;t be able to load a beam spectrum using spekpy
+xpecgen is not install, you won&#39;t be able to load a beam spectrum using xpecgen
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Tue Jan  7 15:01:02 2025 (WW) Spekpy is not installed, try Xpecgen instead.
+Tue Jan  7 15:01:02 2025 (WW) Xpecgen is not installed either.
+</pre></div></div>
+</div>
+<section id="Read-data">
+<h3>Read data<a class="headerlink" href="#Read-data" title="Link to this heading">#</a></h3>
+<p>The scan parameters and object parameters are found in the xml and stl files, respectively, in the repository. The experimental data is very large, so for the simulation a reduction factor is applied to the projection resolution, and a smaller number of projection angles are used.</p>
+<p>First the user specifies the file locations and the data reduction factor:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># xml name</span>
+<span class="n">xmlName</span> <span class="o">=</span> <span class="s1">&#39;scan_param.xml&#39;</span>
+
+<span class="c1"># stl name</span>
+<span class="n">stlName</span> <span class="o">=</span> <span class="s1">&#39;object.stl&#39;</span>
+
+<span class="c1"># data reduction factor (scale down)</span>
+<span class="n">dataRed</span> <span class="o">=</span> <span class="mi">15</span>
+</pre></div>
+</div>
+</div>
+<p>The XML data is read, setting the scan geometry:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># convert xml as nested dictionary</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xmlName</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">():</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">subitem</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="n">item</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="n">item</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="n">subitem</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">subitem</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="n">item</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">text</span>
+
+<span class="c1"># geometry data</span>
+<span class="n">numPixX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;DetectorPixelX&#39;</span><span class="p">])</span>
+<span class="n">numPixY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;DetectorPixelY&#39;</span><span class="p">])</span>
+<span class="n">souPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Geometrie&#39;</span><span class="p">][</span><span class="s1">&#39;SourceObjectDist&#39;</span><span class="p">])</span>
+<span class="n">detPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Geometrie&#39;</span><span class="p">][</span><span class="s1">&#39;SourceDetectorDist&#39;</span><span class="p">])</span>
+<span class="n">pixSiz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionPixelSizeX&#39;</span><span class="p">])</span>
+<span class="n">detOffX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCenterOffsetX&#39;</span><span class="p">])</span>
+<span class="n">detOffY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCenterOffsetY&#39;</span><span class="p">])</span>
+
+<span class="c1"># simulation data - resolution decreased by factor of dataRed</span>
+<span class="n">numPixX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numPixX</span> <span class="o">/</span> <span class="n">dataRed</span><span class="p">)</span>
+<span class="n">numPixY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numPixY</span> <span class="o">/</span> <span class="n">dataRed</span><span class="p">)</span>
+<span class="n">pixSiz</span> <span class="o">=</span> <span class="n">pixSiz</span> <span class="o">*</span> <span class="n">dataRed</span>
+
+<span class="c1"># scan data</span>
+<span class="n">scaVol</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;Voltage&#39;</span><span class="p">])</span>
+<span class="n">numPro</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCount&#39;</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipykernel_4044685/1872668756.py:7: DeprecationWarning: Testing an element&#39;s truth value will always return True in future versions.  Use specific &#39;len(elem)&#39; or &#39;elem is not None&#39; test instead.
+  if item:
+</pre></div></div>
+</div>
+<p>The stl file is read and the object viewable in an interactive window:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">stlName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">plot</span> <span class="o">+=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">stl</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span><span class="n">color</span><span class="o">=</span><span class="mh">0xfdea4f</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;object_screenshot.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "693af114163348f2a80b2f82332d6a02", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Screenshot for online viewing:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<img src="object_screenshot.png"/></div>
+</div>
+</section>
+<section id="Simulate-Projection">
+<h3>Simulate Projection<a class="headerlink" href="#Simulate-Projection" title="Link to this heading">#</a></h3>
+<p>The user can determine the number of projections and the end argument. They also set the material of the object being scanned.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># projection</span>
+<span class="n">numPro</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">endAng</span> <span class="o">=</span> <span class="mi">360</span>
+
+<span class="c1"># material</span>
+<span class="n">matNam</span> <span class="o">=</span> <span class="s2">&quot;ZrO2&quot;</span>
+<span class="n">matDen</span> <span class="o">=</span> <span class="mf">5.68</span>     <span class="c1"># g/cm3</span>
+</pre></div>
+</div>
+</div>
+<p>Using the CIL function <code class="docutils literal notranslate"><span class="pre">show_geometry</span></code>, we can visualise the scan parameters:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create geometry</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">souPos</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                                       <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="n">detOffX</span><span class="p">,</span><span class="n">detPos</span><span class="p">,</span><span class="n">detOffY</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="n">numPixX</span><span class="p">,</span><span class="n">numPixY</span><span class="p">],</span><span class="n">pixel_size</span><span class="o">=</span><span class="n">pixSiz</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">endAng</span><span class="p">,</span><span class="n">numPro</span><span class="p">,</span><span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="c1"># display geometry</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+
+<span class="c1"># image geometry</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Simulation_and_CPU_reconstruction_16_0.png" src="../../_images/demos_Simulation_and_CPU_reconstruction_16_0.png" />
+</div>
+</div>
+<p>The geometry looks feasible and so we can set up gVXR:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create an OpenGL context</span>
+<span class="n">window_id</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">opengl_major_version</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">opengl_minor_version</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;OPENGL&quot;</span>
+<span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">createWindow</span><span class="p">(</span><span class="n">window_id</span><span class="p">,</span> <span class="n">visible</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">opengl_major_version</span><span class="p">,</span> <span class="n">opengl_minor_version</span><span class="p">)</span>
+
+<span class="c1"># Setup Detector</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorNumberOfPixels</span><span class="p">(</span><span class="n">numPixX</span><span class="p">,</span> <span class="n">numPixY</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPixelSize</span><span class="p">(</span><span class="n">pixSiz</span><span class="p">,</span> <span class="n">pixSiz</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorUpVector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">detPos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+
+<span class="c1"># Setup Source</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setSourcePosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">souPos</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">usePointSource</span><span class="p">()</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">addEnergyBinToSpectrum</span><span class="p">(</span><span class="n">scaVol</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Setup Model</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">removePolygonMeshesFromSceneGraph</span><span class="p">()</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">loadMeshFile</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span> <span class="n">stlName</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setCompound</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span><span class="n">matNam</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDensity</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span> <span class="n">matDen</span><span class="p">,</span> <span class="s2">&quot;g/cm3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Tue Jan  7 15:01:05 2025 ---- Create window (ID: 0)
+Tue Jan  7 15:01:05 2025 ---- Request an interactive OpenGL context
+Tue Jan  7 15:01:05 2025 ---- Initialise GLFW
+Tue Jan  7 15:01:05 2025 (WW) GLFW error: X11: The DISPLAY environment variable is missing
+Tue Jan  7 15:01:05 2025 (WW) Cannot initialise GLFW.
+gvxrWarning:    OpenGLWindow  cannot be created.
+Tue Jan  7 15:01:05 2025 (WW) Could not create a context
+Tue Jan  7 15:01:05 2025 ---- Request a EGL context
+Tue Jan  7 15:01:05 2025 ---- EGL client extensions:
+Tue Jan  7 15:01:05 2025 ---- EGL_EXT_platform_base EGL_EXT_device_base EGL_EXT_device_enumeration EGL_EXT_device_query EGL_KHR_client_get_all_proc_addresses EGL_EXT_client_extensions EGL_KHR_debug EGL_KHR_platform_x11 EGL_EXT_platform_x11 EGL_EXT_platform_device EGL_MESA_platform_surfaceless EGL_EXT_explicit_device EGL_KHR_platform_wayland EGL_EXT_platform_wayland EGL_KHR_platform_gbm EGL_MESA_platform_gbm EGL_EXT_platform_xcb
+Tue Jan  7 15:01:05 2025 ---- EGL clients supported by this host:
+Tue Jan  7 15:01:05 2025 ----   - Surfaceless platform
+Tue Jan  7 15:01:05 2025 ----   - X11 platform
+Tue Jan  7 15:01:05 2025 ----   - Wayland platform
+Tue Jan  7 15:01:05 2025 ----   - GBM platform
+Tue Jan  7 15:01:05 2025 ----   - Device platform
+Tue Jan  7 15:01:05 2025 ---- Initialise EGL
+Tue Jan  7 15:01:05 2025 ---- Try to build an EGL display.
+Tue Jan  7 15:01:05 2025 ---- Go through all the EGL devices to find a suitable display.
+Tue Jan  7 15:01:05 2025 ---- Surfaceless have the lowest priority.
+Tue Jan  7 15:01:05 2025 ---- Query the number of EGL devices
+Tue Jan  7 15:01:05 2025 ---- Success
+Tue Jan  7 15:01:05 2025 ---- Detected 5 EGL devices.
+Tue Jan  7 15:01:05 2025 ---- Print the details here of every EGL device.
+Tue Jan  7 15:01:05 2025 ---- Success
+Tue Jan  7 15:01:05 2025 ---- Device 1/5:
+Tue Jan  7 15:01:05 2025 ----   Device Extensions: EGL_NV_device_cuda EGL_EXT_device_drm EGL_EXT_device_drm_render_node EGL_EXT_device_query_name EGL_EXT_device_persistent_id
+Tue Jan  7 15:01:05 2025 ---- Device 2/5:
+Tue Jan  7 15:01:05 2025 ----   Device Extensions: EGL_NV_device_cuda EGL_EXT_device_drm EGL_EXT_device_drm_render_node EGL_EXT_device_query_name EGL_EXT_device_persistent_id
+Tue Jan  7 15:01:05 2025 ---- Device 3/5:
+Tue Jan  7 15:01:05 2025 ----   Device Extensions: EGL_EXT_device_drm EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Device 4/5:
+Tue Jan  7 15:01:05 2025 ----   Device Extensions: EGL_EXT_device_drm EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Device 5/5:
+Tue Jan  7 15:01:05 2025 ----   Device Extensions: EGL_MESA_device_software EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Device 0&#39;s extensions: EGL_NV_device_cuda EGL_EXT_device_drm EGL_EXT_device_drm_render_node EGL_EXT_device_query_name EGL_EXT_device_persistent_id
+Tue Jan  7 15:01:05 2025 ---- Device 1&#39;s extensions: EGL_NV_device_cuda EGL_EXT_device_drm EGL_EXT_device_drm_render_node EGL_EXT_device_query_name EGL_EXT_device_persistent_id
+Tue Jan  7 15:01:05 2025 ---- Device 2&#39;s extensions: EGL_EXT_device_drm EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Device 3&#39;s extensions: EGL_EXT_device_drm EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Device 4&#39;s extensions: EGL_MESA_device_software EGL_EXT_device_drm_render_node
+Tue Jan  7 15:01:05 2025 ---- Try to build an EGL display for Platform device 1/5.
+Tue Jan  7 15:01:05 2025 ----   Success.
+Tue Jan  7 15:01:05 2025 ---- EGL extensions:
+Tue Jan  7 15:01:05 2025 (WW)   Retrieving EGL extensions failed
+Tue Jan  7 15:01:05 2025 ---- EGL version: 1.5
+Tue Jan  7 15:01:05 2025 ---- Bind the OpenGL API to EGL
+Tue Jan  7 15:01:05 2025 ---- Create the context
+Tue Jan  7 15:01:05 2025 ---- Create the surface
+Tue Jan  7 15:01:05 2025 ---- Make the context current
+Tue Jan  7 15:01:05 2025 ---- Initialise GLEW
+Tue Jan  7 15:01:05 2025 ---- OpenGL version supported by this platform 4.5.0 NVIDIA 550.120
+Tue Jan  7 15:01:05 2025 ---- OpenGL vendor:NVIDIA Corporation
+Tue Jan  7 15:01:05 2025 ---- OpenGL renderer:Tesla V100-PCIE-32GB/PCIe/SSE2
+Tue Jan  7 15:01:05 2025 ---- OpenGL version:4.5.0 NVIDIA 550.120
+Tue Jan  7 15:01:05 2025 ---- Use OpenGL 4.5.
+Tue Jan  7 15:01:05 2025 ---- Initialise the X-ray renderer if needed and if possible
+Tue Jan  7 15:01:05 2025 ---- Initialise the renderer
+Tue Jan  7 15:01:05 2025 ---- file_name:        object.stl      nb_faces:       39806   nb_vertices:    119418  bounding_box (in cm):   (-1.09503, -1.10892, -1.24934)  (1.10467, 1.09054, 1.22056)
+</pre></div></div>
+</div>
+<p>Run the virtual scan using gVXR:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gvxr</span><span class="o">.</span><span class="n">computeCTAcquisition</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># Where to save the projections</span>
+                          <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># Where to save the screenshots</span>
+                          <span class="n">numPro</span><span class="p">,</span> <span class="c1"># Total number of projections</span>
+                          <span class="mi">0</span><span class="p">,</span> <span class="c1"># First angle</span>
+                          <span class="kc">False</span><span class="p">,</span> <span class="c1"># Include the last angle</span>
+                          <span class="n">endAng</span><span class="p">,</span> <span class="c1"># Last angle</span>
+                          <span class="mi">0</span><span class="p">,</span> <span class="c1"># Number of flat images</span>
+                          <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="c1"># Centre of rotation</span>
+                          <span class="o">*</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getDetectorUpVector</span><span class="p">())</span> <span class="c1"># Rotation axis</span>
+
+<span class="n">projSim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getLastProjectionSet</span><span class="p">())</span>
+
+<span class="c1"># Don&#39;t forget, we need to use flatfield normalisation on the radiographs to get the correct attenuation values!</span>
+<span class="c1"># Because our flatfield and darkfield are perfect, all we need to do is divide by the total energy</span>
+<span class="n">projSim</span> <span class="o">/=</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getTotalEnergyWithDetectorResponse</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Again using the K3D package, we can visualise again the scan set up alongside one projection:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">=</span><span class="n">visualise</span><span class="p">(</span><span class="n">use_log</span><span class="o">=</span><span class="kc">True</span><span class="p">,)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;projection_screenshot.png&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "9d11c964e81c48a2a0b4703078d69b8d", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Screenshot for online viewing:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<img src="projection_screenshot.png"/></div>
+</div>
+<p>We export the projections. This allows us to demonstrate saving and loading projections in GVXR and loading and reconstructing GVXR simulations in CIL</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># bit depth</span>
+<span class="n">bitDep</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># bit depth multiplier</span>
+<span class="n">bitMul</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">bitDep</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+
+<span class="c1"># admin</span>
+<span class="n">filNam</span> <span class="o">=</span> <span class="s2">&quot;proj&quot;</span>
+
+<span class="c1"># write data to raw - CIL method</span>
+<span class="n">imData</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">projSim</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">rawWrite</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">imData</span><span class="p">,</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_CIL&quot;</span><span class="p">,</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+<span class="n">rawWrite</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+
+<span class="c1"># write to raw - numpy</span>
+<span class="n">projSimNP</span> <span class="o">=</span> <span class="n">projSim</span> <span class="o">*</span> <span class="n">bitMul</span>
+<span class="n">projSimNP</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_np.raw&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Read-projections">
+<h1>Read projections<a class="headerlink" href="#Read-projections" title="Link to this heading">#</a></h1>
+<p>We now read in the raw projections from the file we just made:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use simulated or simulated read/write projection data</span>
+<span class="n">dataSource</span> <span class="o">=</span> <span class="s2">&quot;simRW&quot;</span>        <span class="c1"># sim, simRW, exp</span>
+<span class="n">dataWriteMethod</span> <span class="o">=</span> <span class="s2">&quot;np&quot;</span>      <span class="c1"># CIL, np</span>
+
+<span class="k">match</span><span class="p">(</span><span class="n">dataSource</span><span class="p">):</span>
+    <span class="k">case</span> <span class="s2">&quot;sim&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using sim data&#39;</span><span class="p">)</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">projSim</span>
+
+    <span class="k">case</span> <span class="s2">&quot;exp&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using experimental data&#39;</span><span class="p">)</span>
+
+    <span class="k">case</span> <span class="s2">&quot;simRW&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using simRW data&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get number of pixels</span>
+        <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">numPixX</span> <span class="o">*</span> <span class="n">numPixY</span> <span class="o">*</span> <span class="n">numPro</span>
+
+        <span class="k">match</span><span class="p">(</span><span class="n">dataWriteMethod</span><span class="p">):</span>
+            <span class="k">case</span> <span class="s2">&quot;CIL&quot;</span><span class="p">:</span>
+                <span class="c1"># Read the .raw file as a numpy array - CIL data</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_CIL.raw&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">num_pixels</span><span class="p">)</span>
+
+                <span class="c1"># normalise data - need to use compression and scale data</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span> <span class="mf">16918.20416302011</span><span class="p">)</span> <span class="o">/</span> <span class="mf">82453.20416302011</span>
+
+            <span class="k">case</span> <span class="s2">&quot;np&quot;</span><span class="p">:</span>
+                <span class="c1"># Read the .raw file as a numpy array - NP data</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_np.raw&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">num_pixels</span><span class="p">)</span>
+
+                <span class="c1"># normalise data</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">bitMul</span>
+
+        <span class="c1"># Reshape the data into a 3D array (num_images, height, width)</span>
+        <span class="n">projRead</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">numPro</span><span class="p">,</span> <span class="n">numPixX</span><span class="p">,</span> <span class="n">numPixY</span><span class="p">))</span>
+
+        <span class="c1"># reallocate projections</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">projRead</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+using simRW data
+</pre></div></div>
+</div>
+<p>We can compare the data we read in to the data we simulated. A small amount of noise has been added:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projDiff</span> <span class="o">=</span> <span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">projRead</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">limit</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">projDiff</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span><span class="n">projDiff</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projRead</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projDiff</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sim&quot;</span><span class="p">,</span><span class="s2">&quot;sim_read_write_&quot;</span><span class="o">+</span><span class="n">dataWriteMethod</span><span class="p">,</span><span class="s2">&quot;difference (in %)&quot;</span><span class="p">],</span>\
+        <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span><span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="n">limit</span><span class="p">,</span><span class="n">limit</span><span class="p">)],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">projDiff</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Histogram of </span><span class="si">% d</span><span class="s2">ifference&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Simulation_and_CPU_reconstruction_29_0.png" src="../../_images/demos_Simulation_and_CPU_reconstruction_29_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Simulation_and_CPU_reconstruction_29_1.png" src="../../_images/demos_Simulation_and_CPU_reconstruction_29_1.png" />
+</div>
+</div>
+</section>
+<section id="Reconstruction">
+<h1>Reconstruction<a class="headerlink" href="#Reconstruction" title="Link to this heading">#</a></h1>
+<p>We can now reconstruct the simulation in CIL. We first visualise the acquisition data using the CIL islicer:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># colormap</span>
+<span class="n">cmapSino</span> <span class="o">=</span> <span class="s2">&quot;inferno&quot;</span>    <span class="c1"># gray, inferno</span>
+
+<span class="c1"># reduce data (64 -&gt; 32 bit)</span>
+<span class="n">proj_red</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">aqData</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">proj_red</span><span class="p">,</span><span class="kc">False</span><span class="p">,</span><span class="n">ag</span><span class="p">)</span>
+<span class="n">islicer</span><span class="p">(</span><span class="n">aqData</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmapSino</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;islicer_screenshot.png&#39;</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Screenshot for online viewing:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<img src="islicer_screenshot.png"/></div>
+</div>
+<p>Working on the CPU, we cannot reconstruct the whole 3D volume for a cone beam geometry. Instead we reconstruct a single slice:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># get slice</span>
+<span class="n">dataSlice</span> <span class="o">=</span> <span class="n">aqData</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+
+<span class="c1"># log corecction</span>
+<span class="n">dataSlice</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">)</span>
+<span class="n">dataSlice</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="c1">#  set up the 2D fandbeam geometry</span>
+<span class="n">datageom</span> <span class="o">=</span> <span class="n">dataSlice</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">imgeom</span> <span class="o">=</span> <span class="n">datageom</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Astra has a forward and back projectors for 2D fan beam geometries for CPU but not an FBP algorithm. Thus, to reconstruct, we try two basic iterative algorithms, CGLS and SIRT, to reconstruct the image.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">imgeom</span><span class="p">,</span> <span class="n">dataSlice</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+<span class="c1"># &#39;CGLS&#39;:</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">imgeom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">)</span>
+<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># &#39;SIRT&#39;:</span>
+<span class="n">constraint</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">imgeom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="n">constraint</span><span class="p">)</span>
+<span class="n">sirt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b77af1d0b0f441f588c968d947dc7994", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6104c82ebc0248408157c04c9b964cb5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">cgls</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span><span class="n">sirt</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CGLS&quot;</span><span class="p">,</span><span class="s2">&quot;SIRT&quot;</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmapRecon</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Simulation_and_CPU_reconstruction_38_0.png" src="../../_images/demos_Simulation_and_CPU_reconstruction_38_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f0016b83170&gt;
+</pre></div></div>
+</div>
+<p>CGLS takes many fewer iterations to converge, as expected, and seems to give a sharper image.</p>
+</section>
+<section id="Conclusion">
+<h1>Conclusion<a class="headerlink" href="#Conclusion" title="Link to this heading">#</a></h1>
+<p>We have demonstrated:</p>
+<ul class="simple">
+<li><p>simulating a cone beam CT scan using real scan parameters, on a single material object defined in an stl file</p></li>
+<li><p>saving and loading the raw projections</p></li>
+<li><p>reconstructed the central 2D slice using CGLS and SIRT in CIL with CPU only projectors</p></li>
+<li><p>demonstrated the difference in behaviour of the CGLS and SIRT algorithms.</p></li>
+</ul>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../013_Anisotropic_regularisation_FILD_measurements/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../memory_profiling_sandstone/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

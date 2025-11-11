@@ -1,0 +1,2096 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>TV-regularized reconstruction of the dynamix STEMPO dataset in CIL &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/stempo2d_v2_1';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Dynamic MR Reconstruction" href="../dynamic_mr_recon/" />
+    <link rel="prev" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#General-outline">General outline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Future-goal">Future goal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#License">License</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#1.-Load-STEMPO-data">1. Load STEMPO data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.-FBP-of-the-static-data">2. FBP of the static data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.-Repeat-the-previous-steps-with-dynamic-data">3. Repeat the previous steps with dynamic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#4.-Split-into-separate-time-steps">4. Split into separate time steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#5.-Iterative-algorithms-with-multiple-time-steps">5. Iterative algorithms with multiple time steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#6.-Hacky-temporal-TV">6. Hacky temporal TV</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/stempo2d_v2_1.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Tommi Heikkilä (University of Helsinki, Finland),</span>
+<span class="c1">#   Edited by:  Margaret Duff (STFC-UKRI)</span>
+</pre></div>
+</div>
+</div>
+<section id="TV-regularized-reconstruction-of-the-dynamix-STEMPO-dataset-in-CIL">
+<h1>TV-regularized reconstruction of the dynamix STEMPO dataset in CIL<a class="headerlink" href="#TV-regularized-reconstruction-of-the-dynamix-STEMPO-dataset-in-CIL" title="Link to this heading">#</a></h1>
+<p>Based mostly on the work carried out during the CIL Hackathon in Cambridge, UK 20-23 March 2023.</p>
+<p>Created by <a class="reference external" href="https://github.com/tommheik">Tommi Heikkilä</a>, University of Helsinki, Finland.</p>
+<p>Special thanks to the CIL team and Christoph Kolbitsch (PTB) for all the help.</p>
+<p>Computations performed using <code class="docutils literal notranslate"><span class="pre">CIL</span> <span class="pre">23.0.1</span></code>.</p>
+<section id="General-outline">
+<h2>General outline<a class="headerlink" href="#General-outline" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Setup: CIL, load the data, the geometry etc.</p></li>
+<li><p>Start with static data and single time step reconstruction</p></li>
+<li><p>Move to dynamic data and single time step reconstruction</p></li>
+<li><p>Split dynamic data into multiple time steps (batches)</p></li>
+<li><p>Reconstruct each at the same time using FISTA and (spatial) TV regularization</p></li>
+<li><p>(Inefficient temporal + spatial TV implementation)</p></li>
+</ol>
+</section>
+<section id="Future-goal">
+<h2>Future goal<a class="headerlink" href="#Future-goal" title="Link to this heading">#</a></h2>
+<p>Temporal (anisotropic) TV regularization (i.e regularize across time steps) for controlled temporal evolution. Preferably in a more efficient manner, similar to <em>Papoutsellis E et al.</em> (2021) <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral tomography</a>. Phil. Trans. R. Soc. A 20200193.</p>
+<p><strong>Note</strong>: it is very likely that the approach taken here (<code class="docutils literal notranslate"><span class="pre">Partitioner</span></code>) is not suitable for this.</p>
+</section>
+<section id="License">
+<h2>License<a class="headerlink" href="#License" title="Link to this heading">#</a></h2>
+<p>This code is licensed under the Apache License, Version 2.0 which is availalbe at: <a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>The STEMPO Dataset is licensed under Creative Commons Attributiom 4.0 International: <a class="reference external" href="https://creativecommons.org/licenses/by/4.0/legalcode">https://creativecommons.org/licenses/by/4.0/legalcode</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># cil imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">BlockDataContainer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Slicer</span><span class="p">,</span> <span class="n">AbsorptionTransmissionConverter</span><span class="p">,</span> <span class="n">TransmissionAbsorptionConverter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">ZeroFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGLS</span><span class="p">,</span> <span class="n">SIRT</span><span class="p">,</span> <span class="n">FISTA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">GradientOperator</span><span class="p">,</span> <span class="n">IdentityOperator</span><span class="p">,</span> <span class="n">FiniteDifferenceOperator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDK</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">TomoPhantom</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show1D</span><span class="p">,</span> <span class="n">show_geometry</span>
+
+<span class="c1"># External imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mat73</span> <span class="c1"># This makes loading MATLAB v7.3 files much easier # can be installed via pip</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+23.0.1
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set logging level for CIL processors:</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cil.processors&#39;</span><span class="p">)</span>
+<span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="1.-Load-STEMPO-data">
+<h2>1. Load STEMPO data<a class="headerlink" href="#1.-Load-STEMPO-data" title="Link to this heading">#</a></h2>
+<p>Data is available in Zenodo: <a class="reference external" href="https://zenodo.org/record/7147139">https://zenodo.org/record/7147139</a> / <a class="reference external" href="https://doi.org/10.5281/zenodo.7147139">https://doi.org/10.5281/zenodo.7147139</a></p>
+<p>Let’s start with the <strong>static data</strong> to make sure the geometry is set up correctly</p>
+<p><strong>Note</strong>: it may be worth using smaller resolution data (larger binning value) than <span class="math notranslate nohighlight">\(b=4\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;stempo_static_2d_b4.mat&quot;</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">mat73</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;CtData&quot;</span><span class="p">]</span>
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;sinogram&quot;</span><span class="p">])</span>
+<span class="c1"># Load parameters</span>
+<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;angles&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sinogram size is </span><span class="si">{</span><span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Sinogram size is (360, 560)
+</pre></div></div>
+</div>
+<section id="1.1-Set-up-one-large-geometry">
+<h3>1.1 Set up one large geometry<a class="headerlink" href="#1.1-Set-up-one-large-geometry" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquisition geometry parameters</span>
+<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;binningPost&quot;</span><span class="p">]</span> <span class="c1"># Data is binned</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceOrigin&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceDetector&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">ODD</span> <span class="o">=</span> <span class="n">SDD</span> <span class="o">-</span> <span class="n">SOD</span> <span class="c1"># Origin-detector-distance</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;pixelSizePost&quot;</span><span class="p">]</span> <span class="c1"># Detector pixel width after binning</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+SOD: 410.660 mm
+SDD: 553.740 mm
+ODD: 143.080 mm
+Detector pixel size: 0.200 mm
+</pre></div></div>
+</div>
+<p>Note that we can not change the rotational axis direction in fan-beam geometry so we simply change the sign of the angles</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">num_angles</span><span class="p">,</span> <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">angles</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2D Cone-beam tomography
+System configuration:
+        Source position: [   0.  , -410.66]
+        Rotation axis position: [0., 0.]
+        Detector position: [  0.  , 143.08]
+        Detector direction x: [1., 0.]
+Panel configuration:
+        Number of pixels: [560   1]
+        Pixel size: [0.2 0.2]
+        Pixel origin: bottom-left
+Channel configuration:
+        Number of channels: 1
+Acquisition description:
+        Number of positions: 360
+        Angles 0-20 in degrees:
+[ -0.,  -1.,  -2.,  -3.,  -4.,  -5.,  -6.,  -7.,  -8.,  -9., -10., -11.,
+ -12., -13., -14., -15., -16., -17., -18., -19.]
+Distances in units: mm
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_11_0.png" src="../../_images/demos_stempo2d_v2_1_11_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fcc07ee6c20&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup image geometry</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">num_pixels</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">n</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">n</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x560,y560
+voxel_size : x0.14832231733304438,y0.14832231733304438
+center : x0,y0
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup data</span>
+<span class="n">stempoData</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">sinogram</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">stempoData</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_14_0.png" src="../../_images/demos_stempo2d_v2_1_14_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcc07fc5900&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="2.-FBP-of-the-static-data">
+<h2>2. FBP of the static data<a class="headerlink" href="#2.-FBP-of-the-static-data" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># run on the AcquisitionData</span>
+<span class="n">recon_fbp_static</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">stempoData</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon_fbp_static</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_18_0.png" src="../../_images/demos_stempo2d_v2_1_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbffb16b30&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="3.-Repeat-the-previous-steps-with-dynamic-data">
+<h2>3. Repeat the previous steps with dynamic data<a class="headerlink" href="#3.-Repeat-the-previous-steps-with-dynamic-data" title="Link to this heading">#</a></h2>
+<p><strong>Note</strong>: variable names are reused</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load data</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;stempo_seq8x45_2d_b4.mat&quot;</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">mat73</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;CtData&quot;</span><span class="p">]</span>
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;sinogram&quot;</span><span class="p">])</span>
+<span class="c1"># Load parameters</span>
+<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;angles&quot;</span><span class="p">])</span>
+
+<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;binningPost&quot;</span><span class="p">]</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceOrigin&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceDetector&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">ODD</span> <span class="o">=</span> <span class="n">SDD</span> <span class="o">-</span> <span class="n">SOD</span> <span class="c1"># Origin-detector-distance</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;pixelSizePost&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+
+<span class="c1"># Acquisition geometry</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">num_angles</span><span class="p">,</span> <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">angles</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+
+<span class="c1"># Setup image geometry</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">540</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">n</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">n</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+SOD: 410.660 mm
+SDD: 553.740 mm
+ODD: 143.080 mm
+Detector pixel size: 0.200 mm
+2D Cone-beam tomography
+System configuration:
+        Source position: [   0.  , -410.66]
+        Rotation axis position: [0., 0.]
+        Detector position: [  0.  , 143.08]
+        Detector direction x: [1., 0.]
+Panel configuration:
+        Number of pixels: [560   1]
+        Pixel size: [0.2 0.2]
+        Pixel origin: bottom-left
+Channel configuration:
+        Number of channels: 1
+Acquisition description:
+        Number of positions: 360
+        Angles 0-20 in degrees:
+[  -0.,   -8.,  -16.,  -24.,  -32.,  -40.,  -48.,  -56.,  -64.,  -72.,
+  -80.,  -88.,  -96., -104., -112., -120., -128., -136., -144., -152.]
+Distances in units: mm
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x540,y540
+voxel_size : x0.14832231733304438,y0.14832231733304438
+center : x0,y0
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup data</span>
+<span class="n">stempoData</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">sinogram</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">stempoData</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_21_0.png" src="../../_images/demos_stempo2d_v2_1_21_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbffb98e50&gt;
+</pre></div></div>
+</div>
+<p>The sinogram looks rather busy since it contains (sparse set of) projections from 8 full rotations around the object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sinogram</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.image.AxesImage at 0x7fcbffbcb850&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_23_1.png" src="../../_images/demos_stempo2d_v2_1_23_1.png" />
+</div>
+</div>
+<section id="3.1-Witness-the-movement-artefacts">
+<h3>3.1 Witness the movement artefacts<a class="headerlink" href="#3.1-Witness-the-movement-artefacts" title="Link to this heading">#</a></h3>
+<p>Using the adjoint of the projection operator we can see some of the movement artefacts:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create projection operator using Astra-Toolbox.</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">stempoData</span><span class="p">)</span> <span class="c1"># Backgprojection</span>
+<span class="n">show2D</span><span class="p">([</span> <span class="n">bp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span> <span class="s1">&#39;Adjoint reconstruction&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_26_0.png" src="../../_images/demos_stempo2d_v2_1_26_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf519dcc0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="3.2-FBP-reconstruction-of-a-dynamic-data">
+<h3>3.2 FBP reconstruction of a dynamic data<a class="headerlink" href="#3.2-FBP-reconstruction-of-a-dynamic-data" title="Link to this heading">#</a></h3>
+<p>Compare the back projection from the dynamic data from the previous reconstruction from static data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="c1"># run on the AcquisitionData</span>
+<span class="n">recon_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">stempoData</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp_static</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Static reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic reconstruction&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_29_0.png" src="../../_images/demos_stempo2d_v2_1_29_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf4f68370&gt;
+</pre></div></div>
+</div>
+<p>That looks terrible. Let’s remove negative pixel values by fixing the range of the plot:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_31_0.png" src="../../_images/demos_stempo2d_v2_1_31_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcc08099ed0&gt;
+</pre></div></div>
+</div>
+<p>Now it only looks bad. We can see notable motion artefacts in the middle and a lot of sparse angle artefacts since we only have 45 unique projection directions.</p>
+</section>
+<section id="3.3-Iterative-methods-have-the-same-artefacts">
+<h3>3.3 Iterative methods have the same artefacts<a class="headerlink" href="#3.3-Iterative-methods-have-the-same-artefacts" title="Link to this heading">#</a></h3>
+<p>First use CGLS to solve the optimisation problem</p>
+<div class="math notranslate nohighlight">
+\[\min_x\|Ax-y\|_2^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the image to reconstruct, <span class="math notranslate nohighlight">\(A\)</span> is the projection operator, and <span class="math notranslate nohighlight">\(y\)</span> is the observed sinogram.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialisation of the optimisation algorithm - zero array in this case</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup CGLS</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">stempoData</span><span class="p">,</span>
+            <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Running for 50 iterations gives a similar reconstruction to the FBP:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># get and visualise the results</span>
+<span class="n">recon_cgls</span> <span class="o">=</span> <span class="n">cgls</span><span class="o">.</span><span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        100         0.000          6.73189e+04
+       10        100         0.061          3.45551e+03
+       20        100         0.060          3.43862e+03
+       30        100         0.059          3.43665e+03
+       40        100         0.068          3.43600e+03
+       50        100         0.080          3.43566e+03
+-------------------------------------------------------
+       50        100         0.080          3.43566e+03
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<p>We can also try running for a smaller number of iterations to regularise by early stopping:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialisation of the optimisation algorithm - zero array in this case</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup CGLS</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">stempoData</span><span class="p">,</span>
+            <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span>
+
+<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># get and visualise the results</span>
+<span class="n">recon_cgls_early_stopping</span> <span class="o">=</span> <span class="n">cgls</span><span class="o">.</span><span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        100         0.000          6.73189e+04
+-------------------------------------------------------
+        5        100         0.117
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_cgls</span><span class="p">,</span> <span class="n">recon_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS_early_stopping&#39;</span><span class="p">],</span> \
+       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_40_0.png" src="../../_images/demos_stempo2d_v2_1_40_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf4c28d30&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="3.4-Consider-only-one-time-step-(out-of-8)">
+<h3>3.4 Consider only one time step (out of 8)<a class="headerlink" href="#3.4-Consider-only-one-time-step-(out-of-8)" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Limited angles</span>
+<span class="c1"># We cut a small section out of the sinogram and angles</span>
+<span class="n">numAngles</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">anglesSparse</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">numAngles</span><span class="p">]</span>
+<span class="n">sinoSparse</span> <span class="o">=</span> <span class="n">sinogram</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">numAngles</span><span class="p">,:]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sinogram size is now </span><span class="si">{</span><span class="n">sinoSparse</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">agSparse</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">agSparse</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">anglesSparse</span><span class="p">)</span>
+<span class="n">stempoSparse</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">sinoSparse</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">agSparse</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">stempoSparse</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Sinogram size is now (45, 560)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_42_1.png" src="../../_images/demos_stempo2d_v2_1_42_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf4c41060&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="c1"># run on the AcquisitionData</span>
+<span class="n">sparse_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">stempoSparse</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;t=1, 45 angles FBP&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_43_0.png" src="../../_images/demos_stempo2d_v2_1_43_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf4f7a0e0&gt;
+</pre></div></div>
+</div>
+<p>Some movement artefacts are still visible but the situations has improved. Let’s try iterative algorithm (cgls) and consider regularisation by early stopping:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="c1"># initial estimate - zero array in this case</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup CGLS</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">stempoSparse</span><span class="p">,</span>
+            <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span>
+
+
+<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># get and visualise the results</span>
+<span class="n">sparse_cgls</span> <span class="o">=</span> <span class="n">cgls</span><span class="o">.</span><span class="n">solution</span>
+
+
+<span class="c1"># initialisation of the optimisation algorithm - zero array in this case</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup CGLS</span>
+<span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">stempoSparse</span><span class="p">,</span>
+            <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span>
+
+<span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># get and visualise the results</span>
+<span class="n">sparse_cgls_early_stopping</span> <span class="o">=</span> <span class="n">cgls</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">sparse_cgls</span><span class="p">,</span> <span class="n">sparse_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS_early_stopping&#39;</span><span class="p">],</span> \
+       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        100         0.000          8.42717e+03
+       10        100         0.078          1.65551e+01
+       20        100         0.070          1.36376e+01
+       30        100         0.069          1.30771e+01
+       40        100         0.070          1.28557e+01
+       50        100         0.062          1.27849e+01
+-------------------------------------------------------
+       50        100         0.062          1.27849e+01
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        100         0.000          8.42717e+03
+-------------------------------------------------------
+        5        100         0.026
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_45_1.png" src="../../_images/demos_stempo2d_v2_1_45_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf4f680d0&gt;
+</pre></div></div>
+</div>
+<p>Try Tikhonov regularisation:</p>
+<div class="math notranslate nohighlight">
+\[\min_x\|Ax-y\|_2^2+\alpha\|x\|_2^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is a regularisation parameter that balances the data discrepency term and the regularisation term:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Tikhonov regularization with one time step</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.7</span>
+
+<span class="n">operator_block</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
+<span class="n">zero_data</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">data_block</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">stempoSparse</span><span class="p">,</span> <span class="n">zero_data</span><span class="p">)</span>
+
+<span class="c1">#setup CGLS with the Block Operator and Block DataContainer</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cgls_tikh</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">operator_block</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_block</span><span class="p">,</span> <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">)</span>
+<span class="n">cgls_tikh</span><span class="o">.</span><span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="c1">#run the algorithm until convergence</span>
+<span class="n">cgls_tikh</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">cgls_tikh</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          8.42717e+03
+       10       1000         0.059          3.78615e+01
+       20       1000         0.075          3.55106e+01
+       30       1000         0.081          3.52775e+01
+       40       1000         0.083          3.52379e+01
+       50       1000         0.086          3.52269e+01
+       60       1000         0.088          3.52224e+01
+       70       1000         0.087          3.52186e+01
+       80       1000         0.087          3.52170e+01
+       90       1000         0.086          3.52167e+01
+      100       1000         0.085          3.52175e+01
+      110       1000         0.084          3.52195e+01
+      120       1000         0.084          3.52204e+01
+      130       1000         0.085          3.52230e+01
+      140       1000         0.083          3.52247e+01
+      150       1000         0.080          3.52255e+01
+      160       1000         0.077          3.52256e+01
+      170       1000         0.075          3.52266e+01
+      180       1000         0.073          3.52284e+01
+      190       1000         0.071          3.52284e+01
+      200       1000         0.069          3.52284e+01
+      210       1000         0.067          3.52282e+01
+      220       1000         0.066          3.52285e+01
+      230       1000         0.066          3.52282e+01
+      240       1000         0.067          3.52266e+01
+      250       1000         0.068          3.52250e+01
+      260       1000         0.069          3.52230e+01
+      270       1000         0.070          3.52216e+01
+      280       1000         0.071          3.52198e+01
+      290       1000         0.072          3.52187e+01
+      300       1000         0.073          3.52180e+01
+      310       1000         0.073          3.52176e+01
+      320       1000         0.074          3.52175e+01
+      330       1000         0.074          3.52170e+01
+      340       1000         0.075          3.52169e+01
+      350       1000         0.075          3.52168e+01
+      360       1000         0.074          3.52166e+01
+      370       1000         0.073          3.52164e+01
+      380       1000         0.072          3.52164e+01
+      390       1000         0.071          3.52164e+01
+      400       1000         0.070          3.52162e+01
+      401       1000         0.070
+Tolerance is reached: 1e-05
+-------------------------------------------------------
+      401       1000         0.070
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_47_1.png" src="../../_images/demos_stempo2d_v2_1_47_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbf509c190&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="3.5-Just-in-case,-test-FISTA-with-one-time-step-and-non-negativity-constraint">
+<h3>3.5 Just in case, test FISTA with one time step and non negativity constraint<a class="headerlink" href="#3.5-Just-in-case,-test-FISTA-with-one-time-step-and-non-negativity-constraint" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="n">LS</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">stempoSparse</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">fista_LS</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          8.42717e+03
+       10       1000         0.021          7.46408e+01
+       20       1000         0.021          1.99271e+01
+       30       1000         0.021          1.60728e+01
+       40       1000         0.021          1.52739e+01
+       50       1000         0.021          1.49438e+01
+       60       1000         0.021          1.48031e+01
+       70       1000         0.021          1.47198e+01
+       80       1000         0.021          1.46630e+01
+       90       1000         0.023          1.46259e+01
+      100       1000         0.023          1.45980e+01
+-------------------------------------------------------
+      100       1000         0.023          1.45980e+01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">LS_reco</span> <span class="o">=</span> <span class="n">fista_LS</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">LS_reco</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;LS reconstruction&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_51_0.png" src="../../_images/demos_stempo2d_v2_1_51_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb7488b20&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="4.-Split-into-separate-time-steps">
+<h2>4. Split into separate time steps<a class="headerlink" href="#4.-Split-into-separate-time-steps" title="Link to this heading">#</a></h2>
+<p>We want to treat data mismatch of each time step separately but consider only one 2d + time object <span class="math notranslate nohighlight">\(f\)</span>, i.e. something like</p>
+<div class="math notranslate nohighlight">
+\[\Big\| \sum_{t=0}^{T-1} A f_t - m_t \Big\|^2 + \alpha R(f)\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Split time steps</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">Partitioner</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">L2NormSquared</span><span class="p">,</span> <span class="n">L1Norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">MixedL21Norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZeroOperator</span>
+<span class="n">stempoSplit</span> <span class="o">=</span> <span class="n">stempoData</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">Partitioner</span><span class="o">.</span><span class="n">SEQUENTIAL</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">stempoSplit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_54_0.png" src="../../_images/demos_stempo2d_v2_1_54_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb7488970&gt;
+</pre></div></div>
+</div>
+<section id="4.1-Build-block-(diagonal)-operators">
+<h3>4.1 Build block (diagonal) operators<a class="headerlink" href="#4.1-Build-block-(diagonal)-operators" title="Link to this heading">#</a></h3>
+<p>Regular block operators and functions are block-like either in row or column direction, what we want is something like</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A_{big} =
+\left(\begin{array}{cccc}
+A_0 &amp; 0 &amp; \dots &amp; 0 \\
+0 &amp; A_1 &amp; \dots &amp; 0 \\
+\vdots &amp; &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; \dots &amp; A_{T-1}
+\end{array}\right).\end{split}\]</div>
+<p>Unfortunately at the moment CIL can not create such operators in efficient (sparse) way. So we have to do it inefficiently.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projOp</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">stempoSplit</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="n">projOpList</span> <span class="o">=</span> <span class="n">projOp</span><span class="o">.</span><span class="n">get_as_list</span><span class="p">()</span> <span class="c1"># List of the operators we want</span>
+
+<span class="c1"># We need a zero-operator for padding (If the sizes changed for different time steps this would be pain)</span>
+<span class="c1"># (Luckily they don&#39;t)</span>
+<span class="n">ZOp</span> <span class="o">=</span> <span class="n">ZeroOperator</span><span class="p">(</span><span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> <span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
+
+<span class="n">Alist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ZOp</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">T</span><span class="p">)]</span> <span class="c1"># Long list of zero-operators</span>
+<span class="c1"># Fill diagonal with proper operators</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">Alist</span><span class="p">[</span><span class="n">t</span><span class="o">*</span><span class="n">T</span><span class="o">+</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">projOpList</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+
+<span class="c1"># Obtain block-diagonal square operator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="o">*</span><span class="n">Alist</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">T</span><span class="p">))</span>
+
+<span class="n">bList</span> <span class="o">=</span> <span class="p">[</span><span class="n">stempoSplit</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">bList</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial value using A</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="c1"># Sanity check: we should see 8 different images</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_57_0.png" src="../../_images/demos_stempo2d_v2_1_57_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb798af20&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We initialize with zeros, which we have to do by iterating each image</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">x0</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="5.-Iterative-algorithms-with-multiple-time-steps">
+<h2>5. Iterative algorithms with multiple time steps<a class="headerlink" href="#5.-Iterative-algorithms-with-multiple-time-steps" title="Link to this heading">#</a></h2>
+<section id="5.1-FISTA-with-non-negativity-constraint-for-each-time-step">
+<h3>5.1 FISTA with non-negativity constraint for each time step<a class="headerlink" href="#5.1-FISTA-with-non-negativity-constraint-for-each-time-step" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Nonnegativity constraint block function to act on each image separately</span>
+<span class="n">IBList</span> <span class="o">=</span> <span class="p">[</span><span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">IB</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="n">IBList</span><span class="p">)</span>
+
+<span class="c1"># One large least squares term</span>
+<span class="n">F_LS</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">stempoSplit</span><span class="p">)</span>
+
+<span class="c1"># Set up FISTA algorithm</span>
+<span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F_LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">IB</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        200         0.000          6.73190e+04
+       10        200         0.215          5.86625e+03
+       20        200         0.217          2.03110e+03
+       30        200         0.217          8.11439e+02
+       40        200         0.219          4.63374e+02
+       50        200         0.219          3.24651e+02
+       60        200         0.219          2.71682e+02
+       70        200         0.218          2.53289e+02
+       80        200         0.218          2.43930e+02
+       90        200         0.219          2.38423e+02
+      100        200         0.218          2.35406e+02
+-------------------------------------------------------
+      100        200         0.218          2.35406e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FISTArecn</span> <span class="o">=</span> <span class="n">fista</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">FISTArecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_63_0.png" src="../../_images/demos_stempo2d_v2_1_63_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb675ddb0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="5.2-Let's-do-some-(spatial)-TV-regularization">
+<h3>5.2 Let’s do some (spatial) TV regularization<a class="headerlink" href="#5.2-Let's-do-some-(spatial)-TV-regularization" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.ccpi_regularisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">FGP_TV</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">TVlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="n">TVlist</span><span class="p">)</span> <span class="c1"># Unroll the list as before</span>
+
+<span class="n">fista_TV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F_LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">TV</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista_TV</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        500         0.000          6.73190e+04
+       10        500         0.532          5.88299e+03
+       20        500         0.423          2.07038e+03
+       30        500         0.390          8.61867e+02
+       40        500         0.371          5.19534e+02
+       50        500         0.361          3.84051e+02
+       60        500         0.354          3.32823e+02
+       70        500         0.348          3.15552e+02
+       80        500         0.345          3.06732e+02
+       90        500         0.342          3.01659e+02
+      100        500         0.339          2.98781e+02
+-------------------------------------------------------
+      100        500         0.339          2.98781e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FISTATVrecn</span> <span class="o">=</span> <span class="n">fista_TV</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">FISTATVrecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_68_0.png" src="../../_images/demos_stempo2d_v2_1_68_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb6f356c0&gt;
+</pre></div></div>
+</div>
+<p>This doesn’t seem too bad. However our block-diagonal approach does have its limits. Let’s push them!</p>
+</section>
+</section>
+<section id="6.-Hacky-temporal-TV">
+<h2>6. Hacky temporal TV<a class="headerlink" href="#6.-Hacky-temporal-TV" title="Link to this heading">#</a></h2>
+<p>i.e. so many block diagonal operators…</p>
+<p>For temporal TV we want to subtract subsequent time steps: <span class="math notranslate nohighlight">\(f_t - f_{t+1}\)</span>. We can do this with a linear operator:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}D_{t} =
+\left(\begin{array}{ccccc}
+I &amp; -I &amp; 0 &amp; \dots &amp; 0 \\
+0 &amp; I &amp; -I &amp; \dots &amp; 0 \\
+\vdots &amp; &amp; &amp; \ddots &amp; \vdots \\
+0 &amp; &amp; \dots &amp; I &amp; -I \\
+0 &amp; &amp; \dots &amp; &amp; 0
+\end{array}\right)\end{split}\]</div>
+<p>and then do $R(f) = :nbsphinx-math:<a href="#id1"><span class="problematic" id="id2">`</span></a>alpha <a href="#id3"><span class="problematic" id="id4">`</span></a>| D_t f |_2^2 $.</p>
+<p>Problem is, we have very limited options for creating the operator such that the optimization methods still work. Luckily there is a way…</p>
+<section id="6.1-Let's-use-MASSIVE-block-operators">
+<h3>6.1 Let’s use MASSIVE block operators<a class="headerlink" href="#6.1-Let's-use-MASSIVE-block-operators" title="Link to this heading">#</a></h3>
+<p>(This will be slow)</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}M =
+\left(\begin{array}{cc}
+A_{big} \\
+\alpha D_t
+\end{array}\right) =
+\left(\begin{array}{ccc}
+A_0 &amp; \dots &amp; 0 \\
+&amp; \ddots &amp;  \\
+0 &amp; \dots &amp; A_{T-1} \\
+\alpha I &amp; -\alpha I &amp; \\
+&amp; \ddots &amp; \\
+0 &amp; \dots &amp; 0
+\end{array}\right)
+, \quad B = \left(\begin{array}{cc}
+b_0 \\
+\vdots \\
+b_{T-1} \\
+0 \\
+\vdots \\
+0
+\end{array}\right)\end{split}\]</div>
+<p>and do least squares term with that</p>
+<div class="math notranslate nohighlight">
+\[\| M f - B \|_2^2 = \| A_{big} f - b \|_2^2 + \alpha^2 \| D_t f \|_2^2.\]</div>
+<p>This way our functional will be</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{F}(f) = \sum_{t=0}^{T-1} \left( \| A f_t - b_t \|_2^2 + \beta \, TV(f_t) \right) + \alpha^2 \| D_t f \|_2^2 .\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">IdentityOperator</span>
+
+<span class="n">projOp</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">stempoSplit</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+<span class="n">projOpList</span> <span class="o">=</span> <span class="n">projOp</span><span class="o">.</span><span class="n">get_as_list</span><span class="p">()</span> <span class="c1"># List of the operators we want</span>
+
+<span class="c1"># We want the zero operator to have same domain and range as the forward operator projOp</span>
+<span class="n">ZOp1</span> <span class="o">=</span> <span class="n">ZeroOperator</span><span class="p">(</span><span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> <span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
+<span class="n">Alist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ZOp1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">T</span><span class="p">)]</span> <span class="c1"># Long list of zero-operators</span>
+<span class="c1"># Fill diagonal with proper operators</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">Alist</span><span class="p">[</span><span class="n">t</span><span class="o">*</span><span class="n">T</span><span class="o">+</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">projOpList</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+
+<span class="c1"># Now we want to make each block operate from image domain to image domain!</span>
+<span class="n">ZOp2</span> <span class="o">=</span> <span class="n">ZeroOperator</span><span class="p">(</span><span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> <span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
+<span class="n">IOp</span> <span class="o">=</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> <span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># Regularization parameter for temporal TV</span>
+
+<span class="n">DtList</span> <span class="o">=</span> <span class="p">[</span><span class="n">ZOp2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">T</span><span class="p">)]</span> <span class="c1"># Long list of zero-operators</span>
+<span class="c1"># Fill diagonal and off-diagonal with proper operators (last row is zeroes for simplicity)</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">DtList</span><span class="p">[</span><span class="n">t</span><span class="o">*</span><span class="n">T</span><span class="o">+</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">IOp</span>
+    <span class="n">DtList</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">((</span><span class="n">t</span><span class="p">,</span><span class="n">T</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">T</span><span class="o">+</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span><span class="o">*</span><span class="n">IOp</span>
+
+<span class="c1"># Use existing lists of operators and concanate</span>
+<span class="n">Mlist</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">Alist</span><span class="p">,</span> <span class="o">*</span><span class="n">DtList</span><span class="p">]</span>
+<span class="c1"># Obtain block-diagonal rectangular operator</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="o">*</span><span class="n">Mlist</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">T</span><span class="p">,</span><span class="n">T</span><span class="p">))</span>
+
+<span class="n">bList</span> <span class="o">=</span> <span class="p">[</span><span class="n">stempoSplit</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">x0List</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="o">*</span><span class="n">bList</span><span class="p">,</span> <span class="o">*</span><span class="n">x0List</span><span class="p">])</span> <span class="c1"># Concanate lists</span>
+
+<span class="n">MASSIVE_LS</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s add spatial TV to the mix (luckily it can also include non-negativity)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="c1"># Regularization parameter for spatial TV</span>
+
+<span class="n">TV</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can set function g to be just non-negativity constraint (g=IB) or non-negativity + spatial TV (g=TV)</span>
+<span class="c1"># Note that including spatial TV will make the algorithm even slower!</span>
+<span class="n">fista_MASSIVE</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">MASSIVE_LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">TV</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>So far so good. Fingers crossed it runs…</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista_MASSIVE</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        100         0.000          6.73190e+04
+       10        100         0.347          6.32259e+03
+       20        100         0.353          2.61179e+03
+       30        100         0.353          1.43551e+03
+       40        100         0.422          1.06185e+03
+       50        100         0.439          9.13366e+02
+-------------------------------------------------------
+       50        100         0.439          9.13366e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MASSIVErecn</span> <span class="o">=</span> <span class="n">fista_MASSIVE</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">MASSIVErecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_stempo2d_v2_1_77_0.png" src="../../_images/demos_stempo2d_v2_1_77_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fcbb5a38f10&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Comments">
+<h3>Comments<a class="headerlink" href="#Comments" title="Link to this heading">#</a></h3>
+<p>It is possible to obtain (isotropic) temporal TV this way. Whether you actually <em>should</em> do it is another question. It’s definitely not efficient. Also the isotropic TV may not be the best choice because it seems to cause motion artefacts as it smooths the temporal evolution.</p>
+<p>Nevertheless it is a fun experiment and illustrates the capabilities of CIL.</p>
+<p>For another example of dynamic reconstructions see the demo on dynamic CT: <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/3_Multichannel/02_Dynamic_CT.ipynb">https://github.com/TomographicImaging/CIL-Demos/blob/main/demos/3_Multichannel/02_Dynamic_CT.ipynb</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../deriv2_cgls/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1D inverse problem demo using deriv2 from regtools</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../dynamic_mr_recon/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dynamic MR Reconstruction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

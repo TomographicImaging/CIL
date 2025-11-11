@@ -1,0 +1,1797 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/013_Anisotropic_regularisation_FILD_measurements';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels" href="../Simulation_and_CPU_reconstruction/" />
+    <link rel="prev" title="Controlled Wavelet Sparsity using callbacks (3D data)" href="../controlledWaveletSparsity_3d/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Data-Availability">Data Availability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#What-You'll-Learn">What You’ll Learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Experimental-data-reconstructions">Experimental data reconstructions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/013_Anisotropic_regularisation_FILD_measurements.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="CIL-User-Showcase-13:-Anisotropic-Regularization-for-FILD-Measurements-using-CIL">
+<h1>CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL<a class="headerlink" href="#CIL-User-Showcase-13:-Anisotropic-Regularization-for-FILD-Measurements-using-CIL" title="Link to this heading">#</a></h1>
+<p>Copyright 2024 Bo Simmendefeldt Schmidt and collaborators.</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http://www.apache.org/licenses/LICENSE-2.0
+</pre></div>
+</div>
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+<div class="line-block">
+<div class="line"><strong>Author:</strong> Bo Simmendefeldt Schmidt</div>
+<div class="line"><strong>Affiliation:</strong> Department of Physics and Astronomy, University of California, Irvine</div>
+<div class="line"><strong>Contact:</strong> <a class="reference external" href="mailto:bo&#46;simmendefeldt&#37;&#52;&#48;uci&#46;edu">bo<span>&#46;</span>simmendefeldt<span>&#64;</span>uci<span>&#46;</span>edu</a></div>
+</div>
+<p>This notebook demonstrates how to use the Core Imaging Library (CIL) to implement anisotropic regularization for the reconstruction of fast-ion loss detector (FILD) measurements, as described in <a class="reference external" href="https://doi.org/10.1088/1741-4326/ad75a5">Simmendefeldt Schmidt et al 2024</a>.</p>
+<section id="Table-of-Contents">
+<h2>Table of Contents<a class="headerlink" href="#Table-of-Contents" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Prerequisites</p></li>
+<li><p>Background and Overview</p></li>
+<li><p>Setup and Imports</p></li>
+<li><p>Custom Operators</p></li>
+<li><p>Loading Weight Functions</p></li>
+<li><p>Anisotropic Regularization Framework</p></li>
+<li><p>Implementation and Reconstruction</p></li>
+<li><p>Results and Analysis</p></li>
+</ol>
+<p>## 1. Prerequisites</p>
+<p>This notebook has been tested with the following package versions:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CIL (Core Imaging Library)</p></td>
+<td><p>24.2.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>NumPy</p></td>
+<td><p>1.26.4</p></td>
+</tr>
+<tr class="row-even"><td><p>Matplotlib</p></td>
+<td><p>3.9.2</p></td>
+</tr>
+<tr class="row-odd"><td><p>SciPy</p></td>
+<td><p>1.14.1</p></td>
+</tr>
+<tr class="row-even"><td><p>netCDF4</p></td>
+<td><p>1.7.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>PyWavelets</p></td>
+<td><p>1.7.0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Later versions may also work but have not been tested.</p>
+</section>
+<section id="Data-Availability">
+<h2>Data Availability<a class="headerlink" href="#Data-Availability" title="Link to this heading">#</a></h2>
+<div class="line-block">
+<div class="line">The datasets used in this notebook are publicly available at the git repository:</div>
+<div class="line"><a class="reference external" href="https://github.com/bosschmidt/AniReg_FILD">https://github.com/bosschmidt/AniReg_FILD</a></div>
+</div>
+<p>Additional custom files required can also be found and downloaded from this git repository:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">my_custom_operator.py</span></code>: Custom FILD operator implementation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manolo_colormap.py</span></code>: Custom colormap for visualization</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b_2D.npy</span></code>: Experimental FILD data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">34614_Bo_v2023_4_weight_function.nc</span></code>: Simulated system matrix</p></li>
+</ul>
+<p>## 2. Background Fast-ion loss detectors (FILDs) are diagnostic tools in experimental magnetically confined fusion plasma devices, measuring the velocity distribution of lost fast ions. The measurement principle is detailed in <a class="reference external" href="https://doi.org/10.1088/1361-6587/ad268f">Simmendefeldt Schmidt et al 2024</a>, where lost fast ions impact a plate coated with a scintillating material, emitting photons which are subsequently measured by a camera. The velocity space coordinates (<span class="math notranslate nohighlight">\(g\)</span>,
+<span class="math notranslate nohighlight">\(\alpha\)</span>) used in this analysis are defined in <a class="reference external" href="https://doi.org/10.1088/1741-4326/ad75a5">Simmendefeldt Schmidt et al 2024</a>, where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(g\)</span> (gyroscalar): Relates to particle energy</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> (pitch angle): Describes the angle between particle velocity and magnetic field</p></li>
+</ul>
+<p>However, the reconstruction of these distributions from FILD measurements is an ill-posed inverse problem requiring careful regularization.</p>
+<p>This showcase demonstrates how CIL can be used to implement anisotropic regularization techniques that:</p>
+<ul class="simple">
+<li><p>Apply different regularization in different dimensions</p></li>
+<li><p>Improve reconstruction quality compared to traditional methods</p></li>
+<li><p>Preserve the physical characteristics of the fast-ion distribution</p></li>
+</ul>
+</section>
+<section id="What-You'll-Learn">
+<h2>What You’ll Learn<a class="headerlink" href="#What-You'll-Learn" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>How to set up an anisotropic regularization problem in CIL</p></li>
+<li><p>How to implement different regularization strategies (Tikhonov, total variation (TV), Besov-space priors)</p></li>
+</ul>
+<p>## 3. Setup and Imports</p>
+<p>The following section sets up the computational environment using CIL and necessary supporting libraries. Key imports include:</p>
+<ul class="simple">
+<li><p>CIL components for optimization and operator definitions</p></li>
+<li><p>Custom operators for FILD-specific computations</p></li>
+<li><p>Supporting libraries for data handling and visualization</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">rcParams</span>
+
+<span class="c1"># Optional formatting settings for matplotlib</span>
+<span class="c1">#rcParams[&#39;font.family&#39;] = &#39;serif&#39;</span>
+<span class="c1">#rcParams[&#39;font.serif&#39;] = [&#39;Computer Modern Roman&#39;]</span>
+<span class="c1">#rcParams[&#39;text.usetex&#39;] = True # Set to True to use LaTeX</span>
+<span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">manolo_colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">manolo_colormap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListedColormap</span>
+<span class="n">manolo_cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">manolo_colormap</span><span class="p">(</span><span class="mi">256</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">netCDF4</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegularGridInterpolator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">FiniteDifferenceOperator</span><span class="p">,</span> <span class="n">IdentityOperator</span><span class="p">,</span> <span class="n">WaveletOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">BlockFunction</span><span class="p">,</span> <span class="n">L2NormSquared</span><span class="p">,</span> <span class="n">L1Norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDHG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">callbacks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_custom_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyCustomOperator</span>
+</pre></div>
+</div>
+</div>
+<p>## 4. Custom Operators</p>
+<p>We implement a custom linear operator <code class="docutils literal notranslate"><span class="pre">MyCustomOperator</span></code> that handles the mapping between velocity space and measurement space. This operator extends CIL’s <code class="docutils literal notranslate"><span class="pre">LinearOperator</span></code> class and provides the following key functionality:</p>
+<ol class="arabic simple">
+<li><p><strong>Initialization</strong>:</p>
+<ul class="simple">
+<li><p>Takes a matrix <code class="docutils literal notranslate"><span class="pre">A</span></code> representing the FILD system response</p></li>
+<li><p>Requires domain and range geometries to define input/output spaces</p></li>
+<li><p>Allows specification of array ordering (‘C’ or ‘F’ style)</p></li>
+</ul>
+</li>
+<li><p><strong>Direct Operation</strong>:</p>
+<ul class="simple">
+<li><p>Implements the forward mapping from velocity space to measurement space</p></li>
+<li><p>Flattens input, applies matrix multiplication, and reshapes result</p></li>
+</ul>
+</li>
+<li><p><strong>Adjoint Operation</strong>:</p>
+<ul class="simple">
+<li><p>Implements the backward mapping from measurement space to velocity space</p></li>
+<li><p>Uses transpose of system matrix for adjoint computation</p></li>
+</ul>
+</li>
+</ol>
+<section id="Understanding-the-MyCustomOperator-Implementation">
+<h3>Understanding the MyCustomOperator Implementation<a class="headerlink" href="#Understanding-the-MyCustomOperator-Implementation" title="Link to this heading">#</a></h3>
+<p>Let’s understand the custom FILD operator step by step. This operator handles transformations between velocity space (where the physics lives) and measurement space (where the data is collected).</p>
+<section id="1.-The-Class-Foundation-(__init__)">
+<h4>1. The Class Foundation (<code class="docutils literal notranslate"><span class="pre">__init__</span></code>)<a class="headerlink" href="#1.-The-Class-Foundation-(__init__)" title="Link to this heading">#</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">MyCustomOperator</span></code> class inherits from CIL’s <code class="docutils literal notranslate"><span class="pre">LinearOperator</span></code> and is initialized with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>Key Parameters:</p>
+<ul class="simple">
+<li><p>self: References the specific instance being created</p></li>
+<li><p>A: The system matrix describing the response of the FILD</p></li>
+<li><p>domain_geometry: Structure of velocity space</p></li>
+<li><p>range_geometry: Structure of measurement space</p></li>
+<li><p>order: How to handle array transformations (‘C’ or ‘F’ style)</p></li>
+</ul>
+<p>The initialization process:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">super</span><span class="p">(</span><span class="n">MyCustomOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
+                                     <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+</pre></div>
+</div>
+<p>Sets up basic operator features and stores essential values for later use.</p>
+</section>
+<section id="2.-Forward-Operation-(direct)">
+<h4>2. Forward Operation (<code class="docutils literal notranslate"><span class="pre">direct</span></code>)<a class="headerlink" href="#2.-Forward-Operation-(direct)" title="Link to this heading">#</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">direct</span></code> method transforms velocity space data into measurement space:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>Process flow:</p>
+<ol class="arabic simple">
+<li><p><strong>Flatten input</strong>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">flattened_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Converts 2D velocity space data into 1D array.</p>
+<ol class="arabic simple" start="2">
+<li><p><strong>Apply system response</strong>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">flattened_x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Transforms the data using the FILD system matrix.</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>Reshape result</strong>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result_2d</span> <span class="o">=</span> <span class="n">result_1d</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">voxel_num_y</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">voxel_num_x</span><span class="p">),</span>
+                             <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Converts back to 2D measurement space format.</p>
+<ol class="arabic simple" start="4">
+<li><p><strong>Handle output</strong>:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">result_2d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">result_2d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Returns or fills provided output with results.</p>
+</section>
+<section id="3.-Backward-Operation-(adjoint)">
+<h4>3. Backward Operation (<code class="docutils literal notranslate"><span class="pre">adjoint</span></code>)<a class="headerlink" href="#3.-Backward-Operation-(adjoint)" title="Link to this heading">#</a></h4>
+<p>The adjoint method goes from measurement space back to velocity space. The process flow mirrors the direct method but using <span class="math notranslate nohighlight">\(A^{\mathrm{T}}\)</span> and <code class="docutils literal notranslate"><span class="pre">domain_geometry()</span></code> rather than <span class="math notranslate nohighlight">\(A\)</span> and <code class="docutils literal notranslate"><span class="pre">range_geometry()</span></code>.</p>
+</section>
+</section>
+<section id="Supporting-Operators:-WaveletOperator">
+<h3>Supporting Operators: WaveletOperator<a class="headerlink" href="#Supporting-Operators:-WaveletOperator" title="Link to this heading">#</a></h3>
+<p>In addition to our custom FILD operator, we use the <code class="docutils literal notranslate"><span class="pre">`WaveletOperator</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/WaveletOperator.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/WaveletOperator.py</a>&gt;`__ from CIL’s library for wavelet transformations. This operator implements discrete wavelet transforms for signal processing, supports various wavelet types (e.g., Haar, Daubechies), and handles both forward (analysis) and adjoint (synthesis) operations. The <code class="docutils literal notranslate"><span class="pre">WaveletOperator</span></code> is useful in our FILD
+analysis for implementing Besov-space prior regularization.</p>
+<p>## 5. Loading FILD Weight Functions</p>
+<p>The weight functions describe how the FILD system maps fast ions with specific velocities to measurements on the detector. These are essential for:</p>
+<ul class="simple">
+<li><p>Constructing the forward model matrix <span class="math notranslate nohighlight">\(A_{kn}\)</span></p></li>
+<li><p>Mapping between velocity space and measurement space</p></li>
+</ul>
+</section>
+<section id="Weight-Function-Properties">
+<h3>Weight Function Properties<a class="headerlink" href="#Weight-Function-Properties" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Physical meaning: Each row shows how any velocity-space distribution contributes (or “is weighted”) to the signal at a specific detector pixel–Ref. W W Heidbrink et al 2007 Plasma Phys. Control. Fusion 49 1457.</p></li>
+<li><p>Dimensions: <span class="math notranslate nohighlight">\([g \times \alpha]\)</span> for velocity space, identical to measurement coordinates</p></li>
+<li><p>Normalization: Weight functions are normalized for numerical stability</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;34614_Bo_v2023_4_weight_function.nc&#39;</span>
+
+<span class="c1"># Open the NetCDF file</span>
+<span class="n">nc_data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="c1"># Extract variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">][:])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">][:])</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;ys&#39;</span><span class="p">][:])</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;xs&#39;</span><span class="p">][:])</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">new_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">92</span><span class="p">)</span>
+<span class="n">new_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">52</span><span class="p">)</span>
+<span class="n">new_X</span><span class="p">,</span> <span class="n">new_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span><span class="p">)</span>
+<span class="n">new_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">new_Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">new_X</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;__xarray_dataarray_variable__&#39;</span><span class="p">][:])</span>
+<span class="n">new_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
+<span class="n">W</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="c1"># Close the file</span>
+<span class="n">nc_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>To avoid inverse crime, we use different grid dimensions for simulation (92x52 = 4784 points) and reconstruction (91x51 = 4641 points). We interpolate the weight functions to the finer domain geometry to generate the forward operator:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W_for</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_x</span><span class="p">)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">new_y</span><span class="p">)))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">W_for</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">W_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="n">interpolator</span> <span class="o">=</span> <span class="n">RegularGridInterpolator</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">W_temp</span><span class="p">)</span>
+    <span class="n">W_temp_interpolated</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">new_points</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_x</span><span class="p">))</span>
+    <span class="n">W_temp_row</span> <span class="o">=</span> <span class="n">W_temp_interpolated</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">W_for</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">W_temp_row</span>
+</pre></div>
+</div>
+</div>
+<p>## 6. Anisotropic Regularization Framework</p>
+</section>
+<section id="Motivation-from-FILD-Data-Characteristics">
+<h3>Motivation from FILD Data Characteristics<a class="headerlink" href="#Motivation-from-FILD-Data-Characteristics" title="Link to this heading">#</a></h3>
+<p>FILD measurements have distinct behaviors in different dimensions:</p>
+<ul class="simple">
+<li><p><strong>Gyroscalar (:math:`g`)</strong>: Shows highly localized peaks corresponding to specific particle energies (e.g., from neutral beam injection (NBI))</p></li>
+<li><p><strong>Pitch Angle (:math:`alpha`)</strong>: Exhibits broader, continuous distributions reflecting the pitch-angle spreading of particle velocities</p></li>
+</ul>
+<p>These fundamentally different characteristics suggest that applying the same regularization to both dimensions is suboptimal. Instead, we implement an anisotropic approach that treats each dimension independently.</p>
+</section>
+<section id="Mathematical-Framework">
+<h3>Mathematical Framework<a class="headerlink" href="#Mathematical-Framework" title="Link to this heading">#</a></h3>
+<p>The anisotropic regularization is formulated as the optimization problem:</p>
+<div class="math notranslate nohighlight">
+\[f^* = \underset{f}{\text{argmin}} \|Af - m\|_2^2 + \lambda^g R^g(f) + \lambda^\alpha R^\alpha(f) \quad \text{subject to } f \geq 0\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(f^*\)</span> is the reconstructed velocity distribution</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is the FILD system matrix</p></li>
+<li><p><span class="math notranslate nohighlight">\(m\)</span> is the measurement data</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda^g, \lambda^\alpha\)</span> are regularization parameters</p></li>
+<li><p><span class="math notranslate nohighlight">\(R^g, R^\alpha\)</span> are regularization functionals for each dimension</p></li>
+</ul>
+</section>
+<section id="Regularization-Methods">
+<h3>Regularization Methods<a class="headerlink" href="#Regularization-Methods" title="Link to this heading">#</a></h3>
+<p>We implement three regularization strategies:</p>
+<ol class="arabic simple">
+<li><p><strong>Non-Negativity Constrained First-Order Tikhonov Regularization</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p>Promotes smoothness through gradient penalization</p></li>
+<li><p>Particularly suitable for the continuous pitch-angle distributions</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><strong>Total Variation (TV)</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p>Preserves sharp edges</p></li>
+<li><p>Well-suited for the localized features in gyroscalar</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p><strong>Besov-Space Prior</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p>Multi-scale wavelets-based approach</p></li>
+<li><p>Effectively handles both smooth and localized features</p></li>
+</ul>
+<p>## 7. Implementation and Reconstruction of Fast-Ion Velocity Distributions</p>
+</section>
+<section id="Numerical-Implementation">
+<h3>Numerical Implementation<a class="headerlink" href="#Numerical-Implementation" title="Link to this heading">#</a></h3>
+<p>We solve the anisotropic regularization problem using the Chambolle-Pock primal-dual hybrid gradient (PDHG) algorithm, which is well-suited for handling non-smooth convex optimization problems. The algorithm addresses problems of the form:</p>
+<div class="math notranslate nohighlight">
+\[\underset{f}{\text{argmin}} \; F(Kf) + G(f)\]</div>
+<p>where <span class="math notranslate nohighlight">\(F\)</span> corresponds to our data fidelity and regularization terms, and <span class="math notranslate nohighlight">\(G\)</span> enforces non-negativity. In our implementation, we expand <span class="math notranslate nohighlight">\(F(Kf)\)</span> into component functionals:</p>
+<div class="math notranslate nohighlight">
+\[F(Kf) = \sum_j F_j(K_jf)\]</div>
+<p>Specifically, we structure our problem with:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}F = \begin{pmatrix} F_1 \\ F_2 \\ F_3 \end{pmatrix} = \begin{pmatrix} \|\cdot - m\|_2 \\ \lambda^g\|\cdot\|_{p_g} \\ \lambda^\alpha\|\cdot\|_{p_\alpha} \end{pmatrix}, \quad
+K = \begin{pmatrix} K_1 \\ K_2 \\ K_3 \end{pmatrix} = \begin{pmatrix} A \\ L_g \\ L_\alpha \end{pmatrix}\end{split}\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(L_g\)</span> and <span class="math notranslate nohighlight">\(L_\alpha\)</span> are operators (differential or wavelet transform) for each dimension</p></li>
+<li><p><span class="math notranslate nohighlight">\(p_g\)</span> and <span class="math notranslate nohighlight">\(p_\alpha\)</span> can be 1 or 2, depending on the chosen regularization</p></li>
+<li><p>Non-negativity is enforced through the constraint <span class="math notranslate nohighlight">\(G(f) = \mathbb{I}_{\mathbb{R}_+}(f)\)</span></p></li>
+</ul>
+</section>
+<section id="Reconstruction-Test-Cases">
+<h3>Reconstruction Test Cases<a class="headerlink" href="#Reconstruction-Test-Cases" title="Link to this heading">#</a></h3>
+<p>We validate our implementation using both synthetic and experimental data:</p>
+<ol class="arabic simple">
+<li><p><strong>Synthetic Data Test Case</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p>Based on realistic fast-ion distributions from NBI sources</p></li>
+<li><p>The noise model follows equation (4) in Schmidt et al 2024 Nucl. Fusion 64 076009: Measurement noise (10%) represents detector-specific noise in the FILD measurements, and background noise (1%) accounts for other factors like neutron radiation and gamma rays.</p></li>
+<li><p>Allows quantitative assessment of reconstruction accuracy</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><strong>Experimental Data Test Case</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p>From discharge #34614 at ASDEX Upgrade</p></li>
+<li><p>Measurements from FILD1 during edge-localized mode (ELM) activity</p></li>
+<li><p>Demonstrates performance with real diagnostic data</p></li>
+</ul>
+</section>
+<section id="Generate-synthetic-data:">
+<h3>Generate synthetic data:<a class="headerlink" href="#Generate-synthetic-data:" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">new_y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_x</span><span class="p">)))</span>
+<span class="n">mu_p</span> <span class="o">=</span> <span class="mi">55</span>
+<span class="n">sigma_p</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">mu_r1</span> <span class="o">=</span> <span class="mf">3.17582418</span>
+<span class="n">mu_r2</span> <span class="o">=</span> <span class="mf">4.36263736</span>
+<span class="n">mu_r3</span> <span class="o">=</span> <span class="mf">5.45054945</span>
+<span class="n">sigma_r</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="n">pitch_dist</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma_p</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">new_y</span> <span class="o">-</span> <span class="n">mu_p</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma_p</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">pitch_dist</span> <span class="o">/=</span> <span class="n">pitch_dist</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">gyro_dist_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma_r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">new_x</span> <span class="o">-</span> <span class="n">mu_r1</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma_r</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gyro_dist_1</span> <span class="o">/=</span> <span class="n">gyro_dist_1</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">gyro_dist_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma_r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">new_x</span> <span class="o">-</span> <span class="n">mu_r2</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma_r</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gyro_dist_2</span> <span class="o">/=</span> <span class="n">gyro_dist_2</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">gyro_dist_3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma_r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">new_x</span> <span class="o">-</span> <span class="n">mu_r3</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma_r</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gyro_dist_3</span> <span class="o">/=</span> <span class="n">gyro_dist_3</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">gyro_dist</span> <span class="o">=</span> <span class="n">gyro_dist_1</span> <span class="o">*</span> <span class="mf">0.1</span> <span class="o">+</span> <span class="n">gyro_dist_2</span> <span class="o">*</span> <span class="mf">0.2</span> <span class="o">+</span> <span class="n">gyro_dist_3</span> <span class="o">*</span> <span class="mf">0.7</span>
+
+<span class="n">full_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">pitch_dist</span><span class="p">,</span> <span class="n">gyro_dist</span><span class="p">)</span>
+<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">full_dist</span>
+
+<span class="n">s_full_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W_for</span><span class="p">,</span> <span class="n">full_dist</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+
+<span class="n">noise1</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">s_full_dist</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">s_full_dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">noise2</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">s_full_dist</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">s_full_dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">s_full_dist</span> <span class="o">+</span> <span class="n">noise1</span> <span class="o">+</span> <span class="n">noise2</span>
+<span class="n">b</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">b_2D</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">131</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">132</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Measurement&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Measurement&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_14_1.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_14_1.png" />
+</div>
+</div>
+</section>
+<section id="Implementation-in-CIL">
+<h3>Implementation in CIL<a class="headerlink" href="#Implementation-in-CIL" title="Link to this heading">#</a></h3>
+<p>We implement our anisotropic regularization framework using CIL’s optimization tools, specifically:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">`BlockOperator</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/BlockOperator.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/BlockOperator.py</a>&gt;`__ for combining multiple operators</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">`BlockFunction</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/functions/BlockFunction.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/functions/BlockFunction.py</a>&gt;`__ for combining multiple functionals</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">`PDHG</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/algorithms/PDHG.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/algorithms/PDHG.py</a>&gt;`__ algorithm for solving the optimization problem</p></li>
+</ul>
+<p>The implementation for Besov-space priors follows these steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Setup Geometries</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>  <span class="c1"># Domain geometry</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>  <span class="c1"># Range geometry</span>
+</pre></div>
+</div>
+<p>This defines the velocity space dimensions (<span class="math notranslate nohighlight">\(91 \times 51\)</span> pixels).</p>
+<ol class="arabic simple" start="2">
+<li><p><strong>Data Container Setup</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>     <span class="c1"># Fill with FILD measurement data</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>Function Block Setup</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">omega</span> <span class="o">=</span> <span class="mf">1e4</span>    <span class="c1"># Data fidelity weight</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-2</span>   <span class="c1"># Gyroscalar regularization weight</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1e-4</span>    <span class="c1"># Pitch-angle regularization weight</span>
+
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>  <span class="c1"># Data fidelity term</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>                      <span class="c1"># Gyroscalar regularization</span>
+<span class="n">F3</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>                       <span class="c1"># Pitch-angle regularization</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This implements our functional <span class="math notranslate nohighlight">\(F\)</span> with components:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(F_1\)</span>: Data fidelity term <span class="math notranslate nohighlight">\(\omega \|Af - m\|_2^2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(F_2\)</span>: Gyroscalar regularization <span class="math notranslate nohighlight">\(\alpha \|L_gf \|_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(F_3\)</span>: Pitch-angle regularization <span class="math notranslate nohighlight">\(\beta \|L_\alpha f \|_1\)</span></p></li>
+</ul>
+<ol class="arabic simple" start="4">
+<li><p><strong>Operator Block Setup</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>         <span class="c1"># FILD system matrix</span>
+<span class="n">Dy</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># Wavelet transform for g</span>
+                     <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="n">Dx</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># Wavelet transform for α</span>
+                     <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Dy</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This implements our operator <span class="math notranslate nohighlight">\(K = [A; L_g; L_\alpha]\)</span> where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is our custom FILD operator</p></li>
+<li><p><span class="math notranslate nohighlight">\(L_g, L_\alpha\)</span> are wavelet transforms (Daubechies-2, 4 levels)</p></li>
+</ul>
+<ol class="arabic simple" start="5">
+<li><p><strong>Non-negativity Constraint</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Enforces f ≥ 0</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p><strong>PDHG Algorithm Setup and Run</strong></p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Primal step size</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># Zero initial guess</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span>
+                      <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The implementation uses Daubechies-2 wavelets for both dimensions, though their effect is controlled separately through the weights <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>. The PDHG algorithm iterates until convergence or reaching the maximum iteration count, providing the reconstructed velocity distribution.</p>
+</section>
+<section id="Besov-prior-decoupled-in-both-directions">
+<h3>Besov prior decoupled in both directions<a class="headerlink" href="#Besov-prior-decoupled-in-both-directions" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+<span class="n">zeros_container</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">zeros_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">)))</span>
+
+<span class="c1"># Separable sum as BlockFunction</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="mf">1e4</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>
+<span class="n">F3</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">)</span>
+
+<span class="c1"># BlockOperator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">Dy</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="n">Dx</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Dy</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Constraint</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Primal-dual step sizes</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">result_array</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/2000       ?it/s
+   100/2000    3.79it/s, primal=+1.086e+03, dual=-inf, primal_dual=+inf
+   200/2000    3.82it/s, primal=+2.829e+02, dual=-inf, primal_dual=+inf
+   300/2000    3.85it/s, primal=+3.296e+02, dual=-inf, primal_dual=+inf
+   400/2000    3.86it/s, primal=+1.785e+02, dual=-inf, primal_dual=+inf
+   500/2000    3.88it/s, primal=+1.687e+02, dual=-inf, primal_dual=+inf
+   600/2000    3.88it/s, primal=+1.328e+02, dual=-inf, primal_dual=+inf
+   700/2000    3.86it/s, primal=+1.312e+02, dual=-inf, primal_dual=+inf
+   800/2000    3.85it/s, primal=+1.243e+02, dual=-inf, primal_dual=+inf
+   900/2000    3.86it/s, primal=+1.232e+02, dual=-inf, primal_dual=+inf
+  1000/2000    3.86it/s, primal=+1.204e+02, dual=-inf, primal_dual=+inf
+  1100/2000    3.86it/s, primal=+1.180e+02, dual=-inf, primal_dual=+inf
+  1200/2000    3.85it/s, primal=+1.179e+02, dual=-inf, primal_dual=+inf
+  1300/2000    3.87it/s, primal=+1.177e+02, dual=-inf, primal_dual=+inf
+  1400/2000    3.87it/s, primal=+1.167e+02, dual=-inf, primal_dual=+inf
+  1500/2000    3.84it/s, primal=+1.159e+02, dual=-inf, primal_dual=+inf
+  1600/2000    3.86it/s, primal=+1.159e+02, dual=-inf, primal_dual=+inf
+  1700/2000    3.87it/s, primal=+1.160e+02, dual=-inf, primal_dual=+inf
+  1800/2000    3.86it/s, primal=+1.157e+02, dual=-inf, primal_dual=+inf
+  1900/2000    3.85it/s, primal=+1.156e+02, dual=-inf, primal_dual=+inf
+  2000/2000    3.86it/s, primal=+1.152e+02, dual=-inf, primal_dual=+inf
+  2000/2000    3.86it/s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+<span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array_2D</span> <span class="o">*</span> <span class="mf">0.7</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Reconstruction&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 1.0, &#39;Reconstruction&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_18_1.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_18_1.png" />
+</div>
+</div>
+</section>
+<section id="Non-Negativity-Constrained-Isotropic-Zeroth-Order-Tikhonov-Regularization:">
+<h3>Non-Negativity Constrained Isotropic Zeroth-Order Tikhonov Regularization:<a class="headerlink" href="#Non-Negativity-Constrained-Isotropic-Zeroth-Order-Tikhonov-Regularization:" title="Link to this heading">#</a></h3>
+<p>Slightly modified version from Besov-space prior in the obvious ways.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+
+<span class="c1"># Separable sum as BlockFunction</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="mf">1e4</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">2e-2</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">()</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">)</span>
+
+<span class="c1"># BlockOperator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">I</span> <span class="o">=</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">dg</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Constraint</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Primal-dual step sizes</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">result_array</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/2000       ?it/s
+   100/2000    4.07it/s, primal=+1.709e+02, dual=+5.082e+00, primal_dual=+1.658e+02
+   200/2000    4.08it/s, primal=+1.430e+02, dual=+6.225e+00, primal_dual=+1.367e+02
+   300/2000    4.07it/s, primal=+1.375e+02, dual=+7.546e+00, primal_dual=+1.300e+02
+   400/2000    4.09it/s, primal=+1.343e+02, dual=+8.815e+00, primal_dual=+1.254e+02
+   500/2000    4.09it/s, primal=+1.320e+02, dual=+1.005e+01, primal_dual=+1.219e+02
+   600/2000    4.10it/s, primal=+1.301e+02, dual=+1.125e+01, primal_dual=+1.189e+02
+   700/2000    4.09it/s, primal=+1.286e+02, dual=+1.242e+01, primal_dual=+1.162e+02
+   800/2000    4.09it/s, primal=+1.274e+02, dual=+1.357e+01, primal_dual=+1.139e+02
+   900/2000    4.11it/s, primal=+1.265e+02, dual=+1.469e+01, primal_dual=+1.118e+02
+  1000/2000    4.11it/s, primal=+1.257e+02, dual=+1.580e+01, primal_dual=+1.099e+02
+  1100/2000    4.11it/s, primal=+1.251e+02, dual=+1.689e+01, primal_dual=+1.082e+02
+  1200/2000    4.11it/s, primal=+1.245e+02, dual=+1.796e+01, primal_dual=+1.066e+02
+  1300/2000    4.10it/s, primal=+1.241e+02, dual=+1.902e+01, primal_dual=+1.051e+02
+  1400/2000    4.11it/s, primal=+1.237e+02, dual=+2.006e+01, primal_dual=+1.037e+02
+  1500/2000    4.10it/s, primal=+1.234e+02, dual=+2.109e+01, primal_dual=+1.023e+02
+  1600/2000    4.11it/s, primal=+1.230e+02, dual=+2.210e+01, primal_dual=+1.009e+02
+  1700/2000    4.11it/s, primal=+1.228e+02, dual=+2.311e+01, primal_dual=+9.966e+01
+  1800/2000    4.11it/s, primal=+1.225e+02, dual=+2.410e+01, primal_dual=+9.841e+01
+  1900/2000    4.11it/s, primal=+1.223e+02, dual=+2.507e+01, primal_dual=+9.720e+01
+  2000/2000    4.11it/s, primal=+1.221e+02, dual=+2.604e+01, primal_dual=+9.601e+01
+  2000/2000    4.10it/s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+<span class="n">interpolator</span> <span class="o">=</span> <span class="n">RegularGridInterpolator</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">result_array_2D</span><span class="p">)</span>
+<span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">new_points</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_x</span><span class="p">))</span>
+<span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array_2D</span> <span class="o">*</span> <span class="mf">0.7</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span><span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_21_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_21_0.png" />
+</div>
+</div>
+</section>
+<section id="Key-observations:">
+<h3>Key observations:<a class="headerlink" href="#Key-observations:" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Sharp peaks in <span class="math notranslate nohighlight">\(g\)</span> are better preserved with anisotropic methods</p></li>
+<li><p>Pitch angle distributions remain physically meaningful (no blobs)</p></li>
+<li><p>Noise suppression achieved without over-smoothing</p></li>
+</ul>
+</section>
+</section>
+<section id="Experimental-data-reconstructions">
+<h2>Experimental data reconstructions<a class="headerlink" href="#Experimental-data-reconstructions" title="Link to this heading">#</a></h2>
+<section id="Load-34614-Weight-Function">
+<h3>Load 34614 Weight Function<a class="headerlink" href="#Load-34614-Weight-Function" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;34614_Bo_v2023_4_weight_function.nc&#39;</span>
+
+<span class="c1"># Open the NetCDF file</span>
+<span class="n">nc_data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="c1"># Extract variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">][:])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">][:])</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;ys&#39;</span><span class="p">][:])</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;xs&#39;</span><span class="p">][:])</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nc_data</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;__xarray_dataarray_variable__&#39;</span><span class="p">][:])</span>
+
+<span class="n">new_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
+<span class="n">W</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="c1"># Close the file</span>
+<span class="n">nc_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Load-Data">
+<h3>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b_2D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;b_2D.npy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Anisotropic-Besov-space-prior-regularization">
+<h3>Anisotropic Besov-space prior regularization<a class="headerlink" href="#Anisotropic-Besov-space-prior-regularization" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+<span class="n">zeros_container</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">zeros_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">)))</span>
+
+<span class="c1"># Separable sum as BlockFunction</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="mf">1e4</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-1</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">9e-3</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>
+<span class="n">F3</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">)</span>
+
+<span class="c1"># BlockOperator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">Dy</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="n">Dx</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Dy</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Constraint</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+<span class="n">mask</span><span class="p">[</span><span class="n">b_2D</span> <span class="o">&lt;</span> <span class="mf">0.006</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">muA</span> <span class="o">=</span> <span class="mf">1e6</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">muA</span> <span class="o">*</span> <span class="n">mask</span><span class="p">)</span>
+
+<span class="c1"># Primal-dual step sizes</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">result_array</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/3000       ?it/s
+   200/3000    3.67it/s, primal=+1.027e+03, dual=-inf, primal_dual=+inf
+   400/3000    3.69it/s, primal=+3.916e+02, dual=-inf, primal_dual=+inf
+   600/3000    3.72it/s, primal=+2.795e+02, dual=-inf, primal_dual=+inf
+   800/3000    3.73it/s, primal=+2.252e+02, dual=-inf, primal_dual=+inf
+  1000/3000    3.73it/s, primal=+1.989e+02, dual=-inf, primal_dual=+inf
+  1200/3000    3.69it/s, primal=+1.863e+02, dual=-inf, primal_dual=+inf
+  1400/3000    3.70it/s, primal=+1.716e+02, dual=-inf, primal_dual=+inf
+  1600/3000    3.72it/s, primal=+1.543e+02, dual=-inf, primal_dual=+inf
+  1800/3000    3.73it/s, primal=+1.518e+02, dual=-inf, primal_dual=+inf
+  2000/3000    3.74it/s, primal=+1.493e+02, dual=-inf, primal_dual=+inf
+  2200/3000    3.74it/s, primal=+1.416e+02, dual=-inf, primal_dual=+inf
+  2400/3000    3.75it/s, primal=+1.381e+02, dual=-inf, primal_dual=+inf
+  2600/3000    3.75it/s, primal=+1.360e+02, dual=-inf, primal_dual=+inf
+  2800/3000    3.73it/s, primal=+1.348e+02, dual=-inf, primal_dual=+inf
+  3000/3000    3.73it/s, primal=+1.336e+02, dual=-inf, primal_dual=+inf
+  3000/3000    3.73it/s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+
+<span class="n">num_xticks</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="n">num_yticks</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span><span class="n">xtick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_xticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">xtick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_x</span><span class="p">[</span><span class="n">xtick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ytick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_yticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">ytick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_y</span><span class="p">[</span><span class="n">ytick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">);</span><span class="n">im1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;FILD1 #34614&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">);</span><span class="n">im2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Reconstruction&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_31_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_31_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D_HEF</span> <span class="o">=</span> <span class="n">result_array_2D</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">result_array_2D_HEF</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D_HEF</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">new_x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_32_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_32_0.png" />
+</div>
+</div>
+</section>
+<section id="Zeroth-Order-Tikhonov-Regularization">
+<h3>Zeroth-Order Tikhonov Regularization<a class="headerlink" href="#Zeroth-Order-Tikhonov-Regularization" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+
+<span class="c1"># Separable sum as BlockFunction</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="mf">1e4</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">()</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">)</span>
+
+<span class="c1"># BlockOperator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">I</span> <span class="o">=</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">dg</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Constraint</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Primal-dual step sizes</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">result_array</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/2000       ?it/s
+   100/2000    4.14it/s, primal=+5.171e+02, dual=+4.911e+00, primal_dual=+5.122e+02
+   200/2000    4.13it/s, primal=+1.421e+02, dual=+7.374e+00, primal_dual=+1.347e+02
+   300/2000    4.15it/s, primal=+9.856e+01, dual=+8.638e+00, primal_dual=+8.993e+01
+   400/2000    4.17it/s, primal=+8.373e+01, dual=+9.228e+00, primal_dual=+7.450e+01
+   500/2000    4.15it/s, primal=+7.669e+01, dual=+9.865e+00, primal_dual=+6.683e+01
+   600/2000    4.15it/s, primal=+7.256e+01, dual=+1.049e+01, primal_dual=+6.207e+01
+   700/2000    4.12it/s, primal=+6.974e+01, dual=+1.106e+01, primal_dual=+5.868e+01
+   800/2000    4.12it/s, primal=+6.768e+01, dual=+1.162e+01, primal_dual=+5.606e+01
+   900/2000    4.11it/s, primal=+6.611e+01, dual=+1.216e+01, primal_dual=+5.395e+01
+  1000/2000    4.10it/s, primal=+6.484e+01, dual=+1.268e+01, primal_dual=+5.217e+01
+  1100/2000    4.11it/s, primal=+6.382e+01, dual=+1.318e+01, primal_dual=+5.063e+01
+  1200/2000    4.12it/s, primal=+6.296e+01, dual=+1.368e+01, primal_dual=+4.928e+01
+  1300/2000    4.11it/s, primal=+6.223e+01, dual=+1.416e+01, primal_dual=+4.807e+01
+  1400/2000    4.10it/s, primal=+6.160e+01, dual=+1.463e+01, primal_dual=+4.698e+01
+  1500/2000    4.10it/s, primal=+6.106e+01, dual=+1.509e+01, primal_dual=+4.597e+01
+  1600/2000    4.10it/s, primal=+6.058e+01, dual=+1.554e+01, primal_dual=+4.504e+01
+  1700/2000    4.12it/s, primal=+6.015e+01, dual=+1.598e+01, primal_dual=+4.417e+01
+  1800/2000    4.12it/s, primal=+5.977e+01, dual=+1.642e+01, primal_dual=+4.335e+01
+  1900/2000    4.11it/s, primal=+5.943e+01, dual=+1.685e+01, primal_dual=+4.258e+01
+  2000/2000    4.11it/s, primal=+5.912e+01, dual=+1.727e+01, primal_dual=+4.185e+01
+  2000/2000    4.12it/s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+<span class="n">num_xticks</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="n">num_yticks</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span><span class="n">xtick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_xticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">xtick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_x</span><span class="p">[</span><span class="n">xtick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ytick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_yticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">ytick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_y</span><span class="p">[</span><span class="n">ytick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">);</span><span class="n">im1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;FILD1 #34614&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">);</span><span class="n">im2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Reconstruction&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_35_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_35_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D_HEF</span> <span class="o">=</span> <span class="n">result_array_2D</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">result_array_2D_HEF</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D_HEF</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">new_x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_36_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_36_0.png" />
+</div>
+</div>
+</section>
+<section id="Combined-non-negativity-constrained-anisotropic-regularization:-Besov-space-prior-in-\rho-and-first-order-Tikhonov-regularization-in-\alpha">
+<h3>Combined non-negativity constrained anisotropic regularization: Besov-space prior in <span class="math notranslate nohighlight">\(\rho\)</span> and first-order Tikhonov regularization in <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#Combined-non-negativity-constrained-anisotropic-regularization:-Besov-space-prior-in-\rho-and-first-order-Tikhonov-regularization-in-\alpha" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="mi">91</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span>
+<span class="n">b_container</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">b_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">b_2D</span><span class="p">)</span>
+<span class="n">zeros_container</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">zeros_container</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">)))</span>
+
+<span class="c1"># Separable sum as BlockFunction</span>
+<span class="n">omega</span> <span class="o">=</span>  <span class="mf">1e4</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">5e-4</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">omega</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b_container</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">zeros_container</span><span class="p">)</span>
+<span class="n">F3</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">L1Norm</span><span class="p">()</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">)</span>
+
+<span class="c1"># BlockOperator</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">MyCustomOperator</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">Ly</span> <span class="o">=</span> <span class="n">FiniteDifferenceOperator</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">)</span>
+<span class="n">Dx</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">dg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Constraint</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Primal-dual step sizes</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">pdhg_algorithm</span> <span class="o">=</span> <span class="n">PDHG</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pdhg_algorithm</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">result_array</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+     0/2000       ?it/s
+   100/2000    3.72it/s, primal=+3.043e+03, dual=-inf, primal_dual=+inf
+   200/2000    3.76it/s, primal=+1.435e+03, dual=-inf, primal_dual=+inf
+   300/2000    3.78it/s, primal=+1.160e+03, dual=-inf, primal_dual=+inf
+   400/2000    3.78it/s, primal=+6.969e+02, dual=-inf, primal_dual=+inf
+   500/2000    3.79it/s, primal=+4.074e+02, dual=-inf, primal_dual=+inf
+   600/2000    3.79it/s, primal=+3.161e+02, dual=-inf, primal_dual=+inf
+   700/2000    3.81it/s, primal=+2.995e+02, dual=-inf, primal_dual=+inf
+   800/2000    3.81it/s, primal=+2.910e+02, dual=-inf, primal_dual=+inf
+   900/2000    3.81it/s, primal=+1.871e+02, dual=-inf, primal_dual=+inf
+  1000/2000    3.81it/s, primal=+1.296e+02, dual=-inf, primal_dual=+inf
+  1100/2000    3.79it/s, primal=+1.200e+02, dual=-inf, primal_dual=+inf
+  1200/2000    3.79it/s, primal=+1.207e+02, dual=-inf, primal_dual=+inf
+  1300/2000    3.79it/s, primal=+1.122e+02, dual=-inf, primal_dual=+inf
+  1400/2000    3.77it/s, primal=+9.643e+01, dual=-inf, primal_dual=+inf
+  1500/2000    3.77it/s, primal=+9.437e+01, dual=-inf, primal_dual=+inf
+  1600/2000    3.77it/s, primal=+9.442e+01, dual=-inf, primal_dual=+inf
+  1700/2000    3.77it/s, primal=+8.793e+01, dual=-inf, primal_dual=+inf
+  1800/2000    3.77it/s, primal=+7.755e+01, dual=-inf, primal_dual=+inf
+  1900/2000    3.77it/s, primal=+7.766e+01, dual=-inf, primal_dual=+inf
+  2000/2000    3.78it/s, primal=+7.515e+01, dual=-inf, primal_dual=+inf
+  2000/2000    3.78it/s
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D</span> <span class="o">=</span> <span class="n">result_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">51</span><span class="p">,</span><span class="mi">91</span><span class="p">))</span>
+<span class="n">num_xticks</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="n">num_yticks</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span><span class="n">xtick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_xticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">xtick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_x</span><span class="p">[</span><span class="n">xtick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ytick_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">b_2D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_yticks</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">);</span><span class="n">ytick_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_y</span><span class="p">[</span><span class="n">ytick_positions</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">);</span><span class="n">im1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;FILD1 #34614&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">);</span><span class="n">im2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Reconstruction&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xtick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtick_labels</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ytick_positions</span><span class="p">);</span><span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytick_labels</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_40_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_40_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result_array_2D_HEF</span> <span class="o">=</span> <span class="n">result_array_2D</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">result_array_2D_HEF</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_array_2D_HEF</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">manolo_cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">new_x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">new_y</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_41_0.png" src="../../_images/demos_013_Anisotropic_regularisation_FILD_measurements_41_0.png" />
+</div>
+</div>
+<p>## 8. Application to ASDEX Upgrade Data: Comparative Analysis</p>
+<p>Our analysis demonstrates that the choice of regularization strategy impacts the quality of FILD reconstructions. Here we compare the performance of different methods:</p>
+</section>
+<section id="Performance-Analysis">
+<h3>Performance Analysis<a class="headerlink" href="#Performance-Analysis" title="Link to this heading">#</a></h3>
+<section id="Anisotropic-Besov-Space-Prior">
+<h4>Anisotropic Besov-Space Prior<a class="headerlink" href="#Anisotropic-Besov-Space-Prior" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>Superior Feature Resolution</strong>: Accurately captures both sharp peaks in gyroscalar and smooth distributions in pitch angle</p></li>
+<li><p><strong>High-Energy Features</strong>: Resolves the acceleration of ions to over twice the injection energy</p></li>
+<li><p><strong>Pitch-Angle Structure</strong>: Reveals fine structure in pitch-angle splitting during ELM activity</p></li>
+<li><p><strong>Physical Consistency</strong>: Reconstructions align well with expected fast-ion behavior and ASCOT simulations</p></li>
+</ul>
+</section>
+<section id="Traditional-Isotropic-Tikhonov">
+<h4>Traditional Isotropic Tikhonov<a class="headerlink" href="#Traditional-Isotropic-Tikhonov" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>Limited Resolution</strong>: Compromises sharp features in gyroscalar to maintain stability</p></li>
+<li><p><strong>Feature Loss</strong>: High-energy features become diffuse and harder to interpret</p></li>
+<li><p><strong>Regularization Trade-off</strong>: Cannot simultaneously achieve noise suppression and feature preservation</p></li>
+<li><p><strong>Physical Interpretation</strong>: Limits detailed analysis of fast-ion dynamics</p></li>
+</ul>
+</section>
+<section id="Hybrid-Anisotropic-Approach-(Non-Negativity-Constrained-First-Order-Tikhonov-with-Besov)">
+<h4>Hybrid Anisotropic Approach (Non-Negativity Constrained First-Order Tikhonov with Besov)<a class="headerlink" href="#Hybrid-Anisotropic-Approach-(Non-Negativity-Constrained-First-Order-Tikhonov-with-Besov)" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>Improved Edge Definition</strong>: Better preservation of sharp features compared to isotropic methods</p></li>
+<li><p><strong>Stability</strong>: Enhanced noise suppression while maintaining key features</p></li>
+<li><p><strong>Performance Gap</strong>: While superior to isotropic methods, falls short of pure Besov-space prior implementation</p></li>
+</ul>
+</section>
+</section>
+<section id="Key-Findings">
+<h3>Key Findings<a class="headerlink" href="#Key-Findings" title="Link to this heading">#</a></h3>
+<p>The anisotropic Besov-space prior approach emerges as the optimal choice for FILD reconstruction because it:</p>
+<ol class="arabic simple">
+<li><p>Respects the inherent anisotropic nature of fast-ion velocity distributions</p></li>
+<li><p>Preserves physical features while suppressing noise</p></li>
+<li><p>Enables analysis of complex phenomena like ELM-induced fast-ion acceleration</p></li>
+<li><p>Provides reconstructions that support physical interpretation</p></li>
+</ol>
+<p>These results suggest that future FILD analysis should prioritize anisotropic regularization methods, particularly those utilizing Besov-space priors.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../controlledWaveletSparsity_3d/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Controlled Wavelet Sparsity using callbacks (3D data)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../Simulation_and_CPU_reconstruction/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

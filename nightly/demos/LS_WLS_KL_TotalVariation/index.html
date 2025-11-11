@@ -1,0 +1,2533 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/LS_WLS_KL_TotalVariation';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Offset reconstruction" href="../Apple_offset_reconstruction/" />
+    <link rel="prev" title="Reconstruction and regularisation for a hyperspectral dataset" href="../Hyperspectral_regularisation/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CIL-version-23.1.0">CIL version 23.1.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-dataset">The dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstruct-the-noisy-data-using-FBP">Reconstruct the noisy data using FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstructing-the-noisy-data-using-least-squares-(LS)">Reconstructing the noisy data using least squares (LS)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstructing-the-noisy-data-using-weighted-least-squares-(WLS)">Reconstructing the noisy data using weighted least squares (WLS)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstruct-the-noisy-data-using-Kullback-Liebler-(KL)-divergence">Reconstruct the noisy data using Kullback Liebler (KL) divergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Comparisons-without-regularisation">Comparisons without regularisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstructing-the-noisy-data-using-least-squares-with-Total-Variation-regualrisation">Reconstructing the noisy data using least squares with Total Variation regualrisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Reconstructing the noisy data using least squares with Total Variation regualrisation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Comparisons-with-TV">Comparisons with TV</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/LS_WLS_KL_TotalVariation.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Francesca Bevilacqua (University of Bologna)</span>
+<span class="c1">#   Reviewed by:  Margaret Duff (STFC - UKRI )</span>
+</pre></div>
+</div>
+</div>
+<section id="Comparison-between-the-Least-Square-and-the-Weighted-Least-Square-and-the-Kullback-Leibler-Divergence">
+<h1>Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence<a class="headerlink" href="#Comparison-between-the-Least-Square-and-the-Weighted-Least-Square-and-the-Kullback-Leibler-Divergence" title="Link to this heading">#</a></h1>
+<p>As we know, the data in computed tomography is affected by Poisson Noise due to the electromagnetic nature of X-rays. The Poisson distribution can be easily approximated by a Gaussian when the mean is high, but it differs from it when the mean is lower. This is the case of Low Dose CT, where the number of photon that reach the detector pixels are less than standard CT.</p>
+<p>Here we briefly summarize the acquisition model:</p>
+<div class="math notranslate nohighlight">
+\[I = I_{0} e^{-Ax}\]</div>
+<p>where <span class="math notranslate nohighlight">\(I\)</span> is the intensity data collected by the detector, <span class="math notranslate nohighlight">\(I_{0}\)</span> is the incoming souce intensity, <span class="math notranslate nohighlight">\(A\)</span> is the projection operator of Computed Tomography and <span class="math notranslate nohighlight">\(x\)</span> is the object (attenuation coefficients) that we want to reconstruct. When adding the Poisson Noise we have:</p>
+<div class="math notranslate nohighlight">
+\[B \sim \mathrm{Poisson}(I).\]</div>
+<p>Most of the standard CT reconstruction strategies assume that the mean is high and therefore the Poisson distribution can be approximated by a Gaussian distribution and so</p>
+<div class="math notranslate nohighlight">
+\[Y \sim \mathrm{Normal}( Ax,\delta I)\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y = -\log (\frac{B}{I_{0}})\)</span> is the sinogram data (obtained after taking the negative logarithm of <span class="math notranslate nohighlight">\(\frac{B}{I_{0}}\)</span>) and <span class="math notranslate nohighlight">\(\delta\)</span> is the noise level. This leads to a least square problem for finding <span class="math notranslate nohighlight">\(x\)</span> by solving the following minimisation problem:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x} \mathcal{F}_{G}(x) := \frac{1}{2} || Y - Ax||_{2}^{2}.\]</div>
+<p>Clearly, using this formulation, we are supposing that the distribution of the noise inside <span class="math notranslate nohighlight">\(Y\)</span> is a white Gaussian. We know instead that there is instead a Poisson distribution on the measurements, so <span class="math notranslate nohighlight">\(B \sim \mathrm{Poisson}( I_{0} e^{-Ax})\)</span>. Taking the negative logorithm of the probability density function of the Poisson noise, we get a Kullback Leibler Divergence loss i.e. if we observe <span class="math notranslate nohighlight">\(u \sim\mathrm{Poisson}(v)\)</span> to find <span class="math notranslate nohighlight">\(v\)</span> we minimise with respect to <span class="math notranslate nohighlight">\(v\)</span> the
+objective $ KL(u,v) = u <span class="math">\log`(:nbsphinx-math:</span>frac{u}{v}`)-u+v<span class="math notranslate nohighlight">\(. Hence, write\)</span>$ <span class="math">\min</span><em>{x} :nbsphinx-math:`mathcal{F}`</em>{P}(x) := KL(B, I_{0} e^{-Ax}).$$</p>
+<p>Between the two approaches, we can consider a quadratic approximation of function <span class="math notranslate nohighlight">\(\mathcal{F}_{P}\)</span> and the problem takes the following form:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x} \mathcal{F_{W}} : = \frac{1}{2} || Y - Ax ||_{W}^{2} \ = \min_{x} \frac{1}{2} \sum_{i} w_{i} (Y-Ax)^2_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(w_{i} = e^{-Y_{i}} = \frac{B}{I_{0}}\)</span>. The main difference between <span class="math notranslate nohighlight">\(\mathcal{F}_{G}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{F}_{W}\)</span> is the weight matrix <span class="math notranslate nohighlight">\(W\)</span>. This is the weighted least squares approach.</p>
+<p>In this notebook we will see the difference between the solution obtained by minimizing <span class="math notranslate nohighlight">\(\mathcal{F}_{G}\)</span>, <span class="math notranslate nohighlight">\(\mathcal{F}_{W}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{F}_{P}\)</span> for the case of low dose CT, i.e. where the distribution of the noise is very different from a white gaussian, and the level of the noise is high. We consider results with and without Total Variation and demonstrate a parameter search for an optimum regularisation parameter.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># cil imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Function</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">KullbackLeibler</span><span class="p">,</span> <span class="n">OperatorCompositionFunction</span><span class="p">,</span> <span class="n">ZeroFunction</span><span class="p">,</span> <span class="n">IndicatorBox</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TotalVariation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GD</span><span class="p">,</span> <span class="n">PDHG</span><span class="p">,</span> <span class="n">FISTA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">TomoPhantom</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.quality_measures</span><span class="w"> </span><span class="kn">import</span> <span class="n">psnr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show_geometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+
+<span class="c1"># set up default colour map for visualisation</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+
+<span class="c1"># set the backend for FBP and the ProjectionOperator</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
+</pre></div>
+</div>
+</div>
+<section id="CIL-version-23.1.0">
+<h2>CIL version 23.1.0<a class="headerlink" href="#CIL-version-23.1.0" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+23.1.0
+</pre></div></div>
+</div>
+</section>
+<section id="The-dataset">
+<h2>The dataset<a class="headerlink" href="#The-dataset" title="Link to this heading">#</a></h2>
+<p>In this notebook we will use a classical Shepp-Logan phantom generated with the <a class="reference external" href="https://github.com/dkazanc/TomoPhantom">TomoPhantom toolbox</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># number of pixels</span>
+<span class="n">n_pixels</span> <span class="o">=</span> <span class="mi">256</span>
+
+<span class="c1"># Angles</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># set-up fan-beam AcquisitionGeometry</span>
+<span class="c1"># distance from source to center of rotation</span>
+<span class="n">dist_source_center</span> <span class="o">=</span> <span class="mi">6</span><span class="c1">#300.0</span>
+<span class="c1"># distance from center of rotation to detector</span>
+<span class="n">dist_center_detector</span> <span class="o">=</span> <span class="mi">6</span><span class="c1"># 200.0</span>
+<span class="c1"># physical pixel size</span>
+<span class="n">pixel_size_h</span> <span class="o">=</span> <span class="mi">2</span><span class="o">/</span><span class="n">n_pixels</span>
+<span class="c1">#magnification</span>
+<span class="n">mag</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist_source_center</span> <span class="o">+</span> <span class="n">dist_center_detector</span><span class="p">)</span> <span class="o">/</span> <span class="n">dist_source_center</span>
+
+<span class="c1"># Setup acquisition geometry</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">dist_source_center</span><span class="p">],</span> <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">dist_center_detector</span><span class="p">])</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">angles</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="n">n_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="n">pixel_size_h</span><span class="p">,</span> <span class="n">pixel_size_h</span><span class="p">))</span>
+
+<span class="c1"># Setup image geometry</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="n">n_pixels</span><span class="p">,</span>
+                   <span class="n">voxel_num_y</span><span class="o">=</span><span class="n">n_pixels</span><span class="p">,</span>
+                   <span class="n">voxel_size_x</span><span class="o">=</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="o">/</span> <span class="n">mag</span><span class="p">,</span>
+                   <span class="n">voxel_size_y</span><span class="o">=</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="o">/</span> <span class="n">mag</span><span class="p">)</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+<span class="n">phantom</span> <span class="o">=</span> <span class="n">TomoPhantom</span><span class="o">.</span><span class="n">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_7_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_7_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">phantom</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">phantom</span><span class="o">.</span><span class="n">array</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># Visualise data</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_8_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_8_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb39d93ba00&gt;
+</pre></div></div>
+</div>
+<p>Next, we create our simulated tomographic data by projecting our noiseless phantom to the acquisition space.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create projection operator using Astra-Toolbox.</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Create an acqusition data (numerically)</span>
+<span class="n">sino</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">phantom</span><span class="p">)</span>
+<span class="c1">#print(np.min(sino))</span>
+
+<span class="c1"># Visualise data</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="s1">&#39;simulated sinogram&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_10_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_10_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb395256aa0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Incident intensity: lower counts will increase the noise</span>
+<span class="n">background_counts</span> <span class="o">=</span> <span class="mi">300</span>
+
+<span class="c1"># Convert the simulated absorption sinogram to transmission values using Lambert-Beer.</span>
+<span class="c1"># Use as mean for Poisson data generation.</span>
+<span class="c1"># Convert back to absorption sinogram.</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">background_counts</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="n">noisy_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+<span class="n">nonzero</span> <span class="o">=</span> <span class="n">noisy_counts</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="n">sino_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="n">sino_out</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">noisy_counts</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">/</span> <span class="n">background_counts</span><span class="p">)</span>
+
+
+<span class="c1"># allocate sino_noisy and fill with noisy data</span>
+<span class="n">sino_noisy</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">sino_noisy</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">sino_out</span><span class="p">)</span>
+
+
+<span class="n">psnr_sino</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">sino</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">psnr_sino</span><span class="p">)</span>
+
+<span class="c1"># Visualize the true and noisy data</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">counts</span><span class="p">,</span> <span class="n">noisy_counts</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;true counts&#39;</span><span class="p">,</span> <span class="s1">&#39;noisy counts&#39;</span><span class="p">],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="c1">## Visualize the true and noisy data</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">sino</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;true sino&#39;</span><span class="p">,</span> <span class="s2">&quot;noisy sino, psnr = </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_sino</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="c1">#plt.savefig(&quot;Sinogram_I0_%7.f.png&quot; %(background_counts))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+12.732529879336653
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_11_1.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_11_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_11_2.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_11_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb3844eba30&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Reconstruct-the-noisy-data-using-FBP">
+<h2>Reconstruct the noisy data using FBP<a class="headerlink" href="#Reconstruct-the-noisy-data-using-FBP" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># reconstruct full data</span>
+<span class="c1"># configure FBP</span>
+<span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="c1"># run on the AcquisitionData</span>
+<span class="n">recon_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">sino_noisy</span><span class="p">)</span>
+<span class="n">psnr_fbp</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+<span class="c1">#print(psnr_fbp)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;phantom&#39;</span><span class="p">,</span> <span class="s1">&#39;FBP reconstruction&#39;</span><span class="p">],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/><br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_14_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_14_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb395256860&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Reconstructing-the-noisy-data-using-least-squares-(LS)">
+<h2>Reconstructing the noisy data using least squares (LS)<a class="headerlink" href="#Reconstructing-the-noisy-data-using-least-squares-(LS)" title="Link to this heading">#</a></h2>
+<p>So, for the LS problem, we want to minimize the following with respect to <span class="math notranslate nohighlight">\(x\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[||Y-Ax||_{2}^{2}\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#Definition of the fidelity term</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">)</span>
+
+
+<span class="c1"># Setting up FISTA</span>
+<span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+            <span class="n">max_iteration</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="c1"># Run FISTA</span>
+<span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">recon_ls</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">psnr_ls</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_ls</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       5000         0.000          3.08699e+03
+      100       5000         0.032          3.05872e+02
+      200       5000         0.032          2.86414e+02
+      300       5000         0.033          2.78917e+02
+-------------------------------------------------------
+      300       5000         0.033          2.78917e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get and visusualise the results</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot; psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_ls</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_17_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_17_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb395256d40&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;fbp&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;ls fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_18_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_18_0.png" />
+</div>
+</div>
+</section>
+<section id="Reconstructing-the-noisy-data-using-weighted-least-squares-(WLS)">
+<h2>Reconstructing the noisy data using weighted least squares (WLS)<a class="headerlink" href="#Reconstructing-the-noisy-data-using-weighted-least-squares-(WLS)" title="Link to this heading">#</a></h2>
+<p>So, for the LS problem, we want to minimize the following:</p>
+<div class="math notranslate nohighlight">
+\[||Y-Ax||_{W}^{2}\]</div>
+<p>following the derivation in section 6.54 of the book <a class="reference external" href="https://doi.org/10.1007/978-3-540-39408-2">Computed Tomography: From Photon Statistics to Modern Cone-BEam CT by Thorsten Buzug</a> we take the weights to be proportional to the noisy counts.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#Definition of the fidelity term</span>
+
+<span class="n">weights</span><span class="o">=</span><span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">WF</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+
+<span class="c1"># Setting up FISTA</span>
+<span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">WF</span><span class="p">,</span>
+            <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+            <span class="n">max_iteration</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="c1"># Run FISTA</span>
+<span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">recon_wls</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">psnr_wls</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_wls</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       5000         0.000          2.52433e+03
+      100       5000         0.034          2.74321e+02
+      200       5000         0.035          2.55345e+02
+      300       5000         0.034          2.47674e+02
+-------------------------------------------------------
+      300       5000         0.034          2.47674e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get and visusualise the results</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_wls</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot; psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_wls</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_21_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_21_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb39551c400&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;fbp&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;ls fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_wls</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;wls fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_22_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_22_0.png" />
+</div>
+</div>
+<p>We can visualise the weights used. The more data that is meaured, the smaller the signal variance and the data is weighted to be more reliable in the minimisation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_24_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_24_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb395116530&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Reconstruct-the-noisy-data-using-Kullback-Liebler-(KL)-divergence">
+<h2>Reconstruct the noisy data using Kullback Liebler (KL) divergence<a class="headerlink" href="#Reconstruct-the-noisy-data-using-Kullback-Liebler-(KL)-divergence" title="Link to this heading">#</a></h2>
+<p>If <span class="math notranslate nohighlight">\(u \sim \mathrm{Poiss}(v)\)</span>, the maximum likelihood of <span class="math notranslate nohighlight">\(v\)</span> given observation <span class="math notranslate nohighlight">\(u\)</span> is found by minimising with respect to <span class="math notranslate nohighlight">\(v\)</span> the objective</p>
+<div class="math notranslate nohighlight">
+\[KL(u,v) = u \log\left(\frac{u}{v}\right)-u+v.\]</div>
+<p>Considering</p>
+<div class="math notranslate nohighlight">
+\[b = \mathrm{Poiss}\left(I_{0} e^{-Ax}\right)\]</div>
+<p>we can define:</p>
+<div class="math notranslate nohighlight">
+\[KL(b,I_{0} e^{-Ax}) = \sum_{i} \bigg[b_{i} \log \left(\frac{b_{i}}{I_{0} e^{-(Ax)_{i}}}\right) - b_{i} + I_{0} e^{-(Ax)_{i}}\bigg] =
+\sum_{i} \bigg[ b_{i}\log(b_{i}) - b_{i} \log(I_{0}) - b_{i} \log\left(I_{0} e^{-(Ax)_{i}}\right) - b_{i} + I_{0} e^{-(Ax)_{i}} \bigg]\]</div>
+<p>We want to minimize the KL function with respect to <span class="math notranslate nohighlight">\(x\)</span>, so we consider</p>
+<div class="math notranslate nohighlight">
+\[KL(b,I_{0} e^{-Ax}) = \sum_{i} \bigg[ b_{i} (Ax)_{i} + I_{0} e^{-(Ax)_{i}}\bigg] +\mathrm{constants}= \sum_{i} \bigg[ \frac{b_{i}}{I_{0}}(Ax)_{i} + e^{-(Ax)_{i}}\bigg]+\mathrm{constants}\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Defining the KL fidelity term</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KL_prelog</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">KL_prelog</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span>  <span class="o">=</span> <span class="n">d</span>   <span class="c1"># d = b/I0</span>
+
+    <span class="c1">#@property</span>
+    <span class="c1">#def L(self):</span>
+    <span class="c1">#    return 0.00001</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">*</span><span class="n">vec</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">vec</span>  <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">der</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">vec</span><span class="p">)</span>
+        <span class="c1">#res2 = np.sum(der)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span> <span class="p">(</span><span class="n">der</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">der</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Definition of the fidelity term</span>
+<span class="n">d2</span> <span class="o">=</span> <span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+<span class="n">KL_pre</span> <span class="o">=</span> <span class="n">KL_prelog</span><span class="p">(</span><span class="n">d</span> <span class="o">=</span> <span class="n">d2</span><span class="p">)</span>
+<span class="n">f_KL</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">KL_pre</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+
+<span class="c1"># Setting up FISTA</span>
+<span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f_KL</span><span class="p">,</span>
+            <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+            <span class="n">max_iteration</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="c1"># Run FISTA</span>
+<span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">recon_kl</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">psnr_kl</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_kl</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       5000         0.000          1.28000e+05
+      100       5000         0.035          1.26785e+05
+      200       5000         0.036          1.26776e+05
+-------------------------------------------------------
+      200       5000         0.036          1.26776e+05
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get and visusualise the results</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_kl</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot; psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_kl</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_28_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_28_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb3844b51e0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;fbp&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;ls fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_wls</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;wls fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_kl</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;kl fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_29_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_29_0.png" />
+</div>
+</div>
+</section>
+<section id="Comparisons-without-regularisation">
+<h2>Comparisons without regularisation<a class="headerlink" href="#Comparisons-without-regularisation" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls</span><span class="p">,</span><span class="n">recon_wls</span><span class="p">,</span> <span class="n">recon_kl</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot;LS psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_ls</span><span class="p">),</span>\
+    <span class="s2">&quot;WLS psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_wls</span><span class="p">),</span> \
+    <span class="s2">&quot;KL psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_kl</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_31_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_31_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb38dbc6740&gt;
+</pre></div></div>
+</div>
+<p>The KL reconstruction is better than the WLS reconstruction which is better than the LS reconstruction. However, all the above reconstructions are worse than the FDK reconcstruction and seem to be overfitting to the noise. In the next section, we consider reconstructions with TV regularisation.</p>
+</section>
+<section id="Reconstructing-the-noisy-data-using-least-squares-with-Total-Variation-regualrisation">
+<h2>Reconstructing the noisy data using least squares with Total Variation regualrisation<a class="headerlink" href="#Reconstructing-the-noisy-data-using-least-squares-with-Total-Variation-regualrisation" title="Link to this heading">#</a></h2>
+<p>In addition to the least-square term, we considered a Total Variation Regulariser. So, for the LS-TV problem, we want to minimize the following:</p>
+<div class="math notranslate nohighlight">
+\[||Y-Ax||_{2}^{2} + \alpha \, TV(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the regularization parameter that balances the two terms. In the next box, we search over a range of values of <span class="math notranslate nohighlight">\(\alpha\)</span> to find the best one for our data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selection of the best regularization parametr using LS TV - FISTA</span>
+<span class="n">alpha_min</span> <span class="o">=</span> <span class="mf">0.00002</span>
+<span class="n">alpha_max</span> <span class="o">=</span> <span class="mf">0.00006</span>
+<span class="n">alpha_n</span>   <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alphas_ls</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">alpha_min</span><span class="p">,</span> <span class="n">alpha_max</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span>
+<span class="n">modulo</span>    <span class="o">=</span> <span class="mi">5</span> <span class="c1">#how often to plot the reconstructions, for the different values of alpha</span>
+
+<span class="c1">#Definition of the fidelity term</span>
+<span class="n">f3</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">)</span>
+
+<span class="c1">#Initialize quantities</span>
+<span class="n">psnr_ls_tv_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">alphas_ls</span><span class="p">)</span>
+<span class="n">max_psnr</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Run the loop over the different values of alpha</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alpha_n</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas_ls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Defining the regularization term with the new alpha</span>
+    <span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">()</span>
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTATV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f3</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">GTV</span><span class="p">,</span>
+                  <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTATV</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_ls_tv</span> <span class="o">=</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_ls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_ls_tv</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+
+
+    <span class="c1"># Save the reconstruction (one every &quot;modulo&quot;)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">modulo</span> == 0:
+        <span class="n">show2D</span><span class="p">([</span><span class="n">recon_ls_tv</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;LS TV alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr = </span><span class="si">%7.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_ls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">])],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+         <span class="c1"># plot the objective function</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">objective</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;alpha =</span><span class="si">%7.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># print the value of alpha and the obtained psnr of the reconstruction</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_ls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="c1"># Save the best reconstruction</span>
+    <span class="k">if</span> <span class="n">psnr_ls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="n">max_psnr</span><span class="p">:</span>
+        <span class="n">max_psnr</span>   <span class="o">=</span> <span class="n">psnr_ls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">best_recon</span> <span class="o">=</span> <span class="n">recon_ls_tv</span>
+        <span class="n">best_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_1.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000020, psnr= 17.222
+alpha=0.000022, psnr= 18.315
+alpha=0.000024, psnr= 19.247
+alpha=0.000026, psnr= 20.028
+alpha=0.000028, psnr= 20.667
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_3.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_4.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000031, psnr= 21.184
+alpha=0.000033, psnr= 21.600
+alpha=0.000035, psnr= 21.932
+alpha=0.000037, psnr= 22.192
+alpha=0.000039, psnr= 22.392
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_6.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_7.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000041, psnr= 22.540
+alpha=0.000043, psnr= 22.644
+alpha=0.000045, psnr= 22.712
+alpha=0.000047, psnr= 22.752
+alpha=0.000049, psnr= 22.772
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_9.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_34_10.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_34_10.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000052, psnr= 22.772
+alpha=0.000054, psnr= 22.756
+alpha=0.000056, psnr= 22.729
+alpha=0.000058, psnr= 22.694
+alpha=0.000060, psnr= 22.652
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Save the best reconstructions</span>
+<span class="n">recon_ls_tv_fista</span> <span class="o">=</span> <span class="n">best_recon</span>
+<span class="n">psnr_ls_tv_fista</span>  <span class="o">=</span> <span class="n">max_psnr</span>
+<span class="n">alpha_ls_tv_fista</span> <span class="o">=</span> <span class="n">best_alpha</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PSNR for different values of alpha</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_ls</span><span class="p">,</span><span class="n">psnr_ls_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span> <span class="n">psnr_ls_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_36_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_36_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get and visusualise the results</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls_tv_fista</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot;LS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span><span class="n">psnr_ls_tv_fista</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_37_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_37_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb38dc47d90&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;fbp&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;ls tv fista&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_38_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_38_0.png" />
+</div>
+</div>
+</section>
+<section id="id1">
+<h2>Reconstructing the noisy data using least squares with Total Variation regualrisation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>Similar to the least squares cas, in addition to the weighted least square term, we considered a Total Variation Regulariser. We minimize:</p>
+<div class="math notranslate nohighlight">
+\[||Y-Ax||_{W}^{2} + \alpha \, TV(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is the regularization parameter that balances the two terms. Again we search a range of values of <span class="math notranslate nohighlight">\(\alpha\)</span> to find the best one for the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selection of the best regularization parameter using WLS TV - FISTA</span>
+<span class="n">alpha_min</span> <span class="o">=</span> <span class="mf">0.00002</span>
+<span class="n">alpha_max</span> <span class="o">=</span> <span class="mf">0.00006</span>
+<span class="n">alpha_n</span>   <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alphas_wls</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">alpha_min</span><span class="p">,</span> <span class="n">alpha_max</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span>
+<span class="n">modulo</span>    <span class="o">=</span> <span class="mi">5</span> <span class="c1">#10 #how often to plot reconstructions, for the different values of alpha</span>
+
+<span class="c1">#Definition of the fidelity term</span>
+<span class="n">weights</span><span class="o">=</span><span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">WF</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+<span class="c1">#Initialize quantities</span>
+<span class="n">psnr_wls_tv_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">alphas_wls</span><span class="p">)</span>
+<span class="n">w_max_psnr</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Run the loop over the different values of alpha</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alpha_n</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas_wls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Defining the regularization term with the new alpha</span>
+    <span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">()</span>
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTAWTV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">WF</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">GTV</span><span class="p">,</span>
+                  <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTAWTV</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_wls_tv</span> <span class="o">=</span> <span class="n">myFISTAWTV</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_wls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_wls_tv</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+    <span class="c1"># Plot the reconstruction (one every &quot;modulo&quot;)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">modulo</span> == 0:
+
+        <span class="c1"># plot the reconstruction</span>
+        <span class="n">show2D</span><span class="p">([</span><span class="n">recon_wls_tv</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;WLS TV alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr = </span><span class="si">%7.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_wls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">])],</span> \
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+        <span class="c1"># plot the objective function</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">myFISTAWTV</span><span class="o">.</span><span class="n">objective</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;alpha =</span><span class="si">%7.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+    <span class="c1"># print the value of alpha and the obtained psnr of the reconstruction</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_wls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="c1"># Save the best reconstruction</span>
+    <span class="k">if</span> <span class="n">psnr_wls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="n">w_max_psnr</span><span class="p">:</span>
+        <span class="n">w_max_psnr</span>   <span class="o">=</span> <span class="n">psnr_wls_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">w_best_recon</span> <span class="o">=</span> <span class="n">recon_wls_tv</span>
+        <span class="n">w_best_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_1.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000020, psnr= 18.611
+alpha=0.000022, psnr= 19.630
+alpha=0.000024, psnr= 20.455
+alpha=0.000026, psnr= 21.108
+alpha=0.000028, psnr= 21.611
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_3.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_4.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000031, psnr= 21.991
+alpha=0.000033, psnr= 22.275
+alpha=0.000035, psnr= 22.479
+alpha=0.000037, psnr= 22.621
+alpha=0.000039, psnr= 22.711
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_6.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_7.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000041, psnr= 22.762
+alpha=0.000043, psnr= 22.781
+alpha=0.000045, psnr= 22.778
+alpha=0.000047, psnr= 22.758
+alpha=0.000049, psnr= 22.725
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_9.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_40_10.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_40_10.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000052, psnr= 22.680
+alpha=0.000054, psnr= 22.626
+alpha=0.000056, psnr= 22.566
+alpha=0.000058, psnr= 22.500
+alpha=0.000060, psnr= 22.431
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#save the best reconstruction</span>
+<span class="n">recon_wls_tv_fista</span> <span class="o">=</span> <span class="n">w_best_recon</span>
+<span class="n">psnr_wls_tv_fista</span>  <span class="o">=</span> <span class="n">w_max_psnr</span>
+<span class="n">alpha_wls_tv_fista</span> <span class="o">=</span> <span class="n">w_best_alpha</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PSNR for different values of alpha</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_ls</span><span class="p">,</span><span class="n">psnr_ls_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_wls</span><span class="p">,</span><span class="n">psnr_wls_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;wLS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span> <span class="n">psnr_ls_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_wls_tv_fista</span><span class="p">,</span> <span class="n">psnr_wls_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PSNR for different values of alpha, I0 = %7.f&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_42_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_42_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_wls_tv_fista</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot;WLS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_wls_tv_fista</span><span class="p">,</span><span class="n">psnr_wls_tv_fista</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_43_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_43_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb345ef5f60&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Use a line plot to compare the reconstructions</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;FBP&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_wls_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;WLS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Reconstruction line horizontal=</span><span class="si">%3.0f</span><span class="s2"> , I0 = %7.f&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">linenumy</span><span class="p">,</span><span class="n">background_counts</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_44_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_44_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">
+<h1>Reconstructing the noisy data using KL divergence with TV regularisation<a class="headerlink" href="#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation" title="Link to this heading">#</a></h1>
+<p>As in the least squares and weighted least squares case, we add in a TV regularisation term and search for an optimal regularisation parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selection of the best regularization parametr using KL TV - FISTA</span>
+<span class="n">alpha_min</span> <span class="o">=</span> <span class="mf">0.000005</span>
+<span class="n">alpha_max</span> <span class="o">=</span> <span class="mf">0.000045</span>
+<span class="n">alpha_n</span>   <span class="o">=</span> <span class="mi">20</span>
+<span class="n">alphas_kl</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">alpha_min</span><span class="p">,</span> <span class="n">alpha_max</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span>
+<span class="n">modulo</span>    <span class="o">=</span> <span class="mi">5</span> <span class="c1">#10 #how often to save reconstructions, for the different values of alpha</span>
+
+<span class="c1">#Definition of the fidelity term</span>
+<span class="n">d2</span> <span class="o">=</span> <span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+<span class="n">KL_pre</span> <span class="o">=</span> <span class="n">KL_prelog</span><span class="p">(</span><span class="n">d</span> <span class="o">=</span> <span class="n">d2</span><span class="p">)</span>
+<span class="n">f_KL</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">KL_pre</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+<span class="c1">#Initialize quantities</span>
+<span class="n">psnr_kl_tv_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">alphas_kl</span><span class="p">)</span>
+<span class="n">kl_max_psnr</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Run the loop over the different values of alpha</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alpha_n</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas_kl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Defining the regularization term with the new alpha</span>
+    <span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">()</span>
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTAKLTV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f_KL</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">GTV</span><span class="p">,</span>
+                  <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTAKLTV</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_kl_tv</span> <span class="o">=</span> <span class="n">myFISTAKLTV</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_kl_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_kl_tv</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+
+
+    <span class="c1"># Plot the reconstruction (one every &quot;modulo&quot;)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">modulo</span> == 0:
+        <span class="c1"># plot the objective function</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">myFISTAKLTV</span><span class="o">.</span><span class="n">objective</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;alpha =</span><span class="si">%7.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># plot the reconstruction</span>
+        <span class="n">show2D</span><span class="p">([</span><span class="n">recon_kl_tv</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;KL TV alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr = </span><span class="si">%7.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_kl_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">])],</span> \
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+
+
+    <span class="c1"># print the value of alpha and the obtained psnr of the reconstruction</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">psnr_kl_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="c1"># Save the best reconstruction</span>
+    <span class="k">if</span> <span class="n">psnr_kl_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="n">kl_max_psnr</span><span class="p">:</span>
+        <span class="n">kl_max_psnr</span>   <span class="o">=</span> <span class="n">psnr_kl_tv_alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">kl_best_recon</span> <span class="o">=</span> <span class="n">recon_kl_tv</span>
+        <span class="n">kl_best_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_1.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000005, psnr= 11.235
+alpha=0.000007, psnr= 14.860
+alpha=0.000009, psnr= 17.799
+alpha=0.000011, psnr= 19.910
+alpha=0.000013, psnr= 21.271
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_3.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_4.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000016, psnr= 22.088
+alpha=0.000018, psnr= 22.545
+alpha=0.000020, psnr= 22.754
+alpha=0.000022, psnr= 22.813
+alpha=0.000024, psnr= 22.783
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_6.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_7.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000026, psnr= 22.702
+alpha=0.000028, psnr= 22.588
+alpha=0.000030, psnr= 22.455
+alpha=0.000032, psnr= 22.310
+alpha=0.000034, psnr= 22.158
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_9.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_47_10.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_47_10.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+alpha=0.000037, psnr= 22.004
+alpha=0.000039, psnr= 21.847
+alpha=0.000041, psnr= 21.689
+alpha=0.000043, psnr= 21.536
+alpha=0.000045, psnr= 21.389
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Save the optimal parameters</span>
+<span class="n">recon_kl_tv_fista</span> <span class="o">=</span> <span class="n">kl_best_recon</span>
+<span class="n">psnr_kl_tv_fista</span>  <span class="o">=</span> <span class="n">kl_max_psnr</span>
+<span class="n">alpha_kl_tv_fista</span> <span class="o">=</span> <span class="n">kl_best_alpha</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#PSNR for different values of alpha</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_ls</span><span class="p">,</span><span class="n">psnr_ls_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_wls</span><span class="p">,</span><span class="n">psnr_wls_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;wLS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas_kl</span><span class="p">,</span><span class="n">psnr_kl_tv_alpha</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;KL TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span> <span class="n">psnr_ls_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_wls_tv_fista</span><span class="p">,</span> <span class="n">psnr_wls_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha_kl_tv_fista</span><span class="p">,</span> <span class="n">psnr_kl_tv_fista</span><span class="p">,</span> <span class="s1">&#39;*r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PSNR for different values of alpha, I0 = %7.f&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_50_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_50_0.png" />
+</div>
+</div>
+<p>We see for that different loss terms there is a different optimal regularisation parameter/</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the reconstructions</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_kl_tv_fista</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot;KL TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_kl_tv_fista</span><span class="p">,</span><span class="n">psnr_kl_tv_fista</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_52_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_52_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb345a16650&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#And a line plot again</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">phantom</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="s1">&#39;:k&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;phantom&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_fbp</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;FBP&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_ls_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;LS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_wls_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;WLS TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon_kl_tv_fista</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">horizontal_y</span><span class="o">=</span><span class="n">linenumy</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;KL TV&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Reconstruction line horizontal=</span><span class="si">%3.0f</span><span class="s2"> , I0 = %7.f&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">linenumy</span><span class="p">,</span><span class="n">background_counts</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_53_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_53_0.png" />
+</div>
+</div>
+<section id="Comparisons-with-TV">
+<h2>Comparisons with TV<a class="headerlink" href="#Comparisons-with-TV" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls_tv_fista</span><span class="p">,</span><span class="n">recon_wls_tv_fista</span><span class="p">,</span> <span class="n">recon_kl_tv_fista</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+    <span class="s2">&quot;LS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span><span class="n">psnr_ls_tv_fista</span><span class="p">),</span>\
+    <span class="s2">&quot;WLS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_wls_tv_fista</span><span class="p">,</span><span class="n">psnr_wls_tv_fista</span><span class="p">),</span> \
+    <span class="s2">&quot;KL TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_kl_tv_fista</span><span class="p">,</span><span class="n">psnr_kl_tv_fista</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_55_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_55_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb38c9eed70&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Compare-all-the-reconstructions">
+<h1>Compare all the reconstructions<a class="headerlink" href="#Compare-all-the-reconstructions" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls</span><span class="p">,</span> <span class="n">recon_wls_tv_fista</span><span class="p">,</span> <span class="n">recon_wls</span><span class="p">,</span> <span class="n">recon_wls_tv_fista</span><span class="p">,</span>  <span class="n">recon_kl</span><span class="p">,</span> <span class="n">recon_kl_tv_fista</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+   <span class="s2">&quot;LS  psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_ls</span><span class="p">),</span> <span class="s2">&quot;LS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_ls_tv_fista</span><span class="p">,</span><span class="n">psnr_ls_tv_fista</span><span class="p">),</span> \
+    <span class="s2">&quot;WLS   psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_wls</span><span class="p">),</span>  <span class="s2">&quot;WLS TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_wls_tv_fista</span><span class="p">,</span><span class="n">psnr_wls_tv_fista</span><span class="p">),</span> \
+    <span class="s2">&quot;KL  psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_kl</span><span class="p">),</span>    <span class="s2">&quot;KL TV FISTA alpha=</span><span class="si">%7.6f</span><span class="s2">, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">alpha_kl_tv_fista</span><span class="p">,</span><span class="n">psnr_kl_tv_fista</span><span class="p">)],</span> \
+       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_57_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_57_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fb38c9efd00&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">
+<h1>Comparisons between LS, WLS and KL loss for a range of counts<a class="headerlink" href="#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts" title="Link to this heading">#</a></h1>
+<p>We consider again without regularisation and try a range of different background counts. We see a similar pattern in the PSNR with the KL reconstruction giving an improvement on the WLS reconstruction which improves on the LS reconstruction. We see that the KL divergence loss makes the reconstruction less likely to overfit to the noise in the background where there is a large number of counts and thus less uncertainty. We still see that regularisation is required as the solution is not an
+improvement on the FBP reconstruction</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Incident intensity: lower counts will increase the noise</span>
+<span class="k">for</span> <span class="n">background_counts</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">500</span><span class="p">,</span><span class="mi">20000</span><span class="p">,</span> <span class="mi">500</span><span class="p">):</span>
+
+    <span class="c1"># Convert the simulated absorption sinogram to transmission values using Lambert-Beer.</span>
+    <span class="c1"># Use as mean for Poisson data generation.</span>
+    <span class="c1"># Convert back to absorption sinogram.</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">background_counts</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">noisy_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">noisy_counts</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">sino_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sino</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">sino_out</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">noisy_counts</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">/</span> <span class="n">background_counts</span><span class="p">)</span>
+
+
+    <span class="c1"># allocate sino_noisy and fill with noisy data</span>
+    <span class="n">sino_noisy</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">sino_noisy</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">sino_out</span><span class="p">)</span>
+
+
+    <span class="c1">#FBP reconstruction</span>
+    <span class="n">recon_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">sino_noisy</span><span class="p">)</span>
+    <span class="n">psnr_fbp</span> <span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+    <span class="c1">#Definition of the fidelity term for LS</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">)</span>
+
+
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+                <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+                <span class="n">max_iteration</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_ls</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_ls</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_ls</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+
+    <span class="c1">#Definition of the fidelity term for WLS</span>
+
+    <span class="n">weights</span><span class="o">=</span><span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">WF</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sino_noisy</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">WF</span><span class="p">,</span>
+                <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+                <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_wls</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_wls</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_wls</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+    <span class="c1">#Definition of the fidelity term</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span>
+    <span class="n">KL_pre</span> <span class="o">=</span> <span class="n">KL_prelog</span><span class="p">(</span><span class="n">d</span> <span class="o">=</span> <span class="n">d2</span><span class="p">)</span>
+    <span class="n">f_KL</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">KL_pre</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+
+    <span class="c1"># Setting up FISTA</span>
+    <span class="n">myFISTA</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f_KL</span><span class="p">,</span>
+                <span class="n">g</span><span class="o">=</span><span class="n">ZeroFunction</span><span class="p">(),</span>
+                <span class="n">max_iteration</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="c1"># Run FISTA</span>
+    <span class="n">myFISTA</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">recon_kl</span> <span class="o">=</span> <span class="n">myFISTA</span><span class="o">.</span><span class="n">solution</span>
+    <span class="n">psnr_kl</span><span class="o">=</span> <span class="n">psnr</span><span class="p">(</span><span class="n">phantom</span><span class="p">,</span><span class="n">recon_kl</span><span class="p">,</span> <span class="n">data_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">phantom</span><span class="p">))</span>
+
+    <span class="c1"># get and visusualise the results</span>
+
+    <span class="n">show2D</span><span class="p">([</span><span class="n">phantom</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_ls</span><span class="p">,</span><span class="n">recon_wls</span><span class="p">,</span> <span class="n">recon_kl</span> <span class="p">],</span> <span class="p">[</span><span class="s2">&quot;phantom, I0 = </span><span class="si">%7.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">background_counts</span><span class="p">),</span> <span class="s2">&quot;FBP, psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_fbp</span><span class="p">),</span>\
+        <span class="s2">&quot;LS psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_ls</span><span class="p">),</span>\
+        <span class="s2">&quot;WLS psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_wls</span><span class="p">),</span> \
+        <span class="s2">&quot;KL psnr= </span><span class="si">%5.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psnr_kl</span><span class="p">)],</span> \
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_0.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_1.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_2.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_3.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_4.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_5.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_6.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_7.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_8.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_8.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_9.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_10.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_10.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_11.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_11.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_12.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_12.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_13.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_13.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_14.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_14.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_15.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_15.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_16.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_16.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_17.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_17.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_18.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_18.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_19.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_19.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_20.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_20.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_21.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_21.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_22.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_22.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_23.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_23.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_24.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_24.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_25.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_25.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_26.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_26.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_27.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_27.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_28.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_28.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_29.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_29.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_30.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_30.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_31.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_31.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_32.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_32.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_33.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_33.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_34.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_34.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_35.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_35.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_36.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_36.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_37.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_37.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_LS_WLS_KL_TotalVariation_59_38.png" src="../../_images/demos_LS_WLS_KL_TotalVariation_59_38.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../Hyperspectral_regularisation/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Reconstruction and regularisation for a hyperspectral dataset</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../Apple_offset_reconstruction/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Offset reconstruction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

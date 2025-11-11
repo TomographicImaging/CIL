@@ -1,0 +1,1717 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Showcase of the algorithms for deblurring and denoising &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Showcase_of_the_algorithms_for_deblurring_and_denoising';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
+    <link rel="prev" title="Multibang Regularisation in CIL" href="../Multibang_Hackathon2023/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Showcase of the algorithms for deblurring and denoising</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Import-algorithms,-operators-and-functions">Import algorithms, operators and functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Setting-up-the-direct-problem">Setting up the direct problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-Deblurring-Inverse-Problem">The Deblurring Inverse Problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Different-Noise:-Gaussian-Noise">Different Noise: Gaussian Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Different-Noises:-Salt-and-Pepper-Noise">Different Noises: Salt and Pepper Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Denoising-and-deblurring-without-knowledge-of-the-blur-kernel">Denoising and deblurring without knowledge of the blur kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Deblurring-without-noise-in-the-data">Deblurring without noise in the data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/Showcase_of_the_algorithms_for_deblurring_and_denoising.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Showcase of the algorithms for deblurring and denoising</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Adile Gündoğdu ( Istanbul Technical University)</span>
+<span class="c1">#   E-mail: adilegundogdu34@gmail.com</span>
+<span class="c1">#   Edited by:  Margaret Duff (STFC)</span>
+</pre></div>
+</div>
+</div>
+<section id="Showcase-of-the-algorithms-for-deblurring-and-denoising">
+<h1>Showcase of the algorithms for deblurring and denoising<a class="headerlink" href="#Showcase-of-the-algorithms-for-deblurring-and-denoising" title="Link to this heading">#</a></h1>
+<p>In this notebook, we are going to investigate the Total Variation Algorithms, Gradient Descent and FISTA on cases with 2 types of noises. Firstly, we build an inverse problem; thus, we will blur the image and then add noise. Next, we will try to fix the picture we’ve distorted and finally, we will compare the results.</p>
+<p>If you have any questions, please do not hesitate to contact with me!</p>
+<section id="Import-algorithms,-operators-and-functions">
+<h2>Import algorithms, operators and functions<a class="headerlink" href="#Import-algorithms,-operators-and-functions" title="Link to this heading">#</a></h2>
+<p>First, we import all tools needed:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import algorithms, operators and functions from CIL optimisation module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GD</span><span class="p">,</span> <span class="n">FISTA</span><span class="p">,</span> <span class="n">PDHG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">GradientOperator</span><span class="p">,</span>\
+                                       <span class="n">GradientOperator</span><span class="p">,</span> <span class="n">BlurringOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">L2NormSquared</span><span class="p">,</span> \
+                                       <span class="n">BlockFunction</span><span class="p">,</span> <span class="n">L1Norm</span><span class="p">,</span> <span class="n">LeastSquares</span><span class="p">,</span> \
+                                       <span class="n">OperatorCompositionFunction</span><span class="p">,</span> <span class="n">TotalVariation</span><span class="p">,</span> \
+                                       <span class="n">ZeroFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span>  <span class="n">noise</span>
+
+<span class="c1"># Import data examples</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
+
+
+<span class="c1"># Import CIL Processors for preprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span><span class="p">,</span> <span class="n">Slicer</span><span class="p">,</span> <span class="n">TransmissionAbsorptionConverter</span>
+
+<span class="c1"># Import CIL display function</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span>
+
+
+<span class="c1"># Import FBP from CIL recon class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+
+<span class="c1">#Import Total Variation from the regularisation toolkit plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.ccpi_regularisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">FGP_TV</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">ImageData</span>
+
+<span class="c1"># All external imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.image</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpimg</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="CIL-Version-23.0.1">
+<h3>CIL Version 23.0.1<a class="headerlink" href="#CIL-Version-23.0.1" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+23.0.1
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Setting-up-the-direct-problem">
+<h2>Setting up the direct problem<a class="headerlink" href="#Setting-up-the-direct-problem" title="Link to this heading">#</a></h2>
+<p>We choose a CIL example image:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">im_gray_cil</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">BOAT</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="mi">225</span><span class="p">,</span><span class="mi">225</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">im_gray_cil</span><span class="p">)</span>
+<span class="n">ig</span><span class="o">=</span><span class="n">im_gray_cil</span><span class="o">.</span><span class="n">geometry</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of dimensions: 2
+Shape: (225, 225)
+Axis labels: (&#39;horizontal_y&#39;, &#39;horizontal_x&#39;)
+
+</pre></div></div>
+</div>
+<p>We need to define a plotting function for the use same range and size all the time.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">myshow</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">image</span> <span class="p">:</span> <span class="n">show2D</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">myshow</span><span class="p">(</span><span class="n">im_gray_cil</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_10_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_10_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff93473d420&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="The-Deblurring-Inverse-Problem">
+<h2>The Deblurring Inverse Problem<a class="headerlink" href="#The-Deblurring-Inverse-Problem" title="Link to this heading">#</a></h2>
+<p>We consider the deblurring problem</p>
+<div class="math notranslate nohighlight">
+\[d = A u + \eta\]</div>
+<p>where</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the unknown sharp image</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is a linear operator representing blurring</p></li>
+<li><p><span class="math notranslate nohighlight">\(\eta\)</span> is additive Gaussian noise</p></li>
+<li><p><span class="math notranslate nohighlight">\(d\)</span> is the blurred and noisy image.</p></li>
+</ul>
+<p>To set up the direct problem we specify a <em>point spread function (PSF)</em> to blur the image through a convolution:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parameters for point spread function PSF (size and std)</span>
+<span class="n">ks</span>          <span class="o">=</span> <span class="mi">5</span>
+<span class="n">ksigma</span>      <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create 1D PSF and 2D as outer product, then normalise.</span>
+<span class="n">w</span>           <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,(</span><span class="n">ks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ksigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">w</span><span class="o">.</span><span class="n">shape</span>     <span class="o">=</span> <span class="p">(</span><span class="n">ks</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">PSF</span><span class="o">/</span><span class="p">(</span><span class="n">PSF</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">PSF</span><span class="o">/</span><span class="n">PSF</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>For the blurring, CIL has a specify Blurring Operator and we use it, then we apply it to the test image and display it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">BlurringOperator</span><span class="p">(</span><span class="n">PSF</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">im_blur</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">im_gray_cil</span><span class="p">)</span>
+<span class="n">myshow</span><span class="p">(</span><span class="n">im_blur</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_16_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_16_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff935823820&gt;
+</pre></div></div>
+</div>
+<p>For the denoising part of this problem, we want to compare the different noises and their results. So, we add Gaussian and Salt-and-Pepper noise.</p>
+</section>
+<section id="Different-Noise:-Gaussian-Noise">
+<h2>Different Noise: Gaussian Noise<a class="headerlink" href="#Different-Noise:-Gaussian-Noise" title="Link to this heading">#</a></h2>
+<p>We add Gaussian noise to the blurred image.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_blur_noise_gaussian</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">im_blur</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">myshow</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_20_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_20_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff813a02920&gt;
+</pre></div></div>
+</div>
+<section id="Variational-regularisation">
+<h3>Variational regularisation<a class="headerlink" href="#Variational-regularisation" title="Link to this heading">#</a></h3>
+<p>We formulate the image deblurring problem as an optimization problem to simultaneously fit to the data and enforce regularization on the solution. We use a simple least squares data-fitting term with the blurring operator and try out a few different regularizers <span class="math notranslate nohighlight">\(\Psi(u)\)</span> in the general form optimization problem:</p>
+<div class="math notranslate nohighlight">
+\[\min_u  \| A u - d\|^{2}_{2} + \alpha\,\Psi(u)\]</div>
+<section id="Gradient-Descent">
+<h4>Gradient Descent<a class="headerlink" href="#Gradient-Descent" title="Link to this heading">#</a></h4>
+<p>The choice of <span class="math notranslate nohighlight">\(\Psi(u)\)</span> determines the regularization to apply. We first try without regularization, <span class="math notranslate nohighlight">\(\Psi(u) = 0\)</span>, leaving us with the simpler least-squares optimization problem</p>
+<div class="math notranslate nohighlight">
+\[\min_u  \| A u - d\|^{2}_{2}\]</div>
+<p>We set up a <em>LeastSquares</em> function object(F):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>You can visualise the calculated gradients:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s_x</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">s_y</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">slices</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span><span class="n">s_x</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">s_y</span><span class="p">)]</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="n">slice_list</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span>  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_25_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_25_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff809f62050&gt;
+</pre></div></div>
+</div>
+<p>We now run gradient descent:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">myGD_LS</span> <span class="o">=</span> <span class="n">GD</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+             <span class="n">objective_function</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+             <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+             <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">myshow</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.56076e+04
+       50       1000         0.012          3.67519e+01
+      100       1000         0.011          3.29310e+01
+      150       1000         0.011          3.07064e+01
+      200       1000         0.011          2.91941e+01
+      250       1000         0.011          2.80672e+01
+      300       1000         0.011          2.71755e+01
+-------------------------------------------------------
+      300       1000         0.011          2.71755e+01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_27_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_27_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff813a03eb0&gt;
+</pre></div></div>
+</div>
+<p>Reconstructing the blurred image is an ill-posed inverse problem, and we see that the solution has become unstable with the added noise in the observed data. Looking at the solution over the full range of values we see that the reconstruction has some values outside the expected range:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39; The range of the solution is &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ The range of the solution is  -0.51695734 1.5081458
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Using-FISTA-to-add-an-indicator-function-to-the-objective">
+<h3>Using FISTA to add an indicator function to the objective<a class="headerlink" href="#Using-FISTA-to-add-an-indicator-function-to-the-objective" title="Link to this heading">#</a></h3>
+<p>With FISTA, we can solve the least squares problem and in addition we can add the extra condition that the reconstructed values should be bounded below by zero and above by 1 and this improves the reconstruction:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">myFISTANN</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+                  <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">myFISTANN</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">myshow</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; The range of the solution is &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.56076e+04
+       50       1000         0.050          2.70418e+01
+      100       1000         0.054          2.42223e+01
+      150       1000         0.051          2.37390e+01
+      200       1000         0.051          2.36360e+01
+      250       1000         0.050          2.36093e+01
+      300       1000         0.048          2.36002e+01
+-------------------------------------------------------
+      300       1000         0.048          2.36002e+01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_31_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_31_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ The range of the solution is  0.0 1.0
+</pre></div></div>
+</div>
+<p>The range is now correct but the solution is still sensitive to the noise in the data. We can now try different regularisers.</p>
+</section>
+<section id="GGLS-with-regularisation">
+<h3>GGLS with regularisation<a class="headerlink" href="#GGLS-with-regularisation" title="Link to this heading">#</a></h3>
+<div class="line-block">
+<div class="line">Using CGLS to solve the Tikhonov problem with gradient operator D, i.e.,</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\min_u \|Au-b\|_2^2 + \alpha^2\|Du\|_2^2\]</div>
+</div></blockquote>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">F_reg</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">(),</span><span class="n">D</span><span class="p">)</span>
+<span class="n">Full</span> <span class="o">=</span> <span class="n">F</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">F_reg</span>
+
+<span class="n">myGD_tikh</span> <span class="o">=</span> <span class="n">GD</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+               <span class="n">objective_function</span><span class="o">=</span><span class="n">Full</span><span class="p">,</span>
+               <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+               <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">myGD_tikh</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">75</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">myshow</span><span class="p">(</span><span class="n">myGD_tikh</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.56076e+04
+       30       1000         0.016          1.74882e+02
+       60       1000         0.015          1.74717e+02
+-------------------------------------------------------
+       75       1000         0.015
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_34_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_34_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff809e231c0&gt;
+</pre></div></div>
+</div>
+<section id="Total-variation-deblurring">
+<h4>Total variation deblurring<a class="headerlink" href="#Total-variation-deblurring" title="Link to this heading">#</a></h4>
+<p>The solution is blurry and we have lost all sharp edges and so we try Total Variation regularisation. We will try to solve this minimization problem.</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+\underset{u}{\operatorname{argmin}} \frac{1}{2} \| A u - g\|^{2}_{2} + \alpha\,\mathrm{TV}(u)
+\end{equation}\]</div>
+<p>where,</p>
+<ul class="simple">
+<li><p>g is a noisy data corrupted with Gaussian noise,</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is a Blurring operator,</p></li>
+<li><p>TV stands for the Total variation regulariser.</p></li>
+</ul>
+<p>Once set up, we can then run it for some iterations and inspect the preliminary resulting image:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
+
+<span class="n">deblur_TV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
+              <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">deblur_TV</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        200         0.000          1.56076e+04
+       50        200         0.312          6.26944e+01
+      100        200         0.316          6.26940e+01
+      150        200         0.314          6.26940e+01
+      200        200         0.317          6.26940e+01
+-------------------------------------------------------
+      200        200         0.317          6.26940e+01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<p>We clearly see that TV deblurring works on the blurred image very well even if there is added noise.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">deblur_TV</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred -TV&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_39_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_39_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff809bf7d60&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="The-results">
+<h4>The results<a class="headerlink" href="#The-results" title="Link to this heading">#</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myGD_tikh</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span>  <span class="n">deblur_TV</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;GD_LS&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_indicator&#39;</span><span class="p">,</span>  <span class="s1">&#39;GD_Tikh&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">1.2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_41_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_41_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff808315750&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Different-Noises:-Salt-and-Pepper-Noise">
+<h2>Different Noises: Salt and Pepper Noise<a class="headerlink" href="#Different-Noises:-Salt-and-Pepper-Noise" title="Link to this heading">#</a></h2>
+<p>Now, we use another noise which is Salt-and-Pepper noise.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">im_blur_noise_saltnpepper</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">saltnpepper</span><span class="p">(</span><span class="n">im_blur</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">myshow</span><span class="p">(</span><span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_44_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_44_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff808e6bcd0&gt;
+</pre></div></div>
+</div>
+<p>We try Total Variation denoising again for different values of the regularisation parameter <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
+<p>If the regularisation parameter is too small, the solution converges to the least squares solution. For example, if <span class="math notranslate nohighlight">\(\alpha\)</span> is 0.001, then the result is divergent:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0001</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
+
+<span class="n">fista_saltnpepper_small</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
+              <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        200         0.000          1.56462e+04
+       50        200         0.337          7.43907e+01
+      100        200         0.341          6.11240e+01
+      150        200         0.334          5.40769e+01
+      200        200         0.321          4.97718e+01
+-------------------------------------------------------
+      200        200         0.321          4.97718e+01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_46_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_46_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff80840e050&gt;
+</pre></div></div>
+</div>
+<p>If the regularisation parameter is too large, the solution is overly cartoonish and blurry:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
+
+<span class="n">fista_saltnpepper_large</span><span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
+              <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        200         0.000          1.56462e+04
+       50        200         0.288          2.59121e+02
+      100        200         0.285          2.59122e+02
+      150        200         0.294          2.59122e+02
+      200        200         0.305          2.59122e+02
+-------------------------------------------------------
+      200        200         0.305          2.59122e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_48_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_48_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff809d13fa0&gt;
+</pre></div></div>
+</div>
+<p>A middle regularisation parameter is still struggling with the salt and pepper noise</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
+
+<span class="n">fista_saltnpepper_middle</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
+              <span class="n">max_iteration</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0        200         0.000          1.56462e+04
+       50        200         0.318          1.42820e+02
+      100        200         0.338          1.42818e+02
+      150        200         0.343          1.42818e+02
+      200        200         0.324          1.42818e+02
+-------------------------------------------------------
+      200        200         0.324          1.42818e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_50_1.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_50_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff80840c790&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span><span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.00001&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.01&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.1&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_51_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_51_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff8083e8820&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Denoising-and-deblurring-without-knowledge-of-the-blur-kernel">
+<h2>Denoising and deblurring without knowledge of the blur kernel<a class="headerlink" href="#Denoising-and-deblurring-without-knowledge-of-the-blur-kernel" title="Link to this heading">#</a></h2>
+<p>Consider the case where you did not know the blur kernel (or that the image was blurred), and just attempt to remove the noise in the image. One could consider:</p>
+<div class="math notranslate nohighlight">
+\[\begin{equation}
+\underset{u}{\operatorname{argmin}} \frac{1}{2} \| u - g\|^{2}_{2} + \alpha \mathrm{TV}(u)
+\end{equation}\]</div>
+<p>where,</p>
+<ul class="simple">
+<li><p>g is a noisy data corrupted with Gaussian noise,</p></li>
+<li><p>TV stands for the Total variation regulariser.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is penalty.</p></li>
+</ul>
+<p>Consider a range of different <span class="math notranslate nohighlight">\(\alpha\)</span>:</p>
+<p>When <span class="math notranslate nohighlight">\(\alpha\)</span> is so small;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.00001</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV_1</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_1</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.00001)&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_53_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_53_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff808e89930&gt;
+</pre></div></div>
+</div>
+<p>When <span class="math notranslate nohighlight">\(\alpha\)</span> is small;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV_2</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_2</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.001)&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_55_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_55_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff808539180&gt;
+</pre></div></div>
+</div>
+<p>When <span class="math notranslate nohighlight">\(\alpha\)</span> is (somewhat) optimal;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV_3</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_3</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.1)&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_57_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_57_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff80906e890&gt;
+</pre></div></div>
+</div>
+<p>When <span class="math notranslate nohighlight">\(\alpha\)</span> is big;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV_4</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_4</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 10)&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_59_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_59_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff7fdad9d50&gt;
+</pre></div></div>
+</div>
+<p>When <span class="math notranslate nohighlight">\(\alpha\)</span> is so big;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV_5</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_5</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 1000)&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_61_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_61_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff808ed2140&gt;
+</pre></div></div>
+</div>
+<p>Overall, we can see that when <span class="math notranslate nohighlight">\(\alpha\)</span> is big, all the details and lines disappear. However, when <span class="math notranslate nohighlight">\(\alpha\)</span> is small, noise doesn’t disappear.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span><span class="n">proxTV_1</span><span class="p">,</span> <span class="n">proxTV_2</span><span class="p">,</span> <span class="n">proxTV_3</span><span class="p">,</span> <span class="n">proxTV_4</span><span class="p">,</span> <span class="n">proxTV_5</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.00001&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.001&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.1&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 10&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 1000&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_63_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_63_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff809343d00&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Deblurring-without-noise-in-the-data">
+<h2>Deblurring without noise in the data<a class="headerlink" href="#Deblurring-without-noise-in-the-data" title="Link to this heading">#</a></h2>
+<p>I will try the TV denoising algorithm only with blurred image (no added noise):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parameters for point spread function PSF (size and std)</span>
+<span class="n">ks</span>          <span class="o">=</span> <span class="mi">5</span>
+<span class="n">ksigma</span>      <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create 1D PSF and 2D as outer product, then normalise.</span>
+<span class="n">w</span>           <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">ks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,(</span><span class="n">ks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ksigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">w</span><span class="o">.</span><span class="n">shape</span>     <span class="o">=</span> <span class="p">(</span><span class="n">ks</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">PSF</span><span class="o">/</span><span class="p">(</span><span class="n">PSF</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">PSF</span>         <span class="o">=</span> <span class="n">PSF</span><span class="o">/</span><span class="n">PSF</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">BlurringOperator</span><span class="p">(</span><span class="n">PSF</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">im_blur</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">im_gray_cil</span><span class="p">)</span>
+<span class="n">myshow</span><span class="p">(</span><span class="n">im_blur</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_67_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_67_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff8083858a0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">proxTV</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c1">#we can change tau and see the differences.</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur</span><span class="p">,</span> <span class="n">proxTV</span><span class="p">],</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Blurred&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising&#39;</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_69_0.png" src="../../_images/demos_Showcase_of_the_algorithms_for_deblurring_and_denoising_69_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7ff80852c490&gt;
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../Multibang_Hackathon2023/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Multibang Regularisation in CIL</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../deriv2_cgls/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">1D inverse problem demo using deriv2 from regtools</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1503 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Multibang Regularisation in CIL &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Multibang_Hackathon2023';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Showcase of the algorithms for deblurring and denoising" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/" />
+    <link rel="prev" title="User showcase" href="../../usershowcase/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multibang Regularisation in CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CIL-Version-23.0.1">CIL Version 23.0.1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-dataset">The dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Set-the-image-geometry,-create-a-phantom-and-test-the-regulariser">Set the image geometry, create a phantom and test the regulariser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Create-a-synthetic-sinogram">Create a synthetic sinogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Full-data-reconstruction">Full data reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Reduced-data-reconstruction">Reduced data reconstruction</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/Multibang_Hackathon2023.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Multibang Regularisation in CIL</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Sean Holman (University of Manchester),</span>
+<span class="c1">#</span>
+<span class="c1">#   Edited by: Gemma Fardell (STFC-UKRI), Margaret Duff (STFC-UKRI)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Import a large number of libraries to help!</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">ZeroFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">OperatorCompositionFunction</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDHG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockFunction</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">L2NormSquared</span><span class="p">,</span> <span class="n">SmoothMixedL21Norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">GradientOperator</span>
+
+
+<span class="c1"># CIL core components needed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">,</span> <span class="n">AcquisitionData</span>
+
+<span class="c1"># CIL optimisation algorithms and linear operators</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">FISTA</span><span class="p">,</span> <span class="n">ISTA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">GradientOperator</span><span class="p">,</span> <span class="n">IdentityOperator</span><span class="p">,</span> <span class="n">FiniteDifferenceOperator</span>
+
+<span class="c1"># CIL example synthetic test image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.dataexample</span><span class="w"> </span><span class="kn">import</span> <span class="n">SHAPES</span>
+
+<span class="c1"># CIL display tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show1D</span><span class="p">,</span> <span class="n">show_geometry</span>
+
+<span class="c1"># Forward/backprojector from CIL ASTRA plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+
+<span class="c1"># For shepp-logan test image in CIL tomophantom plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">TomoPhantom</span> <span class="k">as</span> <span class="n">cilTomoPhantom</span>
+
+<span class="c1"># Third-party imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<section id="Multibang-Regularisation-in-CIL">
+<h1>Multibang Regularisation in CIL<a class="headerlink" href="#Multibang-Regularisation-in-CIL" title="Link to this heading">#</a></h1>
+<p>This notebook implements the multibang regulariser described in [1] as a “Function” in CIL that includes a proximal map. It then uses this function to analyze both synthetic CT data (the Shepp-Logan phantom) and some of the cone beam CT training data from the Helsinki 2022 limited angle tomography challenge.</p>
+<p>Upon instantiation, the multibang function must include an np.array of dimension (n,) as <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">=</span> <span class="pre">np.array([...])</span></code> which gives the list of multibang values. These are target values, and the multibang function penalises any value in an image which is not on the list.</p>
+<p>There appears to be in error in the function call which results in it returning a value of <code class="docutils literal notranslate"><span class="pre">-inf</span></code> in some cases. This does not affect the proximal map but does mean that the objective function is sometimes incorrectly given a value <code class="docutils literal notranslate"><span class="pre">-inf</span></code>.</p>
+<section id="Reference">
+<h2>Reference<a class="headerlink" href="#Reference" title="Link to this heading">#</a></h2>
+<p>[1] <em>SPECT with a multi-bang assumption on attenuation</em>, Sean Holman and Philip Richardson, 2020 Inverse Problems, (<strong>36</strong>)12.</p>
+</section>
+<section id="CIL-Version-23.0.1">
+<h2>CIL Version 23.0.1<a class="headerlink" href="#CIL-Version-23.0.1" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+23.0.1
+</pre></div></div>
+</div>
+</section>
+<section id="The-dataset">
+<h2>The dataset<a class="headerlink" href="#The-dataset" title="Link to this heading">#</a></h2>
+<p>This requires the dataset “”htc2022_tf_full.mat” from <a class="reference external" href="https://zenodo.org/record/6984868">https://zenodo.org/record/6984868</a>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://zenodo.org/record/6984868/files/htc2022_td_full.mat">https://zenodo.org/record/6984868/files/htc2022_td_full.mat</a></p></li>
+</ul>
+<p>Please download the data and update the ‘filename’ variable below to point to where you have the data saved:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;../htc2022_td_full.mat&#39;</span>
+</pre></div>
+</div>
+</div>
+<section id="Define-the-regularisation-function">
+<h3>Define the regularisation function<a class="headerlink" href="#Define-the-regularisation-function" title="Link to this heading">#</a></h3>
+<p>Define the multibang class for objective function, includes function call and proximal map.</p>
+<p>Required input for initialisation is u = np.array([…]) a list of multibang values.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Multbang</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">))</span>
+        <span class="c1">#self.u = np.concatenate(([-np.inf],utemp,[np.inf]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">utemp</span> <span class="c1">#u should be numpty array</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span>
+        <span class="n">Max</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span><span class="n">u</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]))</span>
+        <span class="n">su</span> <span class="o">=</span> <span class="n">utemp</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">ru</span> <span class="o">=</span> <span class="n">utemp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">su</span><span class="p">)))</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">sx</span><span class="p">,[</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="n">uval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ru</span><span class="o">&lt;=</span><span class="n">rx</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">uval</span> <span class="o">=</span> <span class="n">uval</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="n">Max</span><span class="p">)</span>
+        <span class="n">uL</span> <span class="o">=</span> <span class="n">utemp</span><span class="p">[</span><span class="n">uval</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">uR</span> <span class="o">=</span> <span class="n">utemp</span><span class="p">[</span><span class="n">uval</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">uR</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="n">uL</span><span class="p">)</span>
+        <span class="n">m</span><span class="p">[</span><span class="n">m</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="c1">#t is step size, must be &lt;1/2.</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="mi">0</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">xm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],(</span><span class="mi">1</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">t</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)]))</span>
+        <span class="n">xm</span> <span class="o">=</span> <span class="n">xm</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]))</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(((</span><span class="mi">1</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">t</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">k</span><span class="p">],[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]))</span>
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">sx</span><span class="p">,[</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="n">uvalm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xm</span><span class="o">&lt;</span><span class="n">rx</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">uvalp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xp</span><span class="o">&lt;</span><span class="n">rx</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">uvalp</span><span class="o">&lt;</span><span class="n">uvalm</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">sx</span><span class="p">)</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">temp</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">uvalp</span><span class="p">[</span><span class="n">temp</span><span class="p">]]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">temp</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="o">~</span><span class="n">temp</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">uvalp</span><span class="p">[</span><span class="o">~</span><span class="n">temp</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">u</span><span class="p">[</span><span class="n">uvalp</span><span class="p">[</span><span class="o">~</span><span class="n">temp</span><span class="p">]]))</span>
+
+        <span class="n">y</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>An example instantiating a multibang function with the multibang values that appear in the Shepp-Logan phantom. Note that the multibang values do not need to be sorted.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">1.</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Example-using-Shepp-Logan-phantom">
+<h3>Example using Shepp-Logan phantom<a class="headerlink" href="#Example-using-Shepp-Logan-phantom" title="Link to this heading">#</a></h3>
+<p>We first look at application of the multibang regulariser to the Shepp-Logan phantom with a limited number of projection angles. To begin we get the phantom, ensure that all pixel values are positive and create a synthetic sinogram.</p>
+</section>
+</section>
+<section id="Set-the-image-geometry,-create-a-phantom-and-test-the-regulariser">
+<h2>Set the image geometry, create a phantom and test the regulariser<a class="headerlink" href="#Set-the-image-geometry,-create-a-phantom-and-test-the-regulariser" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create phantom test the multibang regulariser</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                   <span class="n">voxel_num_y</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                   <span class="n">voxel_size_x</span><span class="o">=</span><span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">,</span>
+                   <span class="n">voxel_size_y</span><span class="o">=</span><span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">phantom2D</span> <span class="o">=</span> <span class="n">cilTomoPhantom</span><span class="o">.</span><span class="n">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span>
+<span class="n">phantom2D</span><span class="o">-=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Multibang evaluated on the  Shepp-Logan phandom:&quot;</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Multibang evaluated on a random noisy image:&quot;</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Multibang evaluated on the  Shepp-Logan phandom: 5.8968804284136865e-05
+Multibang evaluated on a random noisy image: 2406.184244750844
+</pre></div></div>
+</div>
+</section>
+<section id="Create-a-synthetic-sinogram">
+<h2>Create a synthetic sinogram<a class="headerlink" href="#Create-a-synthetic-sinogram" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">num_angles</span> <span class="o">=</span> <span class="mi">15</span> <span class="c1"># You may want to try varying the number of angles</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel2D</span><span class="p">()</span>  \
+                   <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="n">num_angles</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  \
+                   <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;gpu&quot;</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom2D</span><span class="p">,</span><span class="n">sinogram</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Shepp-Logan Phantom&quot;</span><span class="p">,</span><span class="s2">&quot;Shepp-Logan Synthetic Sinogram&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_16_0.png" src="../../_images/demos_Multibang_Hackathon2023_16_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea2e8a36d0&gt;
+</pre></div></div>
+</div>
+<p>To avoid inverse crime, we add some noise to the phantom.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Incident intensity: lower counts will increase the noise</span>
+<span class="n">background_counts</span> <span class="o">=</span> <span class="mi">20000</span>
+
+<span class="c1"># Convert the simulated absorption sinogram to transmission values using Lambert-Beer.</span>
+<span class="c1"># Use as mean for Poisson data generation.</span>
+<span class="c1"># Convert back to absorption sinogram.</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">background_counts</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sinogram</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+<span class="n">noisy_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+<span class="n">sino_out</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">noisy_counts</span><span class="o">/</span><span class="n">background_counts</span><span class="p">)</span>
+
+<span class="c1"># Create new AcquisitionData object with same geometry and fill with noisy data.</span>
+<span class="n">sinogram_noisy</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+<span class="n">sinogram_noisy</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">sino_out</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">sinogram_noisy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_18_0.png" src="../../_images/demos_Multibang_Hackathon2023_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea2e8a14b0&gt;
+</pre></div></div>
+</div>
+<section id="FISTA-with-multibang-only">
+<h3>FISTA with multibang only<a class="headerlink" href="#FISTA-with-multibang-only" title="Link to this heading">#</a></h3>
+<p>Now we set up FISTA to run on the Shepp-Logan phantom synthetic sinogram using a multibang regulariser with multibang values that appear in the Shepp-Logan phantom. The multibang results are compared with the output when FISTA is run with the zero function as regulariser, which should correspond to gradient descent.</p>
+<p>Precisely, the FISTA algorithm is solving the variational problem</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{argmin}_x \|Ax - b\|^2_2 + \alpha\ \mathcal{M}(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is the CT matrix, <span class="math notranslate nohighlight">\(b\)</span> is the sinogram and <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> is the multibang regulariser. The result is compared against the output, from the same algorithm, of</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{argmin}_x \|Ax - b\|^2_2\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Set up and run reconstruction: FISTA with multibang only</span>
+
+<span class="c1">#Regularisation parameter is alpha</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.00004</span>
+
+<span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">sinogram_noisy</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MB</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">MBsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Plainsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">MBsol</span><span class="p">,</span><span class="n">Plainsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Multibang Regularised&#39;</span><span class="p">,</span><span class="s1">&#39;Not Multibang Regularised&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          3.04939e+02
+      100       1000         0.018          3.17160e-02
+      200       1000         0.019          2.61139e-02
+-------------------------------------------------------
+      200       1000         0.019          2.61139e-02
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          3.04939e+02
+      100       1000         0.011          2.84016e-03
+      200       1000         0.011          2.09293e-03
+-------------------------------------------------------
+      200       1000         0.011          2.09293e-03
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_21_1.png" src="../../_images/demos_Multibang_Hackathon2023_21_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea08252ec0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="FISTA-with-smoothed-TV-and-multibang">
+<h3>FISTA with smoothed TV and multibang<a class="headerlink" href="#FISTA-with-smoothed-TV-and-multibang" title="Link to this heading">#</a></h3>
+<p>Results from the previous step show that, while the multibang regulariser has removed some of the undersampling artefacts, the resulting image is still noisy. This might suggest that total variation regularisation should also be included in the multibang reconstruction. We do this in the next step. Here the precise variational problem is</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{argmin}_x \|Ax - b\|^2_2 + \beta\ \|x\|_{TV_\epsilon}+ \alpha\ \mathcal{M}(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\|\cdot\|_{TV_\epsilon}\)</span> is a smoothed <span class="math notranslate nohighlight">\(TV\)</span> norm with parameter <span class="math notranslate nohighlight">\(\epsilon\)</span>. This is compared against the solution of the same problem with <span class="math notranslate nohighlight">\(\alpha = 0\)</span>. The problem is again solved using FISTA.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">Grad</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+
+<span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">sinogram_noisy</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+
+<span class="c1">#Set parameters here if desired</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0008</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.000003</span>
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0001</span>
+
+<span class="n">f2</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">),</span> <span class="n">Grad</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MB</span>
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVMBsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV regularisation only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          3.04939e+02
+      100       1000         0.017          7.58735e-01
+      200       1000         0.017          7.39155e-01
+-------------------------------------------------------
+      200       1000         0.017          7.39155e-01
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          3.04939e+02
+      100       1000         0.008          7.15227e-01
+      200       1000         0.008          6.63787e-01
+-------------------------------------------------------
+      200       1000         0.008          6.63787e-01
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_24_1.png" src="../../_images/demos_Multibang_Hackathon2023_24_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea0827f9a0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Example-using-Helsinki-limited-angle-challenge-data">
+<h3>Example using Helsinki limited angle challenge data<a class="headerlink" href="#Example-using-Helsinki-limited-angle-challenge-data" title="Link to this heading">#</a></h3>
+<p>Next we apply multibang regularisation to cone beam training data from the 2022 Helsinki limited angle tomography challenge (HTC). The first section loads the data. Note that when the code is run some warnings will appear, but the sinogram should display when the code is run to indicate it has executed correctly. Code for loading the data is copied from the CIL github (<a class="reference external" href="https://github.com/TomographicImaging/CIL-HTC2022-Algo2">https://github.com/TomographicImaging/CIL-HTC2022-Algo2</a>).</p>
+<p>First load the data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Function to load htc data, copied from CIL github Algorthm 2  (https://github.com/TomographicImaging/CIL-HTC2022-Algo2/blob/main/util.py)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_htc2022data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s1">&#39;CtDataFull&#39;</span><span class="p">):</span>
+
+    <span class="c1">#read in matlab file</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">scan_parameters</span><span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span>
+
+    <span class="c1">#read important parameters</span>
+    <span class="n">source_center</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;distanceSourceOrigin&#39;</span><span class="p">]</span>
+    <span class="n">source_detector</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;distanceSourceDetector&#39;</span><span class="p">]</span>
+    <span class="n">pixel_size</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;pixelSizePost&#39;</span><span class="p">]</span> <span class="c1">#data is binned</span>
+    <span class="n">num_dets</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;numDetectorsPost&#39;</span><span class="p">]</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;angles&#39;</span><span class="p">]</span>
+
+    <span class="c1">#create CIL data from meta data</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">source_center</span><span class="p">],</span>
+                                        <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">source_detector</span><span class="o">-</span><span class="n">source_center</span><span class="p">])</span>\
+        <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="n">num_dets</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=-</span><span class="n">angles</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">)</span>
+
+    <span class="c1">#%% read data</span>
+    <span class="n">scan_sinogram</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">&#39;sinogram&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+    <span class="c1">#create CIL data</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">scan_sinogram</span><span class="p">),</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="c1">#Required utilities to load htc data, also copied from CIL github (https://github.com/TomographicImaging/CIL-HTC2022-Algo2/blob/main/mat_reader.py)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spio</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    this function should be called instead of direct spio.loadmat</span>
+<span class="sd">    as it cures the problem of not properly recovering python dictionaries</span>
+<span class="sd">    from mat files. It calls the function check keys to cure all entries</span>
+<span class="sd">    which are still mat-objects</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">spio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">struct_as_record</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">squeeze_me</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_check_keys</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_keys</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    checks if entries in dictionary are mat-objects. If yes</span>
+<span class="sd">    todict is called to change them to nested dictionaries</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">spio</span><span class="o">.</span><span class="n">matlab</span><span class="o">.</span><span class="n">mio5_params</span><span class="o">.</span><span class="n">mat_struct</span><span class="p">):</span>
+            <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_todict</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">dict</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_todict</span><span class="p">(</span><span class="n">matobj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A recursive function which constructs from matobjects nested dictionaries</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">strg</span> <span class="ow">in</span> <span class="n">matobj</span><span class="o">.</span><span class="n">_fieldnames</span><span class="p">:</span>
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">matobj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">strg</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">spio</span><span class="o">.</span><span class="n">matlab</span><span class="o">.</span><span class="n">mio5_params</span><span class="o">.</span><span class="n">mat_struct</span><span class="p">):</span>
+            <span class="nb">dict</span><span class="p">[</span><span class="n">strg</span><span class="p">]</span> <span class="o">=</span> <span class="n">_todict</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">dict</span><span class="p">[</span><span class="n">strg</span><span class="p">]</span> <span class="o">=</span> <span class="n">elem</span>
+    <span class="k">return</span> <span class="nb">dict</span>
+
+<span class="n">testdata</span><span class="o">=</span><span class="n">load_htc2022data</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipykernel_2030/583218848.py:51: DeprecationWarning: Please use `mat_struct` from the `scipy.io.matlab` namespace, the `scipy.io.matlab.mio5_params` namespace is deprecated.
+  if isinstance(dict[key], spio.matlab.mio5_params.mat_struct):
+/tmp/ipykernel_2030/583218848.py:62: DeprecationWarning: Please use `mat_struct` from the `scipy.io.matlab` namespace, the `scipy.io.matlab.mio5_params` namespace is deprecated.
+  if isinstance(elem, spio.matlab.mio5_params.mat_struct):
+</pre></div></div>
+</div>
+<p>Set the geometry for htc data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">testdata</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">testdata</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">devive</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">device</span><span class="p">)</span>
+<span class="n">Grad</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">testdata</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Full angle sinogram&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_29_0.png" src="../../_images/demos_Multibang_Hackathon2023_29_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea08223640&gt;
+</pre></div></div>
+</div>
+<p>We apply the same combined TV and multibang method described above to reconstruct an image from the full data. Results with and without multibang regularisation are compared. Note that the paramters are chosen differently from above and can be changed.</p>
+<p>The reconstructions are very similar, but you will note that in the multibang case more pixels are assigned the multibang value, which is initially set to 0.035.</p>
+</section>
+</section>
+<section id="Full-data-reconstruction">
+<h2>Full data reconstruction<a class="headerlink" href="#Full-data-reconstruction" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="c1">#Parameters</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.14</span>
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0001</span>
+
+<span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.035</span><span class="p">]))</span>
+<span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">testdata</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">),</span> <span class="n">Grad</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MB</span>
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVMBsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only reconstruction&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.08457e+06
+      100       1000         0.082          6.07662e+02
+      200       1000         0.082          6.07780e+02
+-------------------------------------------------------
+      200       1000         0.082          6.07780e+02
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.08457e+06
+      100       1000         0.051          1.79711e+02
+      200       1000         0.051          1.79981e+02
+-------------------------------------------------------
+      200       1000         0.051          1.79981e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_32_1.png" src="../../_images/demos_Multibang_Hackathon2023_32_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea1a25ca00&gt;
+</pre></div></div>
+</div>
+<p>We use a command copied from the CIL github site to create a new data set containing only a limited angular range.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Command copied from CIL github</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_reduced_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">astart</span><span class="p">,</span> <span class="n">arange</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">astart</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">astart</span><span class="o">+</span><span class="n">arange</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">data_array</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">idx</span><span class="p">,:]</span>
+    <span class="n">ag_reduced</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ag_reduced</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">ag_reduced</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="n">data_reduced</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag_reduced</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_reduced</span>
+
+<span class="c1">#Reduce angles in test data</span>
+
+<span class="n">testdatareduce</span> <span class="o">=</span> <span class="n">generate_reduced_data</span><span class="p">(</span><span class="n">testdata</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">testdatareduce</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Angularly reduced data&#39;</span><span class="p">])</span>
+
+<span class="c1">#Reset geometry for reduced htc data</span>
+
+<span class="n">ig</span> <span class="o">=</span> <span class="n">testdatareduce</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">testdatareduce</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">devive</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">device</span><span class="p">)</span>
+<span class="n">Grad</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_34_0.png" src="../../_images/demos_Multibang_Hackathon2023_34_0.png" />
+</div>
+</div>
+<p>We now perform the same reconstruction but on the reduced data set. The results are clearly quite different with the multibang determining more of the shape although also reconstructing the structure incorrectly.</p>
+</section>
+<section id="Reduced-data-reconstruction">
+<h2>Reduced data reconstruction<a class="headerlink" href="#Reduced-data-reconstruction" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.14</span>
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0001</span>
+
+<span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.035</span><span class="p">]))</span>
+<span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">testdatareduce</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">),</span> <span class="n">Grad</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MB</span>
+
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVMBsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.83778e+05
+      100       1000         0.054          3.38691e+02
+      200       1000         0.056          2.96190e+02
+-------------------------------------------------------
+      200       1000         0.056          2.96190e+02
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.83778e+05
+      100       1000         0.022          2.14425e+02
+      200       1000         0.022          2.18321e+02
+-------------------------------------------------------
+      200       1000         0.022          2.18321e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_37_1.png" src="../../_images/demos_Multibang_Hackathon2023_37_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea2e80a890&gt;
+</pre></div></div>
+</div>
+<p>By changing the regularisation parameters, we can tweak the reconstruction:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0001</span>
+
+<span class="n">MB</span> <span class="o">=</span> <span class="n">Multbang</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.035</span><span class="p">]))</span>
+<span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">testdatareduce</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">SmoothMixedL21Norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">),</span> <span class="n">Grad</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MB</span>
+
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVMBsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">()</span>
+
+<span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">fista_mb</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.83821e+05
+      100       1000         0.055          1.27998e+04
+      200       1000         0.056          1.48406e+04
+-------------------------------------------------------
+      200       1000         0.056          1.48406e+04
+Stop criterion has been reached.
+
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          1.83821e+05
+      100       1000         0.022          1.04833e+04
+      200       1000         0.022          1.26393e+04
+-------------------------------------------------------
+      200       1000         0.022          1.26393e+04
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Multibang_Hackathon2023_39_1.png" src="../../_images/demos_Multibang_Hackathon2023_39_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fea08ce07f0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../usershowcase/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User showcase</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Showcase of the algorithms for deblurring and denoising</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

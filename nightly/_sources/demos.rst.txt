@@ -18,5 +18,4 @@ Advanced topics
 ===============
 
 .. nbgallery::
-    demos/deriv2_cgls
     demos/callback_demonstration

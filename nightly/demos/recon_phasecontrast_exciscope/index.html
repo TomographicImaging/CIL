@@ -1,0 +1,1430 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Exciscope Polaris phase contrast reconstruction with CIL &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/recon_phasecontrast_exciscope';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Controlled Wavelet Sparsity using callbacks (2D data)" href="../controlledWaveletSparsity_2d/" />
+    <link rel="prev" title="Introduction" href="../bruker2cil/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Exciscope Polaris phase contrast reconstruction with CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Cil-version-24.2.0">Cil version 24.2.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Data">Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Import-Metadata">Import Metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Import-Projection-Data">Import Projection Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Define-Geometry">Define Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Normalize-Data">Normalize Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Center-of-Rotation">Center-of-Rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Ring-Artefact-Removal">Ring Artefact Removal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Paganin-Phase-Retrieval">Paganin Phase Retrieval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Data-Export">Data Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Inspect-3D-Volume">Inspect 3D Volume</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/recon_phasecontrast_exciscope.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Exciscope Polaris phase contrast reconstruction with CIL</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:</span>
+<span class="c1">#   Robin Krüger (Lund University),</span>
+<span class="c1">#   Anne Marie Faaborg (Aarhus University),</span>
+<span class="c1">#   Adam Cretton (Technical University of Denmark),</span>
+<span class="c1">#   Rasmus J. Pedersen (Technical University of Denmark)</span>
+<span class="c1">#</span>
+<span class="c1">#   Reviewed by: Margaret Duff (STFC-UKRI) and Hannah Robarts (STFC-UKRI)</span>
+</pre></div>
+</div>
+</div>
+<section id="Exciscope-Polaris-phase-contrast-reconstruction-with-CIL">
+<h1>Exciscope Polaris phase contrast reconstruction with CIL<a class="headerlink" href="#Exciscope-Polaris-phase-contrast-reconstruction-with-CIL" title="Link to this heading">#</a></h1>
+<p>In this notebook, tomographic projections from the Exciscope Polaris instrument are reconstructured using the Core Imaging Library (CIL). The reconstruction includes phase retrieval and ring artefact correction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.notebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qim3d</span> <span class="c1">#https://platform.qim.dk/qim3d/ and can be installed using `pip install qim3d`</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">AcquisitionData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="n">Slicer</span><span class="p">,</span> <span class="n">CentreOfRotationCorrector</span><span class="p">,</span> <span class="n">PaganinProcessor</span><span class="p">,</span> <span class="n">RingRemover</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDK</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show_geometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.jupyter</span><span class="w"> </span><span class="kn">import</span> <span class="n">islicer</span><span class="p">,</span> <span class="n">link_islicer</span>
+</pre></div>
+</div>
+</div>
+<section id="Cil-version-24.2.0">
+<h2>Cil version 24.2.0<a class="headerlink" href="#Cil-version-24.2.0" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+24.2.0
+</pre></div></div>
+</div>
+</section>
+<section id="Data">
+<h2>Data<a class="headerlink" href="#Data" title="Link to this heading">#</a></h2>
+<p>Please download the showcase wood dataset:</p>
+<p><a class="reference external" href="https://doi.org/10.5281/zenodo.13480488"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.13480488.svg" /></a></p>
+<p>In the following cell, please set the paths for your data, output directory and reconstruction name:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># choose scan path</span>
+<span class="n">scan_path</span> <span class="o">=</span> <span class="s2">&quot;/mnt/share-private/ses-240826-143058-woodzoom&quot;</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;/mnt/share-private/ses-240826-143058-woodzoom/output/&quot;</span>
+<span class="n">recon_name</span> <span class="o">=</span> <span class="s2">&quot;wood_test&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>The data from the Exciscope Polaris is available in two folders: 01-ff containing flat field images and 02-tomo containing the tomographic projections. The image files are in .tiff-format. The flat-field and projection images align around the image centers. Meta-data is in .json-format. The data structure is visualized below:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>├── 01-ff/
+│   ├── Input/
+│   │   └── command.json
+│   └── Output/
+│       └── Binaries/
+│           ├── f0000.tiff
+│           ├── f0001.tiff
+│           └── ...
+├── 02-tomo/
+│   ├── Input/
+│   │   └── command.json
+│   ├── Output/
+│   │   └── Binaries/
+│   │       ├── tomo0000.tiff
+│   │       ├── tomo0001.tiff
+│   │       └── ...
+│   └── scan_information.json
+└── scan_list.scanlist
+</pre></div>
+</div>
+</section>
+<section id="Import-Metadata">
+<h2>Import Metadata<a class="headerlink" href="#Import-Metadata" title="Link to this heading">#</a></h2>
+<p>The metadata needed for the reconstruction is extracted from the instrument files. <strong>Note!</strong> The pixel size is not available in the metadata and has been indicated manually for the used camera.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">scan_path</span><span class="o">+</span><span class="s1">&#39;/02-tomo/scan_information.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+  <span class="n">scan_information</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">scan_path</span><span class="o">+</span><span class="s1">&#39;/02-tomo/Input/command.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+  <span class="n">tomo_command</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">scan_path</span><span class="o">+</span><span class="s1">&#39;/01-ff/Input/command.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+  <span class="n">flat_command</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Parsing of parameters from file</span>
+<span class="n">voxel_size_mm</span> <span class="o">=</span> <span class="n">scan_information</span><span class="p">[</span><span class="s1">&#39;pixel_size_um&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span>
+<span class="n">propagation_distance_mm</span> <span class="o">=</span> <span class="n">scan_information</span><span class="p">[</span><span class="s1">&#39;propagation_distance_mm&#39;</span><span class="p">]</span>
+<span class="n">source_detector_mm</span> <span class="o">=</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;stage_position_mm&#39;</span><span class="p">][</span><span class="s1">&#39;camera_beam&#39;</span><span class="p">]</span>
+<span class="n">source_object_mm</span> <span class="o">=</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;stage_position_mm&#39;</span><span class="p">][</span><span class="s1">&#39;object_beam&#39;</span><span class="p">]</span>
+<span class="n">roi</span> <span class="o">=</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;camera&#39;</span><span class="p">][</span><span class="s1">&#39;roi_px&#39;</span><span class="p">]</span>
+<span class="n">num_pixels</span> <span class="o">=</span> <span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">roi</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">roi</span><span class="p">[</span><span class="s1">&#39;bot&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">roi</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">total_angle_deg</span> <span class="o">=</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;acquisition&#39;</span><span class="p">][</span><span class="s1">&#39;total_angle_deg&#39;</span><span class="p">]</span>
+<span class="n">step_size_deg</span> <span class="o">=</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;acquisition&#39;</span><span class="p">][</span><span class="s1">&#39;step_size_deg&#39;</span><span class="p">]</span>
+
+<span class="c1"># The Detektor pixel size is not saved in the metadata.</span>
+<span class="k">if</span> <span class="n">tomo_command</span><span class="p">[</span><span class="s1">&#39;camera&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;camera-photonicscience-gsense4040xl-221094&#39;</span><span class="p">:</span>
+    <span class="n">px_size</span> <span class="o">=</span> <span class="mf">0.016</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Camera Name is unknown&#39;</span><span class="p">)</span>
+    <span class="n">px_size</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Import-Projection-Data">
+<h2>Import Projection Data<a class="headerlink" href="#Import-Projection-Data" title="Link to this heading">#</a></h2>
+<section id="Define-ROI-for-Import">
+<h3>Define ROI for Import<a class="headerlink" href="#Define-ROI-for-Import" title="Link to this heading">#</a></h3>
+<p>In the following cell, the projections can be cropped in height and width in order to reconstruct a limited volume. The cropping is contucted symmetrically around the center of the projections.</p>
+<p>Note, if the default showcase wood-sample is utilized, the flat-field images are larger than the projections, and cropping of the flat-field images will be conducted under all circumstances to match the projections. The flat-field and projection images are aligned around the image center.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We assuming here symmetrical cropping</span>
+<span class="n">width</span> <span class="o">=</span> <span class="mi">3500</span> <span class="c1">#num_pixels[0]</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># num_pixels[1] # change here if only limited number of slices in use</span>
+
+<span class="c1"># Tomo Files</span>
+<span class="n">path_tomo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan_path</span><span class="p">,</span><span class="s2">&quot;02-tomo/Output/Binaries&quot;</span><span class="p">)</span>
+<span class="n">files_tomo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_tomo</span><span class="p">)</span>
+<span class="n">files_tomo</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="c1"># Flat Files</span>
+<span class="n">path_flat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">scan_path</span><span class="p">,</span><span class="s2">&quot;01-ff/Output/Binaries&quot;</span><span class="p">)</span>
+<span class="n">files_flat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_flat</span><span class="p">)</span>
+<span class="n">files_flat</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="n">flat_example</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_flat</span><span class="p">,</span><span class="n">files_flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="n">proj_example</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_tomo</span><span class="p">,</span><span class="n">files_tomo</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">proj_example</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Projection&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">flat_example</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Flat&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># display central slice</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">proj_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">flat_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+
+<span class="c1"># calculate index positions</span>
+<span class="n">roi_tomo</span> <span class="o">=</span> <span class="p">[</span><span class="n">proj_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="n">width</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">proj_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="n">height</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">proj_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="n">width</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">proj_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="n">height</span> <span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">roi_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">flat_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="n">width</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">flat_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="n">height</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">flat_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="n">width</span> <span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">flat_example</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="n">height</span> <span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">roi_tomo</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">roi_tomo</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">roi_tomo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">roi_tomo</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">roi_flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">roi_flat</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">roi_flat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">roi_flat</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.lines.Line2D at 0x7f1f2a1a67b0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_12_1.png" src="../../_images/demos_recon_phasecontrast_exciscope_12_1.png" />
+</div>
+</div>
+</section>
+<section id="Load-Data">
+<h3>Load Data<a class="headerlink" href="#Load-Data" title="Link to this heading">#</a></h3>
+<p>If an ROI was chosen above, only the chosen ROI is imported.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load tomography data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Importing Projections...&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">files_tomo</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_tomo</span><span class="p">,</span><span class="n">file</span><span class="p">))</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
+        <span class="c1"># Crop the image to the ROI (left, upper, right, lower)</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">roi_tomo</span><span class="p">))</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Importing Flat Images...&#39;</span><span class="p">)</span>
+<span class="n">flats</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">files_flat</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_flat</span><span class="p">,</span><span class="n">file</span><span class="p">))</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
+        <span class="c1"># Crop the image to the ROI (left, upper, right, lower)</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">roi_flat</span><span class="p">))</span>
+    <span class="n">flats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="n">flats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">flats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Importing Projections...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "81e2604da03a4056aaf887a6851cd997", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Importing Flat Images...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "df662d7fec564301969669f378e46783", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</section>
+</section>
+<section id="Define-Geometry">
+<h2>Define Geometry<a class="headerlink" href="#Define-Geometry" title="Link to this heading">#</a></h2>
+<p>The image geometry is defined using the metadata retrieved from the Exciscope scans using the CIL logic.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">source_object_mm</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">source_detector_mm</span><span class="o">-</span><span class="n">source_object_mm</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;mm&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="n">px_size</span><span class="p">,</span> <span class="n">px_size</span><span class="p">))</span>\
+    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="o">+</span><span class="n">step_size_deg</span><span class="p">,</span><span class="n">step_size_deg</span><span class="p">))</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_size_x</span> <span class="o">=</span> <span class="n">voxel_size_mm</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_size_y</span> <span class="o">=</span> <span class="n">voxel_size_mm</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_16_0.png" src="../../_images/demos_recon_phasecontrast_exciscope_16_0.png" />
+</div>
+</div>
+</section>
+<section id="Normalize-Data">
+<h2>Normalize Data<a class="headerlink" href="#Normalize-Data" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">data</span><span class="p">,</span> <span class="n">flats</span>
+<span class="n">corrected</span> <span class="o">=</span> <span class="n">corrected</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">corrected</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">)</span>
+<span class="n">sino</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">()(</span><span class="n">sinogram</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_18_0.png" src="../../_images/demos_recon_phasecontrast_exciscope_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1f2a425e20&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Center-of-Rotation">
+<h2>Center-of-Rotation<a class="headerlink" href="#Center-of-Rotation" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sino</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+<span class="n">sino</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="c1"># Test reconstructionto inspect correct CoR</span>
+<span class="n">fdk</span> <span class="o">=</span>  <span class="n">FDK</span><span class="p">(</span><span class="n">sino</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 2001
+        vertical: 100
+        horizontal: 3500
+
+Reconstruction Volume:
+        vertical: 100
+        horizontal_y: 3500
+        horizontal_x: 3500
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 13
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_20_1.png" src="../../_images/demos_recon_phasecontrast_exciscope_20_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1f283cc860&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Ring-Artefact-Removal">
+<h2>Ring Artefact Removal<a class="headerlink" href="#Ring-Artefact-Removal" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ringRemove</span> <span class="o">=</span> <span class="n">RingRemover</span><span class="p">()</span>
+<span class="n">ringRemove</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sino</span><span class="p">)</span>
+<span class="n">sino_rings</span> <span class="o">=</span> <span class="n">ringRemove</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">fdk_rings</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">sino_rings</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon_rings</span> <span class="o">=</span> <span class="n">fdk_rings</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="c1"># plot comparison with and with less rings</span>
+<span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">:(</span><span class="mi">1200</span><span class="p">,</span><span class="mi">2200</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">:(</span><span class="mi">1200</span><span class="p">,</span><span class="mi">2200</span><span class="p">,</span><span class="mi">1</span><span class="p">)}</span>
+<span class="n">slicing</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="n">slicing</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">recon</span><span class="p">)</span>
+<span class="n">recon_sliced</span> <span class="o">=</span> <span class="n">slicing</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">slicing</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">recon_rings</span><span class="p">)</span>
+<span class="n">recon_rings_sliced</span> <span class="o">=</span> <span class="n">slicing</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_sliced</span><span class="p">,</span> <span class="n">recon_rings_sliced</span><span class="p">],</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Finish Ring Remover
+FDK recon
+
+Input Data:
+        angle: 2001
+        vertical: 100
+        horizontal: 3500
+
+Reconstruction Volume:
+        vertical: 100
+        horizontal_y: 3500
+        horizontal_x: 3500
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 13
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_22_1.png" src="../../_images/demos_recon_phasecontrast_exciscope_22_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1f288621b0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Paganin-Phase-Retrieval">
+<h2>Paganin Phase Retrieval<a class="headerlink" href="#Paganin-Phase-Retrieval" title="Link to this heading">#</a></h2>
+<p>Soft organic materials like wood and soft tissue often don’t show strong absorption contrast in X-ray imaging. One way to circumvent this issue is by using propagation-based phase contrast. In this method, the phase component, <span class="math notranslate nohighlight">\(\delta\)</span>, of the complex refractive index $n = 1 - <span class="math">\delta `+i :nbsphinx-math:</span>beta <a href="#id1"><span class="problematic" id="id2">`</span></a>$ is utilized. The sample shifts the phase of the X-rays, and as the X-rays propagate to the detector, phase fringes become visible. These fringes can then be used to
+retrieve the phase information using a filter.</p>
+<p>In this case, the PaganinProcessor of CIL is used to retrieve the phase. Three key parameters need to be specified to obtain the phase information: the X-ray energy and the two components of the refractive index <span class="math notranslate nohighlight">\(\delta\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>. In this instance, a single energy value was chosen, which was also used in the reconstruction software from the manufacturer. This energy is interpreted as an effective energy for a polychromatic X-ray spectrum. The refractive index must be chosen based
+on the material being studied. We used a tabulated value from a database (<a class="reference external" href="https://henke.lbl.gov/optical_constants/getdb2.html">https://henke.lbl.gov/optical_constants/getdb2.html</a>) for polycarbonate (assuming a similar elemental composition and density to wood) at 10 keV energy.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># phase retrieval for one material</span>
+<span class="n">energy</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mf">2.63154061E-06</span> <span class="c1"># the used parameters here are polycarbonat at 10 keV</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">3.26059624E-09</span>
+
+<span class="n">paganin_processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">full_retrieval</span><span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">paganin_processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sino_rings</span><span class="p">)</span>
+<span class="n">sino_pag</span> <span class="o">=</span> <span class="n">paganin_processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">fdk</span> <span class="o">=</span>  <span class="n">FDK</span><span class="p">(</span><span class="n">sino_pag</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon_pag</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_rings</span><span class="p">,</span> <span class="n">recon_pag</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Absorption contrast&#39;</span><span class="p">,</span> <span class="s1">&#39;Phase contrast&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 2001/2001 [00:24&lt;00:00, 80.13it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 2001
+        vertical: 100
+        horizontal: 3500
+
+Reconstruction Volume:
+        vertical: 100
+        horizontal_y: 3500
+        horizontal_x: 3500
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 13
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_24_2.png" src="../../_images/demos_recon_phasecontrast_exciscope_24_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1f2a7ffb00&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">slicing</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">recon_pag</span><span class="p">)</span>
+<span class="n">recon_pag_sliced</span> <span class="o">=</span> <span class="n">slicing</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_rings_sliced</span><span class="p">,</span> <span class="n">recon_pag_sliced</span><span class="p">],</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_25_0.png" src="../../_images/demos_recon_phasecontrast_exciscope_25_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1e58641e80&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paganin_processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span>  <span class="n">energy</span><span class="p">,</span> <span class="n">full_retrieval</span><span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">paganin_processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sino_rings</span><span class="p">)</span>
+<span class="n">sino_pag_smaller</span> <span class="o">=</span> <span class="n">paganin_processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">fdk</span> <span class="o">=</span>  <span class="n">FDK</span><span class="p">(</span><span class="n">sino_pag_smaller</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon_pag_smaller</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 2001/2001 [00:24&lt;00:00, 80.56it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 2001
+        vertical: 100
+        horizontal: 3500
+
+Reconstruction Volume:
+        vertical: 100
+        horizontal_y: 3500
+        horizontal_x: 3500
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 13
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paganin_processor</span> <span class="o">=</span> <span class="n">PaganinProcessor</span><span class="p">(</span><span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span>  <span class="n">energy</span><span class="p">,</span> <span class="n">full_retrieval</span><span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">paganin_processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sino_rings</span><span class="p">)</span>
+<span class="n">sino_pag_default</span> <span class="o">=</span> <span class="n">paganin_processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">fdk</span> <span class="o">=</span>  <span class="n">FDK</span><span class="p">(</span><span class="n">sino_pag_default</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon_pag_default</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 2001/2001 [00:26&lt;00:00, 75.64it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 2001
+        vertical: 100
+        horizontal: 3500
+
+Reconstruction Volume:
+        vertical: 100
+        horizontal_y: 3500
+        horizontal_x: 3500
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 13
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_rings</span><span class="p">,</span> <span class="n">recon_pag_smaller</span><span class="p">,</span> <span class="n">recon_pag_default</span><span class="p">,</span> <span class="n">recon_pag</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Absoption&#39;</span><span class="p">,</span> <span class="s1">&#39;Small Delta Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Large Delta Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Polycarbonate&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_28_0.png" src="../../_images/demos_recon_phasecontrast_exciscope_28_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1e585ad700&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">slicing</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">recon_pag_default</span><span class="p">)</span>
+<span class="n">recon_pag_default_sliced</span> <span class="o">=</span> <span class="n">slicing</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">slicing</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">recon_pag_smaller</span><span class="p">)</span>
+<span class="n">recon_pag_smaller_sliced</span> <span class="o">=</span> <span class="n">slicing</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_rings_sliced</span><span class="p">,</span> <span class="n">recon_pag_smaller_sliced</span><span class="p">,</span> <span class="n">recon_pag_default_sliced</span><span class="p">,</span> <span class="n">recon_pag_sliced</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Absoption&#39;</span><span class="p">,</span> <span class="s1">&#39;Small Delta Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Large Delta Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Polycarbonate&#39;</span><span class="p">],</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_recon_phasecontrast_exciscope_29_0.png" src="../../_images/demos_recon_phasecontrast_exciscope_29_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f1e5824d430&gt;
+</pre></div></div>
+</div>
+<p>In the previous cell, you can see a comparison between different chosen refractive indices for the phase retrieval. The ratio between <span class="math notranslate nohighlight">\(\delta\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span> has to be optimized for each sample. The four images shown are:</p>
+<ul class="simple">
+<li><p><strong>Absorption</strong>: The reconstruction without phase retrieval. Not all features are clearly distinguishable, and phase fringes are visible, especially at the borders of larger pores. The image appears noisy.</p></li>
+<li><p><strong>Polycarbonate</strong>: The contrast between features is improved, and the fringes have disappeared. The image looks less noisy, as the phase retrieval also acts as a low-pass filter.</p></li>
+<li><p><strong>Small Delta Value</strong>: A small <span class="math notranslate nohighlight">\(\delta\)</span> is chosen while <span class="math notranslate nohighlight">\(\beta\)</span> remains the same as for polycarbonate. There is not much improvement compared to the absorption image.</p></li>
+<li><p><strong>Large Delta Value</strong>: A large <span class="math notranslate nohighlight">\(\delta\)</span> is chosen while <span class="math notranslate nohighlight">\(\beta\)</span> remains the same as for polycarbonate. In this case, too much phase retrieval has been applied. The contrast is improved, but the image appears blurred.</p></li>
+</ul>
+</section>
+<section id="Data-Export">
+<h2>Data Export<a class="headerlink" href="#Data-Export" title="Link to this heading">#</a></h2>
+<p>The data is exported using the qim3d package. 4 version are exported:</p>
+<ul class="simple">
+<li><p>Phase contrast full volume (of the ROI selected at the beginning)</p></li>
+<li><p>Phase contrast downsampled volume</p></li>
+<li><p>Absoption contrast full volume</p></li>
+<li><p>Absoption contrast downsampled volume</p></li>
+</ul>
+<p>All volumes are exported as TIFF stacks.</p>
+<section id="Data-Cropping">
+<h3>Data Cropping<a class="headerlink" href="#Data-Cropping" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">recon_pag_roi</span> <span class="o">=</span> <span class="n">recon_pag</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[:,</span><span class="mi">500</span><span class="p">:</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">500</span><span class="p">:</span><span class="o">-</span><span class="mi">500</span><span class="p">]</span>
+<span class="n">recon_roi</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[:,</span><span class="mi">500</span><span class="p">:</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span><span class="mi">500</span><span class="p">:</span><span class="o">-</span><span class="mi">500</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Saving-of-Absorption-Data">
+<h3>Saving of Absorption Data<a class="headerlink" href="#Saving-of-Absorption-Data" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">recon_pag_roi</span> <span class="o">=</span> <span class="n">recon_pag_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float16&#39;</span><span class="p">)</span>
+<span class="n">qim3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_dir</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">recon_name</span><span class="si">}</span><span class="s2">_recon_pag.tiff&quot;</span><span class="p">,</span><span class="n">recon_pag_roi</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">qim3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_dir</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">recon_name</span><span class="si">}</span><span class="s2">_recon_pag_4x4.tiff&quot;</span><span class="p">,</span><span class="n">recon_pag_roi</span><span class="p">[:,::</span><span class="mi">4</span><span class="p">,::</span><span class="mi">4</span><span class="p">],</span><span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Saving-of-Phase-Retrieved-Data">
+<h3>Saving of Phase Retrieved Data<a class="headerlink" href="#Saving-of-Phase-Retrieved-Data" title="Link to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">recon_roi</span> <span class="o">=</span> <span class="n">recon_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float16&#39;</span><span class="p">)</span>
+<span class="n">qim3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_dir</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">recon_name</span><span class="si">}</span><span class="s2">_recon_abs.tiff&quot;</span><span class="p">,</span><span class="n">recon_roi</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">qim3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_dir</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">recon_name</span><span class="si">}</span><span class="s2">_recon_abs.tiff&quot;</span><span class="p">,</span><span class="n">recon_roi</span><span class="p">[:,::</span><span class="mi">4</span><span class="p">,::</span><span class="mi">4</span><span class="p">],</span><span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Inspect-3D-Volume">
+<h2>Inspect 3D Volume<a class="headerlink" href="#Inspect-3D-Volume" title="Link to this heading">#</a></h2>
+<p>The volume can be visualised using the qim3d package.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qim3d</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">vol</span><span class="p">(</span><span class="n">recon_pag_roi</span><span class="p">[:,::</span><span class="mi">4</span><span class="p">,::</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e7f7149eb06d4337a9a6ccb6c203c232", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../bruker2cil/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Introduction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../controlledWaveletSparsity_2d/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Controlled Wavelet Sparsity using callbacks (2D data)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CIL Callbacks How To &#8212; CIL 25.0.1.dev11+g21355fe32 documentation</title>
+    <title>CIL Callbacks How To &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
   
   
   
@@ -41,27 +41,29 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../_static/documentation_options.js?v=f7685a78"></script>
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/callback_demonstration';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev11+g21355fe32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" />
-    <link rel="prev" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
+    <link rel="next" title="User showcase" href="../../usershowcase/" />
+    <link rel="prev" title="A detailed look at CIL geometry" href="../00_CIL_geometry/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev11+g21355fe32" />
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -209,13 +211,30 @@
   </a>
 </li>
 
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../">
     Tutorials
   </a>
 </li>
 
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -335,6 +354,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
   </ul>
 </nav></div>
           
@@ -410,12 +436,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../#load-and-visualise-data">Load and visualise data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../#geometry">Geometry</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../#advanced-topics">Advanced topics</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">CIL Callbacks How To</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../usershowcase/">User showcase</a></li>
 </ul>
 </div>
         <div class="sidebar-primary-item">
@@ -1049,13 +1075,22 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../deriv2_cgls/"
+       href="../00_CIL_geometry/"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">1D inverse problem demo using deriv2 from regtools</p>
+        <p class="prev-next-title">A detailed look at CIL geometry</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="../../usershowcase/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">User showcase</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>

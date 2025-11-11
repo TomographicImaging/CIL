@@ -1,0 +1,1342 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Offset reconstruction &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Apple_offset_reconstruction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Introduction" href="../bruker2cil/" />
+    <link rel="prev" title="Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence" href="../LS_WLS_KL_TotalVariation/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Offset reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Reconstruction-of-an-apple-measured-with-offset-detector.">Reconstruction of an apple measured with offset detector.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CIL-Version-23.1.0">CIL Version 23.1.0</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/Apple_offset_reconstruction.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Offset reconstruction</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by: Estrid Buhl Naver (DTU), Maja Østergaard ( Aarhus University) and Silvio Achilles (DESY)</span>
+<span class="c1">#   Edited by: Margaret Duff (STFC - UKRI), Jakob Sauer Jørgensen (DTU), Edo Pasca (STFC - UKRI)</span>
+</pre></div>
+</div>
+</div>
+<section id="Offset-reconstruction">
+<h1>Offset reconstruction<a class="headerlink" href="#Offset-reconstruction" title="Link to this heading">#</a></h1>
+<section id="Reconstruction-of-an-apple-measured-with-offset-detector.">
+<h2>Reconstruction of an apple measured with offset detector.<a class="headerlink" href="#Reconstruction-of-an-apple-measured-with-offset-detector." title="Link to this heading">#</a></h2>
+<p>Apple measured with lab-Xray CT machine where the detector was offset in order to image the entire sample in the tomography. We scanned the apple, which was too wide for the regular beam, in offset mode, where the fan only covers a bit more than half of the apple width, and due to offsetting the rotation centre to the side, the other half of the apple will rotate into the fan and as such full data will be recorded. The default reconstruction done by the table top CT machine did not support this,
+so we used CIL to set up the offset geometry. This notebook showcases three different reconstructions of this sample, one using the filtered-back-projection and two using iterative methods.</p>
+</section>
+<section id="CIL-Version-23.1.0">
+<h2>CIL Version 23.1.0<a class="headerlink" href="#CIL-Version-23.1.0" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+23.1.0
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">TIFFStackReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="n">CentreOfRotationCorrector</span><span class="p">,</span> <span class="n">Slicer</span><span class="p">,</span> <span class="n">Padder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show_geometry</span><span class="p">,</span> <span class="n">show1D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.jupyter</span><span class="w"> </span><span class="kn">import</span> <span class="n">islicer</span>
+
+<span class="c1"># Import algorithms, operators and functions from CIL optimisation module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GD</span><span class="p">,</span> <span class="n">FISTA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span><span class="p">,</span>  <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">TotalVariation</span><span class="p">,</span> <span class="n">OperatorCompositionFunction</span><span class="p">,</span><span class="n">L2NormSquared</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span>  <span class="n">GradientOperator</span>
+
+<span class="c1"># Import from CIL ASTRA plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span><span class="p">,</span> <span class="n">AstraBackProjector3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+</pre></div>
+</div>
+</div>
+<section id="Setting-up-the-geometry">
+<h3>Setting up the geometry<a class="headerlink" href="#Setting-up-the-geometry" title="Link to this heading">#</a></h3>
+<p>We define the geometry of the system.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define cone geometry variables</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="mi">355</span> <span class="c1"># mm</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="mi">398</span> <span class="c1"># mm</span>
+<span class="n">COR</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span> <span class="c1"># number of pixels from the edge of the center</span>
+<span class="n">pixel_size</span> <span class="o">=</span> <span class="mf">0.048</span> <span class="c1"># mm</span>
+<span class="n">image_pixel_size</span> <span class="o">=</span> <span class="mf">0.096</span> <span class="c1"># mm</span>
+
+<span class="n">angles_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create AcquisitionGeometry</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">(</span>
+    <span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">SOD</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+    <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">SDD</span><span class="o">-</span><span class="n">SOD</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+    <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="o">-</span><span class="n">COR</span><span class="o">*</span><span class="n">pixel_size</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">angles_arr</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;radian&#39;</span> <span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;top-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.framework.framework.AcquisitionGeometry at 0x7fc88c3bf790&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_10_0.png" src="../../_images/demos_Apple_offset_reconstruction_10_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fc88c3bffd0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="The-dataset">
+<h3>The dataset<a class="headerlink" href="#The-dataset" title="Link to this heading">#</a></h3>
+<p>This requires the dataset <code class="docutils literal notranslate"><span class="pre">apple.zip</span></code> from <a class="reference external" href="https://doi.org/10.5281/zenodo.10089694">https://doi.org/10.5281/zenodo.10089694</a>. Please download the data and update the ‘proj_folder’ variable below to point to where you have the projections saved:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">&#39;./Apple_offset/raw/projections&#39;</span>
+<span class="n">n_projs</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># and starts with idx 0</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">proj_folder</span><span class="p">)</span><span class="o">.</span><span class="n">read_as_AcquisitionData</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Preprocess the data so it is ready for reconstruction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">data</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">()(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Visualise the projections:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_16_0.png" src="../../_images/demos_Apple_offset_reconstruction_16_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc75c8f6770&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Automatic-reconstruction">
+<h3>Automatic reconstruction<a class="headerlink" href="#Automatic-reconstruction" title="Link to this heading">#</a></h3>
+<p>We load the scanner reconstruction for comparison</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">&#39;./Apple_offset/raw/reconstruction&#39;</span>
+<span class="n">n_projs</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># and starts with idx 0</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">472</span><span class="p">)</span>
+<span class="n">recon_scanner</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">proj_folder</span><span class="p">)</span><span class="o">.</span><span class="n">read_as_ImageData</span><span class="p">(</span><span class="n">ig</span> <span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon_scanner</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">60000</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_18_0.png" src="../../_images/demos_Apple_offset_reconstruction_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc75ac362f0&gt;
+</pre></div></div>
+</div>
+<p>We see that the scanner is unable to reconstruct the full slice of the apple. There is also a brighter circle as part of the horizontal slice and a brighter vertical strip in the vertical slice. This is because these areas are always within the field of view whereas the other parts of the apple move in and out the field of view. The aim of this notebook is to do better!</p>
+</section>
+<section id="FBP-Reconstruction">
+<h3>FBP Reconstruction<a class="headerlink" href="#FBP-Reconstruction" title="Link to this heading">#</a></h3>
+<p>We start by using the FBP reconstruction.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_22_0.png" src="../../_images/demos_Apple_offset_reconstruction_22_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc75cb3d7b0&gt;
+</pre></div></div>
+</div>
+<p>There is a very clear region-of-interest artifact so we choose to pad the projections to get it away from the sample.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Padding the data</span>
+<span class="n">Npad</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">data_padded</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="n">Npad</span><span class="p">,</span> <span class="n">Npad</span><span class="p">)})(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Padding in horizontal direction</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">580</span><span class="p">,</span> <span class="mi">580</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_27_0.png" src="../../_images/demos_Apple_offset_reconstruction_27_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc75ab62560&gt;
+</pre></div></div>
+</div>
+<p>We can use the CIL centre of rotation corrector to check the centre of rotation inputted when we set up the geometry earlier.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span>
+
+<span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">search_range</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
+<span class="n">data_centred</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">(</span><span class="n">distance_units</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;offset&#39;: (0.14603414381488417, &#39;pixels&#39;), &#39;angle&#39;: (0.0, &#39;radian&#39;)}
+</pre></div></div>
+</div>
+<p>We see a very small update of 0.14 pixels on top of the 100 pixels we set earlier. We can update our COR with this value but it makes very little difference to our reconstructed image:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="o">-</span><span class="n">COR</span><span class="o">*</span><span class="n">pixel_size</span><span class="o">+</span><span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">()[</span><span class="s1">&#39;offset&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pixel_size</span><span class="p">)</span>
+<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_31_0.png" src="../../_images/demos_Apple_offset_reconstruction_31_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc75cdbfeb0&gt;
+</pre></div></div>
+</div>
+<p>Adjusting the contrast we can see there still remains a bright circular artifact in the horizontal slice and a stripe pattern in the vertical slice.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">210</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.06</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_33_0.png" src="../../_images/demos_Apple_offset_reconstruction_33_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc747eb8e50&gt;
+</pre></div></div>
+</div>
+<p>This can also be viewed on a line plot where we see a hump in the middle of the apple slice. We take multiple horizontal lines in the horizontal slice, visualised in a thick red band, plot their line profiles and also plot an average line profile for this section of the slice. Multiple lines and an average are useful to visualise the underlying behaviour amoungst the noise.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span> <span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">200</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">+=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_35_0.png" src="../../_images/demos_Apple_offset_reconstruction_35_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_35_1.png" src="../../_images/demos_Apple_offset_reconstruction_35_1.png" />
+</div>
+</div>
+<p>The hope is that using iterative reconstruction, where the projector can take into account the repeated measurements of some areas will lead to a reconstruction without these artifacts.</p>
+</section>
+<section id="Iterative-reconstruction">
+<h3>Iterative reconstruction<a class="headerlink" href="#Iterative-reconstruction" title="Link to this heading">#</a></h3>
+<p>We run iterative reconstruction on just the centre slice to speed up the reconstruction. It could be done on the whole 3D volume but it will be slow. We extend the image geometry but do not pad the data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span> <span class="c1"># Change the order of the variables in the array</span>
+<span class="n">data2D</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">ag2D</span> <span class="o">=</span> <span class="n">data2D</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">580</span><span class="p">,</span> <span class="mi">580</span><span class="p">,</span><span class="mi">400</span> <span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)</span>
+<span class="n">ig2D</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="c1"># Set up linear operator representing forward and backward projections</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">,</span> <span class="n">ag2D</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Reconstruct using the gradient descent algorithm for a least squares objective without regularisation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data2D</span><span class="p">)</span><span class="c1"># Set up least squares problem</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">(),</span><span class="n">D</span><span class="p">)</span>
+<span class="n">alpha</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">f2</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig2D</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> <span class="c1"># Start from image no. 0</span>
+
+<span class="c1"># Set up gradient descent algorithm</span>
+<span class="n">myGD_LS</span> <span class="o">=</span> <span class="n">GD</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+             <span class="n">objective_function</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+             <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+             <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the first few iterations, the bright circle is still clearly visible :</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;5 iterations&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+
+
+<span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;30 iterations&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          5.43500e+05
+-------------------------------------------------------
+        5       1000         0.114
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_43_1.png" src="../../_images/demos_Apple_offset_reconstruction_43_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        5       1000         0.114
+-------------------------------------------------------
+       30       1000         0.056
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_43_3.png" src="../../_images/demos_Apple_offset_reconstruction_43_3.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc745a94dc0&gt;
+</pre></div></div>
+</div>
+<p>Running to convergence, we see the bright circle disappear but the ring artefact remains due to the truncated projection.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">965</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+       30       1000         0.056
+      100       1000         0.048          1.79873e+02
+      200       1000         0.046          1.41060e+02
+      300       1000         0.045          1.33630e+02
+      400       1000         0.045          1.30990e+02
+      500       1000         0.045          1.29754e+02
+      600       1000         0.045          1.29071e+02
+      700       1000         0.045          1.28645e+02
+      800       1000         0.045          1.28353e+02
+      900       1000         0.045          1.28139e+02
+-------------------------------------------------------
+      995       1000         0.045
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_45_1.png" src="../../_images/demos_Apple_offset_reconstruction_45_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fc7458a0310&gt;
+</pre></div></div>
+</div>
+<p>Again, we can visualise in a line plot.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">200</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">=</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">+=</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_47_0.png" src="../../_images/demos_Apple_offset_reconstruction_47_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_47_1.png" src="../../_images/demos_Apple_offset_reconstruction_47_1.png" />
+</div>
+</div>
+<p>We can also try reconstruction using Tikhonov regularisation to smooth out the ring artefacts. It succeeds with all but the largest one, caused by the padding.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data2D</span><span class="p">)</span><span class="c1"># Set up least squares problem</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">(),</span><span class="n">D</span><span class="p">)</span>
+<span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">f1</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">f2</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig2D</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> <span class="c1"># Start from image no. 0</span>
+
+<span class="c1"># Set up gradient descent algorithm</span>
+<span class="n">myGD_LS_TIK</span> <span class="o">=</span> <span class="n">GD</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+             <span class="n">objective_function</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+             <span class="n">step_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+             <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">))</span>
+
+<span class="c1">#Visualise the results using a line plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">linenumy</span><span class="o">=</span><span class="mi">200</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">=</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total</span><span class="o">+=</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+     Iter   Max Iter     Time/Iter            Objective
+                               [s]
+        0       1000         0.000          5.43500e+05
+      100       1000         0.048          2.20849e+02
+      200       1000         0.047          1.96799e+02
+      300       1000         0.046          1.94713e+02
+      400       1000         0.046          1.94320e+02
+      500       1000         0.046          1.94184e+02
+-------------------------------------------------------
+      500       1000         0.046          1.94184e+02
+Stop criterion has been reached.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_49_1.png" src="../../_images/demos_Apple_offset_reconstruction_49_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_49_2.png" src="../../_images/demos_Apple_offset_reconstruction_49_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_Apple_offset_reconstruction_49_3.png" src="../../_images/demos_Apple_offset_reconstruction_49_3.png" />
+</div>
+</div>
+<p>The Tikhonov regularisation also smooths out the rest of the image, not just the rings, as can be seen in the image and the line plot. Other options could be explored for further removal of the rings such as: fine-tuning alignment, stitching projections, padding or the CIL RingRemover! Also note that the CIL FBP recon also shows ring artefacts. We also note that the U-shaped line profile of the apple is characteristic of beam hardening effects and further work could be done to correct for this.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../LS_WLS_KL_TotalVariation/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../bruker2cil/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Introduction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

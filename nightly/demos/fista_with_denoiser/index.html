@@ -1,0 +1,1815 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/fista_with_denoiser';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="prev" title="Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR" href="../memory_profiling_sandstone/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CIL-Version-24.3.1">CIL Version 24.3.1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Total-Variation-regularised-reconstruction">Total Variation regularised reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#FISTA-with-the-proximal-step-replaced-by-a-learned-denoiser">FISTA with the proximal step replaced by a learned denoiser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Future-work">Future work</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/fista_with_denoiser.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by:  Justus Sagemüller  (KTH)</span>
+<span class="c1">#   Authored by:  Margaret Duff (STFC-UKRI)</span>
+<span class="c1">#   Reviewed by: Jakob Sauer Jørgensen (DTU)</span>
+</pre></div>
+</div>
+</div>
+<section id="A-CIL-pytorch-example-using-DeepInverse-using-a-pre-trained-denoiser-in-the-CIL-FISTA-algorithm">
+<h1>A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm<a class="headerlink" href="#A-CIL-pytorch-example-using-DeepInverse-using-a-pre-trained-denoiser-in-the-CIL-FISTA-algorithm" title="Link to this heading">#</a></h1>
+<p>This notebook covers:</p>
+<ul class="simple">
+<li><p>How to set up an environment with CIL and pytorch and deep inverse</p></li>
+<li><p>How to create a CIL function to wrap a pytorch function or operator</p></li>
+<li><p>Examples of image reconstruction using a pre-trained denoiser in CIL</p></li>
+<li><p>Timings of the data copies between pytorch and CIL</p></li>
+</ul>
+<p>This notebook is a result of the CCPi/SyneRBi Hackathon on CIL/SIRF/Pytorch integration. Note that this notebook is the result of a day of hacking is therefore not a complete piece of work. Ideas for future work are presented at the end.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># Import algorithms, operators and functions from CIL optimisation module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GD</span><span class="p">,</span> <span class="n">FISTA</span><span class="p">,</span> <span class="n">PDHG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">GradientOperator</span><span class="p">,</span>\
+                                       <span class="n">GradientOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicatorBox</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">L2NormSquared</span><span class="p">,</span> \
+                                       <span class="n">BlockFunction</span><span class="p">,</span> <span class="n">L1Norm</span><span class="p">,</span> <span class="n">LeastSquares</span><span class="p">,</span> \
+                                       <span class="n">OperatorCompositionFunction</span><span class="p">,</span> <span class="n">TotalVariation</span><span class="p">,</span> <span class="n">Function</span>
+
+<span class="c1"># Import CIL Processors for preprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span><span class="p">,</span> <span class="n">Slicer</span><span class="p">,</span> <span class="n">TransmissionAbsorptionConverter</span>
+
+<span class="c1"># Import CIL display function</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span>
+
+<span class="c1"># Import from CIL ASTRA plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+
+<span class="c1"># Import FBP from CIL recon class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FBP</span>
+
+<span class="c1">#Import Total Variation from the regularisation toolkit plugin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.ccpi_regularisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">FGP_TV</span>
+
+<span class="c1"># All external imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<section id="CIL-Version-24.3.1">
+<h2>CIL Version 24.3.1<a class="headerlink" href="#CIL-Version-24.3.1" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+24.3.1.dev20+ga06f691f1
+</pre></div></div>
+</div>
+</section>
+<section id="Dataset">
+<h2>Dataset<a class="headerlink" href="#Dataset" title="Link to this heading">#</a></h2>
+<p>We use the parallel beam steel wire dataset from CIL dataexamples. We crop the data and slice the data to give a limited angle dataset of just 15 angles.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the example data set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.dataexample</span><span class="w"> </span><span class="kn">import</span> <span class="n">SYNCHROTRON_PARALLEL_BEAM_DATA</span>
+<span class="n">data_sync</span> <span class="o">=</span> <span class="n">SYNCHROTRON_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+<span class="c1"># Preprocessing</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">data_sync</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">data_sync</span> <span class="o">=</span> <span class="n">data_sync</span><span class="o">/</span><span class="n">scale</span>
+<span class="n">data_sync</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">()(</span><span class="n">data_sync</span><span class="p">)</span>
+<span class="n">data_sync</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">xcorrelation</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)(</span><span class="n">data_sync</span><span class="p">)</span>
+
+<span class="c1"># Crop data and reorder for ASTRA backend</span>
+<span class="n">data90</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span><span class="mi">90</span><span class="p">),</span>
+                     <span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">20</span><span class="p">,</span><span class="mi">140</span><span class="p">,</span><span class="mi">1</span><span class="p">)})(</span><span class="n">data_sync</span><span class="p">)</span>
+<span class="n">data90</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set up a 15-angle dataset</span>
+<span class="n">data15</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="mi">6</span><span class="p">)})(</span><span class="n">data90</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>We reconstruct the 15-angle dataset using FBP and visualise the results</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Reconstruct using FBP</span>
+<span class="n">recon15</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">data15</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="c1"># Define custom parameters for show2D for visualizing all reconstructions consistently</span>
+<span class="n">sx</span> <span class="o">=</span> <span class="mi">44</span>
+<span class="n">sz</span> <span class="o">=</span> <span class="mi">103</span>
+<span class="n">ca1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.01</span>
+<span class="n">ca2</span> <span class="o">=</span>  <span class="mf">0.11</span>
+<span class="n">slices</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span><span class="n">sx</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">)]</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon15</span><span class="p">,</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_9_0.png" src="../../_images/demos_fista_with_denoiser_9_0.png" />
+</div>
+</div>
+</section>
+<section id="Total-Variation-regularised-reconstruction">
+<h2>Total Variation regularised reconstruction<a class="headerlink" href="#Total-Variation-regularised-reconstruction" title="Link to this heading">#</a></h2>
+<p>We first reconstruct with TV regularisation. We use the FISTA algorithm to solve the optimisation problem.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">data15</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">data15</span>
+
+<span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">myFISTATV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">GTV</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">myFISTATV</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cff70c73037046e3aa48a63bfa82bd08", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<p>TV regularisation reduces many of the limited angle artefacts giving an almost cartoon like image, with constant areas and sharp edges.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span> <span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span><span class="p">],</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">));</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_13_0.png" src="../../_images/demos_fista_with_denoiser_13_0.png" />
+</div>
+</div>
+</section>
+<section id="FISTA-with-the-proximal-step-replaced-by-a-learned-denoiser">
+<h2>FISTA with the proximal step replaced by a learned denoiser<a class="headerlink" href="#FISTA-with-the-proximal-step-replaced-by-a-learned-denoiser" title="Link to this heading">#</a></h2>
+<p>Consider using FISTA to minimise <span class="math notranslate nohighlight">\(f(x)+\lambda g(x)\)</span>. In each FISTA update step, for current iterate <span class="math notranslate nohighlight">\(x_k\)</span> and stepsize <span class="math notranslate nohighlight">\(\alpha_l\)</span> we do the calculation:</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = \mathrm{prox}_{\alpha_k \ \lambda g} (x_k-\alpha_k \nabla f(x_k))\]</div>
+<p>Where</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{prox}_{\alpha \  \lambda g}(x)=\arg\min_u \frac{1}{2}\| x-u\|+ \alpha\lambda g(u)\]</div>
+<p>this last equation looks like a denoiser with regulariser <span class="math notranslate nohighlight">\(g\)</span> and regularisation parameter <span class="math notranslate nohighlight">\(\alpha\lambda\)</span>.</p>
+<p>The idea of Plug and Play denoisers is to replace the proximal step with any denoiser. This could be a neural network trained to remove noise from images or it could be something non-learned e.g. BM3D. We call this implicit regularisation: the denoiser will implicitly regularise the resulting solution but, in most cases, the equivalent regularisation function can’t be written out explicitly.</p>
+<p>In order to implement this in CIL, we use the pytorch library. To install pytorch and CIL we recommend <a class="reference external" href="https://pytorch.org/get-started/locally/">pip installing</a> pytorch into an environment that already contains CIL.</p>
+<p>We define a CIL Function that evaluates to 0 when it is called, but, importantly, when it’s proximal is called it transforms the CIL data container to a torch tensor and passes this torch tensor along with the scalar value used in the proximal as a noise level to the torch denoiser. It then wraps the result in a CIL data container before returning.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DenoiserProximal</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DenoiserProximal is a custom CIL function that, when evaluated (__call__), returns 0.</span>
+<span class="sd">    It implements a proximal operator via a torch-based denoiser. When the</span>
+<span class="sd">    proximal() method is called, the input CIL data container is converted into a PyTorch</span>
+<span class="sd">    tensor, processed with the denoiser  using the specified noise level (tau), and then</span>
+<span class="sd">    wrapped back into a CIL data container.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        denoiser: The torch-based denoiser which accepts an input tensor and a noise level.</span>
+<span class="sd">        device: The torch device (e.g., &#39;cuda&#39; or &#39;cpu&#39;) on which the denoiser runs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span> <span class="o">=</span> <span class="n">denoiser</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DenoiserProximal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># This function merely returns 0 as its evaluation.</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cil_to_torch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a CIL data container to a PyTorch tensor.</span>
+
+<span class="sd">        This method extracts the &#39;array&#39; attribute from the input CIL data container,</span>
+<span class="sd">        moves the data to the designated device, and adjusts the tensor&#39;s shape by squeezing</span>
+<span class="sd">        out the first dimension and adding a channel dimension. This reshaped tensor is then</span>
+<span class="sd">        ready to be passed to the denoiser denoiser.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x: A CIL data container with an &#39;array&#39; attribute containing the data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: A PyTorch tensor formatted for the denoiser denoiser.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">torch_to_cil</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_tens</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a PyTorch tensor to a CIL data container.</span>
+
+<span class="sd">        After the denoiser processes the input, this method converts the resulting PyTorch tensor</span>
+<span class="sd">        back into the format expected by a CIL data container. It performs a reverse of the shaping operations</span>
+<span class="sd">        applied in cil_to_torch (i.e., removing the channel dimension and adding back the batch dimension)</span>
+<span class="sd">        and updates the &#39;array&#39; attribute of the output container.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x_tens (torch.Tensor): The processed tensor from the denoiser.</span>
+<span class="sd">            out: A pre-allocated CIL data container to store the final output data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_tens</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply the proximal operator via a torch-based denoiser to a CIL data container.</span>
+
+<span class="sd">        This method implements the proximal step by first converting the input CIL data container</span>
+<span class="sd">        to a PyTorch tensor using cil_to_torch. The tensor is then passed to the denoiser along</span>
+<span class="sd">        with the provided noise level &#39;tau&#39;. The output tensor is converted back into a CIL data container using</span>
+<span class="sd">        torch_to_cil. If no output container is provided (i.e., out is None), a new container is allocated</span>
+<span class="sd">        based on the geometry of x.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x: The input CIL data container to be processed.</span>
+<span class="sd">            tau (float): A scalar noise level parameter passed to the denoiser.</span>
+<span class="sd">            out: (Optional) A pre-allocated CIL data container for returning the result. If not provided,</span>
+<span class="sd">                 a new container is allocated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A CIL data container containing the denoiser-processed data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cil_to_torch</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">torch_to_cil</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+</div>
+</div>
+<p>With this formulation can we use the FISTA algorithm as we would usually do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">denoiser</span> <span class="o">=</span> <span class="c1"># denoiser model here</span>
+<span class="n">lamb</span> <span class="o">=</span> <span class="c1"># regularisation parameter</span>
+<span class="n">regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="p">)</span>
+<span class="n">myFISTADnCNN</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://deepinv.github.io/deepinv/user_guide/reconstruction/denoisers.html#denoisers">The deep inverse library has a range of denoisers</a> that take a noisy image as input and return a denoised image. Some of these come with pre-trained weights. We play with a couple of these pre-trained denoisers in the next few sections.</p>
+<p>To install deep inverse, follow the instructions <a class="reference external" href="https://deepinv.github.io/deepinv/quickstart.html">here.</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">deepinv</span>
+</pre></div>
+</div>
+</div>
+<p>In the below cell, set the device to be used by torch, either a GPU, if available, or the CPU</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">use_cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">use_cuda</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="DnCCN---not-noise-level-aware">
+<h3>DnCCN - not noise level aware<a class="headerlink" href="#DnCCN---not-noise-level-aware" title="Link to this heading">#</a></h3>
+<p>The DnCNN architecture was introduced in <a class="reference external" href="https://arxiv.org/abs/1608.03981">https://arxiv.org/abs/1608.03981</a> and is composed of a series of convolutional layers with ReLU activation functions. This denoiser takes an image and returns a denoised image and is “not noise level aware”, i.e. the denoiser does not need or use any information about the amount of noise in the image.</p>
+<p>This means that the in the calculation of the proximal, the <code class="docutils literal notranslate"><span class="pre">tau</span></code> constant is not used and thus changing the regularisation parameter has no effect and the denoiser gets no information on the current step size.</p>
+<p>We can first load the denoiser with pretrained weights, define the DenoiserProximal function and see the effect of the denoiser on the FBP reconstructed image:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">denoiser</span> <span class="o">=</span> <span class="n">deepinv</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">DnCNN</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;download_lipschitz&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">regulariser</span> <span class="o">=</span> <span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+<span class="n">TV_denoised_image</span> <span class="o">=</span> <span class="n">GTV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">recon15</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">denoised_image</span><span class="o">=</span> <span class="n">regulariser</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">recon15</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">TV_denoised_image</span><span class="p">,</span> <span class="n">denoised_image</span>  <span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV denoised image&#39;</span><span class="p">,</span> <span class="s1">&#39;DnCNN denoised image&#39;</span><span class="p">],</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">36</span><span class="p">)</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_23_0.png" src="../../_images/demos_fista_with_denoiser_23_0.png" />
+</div>
+</div>
+<p>We can see that the DnCNN denoiser it has removed some of the artifacts in the bottom left and top right. The TV proximal has made a very cartoon like image, denoising more of the image.</p>
+<p>We run FISTA with the denoiser as a replacement for the proximal of the regulariser. We plot the results every 50 iterations for 200 iterations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">denoiser</span> <span class="o">=</span> <span class="n">deepinv</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">DnCNN</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;download_lipschitz&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">regulariser</span> <span class="o">=</span> <span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+<span class="n">myFISTADnCNN</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">),</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6e1a2acc1524497abb3682f6d00be361", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_26_1.png" src="../../_images/demos_fista_with_denoiser_26_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "67291898ffc34b8a9a92f15b23eff8af", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_26_3.png" src="../../_images/demos_fista_with_denoiser_26_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e82664d7af424287a05c634b67494fec", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_26_5.png" src="../../_images/demos_fista_with_denoiser_26_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "635c90cb02a642cdbbb35d1d6165e613", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_26_7.png" src="../../_images/demos_fista_with_denoiser_26_7.png" />
+</div>
+</div>
+<p>Comparing the result to the FDK and TV results, the final image is defintely oversmoothed and we have lost information on the edges.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span><span class="p">,</span> <span class="s1">&#39;Prox DnCNN&#39;</span><span class="p">],</span>
+            <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">36</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_28_0.png" src="../../_images/demos_fista_with_denoiser_28_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f2230213440&gt;
+</pre></div></div>
+</div>
+<p>We are careful to clear up after using the torch denoiser, it can use (and sometimes leak) a lot of memory.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="DRUNet---a-noise-level-aware-denoiser">
+<h3>DRUNet - a noise level aware denoiser<a class="headerlink" href="#DRUNet---a-noise-level-aware-denoiser" title="Link to this heading">#</a></h3>
+<p>We now consider a noise level aware denoiser - this time DRUNet, with architecture from the paper <a class="reference external" href="https://arxiv.org/abs/2008.13751">Plug-and-Play Image Restoration with Deep Denoiser Prior</a>. It has a U-Net like structure, with convolutional blocks in the encoder and decoder parts. The network takes into account the noise level of the input image, which is encoded as an additional input channel.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">denoiser</span> <span class="o">=</span> <span class="n">deepinv</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">DRUNet</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;download&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="Too-large-regularisation-parameter-(\lambda-=-20)">
+<h4>Too large regularisation parameter (<span class="math notranslate nohighlight">\(\lambda = 20\)</span>)<a class="headerlink" href="#Too-large-regularisation-parameter-(\lambda-=-20)" title="Link to this heading">#</a></h4>
+<p>This first regularisation parameter we try looks too large. Again the results are oversmoothed:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">lamb</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">Regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="o">=</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">myFISTADRUNet2D</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">Regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">),</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "20d46f5d0e804072993b8b5a8c1c9cbb", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_34_1.png" src="../../_images/demos_fista_with_denoiser_34_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "9803e09cf56744ef87fa8d5909befa1e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_34_3.png" src="../../_images/demos_fista_with_denoiser_34_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "50d26363fd084e2d8628255407ceae64", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_34_5.png" src="../../_images/demos_fista_with_denoiser_34_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "951b226b8a0848048a7101a8e932a5ff", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_34_7.png" src="../../_images/demos_fista_with_denoiser_34_7.png" />
+</div>
+</div>
+</section>
+<section id="Too-small-regularisation-parameter-(\lambda=0.5)">
+<h4>Too small regularisation parameter (<span class="math notranslate nohighlight">\(\lambda=0.5\)</span>)<a class="headerlink" href="#Too-small-regularisation-parameter-(\lambda=0.5)" title="Link to this heading">#</a></h4>
+<p>This time we have a value which is potentially too small. The limited angle artefacts are not treated as “noise” and instead the denoiser tries to recreate these artefacts to produce images similar to what it saw during training: it looks like the denoiser is trying to make curtains or fabric to me! With this denoiser and this regularisation parameter and automatic step size choice from FISTA, the algorithm is not convergent!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">lamb</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="n">Regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="o">=</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">myFISTADRUNet2D</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">Regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">),</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "afdd67847af4421f88a8ac3422969d17", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_36_1.png" src="../../_images/demos_fista_with_denoiser_36_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3d13b3fc1bc049689d09aebcfe1bf14f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_36_3.png" src="../../_images/demos_fista_with_denoiser_36_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "58297db792254d329539c6f6f8d17ca9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_36_5.png" src="../../_images/demos_fista_with_denoiser_36_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2d3e2163592943ccb19531ab55a59b79", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_36_7.png" src="../../_images/demos_fista_with_denoiser_36_7.png" />
+</div>
+</div>
+</section>
+<section id="About-right-(?)-regularisation-parameter-(\lambda-=-3)">
+<h4>About right (?) regularisation parameter (<span class="math notranslate nohighlight">\(\lambda = 3\)</span>)<a class="headerlink" href="#About-right-(?)-regularisation-parameter-(\lambda-=-3)" title="Link to this heading">#</a></h4>
+<p>An intermediate value gives a better result. Disclaimer: this is probably not the optimal <span class="math notranslate nohighlight">\(\lambda\)</span> parameter, just the best result from a limited few values we tried</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">lamb</span><span class="o">=</span><span class="mi">3</span>
+<span class="n">Regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximal</span><span class="p">(</span><span class="n">denoiser</span><span class="o">=</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">myFISTADRUNet2D</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">Regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">),</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "aa7f9c2c72354808acdc9b37bf30ee50", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_38_1.png" src="../../_images/demos_fista_with_denoiser_38_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5ad5f41135ba416ba1dd5e5d304529fb", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_38_3.png" src="../../_images/demos_fista_with_denoiser_38_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "48b24e8d465f41c3815f0553d59ab261", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_38_5.png" src="../../_images/demos_fista_with_denoiser_38_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "96c3853e92764820b619c1a38891c989", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_38_7.png" src="../../_images/demos_fista_with_denoiser_38_7.png" />
+</div>
+</div>
+<p>We can compare the results of the FDK and TV reconstruction and the two plug and play denoisers we have tried.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span>  <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span> <span class="p">,</span> <span class="s1">&#39;DnCNN prox&#39;</span><span class="p">,</span> <span class="s1">&#39;DRUNet2D prox&#39;</span><span class="p">],</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_40_0.png" src="../../_images/demos_fista_with_denoiser_40_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f21e429fdd0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Aside---cost-of-copying-to-and-from-pytorch">
+<h3>Aside - cost of copying to and from pytorch<a class="headerlink" href="#Aside---cost-of-copying-to-and-from-pytorch" title="Link to this heading">#</a></h3>
+<p>Copying the data from CIL to torch (and onto the GPU if one exists) and back again could be computationally expensive for large data. In this section we want to work out how long this takes. To do this, we add an extra step in the proximal method where we copy the data to and from torch <code class="docutils literal notranslate"><span class="pre">n_copy_repeats</span></code> times. To make sure that torch actually does the copy, we multiply by a number very close to one after copying to torch. We update the CIL function as follows:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DenoiserProximalWithRepeats</span><span class="p">(</span><span class="n">DenoiserProximal</span> <span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda:1&#39;</span><span class="p">,</span>  <span class="n">n_copy_repeats</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_copy_repeats</span> <span class="o">=</span> <span class="n">n_copy_repeats</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DenoiserProximalWithRepeats</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">denoiser</span> <span class="o">=</span> <span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">)</span>
+
+
+    <span class="c1">#overwrite the proximal method</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cil_to_torch</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_copy_repeats</span><span class="p">):</span>
+                <span class="n">x_torch</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-14</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">torch_to_cil</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cil_to_torch</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">torch_to_cil</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_DRUProx_recon</span><span class="p">(</span><span class="n">n_iterations</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_copy_repeats</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">lamb</span><span class="o">=</span><span class="mf">0.02</span>
+    <span class="n">Regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximalWithRepeats</span><span class="p">(</span><span class="n">denoiser</span><span class="o">=</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">n_copy_repeats</span><span class="o">=</span><span class="n">n_copy_repeats</span><span class="p">)</span>
+    <span class="n">myFISTADRUNet</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                      <span class="n">g</span><span class="o">=</span><span class="n">Regulariser</span><span class="p">,</span>
+                      <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                      <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">myFISTADRUNet</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_copying_overhead</span><span class="p">(</span><span class="n">n_iterations</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_n_copy_repeats</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ncrs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">ncrs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_n_copy_repeats</span><span class="p">:</span>
+        <span class="n">ncrs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ncr</span><span class="o">*</span><span class="mi">10</span> <span class="k">for</span> <span class="n">ncr</span> <span class="ow">in</span> <span class="n">ncrs</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]]</span>
+    <span class="k">while</span> <span class="n">ncrs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_n_copy_repeats</span><span class="p">:</span>
+        <span class="n">ncrs</span> <span class="o">=</span> <span class="n">ncrs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">timings</span> <span class="o">=</span> <span class="p">{</span><span class="n">ncr</span><span class="p">:</span> <span class="n">run_DRUProx_recon</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">n_copy_repeats</span><span class="o">=</span><span class="n">ncr</span><span class="p">)</span> <span class="k">for</span> <span class="n">ncr</span> <span class="ow">in</span> <span class="n">ncrs</span><span class="p">}</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">timings</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Number of copy repeats in each proximal&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Total time for </span><span class="si">{}</span><span class="s1"> iterations&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">timings</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">timings</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<p>We now calculate the time for 2 iterations of the FISTA algorithm with the denoiser proximal, first with 0 repeated copies and then for 1 repeated copy, then 2 repeated copies and then for a range of number of repeats. We can now plot the total time taken for 2 iterations against the number of repeats. We can also calculate the additional time taken for one copy back and forth.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">plot_copying_overhead</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Seconds for a copy back and forth : &#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span>  <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span>  <span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "22d08bc6d8714d889aa9b13c538fab38", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "28b7a0db18454a8aa443792f1a5779b6", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d3263a74a9244ec0bb8d61d4b27a238e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5f4baf688dd54215ad2ef516bc6a637c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7eecef91b13c42a08493b276b5579397", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c45a2487450b4effa9848e75d5a8e427", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3f96f61d29cf48d2a789eceef8976fb4", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Seconds for a copy back and forth :  0.003410117966788156
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_46_8.png" src="../../_images/demos_fista_with_denoiser_46_8.png" />
+</div>
+</div>
+<p>We repeat this experiment, but this time looking at the time taken for 15 iterations of the FISTA algorithm with the proximal denoiser. The calculated time taken for one copy back and forth roughly matches the value calculated above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">plot_copying_overhead</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Seconds for a copy back and forth : &#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span>  <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="mi">15</span><span class="o">*</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span>  <span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ab6bb2dfec524d8487e0ec372844ad23", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "de163e4750954092acc7f51bedea57b1", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ffe97179246a4f978a01cd5e5311e39a", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "829653db5bb145b5a26311da9b6494c4", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1e57c51f84c844a890db3bd1ea82bb2b", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e14218540c6d4ae88b211da630104a41", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "df89bfbf420440a2b8f2e54540b88706", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f137d3650fbc4c18a1d6cfe5476b1e5e", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0160e6aa63cc4c678a03467c9d3d8029", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7274b3287989412cbf7041f47c232be0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Seconds for a copy back and forth :  0.004737761550479465
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_48_11.png" src="../../_images/demos_fista_with_denoiser_48_11.png" />
+</div>
+</div>
+</section>
+<section id="How-to-deal-with-3D-data">
+<h3>How to deal with 3D data<a class="headerlink" href="#How-to-deal-with-3D-data" title="Link to this heading">#</a></h3>
+<p>All looks brilliant. However, we were dealing with 3D data and currently we are denoising the images with a 2D denoiser, slice by slice. What if we visualise the data in a different plane:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span> <span class="p">,</span><span class="s1">&#39;DnCNN prox&#39;</span><span class="p">,</span> <span class="s1">&#39;DRUNet 2D prox&#39;</span><span class="p">],</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span><span class="n">sx</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">64</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_50_0.png" src="../../_images/demos_fista_with_denoiser_50_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f21e41d9070&gt;
+</pre></div></div>
+</div>
+<p>Oh dear! We have lost any consistency in this vertical plane and the reconstruction, although it looked ok, is mostly useless. 3D volume denoisers are rare because of the data sizes involved and lack of training data. In the next section, we instead create a hacky solution by applying the denoiser three times, in 3 different directions, for each call of the proximal.</p>
+<section id="DRUNet---noise-level-aware---applied-three-times-in-each-iteration!">
+<h4>DRUNet - noise level aware - applied three times in each iteration!<a class="headerlink" href="#DRUNet---noise-level-aware---applied-three-times-in-each-iteration!" title="Link to this heading">#</a></h4>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DenoiserProximal3D</span><span class="p">(</span><span class="n">DenoiserProximal</span> <span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda:1&#39;</span><span class="p">):</span>
+
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">DenoiserProximal3D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cil_to_torch</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="n">x_torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="p">)</span> <span class="c1">#permute</span>
+            <span class="n">x_torch</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="n">x_torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="p">)</span> <span class="c1">#permute back</span>
+
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="n">x_torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="c1">#permute</span>
+            <span class="n">x_torch</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">denoiser</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="n">x_torch</span> <span class="o">=</span> <span class="n">x_torch</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="c1">#permute back</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">torch_to_cil</span><span class="p">(</span><span class="n">x_torch</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">lamb</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">Regulariser</span> <span class="o">=</span> <span class="n">lamb</span><span class="o">*</span><span class="n">DenoiserProximal3D</span><span class="p">(</span><span class="n">denoiser</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="n">myFISTADRUNet3D</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span>
+                  <span class="n">g</span><span class="o">=</span><span class="n">Regulariser</span><span class="p">,</span>
+                  <span class="n">initial</span><span class="o">=</span><span class="n">x0</span> <span class="p">,</span>
+                  <span class="n">update_objective_interval</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">myFISTADRUNet3D</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">myFISTADRUNet3D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">),</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8c2aaed3e30e43dd998deef190aecc23", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_54_1.png" src="../../_images/demos_fista_with_denoiser_54_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8741b417dd1d49928cfa6ff2775e1d65", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_54_3.png" src="../../_images/demos_fista_with_denoiser_54_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5fbc9ea78f924b21bdec19cfe7afd7df", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_54_5.png" src="../../_images/demos_fista_with_denoiser_54_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f30e7be70326477bb43442cba541e399", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_54_7.png" src="../../_images/demos_fista_with_denoiser_54_7.png" />
+</div>
+</div>
+<p>We can plot our results again, and see much better consistency in the vertical slice. However, there is still some oversmoothing, and we have lost information on the “hole” that the steel wire is sitting in.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADRUNet3D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span> <span class="p">,</span> <span class="s1">&#39;DnCNN prox&#39;</span><span class="p">,</span>  <span class="s1">&#39;DRUNet prox&#39;</span><span class="p">,</span> <span class="s1">&#39;DRUNet3D prox&#39;</span><span class="p">],</span>
+     <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon15</span><span class="p">,</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADnCNN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADRUNet2D</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTADRUNet3D</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FDK&#39;</span><span class="p">,</span> <span class="s1">&#39;TV&#39;</span> <span class="p">,</span> <span class="s1">&#39;DnCNN prox&#39;</span><span class="p">,</span> <span class="s1">&#39;DRUNet2D prox&#39;</span><span class="p">,</span> <span class="s1">&#39;DRUNet3D prox&#39;</span><span class="p">],</span>
+    <span class="n">slice_list</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span><span class="n">sx</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="n">ca1</span><span class="p">,</span><span class="n">ca2</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">120</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_56_0.png" src="../../_images/demos_fista_with_denoiser_56_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_fista_with_denoiser_56_1.png" src="../../_images/demos_fista_with_denoiser_56_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7f21e4958c80&gt;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="Summary">
+<h2>Summary<a class="headerlink" href="#Summary" title="Link to this heading">#</a></h2>
+<p>This notebook covers:</p>
+<ul class="simple">
+<li><p>How to set up an environment with CIL and pytorch and deep inverse</p></li>
+<li><p>How to create a CIL function to wrap a pytorch function or operator</p></li>
+<li><p>Examples of image reconstruction using a pre-trained denoiser in CIL</p></li>
+<li><p>Timings of the data copies between pytorch and CIL</p></li>
+</ul>
+</section>
+<section id="Future-work">
+<h2>Future work<a class="headerlink" href="#Future-work" title="Link to this heading">#</a></h2>
+<p>There is lots more work that we could have done on this showcase, for example, we could:</p>
+<ul class="simple">
+<li><p>Investigate different denoisers:</p>
+<ul>
+<li><p>Denoisers trained on tomography datasets or trained to remove limited angle tomography artefacts might be more effective in this case</p></li>
+<li><p>3D denoisers, potentially patch based, would be the <em>proper</em> way of doing the 3D denoising, and would replace our hacky method of applying the denoiser three for each call to proximal</p></li>
+<li><p>Certain denoisers have different mathematical properties e.g. continuity, convexity etc which leads on to…</p></li>
+</ul>
+</li>
+<li><p>Investigate different algorithms</p>
+<ul>
+<li><p>This trick of replacing the proximal with a denoiser can be done for a range of algorithms with different mathematical convergence properties, see e.g. <a class="reference external" href="https://arxiv.org/abs/1605.01710">“Plug-and-Play ADMM for Image Restoration: Fixed Point Convergence and Applications” Stanley H. Chan, Xiran Wang, Omar A. Elgendy</a> or <a class="reference external" href="https://arxiv.org/abs/1903.08616">“Plug and play methods for magnetic resonance imaging (long version)”, Rizwan Ahmad, Charles A. Bouman, Gregery T. Buzzard, Stanley Chan, Sizhou Liu, Edward T. Reehorst,
+Philip Schniter</a></p></li>
+</ul>
+</li>
+<li><p>Try with different data</p>
+<ul>
+<li><p>We could have considered different levels of noise in the data or different numbers of missing angles</p></li>
+<li><p>In this example, depending on what you were going on to do with the data, the TV reconstruction is still probably best. The plug and play denoisers could be improved by playing around with the regularisation parameters. However, different datasets may be more suited to this method</p></li>
+</ul>
+</li>
+<li><p>Increase efficiency of the implementation of the plug and play denoiser method</p>
+<ul>
+<li><p>We quantified the cost of copying to a from pytorch (and the GPU if you have it). This was not huge but still the 3D example case is reasonably slow ( 200 iterations in approx 5mins for me, compared to 20 seconds for the 3D TV reconstruction) and hopefully this could possibly be improved by:</p>
+<ul>
+<li><p>Work to make CIL data containers compatible with pytorch tensors to prevent the additional copies</p></li>
+<li><p>Looking at ways to batch the slices so they can be processed in parallel by the denoiser.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../memory_profiling_sandstone/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

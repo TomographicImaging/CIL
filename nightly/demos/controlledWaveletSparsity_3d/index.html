@@ -1,0 +1,1303 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Controlled Wavelet Sparsity using callbacks (3D data) &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/controlledWaveletSparsity_3d';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL" href="../013_Anisotropic_regularisation_FILD_measurements/" />
+    <link rel="prev" title="Controlled Wavelet Sparsity using callbacks (2D data)" href="../controlledWaveletSparsity_2d/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Data-processing">Data processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Controlled Wavelet Sparsity using callbacks (3D data)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#3D-laboratory-micro-CT,-fan-beam-data-of-a-seashell">3D laboratory micro-CT, fan-beam data of a seashell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Read-data-and-add-geometry">Read data and add geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Process-the-data">Process the data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Image-geometry-and-data">Image geometry and data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Wavelet-based-regularization">Wavelet based regularization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Wavelet-transform">Wavelet transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Fast-Iterative-Soft-Thresholding-Algorithm-(FISTA)">Fast Iterative Soft Thresholding Algorithm (FISTA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Limitations-of-the-method">Limitations of the method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/controlledWaveletSparsity_3d.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Controlled Wavelet Sparsity using callbacks (3D data)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#  Authored by:    Tommi Heikkilä (LUT)</span>
+<span class="c1">#  Reviewed by:    Margaret Duff (STFC-UKRI), Jakob Jørgensen (DTU)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using CIL version </span><span class="si">{</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using CIL version 24.2.0
+</pre></div></div>
+</div>
+<section id="Controlled-Wavelet-Sparsity-using-callbacks-(3D-data)">
+<h1>Controlled Wavelet Sparsity using callbacks (3D data)<a class="headerlink" href="#Controlled-Wavelet-Sparsity-using-callbacks-(3D-data)" title="Link to this heading">#</a></h1>
+<p>This notebook showcases an automated method for tuning the regularization parameter towards a good value during the optimization process. It is organized as follows.</p>
+<ol class="arabic simple">
+<li><p>Set up the data and the appropriate <a class="reference internal" href="#Create-geometry"><span class="std std-ref">geometry</span></a>. The projection images need to be converted to sinogram.</p></li>
+<li><p>Brief introduction to a representation system called wavelets and explaining what <a class="reference internal" href="#Wavelet-based-regularization"><span class="std std-ref">wavelet regularization</span></a> should do.</p>
+<ul class="simple">
+<li><p>Traditional run with fixed regularization parameter using FISTA</p></li>
+</ul>
+</li>
+<li><p>Brief explanation of the <a class="reference internal" href="#Automated-Controlled-Sparsity"><span class="std std-ref">controlled wavelet sparsity method</span></a> including the original source and how the CIL implementation is done.</p></li>
+<li><p>Some comments on the <a class="reference internal" href="#Limitations-of-the-method"><span class="std std-ref">limitations</span></a> of the method</p></li>
+</ol>
+<section id="3D-laboratory-micro-CT,-fan-beam-data-of-a-seashell">
+<h2>3D laboratory micro-CT, fan-beam data of a seashell<a class="headerlink" href="#3D-laboratory-micro-CT,-fan-beam-data-of-a-seashell" title="Link to this heading">#</a></h2>
+<p>This example uses the seashell dataset <code class="docutils literal notranslate"><span class="pre">20211124_seashell.zip</span></code> from <a class="reference external" href="https://doi.org/10.5281/zenodo.6983008">https://doi.org/10.5281/zenodo.6983008</a> :</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://zenodo.org/records/6983008/files/20211124_seashell.zip?download=1">https://zenodo.org/records/6983008/files/20211124_seashell.zip?download=1</a></p></li>
+</ul>
+<p>If running locally please download the data, unzip the folder and update the ‘path’ variable below.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./data&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># remove some annoying warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;dxchange&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>First import all of the modules we will need:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># cil imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">AcquisitionData</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeastSquares</span><span class="p">,</span> <span class="n">L1Sparsity</span><span class="p">,</span> <span class="n">ScaledFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaveletOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">FISTA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.astra</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionOperator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show_geometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.jupyter</span><span class="w"> </span><span class="kn">import</span> <span class="n">islicer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">TIFFStackReader</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span>
+</pre></div>
+</div>
+</div>
+<p>Load the seashell projections images (TIFFs). There are 721 projections in total, with 0.5 degree interval. We do not need all of them so let’s create data with sparser set of projections.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">skip</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;axis_0&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">skip</span><span class="p">),</span> <span class="s1">&#39;axis_1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;axis_2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/20211124_seashell&#39;</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">360.</span><span class="p">,</span> <span class="mi">720</span><span class="o">//</span><span class="n">skip</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Create-geometry">
+<h3>Create geometry<a class="headerlink" href="#Create-geometry" title="Link to this heading">#</a></h3>
+<p>We have to manually set the values for the correct geometry. These can be found in the documentation of the data: <code class="docutils literal notranslate"><span class="pre">20211124_seashell_.txt</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquisition geometry parameters</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="mf">210.66</span> <span class="c1"># Source-Origin-distance</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="mf">553.74</span> <span class="c1"># Source-Detector-distance</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">ODD</span> <span class="o">=</span> <span class="n">SDD</span> <span class="o">-</span> <span class="n">SOD</span> <span class="c1"># Origin-detector-distance</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">pixelSize</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+
+<span class="n">num_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2240</span><span class="p">,</span> <span class="mi">2368</span><span class="p">)</span> <span class="c1"># Projection image width and height</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+SOD: 210.660 mm
+SDD: 553.740 mm
+ODD: 343.080 mm
+Detector pixel size: 0.050 mm
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag_big</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ag_big</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">(</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">pixelSize</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">)</span>
+<span class="n">ag_big</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+<span class="n">ag_big</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ag_big</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3D Cone-beam tomography
+System configuration:
+        Source position: [   0.  , -210.66,    0.  ]
+        Rotation axis position: [0., 0., 0.]
+        Rotation axis direction: [ 0.,  0., -1.]
+        Detector position: [  0.  , 343.08,   0.  ]
+        Detector direction x: [1., 0., 0.]
+        Detector direction y: [0., 0., 1.]
+Panel configuration:
+        Number of pixels: [2240 2368]
+        Pixel size: [0.05 0.05]
+        Pixel origin: bottom-left
+Channel configuration:
+        Number of channels: 1
+Acquisition description:
+        Number of positions: 120
+        Angles 0-9 in degrees: [ 0.,  3.,  6.,  9., 12., 15., 18., 21., 24., 27.]
+        Angles 110-119 in degrees: [330., 333., 336., 339., 342., 345., 348., 351., 354., 357.]
+        Full angular array can be accessed with acquisition_data.geometry.angles
+Distances in units: mm
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show_geometry</span><span class="p">(</span><span class="n">ag_big</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_13_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_13_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Read-data-and-add-geometry">
+<h2>Read data and add geometry<a class="headerlink" href="#Read-data-and-add-geometry" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">big_raw_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_as_AcquisitionData</span><span class="p">(</span><span class="n">ag_big</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">big_raw_data</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">big_raw_data</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of dimensions: 3
+Shape: (120, 2368, 2240)
+Axis labels: (&lt;AcquisitionDimension.ANGLE: &#39;angle&#39;&gt;, &lt;AcquisitionDimension.VERTICAL: &#39;vertical&#39;&gt;, &lt;AcquisitionDimension.HORIZONTAL: &#39;horizontal&#39;&gt;)
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_16_1.png" src="../../_images/demos_controlledWaveletSparsity_3d_16_1.png" />
+</div>
+</div>
+</section>
+<section id="Process-the-data">
+<h2>Process the data<a class="headerlink" href="#Process-the-data" title="Link to this heading">#</a></h2>
+<p>We want to bin the data to smaller resolution and convert from transmission to absorption images</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binner</span><span class="p">,</span> <span class="n">TransmissionAbsorptionConverter</span>
+
+
+<span class="n">binning</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">binner_processor</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="n">binning</span><span class="p">),</span> <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">2284</span><span class="p">,</span> <span class="n">binning</span><span class="p">)})</span>
+<span class="n">binner_processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">big_raw_data</span><span class="p">)</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">binner_processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="c1"># Get the raw intensity from the mean of the k largest values</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">max_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">raw_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="o">-</span><span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="o">-</span><span class="n">k</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">transmission_processor</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">(</span><span class="n">white_level</span><span class="o">=</span><span class="n">max_k</span><span class="p">)</span>
+<span class="n">transmission_processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">transmission_processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+
+<span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_18_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_18_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of dimensions: 3
+Shape: (120, 220, 180)
+Axis labels: (&lt;AcquisitionDimension.ANGLE: &#39;angle&#39;&gt;, &lt;AcquisitionDimension.VERTICAL: &#39;vertical&#39;&gt;, &lt;AcquisitionDimension.HORIZONTAL: &#39;horizontal&#39;&gt;)
+
+</pre></div></div>
+</div>
+</section>
+<section id="Image-geometry-and-data">
+<h2>Image geometry and data<a class="headerlink" href="#Image-geometry-and-data" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup image geometry</span>
+<span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">nx</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">nx</span>
+<span class="n">ig</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">=</span> <span class="n">nz</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x180,y180,z220
+voxel_size : x0.1902156246613934,y0.1902156246613934,z0.1902156246613934
+center : x0,y0,z0
+
+</pre></div></div>
+</div>
+<section id="Reconstructions">
+<h3>Reconstructions<a class="headerlink" href="#Reconstructions" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+
+<span class="n">x_bp</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Simple backprojection</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">x_bp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Naive backprojection&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_22_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_22_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">x_bp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "bfffb76750c14b78acc56f9c4c185124", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Wavelet-based-regularization">
+<h1>Wavelet based regularization<a class="headerlink" href="#Wavelet-based-regularization" title="Link to this heading">#</a></h1>
+<p>Classical approach in imaging problems (such as CT, denoising, etc.) is to try represent the key information about the solution using a wavelet basis. By construction a relatively sparse solution (i.e. only few nonzero components) should suffice, as opposed to pixel-based representation.</p>
+<p>In short, we have the least squares data mismatch term of form</p>
+<div class="math notranslate nohighlight">
+\[\frac{1}{2} \| A x - m_\delta \|_2^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is the forward operator, <span class="math notranslate nohighlight">\(m_\delta\)</span> is the noisy data and <span class="math notranslate nohighlight">\(x\)</span> is the unknown solution. Then we add a regularization term of the form</p>
+<div class="math notranslate nohighlight">
+\[\alpha \| W(x) \|_1 = \alpha \sum_{j,k} | c(x)_{j,k} |,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha &gt; 0\)</span> is the regularization term (balacing our trust in data and need in regularization) and <span class="math notranslate nohighlight">\(W\)</span> is the Discrete Wavelet Transform operator which decomposes any input <span class="math notranslate nohighlight">\(x\)</span> (signal, image or volume) into a sequence of coefficients <span class="math notranslate nohighlight">\(c(x)_{j,k}\)</span> of varying scale (<span class="math notranslate nohighlight">\(j \in \mathbb{N}\)</span>) and location (<span class="math notranslate nohighlight">\(k \in \mathbb{Z}^d\)</span>), such that</p>
+<div class="math notranslate nohighlight">
+\[x = \sum_{j,k} c(x)_{j,k} \psi_{j,k}.\]</div>
+<section id="Wavelet-transform">
+<h2>Wavelet transform<a class="headerlink" href="#Wavelet-transform" title="Link to this heading">#</a></h2>
+<p>Classical choice is one of the orthogonal wavelets of <a class="reference external" href="https://en.wikipedia.org/wiki/Ingrid_Daubechies">Ingrid Daubechies</a>, usually distinguished by their smoothness properties. For example the Daubechies-2 wavelets always give continuous approximations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wname</span> <span class="o">=</span> <span class="s1">&#39;db2&#39;</span>
+<span class="n">level</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">W</span> <span class="o">=</span> <span class="n">WaveletOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">wname</span><span class="o">=</span><span class="n">wname</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Fast-Iterative-Soft-Thresholding-Algorithm-(FISTA)">
+<h2>Fast Iterative Soft Thresholding Algorithm (FISTA)<a class="headerlink" href="#Fast-Iterative-Soft-Thresholding-Algorithm-(FISTA)" title="Link to this heading">#</a></h2>
+<div class="line-block">
+<div class="line">Equally classic choice of minimization algrorithm in the (Fast) Iterative Soft Thresholding Algorithm (ISTA), originally developed for wavelet-based denoising in</div>
+<div class="line">&gt; Daubechies, I, Defrise, M, &amp; De Mol, C..</div>
+<div class="line"><em>An iterative thresholding algorithm for linear inverse problems with a sparsity constraint.</em></div>
+<div class="line">Communications on Pure and Applied Mathematics: A Journal Issued by the Courant Institute of Mathematical Sciences 57.11 (2004): 1413-1457.</div>
+</div>
+<p>Although we will run the accelerated version.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">L1Sparsity</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="n">tau</span> <span class="o">=</span> <span class="mf">1e-5</span>  <span class="c1"># Regularization parameter</span>
+
+<span class="n">fista</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">tau</span><span class="o">*</span><span class="n">g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s run arbitrary number of iterations (200)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2abcf092fce4493b98d7f12337081c2a", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_fista</span> <span class="o">=</span> <span class="n">fista</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">x_fista</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;FISTA with </span><span class="si">{</span><span class="n">tau</span><span class="w"> </span><span class="si">= }</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">90</span><span class="p">)]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_31_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_31_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">x_fista</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;FISTA with </span><span class="si">{</span><span class="n">tau</span><span class="w"> </span><span class="si">= }</span><span class="s2">,&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b90e5071030f4fb4b840e71d7c383525", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<p>Looks okay but how do we know the choice of regularization parameter was good? Could we get a better result with another value? Do we have the patience to try out dozens or even hundreds of values?</p>
+<section id="Automated-Controlled-Sparsity">
+<h3>Automated Controlled Sparsity<a class="headerlink" href="#Automated-Controlled-Sparsity" title="Link to this heading">#</a></h3>
+<div class="line-block">
+<div class="line">We follow the automated tuning strategy as introduced in</div>
+<div class="line">&gt; Purisha, Z., Rimpeläinen, J., Bubba, T., &amp; Siltanen, S. (2017).</div>
+<div class="line"><em>Controlled wavelet domain sparsity for x-ray tomography</em>.</div>
+<div class="line">Measurement Science and Technology, 29(1), 014002.</div>
+<div class="line"><a class="reference external" href="https://doi.org/10.1088/1361-6501/aa9260">DOI:10.1088/1361-6501/aa9260</a></div>
+</div>
+<p>We’ll try to implement it as a <code class="docutils literal notranslate"><span class="pre">StepSizeRule</span></code> and <code class="docutils literal notranslate"><span class="pre">callback</span></code>. However we are NOT actually changing the <code class="docutils literal notranslate"><span class="pre">step_size</span></code> (which is based on the Lipschitz constant of the data mistmatch term) but the regularization parameter <code class="docutils literal notranslate"><span class="pre">tau</span></code>. However, we can update it every iterate by using <code class="docutils literal notranslate"><span class="pre">StepSizeRule</span></code> (in fact we could pass it an actual <code class="docutils literal notranslate"><span class="pre">StepSizeRule</span></code> to perform but let’s just stick with constant value for now).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">SparsityControl</span><span class="w"> </span><span class="kn">import</span> <span class="n">ControlledSparsity</span><span class="p">,</span> <span class="n">DesiredSparsity</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reg_weight</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="c1"># Automated tuning of regularization parameter, smaller step_weight makes the tuning slightly slower -&gt; not as severe overshoot in reg. param. value</span>
+<span class="n">sparsity_ctrl</span> <span class="o">=</span> <span class="n">ControlledSparsity</span><span class="p">(</span><span class="n">desired_sparsity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">step_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">fista_controlled</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">reg_weight</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">sparsity_ctrl</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sparsity based stopping rule</span>
+<span class="n">sparsity_stop</span> <span class="o">=</span> <span class="n">DesiredSparsity</span><span class="p">(</span><span class="n">print_stuff</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rel_change_tol</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fista_controlled</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">sparsity_stop</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Iteration : 5 | Current sparsity: 0.751 | Regularization param.: 1.02e-02 | Desired sparsity: 0.300 | Difference: 0.451 | Beta: 2.55e-04 | Relative change: 1.27e-01
+Iteration : 10 | Current sparsity: 0.747 | Regularization param.: 1.07e-02 | Desired sparsity: 0.300 | Difference: 0.447 | Beta: 2.55e-04 | Relative change: 6.41e-02
+Iteration : 15 | Current sparsity: 0.739 | Regularization param.: 1.13e-02 | Desired sparsity: 0.300 | Difference: 0.439 | Beta: 2.55e-04 | Relative change: 3.75e-02
+Iteration : 20 | Current sparsity: 0.731 | Regularization param.: 1.18e-02 | Desired sparsity: 0.300 | Difference: 0.431 | Beta: 2.55e-04 | Relative change: 2.38e-02
+Iteration : 25 | Current sparsity: 0.722 | Regularization param.: 1.24e-02 | Desired sparsity: 0.300 | Difference: 0.422 | Beta: 2.55e-04 | Relative change: 1.58e-02
+Iteration : 30 | Current sparsity: 0.713 | Regularization param.: 1.29e-02 | Desired sparsity: 0.300 | Difference: 0.413 | Beta: 2.55e-04 | Relative change: 1.09e-02
+Iteration : 35 | Current sparsity: 0.703 | Regularization param.: 1.34e-02 | Desired sparsity: 0.300 | Difference: 0.403 | Beta: 2.55e-04 | Relative change: 7.90e-03
+Iteration : 40 | Current sparsity: 0.692 | Regularization param.: 1.39e-02 | Desired sparsity: 0.300 | Difference: 0.392 | Beta: 2.55e-04 | Relative change: 6.20e-03
+Iteration : 45 | Current sparsity: 0.682 | Regularization param.: 1.44e-02 | Desired sparsity: 0.300 | Difference: 0.382 | Beta: 2.55e-04 | Relative change: 5.25e-03
+Iteration : 50 | Current sparsity: 0.671 | Regularization param.: 1.49e-02 | Desired sparsity: 0.300 | Difference: 0.371 | Beta: 2.55e-04 | Relative change: 4.65e-03
+Iteration : 55 | Current sparsity: 0.660 | Regularization param.: 1.54e-02 | Desired sparsity: 0.300 | Difference: 0.360 | Beta: 2.55e-04 | Relative change: 4.17e-03
+Iteration : 60 | Current sparsity: 0.649 | Regularization param.: 1.58e-02 | Desired sparsity: 0.300 | Difference: 0.349 | Beta: 2.55e-04 | Relative change: 3.74e-03
+Iteration : 65 | Current sparsity: 0.637 | Regularization param.: 1.63e-02 | Desired sparsity: 0.300 | Difference: 0.337 | Beta: 2.55e-04 | Relative change: 3.37e-03
+Iteration : 70 | Current sparsity: 0.626 | Regularization param.: 1.67e-02 | Desired sparsity: 0.300 | Difference: 0.326 | Beta: 2.55e-04 | Relative change: 3.07e-03
+Iteration : 75 | Current sparsity: 0.614 | Regularization param.: 1.71e-02 | Desired sparsity: 0.300 | Difference: 0.314 | Beta: 2.55e-04 | Relative change: 2.84e-03
+Iteration : 80 | Current sparsity: 0.602 | Regularization param.: 1.75e-02 | Desired sparsity: 0.300 | Difference: 0.302 | Beta: 2.55e-04 | Relative change: 2.66e-03
+Iteration : 85 | Current sparsity: 0.590 | Regularization param.: 1.79e-02 | Desired sparsity: 0.300 | Difference: 0.290 | Beta: 2.55e-04 | Relative change: 2.51e-03
+Iteration : 90 | Current sparsity: 0.578 | Regularization param.: 1.82e-02 | Desired sparsity: 0.300 | Difference: 0.278 | Beta: 2.55e-04 | Relative change: 2.38e-03
+Iteration : 95 | Current sparsity: 0.566 | Regularization param.: 1.86e-02 | Desired sparsity: 0.300 | Difference: 0.266 | Beta: 2.55e-04 | Relative change: 2.26e-03
+Iteration : 100 | Current sparsity: 0.554 | Regularization param.: 1.89e-02 | Desired sparsity: 0.300 | Difference: 0.254 | Beta: 2.55e-04 | Relative change: 2.15e-03
+Iteration : 105 | Current sparsity: 0.542 | Regularization param.: 1.92e-02 | Desired sparsity: 0.300 | Difference: 0.242 | Beta: 2.55e-04 | Relative change: 2.06e-03
+Iteration : 110 | Current sparsity: 0.530 | Regularization param.: 1.95e-02 | Desired sparsity: 0.300 | Difference: 0.230 | Beta: 2.55e-04 | Relative change: 1.97e-03
+Iteration : 115 | Current sparsity: 0.518 | Regularization param.: 1.98e-02 | Desired sparsity: 0.300 | Difference: 0.218 | Beta: 2.55e-04 | Relative change: 1.89e-03
+Iteration : 120 | Current sparsity: 0.506 | Regularization param.: 2.01e-02 | Desired sparsity: 0.300 | Difference: 0.206 | Beta: 2.55e-04 | Relative change: 1.82e-03
+Iteration : 125 | Current sparsity: 0.495 | Regularization param.: 2.03e-02 | Desired sparsity: 0.300 | Difference: 0.195 | Beta: 2.55e-04 | Relative change: 1.75e-03
+Iteration : 130 | Current sparsity: 0.484 | Regularization param.: 2.05e-02 | Desired sparsity: 0.300 | Difference: 0.184 | Beta: 2.55e-04 | Relative change: 1.68e-03
+Iteration : 135 | Current sparsity: 0.473 | Regularization param.: 2.08e-02 | Desired sparsity: 0.300 | Difference: 0.173 | Beta: 2.55e-04 | Relative change: 1.62e-03
+Iteration : 140 | Current sparsity: 0.463 | Regularization param.: 2.10e-02 | Desired sparsity: 0.300 | Difference: 0.163 | Beta: 2.55e-04 | Relative change: 1.56e-03
+Iteration : 145 | Current sparsity: 0.453 | Regularization param.: 2.12e-02 | Desired sparsity: 0.300 | Difference: 0.153 | Beta: 2.55e-04 | Relative change: 1.50e-03
+Iteration : 150 | Current sparsity: 0.444 | Regularization param.: 2.14e-02 | Desired sparsity: 0.300 | Difference: 0.144 | Beta: 2.55e-04 | Relative change: 1.45e-03
+Iteration : 155 | Current sparsity: 0.435 | Regularization param.: 2.15e-02 | Desired sparsity: 0.300 | Difference: 0.135 | Beta: 2.55e-04 | Relative change: 1.40e-03
+Iteration : 160 | Current sparsity: 0.426 | Regularization param.: 2.17e-02 | Desired sparsity: 0.300 | Difference: 0.126 | Beta: 2.55e-04 | Relative change: 1.35e-03
+Iteration : 165 | Current sparsity: 0.418 | Regularization param.: 2.19e-02 | Desired sparsity: 0.300 | Difference: 0.118 | Beta: 2.55e-04 | Relative change: 1.31e-03
+Iteration : 170 | Current sparsity: 0.410 | Regularization param.: 2.20e-02 | Desired sparsity: 0.300 | Difference: 0.110 | Beta: 2.55e-04 | Relative change: 1.27e-03
+Iteration : 175 | Current sparsity: 0.403 | Regularization param.: 2.21e-02 | Desired sparsity: 0.300 | Difference: 0.103 | Beta: 2.55e-04 | Relative change: 1.23e-03
+Iteration : 180 | Current sparsity: 0.396 | Regularization param.: 2.23e-02 | Desired sparsity: 0.300 | Difference: 0.096 | Beta: 2.55e-04 | Relative change: 1.19e-03
+Iteration : 185 | Current sparsity: 0.390 | Regularization param.: 2.24e-02 | Desired sparsity: 0.300 | Difference: 0.090 | Beta: 2.55e-04 | Relative change: 1.15e-03
+Iteration : 190 | Current sparsity: 0.384 | Regularization param.: 2.25e-02 | Desired sparsity: 0.300 | Difference: 0.084 | Beta: 2.55e-04 | Relative change: 1.12e-03
+Iteration : 195 | Current sparsity: 0.378 | Regularization param.: 2.26e-02 | Desired sparsity: 0.300 | Difference: 0.078 | Beta: 2.55e-04 | Relative change: 1.09e-03
+Iteration : 200 | Current sparsity: 0.373 | Regularization param.: 2.27e-02 | Desired sparsity: 0.300 | Difference: 0.073 | Beta: 2.55e-04 | Relative change: 1.05e-03
+Iteration : 205 | Current sparsity: 0.368 | Regularization param.: 2.28e-02 | Desired sparsity: 0.300 | Difference: 0.068 | Beta: 2.55e-04 | Relative change: 1.02e-03
+Iteration : 210 | Current sparsity: 0.364 | Regularization param.: 2.29e-02 | Desired sparsity: 0.300 | Difference: 0.064 | Beta: 2.55e-04 | Relative change: 9.95e-04
+Iteration : 215 | Current sparsity: 0.359 | Regularization param.: 2.29e-02 | Desired sparsity: 0.300 | Difference: 0.059 | Beta: 2.55e-04 | Relative change: 9.67e-04
+Iteration : 220 | Current sparsity: 0.356 | Regularization param.: 2.30e-02 | Desired sparsity: 0.300 | Difference: 0.056 | Beta: 2.55e-04 | Relative change: 9.40e-04
+Iteration : 225 | Current sparsity: 0.352 | Regularization param.: 2.31e-02 | Desired sparsity: 0.300 | Difference: 0.052 | Beta: 2.55e-04 | Relative change: 9.13e-04
+Iteration : 230 | Current sparsity: 0.348 | Regularization param.: 2.32e-02 | Desired sparsity: 0.300 | Difference: 0.048 | Beta: 2.55e-04 | Relative change: 8.88e-04
+Iteration : 235 | Current sparsity: 0.345 | Regularization param.: 2.32e-02 | Desired sparsity: 0.300 | Difference: 0.045 | Beta: 2.55e-04 | Relative change: 8.64e-04
+Iteration : 240 | Current sparsity: 0.342 | Regularization param.: 2.33e-02 | Desired sparsity: 0.300 | Difference: 0.042 | Beta: 2.55e-04 | Relative change: 8.40e-04
+Iteration : 245 | Current sparsity: 0.340 | Regularization param.: 2.33e-02 | Desired sparsity: 0.300 | Difference: 0.040 | Beta: 2.55e-04 | Relative change: 8.18e-04
+Iteration : 250 | Current sparsity: 0.337 | Regularization param.: 2.34e-02 | Desired sparsity: 0.300 | Difference: 0.037 | Beta: 2.55e-04 | Relative change: 7.96e-04
+Iteration : 255 | Current sparsity: 0.335 | Regularization param.: 2.34e-02 | Desired sparsity: 0.300 | Difference: 0.035 | Beta: 2.55e-04 | Relative change: 7.74e-04
+Iteration : 260 | Current sparsity: 0.332 | Regularization param.: 2.35e-02 | Desired sparsity: 0.300 | Difference: 0.032 | Beta: 2.55e-04 | Relative change: 7.54e-04
+Iteration : 265 | Current sparsity: 0.330 | Regularization param.: 2.35e-02 | Desired sparsity: 0.300 | Difference: 0.030 | Beta: 2.55e-04 | Relative change: 7.34e-04
+Iteration : 270 | Current sparsity: 0.328 | Regularization param.: 2.35e-02 | Desired sparsity: 0.300 | Difference: 0.028 | Beta: 2.55e-04 | Relative change: 7.15e-04
+Iteration : 275 | Current sparsity: 0.326 | Regularization param.: 2.36e-02 | Desired sparsity: 0.300 | Difference: 0.026 | Beta: 2.55e-04 | Relative change: 6.96e-04
+Iteration : 280 | Current sparsity: 0.325 | Regularization param.: 2.36e-02 | Desired sparsity: 0.300 | Difference: 0.025 | Beta: 2.55e-04 | Relative change: 6.78e-04
+Iteration : 285 | Current sparsity: 0.323 | Regularization param.: 2.36e-02 | Desired sparsity: 0.300 | Difference: 0.023 | Beta: 2.55e-04 | Relative change: 6.61e-04
+Iteration : 290 | Current sparsity: 0.322 | Regularization param.: 2.37e-02 | Desired sparsity: 0.300 | Difference: 0.022 | Beta: 2.55e-04 | Relative change: 6.44e-04
+Iteration : 295 | Current sparsity: 0.320 | Regularization param.: 2.37e-02 | Desired sparsity: 0.300 | Difference: 0.020 | Beta: 2.55e-04 | Relative change: 6.28e-04
+Iteration : 300 | Current sparsity: 0.319 | Regularization param.: 2.37e-02 | Desired sparsity: 0.300 | Difference: 0.019 | Beta: 2.55e-04 | Relative change: 6.12e-04
+Iteration : 305 | Current sparsity: 0.317 | Regularization param.: 2.37e-02 | Desired sparsity: 0.300 | Difference: 0.017 | Beta: 2.55e-04 | Relative change: 5.97e-04
+Iteration : 310 | Current sparsity: 0.316 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.016 | Beta: 2.55e-04 | Relative change: 5.82e-04
+Iteration : 315 | Current sparsity: 0.315 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.015 | Beta: 2.55e-04 | Relative change: 5.68e-04
+Iteration : 320 | Current sparsity: 0.314 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.014 | Beta: 2.55e-04 | Relative change: 5.54e-04
+Iteration : 325 | Current sparsity: 0.313 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.013 | Beta: 2.55e-04 | Relative change: 5.41e-04
+Iteration : 330 | Current sparsity: 0.312 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.012 | Beta: 2.55e-04 | Relative change: 5.28e-04
+Iteration : 335 | Current sparsity: 0.311 | Regularization param.: 2.38e-02 | Desired sparsity: 0.300 | Difference: 0.011 | Beta: 2.55e-04 | Relative change: 5.15e-04
+Iteration : 340 | Current sparsity: 0.311 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.011 | Beta: 2.55e-04 | Relative change: 5.03e-04
+Iteration : 345 | Current sparsity: 0.310 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.010 | Beta: 2.55e-04 | Relative change: 4.91e-04
+Iteration : 350 | Current sparsity: 0.309 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.009 | Beta: 2.55e-04 | Relative change: 4.80e-04
+Iteration : 355 | Current sparsity: 0.308 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.008 | Beta: 2.55e-04 | Relative change: 4.69e-04
+Iteration : 360 | Current sparsity: 0.308 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.008 | Beta: 2.55e-04 | Relative change: 4.58e-04
+Iteration : 365 | Current sparsity: 0.307 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.007 | Beta: 2.55e-04 | Relative change: 4.48e-04
+Iteration : 370 | Current sparsity: 0.306 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.006 | Beta: 2.55e-04 | Relative change: 4.38e-04
+Iteration : 375 | Current sparsity: 0.306 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.006 | Beta: 2.55e-04 | Relative change: 4.28e-04
+Iteration : 380 | Current sparsity: 0.305 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.005 | Beta: 2.55e-04 | Relative change: 4.19e-04
+Iteration : 385 | Current sparsity: 0.305 | Regularization param.: 2.39e-02 | Desired sparsity: 0.300 | Difference: 0.005 | Beta: 2.55e-04 | Relative change: 4.10e-04
+Desired sparsity reached after 385 iterations!
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_controlled</span> <span class="o">=</span> <span class="n">fista_controlled</span><span class="o">.</span><span class="n">solution</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">x_fista</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Fixed reg. param.&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">90</span><span class="p">)]);</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">x_controlled</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Automated reg. param.&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">90</span><span class="p">)]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_39_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_39_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_39_1.png" src="../../_images/demos_controlledWaveletSparsity_3d_39_1.png" />
+</div>
+</div>
+<p>We can use islicer to view the automated controlled solution:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">x_controlled</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Automated parameter choice&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "67128c493d7749b6be2794490a9b17aa", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="n">fista_controlled</span><span class="o">.</span><span class="n">iterations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sparsity_ctrl</span><span class="o">.</span><span class="n">sparsity_vals</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Current sparsity&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">sparsity_ctrl</span><span class="o">.</span><span class="n">desired_sparsity</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Desired sparsity&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Sparsity level&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">sparsity_ctrl</span><span class="o">.</span><span class="n">reg_param_vals</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Regularization parameter&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">label_outer</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_controlledWaveletSparsity_3d_42_0.png" src="../../_images/demos_controlledWaveletSparsity_3d_42_0.png" />
+</div>
+</div>
+<p>Here we can see how increasing the regularization parameter (lower plot) drives the sparsity level down towards the desired level (top plot). The iteration can be stopped once the suitable level has been reached (and the relative change is small enough).</p>
+<p>Notice also how the tuning is adaptive, in the sense that as we get closer to the desired sparsity level, the incremental changes in the regularization parameter get finer.</p>
+</section>
+</section>
+<section id="Limitations-of-the-method">
+<h2>Limitations of the method<a class="headerlink" href="#Limitations-of-the-method" title="Link to this heading">#</a></h2>
+<p>The method does not fully automate the choice of regularization parameter as the desired sparsity level and some of the tuning parameters still need to be chosen. However, chosing a good level of sparsity is much easier, the values are clearly bounded between 0 and 1 (corresponding to 0% and 100% of coefficients being “meaningful”) and the tuning parameters mostly affect the speed on the method. Moreover, with bit of experience, it is relatively easy to tell early whether the choice will be good
+and restart the algorithm if needed.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../controlledWaveletSparsity_2d/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Controlled Wavelet Sparsity using callbacks (2D data)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../013_Anisotropic_regularisation_FILD_measurements/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1271 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Introduction &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=085432a65528ed429d34" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=085432a65528ed429d34"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
+
+    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'demos/bruker2cil';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Exciscope Polaris phase contrast reconstruction with CIL" href="../recon_phasecontrast_exciscope/" />
+    <link rel="prev" title="Offset reconstruction" href="../Apple_offset_reconstruction/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../usershowcase/">User showcase</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../Multibang_Hackathon2023/">Multibang Regularisation in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Data-processing">Data processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Optional:-Apply-Centre-of-Rotation-Corrector">Optional: Apply Centre of Rotation Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Optional:-Slicing">Optional: Slicing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Optional:-Ring-artefact-removal">Optional: Ring artefact removal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Optional:-Data-binning">Optional: Data binning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/TomographicImaging/CIL/edit/master/docs/source/demos/bruker2cil.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Introduction</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#  Copyright 2024 Till Leissner</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#   Authored by: Till Leissner (University of Southern Denmark)</span>
+<span class="c1">#   Edited by: Margaret Duff (Science and Technology Facilities Council - UKRI )</span>
+<span class="c1">#</span>
+<span class="c1">#   We acknowledge support from the ESS Lighthouse on Hard Materials in 3D, SOLID, funded by the Danish Agency for Science and Higher Education (grant No. 8144-00002B).</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### General imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="c1">#import json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interact</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+
+<span class="c1">### Import all CIL components needed</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">tigre</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">TIFFWriter</span><span class="p">,</span> <span class="n">TIFFStackReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CentreOfRotationCorrector</span><span class="p">,</span> <span class="n">Binner</span><span class="p">,</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span><span class="n">RingRemover</span><span class="p">,</span> <span class="n">Slicer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.recon</span><span class="w"> </span><span class="kn">import</span> <span class="n">FDK</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show2D</span><span class="p">,</span> <span class="n">show_geometry</span>
+
+<span class="c1">### Import custom helper functions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bruker2cil</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bc</span>
+<br/></pre></div>
+</div>
+</div>
+<p>This notebook has been tested with CIL version 24.0.0</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">cil</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+24.0.0
+</pre></div></div>
+</div>
+<section id="Introduction">
+<h1>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h1>
+<p>This notebook showcases the volume reconstruction of microCT projection data obtained with a <em>Bruker Skyscan 2214</em> using a flat panel detector and a source voltage of 125 kV at 69 µA. Projections are available as 16-bit tiffs.</p>
+<p>The image normalisation</p>
+<div class="math notranslate nohighlight">
+\[\frac{(projection - darkfield)}{(flatfield - darkfield)}\]</div>
+<p>has been already applied during the data aquisition.</p>
+<p>All files created during a scan are located in a single flat folder.</p>
+<p>Four test data sets are provided:</p>
+<p><ul class="simple">
+<li><p><strong>01-switch-small</strong>: a 360 deg scan of a pushbutton switch (binning 4x4)</p></li>
+<li><p><strong>02-switch-large</strong>: a 360 deg scan of a pushbutton switch (no binning)</p></li>
+<li><p><strong>03-coffee</strong>: a 180 deg scan of a coffee bean</p></li>
+<li><p><strong>04-citron</strong>: a 180 deg scan of a citron</p></li>
+</ul>
+<p>The data sets are available a compressed zip archives on <a class="reference external" href="https://doi.org/10.5281/zenodo.11258475"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.11258475.svg" /></a></p>
+<p>To run this notebook, we recommend making a new directory <code class="docutils literal notranslate"><span class="pre">samples</span></code> and then, in that directory, downloading and unpacking <code class="docutils literal notranslate"><span class="pre">01-switch-small</span></code> e.g. using <code class="docutils literal notranslate"><span class="pre">wget</span> <span class="pre">https://zenodo.org/records/11258475/files/01-switch-small.zip</span></code> and running <code class="docutils literal notranslate"><span class="pre">unzip</span> <span class="pre">01-switch-small.zip</span></code>.</p>
+<p>Example reconstructions of the other datasets can be found in te folder <code class="docutils literal notranslate"><span class="pre">extra_example_notebooks</span></code>.</p>
+</section>
+<section id="Set-variables-and-paths">
+<h1>Set variables and paths<a class="headerlink" href="#Set-variables-and-paths" title="Link to this heading">#</a></h1>
+<p>To get started a few path variables have to be defined:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datadir</span> <span class="o">=</span> <span class="s1">&#39;./samples/01-switch-small&#39;</span> <span class="c1"># Path to the dataset</span>
+<span class="n">dataset_prefix</span> <span class="o">=</span> <span class="s1">&#39;001_&#39;</span> <span class="c1"># Filename prefix</span>
+
+<span class="c1"># Usually you do not need to change the following.</span>
+<span class="n">infofile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span>
+<span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;.log&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Create-acquisition-geometry">
+<h1>Create acquisition geometry<a class="headerlink" href="#Create-acquisition-geometry" title="Link to this heading">#</a></h1>
+<p>The function <em>set_geometry</em> will parse the “.info” and the “.log” files, determine the scan parameters and create the corresponding CIL acquisition geometry.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#ag = bc.set_geometry(logfile,infofile=infofile) # This will use the info file to determine the actually achieved projection angles</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span> <span class="c1"># This will use the angular step size from the log file to determine the projection angles</span>
+<span class="n">show_geometry</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_8_0.png" src="../../_images/demos_bruker2cil_8_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show_geometry at 0x7fbf7c072480&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Read-files">
+<h1>Read files<a class="headerlink" href="#Read-files" title="Link to this heading">#</a></h1>
+<p>The helper function <code class="docutils literal notranslate"><span class="pre">get_filelist</span></code> will create a list of projection files. Further I check if the number of images corresponds to the number of angles obtained from the .info file. Afterwards the images are loaded using the CIL TIFFStackReader class and the projections and sinograms visualised.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filelist</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get_filelist</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ag</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning: Number of files does not correspond to number of rotational steps!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;./samples/01-switch-small/001_00000000.tif&#39;, &#39;./samples/01-switch-small/001_00000001.tif&#39;, &#39;./samples/01-switch-small/001_00000002.tif&#39;, &#39;./samples/01-switch-small/001_00000003.tif&#39;, &#39;./samples/01-switch-small/001_00000004.tif&#39;, &#39;./samples/01-switch-small/001_00000005.tif&#39;, &#39;./samples/01-switch-small/001_00000006.tif&#39;, &#39;./samples/01-switch-small/001_00000007.tif&#39;, &#39;./samples/01-switch-small/001_00000008.tif&#39;, &#39;./samples/01-switch-small/001_00000009.tif&#39;, &#39;./samples/01-switch-small/001_00000010.tif&#39;, &#39;./samples/01-switch-small/001_00000011.tif&#39;, &#39;./samples/01-switch-small/001_00000012.tif&#39;, &#39;./samples/01-switch-small/001_00000013.tif&#39;, &#39;./samples/01-switch-small/001_00000014.tif&#39;, &#39;./samples/01-switch-small/001_00000015.tif&#39;, &#39;./samples/01-switch-small/001_00000016.tif&#39;, &#39;./samples/01-switch-small/001_00000017.tif&#39;, &#39;./samples/01-switch-small/001_00000018.tif&#39;, &#39;./samples/01-switch-small/001_00000019.tif&#39;, &#39;./samples/01-switch-small/001_00000020.tif&#39;, &#39;./samples/01-switch-small/001_00000021.tif&#39;, &#39;./samples/01-switch-small/001_00000022.tif&#39;, &#39;./samples/01-switch-small/001_00000023.tif&#39;, &#39;./samples/01-switch-small/001_00000024.tif&#39;, &#39;./samples/01-switch-small/001_00000025.tif&#39;, &#39;./samples/01-switch-small/001_00000026.tif&#39;, &#39;./samples/01-switch-small/001_00000027.tif&#39;, &#39;./samples/01-switch-small/001_00000028.tif&#39;, &#39;./samples/01-switch-small/001_00000029.tif&#39;, &#39;./samples/01-switch-small/001_00000030.tif&#39;, &#39;./samples/01-switch-small/001_00000031.tif&#39;, &#39;./samples/01-switch-small/001_00000032.tif&#39;, &#39;./samples/01-switch-small/001_00000033.tif&#39;, &#39;./samples/01-switch-small/001_00000034.tif&#39;, &#39;./samples/01-switch-small/001_00000035.tif&#39;, &#39;./samples/01-switch-small/001_00000036.tif&#39;, &#39;./samples/01-switch-small/001_00000037.tif&#39;, &#39;./samples/01-switch-small/001_00000038.tif&#39;, &#39;./samples/01-switch-small/001_00000039.tif&#39;, &#39;./samples/01-switch-small/001_00000040.tif&#39;, &#39;./samples/01-switch-small/001_00000041.tif&#39;, &#39;./samples/01-switch-small/001_00000042.tif&#39;, &#39;./samples/01-switch-small/001_00000043.tif&#39;, &#39;./samples/01-switch-small/001_00000044.tif&#39;, &#39;./samples/01-switch-small/001_00000045.tif&#39;, &#39;./samples/01-switch-small/001_00000046.tif&#39;, &#39;./samples/01-switch-small/001_00000047.tif&#39;, &#39;./samples/01-switch-small/001_00000048.tif&#39;, &#39;./samples/01-switch-small/001_00000049.tif&#39;, &#39;./samples/01-switch-small/001_00000050.tif&#39;, &#39;./samples/01-switch-small/001_00000051.tif&#39;, &#39;./samples/01-switch-small/001_00000052.tif&#39;, &#39;./samples/01-switch-small/001_00000053.tif&#39;, &#39;./samples/01-switch-small/001_00000054.tif&#39;, &#39;./samples/01-switch-small/001_00000055.tif&#39;, &#39;./samples/01-switch-small/001_00000056.tif&#39;, &#39;./samples/01-switch-small/001_00000057.tif&#39;, &#39;./samples/01-switch-small/001_00000058.tif&#39;, &#39;./samples/01-switch-small/001_00000059.tif&#39;, &#39;./samples/01-switch-small/001_00000060.tif&#39;, &#39;./samples/01-switch-small/001_00000061.tif&#39;, &#39;./samples/01-switch-small/001_00000062.tif&#39;, &#39;./samples/01-switch-small/001_00000063.tif&#39;, &#39;./samples/01-switch-small/001_00000064.tif&#39;, &#39;./samples/01-switch-small/001_00000065.tif&#39;, &#39;./samples/01-switch-small/001_00000066.tif&#39;, &#39;./samples/01-switch-small/001_00000067.tif&#39;, &#39;./samples/01-switch-small/001_00000068.tif&#39;, &#39;./samples/01-switch-small/001_00000069.tif&#39;, &#39;./samples/01-switch-small/001_00000070.tif&#39;, &#39;./samples/01-switch-small/001_00000071.tif&#39;, &#39;./samples/01-switch-small/001_00000072.tif&#39;, &#39;./samples/01-switch-small/001_00000073.tif&#39;, &#39;./samples/01-switch-small/001_00000074.tif&#39;, &#39;./samples/01-switch-small/001_00000075.tif&#39;, &#39;./samples/01-switch-small/001_00000076.tif&#39;, &#39;./samples/01-switch-small/001_00000077.tif&#39;, &#39;./samples/01-switch-small/001_00000078.tif&#39;, &#39;./samples/01-switch-small/001_00000079.tif&#39;, &#39;./samples/01-switch-small/001_00000080.tif&#39;, &#39;./samples/01-switch-small/001_00000081.tif&#39;, &#39;./samples/01-switch-small/001_00000082.tif&#39;, &#39;./samples/01-switch-small/001_00000083.tif&#39;, &#39;./samples/01-switch-small/001_00000084.tif&#39;, &#39;./samples/01-switch-small/001_00000085.tif&#39;, &#39;./samples/01-switch-small/001_00000086.tif&#39;, &#39;./samples/01-switch-small/001_00000087.tif&#39;, &#39;./samples/01-switch-small/001_00000088.tif&#39;, &#39;./samples/01-switch-small/001_00000089.tif&#39;, &#39;./samples/01-switch-small/001_00000090.tif&#39;, &#39;./samples/01-switch-small/001_00000091.tif&#39;, &#39;./samples/01-switch-small/001_00000092.tif&#39;, &#39;./samples/01-switch-small/001_00000093.tif&#39;, &#39;./samples/01-switch-small/001_00000094.tif&#39;, &#39;./samples/01-switch-small/001_00000095.tif&#39;, &#39;./samples/01-switch-small/001_00000096.tif&#39;, &#39;./samples/01-switch-small/001_00000097.tif&#39;, &#39;./samples/01-switch-small/001_00000098.tif&#39;, &#39;./samples/01-switch-small/001_00000099.tif&#39;, &#39;./samples/01-switch-small/001_00000100.tif&#39;, &#39;./samples/01-switch-small/001_00000101.tif&#39;, &#39;./samples/01-switch-small/001_00000102.tif&#39;, &#39;./samples/01-switch-small/001_00000103.tif&#39;, &#39;./samples/01-switch-small/001_00000104.tif&#39;, &#39;./samples/01-switch-small/001_00000105.tif&#39;, &#39;./samples/01-switch-small/001_00000106.tif&#39;, &#39;./samples/01-switch-small/001_00000107.tif&#39;, &#39;./samples/01-switch-small/001_00000108.tif&#39;, &#39;./samples/01-switch-small/001_00000109.tif&#39;, &#39;./samples/01-switch-small/001_00000110.tif&#39;, &#39;./samples/01-switch-small/001_00000111.tif&#39;, &#39;./samples/01-switch-small/001_00000112.tif&#39;, &#39;./samples/01-switch-small/001_00000113.tif&#39;, &#39;./samples/01-switch-small/001_00000114.tif&#39;, &#39;./samples/01-switch-small/001_00000115.tif&#39;, &#39;./samples/01-switch-small/001_00000116.tif&#39;, &#39;./samples/01-switch-small/001_00000117.tif&#39;, &#39;./samples/01-switch-small/001_00000118.tif&#39;, &#39;./samples/01-switch-small/001_00000119.tif&#39;, &#39;./samples/01-switch-small/001_00000120.tif&#39;, &#39;./samples/01-switch-small/001_00000121.tif&#39;, &#39;./samples/01-switch-small/001_00000122.tif&#39;, &#39;./samples/01-switch-small/001_00000123.tif&#39;, &#39;./samples/01-switch-small/001_00000124.tif&#39;, &#39;./samples/01-switch-small/001_00000125.tif&#39;, &#39;./samples/01-switch-small/001_00000126.tif&#39;, &#39;./samples/01-switch-small/001_00000127.tif&#39;, &#39;./samples/01-switch-small/001_00000128.tif&#39;, &#39;./samples/01-switch-small/001_00000129.tif&#39;, &#39;./samples/01-switch-small/001_00000130.tif&#39;, &#39;./samples/01-switch-small/001_00000131.tif&#39;, &#39;./samples/01-switch-small/001_00000132.tif&#39;, &#39;./samples/01-switch-small/001_00000133.tif&#39;, &#39;./samples/01-switch-small/001_00000134.tif&#39;, &#39;./samples/01-switch-small/001_00000135.tif&#39;, &#39;./samples/01-switch-small/001_00000136.tif&#39;, &#39;./samples/01-switch-small/001_00000137.tif&#39;, &#39;./samples/01-switch-small/001_00000138.tif&#39;, &#39;./samples/01-switch-small/001_00000139.tif&#39;, &#39;./samples/01-switch-small/001_00000140.tif&#39;, &#39;./samples/01-switch-small/001_00000141.tif&#39;, &#39;./samples/01-switch-small/001_00000142.tif&#39;, &#39;./samples/01-switch-small/001_00000143.tif&#39;, &#39;./samples/01-switch-small/001_00000144.tif&#39;, &#39;./samples/01-switch-small/001_00000145.tif&#39;, &#39;./samples/01-switch-small/001_00000146.tif&#39;, &#39;./samples/01-switch-small/001_00000147.tif&#39;, &#39;./samples/01-switch-small/001_00000148.tif&#39;, &#39;./samples/01-switch-small/001_00000149.tif&#39;, &#39;./samples/01-switch-small/001_00000150.tif&#39;, &#39;./samples/01-switch-small/001_00000151.tif&#39;, &#39;./samples/01-switch-small/001_00000152.tif&#39;, &#39;./samples/01-switch-small/001_00000153.tif&#39;, &#39;./samples/01-switch-small/001_00000154.tif&#39;, &#39;./samples/01-switch-small/001_00000155.tif&#39;, &#39;./samples/01-switch-small/001_00000156.tif&#39;, &#39;./samples/01-switch-small/001_00000157.tif&#39;, &#39;./samples/01-switch-small/001_00000158.tif&#39;, &#39;./samples/01-switch-small/001_00000159.tif&#39;, &#39;./samples/01-switch-small/001_00000160.tif&#39;, &#39;./samples/01-switch-small/001_00000161.tif&#39;, &#39;./samples/01-switch-small/001_00000162.tif&#39;, &#39;./samples/01-switch-small/001_00000163.tif&#39;, &#39;./samples/01-switch-small/001_00000164.tif&#39;, &#39;./samples/01-switch-small/001_00000165.tif&#39;, &#39;./samples/01-switch-small/001_00000166.tif&#39;, &#39;./samples/01-switch-small/001_00000167.tif&#39;, &#39;./samples/01-switch-small/001_00000168.tif&#39;, &#39;./samples/01-switch-small/001_00000169.tif&#39;, &#39;./samples/01-switch-small/001_00000170.tif&#39;, &#39;./samples/01-switch-small/001_00000171.tif&#39;, &#39;./samples/01-switch-small/001_00000172.tif&#39;, &#39;./samples/01-switch-small/001_00000173.tif&#39;, &#39;./samples/01-switch-small/001_00000174.tif&#39;, &#39;./samples/01-switch-small/001_00000175.tif&#39;, &#39;./samples/01-switch-small/001_00000176.tif&#39;, &#39;./samples/01-switch-small/001_00000177.tif&#39;, &#39;./samples/01-switch-small/001_00000178.tif&#39;, &#39;./samples/01-switch-small/001_00000179.tif&#39;, &#39;./samples/01-switch-small/001_00000180.tif&#39;, &#39;./samples/01-switch-small/001_00000181.tif&#39;, &#39;./samples/01-switch-small/001_00000182.tif&#39;, &#39;./samples/01-switch-small/001_00000183.tif&#39;, &#39;./samples/01-switch-small/001_00000184.tif&#39;, &#39;./samples/01-switch-small/001_00000185.tif&#39;, &#39;./samples/01-switch-small/001_00000186.tif&#39;, &#39;./samples/01-switch-small/001_00000187.tif&#39;, &#39;./samples/01-switch-small/001_00000188.tif&#39;, &#39;./samples/01-switch-small/001_00000189.tif&#39;, &#39;./samples/01-switch-small/001_00000190.tif&#39;, &#39;./samples/01-switch-small/001_00000191.tif&#39;, &#39;./samples/01-switch-small/001_00000192.tif&#39;, &#39;./samples/01-switch-small/001_00000193.tif&#39;, &#39;./samples/01-switch-small/001_00000194.tif&#39;, &#39;./samples/01-switch-small/001_00000195.tif&#39;, &#39;./samples/01-switch-small/001_00000196.tif&#39;, &#39;./samples/01-switch-small/001_00000197.tif&#39;, &#39;./samples/01-switch-small/001_00000198.tif&#39;, &#39;./samples/01-switch-small/001_00000199.tif&#39;, &#39;./samples/01-switch-small/001_00000200.tif&#39;, &#39;./samples/01-switch-small/001_00000201.tif&#39;, &#39;./samples/01-switch-small/001_00000202.tif&#39;, &#39;./samples/01-switch-small/001_00000203.tif&#39;, &#39;./samples/01-switch-small/001_00000204.tif&#39;, &#39;./samples/01-switch-small/001_00000205.tif&#39;, &#39;./samples/01-switch-small/001_00000206.tif&#39;, &#39;./samples/01-switch-small/001_00000207.tif&#39;, &#39;./samples/01-switch-small/001_00000208.tif&#39;, &#39;./samples/01-switch-small/001_00000209.tif&#39;, &#39;./samples/01-switch-small/001_00000210.tif&#39;, &#39;./samples/01-switch-small/001_00000211.tif&#39;, &#39;./samples/01-switch-small/001_00000212.tif&#39;, &#39;./samples/01-switch-small/001_00000213.tif&#39;, &#39;./samples/01-switch-small/001_00000214.tif&#39;, &#39;./samples/01-switch-small/001_00000215.tif&#39;, &#39;./samples/01-switch-small/001_00000216.tif&#39;, &#39;./samples/01-switch-small/001_00000217.tif&#39;, &#39;./samples/01-switch-small/001_00000218.tif&#39;, &#39;./samples/01-switch-small/001_00000219.tif&#39;, &#39;./samples/01-switch-small/001_00000220.tif&#39;, &#39;./samples/01-switch-small/001_00000221.tif&#39;, &#39;./samples/01-switch-small/001_00000222.tif&#39;, &#39;./samples/01-switch-small/001_00000223.tif&#39;, &#39;./samples/01-switch-small/001_00000224.tif&#39;, &#39;./samples/01-switch-small/001_00000225.tif&#39;, &#39;./samples/01-switch-small/001_00000226.tif&#39;, &#39;./samples/01-switch-small/001_00000227.tif&#39;, &#39;./samples/01-switch-small/001_00000228.tif&#39;, &#39;./samples/01-switch-small/001_00000229.tif&#39;, &#39;./samples/01-switch-small/001_00000230.tif&#39;, &#39;./samples/01-switch-small/001_00000231.tif&#39;, &#39;./samples/01-switch-small/001_00000232.tif&#39;, &#39;./samples/01-switch-small/001_00000233.tif&#39;, &#39;./samples/01-switch-small/001_00000234.tif&#39;, &#39;./samples/01-switch-small/001_00000235.tif&#39;, &#39;./samples/01-switch-small/001_00000236.tif&#39;, &#39;./samples/01-switch-small/001_00000237.tif&#39;, &#39;./samples/01-switch-small/001_00000238.tif&#39;, &#39;./samples/01-switch-small/001_00000239.tif&#39;, &#39;./samples/01-switch-small/001_00000240.tif&#39;, &#39;./samples/01-switch-small/001_00000241.tif&#39;, &#39;./samples/01-switch-small/001_00000242.tif&#39;, &#39;./samples/01-switch-small/001_00000243.tif&#39;, &#39;./samples/01-switch-small/001_00000244.tif&#39;, &#39;./samples/01-switch-small/001_00000245.tif&#39;, &#39;./samples/01-switch-small/001_00000246.tif&#39;, &#39;./samples/01-switch-small/001_00000247.tif&#39;, &#39;./samples/01-switch-small/001_00000248.tif&#39;, &#39;./samples/01-switch-small/001_00000249.tif&#39;, &#39;./samples/01-switch-small/001_00000250.tif&#39;, &#39;./samples/01-switch-small/001_00000251.tif&#39;, &#39;./samples/01-switch-small/001_00000252.tif&#39;, &#39;./samples/01-switch-small/001_00000253.tif&#39;, &#39;./samples/01-switch-small/001_00000254.tif&#39;, &#39;./samples/01-switch-small/001_00000255.tif&#39;, &#39;./samples/01-switch-small/001_00000256.tif&#39;, &#39;./samples/01-switch-small/001_00000257.tif&#39;, &#39;./samples/01-switch-small/001_00000258.tif&#39;, &#39;./samples/01-switch-small/001_00000259.tif&#39;, &#39;./samples/01-switch-small/001_00000260.tif&#39;, &#39;./samples/01-switch-small/001_00000261.tif&#39;, &#39;./samples/01-switch-small/001_00000262.tif&#39;, &#39;./samples/01-switch-small/001_00000263.tif&#39;, &#39;./samples/01-switch-small/001_00000264.tif&#39;, &#39;./samples/01-switch-small/001_00000265.tif&#39;, &#39;./samples/01-switch-small/001_00000266.tif&#39;, &#39;./samples/01-switch-small/001_00000267.tif&#39;, &#39;./samples/01-switch-small/001_00000268.tif&#39;, &#39;./samples/01-switch-small/001_00000269.tif&#39;, &#39;./samples/01-switch-small/001_00000270.tif&#39;, &#39;./samples/01-switch-small/001_00000271.tif&#39;, &#39;./samples/01-switch-small/001_00000272.tif&#39;, &#39;./samples/01-switch-small/001_00000273.tif&#39;, &#39;./samples/01-switch-small/001_00000274.tif&#39;, &#39;./samples/01-switch-small/001_00000275.tif&#39;, &#39;./samples/01-switch-small/001_00000276.tif&#39;, &#39;./samples/01-switch-small/001_00000277.tif&#39;, &#39;./samples/01-switch-small/001_00000278.tif&#39;, &#39;./samples/01-switch-small/001_00000279.tif&#39;, &#39;./samples/01-switch-small/001_00000280.tif&#39;, &#39;./samples/01-switch-small/001_00000281.tif&#39;, &#39;./samples/01-switch-small/001_00000282.tif&#39;, &#39;./samples/01-switch-small/001_00000283.tif&#39;, &#39;./samples/01-switch-small/001_00000284.tif&#39;, &#39;./samples/01-switch-small/001_00000285.tif&#39;, &#39;./samples/01-switch-small/001_00000286.tif&#39;, &#39;./samples/01-switch-small/001_00000287.tif&#39;, &#39;./samples/01-switch-small/001_00000288.tif&#39;, &#39;./samples/01-switch-small/001_00000289.tif&#39;, &#39;./samples/01-switch-small/001_00000290.tif&#39;, &#39;./samples/01-switch-small/001_00000291.tif&#39;, &#39;./samples/01-switch-small/001_00000292.tif&#39;, &#39;./samples/01-switch-small/001_00000293.tif&#39;, &#39;./samples/01-switch-small/001_00000294.tif&#39;, &#39;./samples/01-switch-small/001_00000295.tif&#39;, &#39;./samples/01-switch-small/001_00000296.tif&#39;, &#39;./samples/01-switch-small/001_00000297.tif&#39;, &#39;./samples/01-switch-small/001_00000298.tif&#39;, &#39;./samples/01-switch-small/001_00000299.tif&#39;, &#39;./samples/01-switch-small/001_00000300.tif&#39;, &#39;./samples/01-switch-small/001_00000301.tif&#39;, &#39;./samples/01-switch-small/001_00000302.tif&#39;, &#39;./samples/01-switch-small/001_00000303.tif&#39;, &#39;./samples/01-switch-small/001_00000304.tif&#39;, &#39;./samples/01-switch-small/001_00000305.tif&#39;, &#39;./samples/01-switch-small/001_00000306.tif&#39;, &#39;./samples/01-switch-small/001_00000307.tif&#39;, &#39;./samples/01-switch-small/001_00000308.tif&#39;, &#39;./samples/01-switch-small/001_00000309.tif&#39;, &#39;./samples/01-switch-small/001_00000310.tif&#39;, &#39;./samples/01-switch-small/001_00000311.tif&#39;, &#39;./samples/01-switch-small/001_00000312.tif&#39;, &#39;./samples/01-switch-small/001_00000313.tif&#39;, &#39;./samples/01-switch-small/001_00000314.tif&#39;, &#39;./samples/01-switch-small/001_00000315.tif&#39;, &#39;./samples/01-switch-small/001_00000316.tif&#39;, &#39;./samples/01-switch-small/001_00000317.tif&#39;, &#39;./samples/01-switch-small/001_00000318.tif&#39;, &#39;./samples/01-switch-small/001_00000319.tif&#39;, &#39;./samples/01-switch-small/001_00000320.tif&#39;, &#39;./samples/01-switch-small/001_00000321.tif&#39;, &#39;./samples/01-switch-small/001_00000322.tif&#39;, &#39;./samples/01-switch-small/001_00000323.tif&#39;, &#39;./samples/01-switch-small/001_00000324.tif&#39;, &#39;./samples/01-switch-small/001_00000325.tif&#39;, &#39;./samples/01-switch-small/001_00000326.tif&#39;, &#39;./samples/01-switch-small/001_00000327.tif&#39;, &#39;./samples/01-switch-small/001_00000328.tif&#39;, &#39;./samples/01-switch-small/001_00000329.tif&#39;, &#39;./samples/01-switch-small/001_00000330.tif&#39;, &#39;./samples/01-switch-small/001_00000331.tif&#39;, &#39;./samples/01-switch-small/001_00000332.tif&#39;, &#39;./samples/01-switch-small/001_00000333.tif&#39;, &#39;./samples/01-switch-small/001_00000334.tif&#39;, &#39;./samples/01-switch-small/001_00000335.tif&#39;, &#39;./samples/01-switch-small/001_00000336.tif&#39;, &#39;./samples/01-switch-small/001_00000337.tif&#39;, &#39;./samples/01-switch-small/001_00000338.tif&#39;, &#39;./samples/01-switch-small/001_00000339.tif&#39;, &#39;./samples/01-switch-small/001_00000340.tif&#39;, &#39;./samples/01-switch-small/001_00000341.tif&#39;, &#39;./samples/01-switch-small/001_00000342.tif&#39;, &#39;./samples/01-switch-small/001_00000343.tif&#39;, &#39;./samples/01-switch-small/001_00000344.tif&#39;, &#39;./samples/01-switch-small/001_00000345.tif&#39;, &#39;./samples/01-switch-small/001_00000346.tif&#39;, &#39;./samples/01-switch-small/001_00000347.tif&#39;, &#39;./samples/01-switch-small/001_00000348.tif&#39;, &#39;./samples/01-switch-small/001_00000349.tif&#39;, &#39;./samples/01-switch-small/001_00000350.tif&#39;, &#39;./samples/01-switch-small/001_00000351.tif&#39;, &#39;./samples/01-switch-small/001_00000352.tif&#39;, &#39;./samples/01-switch-small/001_00000353.tif&#39;, &#39;./samples/01-switch-small/001_00000354.tif&#39;, &#39;./samples/01-switch-small/001_00000355.tif&#39;, &#39;./samples/01-switch-small/001_00000356.tif&#39;, &#39;./samples/01-switch-small/001_00000357.tif&#39;, &#39;./samples/01-switch-small/001_00000358.tif&#39;, &#39;./samples/01-switch-small/001_00000359.tif&#39;, &#39;./samples/01-switch-small/001_00000360.tif&#39;, &#39;./samples/01-switch-small/001_00000361.tif&#39;, &#39;./samples/01-switch-small/001_00000362.tif&#39;, &#39;./samples/01-switch-small/001_00000363.tif&#39;, &#39;./samples/01-switch-small/001_00000364.tif&#39;, &#39;./samples/01-switch-small/001_00000365.tif&#39;, &#39;./samples/01-switch-small/001_00000366.tif&#39;, &#39;./samples/01-switch-small/001_00000367.tif&#39;, &#39;./samples/01-switch-small/001_00000368.tif&#39;, &#39;./samples/01-switch-small/001_00000369.tif&#39;, &#39;./samples/01-switch-small/001_00000370.tif&#39;, &#39;./samples/01-switch-small/001_00000371.tif&#39;, &#39;./samples/01-switch-small/001_00000372.tif&#39;, &#39;./samples/01-switch-small/001_00000373.tif&#39;, &#39;./samples/01-switch-small/001_00000374.tif&#39;, &#39;./samples/01-switch-small/001_00000375.tif&#39;, &#39;./samples/01-switch-small/001_00000376.tif&#39;, &#39;./samples/01-switch-small/001_00000377.tif&#39;, &#39;./samples/01-switch-small/001_00000378.tif&#39;, &#39;./samples/01-switch-small/001_00000379.tif&#39;, &#39;./samples/01-switch-small/001_00000380.tif&#39;, &#39;./samples/01-switch-small/001_00000381.tif&#39;, &#39;./samples/01-switch-small/001_00000382.tif&#39;, &#39;./samples/01-switch-small/001_00000383.tif&#39;, &#39;./samples/01-switch-small/001_00000384.tif&#39;, &#39;./samples/01-switch-small/001_00000385.tif&#39;, &#39;./samples/01-switch-small/001_00000386.tif&#39;, &#39;./samples/01-switch-small/001_00000387.tif&#39;, &#39;./samples/01-switch-small/001_00000388.tif&#39;, &#39;./samples/01-switch-small/001_00000389.tif&#39;, &#39;./samples/01-switch-small/001_00000390.tif&#39;, &#39;./samples/01-switch-small/001_00000391.tif&#39;, &#39;./samples/01-switch-small/001_00000392.tif&#39;, &#39;./samples/01-switch-small/001_00000393.tif&#39;, &#39;./samples/01-switch-small/001_00000394.tif&#39;, &#39;./samples/01-switch-small/001_00000395.tif&#39;, &#39;./samples/01-switch-small/001_00000396.tif&#39;, &#39;./samples/01-switch-small/001_00000397.tif&#39;, &#39;./samples/01-switch-small/001_00000398.tif&#39;, &#39;./samples/01-switch-small/001_00000399.tif&#39;, &#39;./samples/01-switch-small/001_00000400.tif&#39;, &#39;./samples/01-switch-small/001_00000401.tif&#39;, &#39;./samples/01-switch-small/001_00000402.tif&#39;, &#39;./samples/01-switch-small/001_00000403.tif&#39;, &#39;./samples/01-switch-small/001_00000404.tif&#39;, &#39;./samples/01-switch-small/001_00000405.tif&#39;, &#39;./samples/01-switch-small/001_00000406.tif&#39;, &#39;./samples/01-switch-small/001_00000407.tif&#39;, &#39;./samples/01-switch-small/001_00000408.tif&#39;, &#39;./samples/01-switch-small/001_00000409.tif&#39;, &#39;./samples/01-switch-small/001_00000410.tif&#39;, &#39;./samples/01-switch-small/001_00000411.tif&#39;, &#39;./samples/01-switch-small/001_00000412.tif&#39;, &#39;./samples/01-switch-small/001_00000413.tif&#39;, &#39;./samples/01-switch-small/001_00000414.tif&#39;, &#39;./samples/01-switch-small/001_00000415.tif&#39;, &#39;./samples/01-switch-small/001_00000416.tif&#39;, &#39;./samples/01-switch-small/001_00000417.tif&#39;, &#39;./samples/01-switch-small/001_00000418.tif&#39;, &#39;./samples/01-switch-small/001_00000419.tif&#39;, &#39;./samples/01-switch-small/001_00000420.tif&#39;, &#39;./samples/01-switch-small/001_00000421.tif&#39;, &#39;./samples/01-switch-small/001_00000422.tif&#39;, &#39;./samples/01-switch-small/001_00000423.tif&#39;, &#39;./samples/01-switch-small/001_00000424.tif&#39;, &#39;./samples/01-switch-small/001_00000425.tif&#39;, &#39;./samples/01-switch-small/001_00000426.tif&#39;, &#39;./samples/01-switch-small/001_00000427.tif&#39;, &#39;./samples/01-switch-small/001_00000428.tif&#39;, &#39;./samples/01-switch-small/001_00000429.tif&#39;, &#39;./samples/01-switch-small/001_00000430.tif&#39;, &#39;./samples/01-switch-small/001_00000431.tif&#39;, &#39;./samples/01-switch-small/001_00000432.tif&#39;, &#39;./samples/01-switch-small/001_00000433.tif&#39;, &#39;./samples/01-switch-small/001_00000434.tif&#39;, &#39;./samples/01-switch-small/001_00000435.tif&#39;, &#39;./samples/01-switch-small/001_00000436.tif&#39;, &#39;./samples/01-switch-small/001_00000437.tif&#39;, &#39;./samples/01-switch-small/001_00000438.tif&#39;, &#39;./samples/01-switch-small/001_00000439.tif&#39;, &#39;./samples/01-switch-small/001_00000440.tif&#39;, &#39;./samples/01-switch-small/001_00000441.tif&#39;, &#39;./samples/01-switch-small/001_00000442.tif&#39;, &#39;./samples/01-switch-small/001_00000443.tif&#39;, &#39;./samples/01-switch-small/001_00000444.tif&#39;, &#39;./samples/01-switch-small/001_00000445.tif&#39;, &#39;./samples/01-switch-small/001_00000446.tif&#39;, &#39;./samples/01-switch-small/001_00000447.tif&#39;, &#39;./samples/01-switch-small/001_00000448.tif&#39;, &#39;./samples/01-switch-small/001_00000449.tif&#39;, &#39;./samples/01-switch-small/001_00000450.tif&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filelist</span><span class="p">)</span>
+<span class="n">proj</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_as_AcquisitionData</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_12_0.png" src="../../_images/demos_bruker2cil_12_0.png" />
+</div>
+</div>
+</section>
+<section id="Data-processing">
+<h1>Data processing<a class="headerlink" href="#Data-processing" title="Link to this heading">#</a></h1>
+<p>In the following a few CIL processors can be applied.</p>
+<section id="Optional:-Apply-Centre-of-Rotation-Corrector">
+<h2>Optional: Apply Centre of Rotation Corrector<a class="headerlink" href="#Optional:-Apply-Centre-of-Rotation-Corrector" title="Link to this heading">#</a></h2>
+<p>Note, by setting the logging level to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> the centre of rotation corrector prints out information on what it is doing. The plots display a measure of image sharpness (lower the better) against centre of rotation shift</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="c1">### Turn this on for more info</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cil.processors&#39;</span><span class="p">)</span>
+<span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+<span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">proj</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+DEBUG:cil.processors.CofR_image_sharpness:Initial search:
+DEBUG:cil.processors.CofR_image_sharpness:search range is 191
+DEBUG:cil.processors.CofR_image_sharpness:initial binning is 6
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_15_1.png" src="../../_images/demos_bruker2cil_15_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+DEBUG:cil.processors.CofR_image_sharpness:fine search starting at 0.030298
+DEBUG:cil.processors.CofR_image_sharpness:GSS between -0.015702 and 0.076297
+INFO:cil.processors.CofR_image_sharpness:evaluated 17 points
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_15_3.png" src="../../_images/demos_bruker2cil_15_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:cil.processors.CofR_image_sharpness:Centre of rotation correction found using image_sharpness
+INFO:cil.processors.CofR_image_sharpness:backend FBP/FDK tigre
+INFO:cil.processors.CofR_image_sharpness:Calculated from slice: centre
+INFO:cil.processors.CofR_image_sharpness:Centre of rotation shift = 0.727376 pixels
+INFO:cil.processors.CofR_image_sharpness:Centre of rotation shift = 0.016729 units at the object
+INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometry
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.framework.framework.AcquisitionData at 0x7fbf7c15a4e0&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Optional:-Slicing">
+<h2>Optional: Slicing<a class="headerlink" href="#Optional:-Slicing" title="Link to this heading">#</a></h2>
+<p>This will remove projection data that does not contain any information. This will save computational effort.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">300</span><span class="p">,</span><span class="o">-</span><span class="mi">300</span><span class="p">),</span><span class="s1">&#39;angle&#39;</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)}</span> <span class="c1"># The first and the last slice (0, and 360 deg) are equal. To avoid artefacts, the last slice is removed.</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+<span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+<span class="n">proj</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Optional:-Ring-artefact-removal">
+<h2>Optional: Ring artefact removal<a class="headerlink" href="#Optional:-Ring-artefact-removal" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#processor = RingRemover(decNum=4, wname=&#39;db35&#39;, sigma=1.5, info=True)</span>
+<span class="c1">#processor.set_input(proj)</span>
+<span class="c1">#proj = processor.get_output()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Optional:-Data-binning">
+<h2>Optional: Data binning<a class="headerlink" href="#Optional:-Data-binning" title="Link to this heading">#</a></h2>
+<p>Useful for large datasets to reduce memory and computational expense. At the cost of potential image quality.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#roi = {&#39;horizontal&#39;:(None,None,4),&#39;vertical&#39;:(None,None,4)}</span>
+<span class="c1">#processor = Binner(roi)</span>
+<span class="c1">#processor.set_input(proj)</span>
+<span class="c1">#proj = processor.get_output()</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s plot the data set after applying of the processors:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_23_0.png" src="../../_images/demos_bruker2cil_23_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Prepare-back-projection">
+<h1>Prepare back-projection<a class="headerlink" href="#Prepare-back-projection" title="Link to this heading">#</a></h1>
+<p>In this section the following operations are applied to the data set:</p>
+<ul class="simple">
+<li><p>The first vertical slices typically don’t contain anything except air. The mean grey value of this volume is used as background intensity. The dataset is dived by this value, such that “air” will have an transmission coefficient of 1.</p></li>
+<li><p>The data will be converted from transmission to absorption data.</p></li>
+<li><p>The correct dataset order is ensured.</p></li>
+<li><p>The CIL image geometry class is created.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Plot histogram</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">bins</span><span class="o">=</span><span class="mi">256</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Min grey value 1675.0
+Max grey value 56836.0
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_25_1.png" src="../../_images/demos_bruker2cil_25_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Substract Background</span>
+<span class="n">background</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">proj</span> <span class="o">/=</span> <span class="n">background</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare data for reconstruction</span>
+<span class="n">proj</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">(</span><span class="n">min_intensity</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)(</span><span class="n">proj</span><span class="p">)</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">ig</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Review-projection-data-before-running-the-recontruction">
+<h1>Review projection data before running the recontruction<a class="headerlink" href="#Review-projection-data-before-running-the-recontruction" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s summarize the used geometries before we start the reconstruction.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Acquisition geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Projection geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">proj</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Image geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Acquisition geometry:
+ 3D Cone-beam tomography
+System configuration:
+        Source position: [  0.   , -98.706,   0.   ]
+        Rotation axis position: [0., 0., 0.]
+        Rotation axis direction: [0., 0., 1.]
+        Detector position: [  0.   , 222.306,   0.   ]
+        Detector direction x: [1., 0., 0.]
+        Detector direction y: [0., 0., 1.]
+Panel configuration:
+        Number of pixels: [764 486]
+        Pixel size: [0.0748 0.0748]
+        Pixel origin: bottom-left
+Channel configuration:
+        Number of channels: 1
+Acquisition description:
+        Number of positions: 451
+        Angles 0-9 in degrees: [0. , 0.8, 1.6, 2.4, 3.2, 4. , 4.8, 5.6, 6.4, 7.2]
+        Angles 441-450 in degrees: [352.8, 353.6, 354.4, 355.2, 356. , 356.8, 357.6, 358.4, 359.2, 360. ]
+        Full angular array can be accessed with acquisition_data.geometry.angles
+Distances in units: units distance
+
+Projection geometry:
+ Number of dimensions: 3
+Shape: (450, 486, 164)
+Axis labels: (&#39;angle&#39;, &#39;vertical&#39;, &#39;horizontal&#39;)
+
+
+Image geometry:
+ Number of channels: 1
+channel_spacing: 1.0
+voxel_num : x164,y164,z486
+voxel_size : x0.02299979066203132,y0.02299979066203132,z0.02299979066203132
+center : x0,y0,z0
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Min grey value -0.01897411234676838
+Max grey value 3.505382776260376
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_30_1.png" src="../../_images/demos_bruker2cil_30_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fbf73e8ae70&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">bins</span><span class="o">=</span><span class="mi">256</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_31_0.png" src="../../_images/demos_bruker2cil_31_0.png" />
+</div>
+</div>
+</section>
+<section id="Perform-reconstruction">
+<h1>Perform reconstruction<a class="headerlink" href="#Perform-reconstruction" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fdk</span> <span class="o">=</span>  <span class="n">FDK</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+FDK recon
+
+Input Data:
+        angle: 450
+        vertical: 486
+        horizontal: 164
+
+Reconstruction Volume:
+        vertical: 486
+        horizontal_y: 164
+        horizontal_x: 164
+
+Reconstruction Options:
+        Backend: tigre
+        Filter: ram-lak
+        Filter cut-off frequency: 1.0
+        FFT order: 9
+        Filter_inplace: False
+
+</pre></div></div>
+</div>
+</section>
+<section id="Display-results">
+<h1>Display results<a class="headerlink" href="#Display-results" title="Link to this heading">#</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span> \
+       <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
+        <span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
+        <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> \
+        <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> \
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+        <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.7</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/demos_bruker2cil_35_0.png" src="../../_images/demos_bruker2cil_35_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;cil.utilities.display.show2D at 0x7fbf69ae6cf0&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Interactive plotting</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_results</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span> \
+       <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> \
+        <span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> \
+        <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">)],</span> \
+        <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> \
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+        <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.7</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">interact</span><span class="p">(</span><span class="n">plot_results</span><span class="p">,</span>
+         <span class="n">recon</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">fixed</span><span class="p">(</span><span class="n">recon</span><span class="p">),</span> \
+         <span class="n">x</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">),</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> \
+         <span class="n">y</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">),</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> \
+         <span class="n">z</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">2</span><span class="p">),</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2097f428cef34f9688399c219eb4d578", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;function __main__.plot_results(recon, x, y, z)&gt;
+</pre></div></div>
+</div>
+</section>
+<section id="Optional:-Save-results-as-tiff-files">
+<h1>Optional: Save results as tiff files<a class="headerlink" href="#Optional:-Save-results-as-tiff-files" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save data to a subfolder of the data folder</span>
+<span class="n">subfolder</span> <span class="o">=</span> <span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;Rec&#39;</span>
+<span class="n">TIFFWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">recon</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="p">),</span><span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Optional:-Save-results-as-json-files">
+<h1>Optional: Save results as json files<a class="headerlink" href="#Optional:-Save-results-as-json-files" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="c1"># Save to a JSON file</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;_params.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">get_scanparams</span><span class="p">(</span><span class="n">logfile</span><span class="p">),</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><em>The notebook ‘compare-CIL-NRecon.ipynb’ allows you to compare the results from this showcase to the results obtained by the instrument software NRecon.</em></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../Apple_offset_reconstruction/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Offset reconstruction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../recon_phasecontrast_exciscope/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Exciscope Polaris phase contrast reconstruction with CIL</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

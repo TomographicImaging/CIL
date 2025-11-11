@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Welcome to CIL’s documentation! &#8212; CIL 25.0.1.dev11+g21355fe32 documentation</title>
+    <title>Welcome to CIL’s documentation! &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
   
   
   
@@ -40,17 +40,18 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="_static/documentation_options.js?v=f7685a78"></script>
+    <script src="_static/documentation_options.js?v=9ddde472"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev11+g21355fe32';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -60,7 +61,7 @@
     <link rel="next" title="Introduction" href="introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev11+g21355fe32" />
+  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -208,13 +209,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="demos/">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="demos/">
     Tutorials
   </a>
 </li>
 
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -336,6 +354,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usershowcase/">
+    User showcase
+  </a>
+</li>
+
   </ul>
 </nav></div>
           
@@ -408,6 +433,7 @@
 <li class="toctree-l1"><a class="reference internal" href="plugins/">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide/">Developers’ Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="demos/">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usershowcase/">User showcase</a></li>
 </ul>
 </div>
         <div class="sidebar-primary-item">
@@ -755,8 +781,207 @@ The code to reproduce the article results. <a class="reference external" href="h
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="demos/#advanced-topics">Advanced topics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="demos/deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
 <li class="toctree-l3"><a class="reference internal" href="demos/callback_demonstration/">CIL Callbacks How To</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usershowcase/">User showcase</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demos/Multibang_Hackathon2023/">Multibang Regularisation in CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#Reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#CIL-Version-23.0.1">CIL Version 23.0.1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#The-dataset">The dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#Set-the-image-geometry,-create-a-phantom-and-test-the-regulariser">Set the image geometry, create a phantom and test the regulariser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#Create-a-synthetic-sinogram">Create a synthetic sinogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#Full-data-reconstruction">Full data reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Multibang_Hackathon2023/#Reduced-data-reconstruction">Reduced data reconstruction</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/">Showcase of the algorithms for deblurring and denoising</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Import-algorithms,-operators-and-functions">Import algorithms, operators and functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Setting-up-the-direct-problem">Setting up the direct problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#The-Deblurring-Inverse-Problem">The Deblurring Inverse Problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Different-Noise:-Gaussian-Noise">Different Noise: Gaussian Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Different-Noises:-Salt-and-Pepper-Noise">Different Noises: Salt and Pepper Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Denoising-and-deblurring-without-knowledge-of-the-blur-kernel">Denoising and deblurring without knowledge of the blur kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Showcase_of_the_algorithms_for_deblurring_and_denoising/#Deblurring-without-noise-in-the-data">Deblurring without noise in the data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/deriv2_cgls/#CIL-version-24.3.0">CIL version 24.3.0</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#General-outline">General outline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#Future-goal">Future goal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#License">License</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#1.-Load-STEMPO-data">1. Load STEMPO data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#2.-FBP-of-the-static-data">2. FBP of the static data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#3.-Repeat-the-previous-steps-with-dynamic-data">3. Repeat the previous steps with dynamic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#4.-Split-into-separate-time-steps">4. Split into separate time steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#5.-Iterative-algorithms-with-multiple-time-steps">5. Iterative algorithms with multiple time steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/stempo2d_v2_1/#6.-Hacky-temporal-TV">6. Hacky temporal TV</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/dynamic_mr_recon/">Dynamic MR Reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#CIL-Version-22.2.0">CIL Version 22.2.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#SIRF-Version-3.4.0">SIRF Version 3.4.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#The-Dataset">The Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#Load-and-inspect-the-data">Load and inspect the data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#Prepare-dynamic-reconstruction">Prepare dynamic reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#Dynamic-reconstruction-without-regularisation">Dynamic reconstruction without regularisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#Dynamic-reconstruction-with-TV-regularisation">Dynamic reconstruction with TV regularisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/dynamic_mr_recon/#Visualise-results">Visualise results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Import-packages">Import packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Initialise-GVXR-using-our-JSON-file">Initialise GVXR using our JSON file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Create-the-output-directory">Create the output directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Load-our-detector">Load our detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Load-our-source-properties">Load our source properties</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-1.-Download-and-extract-the-phantom-data-from-a-ZIP-file.">Step 1. Download and extract the phantom data from a ZIP file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-2.-Extract-surface-meshes-from-the-voxelied-phantom.">Step 2. Extract surface meshes from the voxelied phantom.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Load-our-samples">Load our samples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-3.-Simulate-an-X-ray-radiograph-of-the-virtual-patient.">Step 3. Simulate an X-ray radiograph of the virtual patient.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-4.-Select-the-number-of-incident-photons-per-pixel">Step 4. Select the number of incident photons per pixel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-5.-Add-the-corresponding-amount-of-Photonic-noise">Step 5. Add the corresponding amount of Photonic noise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-6.-Create-the-flat-field-images-with-the-corresponding-amount-of-Photonic-noise.">Step 6. Create the flat-field images with the corresponding amount of Photonic noise.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-7.-Simulate-a-CT-scan">Step 7. Simulate a CT scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Step-8.-Reconstruct-the-CT-volume-using-the-Core-Imaging-Library-(CIL)">Step 8. Reconstruct the CT volume using the Core Imaging Library (CIL)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Save-the-volume-in-a-file-using-SimpleITK">Save the volume in a file using SimpleITK</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/CBCT-acquisition-with-noise-and-reconstruction/#Cleaning-up">Cleaning up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Hyperspectral_regularisation/">Reconstruction and regularisation for a hyperspectral dataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#Tested-on-CIL-version-23.1.0">Tested on CIL version 23.1.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#Define-the-scan-geometry">Define the scan geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#TV-regularisation-in-space">TV regularisation in space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#TV-regularisation-across-both-energy-channels-and-spatial-dimensions">TV regularisation across both energy channels and spatial dimensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#TV-regularisation-in-spatial-dimensions-and-Tikhonov-regularisation-across-the-energy-channels">TV regularisation in spatial dimensions and Tikhonov regularisation across the energy channels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Hyperspectral_regularisation/#Summary---Comparison-of-Reconstruction-by-each-algorithm">Summary - Comparison of Reconstruction by each algorithm</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/">Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#CIL-version-23.1.0">CIL version 23.1.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#The-dataset">The dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstruct-the-noisy-data-using-FBP">Reconstruct the noisy data using FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-least-squares-(LS)">Reconstructing the noisy data using least squares (LS)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-weighted-least-squares-(WLS)">Reconstructing the noisy data using weighted least squares (WLS)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstruct-the-noisy-data-using-Kullback-Liebler-(KL)-divergence">Reconstruct the noisy data using Kullback Liebler (KL) divergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Comparisons-without-regularisation">Comparisons without regularisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-least-squares-with-Total-Variation-regualrisation">Reconstructing the noisy data using least squares with Total Variation regualrisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#id1">Reconstructing the noisy data using least squares with Total Variation regualrisation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Comparisons-with-TV">Comparisons with TV</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Apple_offset_reconstruction/">Offset reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/Apple_offset_reconstruction/#Reconstruction-of-an-apple-measured-with-offset-detector.">Reconstruction of an apple measured with offset detector.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Apple_offset_reconstruction/#CIL-Version-23.1.0">CIL Version 23.1.0</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Read-files">Read files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Data-processing">Data processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/bruker2cil/#Optional:-Apply-Centre-of-Rotation-Corrector">Optional: Apply Centre of Rotation Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/bruker2cil/#Optional:-Slicing">Optional: Slicing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/bruker2cil/#Optional:-Ring-artefact-removal">Optional: Ring artefact removal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/bruker2cil/#Optional:-Data-binning">Optional: Data binning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Prepare-back-projection">Prepare back-projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Review-projection-data-before-running-the-recontruction">Review projection data before running the recontruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Perform-reconstruction">Perform reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Display-results">Display results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Optional:-Save-results-as-tiff-files">Optional: Save results as tiff files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/bruker2cil/#Optional:-Save-results-as-json-files">Optional: Save results as json files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/">Exciscope Polaris phase contrast reconstruction with CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Cil-version-24.2.0">Cil version 24.2.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Data">Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Import-Metadata">Import Metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Import-Projection-Data">Import Projection Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Define-Geometry">Define Geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Normalize-Data">Normalize Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Center-of-Rotation">Center-of-Rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Ring-Artefact-Removal">Ring Artefact Removal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Paganin-Phase-Retrieval">Paganin Phase Retrieval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Data-Export">Data Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/recon_phasecontrast_exciscope/#Inspect-3D-Volume">Inspect 3D Volume</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/">Controlled Wavelet Sparsity using callbacks (2D data)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#2D-laboratory-micro-CT,-fan-beam-data-of-a-walnut">2D laboratory micro-CT, fan-beam data of a walnut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Image-geometry-and-data">Image geometry and data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Wavelet-based-regularization">Wavelet based regularization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Wavelet-transform">Wavelet transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Fast-Iterative-Soft-Thresholding-Algorithm-(FISTA)">Fast Iterative Soft Thresholding Algorithm (FISTA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Sparsity-levels-of-the-bulk-reconstruction">Sparsity levels of the bulk reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#Limitations-of-the-method">Limitations of the method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_2d/#How-to-pick-desired-sparsity?">How to pick <em>desired sparsity</em>?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/">Controlled Wavelet Sparsity using callbacks (3D data)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#3D-laboratory-micro-CT,-fan-beam-data-of-a-seashell">3D laboratory micro-CT, fan-beam data of a seashell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Read-data-and-add-geometry">Read data and add geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Process-the-data">Process the data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Image-geometry-and-data">Image geometry and data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Wavelet-based-regularization">Wavelet based regularization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Wavelet-transform">Wavelet transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Fast-Iterative-Soft-Thresholding-Algorithm-(FISTA)">Fast Iterative Soft Thresholding Algorithm (FISTA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/controlledWaveletSparsity_3d/#Limitations-of-the-method">Limitations of the method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/013_Anisotropic_regularisation_FILD_measurements/">CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/013_Anisotropic_regularisation_FILD_measurements/#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/013_Anisotropic_regularisation_FILD_measurements/#Data-Availability">Data Availability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/013_Anisotropic_regularisation_FILD_measurements/#What-You'll-Learn">What You’ll Learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/013_Anisotropic_regularisation_FILD_measurements/#Experimental-data-reconstructions">Experimental data reconstructions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/">Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/#Installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/#Import-modules">Import modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/#Read-projections">Read projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/#Reconstruction">Reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/Simulation_and_CPU_reconstruction/#Conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/memory_profiling_sandstone/">Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Loading-The-Sandstone-Dataset">Loading The Sandstone Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Ground-Truth---FBP-Reconstruction-of-pre-processed-sandstone">Ground Truth - FBP Reconstruction of pre-processed sandstone</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Generating-Test-Sinogram---Apply-Noise:">Generating Test Sinogram - Apply Noise:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#CGLS-and-LSQR-without-regularisation">CGLS and LSQR without regularisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Memory-Profiling">Memory Profiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Tikhonov-regularisation-using-CGLS-and-LSQR---with-or-without-a-block">Tikhonov regularisation using CGLS and LSQR - with or without a block</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Memory-costs-for-LSQR+Block,-CGLS+Block-and-LSQR+Tikhonov">Memory costs for LSQR+Block, CGLS+Block and LSQR+Tikhonov</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/memory_profiling_sandstone/#Conclusion:">Conclusion:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="demos/fista_with_denoiser/">A CIL-pytorch example using DeepInverse using a pre-trained denoiser in the CIL FISTA algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#CIL-Version-24.3.1">CIL Version 24.3.1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#Dataset">Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#Total-Variation-regularised-reconstruction">Total Variation regularised reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#FISTA-with-the-proximal-step-replaced-by-a-learned-denoiser">FISTA with the proximal step replaced by a learned denoiser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#Summary">Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demos/fista_with_denoiser/#Future-work">Future work</a></li>
 </ul>
 </li>
 </ul>

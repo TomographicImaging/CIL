@@ -66,33 +66,33 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
 
 
     
-    def run_algorithm(self, name, geometry_type, expect_warning=False, **kwargs):
+    def run_algorithm(self, algorithm_name, geometry_type, expect_warning=False, **kwargs):
         ig, absorption, gt = self.get_geometry_data(geometry_type)
 
         if expect_warning:
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 algo = tigre_algo_wrapper(
-                    name=name,
+                    algorithm_name=algorithm_name,
                     initial=None,
                     image_geometry=ig,
                     data=absorption,
-                    niter=2,
+                    number_iterations=2,
                     **kwargs
                 )
                 img, qual = algo.run()
                 warning_msgs = [str(warn.message) for warn in w]
                 self.assertTrue(
                     any("incorrect results in the TV denoising step" in msg for msg in warning_msgs),
-                    f"Expected warning not raised for {name} with {geometry_type}"
+                    f"Expected warning not raised for {algorithm_name} with {geometry_type}"
                 )
         else:
             algo = tigre_algo_wrapper(
-                name=name,
+                algorithm_name=algorithm_name,
                 initial=None,
                 image_geometry=ig,
                 data=absorption,
-                niter=2,
+                number_iterations=2,
                 **kwargs
             )
             img, qual = algo.run()
@@ -104,7 +104,7 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
 
     
     @parametrize(
-        ("name", "kwargs", "expect_warning", "geometry_type"),
+        ("algorithm_name", "kwargs", "expect_warning", "geometry_type"),
         [
             ("sart", {}, False, "parallel_2d"),
             ("sirt", {}, False, "parallel_3d"),
@@ -128,7 +128,7 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
     )
     @unittest.skipUnless(has_tigre, "Requires TIGRE")
     @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
-    def test_tigre_algorithms_with_geometries(self, name, kwargs, expect_warning, geometry_type):
+    def test_tigre_algorithms_with_geometries(self, algorithm_name, kwargs, expect_warning, geometry_type):
         ig, absorption, _ = self.get_geometry_data(geometry_type)
         
         
@@ -142,6 +142,6 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
             k: v(self, ig, absorption.geometry) if callable(v) else v
             for k, v in kwargs.items()
         }
-        self.run_algorithm(name, geometry_type, expect_warning=expect_warning, **resolved_kwargs)
+        self.run_algorithm(algorithm_name, geometry_type, expect_warning=expect_warning, **resolved_kwargs)
 
 

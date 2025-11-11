@@ -28,7 +28,7 @@ import numpy as np
 import warnings
 from cil.framework.labels import AcquisitionDimension
 
-log = logging.getLogger(__algorithm_name__)
+log = logging.getLogger(__name__)
 
 try:
     from tigre.utilities.gpu import GpuIds
@@ -106,7 +106,7 @@ class tigre_algo_wrapper(Reconstructor):
         elif image_geometry is None and initial is not None:
             image_geometry = initial.geometry
 
-        log.info("%s setting up tigre geometry", self.__class__.__algorithm_name__)
+        log.info("%s setting up tigre geometry", self.__class__.__name__)
 
         if initial is None:
             initial = image_geometry.allocate(0)
@@ -144,7 +144,7 @@ class tigre_algo_wrapper(Reconstructor):
 
         super(tigre_algo_wrapper, self).__init__(data, image_geometry=ig, backend='tigre')
 
-        log.info("%s configured", self.__class__.__algorithm_name__)
+        log.info("%s configured", self.__class__.__name__)
 
     def set_input(self, input):
         """
@@ -214,6 +214,6 @@ class tigre_algo_wrapper(Reconstructor):
 
         out.fill(img)
 
-        log.info("%s completed", self.__class__.__algorithm_name__)
+        log.info("%s completed", self.__class__.__name__)
 
         return out, quality

@@ -1,7 +1,8 @@
 * XX.X.X
   - New features:
-      - Added `get_centre_slice` method to `ImageData`, `ImageGeometry`, and `AcquisitionGeometry`. (#2235)
-      - Allows passing vertical='centre' to `ImageGeometry.get_slice` (#2235)
+    - LSQR algorithm added to the CIL algorithm class (#1975)
+    - Added `get_centre_slice` method to `ImageData`, `ImageGeometry`, and `AcquisitionGeometry`. (#2235)
+    - Allows passing vertical='centre' to `ImageGeometry.get_slice` (#2235)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)

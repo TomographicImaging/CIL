@@ -18,10 +18,12 @@
 
 from cil.framework import Processor, AcquisitionData
 from cil.utilities import multiprocessing as cil_mp
+from cil.framework.labels import AcquisitionType
 
 import numpy
 import logging
 import numba
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -115,6 +117,9 @@ class FluxNormaliser(Processor):
             raise TypeError("Expected AcquistionData, found {}"
                             .format(type(dataset)))
         
+        if dataset.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("FluxNormaliser does not yet support CONE3D_FLEX data")
+        
         image_axes = 0
         if 'vertical' in dataset.dimension_labels:
             self.v_axis = dataset.get_dimension_axis('vertical')
@@ -207,16 +212,11 @@ class FluxNormaliser(Processor):
         # check flux array is the right size
         flux_size_flat = len(self.flux.ravel())
         if flux_size_flat > 1:
-            data_size_flat = len(dataset.geometry.angles)*dataset.geometry.channels
+            data_size_flat = dataset.geometry.num_projections*dataset.geometry.channels
             if data_size_flat != flux_size_flat:
                 raise ValueError("Flux must be a scalar or array with length \
                                     \n = number of projections, found {} and {}"
                                     .format(flux_size_flat, data_size_flat))
-            
-        # check if flux array contains 0s
-        if 0 in self.flux:
-            raise ValueError('Flux value can\'t be 0, provide a different flux\
-                                or region of interest with non-zero values')
           
     def _calculate_target(self):
         '''
@@ -278,6 +278,12 @@ class FluxNormaliser(Processor):
         import matplotlib.pyplot as plt
 
         self._calculate_flux()
+
+        # check if flux array contains 0s
+        if 0 in self.flux:
+            warnings.warn('Flux value can\'t be 0, provide a different flux\
+                                or region of interest with non-zero values')
+
         if self.roi_slice is None:
             raise ValueError('Preview available with roi, run `processor= FluxNormaliser(roi=roi)` then `set_input(data)`')
         else:
@@ -321,7 +327,7 @@ class FluxNormaliser(Processor):
                     raise ValueError("Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram")
             
             plt.subplot(212)
-            if len(data.geometry.angles)==1:
+            if data.geometry.num_projections==1:
                 plt.plot(0, flux_array, '.r', label='Mean')
                 plt.plot(0, min,'.k', label='Minimum')
                 plt.plot(0, max,'.k', label='Maximum')
@@ -338,7 +344,7 @@ class FluxNormaliser(Processor):
 
             ax1 = plt.gca()
             ax2 = ax1.twiny()
-            valid_ticks = [int(tick) for tick in ax1.get_xticks() if 0 <= tick < len(data.geometry.angles)]
+            valid_ticks = [int(tick) for tick in ax1.get_xticks() if 0 <= tick < data.geometry.num_projections]
             ax2.set_xticks(valid_ticks)
             ax2.set_xbound(ax1.get_xbound())
             ax2.set_xticklabels([data.geometry.angles[tick] for tick in valid_ticks])
@@ -436,6 +442,10 @@ class FluxNormaliser(Processor):
         
     def process(self, out=None):
         self._calculate_flux()
+        if 0 in self.flux:
+            raise ValueError('Flux value can\'t be 0, provide a different flux\
+                                or region of interest with non-zero values')
+        
         self._calculate_target()
 
         data = self.get_input()

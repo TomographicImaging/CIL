@@ -42,28 +42,34 @@ class CILDATA(DATA):
         return loader.load(cls.dfile(), size, scale, **kwargs)
 
 class REMOTEDATA(DATA):
-
     FOLDER = ''
     ZENODO_RECORD = ''
     ZIP_FILE = ''
+    CIL_DATA_DIR = os.getenv("CIL_DATA_DIR", None)
 
     @classmethod
-    def get(cls, data_dir):
-        return None
+    def assert_dir(cls, data_dir):
+        if data_dir is None:
+            raise NotADirectoryError("data_dir must be specified")
 
     @classmethod
-    def download_data(cls, data_dir, prompt=True):
+    def get(cls, data_dir=CIL_DATA_DIR):
+        raise NotImplementedError
+
+    @classmethod
+    def download_data(cls, data_dir=CIL_DATA_DIR, prompt=True):
         '''
         Download a dataset from a remote repository
 
         Parameters
         ----------
-        data_dir: str, optional
-           The path to the data directory where the downloaded data should be stored
-
+        data_dir: str
+           The path to the data directory where the downloaded data should be stored.
+           If unspecified, tries to use the CIL_DATA_DIR environment variable.
         '''
+        cls.assert_dir(data_dir)
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
-            print("Dataset folder already exists in " + data_dir)
+            print(f"Dataset folder already exists in {data_dir}")
         else:
             user_input = input("Are you sure you want to download {cls.ZIP_FILE} dataset from Zenodo record {cls.ZENODO_RECORD}? [Y/n]: ") if prompt else 'y'
             if user_input.lower() not in ('y', 'yes'):
@@ -206,7 +212,7 @@ class WALNUT(REMOTEDATA):
     ZIP_FILE = 'walnut.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
         Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
@@ -221,6 +227,7 @@ class WALNUT(REMOTEDATA):
         ImageData
             The walnut dataset
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
@@ -244,7 +251,7 @@ class USB(REMOTEDATA):
     ZIP_FILE = 'usb.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
         Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
@@ -259,6 +266,7 @@ class USB(REMOTEDATA):
         ImageData
             The usb dataset
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
@@ -282,7 +290,7 @@ class KORN(REMOTEDATA):
     ZIP_FILE = 'korn.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
         Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
         This function returns the raw projection data from the .xtekct file
@@ -298,6 +306,7 @@ class KORN(REMOTEDATA):
             The korn dataset
 
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
             loader = NikonDataReader(file_name=filepath)
@@ -323,7 +332,7 @@ class SANDSTONE(REMOTEDATA):
     ZIP_FILE = 'small.zip'
 
     @classmethod
-    def get(cls, data_dir, filename):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR, filename=None):
         '''
         Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
         A small subset of the data containing selected projections and 4 slices of the reconstruction
@@ -340,11 +349,14 @@ class SANDSTONE(REMOTEDATA):
         ImageData
             The selected sandstone dataset
         '''
+        cls.assert_dir(data_dir)
+        if filename is None:
+            raise FileNotFoundError("filename must be specified")
         extension = os.path.splitext(filename)[1]
         if extension == '.mat':
             return loadmat(os.path.join(data_dir,filename))
         raise KeyError(f"Unknown extension: {extension}")
-        
+
 
 class TestData(object):
     '''Class to return test data

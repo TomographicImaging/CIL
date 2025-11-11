@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Satwik Pani (Washington University in St. Louis)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
@@ -26,7 +27,7 @@ find_package(OpenMP REQUIRED)
 add_definitions(${OpenMP_CXX_FLAGS})
 
 if (WIN32)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
+  add_definitions("/Ddll_EXPORTS")
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
@@ -68,29 +69,8 @@ add_library(cilacc SHARED ${cilacc_SOURCES})
 target_link_libraries(cilacc ${cilacc_LIBRARIES})
 include_directories(cilacc PUBLIC ${cilacc_INCLUDES})
 
-## Install
-#include(GNUInstallDirs)
-#install(TARGETS cilacc
-#	RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib
-#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-#	)
-
-if (UNIX)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS cilacc
-	LIBRARY DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-elseif(WIN32)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
-  install(TARGETS cilacc
-	RUNTIME DESTINATION Library/bin
-	ARCHIVE DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-endif()
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)
+        LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME}/lib
+        RUNTIME DESTINATION ${SKBUILD_PROJECT_NAME}/lib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+        DESTINATION ${SKBUILD_PROJECT_NAME}/include/${SKBUILD_PROJECT_NAME})

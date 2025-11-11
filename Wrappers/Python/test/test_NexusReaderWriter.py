@@ -77,6 +77,23 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readAcquisitionDataAndTest()
 
+    def test_write_Cone3D_Flex(self):
+        source_position_set = [[0,-1,0], [0,-1.3,1]]
+        detector_position_set = [[0,2,1], [0,2,2]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[10, 20])
+        ad = ag.allocate('random_int')
+        with self.assertRaises(NotImplementedError):
+            writer = NEXUSDataWriter(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d_flex.nxs'),
+                                     data = ad)
+            writer.write()
+                                   
 
     def test_writeImageData_compressed(self):
         im_size = 5
@@ -86,11 +103,11 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
-                      data = im, compression=16)
+                      data = im, compression='uint16')
         writer.write()
 
         self.assertTrue(writer.dtype == numpy.uint16)
-        self.assertTrue(writer.compression == 16)
+        self.assertTrue(writer.compression == 'uint16')
 
         self.readImageDataAndTest(atol=1e-4)
 

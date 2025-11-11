@@ -34,6 +34,7 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
 import gc
@@ -180,7 +181,7 @@ class TestBinner_cillacc(unittest.TestCase):
 class TestBinner(unittest.TestCase):
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -383,6 +384,21 @@ class TestBinner(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+
+        roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        proc = Binner(roi=roi)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_image_geometry(self):
 
@@ -447,7 +463,7 @@ class TestBinner(unittest.TestCase):
     def test_bin_array_consistency(self):
 
         ig = ImageGeometry(64,32,16,channels=8)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         roi = {'horizontal_x':(1,-1,16),'horizontal_y':(1,-1,8),'channel':(1,-1,2),'vertical':(1,-1,4)}
 
@@ -486,7 +502,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -534,7 +550,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -813,7 +829,7 @@ class TestSlicer(unittest.TestCase):
 
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -1058,6 +1074,48 @@ class TestSlicer(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0], [0,-90000,0], [0,-90000,1], [0,-80000,0]]
+        detector_position_set=[[0,0,0], [0,0,1], [0,0,2], [0,0,3]]
+        detector_direction_x_set=[[1, 0, 0], [0.5, 0, 0], [1, 0, 0], [0.8,0,0]]
+        detector_direction_y_set=[[0, 0, 1], [0,0,0.8], [0,0,1.1], [0,0,1.2]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        roi_invalid = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        with self.assertRaises(NotImplementedError):
+            proc = Slicer(roi=roi_invalid)
+            proc.set_input(ag)
+        
+        roi_valid =  {'projection':(1,3,2)}
+
+        slicer = Slicer(roi=roi_valid)
+        sliced = slicer(ag)
+
+        expected_source_position_set = source_position_set[1:3:2]
+        expected_detector_position_set = detector_position_set[1:3:2]
+        expected_detector_direction_x_set = detector_direction_x_set[1:3:2]
+        expected_detector_direction_y_set = detector_direction_y_set[1:3:2]
+        expected_num_positions = len(expected_source_position_set)
+
+        expected_acq_geometry = AcquisitionGeometry.create_Cone3D_Flex(
+            expected_source_position_set, expected_detector_position_set, expected_detector_direction_x_set, expected_detector_direction_y_set)
+        expected_acq_geometry.set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        numpy.testing.assert_allclose(expected_source_position_set, [x.position for x in sliced.config.system.source])
+        numpy.testing.assert_allclose(expected_num_positions, sliced.config.system.num_positions)
+        self.assertEqual(expected_acq_geometry, sliced)
+
+        roi_channels = {'channel':(1,3,2)}
+
+        slicer = Slicer(roi=roi_channels)
+        sliced = slicer(ag)
+        ag_expected = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(1)
+
+        self.assertEqual(ag_expected, sliced)
+
+       
 
     def test_process_image_geometry(self):
 
@@ -1125,7 +1183,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_image_data(self):
 
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -1165,7 +1223,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_acquisition_data(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -1564,7 +1622,33 @@ class TestCofR_xcorrelation(unittest.TestCase):
         processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
         with self.assertRaises(ValueError):
             processor.set_input(data_limited)           
-    
+
+
+class TestCentreOfRotation_cone3D_Flex(unittest.TestCase):
+
+    def setUp(self):
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        self.data = ag.allocate('random')
+
+    def test_image_sharpness_acquisition_geometry_cone3DFlex(self):
+        #mock the _configure_FBP method to bypass the backprojector setup
+        with patch.object(CofR_image_sharpness, '_configure_FBP', return_value=None):
+            corr = CofR_image_sharpness()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(self.data)
+
+    def test_x_corr_acquisition_geometry_cone3DFlex(self):
+        corr = CofR_xcorrelation()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(self.data)
+
+
 class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def setUp(self):
@@ -1667,7 +1751,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
-class TestPaddder(unittest.TestCase):
+class TestPadder(unittest.TestCase):
 
     def setUp(self):
 
@@ -1691,7 +1775,7 @@ class TestPaddder(unittest.TestCase):
     def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         dim_order = ['channel','vertical','horizontal_y','horizontal_x']
 
         pad_width = {'horizontal_x':(3,4),'vertical':(5,6),'channel':(7,8)}
@@ -1814,6 +1898,18 @@ class TestPaddder(unittest.TestCase):
         self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_acquisition_geometry_origin(self):
         geometry = self.ag2
@@ -1841,7 +1937,7 @@ class TestPaddder(unittest.TestCase):
     def test_process_data(self):
 
         geometry = self.ig
-        data = geometry.allocate('random')
+        data = geometry.allocate('random', seed=42)
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
         proc.set_input(data)
@@ -1866,7 +1962,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.5)
 
-        data_in = self.ag.allocate('random')
+        data_in = self.ag.allocate('random', seed=42)
 
         data_gold = self.ag_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],:,v[0]:-v[1],h[0]:-h[1]] = data_in.array
@@ -1900,7 +1996,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
 
-        data_in = self.ig.allocate('random')
+        data_in = self.ig.allocate('random', seed=42)
 
         data_gold = self.ig_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data_in.array
@@ -2381,7 +2477,7 @@ class TestMaskGenerator(unittest.TestCase):
                         voxel_num_y=10)
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
 
-        data = IG.allocate('random')
+        data = IG.allocate('random', seed=42)
 
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
@@ -2482,9 +2578,7 @@ class TestMaskGenerator(unittest.TestCase):
                             voxel_num_y=200)
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
-        data = IG.allocate()
-        numpy.random.seed(10)
-        data.fill(numpy.random.rand(200,200))
+        data = IG.allocate('random', seed=2)
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
         data_as_data_container = DataContainer(data.as_array().copy())
@@ -2602,7 +2696,7 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
                                             accelerated=accelerated)
@@ -2654,7 +2748,7 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = AbsorptionTransmissionConverter(white_level=10)
         s.set_input(ad)
@@ -2679,8 +2773,8 @@ class TestMasker(unittest.TestCase):
                             voxel_num_y=5,
                             voxel_num_z=5)
         
-        self.data_2D_init = IG_2D.allocate('random')
-        self.data_3D_init = IG_3D.allocate('random')
+        self.data_2D_init = IG_2D.allocate('random', seed=42)
+        self.data_3D_init = IG_3D.allocate('random', seed=42)
 
         self.data_2D = self.data_2D_init.copy()
         self.data_3D = self.data_3D_init.copy()
@@ -2870,7 +2964,14 @@ class TestPaganinProcessor(unittest.TestCase):
             .set_panel([128,128],0.1)\
             .set_channels(4)
 
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=3)
+
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.data_cone_flex  = cone_flex_ag.allocate('random', seed=3)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -2923,6 +3024,8 @@ class TestPaganinProcessor(unittest.TestCase):
             data.reorder('astra')
             with self.assertRaises(ValueError):
                 processor.set_input(data)
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone_flex)
 
 
     def test_PaganinProcessor_set_geometry(self):
@@ -2995,7 +3098,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
 
         self.data_cone.geometry.config.units='m'
         processor.set_input(self.data_cone)
@@ -3008,8 +3111,8 @@ class TestPaganinProcessor(unittest.TestCase):
         self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
         
         kx,ky = numpy.meshgrid( 
-            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
-            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
             sparse=False, 
             indexing='ij'
             )
@@ -3025,7 +3128,7 @@ class TestPaganinProcessor(unittest.TestCase):
         processor.filter_Nx = Nx
         processor.filter_Ny = Ny
         processor._create_filter()
-        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        filter = ifftshift(1/(1. - (2*alpha/(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification)**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*ky) -2)))
         numpy.testing.assert_allclose(processor.filter, filter)
 
         # check unknown method raises error
@@ -3050,7 +3153,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
         self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
         self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
         self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
@@ -3167,7 +3270,7 @@ class TestFluxNormaliser(unittest.TestCase):
             .set_angles(numpy.linspace(0,360,360,endpoint=False))\
             .set_panel([128,128],0.1)\
             .set_channels(4)
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=42)
         self.data_slice = self.data_parallel.get_slice(vertical=1)
         self.data_reorder = self.data_cone.copy()
         self.data_reorder.reorder(['angle','horizontal','vertical'])
@@ -3179,6 +3282,13 @@ class TestFluxNormaliser(unittest.TestCase):
                         [[4,5,6],[4,5,6],[4,5,6]], 
                         [[7,8,9],[7,8,9],[7,8,9]]])
         self.data_simple = AcquisitionData(arr, geometry=ag)
+
+        source_position_set=[[0,-100000,0]]*3
+        detector_position_set=[[0,0,0]]*3
+        detector_direction_x_set=[[1, 0, 0]]*3
+        detector_direction_y_set=[[0, 0, 1]]*3
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.cone_flex  = AcquisitionData(arr, geometry=cone_flex_ag)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3204,6 +3314,11 @@ class TestFluxNormaliser(unittest.TestCase):
         processor = FluxNormaliser()
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
+
+        # check there's a not implemented error if cone flex geom is used:
+        processor = FluxNormaliser(flux=[1,2,3])
+        with self.assertRaises(NotImplementedError):
+            processor.check_input(self.cone_flex)
 
     def test_calculate_flux(self):
         # check there is an error if flux array size is not equal to the number of angles in data
@@ -3240,22 +3355,22 @@ class TestFluxNormaliser(unittest.TestCase):
         processor = FluxNormaliser(flux = 0)
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux = 0.0)
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles)))
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles), dtype=numpy.uint16))
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
     def test_calculate_target(self):
 

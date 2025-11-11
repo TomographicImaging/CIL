@@ -1,40 +1,82 @@
-* XX.X
+* XX.X.X
   - Bug fixes:
-      - Fix deprecation warning for rtol and atol in GD (#2056)
-      - Removed the deprecated usage of run method in test_SIRF.py (#2070)
-      - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
-      - Made ProjectionOperator `device` input case-insensitive (#1990)
-      - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
-      - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
-      - Copy geometry in the creation of a DataContainer (#2108)
-      - Fix order of operations for subtraction and division between a BlockDataContainer and DataContainer (#2133)
-  - Documentation:
-      - Updated documentation for the ChannelWiseOperator including new example (#2096)
-      - Updated documentation for LADMM (#2015)
-      - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
+    - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
+    - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
+
+* 25.0.0
+  - New features:
+    - Added `FunctionOfAbs` class (#1976)
+    - Added `Cone3D_Flex` geometry as a CIL acquisition geometry type. This allows users to reconstruct non-circular trajectories. (#2039)
+    - Added `ASTRA` backend support for `ProjectionOperator` and `FBP` to use `Cone3D_Flex` geometry. (#2039)
+    - Added `show_system_positions` for visualisation of `Cone3D_Flex` geometries. (#2039)
+    - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
   - Enhancements:
-      - Add accelerated version to TransmissionAbsorption processor, controlled by `accelerated` parameter, default is True (#2036)
-      - Made the call to next() in algorithm iteration loop explicit (#2069)
-      - Added option for a random seed in the power method in the linear operator (#1585)
-      - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
-      - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
-      - Renamed Sampler's `get_samples` to `view_samples` (deprecating `get_samples`) (#2128)
-      - PDHG 'check_convergence' updated for new literature (#2084)
-      - Make install local env script work on windows (#2144)
-      - Added an Accelerated Proximal Gradient Descent Algorithm (APGD) with options for momentum (#2145)
+    - Added an accelerated version to the TransmissionAbsorption processor, controlled by the `accelerated` parameter (default is `True`) (#2036)
+    - Made the call to next() in algorithm iteration loop explicit (#2069)
+    - Added option for a random seed in the power method in the linear operator (#1585)
+    - Improved efficiency of `Normaliser` processor. Reduced memory use and increased speed (#2111)
+    - Extra functionality for sampler: `get_previous_samples()` and `get_current_sample()` (#2079)
+    - PDHG 'check_convergence' updated for new literature (#2084)
+    - Updated `create_local_env_for_cil_development.sh` script to work on Windows (#2144)
+    - Improved consistency of `step_size` property across GD, ISTA, FISTA and APGD algorithms (#2157)
+    - In PDHG algorithm, we now have options to initialise the dual variable, as well as the primal variable (#2169)
+    - Allow FluxNormaliser.preview_configuration() even if flux contains zeros (#2177)
+    - Check if kwargs are used in AcquisitionData and ImageData initialisation (#2178)
+    - Added a flag to `show_geometry` that allows for disabling the call to `plt.show()` (#2195)
+    - The random methods to populate a data container can now be accessed via `fill()` and `allocate()`, and will have a lower memory footprint on creation (#2037)
+  - Bug fixes:
+    - Fix deprecation warning for rtol and atol in GD (#2056)
+    - Removed the deprecated usage of run method in test_SIRF.py (#2070)
+    - Ensured CIL forward and back projectors always return, even when `out` is passed (#2059)
+    - Made ProjectionOperator `device` input case-insensitive (#1990)
+    - Ensured the same approximate gradient is used within each iteration for PD3O with a stochastic function `f` (#2043)
+    - Fix `recon.FBP` `split_processing` methods for `ASTRA` backend (#2114)
+    - Copy geometry in the creation of a DataContainer (#2108)
+    - Fix order of operations for subtraction and division between a BlockDataContainer and DataContainer (#2133)
+    - Update default compression for TIFFWriter setup (#2197)
+    - ProjectionOperator device input is no longer case-sensitive (#2065)
+    - Fix `pkg_resources` deprecation warning on `setuptools>=81 dxchange<=0.2.0` (#2207)
+  - Deprecated
+    - Positional arguments for `get_slice` on `AcquisitionGeometry` and `AcquisitionData` have been deprecated (#2039)
+    - Methods to allocate a `DataContainer` using the old numpy random number generator have been renamed and deprecated, `RANDOM`->`RANDOM_DEPRECATED` and `RANDOM_INT`->`RANDOM_INT_DEPRECATED`. See "Breaking Changes" for details of new behaviour (#2037)
+    - Sampler's `get_samples` has been deprecated, use `view_samples` (#2128)
+  - Removed code
+    - Removed the following code which has been deprecated since v23.0.0 or earlier (#2150):
+      - `dimension_labels` kwarg in `AcquisitionGeometry.allocate()` and in `ImageData`'s `__init__`
+      - `axpby` (alias of `sapyb`)
+      - `shape` setter in `DataContainer` and `ImageGeometry`
+      - use of integer compression in `NEXUSDataWriter`
+    - Removed unused kwargs passed to ImageData and AcquisitionData, including `suppress_warning` (#2206)
+  - Documentation:
+    - Updated documentation for the ChannelWiseOperator including new example (#2096)
+    - Updated documentation for LADMM (#2015)
+    - Updated Contributor's Guide to include an example of parametrized tests, using `unittest-parametrize` (#1990)
+    - Tidied up documentation of `L1Norm` (#2186)
+    - Added callbacks to documentation (#2067)
+    - Added new tutorials to the "How-To" page in the docs (#1972)
   - Testing:
-      - Developers can now add `#all-tests` to their commit message on a PR to run the full matrix of GitHub actions tests (#2081)
-      - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
-      - Added tests for Normaliser processor
-      - Update minimum cmake version to 3.5
+    - Developers can now run the full CI matrix [via the web UI](https://github.com/TomographicImaging/CIL/actions/workflows/build.yml) (#2160)
+    - Added tests for ProjectionOperator inputs that use `unittest-parametrize` module (#1990)
+    - Added tests for Normaliser processor
+    - Update minimum cmake version to 3.5
+    - Added unit test for the `ZEISSDataReader` (#2098)
+    - Added `requirements-test-windows.yml` to create test environment (#2174)
+    - Automate Windows conda build & release (#1918)
   - Dependencies:
-      - matplotlib-base is an optional dependency, instead of required (#2093)
-      - `unittest-parametrize has been added as a dependency for tests (#1990)
-      - olefile and dxchange are an optional dependency, instead of required (#2149)
-      - zenodo_get is an optional dependency, instead of required (#2146)
-      - `FindIPP.cmake` fallback (#2148)
-        - enable `find_package` using `*_ROOT` hints
-        - simplified `cilacc` build logic for optional dependencies
+    - Move from CMake to `pip install` (#2145)
+    - Use conda native compilers (#2199)
+    - matplotlib-base is an optional dependency, instead of required (#2093)
+    - `unittest-parametrize` has been added as a dependency for tests (#1990)
+    - Defer import of olefile and dxchange (#2149)
+    - zenodo_get is an optional dependency, instead of required (#2146)
+    - `FindIPP.cmake` fallback (#2148)
+      - enable `find_package` using `*_ROOT` hints
+      - simplified `cilacc` build logic for optional dependencies
+    - Removed upper version constraints on optional plugins when resolving conda environment  (#2204)
+    - Relaxed numpy runtime pinning of versions (#2156)
+  - Breaking changes:
+    - `RANDOM` and `RANDOM_INT` options in `DataContainer.fill()` and `geometry.allocate()` methods now use numpy default random number generator to populate the array. Values for a set seed will now change compared to previous versions. Previous methods can be accessed with `RANDOM_DEPRECATED` and `RANDOM_INT_DEPRECATED`. (#2037)
+    - `RANDOM` and `RANDOM_INT` options in `DataContainer.fill()` and `geometry.allocate()` methods will no longer use a random seed set externally using `numpy.random.seed()`, the seed should be provided as an argument. `RANDOM_DEPRECATED` and `RANDOM_INT_DEPRECATED` will still use an externally set seed (#2037)
 
 * 24.3.0
   - New features:
@@ -65,10 +107,10 @@
     - The `run` method in the cil algorithm class will no longer run if a number of iterations is not passed (#1940)
     - Paganin processor now requires the CIL data order (#1920)
     - The gradient descent algorithm now takes `f` instead of `objective_function` to match with ISTA and FISTA (#2006)
-  - Deprecated code
+  - Deprecated code:
     - Deprecated `norms` and `prob` in the `SPDHG` algorithm to be set in the `BlockOperator` and `Sampler` respectively (#1644)
     - Deprecated `rtol` and `atol` from GD so that it does not stop iterating automatically - for this functionality users should use a callback (#1944)
-  - Testing
+  - Testing:
     - Added a new test file `test_algorithm_convergence` that will hold our algorithm tests that run to convergence (#2019)
     - Update random array in test_stepsizes.TestStepSizeBB.test_bb_converge to fix tests on windows (#2052)
 

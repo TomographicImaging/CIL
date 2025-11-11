@@ -140,5 +140,30 @@ class Test_Parallel2D_Projectors_GPU_toy(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
-        self.tolerance_linearity = 1e-10
+        self.tolerance_linearity = 1e-6
         self.tolerance_norm = 1e-6
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone3DFlex_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3DFlex()
+        self.tolerance_fp=0
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone3DFlex_Projectors_GPU_sim(unittest.TestCase, TestCommon_ProjectionOperator_SIM):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3DFlex()
+        self.tolerance_fp = 0.16
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone3DFlex_Projectors_GPU_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3DFlex()
+        self.tolerance_linearity = 1e-3
+        self.tolerance_norm = 0.1

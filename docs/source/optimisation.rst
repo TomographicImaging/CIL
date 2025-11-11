@@ -542,6 +542,14 @@ Total variation
    :members:
    :inherited-members:
 
+Function of Absolute Value 
+--------------------------
+
+.. autoclass:: cil.optimisation.functions.FunctionOfAbs
+   :members:
+   :inherited-members:
+
+
 Approximate Gradient base class 
 --------------------------------
 

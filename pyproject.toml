@@ -1,6 +1,20 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=64",
+    "setuptools_scm>=8",
+    "scikit-build-core>=0.10",
+    #"ipp-devel==2021.12.*", # PyPI conflicts with conda package
+]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.16"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["Wrappers/Python/cil/version.py"]
+sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
+[tool.scikit-build.wheel.packages]
+cil = "Wrappers/Python/cil"
 
 [tool.setuptools_scm]
 version_file = "Wrappers/Python/cil/version.py"
@@ -48,13 +62,12 @@ dependencies = [
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
-    "numpy>=1.23",
+    "numpy>=1.23, <2.0.0",
     "olefile>=0.46",
     "pillow",
     "pywavelets",
     "scipy>=1.4.0",
     "tqdm",
-    "zenodo_get>=1.6",
 ]
 [project.optional-dependencies]
 plugins = [
@@ -69,11 +82,12 @@ gpu = [
 test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
     "cvxpy",
-    "matplotlib>=3.3.0",
+    "matplotlib-base>=3.3",
     "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",
+    "zenodo_get>=1.6",
 ]
 docs = [
   "jinja2",

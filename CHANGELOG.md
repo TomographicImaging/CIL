@@ -4,6 +4,8 @@
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
+  - Documentation:
+    - Render the user showcase notebooks in the documentation (#2189)
 
 * 25.0.0
   - New features:

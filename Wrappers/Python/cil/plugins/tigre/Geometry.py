@@ -18,6 +18,7 @@
 
 from cil.framework.labels import AcquisitionType, AngleUnit
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 try:
     from tigre.utilities.geometry import Geometry
@@ -35,6 +36,32 @@ class CIL2TIGREGeometry(object):
 
         if ag.config.angles.angle_unit == AngleUnit.DEGREE:
             angles *= (np.pi/180.)
+
+        if ag.geom_type == 'parallel' and ag.system_description == 'advanced':
+            ag_cil = ag.copy()
+            ag_cil.config.system.align_reference_frame('cil')   # geometry in CIL frame
+            untilted_rotation_axis = ag_cil.config.system.rotation_axis.direction
+            untilted_rotation_axis /= np.linalg.norm(untilted_rotation_axis)
+
+            tilted_rotation_axis = ag.config.system.rotation_axis.direction
+            tilted_rotation_axis /= np.linalg.norm(tilted_rotation_axis)
+
+            v = np.cross(untilted_rotation_axis, tilted_rotation_axis)
+            v_norm = np.linalg.norm(v)
+            c = float(np.dot(untilted_rotation_axis, tilted_rotation_axis))
+            
+            # if tilted and untilted rotation axes are not parallel calculate Euler angles
+            if v_norm > 1e-12:
+                theta = np.arctan2(v_norm, c)
+                rotation_matrix = Rotation.from_rotvec(theta * v / v_norm)
+                euler_angles = []
+                for angle in angles:
+                    R1 = Rotation.from_euler("z", angle, degrees=False)
+                    combined = rotation_matrix * R1
+                    euler_angles.append(combined.as_euler("ZYZ", degrees=False))
+                tg.euler_angles = np.array(euler_angles, dtype=np.float32)
+                
+                return tg, tg.euler_angles
 
         #convert CIL to TIGRE angles s
         angles = -(angles + np.pi/2 +tg.theta )
@@ -89,12 +116,13 @@ class TIGREGeometry(Geometry):
             self.mode = 'cone'
 
         else:
-            if ag_in.system_description == 'advanced':
-                raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
             self.DSO = clearance_len
             self.DSD = 2*clearance_len
             self.mode = 'parallel'
+
+            # if ag_in.system_description == 'advanced':
+                # raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
         # number of voxels (vx)
         self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )

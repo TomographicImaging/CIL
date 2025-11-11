@@ -28,7 +28,7 @@ import numpy as np
 import warnings
 from cil.framework.labels import AcquisitionDimension
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(__algorithm_name__)
 
 try:
     from tigre.utilities.gpu import GpuIds
@@ -40,21 +40,21 @@ import weakref
     
 class tigre_algo_wrapper(Reconstructor):
 
-    def __init__(self, name=None,  initial=None, image_geometry=None,  data=None, niter=0,  **kwargs):
+    def __init__(self, algorithm_name=None,  initial=None, image_geometry=None,  data=None, number_iterations=0,  **kwargs):
         """
         A wrapper for TIGRE algorithms, allowing the use of CIL geometries and data.
 
         Parameters
         ----------
-        name : str
-            Name of the TIGRE algorithm to use (e.g., 'ART', 'SART', 'SIRT', 'OSSART').
+        algorithm_name : str
+            algorithm_Name of the TIGRE algorithm to use (e.g., 'ART', 'SART', 'SIRT', 'OSSART').
         initial : ImageData, optional
             Initial guess for the reconstruction. If None, a zero-initialized image is used.
         image_geometry : ImageGeometry
             The geometry of the image to be reconstructed.
         data : AcquisitionData
             The measured projection data.
-        niter : int, default=0
+        number_iterations : int, default=0
             Number of iterations for the reconstruction algorithm.
         **kwargs : dict
             Additional keyword arguments passed to the TIGRE reconstruction algorithm.
@@ -69,14 +69,14 @@ class tigre_algo_wrapper(Reconstructor):
         Raises
         ------
         ValueError
-            If `image_geometry` or `data` is None.
+            If  `data` is None.
 
         Notes
         -----
         This class is designed to facilitate the use of TIGRE algorithms within the CIL framework,
         allowing for the use of CIL's `ImageGeometry` and `AcquisitionData` classes. It handles the conversion
         of CIL geometries to TIGRE geometries and prepares the data for the specified algorithm.
-        The `name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
+        The `algorithm_name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
 
         Note
         ----
@@ -86,28 +86,27 @@ class tigre_algo_wrapper(Reconstructor):
         from tigre.utilities.gpu import GpuIds
         gpuids = GpuIds()
         gpuids.devices = [0]  # Specify the GPU device IDs you want to use
-        algo = tigre_algo_wrapper(name='fista', initial=initial_image, image_geometry=image_geom, data=acquisition_data, niter=10, gpuids=gpuids)
+        algo = tigre_algo_wrapper(algorithm_name='fista', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10, gpuids=gpuids)
         ```
         
         
         Example
         -------
         >>> from cil.plugins.tigre import tigre_algo_wrapping 
-        >>> algo = tigre_algo_wrapper(name='SART', initial=initial_image, image_geometry=image_geom, data=acquisition_data, niter=10)
+        >>> algo = tigre_algo_wrapper(algorithm_name='SART', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10)
         >>> reconstructed_image, quality = algo.run()
 
         """
 
-        missing = []
-        if image_geometry is None:
-            missing.append("`image_geometry`")
+        
         if data is None:
-            missing.append("`data`")
+            raise ValueError("`data` is required")
+        if image_geometry is None and initial is None:
+            image_geometry = data.geometry.get_ImageGeometry()
+        elif image_geometry is None and initial is not None:
+            image_geometry = initial.geometry
 
-        if missing:
-            raise ValueError(f"You must pass {', '.join(missing)}")
-
-        log.info("%s setting up tigre geometry", self.__class__.__name__)
+        log.info("%s setting up tigre geometry", self.__class__.__algorithm_name__)
 
         if initial is None:
             initial = image_geometry.allocate(0)
@@ -117,11 +116,10 @@ class tigre_algo_wrapper(Reconstructor):
         ag = data.geometry
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
             ig, ag)
-        self.tigre_geom.check_geo(self.tigre_angles)
         self.tigre_projections = data.as_array()
         
         if self.tigre_projections.ndim == 2:
-            if any( a==name for a in ['ista', 'fista', 'sart_tv', 'ossart_tv']):
+            if any( a==algorithm_name for a in ['ista', 'fista', 'sart_tv', 'ossart_tv']):
                 warnings.warn(
                     "We are aware that the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to incorrect results in the TV denoising step, particularly when using more than one GPU.", UserWarning, stacklevel=2)
 
@@ -133,8 +131,8 @@ class tigre_algo_wrapper(Reconstructor):
             self.tigre_projections = np.expand_dims(self.tigre_projections, axis=1)
             self.tigre_initial = np.expand_dims(self.tigre_initial, axis=0)
             
-        self.tigre_algo = getattr(algs, name)
-        self.niter = niter
+        self.tigre_algo = getattr(algs, algorithm_name)
+        self.number_iterations = number_iterations
         self.kwargs = kwargs
         if has_gpu_sel:
             self.gpuids = self.kwargs.pop('gpuids', None)
@@ -146,7 +144,7 @@ class tigre_algo_wrapper(Reconstructor):
 
         super(tigre_algo_wrapper, self).__init__(data, image_geometry=ig, backend='tigre')
 
-        log.info("%s configured", self.__class__.__name__)
+        log.info("%s configured", self.__class__.__algorithm_name__)
 
     def set_input(self, input):
         """
@@ -191,7 +189,7 @@ class tigre_algo_wrapper(Reconstructor):
                 geo=self.tigre_geom,
                 angles=self.tigre_angles,
                 init=self.tigre_initial,
-                niter=self.niter,
+                niter=self.number_iterations,
                 gpuids=self.gpuids,
                 **self.kwargs
             )
@@ -201,19 +199,21 @@ class tigre_algo_wrapper(Reconstructor):
                 geo=self.tigre_geom,
                 angles=self.tigre_angles,
                 init=self.tigre_initial,
-                niter=self.niter,
+                niter=self.number_iterations,
                 **self.kwargs
             )
-
-        img = result[0] if isinstance(result, tuple) else result
-
-        quality = result[1] if len(result) > 1 else None
+        if isinstance(result, tuple):
+            img = result[0]
+            quality = result[1]
+        else:
+            img = result
+            quality = None
 
         if out is None:
             out = self._image_geometry.allocate(0)
 
         out.fill(img)
 
-        log.info("%s completed", self.__class__.__name__)
+        log.info("%s completed", self.__class__.__algorithm_name__)
 
         return out, quality

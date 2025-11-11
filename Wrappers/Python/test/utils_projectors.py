@@ -656,9 +656,16 @@ class TestCommon_FBP_SIM(SimData):
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
 
         if AcquisitionType.DIM3 & self.ag.dimension:
+            # Manually generated single slice Image Geometry
             FBP = self.FBP(self.ig_single_slice, self.ag, **self.FBP_args)
             reco = FBP(self.acq_data)
             np.testing.assert_allclose(reco.as_array(), self.gold_roi_single_slice, atol=self.tolerance_fbp_roi)
+
+            # CIL generated single slice Image Geometry
+            central_slice_ig = self.ig.get_slice(vertical='centre')
+            FBP = self.FBP(central_slice_ig, self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.img_data.get_slice(vertical='centre').as_array(),atol=self.tolerance_fbp)
 
 
     def test_input_arguments(self):

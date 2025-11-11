@@ -860,13 +860,20 @@ class TestDataContainer(CCPiTestClass):
         ss1 = vol.get_slice(horizontal_x = 0)
         self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
 
+        ss2 = vol.get_slice(channel=0)
+        self.assertListEqual([ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], list(ss2.geometry.dimension_labels))
+
         vg = ImageGeometry(3,4,5,channels=2)
         self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["VERTICAL"],
                 ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]],
                               list(vg.dimension_labels))
-        ss2 = vg.allocate()
-        ss3 = vol.get_slice(channel=0)
-        self.assertListEqual([ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], list(ss3.geometry.dimension_labels))
+        vol2 = vg.allocate()
+
+        ss3 = vol2.get_slice(vertical=0)
+        self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], 
+                                list(ss3.geometry.dimension_labels))
+
+
 
     def test_DataContainerSubset(self):
         dc = DataContainer(np.ones((2,3,4,5)))

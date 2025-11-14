@@ -229,7 +229,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, delay=5,
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, delay=-1,
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
@@ -557,17 +557,37 @@ class PDHG(Algorithm):
                     y_resid = self.y - self.y_old
                     y_change_norm = y_resid.norm()
                     y_temp2 = self.operator.direct(x_resid)
-                    cross_term = np.vdot(y_resid.as_array(), y_temp2.as_array())
-                    print('x_change_norm = {}, y_change_norm = {}, self.c/self.tau)*x_change_norm**2 + (self.c/self.sigma)*y_change_norm**2= {}, cross_term = {}'.format(x_change_norm, y_change_norm, (self.c/self.tau)*x_change_norm**2 + (self.c/self.sigma)*y_change_norm**2, cross_term))
-                    while (self.c/self.tau)*x_change_norm**2 + (self.c/self.sigma)*y_change_norm**2 < 4*(cross_term): #TODO: check if abs is needed 
+                    cross_term =4*self.sigma*self.tau*y_resid.dot( y_temp2)
+                    print('x_change_norm = {}, y_change_norm = {}, LHS = {}, cross_term = {}'.format(x_change_norm, y_change_norm, self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2, cross_term))
+                    if self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2 < cross_term: #TODO: check if abs is needed 
                         self._tau /= 2
                         self._sigma /= 2
                         print('Reducing step sizes by 1/2')
+                        self.x_old.sapyb((self.theta + 1.0), self.x, -
+                         self.theta, out=self.x_tmp) # somewhere in line 4
+                        # Gradient ascent for the dual variable
+                        self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
+                        self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
+                        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
+                        
+
+                        # Gradient descent for the primal variable
+                        self.operator.adjoint(self.y, out=self.x_tmp) #line 2 
+                        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
+                        self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
+                        print('Recomputing x and y after reducing step sizes')
+                        
+                        x_resid = self.x-self.x_old # Need to be more memory efficient 
+                        x_change_norm = x_resid.norm()
+                        y_resid = self.y - self.y_old
+                        y_change_norm = y_resid.norm()
+                        y_temp2 = self.operator.direct(x_resid)
+                        cross_term = 4*self.sigma*self.tau*np.vdot(y_resid.as_array(), y_temp2.as_array())
                     print('After possible reduction', self.tau, self.sigma)
                     p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid)
                     d = (1/self.sigma)*y_resid - self.operator.direct(x_resid)
                     self.p_norm = p.norm()
-                    self.d_norm = d.norm()
+                    self.d_norm = 255*d.norm()
                     if 2*self.p_norm < self.d_norm:
                         print('2*self.p_norm < self.d_norm')
                         self._tau *= (1- self.alpha)
@@ -1145,26 +1165,45 @@ class PDHG_2013(Algorithm):
         if self.adaptive:
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
             #print('Before adaptive', self.tau, self.sigma)
-                x_resid = self.x-self.x_old
-                x_change_norm = x_resid.norm()
-                y_resid = self.y - self.y_old
+                x_resid = self.x-self.x_old # Extra image 1
+                x_change_norm = x_resid.norm() 
+                y_resid = self.y - self.y_old # Extra range data 1
                 y_change_norm = y_resid.norm()
-                y_temp2 = self.operator.direct(x_resid)
+                y_temp2 = self.operator.direct(x_resid) # Extra range data 2
                 cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
                 b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
 
-                while b>1: 
+                if b>1: 
                     print('x_change_norm = {}, y_change_norm = {}, ((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2)= {}, cross_term = {}'.format(x_change_norm, y_change_norm, (self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 , cross_term))
-                    
                     self._tau *= self.beta/b
                     self._sigma *= self.beta/b
+                    print('Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
+   
+                    
+                    self.x_old.sapyb((self.theta + 1.0), self.x, -
+                         self.theta, out=self.x_tmp) # somewhere in line 4
+                    # Gradient ascent for the dual variable
+                    self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
+                    self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
+                    self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
+                    
+
+                    # Gradient descent for the primal variable
+                    self.operator.adjoint(self.y, out=self.x_tmp) #line 2 
+                    self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
+                    self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
+                    print('Recomputing x and y after reducing step sizes')
+                    x_resid = self.x-self.x_old # Extra image 1 - Need to be more memory efficient 
+                    x_change_norm = x_resid.norm() 
+                    y_resid = self.y - self.y_old # Extra range data 1
+                    y_change_norm = y_resid.norm()
+                    y_temp2 = self.operator.direct(x_resid) # Extra range data 2
                     cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
                     b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
 
-                    print('Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
                 print('After possible reduction', self.tau, self.sigma)
-                p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid)
-                d = (1/self.sigma)*y_resid - self.operator.direct(x_resid)
+                p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid) # Extra image 2
+                d = (1/self.sigma)*y_resid - self.operator.direct(x_resid) # Extra range data 3
                 self.p_norm = p.norm()
                 self.d_norm = d.norm()
                 if self.p_norm < (self.s/self.delta)*self.d_norm:

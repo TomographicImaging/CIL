@@ -24,7 +24,7 @@ from .FISTA import FISTA
 from .FISTA import ISTA
 from .FISTA import ISTA as PGD
 from .APGD import APGD 
-from .PDHG import PDHG
+from .PDHG import PDHG, PDHG_2013
 from .ADMM import LADMM
 from .SPDHG import SPDHG
 from .PD3O import PD3O

@@ -475,7 +475,6 @@ class BlockDataContainer(object):
 
                     # As axpyb cannot return anything we `continue` to skip the rest of the code block
                     continue
-
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
@@ -600,7 +599,7 @@ class BlockDataContainer(object):
     # __rdiv__
     def __truediv__(self, other):
         return self.divide(other)
-
+    
     def __pow__(self, other):
         return self.power(other)
     # reverse operand

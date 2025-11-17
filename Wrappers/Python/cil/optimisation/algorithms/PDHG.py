@@ -40,9 +40,9 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal.
     operator : LinearOperator
         A Linear Operator.
-    sigma : TODO: if adaptive, this needs to be big.  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
+    sigma :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
         Step size for the dual problem.
-    tau :  TODO: if adaptive, this needs to be big. positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
+    tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
         Step size for the primal problem.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
@@ -58,8 +58,6 @@ class PDHG(Algorithm):
         Value of the parameter eta used in the adaptive step size method.
     c : positive :obj:`float`, optional, default=0.9
         Value of the parameter c used in the adaptive step size method.
-    delay : non-negative :obj:`int`, optional, default=5
-        Number of initial iterations to wait before updating the step sizes.
         
     
 
@@ -229,7 +227,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, delay=-1,
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, 
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
@@ -260,7 +258,7 @@ class PDHG(Algorithm):
                     sigma=sigma, initial=initial)
         self.p_norm = 100
         self.d_norm = 100
-        self.delay = delay
+
     @property
     def tau(self):
         """The primal step-size """
@@ -387,6 +385,9 @@ class PDHG(Algorithm):
         
         if self.adaptive:
             self.y_old = self.y.copy()
+            self.y_resid = self.y.copy() # Extra range data 2
+            self.x_resid = self.x.copy() # Extra image 1
+            self.x_store = self.x.copy() # Extra image 2 
 
         if self.gamma_g is not None:
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
@@ -415,13 +416,21 @@ class PDHG(Algorithm):
     def get_output(self):
         " Returns the current solution. "
         return self.x_old
+    
+    def _pdhg_update(self):
 
-    def update(self):
-        """Performs a single iteration of the PDHG algorithm"""
-            
-        # calculate x-bar and store in self.x_tmp
-        self.x_old.sapyb((self.theta + 1.0), self.x, -
-                         self.theta, out=self.x_tmp) # somewhere in line 4
+
+        if self.adaptive:
+            tmp =self.x_store
+            self.x_store = self.x
+            self.x = tmp
+            # calculate x-bar and store in self.x_tmp
+            self.x_old.sapyb((self.theta + 1.0), self.x_store, -
+                            self.theta, out=self.x_tmp) # somewhere in line 4
+        else:
+            # calculate x-bar and store in self.x_tmp
+            self.x_old.sapyb((self.theta + 1.0), self.x, -
+                            self.theta, out=self.x_tmp) # somewhere in line 4
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
@@ -440,10 +449,16 @@ class PDHG(Algorithm):
         self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
         print('x_tmp norm = ',self.x_tmp.norm())
 
+
         self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
         print('x norm = ',(self.x -self.x_old).norm())
         # update_previous_solution() called after update by base class
         # i.e current solution is now in x_old, previous solution is now in x
+        
+
+    def update(self):
+        """Performs a single iteration of the PDHG algorithm"""
+        self._pdhg_update()
 
         # update the step sizes for special cases
         self.update_step_sizes()
@@ -529,6 +544,26 @@ class PDHG(Algorithm):
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
+            
+    def _calculate_backtracking_condition(self): #TODO: Not sure this backgracking is working
+        """Calculates the backtracking condition for adaptive step sizes update.
+        Returns
+        -------
+            Boolean
+                True if backtracking condition is satisfied, False otherwise.
+        """
+        self.x.sapyb(-1.0, self.x_old, 1.0,  out=self.x_resid)
+        x_change_norm = self.x_resid.norm()
+        self.y.sapyb(-1.0, self.y_old, 1.0, out=self.y_resid)
+        y_change_norm = self.y_resid.norm()
+        self.operator.direct(self.x_resid, out=self.y_tmp)
+        cross_term =np.abs(4*self.sigma*self.tau*self.y_resid.dot( self.y_tmp))
+        b = self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2 - cross_term
+        print( "Backtracking condition value:", b)
+        return b
+  
+        
+
 
     def update_step_sizes(self):
         """
@@ -548,64 +583,48 @@ class PDHG(Algorithm):
             self._sigma *= self.theta
             self._tau /= self.theta
             
+            
         if self.adaptive:
-            if self.iteration> self.delay: # wait for a few iterations before updating step sizes
-                if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
-                #print('Before adaptive', self.tau, self.sigma)
-                    x_resid = self.x-self.x_old
-                    x_change_norm = x_resid.norm()
-                    y_resid = self.y - self.y_old
-                    y_change_norm = y_resid.norm()
-                    y_temp2 = self.operator.direct(x_resid)
-                    cross_term =4*self.sigma*self.tau*y_resid.dot( y_temp2)
-                    print('x_change_norm = {}, y_change_norm = {}, LHS = {}, cross_term = {}'.format(x_change_norm, y_change_norm, self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2, cross_term))
-                    if self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2 < cross_term: #TODO: check if abs is needed 
-                        self._tau /= 2
-                        self._sigma /= 2
-                        print('Reducing step sizes by 1/2')
-                        self.x_old.sapyb((self.theta + 1.0), self.x, -
-                         self.theta, out=self.x_tmp) # somewhere in line 4
-                        # Gradient ascent for the dual variable
-                        self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
-                        self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
-                        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
-                        
-
-                        # Gradient descent for the primal variable
-                        self.operator.adjoint(self.y, out=self.x_tmp) #line 2 
-                        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
-                        self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
-                        print('Recomputing x and y after reducing step sizes')
-                        
-                        x_resid = self.x-self.x_old # Need to be more memory efficient 
-                        x_change_norm = x_resid.norm()
-                        y_resid = self.y - self.y_old
-                        y_change_norm = y_resid.norm()
-                        y_temp2 = self.operator.direct(x_resid)
-                        cross_term = 4*self.sigma*self.tau*np.vdot(y_resid.as_array(), y_temp2.as_array())
-                    print('After possible reduction', self.tau, self.sigma)
-                    p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid)
-                    d = (1/self.sigma)*y_resid - self.operator.direct(x_resid)
-                    self.p_norm = p.norm()
-                    self.d_norm = 255*d.norm()
-                    if 2*self.p_norm < self.d_norm:
-                        print('2*self.p_norm < self.d_norm')
-                        self._tau *= (1- self.alpha)
-                        self._sigma /= (1 - self.alpha)
-                        self.alpha *= self.eta
-                    elif 2*self.d_norm < self.p_norm:
-                        print('2*self.d_norm < self.p_norm')
-                        self._tau /= (1 - self.alpha)
-                        self._sigma *= (1 - self.alpha)
-                        self.alpha *=self.eta
-                    else:
-                        print('No change')
-                        pass
-                    print('After adaptive', self.tau, self.sigma, self.alpha)
+   
+            if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
+            #print('Before adaptive', self.tau, self.sigma)
+                b = self._calculate_backtracking_condition()
+                while b<0:
+                    self._tau /= 2
+                    self._sigma /= 2
+                    # Swap x and x_store
+                    tmp=self.x
+                    self.x= self.x_store
+                    self.x_store= tmp
+                    
+                    self._pdhg_update() 
+                    
+                    print('Step sizes reduced')
+                    b = self._calculate_backtracking_condition()
+                print('After possible reduction', self.tau, self.sigma)
+                self.operator.adjoint(self.y_resid, out=self.x_tmp)
+                self.operator.direct(self.x_resid, out=self.y_tmp)
+                self.x_resid.sapyb((1/self.tau), self.x_tmp, -1.0, out=self.x_resid)
+                self.y_resid.sapyb((1/self.sigma), self.y_tmp, -1.0, out=self.y_resid)
+                self.p_norm = self.x_resid.norm()
+                self.d_norm = self.operator.norm()*self.y_resid.norm()
+                if 2*self.p_norm < self.d_norm:
+                    print('2*self.p_norm < self.d_norm')
+                    self._tau *= (1- self.alpha)
+                    self._sigma /= (1 - self.alpha)
+                    self.alpha *= self.eta
+                elif 2*self.d_norm < self.p_norm:
+                    print('2*self.d_norm < self.p_norm')
+                    self._tau /= (1 - self.alpha)
+                    self._sigma *= (1 - self.alpha)
+                    self.alpha *=self.eta
                 else:
-                    print('No adaptive step size update, below tolerance')
+                    print('No change')
+                    pass
+                print('After adaptive', self.tau, self.sigma, self.alpha)
             else:
-                print('No adaptive step size update, wait for a few more iterations')
+                print('No adaptive step size update, below tolerance')
+
     def update_objective(self):
         """Evaluates the primal objective, the dual objective and the primal-dual gap."""
         self.operator.direct(self.x_old, out=self.y_tmp)
@@ -649,10 +668,9 @@ class PDHG_2013(Algorithm):
     g : Function
         A convex function with a "simple" proximal.
     operator : LinearOperator
-        A Linear Operator.
-    sigma : TODO: if adaptive, this needs to be big.  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
+        A Linear Operator.    sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
         Step size for the dual problem.
-    tau :  TODO: if adaptive, this needs to be big. positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
+    tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default (if 'adaptive' is False) is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided. If 'adaptive' is True, default is large value (1e5)
         Step size for the primal problem.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
@@ -670,7 +688,7 @@ class PDHG_2013(Algorithm):
         Value of the parameter c used in the adaptive step size method.
     delta : positive :obj:`float`,greater than one,  optional, default=1.5
         Value of the parameter delta used in the adaptive step size method.
-    s : positive :obj:`float`, optional, default=255
+    s : positive :obj:`float`, optional, default= Norm of the operator A 
         Value of the parameter s used in the adaptive step size method.
     eta : positive :obj:`float`, optional, default=0.95
         Value of the parameter eta used in the adaptive step size method.
@@ -844,7 +862,7 @@ class PDHG_2013(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, beta=0.75, delta=1.5, s=255, gamma=0.9,
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, beta=0.75, delta=1.5, s=None, gamma=0.9,
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
@@ -871,6 +889,8 @@ class PDHG_2013(Algorithm):
         self.eta = eta
         self.beta = beta
         self.delta = delta
+        if s is None:
+            s = operator.norm()
         self.s = s
         self.gamma = gamma
         self.tolerance = 1e-6
@@ -1004,7 +1024,11 @@ class PDHG_2013(Algorithm):
         self.y_tmp = self.operator.range_geometry().allocate(0)
         
         if self.adaptive:
-            self.y_old = self.y.copy()
+            self.y_old = self.y.copy() # Extra range data 1
+            self.x_resid = self.x.copy() # Extra image 1
+            self.y_resid = self.y.copy() # Extra range data 2
+            self.x_store = self.x.copy() # Extra image 2
+
 
         if self.gamma_g is not None:
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
@@ -1028,18 +1052,26 @@ class PDHG_2013(Algorithm):
             tmp = self.y_old
             self.y_old = self.y
             self.y = tmp
-        
+            
 
     def get_output(self):
         " Returns the current solution. "
         return self.x_old
 
-    def update(self):
-        """Performs a single iteration of the PDHG algorithm"""
-            
-        # calculate x-bar and store in self.x_tmp
-        self.x_old.sapyb((self.theta + 1.0), self.x, -
-                         self.theta, out=self.x_tmp) # somewhere in line 4
+    def _pdhg_update(self):
+
+
+        if self.adaptive:
+            tmp =self.x_store
+            self.x_store = self.x
+            self.x = tmp
+            # calculate x-bar and store in self.x_tmp
+            self.x_old.sapyb((self.theta + 1.0), self.x_store, -
+                            self.theta, out=self.x_tmp) # somewhere in line 4
+        else:
+            # calculate x-bar and store in self.x_tmp
+            self.x_old.sapyb((self.theta + 1.0), self.x, -
+                            self.theta, out=self.x_tmp) # somewhere in line 4
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
@@ -1058,10 +1090,16 @@ class PDHG_2013(Algorithm):
         self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
         print('x_tmp norm = ',self.x_tmp.norm())
 
+
         self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
         print('x norm = ',(self.x -self.x_old).norm())
         # update_previous_solution() called after update by base class
         # i.e current solution is now in x_old, previous solution is now in x
+        
+
+    def update(self):
+        """Performs a single iteration of the PDHG algorithm"""
+        self._pdhg_update()
 
         # update the step sizes for special cases
         self.update_step_sizes()
@@ -1143,6 +1181,27 @@ class PDHG_2013(Algorithm):
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
+            
+    def _calculate_backtracking(self):
+        """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
+            Returns
+            -------
+            b : :obj:`float`
+                Backtracking parameter used to update step sizes in the adaptive PDHG algorithm.
+        """
+        
+        self.x.sapyb(1.0, self.x_old, -1.0, out=self.x_resid) 
+        print('self.x, self.x_old = ', self.x.norm(), self.x_old.norm())
+        x_change_norm = self.x_resid.norm()
+        self.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
+        y_change_norm = self.y_resid.norm()
+        self.operator.direct(self.x_resid, out=self.y_tmp)
+        cross_term = np.abs(2*self.sigma*self.tau*self.y_resid.dot(self.y_tmp))
+        print('cross_term = ', cross_term
+              , 'x_change_norm = ', x_change_norm, 'y_change_norm = ', y_change_norm)
+        b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
+        print(b)
+        return b
 
     def update_step_sizes(self):
         """
@@ -1165,47 +1224,27 @@ class PDHG_2013(Algorithm):
         if self.adaptive:
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
             #print('Before adaptive', self.tau, self.sigma)
-                x_resid = self.x-self.x_old # Extra image 1
-                x_change_norm = x_resid.norm() 
-                y_resid = self.y - self.y_old # Extra range data 1
-                y_change_norm = y_resid.norm()
-                y_temp2 = self.operator.direct(x_resid) # Extra range data 2
-                cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
-                b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
-
-                if b>1: 
-                    print('x_change_norm = {}, y_change_norm = {}, ((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2)= {}, cross_term = {}'.format(x_change_norm, y_change_norm, (self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 , cross_term))
+                b = self._calculate_backtracking()
+                while b>1:
                     self._tau *= self.beta/b
                     self._sigma *= self.beta/b
+                    # Swap x and x_store
+                    tmp=self.x
+                    self.x= self.x_store
+                    self.x_store= tmp
+                    
                     print('Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
-   
+                    print('tau = {}, sigma = {}'.format( self.tau, self.sigma))
+                    self._pdhg_update()
+                    b =self._calculate_backtracking()
                     
-                    self.x_old.sapyb((self.theta + 1.0), self.x, -
-                         self.theta, out=self.x_tmp) # somewhere in line 4
-                    # Gradient ascent for the dual variable
-                    self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
-                    self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
-                    self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
-                    
-
-                    # Gradient descent for the primal variable
-                    self.operator.adjoint(self.y, out=self.x_tmp) #line 2 
-                    self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
-                    self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
-                    print('Recomputing x and y after reducing step sizes')
-                    x_resid = self.x-self.x_old # Extra image 1 - Need to be more memory efficient 
-                    x_change_norm = x_resid.norm() 
-                    y_resid = self.y - self.y_old # Extra range data 1
-                    y_change_norm = y_resid.norm()
-                    y_temp2 = self.operator.direct(x_resid) # Extra range data 2
-                    cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
-                    b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
-
                 print('After possible reduction', self.tau, self.sigma)
-                p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid) # Extra image 2
-                d = (1/self.sigma)*y_resid - self.operator.direct(x_resid) # Extra range data 3
-                self.p_norm = p.norm()
-                self.d_norm = d.norm()
+                self.operator.adjoint(self.y_resid, out=self.x_tmp)
+                self.operator.direct(self.x_resid, out=self.y_tmp)
+                self.x_resid.sapyb((1/self.tau), self.x_tmp, -1.0, out=self.x_tmp)
+                self.y_resid.sapyb((1/self.sigma), self.y_tmp, -1.0, out=self.y_tmp)
+                self.p_norm = self.x_tmp.norm()
+                self.d_norm = self.y_tmp.norm()
                 if self.p_norm < (self.s/self.delta)*self.d_norm:
                     print('2*self.p_norm < self.d_norm')
                     self._tau *= (1- self.alpha)

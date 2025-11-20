@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Introduction &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+    <title>microCT reconstruction with Bruker data &#8212; CIL 25.0.1.dev13+g1cf84720a documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/documentation_options.js?v=193d9810"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev13+g1cf84720a';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,10 +62,10 @@
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" />
     <link rel="next" title="Exciscope Polaris phase contrast reconstruction with CIL" href="../recon_phasecontrast_exciscope/" />
-    <link rel="prev" title="Offset reconstruction" href="../Apple_offset_reconstruction/" />
+    <link rel="prev" title="Cone-beam offset reconstruction" href="../Apple_offset_reconstruction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  <meta name="docsearch:version" content="25.0.1.dev13+g1cf84720a" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -441,7 +441,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/"> a data reader for CIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/">a gVXR data reader for CIL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Aims-of-this-session">Aims of this session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Main-steps">Main steps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../CBCT-acquisition-with-noise-and-reconstruction/#Create-directories">Create directories</a></li>
@@ -460,8 +460,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Cone-beam offset reconstruction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">microCT reconstruction with Bruker data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Set-variables-and-paths">Set variables and paths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Create-acquisition-geometry">Create acquisition geometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Read-files">Read files</a></li>
@@ -542,7 +543,7 @@
     
     <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Introduction</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">microCT reconstruction with Bruker data</span></li>
   </ul>
 </nav>
 </div>
@@ -585,6 +586,8 @@
 </pre></div>
 </div>
 </div>
+<section id="microCT-reconstruction-with-Bruker-data">
+<h1>microCT reconstruction with Bruker data<a class="headerlink" href="#microCT-reconstruction-with-Bruker-data" title="Link to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -629,6 +632,7 @@
 24.0.0
 </pre></div></div>
 </div>
+</section>
 <section id="Introduction">
 <h1>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h1>
 <p>This notebook showcases the volume reconstruction of microCT projection data obtained with a <em>Bruker Skyscan 2214</em> using a flat panel detector and a source voltage of 125 kV at 69 µA. Projections are available as 16-bit tiffs.</p>
@@ -682,7 +686,7 @@
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_8_0.png" src="../../_images/demos_bruker2cil_8_0.png" />
+<img alt="../../_images/demos_bruker2cil_9_0.png" src="../../_images/demos_bruker2cil_9_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -738,7 +742,7 @@
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_12_0.png" src="../../_images/demos_bruker2cil_12_0.png" />
+<img alt="../../_images/demos_bruker2cil_13_0.png" src="../../_images/demos_bruker2cil_13_0.png" />
 </div>
 </div>
 </section>
@@ -778,7 +782,7 @@ DEBUG:cil.processors.CofR_image_sharpness:initial binning is 6
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_15_1.png" src="../../_images/demos_bruker2cil_15_1.png" />
+<img alt="../../_images/demos_bruker2cil_16_1.png" src="../../_images/demos_bruker2cil_16_1.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
@@ -795,7 +799,7 @@ INFO:cil.processors.CofR_image_sharpness:evaluated 17 points
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_15_3.png" src="../../_images/demos_bruker2cil_15_3.png" />
+<img alt="../../_images/demos_bruker2cil_16_3.png" src="../../_images/demos_bruker2cil_16_3.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
@@ -876,7 +880,7 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_23_0.png" src="../../_images/demos_bruker2cil_23_0.png" />
+<img alt="../../_images/demos_bruker2cil_24_0.png" src="../../_images/demos_bruker2cil_24_0.png" />
 </div>
 </div>
 </section>
@@ -916,7 +920,7 @@ Max grey value 56836.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_25_1.png" src="../../_images/demos_bruker2cil_25_1.png" />
+<img alt="../../_images/demos_bruker2cil_26_1.png" src="../../_images/demos_bruker2cil_26_1.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -1019,7 +1023,7 @@ Max grey value 3.505382776260376
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_30_1.png" src="../../_images/demos_bruker2cil_30_1.png" />
+<img alt="../../_images/demos_bruker2cil_31_1.png" src="../../_images/demos_bruker2cil_31_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1044,7 +1048,7 @@ Max grey value 3.505382776260376
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_31_0.png" src="../../_images/demos_bruker2cil_31_0.png" />
+<img alt="../../_images/demos_bruker2cil_32_0.png" src="../../_images/demos_bruker2cil_32_0.png" />
 </div>
 </div>
 </section>
@@ -1107,7 +1111,7 @@ Reconstruction Options:
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_bruker2cil_35_0.png" src="../../_images/demos_bruker2cil_35_0.png" />
+<img alt="../../_images/demos_bruker2cil_36_0.png" src="../../_images/demos_bruker2cil_36_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1212,7 +1216,7 @@ Reconstruction Options:
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Offset reconstruction</p>
+        <p class="prev-next-title">Cone-beam offset reconstruction</p>
       </div>
     </a>
     <a class="right-next"

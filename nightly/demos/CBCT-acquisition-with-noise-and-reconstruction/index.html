@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>a data reader for CIL &#8212; CIL 25.0.1.dev12+gab4d56e47 documentation</title>
+    <title>a gVXR data reader for CIL &#8212; CIL 25.0.1.dev13+g1cf84720a documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../_static/documentation_options.js?v=9ddde472"></script>
+    <script src="../../_static/documentation_options.js?v=193d9810"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev12+gab4d56e47';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev13+g1cf84720a';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Dynamic MR Reconstruction" href="../dynamic_mr_recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev12+gab4d56e47" />
+  <meta name="docsearch:version" content="25.0.1.dev13+g1cf84720a" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -441,7 +441,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../deriv2_cgls/">1D inverse problem demo using deriv2 from regtools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../stempo2d_v2_1/">TV-regularized reconstruction of the dynamix STEMPO dataset in CIL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dynamic_mr_recon/">Dynamic MR Reconstruction</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"> a data reader for CIL</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">a gVXR data reader for CIL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Aims-of-this-session">Aims of this session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Main-steps">Main steps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Create-directories">Create directories</a></li>
@@ -472,8 +472,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Reconstructing-the-noisy-data-using-KL-divergence-with-TV-regularisation">Reconstructing the noisy data using KL divergence with TV regularisation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Compare-all-the-reconstructions">Compare all the reconstructions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../LS_WLS_KL_TotalVariation/#Comparisons-between-LS,-WLS-and-KL-loss-for-a-range-of-counts">Comparisons between LS, WLS and KL loss for a range of counts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Offset reconstruction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Apple_offset_reconstruction/">Cone-beam offset reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/">microCT reconstruction with Bruker data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Set-variables-and-paths">Set variables and paths</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Create-acquisition-geometry">Create acquisition geometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bruker2cil/#Read-files">Read files</a></li>
@@ -548,7 +549,7 @@
     
     <li class="breadcrumb-item"><a href="../../usershowcase/" class="nav-link">User showcase</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"> a data reader for CIL</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">a gVXR data reader for CIL</span></li>
   </ul>
 </nav>
 </div>
@@ -588,8 +589,9 @@
 </pre></div>
 </div>
 </div>
-<section id="88e8aa31781f448bbff2870de6e294df-a-data-reader-for-CIL">
-<h1><img alt="gVXR" class="no-scaled-link" src="demos/img/gvxr_logo.png" style="width: 150px;" /> a data reader for CIL<a class="headerlink" href="#88e8aa31781f448bbff2870de6e294df-a-data-reader-for-CIL" title="Link to this heading">#</a></h1>
+<p><img alt="gVXR" class="no-scaled-link" src="demos/img/gvxr_logo.png" style="width: 150px;" /></p>
+<section id="a-gVXR-data-reader-for-CIL">
+<h1>a gVXR data reader for CIL<a class="headerlink" href="#a-gVXR-data-reader-for-CIL" title="Link to this heading">#</a></h1>
 <p>This demo shows the result of the integration between gVirtualXray (gVXR) and the <a class="reference external" href="https://ccpi.ac.uk/cil/">Core Imaging Library (CIL)</a> that we developed during the <em>CIL Training and Bring Your Own Data User Hackathon</em> at Cambridge University. A cone-beam computed-tomography (CBCT) acquisition with Poisson noise is simulated with <a class="reference external" href="https://sourceforge.net/projects/gvirtualxray">gVXR</a>. The data is reconstructed with <a class="reference external" href="https://github.com/TomographicImaging/CIL">CIL</a> version 23.0.1. The
 anthropomorphic phantom used is from the pEdiatRic dosimetRy personalized platfORm (ERROR) (<a class="reference external" href="https://error.upatras.gr/">https://error.upatras.gr/</a>). P. Papadimitroulas et al., “A Review on Personalized Pediatric Dosimetry Applications Using Advanced Computational Tools,” in IEEE Transactions on Radiation and Plasma Medical Sciences, vol. 3, no. 6, pp. 607-620, Nov. 2019, doi: <a class="reference external" href="https://doi.org/10.1109/TRPMS.2018.2876562">10.1109/TRPMS.2018.2876562</a>.” It corresponds to a 5-year old boy. It is available at
 <a class="reference external" href="https://gate.uca.fr/download/examples-tools">https://gate.uca.fr/download/examples-tools</a>.</p>
@@ -961,7 +963,7 @@ Text(0.5, 1.0, &#39;Corresponding spectra&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_21_1.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_21_1.png" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_22_1.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_22_1.png" />
 </div>
 </div>
 </section>
@@ -1144,7 +1146,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_36_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_36_0.png" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_37_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_37_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -1168,7 +1170,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_37_0.png" class="no-scaled-link" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_37_0.png" style="width: 800px;" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_38_0.png" class="no-scaled-link" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_38_0.png" style="width: 800px;" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -1391,7 +1393,7 @@ Number of flat images: 50
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_52_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_52_0.png" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_53_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_53_0.png" />
 </div>
 </div>
 </section>
@@ -1535,7 +1537,7 @@ Reconstruction Options:
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_60_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_60_0.png" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_61_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_61_0.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
@@ -1609,7 +1611,7 @@ Unable to save image
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_64_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_64_0.png" />
+<img alt="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_65_0.png" src="../../_images/demos_CBCT-acquisition-with-noise-and-reconstruction_65_0.png" />
 </div>
 </div>
 <section id="Save-the-volume-in-a-file-using-SimpleITK">

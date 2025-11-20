@@ -312,6 +312,10 @@ class TIFFStackReader(object):
             In 'slice' mode 'step' defines standard numpy slicing.
             Note: in general output array size in bin mode != output array size in slice mode
 
+        proj_name : str, default 'None'
+            Leading string for the tiff files being read in 
+
+
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
 

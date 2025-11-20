@@ -15,6 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Evan Kiely (Warwick Manufacturing Group, University of Warwick)
 
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
 import os, re
@@ -262,21 +263,23 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', dtype=np.float32):
-        self.file_name = file_name
-
-        if self.file_name is not None:
-            self.set_up(file_name = self.file_name,
-                        roi = roi,
-                        transpose = transpose,
-                        mode = mode, dtype=dtype)
-
-    def set_up(self,
-               file_name = None,
-               roi = None,
-               transpose = False,
-               mode = 'bin',
-               dtype = np.float32):
+    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', proj_name = None, dtype=np.float32):    
+            self.file_name = file_name
+            
+            if self.file_name is not None:
+                self.set_up(file_name = self.file_name,
+                            roi = roi,
+                            transpose = transpose,
+                            proj_name = proj_name,
+                            mode = mode, dtype=dtype)
+                
+    def set_up(self, 
+            file_name = None,
+            roi = None,
+            transpose = False,
+            mode = 'bin', 
+            proj_name = None,
+            dtype = np.float32):
         '''
         Set up method for the TIFFStackReader class
 
@@ -310,6 +313,10 @@ class TIFFStackReader(object):
             In 'slice' mode 'step' defines standard numpy slicing.
             Note: in general output array size in bin mode != output array size in slice mode
 
+        proj_name : str, default 'None'
+            Leading string for the tiff files being read in 
+
+
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
 
@@ -324,6 +331,9 @@ class TIFFStackReader(object):
 
         if self.roi is None:
             self.roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1}
+
+        if proj_name == None:
+            proj_name = ''
 
         # check that PIL library is installed
         if (pilAvailable == False):
@@ -354,10 +364,10 @@ class TIFFStackReader(object):
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
         elif os.path.isdir(file_name):
-            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tif"))
-
+            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tif"))
+            
             if not self._tiff_files:
-                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tiff"))
+                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tiff"))
 
             if not self._tiff_files:
                 raise Exception("No tiff files were found in the directory \n{}".format(file_name))

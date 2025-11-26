@@ -319,7 +319,8 @@ class TIFFStackReader(object):
             Note: in general output array size in bin mode != output array size in slice mode
 
         file_prefix : str, default 'None'
-            Leading string for the tiff files being read in 
+            Leading string for the tiff files to be read. Used only when the file_name 
+            is a path to a folder, if None all files in the folder are loaded. 
 
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.

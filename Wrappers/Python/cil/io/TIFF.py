@@ -221,8 +221,9 @@ class TIFFStackReader(object):
 
             Note: in general output array size in bin mode != output array size in slice mode
 
-        proj_name : str, default 'None'
-            Leading string for the tiff files being read in 
+        file_prefix : str, default 'None'
+            Leading string for the tiff files to be read. Used only when the file_name 
+            is a path to a folder, if None all files in the folder are loaded. 
         
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
@@ -267,14 +268,14 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', proj_name = None, dtype=np.float32):    
+    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', file_prefix = None, dtype=np.float32):    
             self.file_name = file_name
             
             if self.file_name is not None:
                 self.set_up(file_name = self.file_name,
                             roi = roi,
                             transpose = transpose,
-                            proj_name = proj_name,
+                            file_prefix = file_prefix,
                             mode = mode, dtype=dtype)
                 
     def set_up(self, 
@@ -282,7 +283,7 @@ class TIFFStackReader(object):
             roi = None,
             transpose = False,
             mode = 'bin', 
-            proj_name = None,
+            file_prefix = None,
             dtype = np.float32):
         '''
         Set up method for the TIFFStackReader class
@@ -317,7 +318,7 @@ class TIFFStackReader(object):
             In 'slice' mode 'step' defines standard numpy slicing.
             Note: in general output array size in bin mode != output array size in slice mode
 
-        proj_name : str, default 'None'
+        file_prefix : str, default 'None'
             Leading string for the tiff files being read in 
 
         dtype : numpy type, string, default np.float32
@@ -361,28 +362,28 @@ class TIFFStackReader(object):
 
         if isinstance(file_name, list):
             self._tiff_files = file_name
-            if proj_name is not None:
-                warnings.warn(f"proj_name: {proj_name} is not used with a list of tiffs", stacklevel=2)
+            if file_prefix is not None:
+                warnings.warn(f"file_prefix: {file_prefix} is not used with a list of tiffs", stacklevel=2)
         
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
-            if proj_name is not None:
-                warnings.warn(f"proj_name: {proj_name} is not used with a single tiff", stacklevel=2)
+            if file_prefix is not None:
+                warnings.warn(f"file_prefix: {file_prefix} is not used with a single tiff", stacklevel=2)
         
         elif os.path.isdir(file_name):
-            if proj_name == None:
-                proj_name = ''
+            if file_prefix == None:
+                file_prefix = ''
 
-            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tif"))
+            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),file_prefix + "*.tif"))
             
             if not self._tiff_files:
-                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tiff"))
+                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),file_prefix + "*.tiff"))
 
             if not self._tiff_files:
-                if proj_name == '':
+                if file_prefix == '':
                     raise Exception("No tiff files were found in the directory \n{}".format(file_name))
                 else:
-                    raise Exception("No tiff files with prefix {} were found in the directory \n{}".format(proj_name, file_name))
+                    raise Exception("No tiff files with prefix {} were found in the directory \n{}".format(file_prefix, file_name))
                 
         else:
             raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))

@@ -236,9 +236,9 @@ class TestTIFF(unittest.TestCase):
         read = reader.read_as_AcquisitionData(data.geometry)
         np.testing.assert_allclose(data.as_array(), read.as_array())
 
-    def test_tiff_stack_proj_name(self):
+    def test_tiff_stack_file_prefix(self):
 
-        # save two files with different names to test proj_name arg
+        # save two files with different names to test file_prefix arg
         data1 = self.get_slice_imagedata(
             dataexample.SIMULATED_SPHERE_VOLUME.get()
         )
@@ -256,35 +256,35 @@ class TestTIFF(unittest.TestCase):
         writer = TIFFWriter(data=data2, file_name=fname)
         writer.write()
 
-        # test all files are loaded without proj_name arg
+        # test all files are loaded without file_prefix arg
         reader = TIFFStackReader(file_name=self.cwd)
         read_array = reader.read()
 
         np.testing.assert_allclose(data1.as_array(), read_array[0:2, :, :])
         np.testing.assert_allclose(data2.as_array(), read_array[2:4, :, :])
 
-        # test proj_name arg
-        reader = TIFFStackReader(file_name=self.cwd, proj_name="name2")
+        # test file_prefix arg
+        reader = TIFFStackReader(file_name=self.cwd, file_prefix="name2")
         read_array = reader.read()
 
         np.testing.assert_allclose(data2.as_array(), read_array)
 
-        # try to load a specific file with correct proj_name arg
+        # try to load a specific file with correct file_prefix arg
         fname = os.path.join(self.cwd, "name2_idx_0000.tiff")
         with np.testing.assert_warns(UserWarning):
-            reader = TIFFStackReader(file_name=fname, proj_name="name2")
+            reader = TIFFStackReader(file_name=fname, file_prefix="name2")
         read_array = reader.read()
         np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
 
-        # try to load a specific file with incorect proj_name arg
+        # try to load a specific file with incorect file_prefix arg
         with np.testing.assert_warns(UserWarning):
-            reader = TIFFStackReader(file_name=fname, proj_name="name1")
+            reader = TIFFStackReader(file_name=fname, file_prefix="name1")
         read_array = reader.read()
         np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
 
-        # try to load from a directory with incorrect proj_name arg
+        # try to load from a directory with incorrect file_prefix arg
         with np.testing.assert_raises(Exception):
-            reader = TIFFStackReader(file_name=self.cwd, proj_name="wrongname")
+            reader = TIFFStackReader(file_name=self.cwd, file_prefix="wrongname")
 
     def test_tiff_stack_ImageDataSlice(self):
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()

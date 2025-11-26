@@ -20,6 +20,7 @@
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
 import os, re
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+import warnings
 
 pilAvailable = True
 try:
@@ -220,6 +221,9 @@ class TIFFStackReader(object):
 
             Note: in general output array size in bin mode != output array size in slice mode
 
+        proj_name : str, default 'None'
+            Leading string for the tiff files being read in 
+        
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
 
@@ -316,7 +320,6 @@ class TIFFStackReader(object):
         proj_name : str, default 'None'
             Leading string for the tiff files being read in 
 
-
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
 
@@ -331,9 +334,6 @@ class TIFFStackReader(object):
 
         if self.roi is None:
             self.roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1}
-
-        if proj_name == None:
-            proj_name = ''
 
         # check that PIL library is installed
         if (pilAvailable == False):
@@ -361,17 +361,29 @@ class TIFFStackReader(object):
 
         if isinstance(file_name, list):
             self._tiff_files = file_name
+            if proj_name is not None:
+                warnings.warn(f"proj_name: {proj_name} is not used with a list of tiffs", stacklevel=2)
+        
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
+            if proj_name is not None:
+                warnings.warn(f"proj_name: {proj_name} is not used with a single tiff", stacklevel=2)
+        
         elif os.path.isdir(file_name):
+            if proj_name == None:
+                proj_name = ''
+
             self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tif"))
             
             if not self._tiff_files:
                 self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),proj_name + "*.tiff"))
 
             if not self._tiff_files:
-                raise Exception("No tiff files were found in the directory \n{}".format(file_name))
-
+                if proj_name == '':
+                    raise Exception("No tiff files were found in the directory \n{}".format(file_name))
+                else:
+                    raise Exception("No tiff files with prefix {} were found in the directory \n{}".format(proj_name, file_name))
+                
         else:
             raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
 

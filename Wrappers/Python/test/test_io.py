@@ -236,6 +236,55 @@ class TestTIFF(unittest.TestCase):
         read = reader.read_as_AcquisitionData(data.geometry)
         np.testing.assert_allclose(data.as_array(), read.as_array())
 
+    def test_tiff_stack_proj_name(self):
+
+        # save two files with different names to test proj_name arg
+        data1 = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )
+
+        fname = os.path.join(self.cwd, "name1")
+
+        writer = TIFFWriter(data=data1, file_name=fname)
+        writer.write()
+
+        data2 = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )+10
+
+        fname = os.path.join(self.cwd, "name2")
+        writer = TIFFWriter(data=data2, file_name=fname)
+        writer.write()
+
+        # test all files are loaded without proj_name arg
+        reader = TIFFStackReader(file_name=self.cwd)
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data1.as_array(), read_array[0:2, :, :])
+        np.testing.assert_allclose(data2.as_array(), read_array[2:4, :, :])
+
+        # test proj_name arg
+        reader = TIFFStackReader(file_name=self.cwd, proj_name="name2")
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data2.as_array(), read_array)
+
+        # try to load a specific file with correct proj_name arg
+        fname = os.path.join(self.cwd, "name2_idx_0000.tiff")
+        with np.testing.assert_warns(UserWarning):
+            reader = TIFFStackReader(file_name=fname, proj_name="name2")
+        read_array = reader.read()
+        np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
+
+        # try to load a specific file with incorect proj_name arg
+        with np.testing.assert_warns(UserWarning):
+            reader = TIFFStackReader(file_name=fname, proj_name="name1")
+        read_array = reader.read()
+        np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
+
+        # try to load from a directory with incorrect proj_name arg
+        with np.testing.assert_raises(Exception):
+            reader = TIFFStackReader(file_name=self.cwd, proj_name="wrongname")
 
     def test_tiff_stack_ImageDataSlice(self):
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()

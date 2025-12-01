@@ -8,6 +8,9 @@
     - olefile and dxchange are optional dependencies, instead of required (#2209)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
+  - Enhancements:
+    - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
+    a folder (#2239)
 
 * 25.0.0
   - New features:

@@ -318,7 +318,7 @@ class TIFFStackReader(object):
             In 'slice' mode 'step' defines standard numpy slicing.
             Note: in general output array size in bin mode != output array size in slice mode
 
-        file_prefix : str, default 'None'
+        file_prefix : str, default None
             Leading string for the tiff files to be read. Used only when the file_name 
             is a path to a folder, if None all files in the folder are loaded. 
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.PaganinProcessor &#8212; CIL 25.0.1.dev13+g1cf84720a documentation</title>
+    <title>cil.processors.PaganinProcessor &#8212; CIL 25.0.1.dev14+g934d0da18 documentation</title>
   
   
   
@@ -39,9 +39,9 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../../../_static/documentation_options.js?v=193d9810"></script>
-    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/documentation_options.js?v=3d4dc798"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev13+g1cf84720a';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev14+g934d0da18';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev13+g1cf84720a" />
+  <meta name="docsearch:version" content="25.0.1.dev14+g934d0da18" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -512,7 +512,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">ifft2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">ifftshift</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -605,12 +605,12 @@
 <span class="sd">        - :math:`T`, is the sample thickness,</span>
 <span class="sd">        - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear</span>
 <span class="sd">          attenuation coefficient where :math:`\beta` is the complex part of the</span>
-<span class="sd">          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the </span>
+<span class="sd">          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the</span>
 <span class="sd">          probe wavelength,</span>
 <span class="sd">        - :math:`I_{norm}` is the input image which is expected to be the</span>
 <span class="sd">          normalised transmission data,</span>
-<span class="sd">        - :math:`\Delta` is the propagation distance. In cone-beam geometry, </span>
-<span class="sd">          :math:`\Delta` is scaled by the magnification :math:`M` as described </span>
+<span class="sd">        - :math:`\Delta` is the propagation distance. In cone-beam geometry,</span>
+<span class="sd">          :math:`\Delta` is scaled by the magnification :math:`M` as described</span>
 <span class="sd">          in [1],</span>
 <span class="sd">        - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining</span>
 <span class="sd">          the strength of the filter to be applied in Fourier space where</span>
@@ -692,22 +692,22 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">AcquisitionData</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor only supports AcquisitionData&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Processor not implemented for CONE_FLEX geometry.&quot;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">!=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor only support dtype=float32&#39;</span><span class="p">)</span>
-        
+
         <span class="n">cil_order</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">,</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">!=</span> <span class="n">cil_order</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This processor requires CIL data order, consider using `data.reorder(&#39;cil&#39;)`&quot;</span><span class="p">)</span>
-    
+
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="n">data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>            
+        <span class="n">data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="c1"># set the geometry parameters to use from data.geometry unless the</span>
         <span class="c1"># geometry is overridden with an override_geometry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_geometry</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">override_geometry</span><span class="p">)</span>
@@ -718,12 +718,12 @@
         <span class="n">target_shape</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>  <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span> 
+            <span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
             <span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;horizontal&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
-            
+
         <span class="n">data</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">target_shape</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">target_shape</span><span class="p">)</span>
-        
+
         <span class="c1"># create a filter based on the shape of the data</span>
         <span class="n">proj_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span> <span class="o">=</span> <span class="n">proj_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="o">*</span><span class="mi">2</span>
@@ -732,12 +732,12 @@
 
         <span class="c1"># allocate padded buffer</span>
         <span class="n">padded_buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_Ny</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="n">buffer_slice</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">+</span> <span class="n">proj_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> 
+        <span class="n">buffer_slice</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">+</span> <span class="n">proj_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                     <span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">+</span> <span class="n">proj_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        
+
         <span class="c1"># pre-calculate the scaling factor</span>
         <span class="n">scaling_factor</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
-        
+
         <span class="c1"># loop over the channels</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
             <span class="c1"># loop over the projections</span>
@@ -755,9 +755,9 @@
                     <span class="c1"># apply the filter in fourier space</span>
                     <span class="n">fI</span> <span class="o">=</span> <span class="n">fft2</span><span class="p">(</span><span class="n">padded_buffer</span><span class="p">)</span>
                     <span class="n">padded_buffer</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ifft2</span><span class="p">(</span><span class="n">fI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
-                
+
                 <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">padded_buffer</span><span class="p">[</span><span class="n">buffer_slice</span><span class="p">]</span>
-                        
+
         <span class="n">data</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
@@ -964,7 +964,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">override_filter</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_alpha</span><span class="p">()</span>
-           
+
 	<span class="c1"># calculate pixel size at sample plane, used for defining fourier mesh</span>
         <span class="n">pixel_size_dmag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_size</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">magnification</span>
 

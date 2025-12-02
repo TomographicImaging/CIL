@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 25.0.1.dev13+g1cf84720a documentation</title>
+    <title>Framework &#8212; CIL 25.0.1.dev14+g934d0da18 documentation</title>
   
   
   
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../_static/documentation_options.js?v=193d9810"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=3d4dc798"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev13+g1cf84720a';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev14+g934d0da18';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev13+g1cf84720a" />
+  <meta name="docsearch:version" content="25.0.1.dev14+g934d0da18" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -546,7 +546,7 @@
 <p>The <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code> class holds the system acquisition parameters.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionGeometry</span></span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionGeometry</span></span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry" title="Link to this definition">#</a></dt>
 <dd><p>This class holds the AcquisitionGeometry of the system.</p>
 <p>Please initialise the AcquisitionGeometry using the static methods:</p>
 <p><cite>AcquisitionGeometry.create_Parallel2D()</cite></p>
@@ -565,7 +565,7 @@ The following methods are available to create the geometry object, use the one t
 <p>Geometry for a 2D parallel beam system. This describes circular-scan data from a single row of detector pixels for parallel beam data i.e. synchrotron data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Parallel2D">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel2D" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel2D" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a parallel beam 2D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
 In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
@@ -603,7 +603,7 @@ In addition, <cite>set_channels()</cite> can be used to set the number of channe
 <p>Geometry for a 3D parallel beam system. This describes circular-scan data from a 2D array of detector pixels for parallel beam data i.e. synchrotron data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Parallel3D">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel3D" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Parallel3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Parallel3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Parallel3D" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a parallel beam 3D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
 In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
@@ -642,7 +642,7 @@ The rotation axis direction is [0,0,1] which means that the rotation axis is ass
 <p>Geometry for a 2D cone-beam system. This describes circular-scan data from a single row of detector pixels for cone/fan-beam data i.e. micro-CT data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone2D">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone2D" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone2D" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a cone beam 2D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
 In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
@@ -679,7 +679,7 @@ In addition, <cite>set_channels()</cite> can be used to set the number of channe
 <p>Geometry for a 3D cone-beam system. This describes circular-scan data from a 2D array of detector pixels for cone/fan-beam data i.e. micro-CT data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone3D">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axis_direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a cone beam 3D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method and the angles must be set using the <cite>set_angles()</cite> method.
 In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
@@ -719,7 +719,7 @@ The rotation axis direction is [0,0,1] which means that the rotation axis is ass
 <p>Geometry for a 3D cone-beam system with flexible detector and source positions. This geometry allows for different detector and source positions for each radiograph.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionGeometry.create_Cone3D_Flex">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D_Flex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_centre_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D_Flex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D_Flex" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">AcquisitionGeometry.</span></span><span class="sig-name descname"><span class="pre">create_Cone3D_Flex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_position_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_x_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector_direction_y_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_centre_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'units</span> <span class="pre">distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_geometry/#AcquisitionGeometry.create_Cone3D_Flex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionGeometry.create_Cone3D_Flex" title="Link to this definition">#</a></dt>
 <dd><p>Creates the AcquisitionGeometry for a per-projection cone beam 3D tomographic system.</p>
 <p>After creating the AcquisitionGeometry object, the panel must be set using the <cite>set_panel()</cite> method.
 In addition, <cite>set_channels()</cite> can be used to set the number of channels and their labels. <cite>set_labels()</cite> can be used to set the order of the dimensions describing the data.</p>
@@ -947,7 +947,7 @@ the resolution and the pixel sizes of the panel. The voxel sizes are calculated 
 in <code class="code docutils literal notranslate"><span class="pre">AcquisitionGeometry</span></code>, with the z-direction aligned with the rotation axis direction.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.ImageGeometry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">ImageGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voxel_num_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_num_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_num_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_geometry/#ImageGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageGeometry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">ImageGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voxel_num_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_num_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_num_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_geometry/#ImageGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageGeometry" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.ImageGeometry.get_slice">
 <span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_geometry/#ImageGeometry.get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageGeometry.get_slice" title="Link to this definition">#</a></dt>
@@ -1013,7 +1013,7 @@ or <cite>value=’random_int_deprecated’</cite></p>
 <h2>BlockGeometry<a class="headerlink" href="#blockgeometry" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.BlockGeometry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">BlockGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockGeometry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">BlockGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockGeometry" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.BlockGeometry.get_item">
 <span class="sig-name descname"><span class="pre">get_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockGeometry.get_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockGeometry.get_item" title="Link to this definition">#</a></dt>
@@ -1076,36 +1076,36 @@ Following operations are defined:</p>
 <h3>DataContainer<a class="headerlink" href="#datacontainer" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.DataContainer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">DataContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/data_container/#DataContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">DataContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/data_container/#DataContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataContainer" title="Link to this definition">#</a></dt>
 <dd><p>Generic class to hold data</p>
 <p>Data is currently held in a numpy arrays</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.DataContainer.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.DataContainer.shape" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.ndim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.DataContainer.ndim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.DataContainer.ndim" title="Link to this definition">#</a></dt>
 <dd><p>Returns the ndim of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.number_of_dimensions">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.DataContainer.number_of_dimensions" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.DataContainer.number_of_dimensions" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the  of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.dtype">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.DataContainer.dtype" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.DataContainer.dtype" title="Link to this definition">#</a></dt>
 <dd><p>Returns the dtype of the data array.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.DataContainer.size">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.DataContainer.size" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.DataContainer.size" title="Link to this definition">#</a></dt>
 <dd><p>Returns the number of elements of the DataContainer</p>
 </dd></dl>
 
@@ -1399,7 +1399,7 @@ Default is to accumulate and return data as float64 or complex128</p>
 <h3>AcquisitionData<a class="headerlink" href="#acquisitiondata" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_data/#AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionData" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">AcquisitionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/acquisition_data/#AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.AcquisitionData" title="Link to this definition">#</a></dt>
 <dd><p>DataContainer for holding 2D or 3D sinogram</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1443,7 +1443,7 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.dtype">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.dtype" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.dtype" title="Link to this definition">#</a></dt>
 <dd><p>Returns the dtype of the data array.</p>
 </dd></dl>
 
@@ -1654,7 +1654,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.ndim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.ndim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.ndim" title="Link to this definition">#</a></dt>
 <dd><p>Returns the ndim of the DataContainer</p>
 </dd></dl>
 
@@ -1666,7 +1666,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.number_of_dimensions">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.number_of_dimensions" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.number_of_dimensions" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the  of the DataContainer</p>
 </dd></dl>
 
@@ -1737,13 +1737,13 @@ generator will not be seeded.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.shape" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.AcquisitionData.size">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.size" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.AcquisitionData.size" title="Link to this definition">#</a></dt>
 <dd><p>Returns the number of elements of the DataContainer</p>
 </dd></dl>
 
@@ -1798,7 +1798,7 @@ Default is to accumulate and return data as float64 or complex128</p>
 <h3>ImageData<a class="headerlink" href="#imagedata" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.ImageData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_data/#ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageData" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">ImageData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/image_data/#ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.ImageData" title="Link to this definition">#</a></dt>
 <dd><p>DataContainer for holding 2D or 3D image data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1869,7 +1869,7 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.ImageData.dtype">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.ImageData.dtype" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.ImageData.dtype" title="Link to this definition">#</a></dt>
 <dd><p>Returns the dtype of the data array.</p>
 </dd></dl>
 
@@ -2052,7 +2052,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.ImageData.ndim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.ImageData.ndim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.ImageData.ndim" title="Link to this definition">#</a></dt>
 <dd><p>Returns the ndim of the DataContainer</p>
 </dd></dl>
 
@@ -2064,7 +2064,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.ImageData.number_of_dimensions">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.ImageData.number_of_dimensions" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.ImageData.number_of_dimensions" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the  of the DataContainer</p>
 </dd></dl>
 
@@ -2096,13 +2096,13 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.ImageData.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.ImageData.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.ImageData.shape" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.ImageData.size">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.ImageData.size" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.ImageData.size" title="Link to this definition">#</a></dt>
 <dd><p>Returns the number of elements of the DataContainer</p>
 </dd></dl>
 
@@ -2157,7 +2157,7 @@ Default is to accumulate and return data as float64 or complex128</p>
 <h3>VectorData<a class="headerlink" href="#vectordata" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.VectorData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">VectorData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/vector_data/#VectorData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.VectorData" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">VectorData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/vector_data/#VectorData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.VectorData" title="Link to this definition">#</a></dt>
 <dd><p>DataContainer to contain 1D array</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.VectorData.as_array">
@@ -2186,7 +2186,7 @@ For complex data,  the dot method returns a.dot(b.conjugate())</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.VectorData.dtype">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.VectorData.dtype" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#cil.framework.VectorData.dtype" title="Link to this definition">#</a></dt>
 <dd><p>Returns the dtype of the data array.</p>
 </dd></dl>
 
@@ -2375,7 +2375,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.VectorData.ndim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.VectorData.ndim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#cil.framework.VectorData.ndim" title="Link to this definition">#</a></dt>
 <dd><p>Returns the ndim of the DataContainer</p>
 </dd></dl>
 
@@ -2387,7 +2387,7 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.VectorData.number_of_dimensions">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.VectorData.number_of_dimensions" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">number_of_dimensions</span></span><a class="headerlink" href="#cil.framework.VectorData.number_of_dimensions" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the  of the DataContainer</p>
 </dd></dl>
 
@@ -2430,13 +2430,13 @@ Default is None</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.VectorData.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.VectorData.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#cil.framework.VectorData.shape" title="Link to this definition">#</a></dt>
 <dd><p>Returns the shape of the DataContainer</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.VectorData.size">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.VectorData.size" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#cil.framework.VectorData.size" title="Link to this definition">#</a></dt>
 <dd><p>Returns the number of elements of the DataContainer</p>
 </dd></dl>
 
@@ -2486,7 +2486,7 @@ represents a column vector of <code class="code docutils literal notranslate"><s
 <p>This provide a base class that will behave as normal <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.BlockDataContainer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">BlockDataContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">BlockDataContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/block/#BlockDataContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer" title="Link to this definition">#</a></dt>
 <dd><p>Class to hold DataContainers as column vector</p>
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
@@ -2718,7 +2718,7 @@ The angles in batch one are  [  1.2  13.2  25.2  37.2  49.2  61.2  73.2  85.2  9
 <p>The <code class="code docutils literal notranslate"><span class="pre">partition</span></code> method is defined as part of:</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.Partitioner">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">Partitioner</span></span><a class="reference internal" href="../_modules/cil/framework/partitioner/#Partitioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Partitioner" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">Partitioner</span></span><a class="reference internal" href="../_modules/cil/framework/partitioner/#Partitioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Partitioner" title="Link to this definition">#</a></dt>
 <dd><p>Interface for AcquisitionData to be able to partition itself in a number of batches.</p>
 <p>This class, by multiple inheritance with AcquisitionData, allows the user to partition the data,
 by using the method <code class="docutils literal notranslate"><span class="pre">partition</span></code>.
@@ -2770,7 +2770,7 @@ generator will not be seeded.</p></li>
 <p>Classes which define the accepted labels</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">ImageDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#ImageDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.ImageDimension" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">ImageDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#ImageDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.ImageDimension" title="Link to this definition">#</a></dt>
 <dd><p>Available dimension labels for image data.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">,</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">])</span>
@@ -2779,29 +2779,29 @@ generator will not be seeded.</p></li>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension.CHANNEL">
-<span class="sig-name descname"><span class="pre">CHANNEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'channel'</span></em><a class="headerlink" href="#cil.framework.labels.ImageDimension.CHANNEL" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CHANNEL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'channel'</span></span><a class="headerlink" href="#cil.framework.labels.ImageDimension.CHANNEL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension.VERTICAL">
-<span class="sig-name descname"><span class="pre">VERTICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vertical'</span></em><a class="headerlink" href="#cil.framework.labels.ImageDimension.VERTICAL" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">VERTICAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vertical'</span></span><a class="headerlink" href="#cil.framework.labels.ImageDimension.VERTICAL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension.HORIZONTAL_X">
-<span class="sig-name descname"><span class="pre">HORIZONTAL_X</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal_x'</span></em><a class="headerlink" href="#cil.framework.labels.ImageDimension.HORIZONTAL_X" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">HORIZONTAL_X</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal_x'</span></span><a class="headerlink" href="#cil.framework.labels.ImageDimension.HORIZONTAL_X" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.ImageDimension.HORIZONTAL_Y">
-<span class="sig-name descname"><span class="pre">HORIZONTAL_Y</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal_y'</span></em><a class="headerlink" href="#cil.framework.labels.ImageDimension.HORIZONTAL_Y" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">HORIZONTAL_Y</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal_y'</span></span><a class="headerlink" href="#cil.framework.labels.ImageDimension.HORIZONTAL_Y" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension" title="Link to this definition">#</a></dt>
 <dd><p>Available dimension labels for acquisition data.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span>
@@ -2812,34 +2812,34 @@ generator will not be seeded.</p></li>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.CHANNEL">
-<span class="sig-name descname"><span class="pre">CHANNEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'channel'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.CHANNEL" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CHANNEL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'channel'</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.CHANNEL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.ANGLE">
-<span class="sig-name descname"><span class="pre">ANGLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'angle'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.ANGLE" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ANGLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'angle'</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.ANGLE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.VERTICAL">
-<span class="sig-name descname"><span class="pre">VERTICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vertical'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.VERTICAL" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">VERTICAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vertical'</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.VERTICAL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.HORIZONTAL">
-<span class="sig-name descname"><span class="pre">HORIZONTAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.HORIZONTAL" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">HORIZONTAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'horizontal'</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.HORIZONTAL" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionDimension.PROJECTION">
-<span class="sig-name descname"><span class="pre">PROJECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'projection'</span></em><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.PROJECTION" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">PROJECTION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'projection'</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionDimension.PROJECTION" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.FillType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">FillType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#FillType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.FillType" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">FillType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#FillType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.FillType" title="Link to this definition">#</a></dt>
 <dd><p>Available fill types for image data.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.FillType.RANDOM">
@@ -2874,7 +2874,7 @@ generator will not be seeded.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AngleUnit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AngleUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AngleUnit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AngleUnit" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AngleUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AngleUnit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AngleUnit" title="Link to this definition">#</a></dt>
 <dd><p>Available units for angles.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angle_data</span><span class="p">,</span> <span class="n">angle_units</span><span class="o">=</span><span class="n">AngleUnit</span><span class="o">.</span><span class="n">DEGREE</span><span class="p">)</span>
@@ -2883,19 +2883,19 @@ generator will not be seeded.</p></li>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AngleUnit.DEGREE">
-<span class="sig-name descname"><span class="pre">DEGREE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'degree'</span></em><a class="headerlink" href="#cil.framework.labels.AngleUnit.DEGREE" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">DEGREE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'degree'</span></span><a class="headerlink" href="#cil.framework.labels.AngleUnit.DEGREE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cil.framework.labels.AngleUnit.RADIAN">
-<span class="sig-name descname"><span class="pre">RADIAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'radian'</span></em><a class="headerlink" href="#cil.framework.labels.AngleUnit.RADIAN" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">RADIAN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'radian'</span></span><a class="headerlink" href="#cil.framework.labels.AngleUnit.RADIAN" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionType" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.labels.</span></span><span class="sig-name descname"><span class="pre">AcquisitionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/labels/#AcquisitionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.labels.AcquisitionType" title="Link to this definition">#</a></dt>
 <dd><p>Available acquisition types &amp; dimensions.</p>
 <p>WARNING: It’s best to use strings rather than integers to initialise.
 &gt;&gt;&gt; AcquisitionType(3) == AcquisitionType(2 | 1) == AcquisitionType.CONE|PARALLEL != AcquisitionType(‘3D’)</p>
@@ -2931,13 +2931,13 @@ generator will not be seeded.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionType.dimension">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionType.dimension" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionType.dimension" title="Link to this definition">#</a></dt>
 <dd><p>Returns the label for the dimension type</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="cil.framework.labels.AcquisitionType.geometry">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">geometry</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionType.geometry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">geometry</span></span><a class="headerlink" href="#cil.framework.labels.AcquisitionType.geometry" title="Link to this definition">#</a></dt>
 <dd><p>Returns the label for the geometry type</p>
 </dd></dl>
 
@@ -2948,7 +2948,7 @@ generator will not be seeded.</p></li>
 <h2>DataProcessor<a class="headerlink" href="#dataprocessor" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.DataProcessor">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">DataProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/processors/#DataProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataProcessor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">DataProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/processors/#DataProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.DataProcessor" title="Link to this definition">#</a></dt>
 <dd><p>Basically an alias of Processor Class</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.framework.DataProcessor.check_input">
@@ -2998,7 +2998,7 @@ input</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.framework.Processor">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">Processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/processors/#Processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Processor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.framework.</span></span><span class="sig-name descname"><span class="pre">Processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/framework/processors/#Processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.Processor" title="Link to this definition">#</a></dt>
 <dd><p>Defines a generic DataContainer processor</p>
 <p>accepts a DataContainer as input
 returns a DataContainer

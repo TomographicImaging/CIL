@@ -6,6 +6,7 @@
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
+    - improve `tqdm` notebook support (#2241)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
 

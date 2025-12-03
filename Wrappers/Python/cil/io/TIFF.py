@@ -509,8 +509,8 @@ class TIFFStackReader(object):
         '''reads the TIFF stack as an ImageData with the provided geometry'''
         data = self.read()
         if len(geometry.shape) == 4:
-            gsize = functools.reduce(lambda x,y: x*y, geometry.shape, 1)
-            dsize = functools.reduce(lambda x,y: x*y, data.shape, 1)
+            gsize = np.prod(geometry.shape)
+            dsize = np.prod(data.shape)
             if gsize != dsize:
                 added_dims = len(geometry.shape) - len(data.shape)
                 if data.shape[0] != functools.reduce(lambda x,y: x*y, geometry.shape[:1+added_dims], 1):

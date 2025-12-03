@@ -552,13 +552,13 @@ class PDHG(Algorithm):
             Boolean
                 True if backtracking condition is satisfied, False otherwise.
         """
-        self.x.sapyb(-1.0, self.x_old, 1.0,  out=self.x_resid)
+        self.x.sapyb(1.0, self.x_old, -1.0,  out=self.x_resid)
         x_change_norm = self.x_resid.norm()
-        self.y.sapyb(-1.0, self.y_old, 1.0, out=self.y_resid)
+        self.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
         y_change_norm = self.y_resid.norm()
         self.operator.direct(self.x_resid, out=self.y_tmp)
         cross_term =np.abs(4*self.sigma*self.tau*self.y_resid.dot( self.y_tmp))
-        b = self.c*self.sigma*x_change_norm**2 + self.c*self.sigma*y_change_norm**2 - cross_term
+        b = self.c*self.sigma*x_change_norm**2 + self.c*self.tau*y_change_norm**2 - cross_term
         print( "Backtracking condition value:", b)
         return b
   

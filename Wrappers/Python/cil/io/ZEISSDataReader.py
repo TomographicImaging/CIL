@@ -217,7 +217,6 @@ class ZEISSDataReader:
         width_slc = range(*self._roi[2])
         #These values are 0 or do not exist in TXM files and can be skipped
         if metadata['data geometry'] == 'acquisition':
-            print("The image_slc is:", image_slc)
             metadata['thetas'] = metadata['thetas'][image_slc]
             metadata['x_positions'] = metadata['x_positions'][image_slc]
             metadata['y_positions'] = metadata['y_positions'][image_slc]

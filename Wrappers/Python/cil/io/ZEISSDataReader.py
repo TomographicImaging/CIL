@@ -133,6 +133,17 @@ class ZEISSDataReader:
             for key in roi.keys():
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
+                    print(roi[key])
+                    if key == AcquisitionDimension.ANGLE:
+                        if roi[key][1] > default_roi[0][1]:
+                            raise ValueError('Requested angle range {} exceeds available range [0, {}]'.format(roi[key], default_roi[0][1]))
+                    elif key == ImageDimension.VERTICAL or key == AcquisitionDimension.VERTICAL:
+                        if roi[key][1] > default_roi[1][1]:
+                            raise ValueError('Requested vertical range {} exceeds available range [0, {}]'.format(roi[key], default_roi[1][1]))
+                    elif key == ImageDimension.HORIZONTAL_X or key == ImageDimension.HORIZONTAL_Y or key == AcquisitionDimension.HORIZONTAL:
+                        if roi[key][1] > default_roi[2][1]:
+                            raise ValueError('Requested horizontal range {} exceeds available range [0, {}]'.format(roi[key], default_roi[2][1]))
+
                     for i, x in enumerate(roi[key]):
                         if x is None:
                             continue
@@ -206,6 +217,7 @@ class ZEISSDataReader:
         width_slc = range(*self._roi[2])
         #These values are 0 or do not exist in TXM files and can be skipped
         if metadata['data geometry'] == 'acquisition':
+            print("The image_slc is:", image_slc)
             metadata['thetas'] = metadata['thetas'][image_slc]
             metadata['x_positions'] = metadata['x_positions'][image_slc]
             metadata['y_positions'] = metadata['y_positions'][image_slc]

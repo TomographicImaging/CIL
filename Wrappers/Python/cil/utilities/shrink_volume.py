@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import label
-from skimage.filters import threshold_otsu
+from skimage.filters import threshold_otsu, threshold_multiotsu
 
 from cil.processors import Binner, Slicer
 from cil.plugins.astra.processors import FBP
@@ -67,27 +67,32 @@ class VolumeShrinker(object):
             for dim in recon.dimension_labels:
                 bounds[dim] = (0, recon.get_dimension_size(dim)*binning)
 
-        if manual_limits is not None:    
-            for dim, v in manual_limits.items():
-                if dim in recon.dimension_labels:
-                    if v is None:
-                        v = (0, recon.get_dimension_size(dim)*binning)
-                    elif v[0] is None:
-                        v[0] = 0
-                    elif v[1] is None:
-                        v[1] = recon.get_dimension_size(dim)*binning
-                    bounds[dim] = v
-                else:
-                    raise ValueError("dimension {} not recognised, must be one of {}".format(dim, recon.dimension_labels))
+            if manual_limits is not None:    
+                for dim, v in manual_limits.items():
+                    if dim in recon.dimension_labels:
+                        if v is None:
+                            v = (0, recon.get_dimension_size(dim)*binning)
+                        elif v[0] is None:
+                            v[0] = 0
+                        elif v[1] is None:
+                            v[1] = recon.get_dimension_size(dim)*binning
+                        bounds[dim] = v
+                    else:
+                        raise ValueError("dimension {} not recognised, must be one of {}".format(dim, recon.dimension_labels))
+            else:
+                bounds = None
 
         self.plot_with_bounds(recon, bounds, binning)
-
+        
         return self.update_ig(data.geometry.get_ImageGeometry(), bounds)
 
     def update_ig(self, ig_unbinned, bounds):
-        ig = Slicer(roi={'horizontal_x':(bounds['horizontal_x'][0], bounds['horizontal_x'][1],1),
-                  'horizontal_y':(bounds['horizontal_y'][0], bounds['horizontal_y'][1], 1),
-                  'vertical':(bounds['vertical'][0], bounds['vertical'][1], 1)})(ig_unbinned)
+        if bounds is None:
+            ig = ig_unbinned
+        else:
+            ig = Slicer(roi={'horizontal_x':(bounds['horizontal_x'][0], bounds['horizontal_x'][1],1),
+                    'horizontal_y':(bounds['horizontal_y'][0], bounds['horizontal_y'][1], 1),
+                    'vertical':(bounds['vertical'][0], bounds['vertical'][1], 1)})(ig_unbinned)
         return ig
 
     def plot_with_bounds(self, recon, bounds, binning):
@@ -105,13 +110,14 @@ class VolumeShrinker(object):
             ax.imshow(recon.max(axis=dim).array, origin='lower', cmap='gray',
                     extent=[0, x_size, 0, y_size])
             
-            x_min, x_max = bounds[x_dim]
-            y_min, y_max = bounds[y_dim]
+            if bounds is not None:
+                x_min, x_max = bounds[x_dim]
+                y_min, y_max = bounds[y_dim]
 
-            ax.plot([x_min, x_max], [y_min, y_min], '--r')
-            ax.plot([x_min, x_max], [y_max, y_max], '--r')
-            ax.plot([x_min, x_min], [y_min, y_max], '--r')
-            ax.plot([x_max, x_max], [y_min, y_max], '--r')
+                ax.plot([x_min, x_max], [y_min, y_min], '--r')
+                ax.plot([x_min, x_max], [y_max, y_max], '--r')
+                ax.plot([x_min, x_min], [y_min, y_max], '--r')
+                ax.plot([x_max, x_max], [y_min, y_max], '--r')
 
             ax.set_xlabel(x_dim)
             ax.set_ylabel(y_dim)
@@ -126,8 +132,8 @@ class VolumeShrinker(object):
             arr = recon.max(axis=dim).array
             mask, large_components_mask = self.otsu_large_components(arr, threshold)
 
-            x_indices = np.where(np.any(large_components_mask, axis=0))[0]
-            y_indices = np.where(np.any(large_components_mask, axis=1))[0]
+            x_indices = np.where(np.any(mask, axis=0))[0]
+            y_indices = np.where(np.any(mask, axis=1))[0]
             x_min, x_max = x_indices[0], x_indices[-1]
             y_min, y_max = y_indices[0], y_indices[-1]
 
@@ -170,7 +176,11 @@ class VolumeShrinker(object):
         if isinstance(threshold, (int, float)):
             thresh = threshold
         elif isinstance(threshold, str) and threshold.lower() == 'otsu':
-            thresh = threshold_otsu(arr[arr > 0])
+            # thresh = threshold_otsu(arr[arr > 0])
+            classes = 4
+            n_bins = 256
+            thresh = threshold_multiotsu(arr[arr>0], classes=classes, nbins=n_bins)
+            thresh = thresh[0]
         else:
             raise ValueError(f"Threshold {threshold} not recognised, must be a number or 'Otsu'")
         mask = arr > thresh
@@ -196,6 +206,16 @@ class VolumeShrinker(object):
 
             axes[2].imshow(mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
             axes[2].set_title('Thresholded')
+
+            x_indices = np.where(np.any(mask, axis=0))[0]
+            y_indices = np.where(np.any(mask, axis=1))[0]
+            x_min, x_max = x_indices[0], x_indices[-1]
+            y_min, y_max = y_indices[0], y_indices[-1]
+
+            axes[2].plot([x_min, x_max], [y_min, y_min], '--r')
+            axes[2].plot([x_min, x_max], [y_max, y_max], '--r')
+            axes[2].plot([x_min, x_min], [y_min, y_max], '--r')
+            axes[2].plot([x_max, x_max], [y_min, y_max], '--r')
 
             axes[3].imshow(large_components_mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
             axes[3].set_title('Large components')

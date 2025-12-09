@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.TIFF &#8212; CIL 25.0.1.dev14+g934d0da18 documentation</title>
+    <title>cil.io.TIFF &#8212; CIL 25.0.1.dev15+gf20988953 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../../../../_static/documentation_options.js?v=3d4dc798"></script>
+    <script src="../../../../_static/documentation_options.js?v=27aa6127"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev14+g934d0da18';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev15+gf20988953';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev14+g934d0da18" />
+  <meta name="docsearch:version" content="25.0.1.dev15+gf20988953" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -502,10 +502,12 @@
 <span class="c1">#</span>
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+<span class="c1"># Evan Kiely (Warwick Manufacturing Group, University of Warwick)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">ImageData</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="n">pilAvailable</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
@@ -714,6 +716,10 @@
 
 <span class="sd">            Note: in general output array size in bin mode != output array size in slice mode</span>
 
+<span class="sd">        file_prefix : str, default None</span>
+<span class="sd">            Leading string for the tiff files to be read. Used only when the file_name </span>
+<span class="sd">            is a path to a folder, if None all files in the folder are loaded. </span>
+<span class="sd">        </span>
 <span class="sd">        dtype : numpy type, string, default np.float32</span>
 <span class="sd">            Requested type of the read image. If set to None it defaults to the type of the saved file.</span>
 
@@ -757,21 +763,23 @@
 <span class="sd">        &gt;&gt;&gt; about_original_data = reader.read_rescaled()</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
-                        <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">,</span>
-                        <span class="n">transpose</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">,</span>
-                        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-               <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">transpose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-               <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span>
-               <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="n">file_prefix</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>    
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span>
+                            <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">,</span>
+                            <span class="n">transpose</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">,</span>
+                            <span class="n">file_prefix</span> <span class="o">=</span> <span class="n">file_prefix</span><span class="p">,</span>
+                            <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+                
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+            <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">transpose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> 
+            <span class="n">file_prefix</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Set up method for the TIFFStackReader class</span>
 
@@ -804,6 +812,10 @@
 <span class="sd">            are binned together, values of resulting binned pixels are calculated as average.</span>
 <span class="sd">            In &#39;slice&#39; mode &#39;step&#39; defines standard numpy slicing.</span>
 <span class="sd">            Note: in general output array size in bin mode != output array size in slice mode</span>
+
+<span class="sd">        file_prefix : str, default None</span>
+<span class="sd">            Leading string for the tiff files to be read. Used only when the file_name </span>
+<span class="sd">            is a path to a folder, if None all files in the folder are loaded. </span>
 
 <span class="sd">        dtype : numpy type, string, default np.float32</span>
 <span class="sd">            Requested type of the read image. If set to None it defaults to the type of the saved file.</span>
@@ -846,17 +858,29 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="n">file_name</span>
+            <span class="k">if</span> <span class="n">file_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file_prefix: </span><span class="si">{</span><span class="n">file_prefix</span><span class="si">}</span><span class="s2"> is not used with a list of tiffs&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">file_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">file_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file_prefix: </span><span class="si">{</span><span class="n">file_prefix</span><span class="si">}</span><span class="s2"> is not used with a single tiff&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">file_name</span><span class="p">),</span><span class="s2">&quot;*.tif&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">file_prefix</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">file_prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">file_name</span><span class="p">),</span><span class="n">file_prefix</span> <span class="o">+</span> <span class="s2">&quot;*.tif&quot;</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">file_name</span><span class="p">),</span><span class="n">file_prefix</span> <span class="o">+</span> <span class="s2">&quot;*.tiff&quot;</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">file_name</span><span class="p">),</span><span class="s2">&quot;*.tiff&quot;</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tiff_files</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No tiff files were found in the directory </span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
-
+                <span class="k">if</span> <span class="n">file_prefix</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No tiff files were found in the directory </span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No tiff files with prefix </span><span class="si">{}</span><span class="s2"> were found in the directory </span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_prefix</span><span class="p">,</span> <span class="n">file_name</span><span class="p">))</span>
+                
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 

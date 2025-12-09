@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 25.0.1.dev14+g934d0da18 documentation</title>
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 25.0.1.dev15+gf20988953 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=085432a65528ed429d34" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=085432a65528ed429d34" />
 
-    <script src="../_static/documentation_options.js?v=3d4dc798"></script>
+    <script src="../_static/documentation_options.js?v=27aa6127"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev14+g934d0da18';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev15+gf20988953';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Framework" href="../framework/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev14+g934d0da18" />
+  <meta name="docsearch:version" content="25.0.1.dev15+gf20988953" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -856,7 +856,7 @@ and will load 200 files.</p>
 <h2>TIFF Reader/Writer<a class="headerlink" href="#tiff-reader-writer" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="cil.io.TIFFStackReader">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">TIFFStackReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.io.</span></span><span class="sig-name descname"><span class="pre">TIFFStackReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/io/TIFF/#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Link to this definition">#</a></dt>
 <dd><p>Basic TIFF reader which loops through all tiff files in a specific
 folder and loads them in alphabetical order</p>
 <dl class="field-list simple">
@@ -875,6 +875,8 @@ are binned together, values of resulting binned pixels are calculated as average
 <p>In ‘slice’ mode ‘step’ defines standard numpy slicing.</p>
 <p>Note: in general output array size in bin mode != output array size in slice mode</p>
 </p></li>
+<li><p><strong>file_prefix</strong> (<em>str</em><em>, </em><em>default None</em>) – Leading string for the tiff files to be read. Used only when the file_name
+is a path to a folder, if None all files in the folder are loaded.</p></li>
 <li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to the type of the saved file.</p></li>
 </ul>
 </dd>

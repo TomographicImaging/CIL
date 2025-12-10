@@ -23,7 +23,7 @@ from scipy.fft import fftfreq
 
 import numpy as np
 import ctypes
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -488,7 +488,7 @@ class FBP(GenericFilteredBackProjection):
 
         if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
-        
+
         super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 

@@ -25,7 +25,7 @@ from scipy.fft import fft2
 from scipy.fft import ifft2
 from scipy.fft import ifftshift
 from scipy import constants
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import logging
 
 log = logging.getLogger(__name__)
@@ -108,35 +108,37 @@ class PaganinProcessor(Processor):
     al. [1] to retrieve the sample thickness
 
     .. math:: T(x,y) = - \frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left
-        (\frac{\mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 +
+        (\frac{\mathcal{F}\left ( I_{norm}(x, y,z = \Delta) \right )}{1 +
           \alpha\left ( k_x^2 + k_y^2 \right )}  \right )\right ),
 
     where
 
         - :math:`T`, is the sample thickness,
         - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear
-        attenuation coefficient where :math:`\beta` is the complex part of the
-        material refractive index and :math:`\lambda=\frac{hc}{E}` is the probe
-        wavelength,
-        - :math:`M` is the magnification at the detector,
+          attenuation coefficient where :math:`\beta` is the complex part of the
+          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the
+          probe wavelength,
         - :math:`I_{norm}` is the input image which is expected to be the
-        normalised transmission data,
-        - :math:`\Delta` is the propagation distance,
+          normalised transmission data,
+        - :math:`\Delta` is the propagation distance. In cone-beam geometry,
+          :math:`\Delta` is scaled by the magnification :math:`M` as described
+          in [1],
         - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining
-        the strength of the filter to be applied in Fourier space where
-        :math:`\delta` is the real part of the deviation of the material
-        refractive index from 1
+          the strength of the filter to be applied in Fourier space where
+          :math:`\delta` is the real part of the deviation of the material
+          refractive index from 1 [2].
         - :math:`k_x, k_y = \left ( \frac{2\pi p}{N_xW}, \frac{2\pi q}{N_yW}
-        \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier
-        mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with
-        size :math:`N_x, N_y` and pixel size :math:`W`.
+          \right )` where :math:`p` and :math:`q` are co-ordinates in a Fourier
+          mesh in the range :math:`-N_x/2` to :math:`N_x/2` for an image with
+          size :math:`N_x, N_y` and pixel size :math:`W`. In cone-beam geometry,
+          the pixel size is scaled by the magnification :math:`M`.
 
     A generalised form of the Paganin phase retrieval method can be called
     using :code:`filter_type='generalised_paganin_method'`, which uses the
-    form of the algorithm described in [2]
+    form of the algorithm described in [3]
 
     .. math:: T(x,y) = -\frac{1}{\mu}\ln\left (\mathcal{F}^{-1}\left (\frac{
-        \mathcal{F}\left ( M^2I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2
+        \mathcal{F}\left (I_{norm}(x, y,z = \Delta) \right )}{1 - \frac{2
         \alpha}{W^2}\left ( \cos(Wk_x) + \cos(Wk_y) -2 \right )}  \right )
         \right )
 
@@ -201,22 +203,22 @@ class PaganinProcessor(Processor):
     def check_input(self, data):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
-        
+
         if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
             raise NotImplementedError("Processor not implemented for CONE_FLEX geometry.")
-        
+
         if data.dtype!=np.float32:
             raise TypeError('Processor only support dtype=float32')
-        
+
         cil_order = tuple(AcquisitionDimension.get_order_for_engine('cil',data.geometry))
         if data.dimension_labels != cil_order:
             raise ValueError("This processor requires CIL data order, consider using `data.reorder('cil')`")
-    
+
         return True
 
     def process(self, out=None):
 
-        data  = self.get_input()            
+        data  = self.get_input()
         # set the geometry parameters to use from data.geometry unless the
         # geometry is overridden with an override_geometry
         self._set_geometry(data.geometry, self.override_geometry)
@@ -227,12 +229,12 @@ class PaganinProcessor(Processor):
         target_shape = (
             data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
             data.geometry.num_projections,
-            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
+            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1,
             data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
-            
+
         data.array = np.reshape(data.array, target_shape)
         out.array = np.reshape(out.array, target_shape)
-        
+
         # create a filter based on the shape of the data
         proj_shape = data.array.shape[-2:]
         self.filter_Nx = proj_shape[0]+self.pad*2
@@ -241,13 +243,12 @@ class PaganinProcessor(Processor):
 
         # allocate padded buffer
         padded_buffer = np.zeros((self.filter_Nx, self.filter_Ny), dtype=data.dtype)
-        buffer_slice = (slice(self.pad, self.pad + proj_shape[0]), 
+        buffer_slice = (slice(self.pad, self.pad + proj_shape[0]),
                     slice(self.pad, self.pad + proj_shape[1]))
-        
+
         # pre-calculate the scaling factor
         scaling_factor = -(1/self.mu)
-        mag2 = self.magnification ** 2
-        
+
         # loop over the channels
         for j in range(data.geometry.channels):
             # loop over the projections
@@ -257,7 +258,6 @@ class PaganinProcessor(Processor):
 
                 if self.full_retrieval==True:
                     # apply the filter in fourier space, apply log and scale
-                    padded_buffer*=mag2
                     fI = fft2(padded_buffer)
                     iffI = ifft2(fI*self.filter).real
                     np.log(iffI, out=padded_buffer)
@@ -266,9 +266,9 @@ class PaganinProcessor(Processor):
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)
                     padded_buffer[:] = ifft2(fI*self.filter).real
-                
+
                 out.array[j, i, :, :] = padded_buffer[buffer_slice]
-                        
+
         data.array = np.squeeze(data.array)
         out.array = np.squeeze(out.array)
         return out
@@ -470,12 +470,15 @@ class PaganinProcessor(Processor):
         else:
             self._calculate_alpha()
 
+	# calculate pixel size at sample plane, used for defining fourier mesh
+        pixel_size_dmag = self.pixel_size/self.magnification
+
         # create the Fourier mesh
         kx,ky = np.meshgrid(
             np.arange(-self.filter_Nx/2, self.filter_Nx/2, 1, dtype=np.float64)
-            * (2*np.pi)/(self.filter_Nx*self.pixel_size),
+            * (2*np.pi)/(self.filter_Nx*pixel_size_dmag),
             np.arange(-self.filter_Ny/2, self.filter_Ny/2, 1, dtype=np.float64)
-            * (2*np.pi)/(self.filter_Ny*self.pixel_size),
+            * (2*np.pi)/(self.filter_Ny*pixel_size_dmag),
             sparse=False,
             indexing='ij'
             )
@@ -484,9 +487,9 @@ class PaganinProcessor(Processor):
         if self.filter_type == 'paganin_method':
             self.filter =  ifftshift(1/(1. + self.alpha*(kx**2 + ky**2)))
         elif self.filter_type == 'generalised_paganin_method':
-            self.filter =  ifftshift(1/(1. - (2*self.alpha/self.pixel_size**2)
-                                        *(np.cos(self.pixel_size*kx)
-                                          + np.cos(self.pixel_size*ky) -2)))
+            self.filter =  ifftshift(1/(1. - (2*self.alpha/pixel_size_dmag**2)
+                                        *(np.cos(pixel_size_dmag*kx)
+                                          + np.cos(pixel_size_dmag*ky) -2)))
         else:
             raise ValueError("filter_type not recognised: got {0} expected one\
                               of 'paganin_method' or \
@@ -504,7 +507,7 @@ class PaganinProcessor(Processor):
         Function to calculate alpha, a constant defining the Paganin filter
         strength
         '''
-        self.alpha = self.propagation_distance*self.delta/self.mu
+        self.alpha = (self.propagation_distance/self.magnification)*self.delta/self.mu
 
     def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''

@@ -19,7 +19,7 @@ Binary installation of CIL can be achieved with `conda`.
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
 #### Create a conda environment with CIL
-We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table below: 
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table below:
 
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
@@ -51,7 +51,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [Numpy](https://github.com/numpy/numpy) | 1.23 - 2.3 | `"numpy>=1.23,<=2.3"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
 | [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | CPU: `conda-forge::astra-toolbox=2.4=py*` <br> GPU: `conda-forge::astra-toolbox=2.4=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
+| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | CPU: `astra-toolbox::astra-toolbox=2.4=py*` <br> GPU: `astra-toolbox::astra-toolbox=2.4=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
 | [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 25.0.0 | CPU: `ccpi::ccpi-regulariser=25.0.0=py*` <br> GPU: `ccpi::ccpi-regulariser=25.0.0=cuda*` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
 | [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [2.0.0](https://github.com/dkazanc/TomoPhantom/releases/tag/v2.0.0) | `ccpi::tomophantom=2.0.0` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |

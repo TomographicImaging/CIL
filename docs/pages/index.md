@@ -19,18 +19,22 @@ widgets:
   text: >
     CIL has a live documentation which gets updated regularly and built nightly.
     We suggest to download and read the open access articles below, which provide very detailed information about CIL structure and usage.
-- title: Papers
-  url: 'https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II'
+- title: Citing CIL
+  url: '/publications/#citing-cil'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
   text: >
-    Jørgensen JS et al. 2021 <a href="https://doi.org/10.1098/rsta.2020.0192">Core Imaging Library – Part I: a versatile python framework for tomographic imaging</a>. Phil. Trans. R. Soc. A 20200192.
-    <br/>
-    The code to reproduce the results of the paper can be found at <a href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I">Paper-2021-RSTA-CIL-Part-I</a>.
+    Please cite CIL if you use it in your research.
     <br/>
     <br/>
-    Papoutsellis E et al. 2021 <a href="https://doi.org/10.1098/rsta.2020.0193">Core Imaging Library – Part II: multichannel reconstruction for dynamic and spectral tomography</a>. Phil. Trans. R. Soc. A 20200193.
+    We provide three main papers describing CIL's framework, multichannel capabilities, and algorithmic developments, along with BibTeX and RIS export options.
+- title: Research Using CIL
+  url: '/publications/#research-using-cil'
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
+  text: >
+    View publications that have used CIL in their research.
     <br/>
-    The code to reproduce the results of the paper can be found at at <a href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II">Paper-2021-RSTA-CIL-Part-II</a>.
+    <br/>
+    Journal papers, conference proceedings, and PhD theses organized by year.
 callforaction:
   url: https://ccpi.ac.uk/training
   text: Training

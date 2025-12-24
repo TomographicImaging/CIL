@@ -7,7 +7,7 @@ from packaging import version
 
 baseurl = f'/{getenv("GITHUB_REPOSITORY", "").split("/", 1)[-1]}/'.replace("//", "/")
 docs = Path(__file__).parent
-exclude_paths = ["assets"] + [i.stem for i in (docs / "pages").glob("*.md")]
+exclude_paths = ["assets"] + [i.stem for i in (docs / "pages").glob("*.md")] + [i.stem for i in (docs / "pages").glob("*.html")]
 build = docs / "build"
 versions = [{
     "name": i.name,

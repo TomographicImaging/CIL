@@ -5,23 +5,17 @@ header:
   image_fullwidth: https://ccpi.ac.uk/wp-content/uploads/2022/08/front-page-1125x800.png # ideally 600x80 pixels
   title: '<img loading="lazy" src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" alt="CIL - Core Imaging Library">'
 widgets:
-- title: Examples
-  url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
-  image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
-  text: >
-    We have a repository with a <a href="https://github.com/TomographicImaging/CIL-Demos">large collection</a> of Jupyter Notebooks which cover a wide range of topics, from basic usage to advanced reconstructions with iterative methods.
-    <br/>
-    Some examples <em>without any local installation</em> are provided in <a href="https://mybinder.org">Binder</a>.
-    Please click the button below to try them immediately in your browser.
 - title: CIL Documentation
   url: '/nightly/'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
   text: >
-    CIL has a live documentation which gets updated regularly and built nightly.
-    We suggest to download and read the open access articles below, which provide very detailed information about CIL structure and usage.
+    Complete API reference, user guides, and tutorials for CIL.
+    <br/>
+    <br/>
+    The documentation is updated regularly and built nightly from the latest development code.
 - title: Citing CIL
   url: '/publications/#citing-cil'
-  image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
   text: >
     Please cite CIL if you use it in your research.
     <br/>
@@ -35,6 +29,14 @@ widgets:
     <br/>
     <br/>
     Journal papers, conference proceedings, and PhD theses organized by year.
+- title: Try CIL in Binder
+  url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
+  text: >
+    Run CIL examples <em>without any local installation</em> using <a href="https://mybinder.org">Binder</a>.
+    <br/>
+    <br/>
+    Access a <a href="https://github.com/TomographicImaging/CIL-Demos">large collection</a> of Jupyter Notebooks covering basic usage to advanced reconstructions with iterative methods.
 callforaction:
   url: https://ccpi.ac.uk/training
   text: Training

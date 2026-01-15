@@ -195,6 +195,36 @@ export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
 python -m unittest discover -v ./Wrappers/Python/test
 ```
 
+## Development Setup
+
+If you wish to contribute to the development of CIL, you can get a working setup following the steps below.
+
+### Setting up a fork and cloning
+
+You will want to fork the CIL repository on GitHub in order to your own repository from which you can submit pull requests.
+
+This forked repository can be cloned with, assuming your fork is also named `CIL`
+```sh
+git clone --recurse-submodule git@github.com:<YOUR_GITHUB_USERNAME>/CIL
+```
+
+### Create local development environment
+
+```sh
+bash ./scripts/create_local_env_for_cil_development.sh -e cil -t
+conda activate cil
+```
+
+### Do editable installation
+
+You will want to have an _editable_ installation such that changes to the CIL source code are immediately reflected in your environment.
+
+```sh
+pip install --no-deps -e .
+```
+
+**Note**: Some performance-critical parts of CIL are implemented in C++ (found in `src/Core/`). These are not automatically recompiled, so the above step would need to be repeated to build these parts and add them to the installation in your environment. _If you only change makes to Python code, you don't need to take this into consideration_.
+
 ## Citing CIL
 
 If you use CIL in your research, please include citations to **both** the software on Zenodo, and a CIL paper:

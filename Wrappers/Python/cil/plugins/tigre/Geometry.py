@@ -18,7 +18,6 @@
 
 from cil.framework.labels import AcquisitionType, AngleUnit
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 try:
     from tigre.utilities.geometry import Geometry
@@ -53,12 +52,12 @@ class CIL2TIGREGeometry(object):
             # if tilted and untilted rotation axes are not parallel calculate Euler angles
             if v_norm > 1e-12:
                 theta = np.arctan2(v_norm, c)
-                rotation_matrix = Rotation.from_rotvec(theta * v / v_norm)
+                rotation_matrix = rotation_matrix_from_vec(theta * v / v_norm)
                 euler_angles = []
                 for angle in angles:
-                    R1 = Rotation.from_euler("z", angle, degrees=False)
-                    combined = rotation_matrix * R1
-                    euler_angles.append(combined.as_euler("ZYZ", degrees=False))
+                    R1 = rot_z(angle)
+                    combined = rotation_matrix @ R1
+                    euler_angles.append(euler_from_matrix_zyz(combined))
                 tg.euler_angles = np.array(euler_angles, dtype=np.float32)
                 
                 return tg, tg.euler_angles
@@ -75,6 +74,57 @@ class CIL2TIGREGeometry(object):
             angles[i] = a
 
         return tg, angles
+    
+def rotation_matrix_from_vec(rotvec):   
+    rotvec = np.asarray(rotvec, dtype=float)
+    theta = np.linalg.norm(rotvec)
+
+    diag = np.array([[1., 0., 0.],
+                    [0., 1., 0.],
+                    [0., 0., 1.]])
+    
+    if theta == 0.0:
+        return diag
+
+    axis = rotvec / theta
+    x, y, z = axis
+    K = np.array([[ 0, -z,  y],
+                    [ z,  0, -x],
+                    [-y,  x,  0]
+    ])
+
+    R = (diag 
+        + np.sin(theta) * K
+        + (1 - np.cos(theta)) * (K @ K)
+    )
+
+    return R
+
+def rot_z(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[c, -s, 0],
+                     [s,  c, 0],
+                     [0,  0, 1]])
+
+def euler_from_matrix_zyz(R, eps=1e-12):
+    """
+    Equivalent to scipy Rotation.as_euler("ZYZ", degrees=False)
+    """
+    R = np.asarray(R, dtype=float)
+
+    beta = np.arccos(np.clip(R[2, 2], -1.0, 1.0))
+
+    if abs(np.sin(beta)) > eps:
+            alpha = np.arctan2(R[1, 2], R[0, 2])
+            gamma = np.arctan2(R[2, 1], -R[2, 0])
+    else:
+            alpha = np.arctan2(R[0, 1], R[0, 0])
+            gamma = 0.0
+    
+    alpha = (alpha + np.pi) % (2*np.pi) - np.pi
+    gamma = (gamma + np.pi) % (2*np.pi) - np.pi
+
+    return np.array([alpha, beta, gamma])
 
 class TIGREGeometry(Geometry):
 

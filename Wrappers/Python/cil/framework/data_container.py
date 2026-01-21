@@ -179,16 +179,18 @@ class DataContainer(object):
                 new_array = new_array.take(indices=value, axis=axis)
 
         if new_array.ndim > 1:
-            return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
+            return DataContainer(new_array, False, dimension_labels_list)
         from .vector_data import VectorData
         return VectorData(new_array, dimension_labels=dimension_labels_list)
 
     def reorder(self, order):
         '''
-        reorders the data in memory as requested.
+        Reorders the data in memory as requested. This is an in-place operation.
 
-        :param order: ordered list of labels from self.dimension_labels
-        :type order: list, sting
+        Parameters
+        ----------
+        order: list or string
+            ordered list of labels from self.dimension_labels
         '''
         try:
             if len(order) != len(self.shape):
@@ -497,14 +499,15 @@ class DataContainer(object):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             else:
                 raise TypeError('Expected x2 type as number or DataContainer, got {}'.format(type(x2)))
-            geom = self.geometry
-            if geom is not None:
-                geom = self.geometry.copy()
+            
+            if self.geometry is None:
+                return type(self)(out,
+                    deep_copy=False,
+                    dimension_labels=self.dimension_labels)
+            
             return type(self)(out,
-                   deep_copy=False,
-                   dimension_labels=self.dimension_labels,
-                   geometry= None if self.geometry is None else self.geometry.copy(),
-                   suppress_warning=True)
+                deep_copy=False,
+                geometry=self.geometry)
 
 
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -728,11 +731,16 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
+
+            if self.geometry is None:
+                return type(self)(out,
+                    deep_copy=False,
+                    dimension_labels=self.dimension_labels)
+            
             return type(self)(out,
                        deep_copy=False,
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry,
-                       suppress_warning=True)
+                       geometry=self.geometry)
+        
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()

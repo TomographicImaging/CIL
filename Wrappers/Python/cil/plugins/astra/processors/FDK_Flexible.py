@@ -68,7 +68,7 @@ class FDK_Flexible(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))
 
-        if self.sinogram_geometry.geom_type != 'cone':
+        if self.sinogram_geometry.geom_type != 'cone' and self.sinogram_geometry.geom_type != 'cone_flex':
             raise ValueError("Expected input data to be cone beam geometry , got {0}"\
                  .format(self.sinogram_geometry.geom_type))
 
@@ -113,7 +113,7 @@ class FDK_Flexible(DataProcessor):
             arr_out = np.squeeze(arr_out, axis=0)
 
         if out is None:
-            out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
+            out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy())
         else:
             out.fill(arr_out)
         return out

@@ -17,8 +17,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
 import numpy
+import warnings
 
-from .labels import AcquisitionDimension, Backend
+from .labels import AcquisitionDimension, Backend, AcquisitionType
 from .data_container import DataContainer
 from .partitioner import Partitioner
 
@@ -67,16 +68,15 @@ class AcquisitionData(DataContainer, Partitioner):
                  geometry = None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', None)
+        dtype = kwargs.pop('dtype', None)
         if dtype is not None and array is not None:
             if dtype != array.dtype:
                     raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
 
         if geometry is None:
             raise AttributeError("AcquisitionData requires a geometry")
-        
 
-        labels = kwargs.get('dimension_labels', None)
+        labels = kwargs.pop('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
@@ -99,6 +99,9 @@ class AcquisitionData(DataContainer, Partitioner):
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def __eq__(self, other):
         '''
@@ -125,11 +128,15 @@ class AcquisitionData(DataContainer, Partitioner):
             return True
         else:
             return False
+        
+    def _get_slice(self, **kwargs):
+        '''
+        Functionality of get_slice
+        '''
 
-    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
-        '''Returns a new dataset of a single slice in the requested direction.'''
+        force = kwargs.pop('force', False)
         try:
-            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            geometry_new = self.geometry.get_slice(**kwargs)
         except ValueError:
             if force:
                 geometry_new = None
@@ -138,24 +145,91 @@ class AcquisitionData(DataContainer, Partitioner):
 
         #get new data
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
-        if vertical == 'centre':
+        if kwargs.get('vertical') == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
 
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
             ind0 = int(numpy.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            kwargs['vertical'] = ind0
+            out = DataContainer.get_slice(self, **kwargs)
 
             if w2 > 0:
-                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                kwargs['vertical'] = ind0 +  1
+                out2 = DataContainer.get_slice(self, **kwargs)
                 out = out * (1 - w2) + out2 * w2
         else:
-            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            out = DataContainer.get_slice(self, **kwargs)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new)
+        
+    
+    def get_slice(self, *args, **kwargs):
+        '''
+        Returns a new AcquisitionData of a single slice in the requested direction.
+
+        Parameters
+        ----------
+        channel: int, optional
+            index on channel dimension to slice on. If None, does not slice on this dimension.
+        angle/projection: int, optional
+            index on angle or projection dimension to slice on. Dimension label depends on the geometry type:
+            For CONE_FLEX geometry, use 'projection'.
+            For all other geometries, use 'angle'.
+        vertical: int, str, optional
+            If int, index on vertical dimension to slice on. If str, can be 'centre' to return the slice at the center of the vertical dimension.
+        horizontal: int, optional
+            index on horizontal dimension to slice on. If None, does not slice on this dimension.
+        force: bool, default False
+            If True, will return a DataContainer instead of an AcquisitionData when the requested slice is not reconstructable.
+
+        Returns
+        -------
+        AcquisitionData
+            A new AcquisitionData object containing the requested slice.
+        DataContainer
+            If `force=True` and the slice is not reconstructable, a DataContainer will be returned instead.
+
+        Notes
+        -----
+        If there is an even number of slices in the vertical dimension and 'centre' is requested, the slice returned will be the average of the two middle slices.
+        '''
+
+        for key in kwargs:
+            if self.geometry.geom_type == AcquisitionType.CONE_FLEX and key == 'angle':
+                raise TypeError(f"Cannot use 'angle' for Cone3D_Flex geometry. Use 'projection' instead.")
+            elif self.geometry.geom_type != AcquisitionType.CONE_FLEX and key == 'projection':
+                raise TypeError(f"Cannot use 'projection' for geometries that use angles. Use 'angle' instead.")
+            elif key not in AcquisitionDimension and key != 'force':
+                raise TypeError(f"'{key}' not in allowed labels {AcquisitionDimension}.")
+            
+        if args:
+            warnings.warn("Positional arguments for get_slice are deprecated. Use keyword arguments instead.", DeprecationWarning, stacklevel=2)
+            
+            num_args = len(args)
+
+            if num_args > 0:
+                kwargs['channel'] = args[0]
+
+            if num_args > 1:
+                if self.geometry.geom_type & AcquisitionType.CONE_FLEX:
+                    kwargs['projection'] = args[1]
+                else:
+                    kwargs['angle'] = args[1]
+
+            if num_args > 2:
+                kwargs['vertical'] = args[2]
+
+            if num_args > 3:
+                kwargs['horizontal'] = args[3]
+
+            if num_args > 4:
+                kwargs['force'] = args[4]
+
+        return self._get_slice(**kwargs)
 
     def reorder(self, order):
         '''

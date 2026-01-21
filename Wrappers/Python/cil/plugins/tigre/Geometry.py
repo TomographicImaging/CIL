@@ -82,6 +82,9 @@ class TIGREGeometry(Geometry):
 
         Geometry.__init__(self)
 
+        if ag.geom_type not in ['cone', 'parallel']:
+            raise ValueError(f"CIL cannot use TIGRE to process geometries of type {ag.geom_type}.")
+
         ag_in = ag.copy()
         system = ag_in.config.system
         system.align_reference_frame('tigre')

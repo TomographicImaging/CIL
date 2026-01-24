@@ -163,7 +163,7 @@ exclude = ["data", "test"]
 # so we keep ccpi for now.
 # When https://github.com/TomographicImaging/CIL/issues/1870 gets resolved, we can remove ccpi from here.
 channels = ["conda-forge", "ccpi", "httomo", "https://tomography.stfc.ac.uk/conda"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "win-64"]
 preview = ["pixi-build"]  # Can be removed when pixi-build is stable. Last checked 2026-01-24 in pixi 0.63.2
 
 [tool.pixi.package.host-dependencies]

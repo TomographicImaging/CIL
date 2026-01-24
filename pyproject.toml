@@ -91,18 +91,21 @@ test = [
 
 docs = [
     "jinja2",
-    #"pydata-sphinx-theme",
+    "pydata-sphinx-theme",
     "recommonmark",
-    "sphinx",
+    "sphinx<9",  # Until https://github.com/sphinx-contrib/multiversion/issues/201 is resolved
     "sphinx_rtd_theme",
     "sphinx-autobuild",
     "sphinx-click",
     "sphinx-copybutton",
+    "sphinx-multiversion",
     "sphinx-panels",
     "sphinxcontrib-bibtex",
     "nbsphinx",
     "sphinx-gallery",
     "notebook",
+    "ipywidgets",
+    "matplotlib",
 ]
 
 ### PEP 517/518 build system configuration ###
@@ -162,9 +165,12 @@ exclude = ["data", "test"]
 # This is because we need https://tomography.stfc.ac.uk/conda for ipp-devel, but it is not the recommended channel yet,
 # so we keep ccpi for now.
 # When https://github.com/TomographicImaging/CIL/issues/1870 gets resolved, we can remove ccpi from here.
-channels = ["conda-forge", "ccpi", "httomo", "https://tomography.stfc.ac.uk/conda"]
+channels = ["ccpi", "httomo", "conda-forge", "https://tomography.stfc.ac.uk/conda"]
 platforms = ["linux-64", "win-64"]
 preview = ["pixi-build"]  # Can be removed when pixi-build is stable. Last checked 2026-01-24 in pixi 0.63.2
+
+[tool.pixi.workspace.build-variants]
+# python = ["3.11.*", "3.12.*"]
 
 [tool.pixi.package.host-dependencies]
 uv = "*"
@@ -184,25 +190,40 @@ cil = { path = ".", editable = true }
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-full = { features = ["data", "docs", "plugins", "test"], solve-group = "default" }
+gpu = { features = ["astra-gpu", "tigre"], solve-group = "cuda" }
 dev = { features = ["data", "docs", "plugins", "test"], solve-group = "default" }
 # cuda = { features = ["cuda"], solve-group = "default" }
 plugins = { features = ["plugins"], solve-group = "default" }
 test = { features = ["test" ], solve-group = "default" }
-test-gpu = { features = ["test", "astra-cuda", "tigre"], solve-group = "default" }
+test-gpu = { features = ["test", "astra-gpu", "tigre"], solve-group = "cuda" }
+docs = { features = ["docs", "astra-gpu", "tigre", "plugin-tomophantom", "plugin-ccpi-regulariser"], solve-group = "cuda" }
+
+## Features ##
+# Plugins #
+[tool.pixi.feature.plugin-tomophantom.dependencies]
+tomophantom = { version = "==2.0.0", channel = "ccpi" }
+
+[tool.pixi.feature.plugin-ccpi-regulariser.dependencies]
+ccpi-regulariser = { version = "==24.0.1", channel = "ccpi" }
+
+[tool.pixi.feature.docs.dependencies]
+ruby = { version = ">=3.4,<4", channel = "conda-forge" }
+
+[tool.pixi.feature.docs.tasks]
+docs-build = { cmd = "sphinx-build -b html docs/source docs/build", default-environment = "docs" }
+docs-serve = { cmd = "sphinx-autobuild docs/source docs/build --open-browser", default-environment = "docs" }
 
 [tool.pixi.feature.test.dependencies]
-ccpi-regulariser = { version = "==24.0.1", channel = "ccpi" }
 cil-data = { version = ">=22.0.0,<23", channel = "ccpi" }
 
 # NOTE: From 3.0.0 onwards tomophantom is only available in httomo channel
 # tomophantom = { version = ">=3.0.0,<4", channel = "ccpi" }
 tomophantom = { version = "==2.0.0", channel = "ccpi" }
 
-[tool.pixi.feature.astra.dependencies]
+[tool.pixi.feature.astra-cpu.dependencies]
 astra-toolbox = { version = "==2.1", build = "py*", channel = "conda-forge" }
 
-[tool.pixi.feature.astra-cuda.dependencies]
+[tool.pixi.feature.astra-gpu.dependencies]
 astra-toolbox = { version = "==2.1", build = "cuda*", channel = "conda-forge" }
 
 [tool.pixi.feature.tigre.dependencies]
@@ -219,4 +240,3 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
-

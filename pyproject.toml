@@ -33,18 +33,17 @@ changelog = "https://github.com/TomographicImaging/CIL/blob/master/CHANGELOG.md"
 
 [project]
 name = "cil"
-dynamic = ["version"]
+version = "26.0.0"
 description = "Core Imaging Library"
-license = {text = "Apache-2.0"}
-maintainers = [{name="CIL developers", email="tomography+cil@stfc.ac.uk"}]
+license = { text = "Apache-2.0" }
+maintainers = [{ name = "CIL developers", email = "tomography+cil@stfc.ac.uk" }]
 requires-python = ">=3.10"
 readme = "README.md"
 keywords = ["tomography", "optimisation"]
 dependencies = [
-    #"cil-data>=22", # missing from PyPI
     "dxchange",
     "h5py",
-    #"ipp==2021.12.*", # PyPI conflicts with conda package
+    "ipp==2021.12.*",
     "numba",
     "numpy>=1.23, <2.0.0",
     "olefile>=0.46",
@@ -54,39 +53,170 @@ dependencies = [
     "tqdm",
     "packaging",
 ]
+
+[project.urls]
+#homepage = "https://ccpi.ac.uk/cil"
+homepage = "https://tomographicimaging.github.io/CIL/"
+documentation = "https://tomographicimaging.github.io/CIL/nightly"
+repository = "https://github.com/TomographicImaging/CIL"
+changelog = "https://github.com/TomographicImaging/CIL/blob/master/CHANGELOG.md"
+
 [project.optional-dependencies]
 plugins = [
     "ipywidgets",
     #"tomophantom==2.0.0", # [linux] # missing from PyPI
 ]
-gpu = [
-    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
-    #"tigre>=2.4,<=2.6", # missing from PyPI
-]
+# cuda = [
+#     "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
+#     #"tigre>=2.4,<=2.6", # missing from PyPI
+# ]
 [dependency-groups]
+
+data = [
+    #"cil-data>=22", # missing from PyPI
+    "zenodo_get>=1.6",
+]
+
 test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
     "cvxpy",
-    "matplotlib-base>=3.3",
+    # "matplotlib-base>=3.3",
     "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",
     "zenodo_get>=1.6",
+    "pytest",
 ]
+
 docs = [
-  "jinja2",
-  #"pydata-sphinx-theme",
-  "recommonmark",
-  "sphinx",
-  "sphinx_rtd_theme",
-  "sphinx-autobuild",
-  "sphinx-click",
-  "sphinx-copybutton",
-  "sphinx-panels",
-  "sphinxcontrib-bibtex",
-  "nbsphinx",
-  "sphinx-gallery",
-  "sphinx-copybutton",
-  "notebook",
+    "jinja2",
+    #"pydata-sphinx-theme",
+    "recommonmark",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-autobuild",
+    "sphinx-click",
+    "sphinx-copybutton",
+    "sphinx-panels",
+    "sphinxcontrib-bibtex",
+    "nbsphinx",
+    "sphinx-gallery",
+    "notebook",
 ]
+
+### PEP 517/518 build system configuration ###
+[build-system]
+requires = [
+    "setuptools>=64",
+    "scikit-build-core>=0.10",
+
+    # "ipp-devel>=2021.10",
+    # "ipp-static>=2021.10",
+    # "intel-openmp",
+]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.16"
+# metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+# sdist.include = ["Wrappers/Python/cil/version.py"]
+sdist.exclude = [
+    "scripts",
+    "docs",
+    "Wrappers/Python/data",
+    "Wrappers/Python/test",
+    ".*",
+]
+[tool.scikit-build.wheel.packages]
+cil = "Wrappers/Python/cil"
+
+# [tool.setuptools_scm]
+# version_file = "Wrappers/Python/cil/version.py"
+# version_file_template = """
+# version = '{version}'
+# major = {version_tuple[0]}
+# minor = {version_tuple[1]}
+# patch = {version_tuple[2]}
+# commit_hash = '{scm_version.node}'
+# num_commit = {scm_version.distance}
+# # work-around for https://github.com/pypa/setuptools_scm/issues/1059
+# if (commit_hash, num_commit) == ('None', 0):
+#     import re
+#     if (_v := re.search(r'\\.dev(\\d+)\\+(\\w+)', version)):
+#         num_commit, commit_hash = int(_v.group(1)), _v.group(2)
+# """
+
+[tool.setuptools]
+package-dir = { "" = "Wrappers/Python" }
+
+[tool.setuptools.packages.find]
+where = ["Wrappers/Python"]
+include = ["cil", "cil.*"]
+exclude = ["data", "test"]
+
+### Pixi Configuration ###
+[tool.pixi.workspace]
+# Currently we keep both ccpi and https://tomography.stfc.ac.uk/conda in here
+# This is because we need https://tomography.stfc.ac.uk/conda for ipp-devel, but it is not the recommended channel yet,
+# so we keep ccpi for now.
+# When https://github.com/TomographicImaging/CIL/issues/1870 gets resolved, we can remove ccpi from here.
+channels = ["conda-forge", "ccpi", "httomo", "https://tomography.stfc.ac.uk/conda"]
+platforms = ["linux-64"]
+preview = ["pixi-build"]  # Can be removed when pixi-build is stable. Last checked 2026-01-24 in pixi 0.63.2
+
+[tool.pixi.package.host-dependencies]
+uv = "*"
+cmake = { version = ">=3.16" }
+
+ipp-devel = { version = ">=2021.10" }
+ipp-include = { version = ">=2021.10" }
+
+[tool.pixi.package.build]
+backend = { name = "pixi-build-python", version = "*" }
+
+[tool.pixi.package.build.config]
+ignore-pypi-mapping = false  # Can be removed when this is default in pixi-build-python. Last checked 2026-01-24 in pixi 0.63.2
+
+[tool.pixi.pypi-dependencies]
+cil = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+full = { features = ["data", "docs", "plugins", "test"], solve-group = "default" }
+dev = { features = ["data", "docs", "plugins", "test"], solve-group = "default" }
+# cuda = { features = ["cuda"], solve-group = "default" }
+plugins = { features = ["plugins"], solve-group = "default" }
+test = { features = ["test" ], solve-group = "default" }
+test-gpu = { features = ["test", "astra-cuda", "tigre"], solve-group = "default" }
+
+[tool.pixi.feature.test.dependencies]
+ccpi-regulariser = { version = "==24.0.1", channel = "ccpi" }
+cil-data = { version = ">=22.0.0,<23", channel = "ccpi" }
+
+# NOTE: From 3.0.0 onwards tomophantom is only available in httomo channel
+# tomophantom = { version = ">=3.0.0,<4", channel = "ccpi" }
+tomophantom = { version = "==2.0.0", channel = "ccpi" }
+
+[tool.pixi.feature.astra.dependencies]
+astra-toolbox = { version = "==2.1", build = "py*", channel = "conda-forge" }
+
+[tool.pixi.feature.astra-cuda.dependencies]
+astra-toolbox = { version = "==2.1", build = "cuda*", channel = "conda-forge" }
+
+[tool.pixi.feature.tigre.dependencies]
+tigre = { version = "==2.6", channel = "ccpi" }
+
+[tool.pixi.tasks]
+test = { cmd = "python -m unittest discover -v ./Wrappers/Python/test", default-environment = "test"}
+test-gpu = { cmd = "pytest Wrappers/Python/test -v" , default-environment = "test-gpu", env = { TESTS_FORCE_GPU = "1" } }
+# test-quick = { cmd = "pytest Wrappers/Python/test -v -x --ignore=Wrappers/Python/test/test_Plugins*" }
+
+[tool.pytest.ini_options]
+testpaths = ["Wrappers/Python/test"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+

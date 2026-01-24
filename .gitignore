@@ -5,3 +5,7 @@ __pycache__/
 /Wrappers/Python/cil/lib/
 *.vscode*
 *.egg*
+
+# Pixi environments
+.pixi/*
+!.pixi/config.toml

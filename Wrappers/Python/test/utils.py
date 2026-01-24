@@ -58,7 +58,7 @@ try:
     has_nvidia = True
 except:
     if os.environ.get("TESTS_FORCE_GPU", ""):
-        raise ImportError
+        raise ImportError("nvidia-smi not found")
     has_nvidia = False
 system_state['has_nvidia']=has_nvidia
 
@@ -66,7 +66,7 @@ system_state['has_nvidia']=has_nvidia
 module_info = importlib.util.find_spec("astra")
 if module_info is None:
     if os.environ.get("TESTS_FORCE_GPU", ""):
-        raise ImportError
+        raise ImportError("module not found: astra")
     has_astra = False
 else:
     has_astra = True
@@ -76,7 +76,7 @@ system_state['has_astra']=has_astra
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
     if os.environ.get("TESTS_FORCE_GPU", ""):
-        raise ImportError
+        raise ImportError("module not found: tigre")
     has_tigre = False
 else:
     has_tigre = True

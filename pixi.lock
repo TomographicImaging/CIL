@@ -2115,7 +2115,7 @@ packages:
 - pypi: ./
   name: cil
   version: 26.0.0
-  sha256: 41eef546dc51ef9fe6df6326e4acc18465ac1437b093d50d9a0c0d0cbd6f5482
+  sha256: 0f9cb4c0d6c5a9137f42e64de4717db0eeb90712d675a53c11029ca7191ad4f4
   requires_dist:
   - dxchange
   - h5py

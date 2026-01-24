@@ -111,9 +111,9 @@ requires = [
     "setuptools>=64",
     "scikit-build-core>=0.10",
 
-    # "ipp-devel>=2021.10",
-    # "ipp-static>=2021.10",
-    # "intel-openmp",
+    "ipp-devel>=2021.10",
+    "ipp-static>=2021.10",
+    "intel-openmp",
 ]
 build-backend = "scikit_build_core.build"
 

@@ -36,7 +36,7 @@ from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser, LaminographyCorrector
 import gc
 
 from utils import has_numba
@@ -3260,6 +3260,100 @@ class TestPaganinProcessor(unittest.TestCase):
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
+
+class TestLaminographyCorrector(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        # ag = AcquisitionGeometry.create_Parallel3D()\
+        #     .set_angles(numpy.linspace(0,360,360,endpoint=False))\
+        #     .set_panel([128,128],0.1)
+
+        self.data_parallel.reorder('astra')
+
+    def error_message(self, processor, test_parameter):
+        return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    def test_LaminographyCorrector_init(self):
+        # test default values are initialised
+        processor = LaminographyCorrector()
+        test_parameter = ['initial_parameters', 'parameter_bounds', 'parameter_tolerance', 
+                          'coarse_binning', 'final_binning', 'angle_binning', 'reduced_volume', 'evaluations']
+        test_value = [(30.0, 0.0), [(30, 40), (-10, 10)], (0.01, 0.01),
+                      None, None, None, None, []]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], 
+                           msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = LaminographyCorrector(initial_parameters=(25.0, 5.0), 
+                                         parameter_bounds=[(20, 35), (-5, 15)],
+                                         parameter_tolerance=(0.1, 0.1),
+                                         coarse_binning=2,
+                                         final_binning=1,
+                                         angle_binning=2,
+                                         reduced_volume=None)
+        test_value = [(25.0, 5.0), [(20, 35), (-5, 15)], (0.1, 0.1),
+                      2, 1, 2, None]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i],
+                           msg=self.error_message(processor, test_parameter[i]))
+
+    def test_LaminographyCorrector_check_input(self):
+        processor = LaminographyCorrector()
+        
+        # test with parallel beam data - should work
+        processor.set_input(self.data_parallel)
+        data2 = processor.get_input()
+        numpy.testing.assert_allclose(data2.as_array(), self.data_parallel.as_array())
+
+        # check there is an error when the wrong data type is input
+        with self.assertRaises(TypeError):
+            processor.set_input(self.data_parallel.geometry)
+
+        with self.assertRaises(TypeError):
+            processor.set_input(self.data_parallel.as_array())
+
+        dc = DataContainer(self.data_parallel.as_array())
+        with self.assertRaises(TypeError):
+            processor.set_input(dc)
+
+        # check with different data order - should raise error
+        data_reorder = self.data_parallel.copy()
+        data_reorder.reorder('astra')
+        data_reorder.reorder(['angle','horizontal','vertical'])
+        with self.assertRaises(ValueError):
+            processor.set_input(data_reorder)
+
+        # # check that cone beam data raises NotImplementedError
+        # with self.assertRaises(NotImplementedError):
+        #     processor.set_input(self.data_cone)
+
+        # # check that cone flex data raises NotImplementedError
+        # with self.assertRaises(NotImplementedError):
+        #     processor.set_input(self.data_cone_flex)
+
+    def test_LaminographyCorrector_update_geometry(self):
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 35.0
+        cor_pix = 5.0
+        
+        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        
+        # Verify CoR was updated
+        self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
+        
+        # Verify rotation axis direction was modified (should be tilted)
+        original_axis = numpy.array([0, 0, 1])
+        tilted_axis = ag_updated.config.system.rotation_axis.direction
+        assert not numpy.allclose(tilted_axis, original_axis)
 
 class TestFluxNormaliser(unittest.TestCase):
 

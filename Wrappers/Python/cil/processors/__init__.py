@@ -28,3 +28,4 @@ from .Masker import Masker
 from .Padder import Padder
 from .PaganinProcessor import PaganinProcessor
 from .FluxNormaliser import FluxNormaliser
+from .LaminographyCorrector import LaminographyCorrector

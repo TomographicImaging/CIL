@@ -220,6 +220,9 @@ cil-data = { version = ">=22.0.0,<23", channel = "ccpi" }
 # tomophantom = { version = ">=3.0.0,<4", channel = "ccpi" }
 tomophantom = { version = "==2.0.0", channel = "ccpi" }
 
+# To be handled when astra-toolbox-cpu is released
+# See: https://github.com/astra-toolbox/astra-toolbox/issues/327#issuecomment-3799202745
+# See: https://discord.com/channels/1082332781146800168/1464650877750087732
 [tool.pixi.feature.astra-cpu.dependencies]
 astra-toolbox = { version = "==2.1", build = "py*", channel = "conda-forge" }
 

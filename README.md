@@ -60,7 +60,7 @@ While building the CIL package we test with specific versions of dependencies. T
 |[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
 |--|--| **CT data readers** |--|--|
 |[olefile](https://github.com/decalage2/olefile)|>= 0.46|`olefile>=0.46`|Package to process Microsoft OLE2 files, used to read ZEISS data files.|[BSD-style (custom)](https://github.com/decalage2/olefile?tab=License-1-ov-file)|
-|[dxchange](https://github.com/data-exchange/dxchange)||`dxchange`|Provides an interface with TomoPy for loading tomography data.|[BSD-style (custom)](https://github.com/data-exchange/dxchange?tab=License-1-ov-file)|
+|[dxchange](https://github.com/data-exchange/dxchange)||`dxchange>=0.2.1`|Provides an interface with TomoPy for loading tomography data.|[BSD-style (custom)](https://github.com/data-exchange/dxchange?tab=License-1-ov-file)|
 
 
 ### Docker

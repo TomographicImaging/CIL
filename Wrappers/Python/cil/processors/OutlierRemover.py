@@ -57,17 +57,15 @@ class OutlierRemover(Processor):
 
         super(OutlierRemover, self).__init__(**kwargs)
 
-    def check_input(self, dataset, diff, radius, mode):
-        if not diff or not diff > 0:
-            raise ValueError(f'diff parameter must be greater than 0. Value provided was {diff}')
+    def check_input(self, dataset):
+        if not (isinstance(dataset, ImageData)):
+            raise Exception('Processor supports only following data types:\n' +
+                            '- Image Data\n')
+        elif (dataset.geometry == None):
+            raise Exception('Geometry is not defined.')
+        else:
+            return True
 
-        if not radius or not radius > 0:
-            raise ValueError(f'radius parameter must be greater than 0. Value provided was {radius}')
-
-        params = {'diff': diff, 'radius': radius, 'mode': mode}
-        #ps.run_compute_func(OutliersFilter.compute_function, dataset.shape[0], dataset.shared_array, params)
-
-        return dataset
     
     def process(self, out=None):
         data = self.get_input()
@@ -75,4 +73,28 @@ class OutlierRemover(Processor):
         radius = self.radius
         mode = self.mode
 
-        median = median_filter(data.as_array(), size=2*radius+1)
+        if not diff or not diff > 0:
+            raise ValueError(f'diff parameter must be greater than 0. Value provided was {diff}')
+
+        if not radius or not radius > 0:
+            raise ValueError(f'radius parameter must be greater than 0. Value provided was {radius}')
+        
+        if mode not in ['bright', 'dark']:
+            raise ValueError("Mode must be either 'bright' or 'dark'")
+        
+        data = self.get_input()
+        if out is None:
+            out = data.copy()
+        elif id(out) != id(data):
+            np.copyto(out.array, data.array)
+        
+        data_array = out.as_array()
+
+        median = median_filter(data_array[i], size=radius)
+        for i in range(data_array.shape[0]):
+            if mode == 'bright':
+                data_array[i] = np.where((data_array[i] - median) > diff, median, data_array[i])
+            else:  # mode == 'dark'
+                data_array[i] = np.where(median - data_array[i] > diff, median, data_array[i])
+        
+        return out

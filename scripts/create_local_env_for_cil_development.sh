@@ -81,8 +81,8 @@ if test $test_deps = 0; then
   conda_args+=(-c conda-forge -c https://software.repos.intel.com/python/conda --override-channels)
 else
   conda_args+=(
-    astra-toolbox=2.1=cuda*
-    ccpi-regulariser=24.0.1
+    astra-toolbox::astra-toolbox=2.*=cuda*
+    ccpi-regulariser=25.0.0=cuda*
     cil-data
     cvxpy
     ipywidgets

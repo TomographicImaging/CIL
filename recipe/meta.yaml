@@ -18,8 +18,8 @@ test:
     - tomophantom 2.0.0       # [linux]
     - tigre 2.6
     - packaging
-    - ccpi-regulariser 24.0.1 # [not osx]
-    - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
+    - ccpi-regulariser 25.0.0 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'cpu*' }} # [not osx]
+    - astra-toolbox >=2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
     - dxchange
@@ -54,7 +54,7 @@ requirements:
   run:
     - {{ pin_compatible('python', min_pin='x.x') }}
     - ipp {{ ipp_version }}
-    - numpy >=1.23,<2
+    - numpy >=1.23,<3
     - scipy >=1.4
     - h5py
     - pillow

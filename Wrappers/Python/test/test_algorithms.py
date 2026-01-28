@@ -57,8 +57,8 @@ from unittest.mock import MagicMock
 log = logging.getLogger(__name__)
 
 
-if has_cvxpy:
-    import cvxpy
+# if has_cvxpy:
+    # import cvxpy
 
 from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):
@@ -533,7 +533,7 @@ class TestFISTA(CCPiTestClass):
         self.assertEqual(alg.step_size, 0.99/2)
 
 
-class testProxSkip(CCPiTestClass):
+class TestProxSkip(CCPiTestClass):
 
     def setUp(self):
 
@@ -550,7 +550,7 @@ class testProxSkip(CCPiTestClass):
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
         self.g = ZeroFunction()
-        self.h = L1Norm()
+        self.h = 0.5 * L1Norm()
 
         self.ig = self.Aop.domain
 
@@ -559,22 +559,20 @@ class testProxSkip(CCPiTestClass):
     def tearDown(self):
         pass
 
-    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
-    def test_with_cvxpy(self):
+    def test_ista_vs_proxskip(self):
 
-        ista = ProxSkip(initial=self.initial, f=self.f,
-                    g=self.g, prob = 0.1)
-        ista.run(2000, verbose=0)
+        prox = ProxSkip(initial=self.initial, f=self.f,
+                    g=self.h, step_size = 1.99/self.f.L, prob = 0.1)
+        prox.run(2000, verbose=0)
 
-        u_cvxpy = cvxpy.Variable(self.ig.shape[0])
-        objective = cvxpy.Minimize(
-            0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
-        p = cvxpy.Problem(objective)
-        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4)
-
-        np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
+        ista = ISTA(initial=self.initial, f=self.f,
+                    g=self.h, step_size = 1.99/self.f.L)
+        ista.run(1000, verbose=0)        
+       
+        np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)
         np.testing.assert_allclose(
-            u_cvxpy.value, ista.solution.array, atol=1e-3)
+            prox.solution.array, ista.solution.array, atol=1e-3)    
+
 
 class testISTA(CCPiTestClass):
 

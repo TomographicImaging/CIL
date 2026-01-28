@@ -115,34 +115,48 @@ Building documentation locally
 
 The easiest way to test documentation changes is to open a pull request and `download the rendered documentation from the CI <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 
-Alternatively, to build the docs locally, you will need a working ``cil`` installation.
-For development of the documentation embedded within the source code itself (e.g. docstrings), you should build ``cil`` from source.
+To build the docs locally, you will need a working ``cil`` installation built from source. The documentation build process has two parts:
 
-The following steps can be used to create an environment that is suitable for building ``cil`` and its documentation, and to start
-a HTTP server to view the documentation.
+1. **Sphinx** builds the API documentation from the source code (docstrings and ``.rst`` files)
+2. **Jekyll** builds the website pages from the ``pages`` folder
 
-#. Clone ``cil`` repo
-#. Update conda with ``conda update -n base -c defaults conda``
-#. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
-#. Go to ``docs`` folder
-#. Install packages from ``docs_environment.yml``
-#. `Install Ruby version 3.2 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
-#. Install the web dependencies with ``make web-deps``
-#. Build the documentation with ``make dirhtml web``
-#. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
+Prerequisites
+^^^^^^^^^^^^^
 
-Example:
+Before building the documentation:
+
+#. Follow the `build from source instructions <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil``
+#. Navigate to the ``docs`` folder
+#. Install documentation dependencies: ``conda env update -f docs_environment.yml``
+#. Install `Ruby 3.2 <https://www.ruby-lang.org/en/documentation/installation/>`_
+#. Install Jekyll dependencies:
+   
+   - **Linux/macOS:** ``make web-deps``
+   - **Windows:** ``gem install bundler && bundle install``
+   - **If bundle install fails on Windows:** Run ``gem install google-protobuf --platform=ruby`` then retry ``bundle install``
+
+Building and viewing
+^^^^^^^^^^^^^^^^^^^^
+
+**Linux/macOS:**
+
 ::
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
-  cd CIL
-  sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
-  conda activate ENVIRONMENT_NAME
-  pip install .
-  cd docs
-  conda update -n base -c defaults conda
-  conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  make web-deps  # install dependencies (requires ruby 3.2)
+
   make dirhtml web serve
+
+**Windows:**
+
+::
+
+  # Replace BRANCH_NAME with your branch name
+  python mkdemos.py
+  sphinx-build -b dirhtml source build\BRANCH_NAME
+  python mkversions.py
+  bundle exec jekyll build -s pages
+  xcopy _site build\ /E /I /Y
+  python -m http.server -d build
+
+Open http://localhost:8000 for the homepage, or http://localhost:8000/BRANCH_NAME/ to go directly to the docs. Press Ctrl+C to stop the server.
 
 Notebooks gallery
 -----------------

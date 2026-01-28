@@ -4,7 +4,7 @@
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
-    - Remove broken `version.py` generation and use standard `importlib` metadata instead (#2269)
+    - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - improve `tqdm` notebook support (#2241)

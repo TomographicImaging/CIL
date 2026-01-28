@@ -3,9 +3,6 @@ from packaging.version import Version
 version = importlib.metadata.version("cil")
 
 __v = Version(version)
-major = __v.major
-minor = __v.minor
-patch = __v.micro
-
-commit_hash = __v.local
+major, minor, patch = __v.major, __v.minor, __v.micro
+commit_hash = __v.local.split(".", 1)[0]
 num_commit = __v.dev

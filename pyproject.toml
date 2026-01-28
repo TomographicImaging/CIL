@@ -1,3 +1,22 @@
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Jeppe Klitgaard (DTU)
+
 [build-system]
 requires = [
     "setuptools>=64",
@@ -15,22 +34,6 @@ sdist.include = ["Wrappers/Python/cil/version.py"]
 sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
-
-[tool.setuptools_scm]
-version_file = "Wrappers/Python/cil/version.py"
-version_file_template = """
-version = '{version}'
-major = {version_tuple[0]}
-minor = {version_tuple[1]}
-patch = {version_tuple[2]}
-commit_hash = '{scm_version.node}'
-num_commit = {scm_version.distance}
-# work-around for https://github.com/pypa/setuptools_scm/issues/1059
-if (commit_hash, num_commit) == ('None', 0):
-    import re
-    if (_v := re.search(r'\\.dev(\\d+)\\+(\\w+)', version)):
-        num_commit, commit_hash = int(_v.group(1)), _v.group(2)
-"""
 
 [tool.setuptools]
 package-dir = {"" = "Wrappers/Python"}
@@ -68,6 +71,7 @@ dependencies = [
     "pywavelets",
     "scipy>=1.4.0",
     "tqdm",
+    "packaging",
 ]
 [project.optional-dependencies]
 plugins = [

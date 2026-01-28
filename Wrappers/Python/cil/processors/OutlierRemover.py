@@ -58,9 +58,9 @@ class OutlierRemover(Processor):
         super(OutlierRemover, self).__init__(**kwargs)
 
     def check_input(self, dataset):
-        if not (isinstance(dataset, ImageData)):
+        if not (isinstance(dataset, AcquisitionData)):
             raise Exception('Processor supports only following data types:\n' +
-                            '- Image Data\n')
+                            '- Acquisition Data\n')
         elif (dataset.geometry == None):
             raise Exception('Geometry is not defined.')
         else:
@@ -90,8 +90,8 @@ class OutlierRemover(Processor):
         
         data_array = out.as_array()
 
-        median = median_filter(data_array[i], size=radius)
         for i in range(data_array.shape[0]):
+            median = median_filter(data_array[i], size=radius)
             if mode == 'bright':
                 data_array[i] = np.where((data_array[i] - median) > diff, median, data_array[i])
             else:  # mode == 'dark'

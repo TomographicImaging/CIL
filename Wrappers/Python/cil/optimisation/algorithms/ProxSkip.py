@@ -38,13 +38,16 @@ class ProxSkip(Algorithm):
         self.rng = np.random.default_rng(seed)
         self.set_up(initial, f, g, step_size, prob, **kwargs)
         self.thetas = []
+
+        ## TODO raise warning if p=1, better to use non-skipped version
+        # because update of control variate is not used.
  
                   
     def set_up(self, initial, f, g, step_size, prob, **kwargs):
         
         logging.info("{} setting up".format(self.__class__.__name__, ))        
         
-        self.initial = initial[0]
+        self.initial = initial
 
         self.x = initial.copy()   
         self.xhat_new = initial.copy()

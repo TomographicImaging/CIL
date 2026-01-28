@@ -38,7 +38,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR, ProxSkip
 
 
 from scipy.optimize import minimize, rosen
@@ -340,8 +340,7 @@ class Test_APGD(CCPiTestClass):
         with self.assertRaises(NotImplementedError):
             alg.is_provably_convergent()
         
-        
-        
+                
         
 
 class TestFISTA(CCPiTestClass):
@@ -532,6 +531,50 @@ class TestFISTA(CCPiTestClass):
         alg.run(1)
         self.assertEqual(alg.step_size, 0.99/2)
         self.assertEqual(alg.step_size, 0.99/2)
+
+
+class testProxSkip(CCPiTestClass):
+
+    def setUp(self):
+
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+        self.h = L1Norm()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+
+    def tearDown(self):
+        pass
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
+    def test_with_cvxpy(self):
+
+        ista = ProxSkip(initial=self.initial, f=self.f,
+                    g=self.g, prob = 0.1)
+        ista.run(2000, verbose=0)
+
+        u_cvxpy = cvxpy.Variable(self.ig.shape[0])
+        objective = cvxpy.Minimize(
+            0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4)
+
+        np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(
+            u_cvxpy.value, ista.solution.array, atol=1e-3)
 
 class testISTA(CCPiTestClass):
 

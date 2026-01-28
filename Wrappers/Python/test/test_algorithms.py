@@ -38,7 +38,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR, ProxSkip
 
 
 from scipy.optimize import minimize, rosen
@@ -57,8 +57,8 @@ from unittest.mock import MagicMock
 log = logging.getLogger(__name__)
 
 
-if has_cvxpy:
-    import cvxpy
+# if has_cvxpy:
+    # import cvxpy
 
 from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):
@@ -340,8 +340,7 @@ class Test_APGD(CCPiTestClass):
         with self.assertRaises(NotImplementedError):
             alg.is_provably_convergent()
         
-        
-        
+                
         
 
 class TestFISTA(CCPiTestClass):
@@ -532,6 +531,48 @@ class TestFISTA(CCPiTestClass):
         alg.run(1)
         self.assertEqual(alg.step_size, 0.99/2)
         self.assertEqual(alg.step_size, 0.99/2)
+
+
+class TestProxSkip(CCPiTestClass):
+
+    def setUp(self):
+
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+        self.h = 0.5 * L1Norm()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+
+    def tearDown(self):
+        pass
+
+    def test_ista_vs_proxskip(self):
+
+        prox = ProxSkip(initial=self.initial, f=self.f,
+                    g=self.h, step_size = 1.99/self.f.L, prob = 0.1)
+        prox.run(2000, verbose=0)
+
+        ista = ISTA(initial=self.initial, f=self.f,
+                    g=self.h, step_size = 1.99/self.f.L)
+        ista.run(1000, verbose=0)        
+       
+        np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(
+            prox.solution.array, ista.solution.array, atol=1e-3)    
+
 
 class testISTA(CCPiTestClass):
 

@@ -45,13 +45,14 @@ class DiagonalOperator(LinearOperator):
     """
     def __init__(self, diagonal, domain_geometry=None):
         if domain_geometry is None:
-            domain_geometry = diagonal.geometry.copy()
+            domain_geometry = diagonal.geometry
         super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry,
                                     range_geometry=domain_geometry)
         if isinstance(diagonal, BlockDataContainer):
             self.operator = _BlockDiagonalOperator(diagonal)          
         else:
             self.operator = _DiagonalOperator(diagonal, domain_geometry)
+        self.diagonal = diagonal
     def direct(self,x,out=None):
         "Returns :math:`D\circ x` "
         return self.operator.direct(x,out=out)
@@ -132,8 +133,8 @@ class _BlockDiagonalOperator(LinearOperator):
 
     Parameters
     ----------
-    diagonal : DataContainer
-        DataContainer with the same dimensions as the data to be operated on.
+    diagonal : BlockDataContainer
+        BlockDataContainer with the same dimensions as the data to be operated on.
     domain_geometry : ImageGeometry
         Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly. default=None .
 
@@ -141,7 +142,7 @@ class _BlockDiagonalOperator(LinearOperator):
     def __init__(self, diagonal, domain_geometry=None):
         if domain_geometry is None:
             domain_geometry = diagonal.geometry.copy()
-        super(_DiagonalOperator, self).__init__(domain_geometry=domain_geometry,
+        super(_BlockDiagonalOperator, self).__init__(domain_geometry=domain_geometry,
                                     range_geometry=domain_geometry)
         self.diagonal = diagonal
         self.diagonal_operator_list = [ DiagonalOperator(diagonal[i]) for i in range(len(diagonal)) ]

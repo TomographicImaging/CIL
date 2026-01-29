@@ -14,6 +14,7 @@ test:
     - pip
     - python-wget
     - cvxpy                   # [linux]
+    - bm3d                    # [linux]
     - scikit-image
     - tomophantom 2.0.0       # [linux]
     - tigre 2.6

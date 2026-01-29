@@ -21,6 +21,8 @@ import csv
 from abc import ABC, abstractmethod
 from functools import partialmethod
 from pathlib import Path
+from time import time
+from typing import List, Optional
 
 import numpy as np
 from tqdm.auto import tqdm as tqdm_auto
@@ -175,6 +177,28 @@ class CSVCallback(Callback):
     def __call__(self, algorithm):
         if not self.skip_iteration(algorithm):
             self.csv.writerow((algorithm.iteration, algorithm.get_last_loss()))
+
+
+class TimingCallback(Callback):
+    """
+    Measures time taken by each iteration in :code:`self.times`,
+    excluding time taken by other specified (nested) :code:`callbacks`.
+    """
+    def __init__(self, callbacks: Optional[List[Callback]]=None, **kwargs):
+        super().__init__(**kwargs)
+        self.times = []
+        self.callbacks = callbacks or []
+        self.reset()
+
+    def reset(self):
+        self.offset = time()
+
+    def __call__(self, algorithm):
+        time_excluding_callbacks = (now := time()) - self.offset
+        self.times.append(time_excluding_callbacks)
+        for c in self.callbacks:
+            c(algorithm)
+        self.offset += time() - now
 
 
 class EarlyStoppingObjectiveValue(Callback):

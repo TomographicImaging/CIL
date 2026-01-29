@@ -261,3 +261,198 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
             self.is_short =  not self.is_short       
         
         return ret
+    
+    
+class PDHG_strongly_convex_update(StepSizeRule):
+    
+    
+    def __init__(self, gamma_g=None, gamma_fconj=None):
+        '''Updates step sizes (theta, sigma, tau) in the PDHG algorithm in the cases of primal or dual acceleration using the strongly convexity property.
+        The case where both functions are strongly convex is not available at the moment.
+    
+        
+         Parameters
+         -------------
+         gamma_g : positive :obj:`float`, optional, default=None
+            Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
+         gamma_fconj : positive :obj:`float`, optional, default=None
+            Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
+        '''
+
+        if self.gamma_g is not None and self.gamma_fconj is not None:
+            raise NotImplementedError("PDHG strongly convex step size update not implemented for both primal and dual acceleration. Please choose only one of gamma_g or gamma_fconj.")
+        if isinstance(gamma_g, Number):
+            if gamma_g <= 0:
+                raise ValueError(
+                    "Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(gamma_g))
+            self.gamma_g = gamma_g
+        elif gamma_g is None:
+            pass
+        else:
+            raise ValueError(
+                "Positive float is expected for the strongly convex constant of the function g, {} is passed".format(gamma_g))
+            pass
+
+        if isinstance(gamma_fconj, Number):
+            if gamma_fconj <= 0:
+                raise ValueError(
+                    "Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(gamma_fconj))
+            self.gamma_fconj = gamma_fconj
+        elif gamma_fconj is None:
+            pass
+        else:
+            raise ValueError(
+                "Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(gamma_fconj))
+        
+    def get_step_size(self, algorithm):
+        """
+        Applies the PDHG strongly convex step size update to calculate the new primal and dual step sizes
+
+        Returns
+        --------
+        
+        """
+        # Update sigma and tau based on the strong convexity of G
+        if self.gamma_g is not None:
+            theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
+            tau *= theta
+            sigma /= theta
+
+        # Update sigma and tau based on the strong convexity of F
+        # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
+        if self.gamma_fconj is not None:
+            theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
+            sigma *= theta
+            tau /= theta
+
+        return theta, sigma, tau
+
+class PDHG_adaptive_2013(StepSizeRule):
+    
+    def __init__(self, initial_alpha=0.95, beta=0.95, gamma=0.75, delta=1.5, s=None, eta=0.95, auto_stop=True):
+        '''Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
+
+            Adaptive: https://arxiv.org/pdf/1305.0546
+         Parameters
+         -------------
+        initial_alpha : positive :obj:`float`, optional, default=0.95
+            Initial value of the parameter alpha used in the adaptive step size method.
+        beta : positive :obj:`float`, optional, default=0.95
+            Value of the parameter eta used in the adaptive step size method.
+        gamma : positive :obj:`float`, optional, default=0.75
+            Value of the parameter c used in the adaptive step size method.
+        delta : positive :obj:`float`,greater than one,  optional, default=1.5
+            Value of the parameter delta used in the adaptive step size method.
+        s : positive :obj:`float`, optional, default= Norm of the operator A 
+            Value of the parameter s used in the adaptive step size method.
+        eta : positive :obj:`float`, optional, default=0.95
+            Value of the parameter eta used in the adaptive step size method.
+        auto_stop : :obj:`boolean`, optional, default=True
+            If True, the adaptive step size method automatically stops updating the step sizes when they have not changed over five consecutive iterations.
+        
+        '''
+        self.alpha = initial_alpha
+        self.eta = eta
+        self.beta = beta
+        self.delta = delta
+        if s is None:
+            s = operator.norm()
+        self.s = s
+        self.gamma = gamma
+        self.tolerance = 1e-6
+        self.p_norm = 100
+        self.d_norm = 100
+        
+        self.auto_stop = auto_stop
+        self.count = 0
+        
+        self.y_old = None
+        self.x_resid = None
+        self.y_resid = None
+        self.x_store = None
+        
+        self.adaptive = True
+        
+    def get_step_size(self, algorithm):
+        if self.y_old is None:
+            self.y_old = algorithm.y.geometry.allocate(None) # Extra range data 1
+            self.x_resid = algorithm.x.geometry.allocate(None) # Extra image 1
+            self.y_resid = algorithm.y.geometry.allocate(None) # Extra range data 2
+            self.x_store = algorithm.x.geometry.allocate(None) # Extra image 2
+        if self.adaptive: 
+            if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
+                #print('Before adaptive', self.tau, self.sigma)
+                    b = self._calculate_backtracking()
+                    while b>1:
+                        algorithm._tau *= self.beta/b
+                        algorithm._sigma *= self.beta/b
+                        # Swap x and x_store
+                        tmp=algorithm.x
+                        algorithm.x= algorithm.x_store
+                        algorithm.x_store= tmp
+                        
+                        print('Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
+                        print('tau = {}, sigma = {}'.format( algorithm._tau, algorithm._sigma))
+                        algorithm._pdhg_update()
+                        b = self._calculate_backtracking()
+
+                    print('After possible reduction', algorithm._tau, algorithm._sigma)
+                    algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
+                    algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
+                    self.x_resid.sapyb((1/algorithm._tau), algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
+                    self.y_resid.sapyb((1/algorithm._sigma), algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
+                    self.p_norm = algorithm.x_tmp.norm()
+                    self.d_norm = algorithm.y_tmp.norm()
+                    if self.p_norm < (self.s/self.delta)*self.d_norm:
+                        print('2*self.p_norm < self.d_norm')
+                        algorithm._tau *= (1- self.alpha)
+                        algorithm._sigma /= (1 - self.alpha)
+                        self.alpha *= self.eta
+                        self.count = 0
+                    elif (self.s*self.delta)*self.d_norm < self.p_norm:
+                        print('2*self.d_norm < self.p_norm')
+                        algorithm._tau /= (1 - self.alpha)
+                        algorithm._sigma *= (1 - self.alpha)
+                        self.alpha *=self.eta
+                        self.count = 0
+                    else:
+                        print('No change')
+                        self.count += 1
+                        pass
+                    print('After adaptive', algorithm._tau, algorithm._sigma, self.alpha)
+            else:
+                    print('No adaptive step size update, below tolerance')
+            self.y_old = algorithm.y.copy() # Can i do something other than copying every iteration?  
+            
+            if self.count>5 and self.auto_stop:
+                    self.adaptive = False
+                    print('Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations')
+                    del self.x_resid
+                    del self.y_resid
+                    del self.x_store
+                    del self.y_old
+            
+            return algorithm._theta, algorithm._tau, algorithm._sigma
+        
+        
+    
+    def _calculate_backtracking(self):
+        """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
+            Returns
+            -------
+            b : :obj:`float`
+                Backtracking parameter used to update step sizes in the adaptive PDHG algorithm.
+        """
+        
+        self.x.sapyb(1.0, self.x_old, -1.0, out=self.x_resid) 
+        print('self.x, self.x_old = ', self.x.norm(), self.x_old.norm())
+        x_change_norm = self.x_resid.norm()
+        self.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
+        y_change_norm = self.y_resid.norm()
+        self.operator.direct(self.x_resid, out=algorithm.y_tmp)
+        cross_term = np.abs(2*self.sigma*self.tau*self.y_resid.dot(algorithm.y_tmp))
+        print('cross_term = ', cross_term
+              , 'x_change_norm = ', x_change_norm, 'y_change_norm = ', y_change_norm)
+        b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
+        print(b)
+        return b

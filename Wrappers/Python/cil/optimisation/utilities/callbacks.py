@@ -20,9 +20,9 @@
 from abc import ABC, abstractmethod
 from functools import partialmethod
 
+import numpy as np
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
-import numpy as np
 
 tqdm_std.monitor_interval = 0  # disable background monitoring thread
 
@@ -34,13 +34,19 @@ class Callback(ABC):
     ----------
     verbose: int, choice of 0,1,2, default 1
         0=quiet, 1=info, 2=debug.
+    interval: int, default 1
+        Number of algorithm iterations between callback calls.
     '''
-    def __init__(self, verbose=1):
+    def __init__(self, verbose=1, interval=1):
         self.verbose = verbose
+        self.interval = interval
 
     @abstractmethod
     def __call__(self, algorithm):
         pass
+
+    def skip_iteration(self, algorithm) -> bool:
+        return algorithm.iteration % min(self.interval, max(1, algorithm.update_objective_interval)) != 0 and algorithm.iteration != algorithm.max_iteration
 
 
 class _OldCallback(Callback):
@@ -68,8 +74,8 @@ class ProgressCallback(Callback):
     **tqdm_kwargs:
         Passed to :code:`tqdm_class`.
     '''
-    def __init__(self, verbose=1, tqdm_class=tqdm_auto, **tqdm_kwargs):
-        super().__init__(verbose=verbose)
+    def __init__(self, verbose=1, interval=1, tqdm_class=tqdm_auto, **tqdm_kwargs):
+        super().__init__(verbose=verbose, interval=interval)
         self.tqdm_class = tqdm_class
         self.tqdm_kwargs = tqdm_kwargs
         self._obj_len = 0  # number of objective updates
@@ -80,6 +86,7 @@ class ProgressCallback(Callback):
             tqdm_kwargs.setdefault('total', algorithm.max_iteration)
             tqdm_kwargs.setdefault('disable', not self.verbose)
             tqdm_kwargs.setdefault('initial', max(0, algorithm.iteration))
+            tqdm_kwargs.setdefault('miniters', min(self.interval, max(1, algorithm.update_objective_interval)))
             self.pbar = self.tqdm_class(**tqdm_kwargs)
         if (obj_len := len(algorithm.objective)) != self._obj_len:
             self.pbar.set_postfix(algorithm.objective_to_dict(self.verbose>=2), refresh=False)
@@ -130,17 +137,10 @@ class TextProgressCallback(ProgressCallback):
 
     Parameters
     ----------
-    miniters: int, default :code:`Algorithm.update_objective_interval`
+    miniters: int, default :code:`min(self.interval, max(1, Algorithm.update_objective_interval))`
         Number of algorithm iterations between screen prints.
     '''
     __init__ = partialmethod(ProgressCallback.__init__, tqdm_class=_TqdmText)
-
-    def __call__(self, algorithm):
-        if not hasattr(self, 'pbar'):
-            self.tqdm_kwargs['miniters'] = min((
-                self.tqdm_kwargs.get('miniters', algorithm.update_objective_interval),
-                algorithm.update_objective_interval))
-        return super().__call__(algorithm)
 
 
 class LogfileCallback(TextProgressCallback):
@@ -157,6 +157,7 @@ class LogfileCallback(TextProgressCallback):
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, **kwargs)
 
+
 class EarlyStoppingObjectiveValue(Callback):
     '''Callback that stops iterations if the change in the objective value is less than a provided threshold value.
 
@@ -172,11 +173,11 @@ class EarlyStoppingObjectiveValue(Callback):
     def __init__(self, threshold=1e-6):
         self.threshold=threshold
 
-
     def __call__(self, algorithm):
         if len(algorithm.loss)>=2:
             if np.abs(algorithm.loss[-1]-algorithm.loss[-2])<self.threshold:
                 raise StopIteration
+
 
 class CGLSEarlyStopping(Callback):
     '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value.
@@ -197,9 +198,7 @@ class CGLSEarlyStopping(Callback):
         self.epsilon=epsilon
         self.omega=omega
 
-
     def __call__(self, algorithm):
-
         if (algorithm.norms <= algorithm.norms0 * self.epsilon):
             print('The norm of the residual is less than {} times the norm of the initial residual and so the algorithm is terminated'.format(self.epsilon))
             raise StopIteration

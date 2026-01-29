@@ -425,29 +425,38 @@ class LinearOperator(Operator):
             return False
 
 class AdjointOperator(LinearOperator):
+    
+    r"""
+        Adjoint of a linear operator.
 
-    """
-    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as
+        Given a linear operator :math:`A: X \to Y` between inner-product spaces
+        :math:`(X,\langle\cdot,\cdot\rangle_X)` and :math:`(Y,\langle\cdot,\cdot\rangle_Y)`,
+        its adjoint :math:`A^{*}: Y \to X` is defined by
+        \[
+        \langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,
+        \qquad \forall x\in X,\; y\in Y.
+        \]
 
-    .. math:: <x, A^* y> = <Ax, y>
+        Parameters
+        ----------
+        operator : LinearOperator
+            The operator :math:`A` whose adjoint is constructed.
 
-    Parameters
-    ----------
+        Examples
+        --------
+        Verify the adjointness relation for the gradient operator :math:`G` and its adjoint
+        (the negative divergence in many discretisations):
+        >>> ig = ImageGeometry(2, 3)
+        >>> G = GradientOperator(ig)
+        >>> div = AdjointOperator(G)     # represents G*
+        >>> x = G.domain.allocate("random_int")
+        >>> y = G.range.allocate("random_int")
+        >>> lhs = G.direct(x).dot(y)     # <Gx, y>_Y
+        >>> rhs = x.dot(div.direct(y))   # <x, G* y>_X
+        >>> lhs == rhs
+        True
+        """
 
-    operator : A linear operator
-
-    Examples
-    --------
-    This example demonstrates that :math:` LHS:=<Gx, y> =<x, G^* y>=:RHS`, where :math:`G` is the gradient operator.
-    >>> ig = ImageGeometry(2,3)
-    >>> G = GradientOperator(ig)
-    >>> div = AdjointOperator(G)
-    >>> x = G.domain.allocate("random_int")
-    >>> y = G.range.allocate("random_int")
-    >>> lhs = G.direct(x).dot(y)
-    >>> rhs = x.dot(div.direct(y))
-    >>> lhs == rhs # returns True
-    """
 
     def __init__(self, operator):
         super(AdjointOperator, self).__init__(domain_geometry=operator.range_geometry(),

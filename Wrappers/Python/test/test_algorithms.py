@@ -1665,11 +1665,10 @@ class TestCallbacks(unittest.TestCase):
 
         log = NamedTemporaryFile(delete=False)
         log.close()
-        algo.run(20, callbacks=[callbacks.LogfileCallback(
-            log.name)], callback=old_callback)
+        algo.run(20, callbacks=[callbacks.LogfileCallback(log.name, interval=5)], callback=old_callback)
         with open(log.name, 'r') as fd:
             self.assertListEqual(
-                ["64/83", "74/83", "83/83", ""],
+                ['64/83', '69/83', '74/83', '79/83', '83/83', ''],
                 [line.lstrip().split(" ", 1)[0] for line in fd.readlines()])
         unlink(log.name)
 

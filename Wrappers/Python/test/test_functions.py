@@ -35,6 +35,7 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity, FunctionOfAbs
 
 from cil.optimisation.functions import BlockFunction
+from cil.utilities import dataexample, noise
 
 import numpy
 import scipy.special
@@ -54,6 +55,13 @@ from utils import has_ccpi_regularisation, has_tomophantom, has_numba, initialis
 import numba
 from numbers import Number
 
+try:
+    from bm3d import bm3d, BM3DStages 
+    from cil.optimisation.functions import BM3DFunction 
+    _HAS_BM3D = True
+except Exception:
+    _HAS_BM3D = False
+
 initialise_tests()
 
 if has_ccpi_regularisation:
@@ -64,6 +72,7 @@ if has_tomophantom:
 
 if has_numba:
     from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
+
 
 
 class TestFunction(CCPiTestClass):
@@ -2224,5 +2233,30 @@ class TestFunctionOfAbs(unittest.TestCase):
         self.abs_function._lower_semi = False
         
         self.assertEqual(self.abs_function.convex_conjugate(self.data_real32), 0.)
+
+
+class TestBM3D(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    @unittest.skipUnless(_HAS_BM3D, "Optional dependency 'bm3d'.")
+    def test_sigma_positive(self):
+        with self.assertRaises(ValueError):
+            BM3DFunction(sigma=0.0)
+        with self.assertRaises(ValueError):
+            BM3DFunction(sigma=-1.0)   
+
+    @unittest.skipUnless(_HAS_BM3D, "Optional dependency 'bm3d'.")
+    def test_proximal_(self):
+        data = dataexample.SHAPES.get()
+
+        G = BM3DFunction(sigma=0.1, positivity=False)
+        G_prox = G.proximal(data, tau=1.0)
+        G_denoise = G._denoise(data.array)
+
+        np.testing.assert_array_almost_equal(G_denoise, G_prox.array, decimal=4)
+
+        
 
 

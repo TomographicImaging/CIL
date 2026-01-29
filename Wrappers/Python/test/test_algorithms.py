@@ -549,8 +549,8 @@ class TestProxSkip(CCPiTestClass):
         self.bop = VectorData(b)
 
         self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
-        self.g = ZeroFunction()
-        self.h = 0.5 * L1Norm()
+        self.g = 0.5 * L1Norm()
+        self.step_size = 1.99/self.f.L
 
         self.ig = self.Aop.domain
 
@@ -559,14 +559,85 @@ class TestProxSkip(CCPiTestClass):
     def tearDown(self):
         pass
 
+    def test_signature(self):
+
+        # check required arguments (initial, f, g, step size, and prob)
+        with np.testing.assert_raises(TypeError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size)
+
+        # test neg prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=-0.1)            
+     
+        # zero prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.)            
+
+    def test_coin_flip(self):
+
+        seed = 10
+        num_it = 100
+        prob = 0.3
+        proxskip1 = ProxSkip(initial = self.initial, f=self.f, g=self.g, 
+                             step_size=self.step_size, prob=prob, seed=seed)
+        proxskip1.run(num_it, verbose=0)   
+
+        thetas1 = []
+        rng = np.random.default_rng(seed)
+        for i in range(num_it-1):
+            if i==0:
+                thetas1.append(True)
+            theta = proxskip1.rng.random() < prob
+            thetas1.append(theta)
+
+        # thetas2 = []
+        # rng = np.random.default_rng(seed)
+        # for i in range(num_it-1):
+        #     if i==0:
+        #         thetas2.append(True)
+        #     theta = rng.random() < prob
+        #     thetas2.append(theta)            
+
+        # np.testing.assert_allclose(thetas1, thetas2)
+        np.testing.assert_allclose(proxskip1.thetas, thetas1)
+        
+
+
+    
+
+    def test_seeds(self):
+
+        # same seeds
+        proxskip1 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip1.run(100, verbose=0)
+
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip2.run(100, verbose=0)
+
+        np.testing.assert_allclose(proxskip2.thetas, proxskip1.thetas) 
+
+        # different seeds
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, 
+                             prob=0.1, seed=20)
+        proxskip2.run(100, verbose=0)     
+
+        assert not np.array_equal(proxskip2.thetas, proxskip1.thetas)
+
+
+
+
+
+
+          
+
     def test_ista_vs_proxskip(self):
 
         prox = ProxSkip(initial=self.initial, f=self.f,
-                    g=self.h, step_size = 1.99/self.f.L, prob = 0.1)
+                    g=self.h, step_size = self.step_size, prob = 0.1)
         prox.run(2000, verbose=0)
 
         ista = ISTA(initial=self.initial, f=self.f,
-                    g=self.h, step_size = 1.99/self.f.L)
+                    g=self.h, step_size = self.step_size)
         ista.run(1000, verbose=0)        
        
         np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)

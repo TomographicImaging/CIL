@@ -616,11 +616,11 @@ class TestProxSkip(CCPiTestClass):
     def test_ista_vs_proxskip(self):
 
         prox = ProxSkip(initial=self.initial, f=self.f,
-                    g=self.h, step_size = self.step_size, prob = 0.1)
+                    g=self.g, step_size = self.step_size, prob = 0.1)
         prox.run(2000, verbose=0)
 
         ista = ISTA(initial=self.initial, f=self.f,
-                    g=self.h, step_size = self.step_size)
+                    g=self.g, step_size = self.step_size)
         ista.run(1000, verbose=0)        
        
         np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)

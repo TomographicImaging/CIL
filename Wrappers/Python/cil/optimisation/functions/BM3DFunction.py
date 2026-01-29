@@ -98,6 +98,7 @@ class BM3DFunction(Function):
         ## TODO asarray for SIRF?
         z = x.array.astype(np.float32, copy=False)
         den_bm3d_np = self._denoise(z)
+        
 
         ## TODO maybe we need a more general constraint?
         if self.positivity:

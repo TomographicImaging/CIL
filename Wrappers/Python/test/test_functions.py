@@ -2249,6 +2249,7 @@ class TestBM3D(unittest.TestCase):
 
     @unittest.skipUnless(_HAS_BM3D, "Optional dependency 'bm3d'.")
     def test_proximal_(self):
+        
         data = dataexample.SHAPES.get()
 
         G = BM3DFunction(sigma=0.1, positivity=False)

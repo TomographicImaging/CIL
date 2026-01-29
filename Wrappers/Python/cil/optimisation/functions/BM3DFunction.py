@@ -5,9 +5,11 @@ import warnings
 try:
     from bm3d import bm3d, BM3DStages
     _HAS_BM3D = True
+    ALL_STAGES = BM3DStages.ALL_STAGES
 except ImportError:
     bm3d = None
     BM3DStages = None
+    ALL_STAGES = None
     _HAS_BM3D = False
 
     warnings.warn(
@@ -25,7 +27,7 @@ class BM3DFunction(Function):
     Maybe add damping: (1-gamma) z + gamma * BM3D(z).
     """
 
-    def __init__(self, sigma,  profile="np", stage_arg=BM3DStages.ALL_STAGES, 
+    def __init__(self, sigma,  profile="np", stage_arg=ALL_STAGES, 
                  positivity=True):
         
         

@@ -17,8 +17,10 @@
 # - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
+import csv
 from abc import ABC, abstractmethod
 from functools import partialmethod
+from pathlib import Path
 
 import numpy as np
 from tqdm.auto import tqdm as tqdm_auto
@@ -156,6 +158,23 @@ class LogfileCallback(TextProgressCallback):
     def __init__(self, log_file, mode='a', **kwargs):
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, **kwargs)
+
+
+class CSVCallback(Callback):
+    """Saves :code:`algo.loss` in :code:`csv_file`"""
+    def __init__(self, csv_file='objectives.csv', append=False, **kwargs):
+        super().__init__(**kwargs)
+        csv_file = Path(csv_file)
+        csv_file.parent.mkdir(parents=True, exist_ok=True)
+        if csv_file.exists() and append:
+            self.csv = csv.writer(csv_file.open('a', buffering=1))
+        else:
+            self.csv = csv.writer(csv_file.open('w', buffering=1))
+            self.csv.writerow(("iteration", "objective"))
+
+    def __call__(self, algorithm):
+        if not self.skip_iteration(algorithm):
+            self.csv.writerow((algorithm.iteration, algorithm.get_last_loss()))
 
 
 class EarlyStoppingObjectiveValue(Callback):

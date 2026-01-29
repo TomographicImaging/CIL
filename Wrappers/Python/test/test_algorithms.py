@@ -57,8 +57,8 @@ from unittest.mock import MagicMock
 log = logging.getLogger(__name__)
 
 
-# if has_cvxpy:
-    # import cvxpy
+if has_cvxpy:
+    import cvxpy
 
 from unittest.mock import MagicMock, patch
 class TestGD(CCPiTestClass):

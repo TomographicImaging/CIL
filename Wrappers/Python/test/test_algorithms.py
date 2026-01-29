@@ -577,34 +577,23 @@ class TestProxSkip(CCPiTestClass):
 
         seed = 10
         num_it = 100
-        prob = 0.3
-        proxskip1 = ProxSkip(initial = self.initial, f=self.f, g=self.g, 
-                             step_size=self.step_size, prob=prob, seed=seed)
-        proxskip1.run(num_it, verbose=0)   
+        prob = 0.2
+
+        proxskip1 = ProxSkip(initial=self.initial, f=self.f, g=self.g,
+                            step_size=self.step_size, prob=prob, seed=seed)
+        proxskip1.run(num_it, verbose=0)
+
+        rng = np.random.default_rng(seed)
 
         thetas1 = []
-        rng = np.random.default_rng(seed)
-        for i in range(num_it-1):
-            if i==0:
-                thetas1.append(True)
-            theta = proxskip1.rng.random() < prob
+        for k in range(num_it):
+            tmp = rng.random() < prob     
+            theta = True if k == 0 else tmp
             thetas1.append(theta)
 
-        # thetas2 = []
-        # rng = np.random.default_rng(seed)
-        # for i in range(num_it-1):
-        #     if i==0:
-        #         thetas2.append(True)
-        #     theta = rng.random() < prob
-        #     thetas2.append(theta)            
+        assert np.array_equal(proxskip1.thetas, thetas1)
 
-        # np.testing.assert_allclose(thetas1, thetas2)
-        np.testing.assert_allclose(proxskip1.thetas, thetas1)
         
-
-
-    
-
     def test_seeds(self):
 
         # same seeds
@@ -623,12 +612,6 @@ class TestProxSkip(CCPiTestClass):
 
         assert not np.array_equal(proxskip2.thetas, proxskip1.thetas)
 
-
-
-
-
-
-          
 
     def test_ista_vs_proxskip(self):
 

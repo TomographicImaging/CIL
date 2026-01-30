@@ -15,5 +15,4 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-from .version import version as __version__
+from cil.version import version as __version__

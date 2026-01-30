@@ -50,8 +50,30 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(IPP)
+# Find Python to get the prefix path for PyPI-installed packages
+find_package(Python COMPONENTS Interpreter QUIET)
+if(Python_FOUND)
+  # Get the Python prefix (where PyPI .data packages install to)
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -c "import sys; print(sys.prefix)"
+    OUTPUT_VARIABLE PYTHON_PREFIX
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+  )
+  if(PYTHON_PREFIX)
+    message(STATUS "Python prefix: ${PYTHON_PREFIX}")
+    # Add Python prefix to CMAKE_PREFIX_PATH for finding IPP from PyPI
+    list(APPEND CMAKE_PREFIX_PATH "${PYTHON_PREFIX}")
+  endif()
+endif()
+
+# Try Intel's official IPPConfig.cmake first (for PyPI ipp-devel package)
+# Fall back to our custom FindIPP.cmake for conda/system installs
+find_package(IPP CONFIG QUIET)
+if(NOT IPP_FOUND)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+  find_package(IPP)
+endif()
 
 list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp)
 list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)

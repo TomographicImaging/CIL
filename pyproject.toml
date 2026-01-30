@@ -102,22 +102,6 @@ sdist.exclude = [
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
 
-# [tool.setuptools_scm]
-# version_file = "Wrappers/Python/cil/version.py"
-# version_file_template = """
-# version = '{version}'
-# major = {version_tuple[0]}
-# minor = {version_tuple[1]}
-# patch = {version_tuple[2]}
-# commit_hash = '{scm_version.node}'
-# num_commit = {scm_version.distance}
-# # work-around for https://github.com/pypa/setuptools_scm/issues/1059
-# if (commit_hash, num_commit) == ('None', 0):
-#     import re
-#     if (_v := re.search(r'\\.dev(\\d+)\\+(\\w+)', version)):
-#         num_commit, commit_hash = int(_v.group(1)), _v.group(2)
-# """
-
 [tool.setuptools]
 package-dir = { "" = "Wrappers/Python" }
 
@@ -190,8 +174,8 @@ tomophantom = { version = "==2.0.0", channel = "ccpi" }
 # To be handled when astra-toolbox-cpu is released
 # See: https://github.com/astra-toolbox/astra-toolbox/issues/327#issuecomment-3799202745
 # See: https://discord.com/channels/1082332781146800168/1464650877750087732
-[tool.pixi.feature.astra-cpu.dependencies]
-astra-toolbox = { version = "==2.1", build = "py*", channel = "conda-forge" }
+# [tool.pixi.feature.astra-cpu.dependencies]
+# astra-toolbox = { version = "==2.1", build = "py*", channel = "conda-forge" }
 
 [tool.pixi.feature.astra-gpu.dependencies]
 astra-toolbox = { version = "==2.1", build = "cuda*", channel = "conda-forge" }

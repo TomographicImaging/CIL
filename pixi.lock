@@ -2404,7 +2404,7 @@ packages:
 - pypi: ./
   name: cil
   version: 26.0.0
-  sha256: cd4d6cf6b0dd26f74e3bcf5d530b384caf668f54d5c119ea60c615e0a8ad3499
+  sha256: 80e36f0283513c769cc390485054f3ec83488c452a2166c53e1440a1e3261e16
   requires_dist:
   - dxchange
   - h5py
@@ -2416,6 +2416,7 @@ packages:
   - pywavelets
   - scipy>=1.4.0
   - tqdm
+  - packaging
   - ipywidgets ; extra == 'plugins'
   requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/ccpi/noarch/cil-data-22.0.0-0.tar.bz2

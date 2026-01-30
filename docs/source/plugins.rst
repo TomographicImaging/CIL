@@ -83,7 +83,18 @@ Projection Operator
 .. autoclass:: cil.plugins.tigre.ProjectionOperator
    :members:
 
+Algorithms
+----------------
+This class is designed to facilitate the use of TIGRE algorithms within the CIL framework,
+allowing for the use of CIL's `ImageGeometry` and `AcquisitionData` classes. It handles the conversion
+of CIL geometries to TIGRE geometries and prepares the data for the specified algorithm.
+The `name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
 
+Note that we provide this wrapper for the convenience of our users who use Tigre or want a specific algorithm and have tested the CIL side of converting the geomtries and passing to Tigre. However, we do not provide support for the algorithms themselves or guarantee that they will work as expected. Please refer to the TIGRE documentation for details on the algorithms and their parameters.
+
+.. autoclass:: cil.plugins.tigre.Algorithms
+   :members:
+   :inherited-members:
 
 ASTRA
 =====
@@ -110,3 +121,5 @@ Projection Operator
    :members:
 
 :ref:`Return Home <mastertoc>`
+
+

@@ -1,6 +1,6 @@
 [project]
 name = "cil"
-version = "26.0.0"
+dynamic = ["version"]
 description = "Core Imaging Library"
 license = { text = "Apache-2.0" }
 maintainers = [{ name = "CIL developers", email = "tomography+cil@stfc.ac.uk" }]
@@ -90,8 +90,7 @@ build-backend = "scikit_build_core.build"
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.16"
-# metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
-# sdist.include = ["Wrappers/Python/cil/version.py"]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 sdist.exclude = [
     "scripts",
     "docs",
@@ -139,7 +138,6 @@ cil = { path = ".", editable = true }
 default = { solve-group = "default" }
 gpu = { features = ["astra-gpu", "tigre"], solve-group = "cuda" }
 dev = { features = ["data", "docs", "plugins", "test"], solve-group = "default" }
-# cuda = { features = ["cuda"], solve-group = "default" }
 plugins = { features = ["plugins"], solve-group = "default" }
 test = { features = ["test" ], solve-group = "default" }
 test-gpu = { features = ["test", "astra-gpu", "tigre"], solve-group = "cuda" }
@@ -152,9 +150,6 @@ tomophantom = { version = "==2.0.0", channel = "https://tomography.stfc.ac.uk/co
 
 [tool.pixi.feature.plugin-ccpi-regulariser.dependencies]
 ccpi-regulariser = { version = "==24.0.1", channel = "https://tomography.stfc.ac.uk/conda" }
-
-[tool.pixi.feature.docs.dependencies]
-ruby = { version = ">=3.4,<4", channel = "conda-forge" }
 
 [tool.pixi.feature.docs.tasks]
 docs-build = { cmd = "sphinx-build -b html docs/source docs/build", default-environment = "docs" }
@@ -178,8 +173,7 @@ tigre = { version = "==2.6", channel = "https://tomography.stfc.ac.uk/conda" }
 
 [tool.pixi.tasks]
 test = { cmd = "python -m unittest discover -v ./Wrappers/Python/test", default-environment = "test"}
-test-gpu = { cmd = "pytest Wrappers/Python/test -v" , default-environment = "test-gpu", env = { TESTS_FORCE_GPU = "1" } }
-# test-quick = { cmd = "pytest Wrappers/Python/test -v -x --ignore=Wrappers/Python/test/test_Plugins*" }
+test-gpu = { cmd = "python -m unittest discover -v ./Wrappers/Python/test" , default-environment = "test-gpu", env = { TESTS_FORCE_GPU = "1" } }
 
 [tool.pytest.ini_options]
 testpaths = ["Wrappers/Python/test"]

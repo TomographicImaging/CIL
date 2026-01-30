@@ -112,11 +112,7 @@ exclude = ["data", "test"]
 
 ### Pixi Configuration ###
 [tool.pixi.workspace]
-# Currently we keep both ccpi and https://tomography.stfc.ac.uk/conda in here
-# This is because we need https://tomography.stfc.ac.uk/conda for ipp-devel, but it is not the recommended channel yet,
-# so we keep ccpi for now.
-# When https://github.com/TomographicImaging/CIL/issues/1870 gets resolved, we can remove ccpi from here.
-channels = ["ccpi", "httomo", "conda-forge", "https://tomography.stfc.ac.uk/conda"]
+channels = ["https://tomography.stfc.ac.uk/conda", "conda-forge"]
 platforms = ["linux-64", "win-64"]
 preview = ["pixi-build"]  # Can be removed when pixi-build is stable. Last checked 2026-01-24 in pixi 0.63.2
 
@@ -152,10 +148,10 @@ docs = { features = ["docs", "astra-gpu", "tigre", "plugin-tomophantom", "plugin
 ## Features ##
 # Plugins #
 [tool.pixi.feature.plugin-tomophantom.dependencies]
-tomophantom = { version = "==2.0.0", channel = "ccpi" }
+tomophantom = { version = "==2.0.0", channel = "https://tomography.stfc.ac.uk/conda" }
 
 [tool.pixi.feature.plugin-ccpi-regulariser.dependencies]
-ccpi-regulariser = { version = "==24.0.1", channel = "ccpi" }
+ccpi-regulariser = { version = "==24.0.1", channel = "https://tomography.stfc.ac.uk/conda" }
 
 [tool.pixi.feature.docs.dependencies]
 ruby = { version = ">=3.4,<4", channel = "conda-forge" }
@@ -165,11 +161,8 @@ docs-build = { cmd = "sphinx-build -b html docs/source docs/build", default-envi
 docs-serve = { cmd = "sphinx-autobuild docs/source docs/build --open-browser", default-environment = "docs" }
 
 [tool.pixi.feature.test.dependencies]
-cil-data = { version = ">=22.0.0,<23", channel = "ccpi" }
-
-# NOTE: From 3.0.0 onwards tomophantom is only available in httomo channel
-# tomophantom = { version = ">=3.0.0,<4", channel = "ccpi" }
-tomophantom = { version = "==2.0.0", channel = "ccpi" }
+cil-data = { version = ">=22.0.0,<23", channel = "https://tomography.stfc.ac.uk/conda" }
+tomophantom = { version = "==2.0.0", channel = "https://tomography.stfc.ac.uk/conda" }
 
 # To be handled when astra-toolbox-cpu is released
 # See: https://github.com/astra-toolbox/astra-toolbox/issues/327#issuecomment-3799202745
@@ -181,7 +174,7 @@ tomophantom = { version = "==2.0.0", channel = "ccpi" }
 astra-toolbox = { version = "==2.1", build = "cuda*", channel = "conda-forge" }
 
 [tool.pixi.feature.tigre.dependencies]
-tigre = { version = "==2.6", channel = "ccpi" }
+tigre = { version = "==2.6", channel = "https://tomography.stfc.ac.uk/conda" }
 
 [tool.pixi.tasks]
 test = { cmd = "python -m unittest discover -v ./Wrappers/Python/test", default-environment = "test"}

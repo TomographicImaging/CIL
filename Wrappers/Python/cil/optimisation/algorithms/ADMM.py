@@ -82,23 +82,26 @@ class LADMM(Algorithm):
 
 
     def __init__(self, f=None, g=None, operator=None, \
-                       tau = None, sigma = 1.,
+                       tau = None, sigma = 0.9, rho = 1., mode = 'constant',
                        initial = None, **kwargs):
 
         """Initialisation of the algorithm."""
 
         super(LADMM, self).__init__(**kwargs)
 
-        self.set_up(f = f, g = g, operator = operator, tau = tau,\
+        self.set_up(f = f, g = g, operator = operator, rho = rho, mode = mode, tau = tau,\
              sigma = sigma, initial=initial)
 
-    def set_up(self, f, g, operator, tau = None, sigma=1., initial=None):
+    def set_up(self, f, g, operator, rho, mode, tau = None, sigma=1., initial=None):
         """Set up of the algorithm."""
         log.info("%s setting up", self.__class__.__name__)
 
         self.f = f
         self.g = g
         self.operator = operator
+        
+        self.rho = rho
+        self.mode = mode
 
         self.tau = tau
         self.sigma = sigma
@@ -125,26 +128,54 @@ class LADMM(Algorithm):
 
     def update(self):
         """Performs a single iteration of the LADMM algorithm"""
-        self.tmp_dir += self.u
+
+        self.tmp_dir += self.u/self.rho
         self.tmp_dir -= self.z
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
+        if self.mode == 'adaptive':
+            self.x0 = self.x.copy()
 
         self.x.sapyb(1, self.tmp_adj, -(self.tau/self.sigma), out=self.x)
 
         # apply proximal of f
-        tmp = self.f.proximal(self.x, self.tau)
+        tmp = self.f.proximal(self.x, self.tau/self.rho)
         self.operator.direct(tmp, out=self.tmp_dir)
         # store the result in x
+        
         self.x.fill(tmp)
         del tmp
 
-        self.u += self.tmp_dir
+        self.u += self.rho*self.tmp_dir
 
         # apply proximal of g
-        self.g.proximal(self.u, self.sigma, out = self.z)
+        if self.mode == 'adaptive':
+            self.z0 = self.z.copy()
+        self.g.proximal(self.u/self.rho, self.sigma/self.rho, out = self.z)
 
         # update
-        self.u -= self.z
+        self.u -= self.rho*self.z
+        if self.mode ==  'adaptive':
+            if self.iteration %5 == 1:
+                num2 = 3*((self.tmp_dir - self.z).norm())**2
+                
+                num2 += 2*(1/self.sigma - 1)*((self.z - 2*self.z0+self.zneg).norm())**2
+                num2 += (1/self.tau)*((self.x - 2*self.x0+self.xneg).norm())**2
+                num2 -= (self.operator.direct(self.x - 2*self.x0+self.xneg).norm())**2
+                
+                denom2 = 2*(1/self.sigma - 1)*((self.z - self.z0).norm())**2 
+                denom2 += (1/self.tau)*((self.x - self.x0).norm())**2 
+                denom2 -= (self.operator.direct(self.x - self.x0).norm())**2
+
+                if num2 > 0 and denom2 > 0:
+                    self.rho *= (num2/denom2)**(1/2)
+                elif num2 == 0 and denom2 > 0:
+                    self.rho /= 10
+                elif num2 > 0 and denom2 == 0:
+                    self.rho *= 10
+                    
+            self.xneg = self.x0.copy()
+            self.zneg = self.z0.copy()
+
 
     def update_objective(self):
         """Update the objective function value"""

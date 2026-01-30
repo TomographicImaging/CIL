@@ -35,6 +35,7 @@ from cil.recon import FBP
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors.CofR_image_sharpness import CofR_image_sharpness
+from cil.processors.OutlierRemover import OutlierRemover
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
 import gc
@@ -3760,3 +3761,49 @@ class TestNormaliser(unittest.TestCase):
         test_out = self.data.array.copy()
         test_out[:,0,0] = 1e-5
         numpy.testing.assert_allclose(normalised_data.array, test_out)
+
+
+class TestOutlierRemover(unittest.TestCase):
+    def setUp(self):
+        self.data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.original = self.data.copy()
+
+    def test_bright_outlier_removal(self):
+        self.data.array[0, 5, 5] = self.data.array.max() + 1000
+
+        remover = OutlierRemover(diff=100, radius=3, mode='bright')
+        remover.set_input(self.data)
+        result = remover.process()
+
+        # TODO: make it so that it actually checks if value is equal to local median
+        self.assertNotEqual(result.array[0, 5, 5], self.data.array.max() + 1000)
+
+    def test_dark_outlier_removal(self):
+        self.data.array[1, 10, 10] = self.data.array.min() - 1000
+
+        remover = OutlierRemover(diff=100, radius=3, mode='dark')
+        remover.set_input(self.data)
+        result = remover.process()
+
+        self.assertNotEqual(result.array[1, 10, 10], self.data.array.min() - 1000)
+
+    def test_invalid_mode(self):
+        remover = OutlierRemover(diff=100, radius=3, mode='invalid')
+        remover.set_input(self.data)
+
+        with self.assertRaises(ValueError):
+            remover.process()
+
+    def test_invalid_diff(self):
+        remover = OutlierRemover(diff=0, radius=3, mode='bright')
+        remover.set_input(self.data)
+
+        with self.assertRaises(ValueError):
+            remover.process()
+
+    def test_invalid_radius(self):
+        remover = OutlierRemover(diff=100, radius=0, mode='bright')
+        remover.set_input(self.data)
+
+        with self.assertRaises(ValueError):
+            remover.process()

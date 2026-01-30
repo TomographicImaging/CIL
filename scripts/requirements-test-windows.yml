@@ -38,7 +38,7 @@ dependencies:
   - matplotlib-base >=3.3
   - h5py
   - pillow
-  - dxchange
+  - dxchange >=0.2.1
   - olefile >=0.46
   - pywavelets
   - numba

@@ -2400,8 +2400,8 @@ packages:
   requires_python: '>=3.7'
 - pypi: ./
   name: cil
-  version: 0.1.dev1906+g2b33baa07.d20260130
-  sha256: c64984e9adbc37c6728df6341129b63db725a133e1e82a43f75d0ca688b9cdeb
+  version: 0.1.dev1907+g862cb0ef7.d20260130
+  sha256: 05f37f882b1e496893bee56e3f8d7dae6559e758aabf15f400794f7ce97b3a46
   requires_dist:
   - dxchange
   - h5py

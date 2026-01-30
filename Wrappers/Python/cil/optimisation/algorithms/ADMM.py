@@ -162,7 +162,7 @@ class LADMM(Algorithm):
                 num2 += (1/self.tau)*((self.x - 2*self.x0+self.xneg).norm())**2
                 num2 -= (self.operator.direct(self.x - 2*self.x0+self.xneg).norm())**2
                 
-                denom2 = 2*(1/self.sigma - 1)*((self.z - self.z0).norm())**2 
+                denom2 = (2/self.sigma - 1)*((self.z - self.z0).norm())**2 
                 denom2 += (1/self.tau)*((self.x - self.x0).norm())**2 
                 denom2 -= (self.operator.direct(self.x - self.x0).norm())**2
 

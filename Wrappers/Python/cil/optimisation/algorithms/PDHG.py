@@ -54,7 +54,7 @@ class PDHG(Algorithm):
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
         check_convergence : :obj:`boolean`, default=True
-            Checks scalar sigma and tau values satisfy convergence criterion and warns if not satisfied. Can be computationally expensive for custom sigma or tau values. 
+            Checks scalar sigma and tau values satisfy convergence criterion and warns if not satisfied. Can be computationally expensive for custom sigma or tau values.
         theta :  Float between 0 and 1, default 1.0
             Relaxation parameter for the over-relaxation of the primal variable.
 
@@ -62,7 +62,7 @@ class PDHG(Algorithm):
     Example
     -------
 
-    In our CIL-Demos repository (https://github.com/TomographicImaging/CIL-Demos) you can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpainting 
+    In our CIL-Demos repository (https://github.com/TomographicImaging/CIL-Demos) you can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpainting
     and Total Variation Tomography reconstruction. More examples can also be found in :cite:`Jorgensen_et_al_2021`, :cite:`Papoutsellis_et_al_2021`.
 
     Note
@@ -126,7 +126,7 @@ class PDHG(Algorithm):
         \tau \sigma \|K\|^2 < 4/3
 
     For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
-    
+
     - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
@@ -326,11 +326,11 @@ class PDHG(Algorithm):
             Step size for the primal problem.
         initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
             Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-     
-        """   
+
+        """
         log.info("%s setting up", self.__class__.__name__)
-        
-        
+
+
         # Triplet (f, g, K)
         self.f = f
         self.g = g
@@ -346,19 +346,19 @@ class PDHG(Algorithm):
                 self.x_old = initial[0].copy()
             else:
                 self.x_old = self.operator.domain_geometry().allocate(0)
-            
+
             if len(initial) > 1 and initial[1] is not None:
                 self.y = initial[1].copy()
             else:
                 self.y = self.operator.range_geometry().allocate(0)
 
-        else: 
+        else:
             self.y = self.operator.range_geometry().allocate(0)
             if initial is None:
                 self.x_old = self.operator.domain_geometry().allocate(0)
             else:
                 self.x_old = initial.copy()
-              
+
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
@@ -418,11 +418,11 @@ class PDHG(Algorithm):
         -------
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
-            
+
         Reference
         ----------
         Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
-        
+
         """
         if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
             if self.sigma * self.tau * self.operator.norm()**2 > 4/3:
@@ -468,17 +468,17 @@ class PDHG(Algorithm):
 
         # Default sigma and tau step-sizes
         if tau is None and sigma is None:
-            self._sigma = 1.0/self.operator.norm()
-            self._tau = 1.0/self.operator.norm()
+            self._sigma = 1/self.operator.norm()
+            self._tau = 1/self.operator.norm()
         elif tau is not None and sigma is not None:
             self._sigma = sigma
             self._tau = tau
         elif sigma is None and isinstance(tau, Number):
-            self._sigma = 1./(tau*self.operator.norm()**2)
+            self._sigma = 1/(tau*self.operator.norm()**2)
             self._tau = tau
         elif tau is None and isinstance(sigma, Number):
             self._sigma = sigma
-            self._tau = 1./(self.sigma*self.operator.norm()**2)
+            self._tau = 1/(self.sigma*self.operator.norm()**2)
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")

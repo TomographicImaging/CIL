@@ -27,10 +27,10 @@ jobs:
     runs-on: [self-hosted, python, cuda]
     strategy:
       matrix:
-        python-version: [3.11]
-        numpy-version: [1.25]
+        python-version: [3.12]
+        numpy-version: [1.26]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with: {fetch-depth: 0, submodules: recursive}
     - id: reqs
       name: set requirements
@@ -67,12 +67,12 @@ jobs:
       matrix:
         include:
         - {python-version: '3.10', numpy-version: 1.23}
-        - {python-version: 3.12, numpy-version: 1.26}
+        - {python-version: 3.12, numpy-version: 2}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with: {fetch-depth: 0, submodules: recursive}
     - name: set requirements
-      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
+      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/ cuda*//' -e '/tigre/d' scripts/requirements-test.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -109,8 +109,8 @@ jobs:
           fi
         fi
         if $include_max; then
-          echo "include=[{'python-version': 3.12, 'os': 'ubuntu'}, {'python-version': 3.12, 'os': 'windows'}]" >> $GITHUB_OUTPUT
-          echo "include-numpy=[{'python-version': 3.12, 'numpy-version': 1.26, 'os': 'ubuntu'}, {'python-version': 3.12, 'numpy-version': 1.26, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+          echo "include=[{'python-version': 3.13, 'os': 'ubuntu'}, {'python-version': 3.13, 'os': 'windows'}]" >> $GITHUB_OUTPUT
+          echo "include-numpy=[{'python-version': 3.13, 'numpy-version': 2, 'os': 'ubuntu'}, {'python-version': 3.13, 'numpy-version': 2, 'os': 'windows'}]" >> $GITHUB_OUTPUT
         else
           echo "include=[]" >> $GITHUB_OUTPUT
           echo "include-numpy=[]" >> $GITHUB_OUTPUT
@@ -125,7 +125,7 @@ jobs:
         os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
         include: ${{ fromJson(needs.conda-matrix.outputs.include) }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: recursive
@@ -158,7 +158,7 @@ jobs:
         os: ${{ fromJson(needs.conda-matrix.outputs.os) }}
         include: ${{ fromJson(needs.conda-matrix.outputs.include-numpy) }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
@@ -166,7 +166,7 @@ jobs:
         channels: conda-forge
         conda-remove-defaults: "true"
     - run: conda install boa
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v5
       with:
         name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
         path: dist
@@ -180,13 +180,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: conda-test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: conda-incubator/setup-miniconda@v3
       with:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v5
       with: {pattern: cil-py*-*, path: dist, merge-multiple: true}
     - run: mamba install anaconda-client
     - name: anaconda upload -c ccpi
@@ -205,7 +205,7 @@ jobs:
     defaults: {run: {shell: 'bash -el {0}', working-directory: docs}}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: recursive
@@ -229,7 +229,7 @@ jobs:
         conda list
     - run: pip install ..
     - name: checkout docs
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: docs/build
         ref: gh-pages
@@ -262,7 +262,7 @@ jobs:
       contents: read
       packages: write
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: recursive

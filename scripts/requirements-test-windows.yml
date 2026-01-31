@@ -18,12 +18,12 @@ channels:
   - https://software.repos.intel.com/python/conda
 dependencies:
   - python >=3.10
-  - numpy >=1.23,<2
+  - numpy >=1.23,<3
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6
-  - ccpi::ccpi-regulariser 24.0.1
+  - ccpi::ccpi-regulariser 25.0.0 cuda*
   - ccpi::tomophantom 2.0.0
-  - astra-toolbox 2.1 cuda*
+  - astra-toolbox::astra-toolbox 2.* cuda*
   - cvxpy
   - python-wget
   - scikit-image

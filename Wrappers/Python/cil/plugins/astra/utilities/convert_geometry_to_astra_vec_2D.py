@@ -112,15 +112,10 @@ def rotation_matrix_z_from_euler(angle, degrees):
     degrees : bool
         if radian or degrees
     """
-    if degrees:
-        alpha = angle / 180. * np.pi
-    else:
-        alpha = angle
-
+    alpha = angle * (np.pi / 180) if degrees else angle
     rot_matrix = np.zeros((2,2), dtype=np.float64)
     rot_matrix[0][0] = np.cos(alpha)
-    rot_matrix[0][1] = -np.sin(alpha)
     rot_matrix[1][0] = np.sin(alpha)
-    rot_matrix[1][1] = np.cos(alpha)
-
+    rot_matrix[0][1] = -rot_matrix[1][0]
+    rot_matrix[1][1] = rot_matrix[0][0]
     return rot_matrix

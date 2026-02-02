@@ -17,10 +17,11 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
 import ctypes
-from pathlib import Path
+from importlib.metadata import distribution
 
 try:
-    cilacc_path = next((Path(__file__).parent.parent / 'lib').resolve().glob("*cilacc.*"))
+    dist = distribution("cil").locate_file("cil/lib")
+    cilacc_path = next(dist.glob("*cilacc.*"))
 except StopIteration:
     raise FileNotFoundError("cilacc library not found")
 cilacc = ctypes.cdll.LoadLibrary(str(cilacc_path))

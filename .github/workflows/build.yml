@@ -138,7 +138,7 @@ jobs:
         mamba-version: "*"
         channels: conda-forge
         conda-remove-defaults: "true"
-    - run: conda install boa conda-verify
+    - run: conda install boa
     - name: conda build
       run: >
         conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}

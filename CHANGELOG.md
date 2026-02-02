@@ -4,11 +4,16 @@
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
+    - `cilacc` path lookup no longer broken for editable installations (#2257)
+    - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - improve `tqdm` notebook support (#2241)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
+  - Enhancements:
+    - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
+    a folder (#2239)
 
 * 25.0.0
   - New features:

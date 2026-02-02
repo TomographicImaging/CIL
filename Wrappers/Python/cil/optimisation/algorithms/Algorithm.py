@@ -223,7 +223,7 @@ class Algorithm:
     @update_objective_interval.setter
     def update_objective_interval(self, value):
         '''sets the update_objective_interval'''
-        if not isinstance(value, Integral) or value < 0:
+        if not ((isinstance(value, Integral) and value >= 0) or np.isposinf(value)):
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
 

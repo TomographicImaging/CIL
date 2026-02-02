@@ -138,30 +138,17 @@ git submodule update --init --recursive
 
 #### Install Dependencies
 
-To create a conda environment with all the dependencies for building CIL run the following shell script:
+We suggest creating a conda environment with all the dependencies for building CIL running the following shell script depending on operating system:
 
-```sh
-bash ./scripts/create_local_env_for_cil_development.sh
-```
+| OS | Command | Status |
+|----|----|----|
+| Linux | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml`| Tested |
+| Windows | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml`| Tested |
+| MacOS (ARM) | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development_osx.yml`| Experimental |
 
-Or with the CIL build and test dependencies:
+> [!NOTE]
+> Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available/working, such as FFT filtering for FDK.
 
-```sh
-bash ./scripts/create_local_env_for_cil_development.sh -t
-```
-
-And then install CIL in to this environment using `pip`.
-
-Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the
-appropriate dependencies, using the following command:
-
-```sh
-conda env create -f ./scripts/requirements-test.yml
-```
-or, on windows:
-```sh
-conda env create -f ./scripts/requirements-test-windows.yml
-```
 
 #### Build CIL
 
@@ -170,6 +157,8 @@ A C++ compiler is required to build the source code. Let's suppose that the user
 ```sh
 pip install --no-deps .
 ```
+> [!NOTE]
+> You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
 
 If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
 
@@ -188,7 +177,7 @@ docker build . -t ghcr.io/tomographicimaging/cil
 
 ### Testing
 
-One installed, CIL functionality can be tested using the following command:
+Once installed, CIL functionality can be tested using the following command:
 
 ```sh
 export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy

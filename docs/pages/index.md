@@ -5,32 +5,38 @@ header:
   image_fullwidth: https://ccpi.ac.uk/wp-content/uploads/2022/08/front-page-1125x800.png # ideally 600x80 pixels
   title: '<img loading="lazy" src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" alt="CIL - Core Imaging Library">'
 widgets:
-- title: Examples
-  url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
-  image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
-  text: >
-    We have a repository with a <a href="https://github.com/TomographicImaging/CIL-Demos">large collection</a> of Jupyter Notebooks which cover a wide range of topics, from basic usage to advanced reconstructions with iterative methods.
-    <br/>
-    Some examples <em>without any local installation</em> are provided in <a href="https://mybinder.org">Binder</a>.
-    Please click the button below to try them immediately in your browser.
 - title: CIL Documentation
   url: '/nightly/'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
   text: >
-    CIL has a live documentation which gets updated regularly and built nightly.
-    We suggest to download and read the open access articles below, which provide very detailed information about CIL structure and usage.
-- title: Papers
-  url: 'https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II'
+    Complete API reference, user guides, and tutorials for CIL.
+    <br/>
+    <br/>
+    The documentation is updated regularly and built nightly from the latest development code.
+- title: Citing CIL
+  url: '/publications/#citing-cil'
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg
+  text: >
+    Please cite CIL if you use it in your research.
+    <br/>
+    <br/>
+    We provide three main papers describing CIL's framework, multichannel capabilities, and algorithmic developments, along with BibTeX and RIS export options.
+- title: Research Using CIL
+  url: '/publications/#research-using-cil'
   image: https://ccpi.ac.uk/wp-content/uploads/2022/10/RSTA_cover.png
   text: >
-    Jørgensen JS et al. 2021 <a href="https://doi.org/10.1098/rsta.2020.0192">Core Imaging Library – Part I: a versatile python framework for tomographic imaging</a>. Phil. Trans. R. Soc. A 20200192.
-    <br/>
-    The code to reproduce the results of the paper can be found at <a href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I">Paper-2021-RSTA-CIL-Part-I</a>.
+    View publications that have used CIL in their research.
     <br/>
     <br/>
-    Papoutsellis E et al. 2021 <a href="https://doi.org/10.1098/rsta.2020.0193">Core Imaging Library – Part II: multichannel reconstruction for dynamic and spectral tomography</a>. Phil. Trans. R. Soc. A 20200193.
+    Journal papers, conference proceedings, and PhD theses organized by year.
+- title: Try CIL in Binder
+  url: 'https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb'
+  image: https://ccpi.ac.uk/wp-content/uploads/2022/04/walnut_training.png
+  text: >
+    Run CIL examples <em>without any local installation</em> using <a href="https://mybinder.org">Binder</a>.
     <br/>
-    The code to reproduce the results of the paper can be found at at <a href="https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II">Paper-2021-RSTA-CIL-Part-II</a>.
+    <br/>
+    Access a <a href="https://github.com/TomographicImaging/CIL-Demos">large collection</a> of Jupyter Notebooks covering basic usage to advanced reconstructions with iterative methods.
 callforaction:
   url: https://ccpi.ac.uk/training
   text: Training

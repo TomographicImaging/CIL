@@ -6,7 +6,7 @@ if test $(python -c "from __future__ import print_function; import platform; pri
   echo "Darwin"
   extra_args="$extra_args -DOPENMP_LIBRARIES=${CONDA_PREFIX}/lib -DOPENMP_INCLUDES=${CONDA_PREFIX}/include"
 else
-  echo "something else"
+  extra_args="$extra_args -DIPP_ROOT=${CONDA_PREFIX}"
 fi
 
 export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}"

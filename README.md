@@ -152,7 +152,7 @@ A C++ compiler is required to build the source code. Let's suppose that the user
 | OS | Build Command |
 |----|----|
 | Linux | `pip install --no-deps . -Ccmake.define.IPP_ROOT=$CONDA_PREFIX`|
-| Windows | `pip install --no-deps . -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%|
+| Windows | `pip install --no-deps . -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%`|
 
 > [!NOTE]
 > You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.

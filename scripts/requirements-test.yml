@@ -45,7 +45,7 @@ dependencies:
   - numba
   - tqdm
   - zenodo_get >=1.6
-  - bm3d
   - pip
   - pip:
     - unittest-parametrize
+    - bm3d

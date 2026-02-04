@@ -14,7 +14,6 @@ test:
     - pip
     - python-wget
     - cvxpy                   # [linux]
-    - bm3d                    # [linux]
     - scikit-image
     - tomophantom 2.0.0       # [linux]
     - tigre 2.6
@@ -31,6 +30,7 @@ test:
 
   commands:
     - pip install unittest-parametrize
+    - pip install bm3d
     - python -m unittest discover -v -s Wrappers/Python/test
 
 {% set ipp_version = '2021.12' %}

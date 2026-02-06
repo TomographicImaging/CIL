@@ -11,6 +11,7 @@
     - improve `tqdm` notebook support (#2241)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
+    - Update on build instructions in README and developer guide for all OS
   - Enhancements:
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)

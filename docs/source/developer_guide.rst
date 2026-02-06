@@ -16,6 +16,9 @@
 Developers' Guide
 *****************
 
+
+
+
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the following.
 
@@ -109,6 +112,88 @@ Rendered
 
 .. automethod:: cil.recon.FBP.FBP.run
 
+Building CIL from source code
+-----------------------------
+
+Getting the code
+^^^^^^^^^^^^^^^^
+
+In case of local development and testing it is useful to be able to build the software directly. 
+You should first clone this repository as
+
+.. code:: sh
+
+   git clone git@github.com:TomographicImaging/CIL
+
+Building with ``pip``
+^^^^^^^^^^^^^^^^^^^^^
+
+Install Dependencies
+""""""""""""""""""
+
+We suggest creating a conda environment with all the dependencies for building CIL running the following shell script depending on operating system:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 65 15
+
+   * - OS
+     - Command
+     - Status
+   * - Linux
+     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml``
+     - Tested
+   * - Windows
+     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml``
+     - Tested
+   * - MacOS (ARM)
+     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development_osx.yml``
+     - Experimental
+
+.. note::
+   Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available and not working, such as FFT filtering for FDK.
+
+Build CIL
+""""""""
+
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - OS
+     - Build Command
+   * - Linux
+     - ``pip install --no-deps . -Ccmake.define.IPP_ROOT=$CONDA_PREFIX``
+   * - Windows
+     - ``pip install --no-deps . -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%``
+
+.. note::
+   You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
+
+
+
+If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
+
+.. code:: sh
+
+   pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
+
+Notes for Windows users
+""""""""""""""""
+
+Install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
+
+If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and the conda environment. 
+
+You can achieve this in two ways:
+1. by opening a "Developer Command Prompt for Visual Studio" and activating the conda environment from there. This requires you 
+to know the path to the `conda.bat` file, which is typically located in the `condabin` subdirectory of your conda installation. 
+Once located you need to run `<path_to>\conda.bat activate <env_name>` to activate the conda environment, and then you can run the build command from there.
+2. by opening the conda prompt and running the `vcvarsall.bat x64` file from the Visual Studio installation (with `x64` argument). 
+This requires you to know the path to the `vcvarsall.bat` file, 
+which is typically located in the `VC/Auxiliary/Build` subdirectory of your Visual Studio installation.
 
 Building documentation locally
 ------------------------------

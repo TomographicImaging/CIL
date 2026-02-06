@@ -4,5 +4,5 @@ set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%
 if not "%GIT_DESCRIBE_NUMBER%"=="0" (
     set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%.dev%GIT_DESCRIBE_NUMBER%+%GIT_DESCRIBE_HASH%
 )
-pip install . --no-deps
+pip install . --no-deps -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%
 if errorlevel 1 exit 1

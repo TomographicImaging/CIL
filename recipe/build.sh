@@ -6,11 +6,11 @@ if test $(python -c "from __future__ import print_function; import platform; pri
   echo "Darwin"
   extra_args="$extra_args -DOPENMP_LIBRARIES=${CONDA_PREFIX}/lib -DOPENMP_INCLUDES=${CONDA_PREFIX}/include"
 else
-  echo "something else"
+  echo "Not Darwin"
 fi
 
 export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}"
 if test "${GIT_DESCRIBE_NUMBER}" != "0"; then
   export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL="${PKG_VERSION}.dev${GIT_DESCRIBE_NUMBER}+${GIT_DESCRIBE_HASH}"
 fi
-pip install . --no-deps -Ccmake.args="${extra_args}"
+pip install . --no-deps -Ccmake.args="${extra_args}" -Ccmake.define.IPP_ROOT=${CONDA_PREFIX}

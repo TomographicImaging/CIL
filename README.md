@@ -127,7 +127,7 @@ In case of development it is useful to be able to build the software directly. Y
 ```sh
 git clone git@github.com:TomographicImaging/CIL
 ```
-
+The parameter `--depth 1` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone, see [git documentation](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth). 
 ### Building with `pip`
 
 #### Install Dependencies

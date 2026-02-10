@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence &#8212; CIL 25.0.1.dev22+gf3612d70d documentation</title>
+    <title>Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence &#8212; CIL 25.0.1.dev23+gf8f2e314a documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=3357575206ef0862cebd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3357575206ef0862cebd" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=5206c6c71f4758f1f4f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5206c6c71f4758f1f4f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=3357575206ef0862cebd"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=5206c6c71f4758f1f4f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3357575206ef0862cebd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3357575206ef0862cebd" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5206c6c71f4758f1f4f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5206c6c71f4758f1f4f2" />
 
-    <script src="../../_static/documentation_options.js?v=621f7985"></script>
+    <script src="../../_static/documentation_options.js?v=c563f36c"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev22+gf3612d70d';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev23+gf8f2e314a';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Reconstruction and regularisation for a hyperspectral dataset" href="../Hyperspectral_regularisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev22+gf3612d70d" />
+  <meta name="docsearch:version" content="25.0.1.dev23+gf8f2e314a" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -608,7 +608,9 @@
 <div class="math notranslate nohighlight">
 \[\min_{x} \mathcal{F}_{G}(x) := \frac{1}{2} || Y - Ax||_{2}^{2}.\]</div>
 <p>Clearly, using this formulation, we are supposing that the distribution of the noise inside <span class="math notranslate nohighlight">\(Y\)</span> is a white Gaussian. We know instead that there is instead a Poisson distribution on the measurements, so <span class="math notranslate nohighlight">\(B \sim \mathrm{Poisson}( I_{0} e^{-Ax})\)</span>. Taking the negative logorithm of the probability density function of the Poisson noise, we get a Kullback Leibler Divergence loss i.e. if we observe <span class="math notranslate nohighlight">\(u \sim\mathrm{Poisson}(v)\)</span> to find <span class="math notranslate nohighlight">\(v\)</span> we minimise with respect to <span class="math notranslate nohighlight">\(v\)</span> the
-objective $ KL(u,v) = u <span class="math">\log`(:nbsphinx-math:</span>frac{u}{v}`)-u+v<span class="math notranslate nohighlight">\(. Hence, write\)</span>$ <span class="math">\min</span><em>{x} :nbsphinx-math:`mathcal{F}`</em>{P}(x) := KL(B, I_{0} e^{-Ax}).$$</p>
+objective $ KL(u,v) = u <span class="math">\log`(:nbsphinx-math:</span>frac{u}{v}`)-u+v$. Hence, write</p>
+<div class="math notranslate nohighlight">
+\[\min_{x} \mathcal{F}_{P}(x) := KL(B, I_{0} e^{-Ax}).\]</div>
 <p>Between the two approaches, we can consider a quadratic approximation of function <span class="math notranslate nohighlight">\(\mathcal{F}_{P}\)</span> and the problem takes the following form:</p>
 <div class="math notranslate nohighlight">
 \[\min_{x} \mathcal{F_{W}} : = \frac{1}{2} || Y - Ax ||_{W}^{2} \ = \min_{x} \frac{1}{2} \sum_{i} w_{i} (Y-Ax)^2_{i}\]</div>
@@ -2505,8 +2507,8 @@ improvement on the FBP reconstruction</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=3357575206ef0862cebd"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=3357575206ef0862cebd"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=5206c6c71f4758f1f4f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=5206c6c71f4758f1f4f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -22,7 +22,7 @@ dependencies:
   - llvm-openmp
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6
-  - ccpi::ccpi-regulariser 25.0.0
+  - ccpi::ccpi-regulariser 24.0.1
   - httomo::tomophantom
   - astra-toolbox 2.1 cuda*
   - cvxpy

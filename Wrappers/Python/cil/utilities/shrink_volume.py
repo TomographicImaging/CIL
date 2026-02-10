@@ -33,7 +33,7 @@ class VolumeShrinker(object):
 
         mask_radius: float, optional
             Radius of circular mask to apply on the reconstructed volume, before
-            automatically cropping the recontruction volume. Default is None.
+            automatically cropping the reconstruction volume. Default is None.
 
         manual_limits : dict, optional
             The limits {'axis_name1':(min, max), 'axis_name2':(min, max)}
@@ -130,7 +130,8 @@ class VolumeShrinker(object):
 
         for dim in dims:
             arr = recon.max(axis=dim).array
-            mask, large_components_mask = self.otsu_large_components(arr, threshold)
+            
+            mask, large_components_mask = self.threshold_large_components(arr, threshold)
 
             x_indices = np.where(np.any(mask, axis=0))[0]
             y_indices = np.where(np.any(mask, axis=1))[0]
@@ -170,7 +171,7 @@ class VolumeShrinker(object):
             
         return bounds
         
-    def otsu_large_components(self, arr, threshold):
+    def threshold_large_components(self, arr, threshold):
         
 
         if isinstance(threshold, (int, float)):
@@ -183,8 +184,8 @@ class VolumeShrinker(object):
             thresh = thresh[0]
         else:
             raise ValueError(f"Threshold {threshold} not recognised, must be a number or 'Otsu'")
-        mask = arr > thresh
 
+        mask = arr > thresh
 
         labeled_mask, num_features = label(mask)
         component_sizes = np.bincount(labeled_mask.ravel())

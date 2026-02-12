@@ -3279,7 +3279,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         processor = LaminographyCorrector()
         test_parameter = ['initial_parameters', 'parameter_bounds', 'parameter_tolerance', 
                           'coarse_binning', 'final_binning', 'angle_binning', 'reduced_volume', 'evaluations']
-        test_value = [(30.0, 0.0), [(30, 40), (-10, 10)], (0.01, 0.01),
+        test_value = [(0.0, 0.0), [(-10, 10), (-20, 20)], (0.01, 0.01),
                       None, None, None, None, []]
 
         for i in numpy.arange(len(test_value)):

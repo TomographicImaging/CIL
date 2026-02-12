@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 class LaminographyCorrector(Processor):
 
-    def __init__(self, initial_parameters=(30.0, 0.0), parameter_bounds=[(30, 40),(-10, 10)], 
+    def __init__(self, initial_parameters=(0.0, 0.0), parameter_bounds=[(-10, 10),(-20, 20)], 
                  parameter_tolerance=(0.01, 0.01), coarse_binning=None, final_binning = None, 
                  angle_binning = None, reduced_volume = None):
         """
@@ -31,14 +31,14 @@ class LaminographyCorrector(Processor):
         ----------
         initial_parameters : tuple of float, optional
             Initial guess for the geometry parameters (tilt_angle_deg, center_of_rotation_pix).
-            Defaults to (30.0, 0.0).
+            Defaults to (0.0, 0.0).
 
         parameter_bounds : list of tuple of float, optional
-            Bounds for the parameters [(tilt_min, tilt_max), (cor_min, cor_max)].
-            Defaults to [(30, 40), (-10, 10)].
+            Bounds for the parameters [(tilt_min, tilt_max), (CoR_min, CoR_max)].
+            Defaults to [(-10, 10), (-20, 20)].
 
         parameter_tolerance : tuple of float, optional
-            Convergence tolerance for optimisation of parameters, (tilt_tol, cor_tol).
+            Convergence tolerance for optimisation of parameters, (tilt_tol, CoR_tol).
             Defaults to (0.01, 0.01).
 
         coarse_binning : int, optional
@@ -46,15 +46,15 @@ class LaminographyCorrector(Processor):
             If None, a value based on dataset size is used.
 
         final_binning : int, optional
-            Final binning factor applied for fine optimisation optimisation.
+            Final binning factor applied for fine optimisation.
             If None, no binning is applied in the fine optimisation step.
 
         angle_binning : float, optional
-            Subsampling factor for the angular dimension during optimisation.
+            Subsampling factor for the angle dimension during optimisation.
             If None, automatically determined based on input dataset.
 
         reduced_volume : ImageGeometry, optional
-            A reduced-resolution volume to be used for optimisation, e.g. obtained using 
+            A reduced-dimension volume to be used for optimisation, e.g. obtained using 
             VolumeShrinker.
             If None, the full dataset is used.
 
@@ -62,9 +62,9 @@ class LaminographyCorrector(Processor):
         Example
         -------
 
-        >>> processor = LaminographyCorrector(initial_parameters=(tilt, cor), 
-            parameter_bounds=(tilt_bounds, cor_bounds), 
-            parameter_tolerance=(tilt_tol, cor_tol))
+        >>> processor = LaminographyCorrector(initial_parameters=(tilt, CoR), 
+            parameter_bounds=(tilt_bounds, CoR_bounds), 
+            parameter_tolerance=(tilt_tol, CoR_tol))
         >>> processor.set_input(data)
         >>> data_corrected = processor.get_output()
         

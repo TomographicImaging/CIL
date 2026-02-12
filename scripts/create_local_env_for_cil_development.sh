@@ -49,7 +49,7 @@ conda_args=(create --name="$name"
   python="$python"
   numpy="$numpy"
   cmake'>=3.16'
-  dxchange
+  dxchange'>=0.2.1'
   h5py
   llvm-openmp
   ipp'>=2021.10'

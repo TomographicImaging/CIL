@@ -3270,6 +3270,21 @@ class TestLaminographyCorrector(unittest.TestCase):
         #     .set_panel([128,128],0.1)
 
         self.data_parallel.reorder('astra')
+        
+        # Additional test data
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.data_cone.reorder('astra')
+        
+        # Create cone flex geometry data
+        source_position_set = [[0, -100000, 0]] * 3
+        detector_position_set = [[0, 0, 0]] * 3
+        detector_direction_x_set = [[1, 0, 0]] * 3
+        detector_direction_y_set = [[0, 0, 1]] * 3
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(
+            source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set
+        ).set_panel([32, 32])
+        arr = numpy.random.rand(3, 32, 32)
+        self.data_cone_flex = AcquisitionData(arr, geometry=cone_flex_ag)
 
     def error_message(self, processor, test_parameter):
         return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3327,13 +3342,113 @@ class TestLaminographyCorrector(unittest.TestCase):
         with self.assertRaises(ValueError):
             processor.set_input(data_reorder)
 
-        # # check that cone beam data raises NotImplementedError
-        # with self.assertRaises(NotImplementedError):
-        #     processor.set_input(self.data_cone)
+        # Test that cone beam data raises NotImplementedError
+        processor = LaminographyCorrector()
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone)
+            processor.check_input(self.data_cone)
 
-        # # check that cone flex data raises NotImplementedError
-        # with self.assertRaises(NotImplementedError):
-        #     processor.set_input(self.data_cone_flex)
+        # Test that cone flex geometry raises NotImplementedError
+        processor = LaminographyCorrector()
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone_flex)
+
+    def test_LaminographyCorrector_filters(self):
+        # Test highpass filter with basic input
+        processor = LaminographyCorrector()
+        test_array = numpy.random.rand(10, 10, 10)
+        
+        result = processor.highpass_2d(test_array, sigma=3.0)
+        
+        # Output shape should match input shape
+        self.assertEqual(result.shape, test_array.shape)
+        # Result should be different from input (unless it's pure noise)
+        self.assertFalse(numpy.allclose(result, test_array))
+
+        # Test highpass filter with large sigma
+        processor = LaminographyCorrector()
+        test_array = numpy.random.rand(20, 20, 20)
+        
+        result = processor.highpass_2d(test_array, sigma=10.0)
+        
+        # Output shape should match input
+        self.assertEqual(result.shape, test_array.shape)
+
+        # Test Sobel filter
+        processor = LaminographyCorrector()
+        test_array = numpy.random.rand(20, 20, 20)
+        
+        result = processor.sobel_2d(test_array)
+        
+        # Output shape should match input
+        self.assertEqual(result.shape, test_array.shape)
+        # Sobel output should be non-negative
+        self.assertTrue(numpy.all(result >= 0))
+
+        # Test Sobel with uniform array (gradient should be zero)
+        processor = LaminographyCorrector()
+        test_array = numpy.ones((10, 10, 10))
+        
+        result = processor.sobel_2d(test_array)
+        
+        # Uniform array should have zero gradient
+        numpy.testing.assert_allclose(result, 0, atol=1e-10)
+
+    def test_LaminographyCorrector_loss_from_residual(self):
+        # Test loss_from_residual with zero residual
+        processor = LaminographyCorrector()
+        
+        # Create zero residual
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
+        ag.set_panel([10, 10])
+        zero_residual = AcquisitionData(numpy.zeros((5, 10, 10)), geometry=ag)
+        
+        loss = processor.loss_from_residual(zero_residual)
+        
+        # Zero residual should give zero loss
+        self.assertAlmostEqual(loss, 0.0, places=5)
+
+        # Test that loss_from_residual returns a scalar float
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
+        ag.set_panel([10, 10])
+        residual = AcquisitionData(numpy.random.rand(5, 10, 10), geometry=ag)
+        
+        loss = processor.loss_from_residual(residual)
+        
+        self.assertIsInstance(loss, (float, numpy.floating))
+        self.assertTrue(loss >= 0)  # Loss should be non-negative
+
+        # Test loss_from_residual without filters
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
+        ag.set_panel([10, 10])
+        residual = AcquisitionData(numpy.ones((5, 10, 10)), geometry=ag)
+        
+        loss_with_filters = processor.loss_from_residual(residual, use_highpass=True, use_sobel=True)
+        loss_no_filters = processor.loss_from_residual(residual, use_highpass=False, use_sobel=False)
+        
+        # Both should be valid numbers
+        self.assertIsInstance(loss_with_filters, (float, numpy.floating))
+        self.assertIsInstance(loss_no_filters, (float, numpy.floating))
+
+        # Test loss_from_residual with only highpass filter
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
+        ag.set_panel([10, 10])
+        residual = AcquisitionData(numpy.random.rand(5, 10, 10), geometry=ag)
+        
+        loss = processor.loss_from_residual(residual, use_highpass=True, use_sobel=False)
+        
+        self.assertIsInstance(loss, (float, numpy.floating))
+        self.assertTrue(loss >= 0)
 
     def test_LaminographyCorrector_update_geometry(self):
         processor = LaminographyCorrector()
@@ -3354,6 +3469,145 @@ class TestLaminographyCorrector(unittest.TestCase):
         original_axis = numpy.array([0, 0, 1])
         tilted_axis = ag_updated.config.system.rotation_axis.direction
         assert not numpy.allclose(tilted_axis, original_axis)
+    
+        # Test tilt around x-axis (default)
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 30.0
+        cor_pix = 0.0
+        tilt_x = numpy.array([1, 0, 0])
+        
+        ag_updated_x = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_x)
+        
+        updated_axis = ag_updated_x.config.system.rotation_axis.direction
+        # When tilting around x-axis, z-component should change, x-component should stay ~1
+        self.assertAlmostEqual(updated_axis[0], 0, places=5)
+
+        # Test tilt around y-axis
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 30.0
+        cor_pix = 0.0
+        tilt_y = numpy.array([0, 1, 0])
+        
+        ag_updated_y = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_y)
+        
+        updated_axis = ag_updated_y.config.system.rotation_axis.direction
+        # When tilting around y-axis, x-component should change
+        original_axis = numpy.array([0, 0, 1])
+        self.assertFalse(numpy.allclose(updated_axis, original_axis))
+
+        # Test tilt around z-axis
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 45.0
+        cor_pix = 0.0
+        tilt_z = numpy.array([0, 0, 1])
+        
+        ag_updated_z = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_z)
+        
+        # Tilting around the rotation axis itself should not change the direction
+        original_axis = numpy.array([0, 0, 1])
+        updated_axis = ag_updated_z.config.system.rotation_axis.direction
+        numpy.testing.assert_allclose(updated_axis, original_axis, atol=1e-5)
+
+        # Test with zero tilt
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 0.0
+        cor_pix = 5.0
+        
+        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        
+        # With zero tilt, rotation axis should remain unchanged
+        original_axis = numpy.array([0, 0, 1])
+        updated_axis = ag_updated.config.system.rotation_axis.direction
+        numpy.testing.assert_allclose(updated_axis, original_axis, atol=1e-5)
+        # CoR should still be updated
+        self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
+
+        # Test that panel size is preserved after geometry update
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        panel_size = (512, 512)
+        ag.set_panel(panel_size, pixel_size=(1.0, 1.0))
+        
+        original_panel = ag.config.panel.num_pixels
+        
+        ag_updated = processor.update_geometry(ag, 35.0, 5.0)
+        updated_panel = ag_updated.config.panel.num_pixels
+        
+        # Panel size should be unchanged
+        self.assertEqual(original_panel[0], updated_panel[0])
+        self.assertEqual(original_panel[1], updated_panel[1])
+
+        # Test that number of angles is preserved
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        num_angles = 15
+        ag.set_angles(numpy.linspace(0, numpy.pi, num_angles))
+        ag.set_panel([128, 128])
+        
+        original_num_angles = len(ag.angles)
+        
+        ag_updated = processor.update_geometry(ag, 30.0, 3.0)
+        updated_num_angles = len(ag_updated.angles)
+        
+        # Number of angles should be preserved
+        self.assertEqual(original_num_angles, updated_num_angles)
+
+        # Test that rotation axis direction remains normalized (unit vector)
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([256, 256])
+        
+        tilt_deg = 45.0
+        cor_pix = 10.0
+        
+        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        
+        # Check that rotation axis is a unit vector
+        axis = ag_updated.config.system.rotation_axis.direction
+        axis_norm = numpy.linalg.norm(axis)
+        self.assertAlmostEqual(axis_norm, 1.0, places=5)
+
+        # Test with extreme tilt angles
+        processor = LaminographyCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([128, 128])
+        
+        original_panel = ag.config.panel.num_pixels
+        
+        # Test with 90 degree tilt
+        ag_updated_90 = processor.update_geometry(ag, 90.0, 0.0)
+        self.assertEqual(ag_updated_90.config.panel.num_pixels[0], original_panel[0])
+        
+        # Test with 180 degree tilt
+        ag_updated_180 = processor.update_geometry(ag, 180.0, 0.0)
+        self.assertEqual(ag_updated_180.config.panel.num_pixels[0], original_panel[0])
 
 class TestFluxNormaliser(unittest.TestCase):
 

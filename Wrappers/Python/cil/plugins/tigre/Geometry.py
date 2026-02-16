@@ -37,43 +37,40 @@ class CIL2TIGREGeometry(object):
             angles *= (np.pi/180.)
 
         if ag.geom_type == 'parallel' and ag.system_description == 'advanced':
-            ag_cil = ag.copy()
-            ag_cil.config.system.align_reference_frame('cil')   # geometry in CIL frame
-            untilted_rotation_axis = ag_cil.config.system.rotation_axis.direction
-            untilted_rotation_axis /= np.linalg.norm(untilted_rotation_axis)
+            angles = calculate_euler_angles(angles, tg)
+            tg.rotDetector = np.array((0.0, 0.0, 0.0))
+        
+        else:
+            # don't do this if using Euler angles because the tigre conversion
+            # is already applied in calculate_euler_angles
 
-            tilted_rotation_axis = ag.config.system.rotation_axis.direction
-            tilted_rotation_axis /= np.linalg.norm(tilted_rotation_axis)
-
-            v = np.cross(untilted_rotation_axis, tilted_rotation_axis)
-            v_norm = np.linalg.norm(v)
-            c = float(np.dot(untilted_rotation_axis, tilted_rotation_axis))
+            #convert CIL to TIGRE angles s
+            angles = -(angles + np.pi/2 +tg.theta )
             
-            # if tilted and untilted rotation axes are not parallel calculate Euler angles
-            if v_norm > 1e-12:
-                theta = np.arctan2(v_norm, c)
-                rotation_matrix = rotation_matrix_from_vec(theta * v / v_norm)
-                euler_angles = []
-                for angle in angles:
-                    R1 = rot_z(angle)
-                    combined = rotation_matrix @ R1
-                    euler_angles.append(euler_from_matrix_zyz(combined))
-                tg.euler_angles = np.array(euler_angles, dtype=np.float32)
-                
-                return tg, tg.euler_angles
-
-        #convert CIL to TIGRE angles s
-        angles = -(angles + np.pi/2 +tg.theta )
-
-        #angles in range -pi->pi
-        for i, a in enumerate(angles):
-            while a < -np.pi:
-                a += 2 * np.pi
-            while a >= np.pi:
-                a -= 2 * np.pi
-            angles[i] = a
+            #angles in range -pi->pi
+            for i, a in enumerate(angles):
+                while a < -np.pi:
+                    a += 2 * np.pi
+                while a >= np.pi:
+                    a -= 2 * np.pi
+                angles[i] = a
 
         return tg, angles
+    
+def calculate_euler_angles(angles, tg):
+    roll, pitch, yaw = tg.rotDetector
+    
+    # R_detector = rot_y(-yaw) @ rot_x(-pitch) @ rot_z(-roll)
+    R_detector = rot_z(yaw) @ rot_y(pitch) @ rot_x(roll)
+
+    euler_angles = []
+    for angle in angles:
+        R_combined = R_detector @ rot_z(angle)
+        R_tigre = rot_z(-np.pi/2 - tg.theta) @ R_combined
+        euler_angles.append(euler_from_matrix_zyz(R_tigre))
+    euler_angles = np.array(euler_angles, dtype=np.float32)
+    
+    return euler_angles
     
 def rotation_matrix_from_vec(rotvec):   
     rotvec = np.asarray(rotvec, dtype=float)
@@ -100,6 +97,19 @@ def rotation_matrix_from_vec(rotvec):
 
     return R
 
+def rot_x(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[1, 0, 0],
+                     [0, c, -s],
+                     [0, s,  c]])
+
+
+def rot_y(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[ c, 0, s],
+                     [ 0, 1, 0],
+                     [-s, 0, c]])
+
 def rot_z(angle):
     c, s = np.cos(angle), np.sin(angle)
     return np.array([[c, -s, 0],
@@ -107,9 +117,7 @@ def rot_z(angle):
                      [0,  0, 1]])
 
 def euler_from_matrix_zyz(R, eps=1e-12):
-    """
-    Equivalent to scipy Rotation.as_euler("ZYZ", degrees=False)
-    """
+
     R = np.asarray(R, dtype=float)
 
     beta = np.arccos(np.clip(R[2, 2], -1.0, 1.0))

@@ -3,5 +3,6 @@ __pycache__/
 /Wrappers/Python/cil-*.dist-info/
 /Wrappers/Python/cil/include/
 /Wrappers/Python/cil/lib/
+/Wrappers/Python/build/
 *.vscode*
 *.egg*

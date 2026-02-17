@@ -36,7 +36,7 @@ from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
 from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser, LaminographyCorrector
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser, LaminographyGeometryCorrector
 import gc
 
 from utils import has_numba
@@ -3261,7 +3261,7 @@ class TestPaganinProcessor(unittest.TestCase):
         sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
-class TestLaminographyCorrector(unittest.TestCase):
+class TestLaminographyGeometryCorrector(unittest.TestCase):
 
     def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -3289,12 +3289,12 @@ class TestLaminographyCorrector(unittest.TestCase):
     def error_message(self, processor, test_parameter):
         return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
 
-    def test_LaminographyCorrector_init(self):
+    def test_LaminographyGeometryCorrector_init(self):
         # test default values are initialised
-        processor = LaminographyCorrector()
-        test_parameter = ['initial_parameters', 'parameter_bounds', 'parameter_tolerance', 
+        processor = LaminographyGeometryCorrector()
+        test_parameter = ['parameter_bounds', 'parameter_tolerance', 
                           'coarse_binning', 'final_binning', 'angle_binning', 'reduced_volume', 'evaluations']
-        test_value = [(0.0, 0.0), [(-10, 10), (-20, 20)], (0.01, 0.01),
+        test_value = [[(-10, 10), (-20, 20)], (0.01, 0.01),
                       None, None, None, None, []]
 
         for i in numpy.arange(len(test_value)):
@@ -3302,22 +3302,22 @@ class TestLaminographyCorrector(unittest.TestCase):
                            msg=self.error_message(processor, test_parameter[i]))
 
         # test non-default values are initialised
-        processor = LaminographyCorrector(initial_parameters=(25.0, 5.0), 
+        processor = LaminographyGeometryCorrector(
                                          parameter_bounds=[(20, 35), (-5, 15)],
                                          parameter_tolerance=(0.1, 0.1),
                                          coarse_binning=2,
                                          final_binning=1,
                                          angle_binning=2,
                                          reduced_volume=None)
-        test_value = [(25.0, 5.0), [(20, 35), (-5, 15)], (0.1, 0.1),
+        test_value = [[(20, 35), (-5, 15)], (0.1, 0.1),
                       2, 1, 2, None]
 
         for i in numpy.arange(len(test_value)):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i],
                            msg=self.error_message(processor, test_parameter[i]))
 
-    def test_LaminographyCorrector_check_input(self):
-        processor = LaminographyCorrector()
+    def test_LaminographyGeometryCorrector_check_input(self):
+        processor = LaminographyGeometryCorrector()
         
         # test with parallel beam data - should work
         processor.set_input(self.data_parallel)
@@ -3343,19 +3343,19 @@ class TestLaminographyCorrector(unittest.TestCase):
             processor.set_input(data_reorder)
 
         # Test that cone beam data raises NotImplementedError
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         with self.assertRaises(NotImplementedError):
             processor.set_input(self.data_cone)
             processor.check_input(self.data_cone)
 
         # Test that cone flex geometry raises NotImplementedError
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         with self.assertRaises(NotImplementedError):
             processor.set_input(self.data_cone_flex)
 
-    def test_LaminographyCorrector_filters(self):
+    def test_LaminographyGeometryCorrector_filters(self):
         # Test highpass filter with basic input
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         test_array = numpy.random.rand(10, 10, 10)
         
         result = processor.highpass_2d(test_array, sigma=3.0)
@@ -3366,7 +3366,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertFalse(numpy.allclose(result, test_array))
 
         # Test highpass filter with large sigma
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         test_array = numpy.random.rand(20, 20, 20)
         
         result = processor.highpass_2d(test_array, sigma=10.0)
@@ -3375,7 +3375,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertEqual(result.shape, test_array.shape)
 
         # Test Sobel filter
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         test_array = numpy.random.rand(20, 20, 20)
         
         result = processor.sobel_2d(test_array)
@@ -3386,7 +3386,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertTrue(numpy.all(result >= 0))
 
         # Test Sobel with uniform array (gradient should be zero)
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         test_array = numpy.ones((10, 10, 10))
         
         result = processor.sobel_2d(test_array)
@@ -3394,9 +3394,9 @@ class TestLaminographyCorrector(unittest.TestCase):
         # Uniform array should have zero gradient
         numpy.testing.assert_allclose(result, 0, atol=1e-10)
 
-    def test_LaminographyCorrector_loss_from_residual(self):
+    def test_LaminographyGeometryCorrector_loss_from_residual(self):
         # Test loss_from_residual with zero residual
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         # Create zero residual
         ag = AcquisitionGeometry.create_Parallel3D()
@@ -3410,7 +3410,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertAlmostEqual(loss, 0.0, places=5)
 
         # Test that loss_from_residual returns a scalar float
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 5))
@@ -3423,7 +3423,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertTrue(loss >= 0)  # Loss should be non-negative
 
         # Test loss_from_residual without filters
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 5))
@@ -3438,7 +3438,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertIsInstance(loss_no_filters, (float, numpy.floating))
 
         # Test loss_from_residual with only highpass filter
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 5))
@@ -3450,8 +3450,8 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertIsInstance(loss, (float, numpy.floating))
         self.assertTrue(loss >= 0)
 
-    def test_LaminographyCorrector_update_geometry(self):
-        processor = LaminographyCorrector()
+    def test_LaminographyGeometryCorrector_update_geometry(self):
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3471,7 +3471,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         assert not numpy.allclose(tilted_axis, original_axis)
     
         # Test tilt around x-axis (default)
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3488,7 +3488,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertAlmostEqual(updated_axis[0], 0, places=5)
 
         # Test tilt around y-axis
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3506,7 +3506,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertFalse(numpy.allclose(updated_axis, original_axis))
 
         # Test tilt around z-axis
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3524,7 +3524,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         numpy.testing.assert_allclose(updated_axis, original_axis, atol=1e-5)
 
         # Test with zero tilt
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3543,7 +3543,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
 
         # Test that panel size is preserved after geometry update
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3560,7 +3560,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertEqual(original_panel[1], updated_panel[1])
 
         # Test that number of angles is preserved
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         num_angles = 15
@@ -3576,7 +3576,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertEqual(original_num_angles, updated_num_angles)
 
         # Test that rotation axis direction remains normalized (unit vector)
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))
@@ -3593,7 +3593,7 @@ class TestLaminographyCorrector(unittest.TestCase):
         self.assertAlmostEqual(axis_norm, 1.0, places=5)
 
         # Test with extreme tilt angles
-        processor = LaminographyCorrector()
+        processor = LaminographyGeometryCorrector()
         
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_angles(numpy.linspace(0, numpy.pi, 10))

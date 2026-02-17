@@ -18,27 +18,22 @@ log = logging.getLogger(__name__)
 
 
 
-class LaminographyCorrector(Processor):
+class LaminographyGeometryCorrector(Processor):
 
-    def __init__(self, initial_parameters=(0.0, 0.0), parameter_bounds=[(-10, 10),(-20, 20)], 
-                 parameter_tolerance=(0.01, 0.01), coarse_binning=None, final_binning = None, 
-                 angle_binning = None, reduced_volume = None):
+    def __init__(self, parameter_bounds=[(-10, 10),(-20, 20)], parameter_tolerance=(0.01, 0.01), 
+                 coarse_binning=None, final_binning = None, angle_binning = None, reduced_volume = None):
         """
-        Initialize a LaminographyCorrector processor to optimize tilt and center-of-rotation for 
-        laminography data.
+        Initialize a LaminographyGeometryCorrector processor to fit a geometry 
+        and find tilt and center-of-rotation for laminography data.
         
         Parameters
         ----------
-        initial_parameters : tuple of float, optional
-            Initial guess for the geometry parameters (tilt_angle_deg, center_of_rotation_pix).
-            Defaults to (0.0, 0.0).
-
         parameter_bounds : list of tuple of float, optional
-            Bounds for the parameters [(tilt_min, tilt_max), (CoR_min, CoR_max)].
+            Bounds for the parameters [(tilt_min_deg, tilt_max_deg), (CoR_min_pix, CoR_max_pix)].
             Defaults to [(-10, 10), (-20, 20)].
 
         parameter_tolerance : tuple of float, optional
-            Convergence tolerance for optimisation of parameters, (tilt_tol, CoR_tol).
+            Convergence tolerance for optimisation of parameters, (tilt_tol_deg, CoR_tol_pix).
             Defaults to (0.01, 0.01).
 
         coarse_binning : int, optional
@@ -49,28 +44,26 @@ class LaminographyCorrector(Processor):
             Final binning factor applied for fine optimisation.
             If None, no binning is applied in the fine optimisation step.
 
-        angle_binning : float, optional
+        angle_subsampling : float, optional
             Subsampling factor for the angle dimension during optimisation.
             If None, automatically determined based on input dataset.
 
-        reduced_volume : ImageGeometry, optional
-            A reduced-dimension volume to be used for optimisation, e.g. obtained using 
-            VolumeShrinker.
+        image_geometry : ImageGeometry, optional
+            Pass a reduced volume ImageGeometry to be used for fitting.
             If None, the full dataset is used.
 
             
         Example
         -------
 
-        >>> processor = LaminographyCorrector(initial_parameters=(tilt, CoR), 
-            parameter_bounds=(tilt_bounds, CoR_bounds), 
+        >>> processor = LaminographyGeometryCorrector(parameter_bounds=(tilt_bounds, CoR_bounds), 
             parameter_tolerance=(tilt_tol, CoR_tol))
         >>> processor.set_input(data)
         >>> data_corrected = processor.get_output()
         
         """
         kwargs = {
-                    'initial_parameters'  : initial_parameters,
+                    'initial_parameters'  : None,
                     'parameter_bounds' : parameter_bounds,
                     'parameter_tolerance' : parameter_tolerance,
                     'reduced_volume' : reduced_volume,
@@ -79,7 +72,7 @@ class LaminographyCorrector(Processor):
                     'angle_binning' : angle_binning,
                     'evaluations' : []
                     }
-        super(LaminographyCorrector, self).__init__(**kwargs)
+        super(LaminographyGeometryCorrector, self).__init__(**kwargs)
 
     def check_input(self, dataset):
         if not isinstance(dataset, (AcquisitionData)):
@@ -89,10 +82,20 @@ class LaminographyCorrector(Processor):
             raise NotImplementedError("Processor not implemented for CONE_FLEX geometry.")
         
         if dataset.geometry.geom_type & AcquisitionType.CONE:
-            raise NotImplementedError("LaminographyCorrector does not yet support CONE data")
+            raise NotImplementedError("LaminographyGeometryCorrector does not yet support CONE data")
         
         if not AcquisitionDimension.check_order_for_engine('astra', dataset.geometry):
-            raise ValueError("LaminographyCorrector must be used with astra data order, try `data.reorder('astra')`")
+            raise ValueError("LaminographyGeometryCorrector must be used with astra data order, try `data.reorder('astra')`")
+
+        # get initial parameters from geometry
+        U = dataset.geometry.config.system.rotation_axis.direction
+        V = dataset.geometry.config.system.detector.direction_y
+        c = np.cross(U, V)
+        d = np.dot(U, V)
+        c_norm = np.linalg.norm(c)
+        tilt_deg = np.rad2deg(np.arctan2(c_norm, d))
+        CoR_pix = dataset.geometry.get_centre_of_rotation('pixels')['offset'][0]
+        self.initial_parameters = (tilt_deg, CoR_pix)
 
         return True
 
@@ -245,15 +248,16 @@ class LaminographyCorrector(Processor):
         if self.coarse_binning is None:
             self.coarse_binning = min(int(np.ceil(data.geometry.config.panel.num_pixels[0] / 256)),5)
         binning = self.coarse_binning
-        if self.angle_binning is None:
-            self.angle_binning = np.ceil(data.get_dimension_size('angle')/(data.get_dimension_size('horizontal')*(np.pi/2)))
         roi = {
                 'horizontal': (None, None, binning),
-                'vertical': (None, None, binning),
-                'angle': (None, None, self.angle_binning*binning)
+                'vertical': (None, None, binning)
             }
-
         data_binned = Binner(roi)(data)
+
+        if self.angle_binning is None:
+            self.angle_binning = np.ceil(data.get_dimension_size('angle')/(data.get_dimension_size('horizontal')*(np.pi/2)))
+        roi={'angle':(None, None, self.angle_binning*binning)}
+        data_binned = Slicer(roi)(data_binned)
         
         coarse_tolerance = (self.parameter_tolerance[0], self.parameter_tolerance[1])
         res = self.minimise_geometry(data_binned, binning=binning, 
@@ -315,7 +319,7 @@ class LaminographyCorrector(Processor):
             losses = [t[2] for t in eval['evaluations']]
             
             ax = axs[i]
-            scatter = ax.scatter(tilts, cors, c=losses, cmap='viridis', s=100, edgecolors='k')
+            scatter = ax.scatter(tilts, cors, c=losses, cmap='viridis_r', s=100, edgecolors='k')
             fig.colorbar(scatter, label='Loss value', ax=ax)
             ax.set_xlabel('Tilt')
             ax.set_ylabel('Cor')

@@ -21,6 +21,11 @@ import warnings
 from .data_container import DataContainer
 from .labels import ImageDimension, Backend
 
+from .array_api_compat import squeeze as cil_squeeze 
+from .array_api_compat import dtype_namespace
+import array_api_compat
+from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
+
 class ImageData(DataContainer):
     """
     DataContainer for holding 2D or 3D image data
@@ -76,17 +81,23 @@ class ImageData(DataContainer):
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype
-            array = numpy.empty(geometry.shape, dtype=dtype)
-
+            xp = array_api_compat.numpy
+            array = xp.empty(geometry.shape, dtype=dtype)
+    
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
+            array = cil_squeeze(array)
 
-        elif issubclass(type(array) , numpy.ndarray):
+        # elif issubclass(type(array) , np.ndarray):
             # remove singleton dimensions
-            array = numpy.squeeze(array)
-
+            # array = np.squeeze(array)
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+            # Consider array as an object is compliant to the array API
+            # https://docs.scipy.org/doc/scipy-1.15.2/dev/api-dev/array_api.html 
+            # this might raise an exception but that's fine
+            array = cil_squeeze(array)
+        # else:
+        #     raise TypeError('array must be a CIL type DataContainer or np.ndarray got {}'.format(type(array)))
 
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
@@ -115,12 +126,16 @@ class ImageData(DataContainer):
             True if the two objects are equal, False otherwise.
         '''
 
+        from .array_api_compat import allclose as cil_allclose
         if isinstance(other, ImageData):
-            if numpy.array_equal(self.as_array(), other.as_array()) \
-                and self.geometry == other.geometry \
-                and self.dtype == other.dtype:
+            xp = array_namespace(self.array)
+            if self.geometry == other.geometry \
+                and self.dtype == other.dtype \
+                and self.shape == other.shape \
+                and cil_allclose(self.as_array(), other.as_array()):
                 return True 
-        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+            return False
+        elif self.dtype==other.dtype and cil_allclose(self.as_array(), other):
             return True
         else:
             return False
@@ -180,6 +195,7 @@ class ImageData(DataContainer):
             If `in_place = False` returns a new ImageData object with the masked data
 
         """
+        # FIXME Address this
         ig = self.geometry
 
         # grid

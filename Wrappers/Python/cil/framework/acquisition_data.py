@@ -22,6 +22,8 @@ import warnings
 from .labels import AcquisitionDimension, Backend, AcquisitionType
 from .data_container import DataContainer
 from .partitioner import Partitioner
+import array_api_compat
+from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
 
 
 class AcquisitionData(DataContainer, Partitioner):
@@ -83,17 +85,15 @@ class AcquisitionData(DataContainer, Partitioner):
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype
-            array = numpy.empty(geometry.shape, dtype)
+            xp = array_api_compat.numpy
+            array = xp.empty(geometry.shape, dtype=dtype)
     
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
-
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+            # remove singleton dimensions
+            array = array.squeeze()
 
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
@@ -118,7 +118,7 @@ class AcquisitionData(DataContainer, Partitioner):
         bool
             True if the two objects are equal, False otherwise.
         '''
-
+        # FIXME: address this
         if isinstance(other, AcquisitionData):
             if numpy.array_equal(self.as_array(), other.as_array()) \
                 and self.geometry == other.geometry \

@@ -37,7 +37,7 @@ where `<env_name>` is `cil_demos`, `cil_demos_cpu` or whatever name you specifie
 #### Install CIL into an existing environment
 If you prefer to install CIL with minimal dependencies into an existing environment you can use:
 ```sh
-conda install -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
+conda install -c https://tomography.stfc.ac.uk/conda -c conda-forge -c ccpi cil=25.0.0
 ```
 A number of additional dependencies are required for specific functionality in CIL, these should be added to your environment as necessary. See the dependency table below for details.
 
@@ -49,12 +49,12 @@ While building the CIL package we test with specific versions of dependencies. T
 |----|----|--------|--------|----|
 | [Python](https://www.python.org/) | 3.10 - 3.13 | `"python>=3.10,<=3.13"` || [PSF-2.0](https://docs.python.org/3/license.html) |
 | [Numpy](https://github.com/numpy/numpy) | 1.23 - 2.3 | `"numpy>=1.23,<=2.3"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
-| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
+| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | CPU: `astra-toolbox::astra-toolbox=2.4=py*` <br> GPU: `astra-toolbox::astra-toolbox=2.4=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
+| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | `astra-toolbox::astra-toolbox=2.4` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
 | [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 25.0.0 | CPU: `ccpi::ccpi-regulariser=25.0.0=cpu*` <br> GPU: `ccpi::ccpi-regulariser=25.0.0=cuda*` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
-| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [2.0.0](https://github.com/dkazanc/TomoPhantom/releases/tag/v2.0.0) | `ccpi::tomophantom=2.0.0` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
+| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [3.0.1](https://github.com/dkazanc/TomoPhantom/releases/tag/v2.0.0) | `httomo::tomophantom=3.0.1` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
 | [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
 | [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
 |[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|

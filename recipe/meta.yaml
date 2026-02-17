@@ -52,7 +52,7 @@ requirements:
     - scikit-build-core >=0.10
 
   run:
-    - {{ pin_compatible('python', min_pin='x.x') }}
+    - {{ pin_compatible('python', min_pin='x.x', max_pin='x') }}
     - ipp {{ ipp_version }}
     - numpy >=1.23,<3
     - scipy >=1.4

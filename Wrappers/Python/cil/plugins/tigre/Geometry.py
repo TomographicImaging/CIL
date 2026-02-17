@@ -38,11 +38,12 @@ class CIL2TIGREGeometry(object):
 
         if ag.geom_type == 'parallel' and ag.system_description == 'advanced':
             angles = calculate_euler_angles(angles, tg)
+            # reset the detector rotation to 0 as the rotation is now included in the Euler angles
             tg.rotDetector = np.array((0.0, 0.0, 0.0))
         
         else:
             # don't do this if using Euler angles because the tigre conversion
-            # is already applied in calculate_euler_angles
+            # is applied in calculate_euler_angles
 
             #convert CIL to TIGRE angles s
             angles = -(angles + np.pi/2 +tg.theta )
@@ -60,12 +61,12 @@ class CIL2TIGREGeometry(object):
 def calculate_euler_angles(angles, tg):
     roll, pitch, yaw = tg.rotDetector
     
-    # R_detector = rot_y(-yaw) @ rot_x(-pitch) @ rot_z(-roll)
     R_detector = rot_z(yaw) @ rot_y(pitch) @ rot_x(roll)
 
     euler_angles = []
     for angle in angles:
         R_combined = R_detector @ rot_z(angle)
+        # convert to tigre angles
         R_tigre = rot_z(-np.pi/2 - tg.theta) @ R_combined
         euler_angles.append(euler_from_matrix_zyz(R_tigre))
     euler_angles = np.array(euler_angles, dtype=np.float32)
@@ -181,9 +182,6 @@ class TIGREGeometry(Geometry):
             self.DSO = clearance_len
             self.DSD = 2*clearance_len
             self.mode = 'parallel'
-
-            # if ag_in.system_description == 'advanced':
-                # raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
         # number of voxels (vx)
         self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )

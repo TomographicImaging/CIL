@@ -90,7 +90,7 @@ else
     python-wget
     setuptools
     scikit-image
-    ccpi::tigre
+    ccpi/label/dev::tigre=3.1.*
     httomo::tomophantom=3.*
     -c conda-forge
     -c https://tomography.stfc.ac.uk/conda

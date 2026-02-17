@@ -21,7 +21,7 @@ dependencies:
   - numpy >=1.23,<3
   - libgomp      # [linux]
   - ccpi::cil-data >=22
-  - ccpi::tigre
+  - ccpi/label/dev::tigre 3.1.*
   - ccpi::ccpi-regulariser * cuda*
   - httomo::tomophantom 3.*
   - astra-toolbox::astra-toolbox 2.*

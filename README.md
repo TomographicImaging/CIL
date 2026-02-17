@@ -48,7 +48,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|
 | [Python](https://www.python.org/) | 3.10 - 3.13 | `"python>=3.10,<=3.13"` || [PSF-2.0](https://docs.python.org/3/license.html) |
-| [Numpy](https://github.com/numpy/numpy) | 1.23 - 2.3 | `"numpy>=1.23,<=2.3"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
+| [Numpy](https://github.com/numpy/numpy) | 2.0 - 2.4 | `"numpy>=2,<=2.4"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
 | [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
 | [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | `astra-toolbox::astra-toolbox=2.4` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |

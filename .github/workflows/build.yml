@@ -293,6 +293,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         context: .
+        target: cil
         load: true
         tags: tomographicimaging/cil:test
     - name: test

@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class LaminographyGeometryCorrector(Processor):
 
     def __init__(self, parameter_bounds=[(-10, 10),(-20, 20)], parameter_tolerance=(0.01, 0.01), 
-                 coarse_binning=None, final_binning = None, angle_binning = None, reduced_volume = None):
+                 coarse_binning=None, final_binning = None, angle_subsampling = None, image_geometry = None):
         """
         Initialize a LaminographyGeometryCorrector processor to fit a geometry 
         and find tilt and center-of-rotation for laminography data.
@@ -66,10 +66,10 @@ class LaminographyGeometryCorrector(Processor):
                     'initial_parameters'  : None,
                     'parameter_bounds' : parameter_bounds,
                     'parameter_tolerance' : parameter_tolerance,
-                    'reduced_volume' : reduced_volume,
+                    'image_geometry' : image_geometry,
                     'coarse_binning' : coarse_binning,
                     'final_binning' : final_binning,
-                    'angle_binning' : angle_binning,
+                    'angle_subsampling' : angle_subsampling,
                     'evaluations' : []
                     }
         super(LaminographyGeometryCorrector, self).__init__(**kwargs)
@@ -186,10 +186,10 @@ class LaminographyGeometryCorrector(Processor):
         ag = data.geometry.copy()
         ag_ref = Slicer(roi={'angle':(None, None, divider)})(ag)
 
-        if self.reduced_volume is None:
+        if self.image_geometry is None:
             ig = ag.get_ImageGeometry()
         else:
-            ig = Binner(roi={'horizontal_x':(None, None,binning), 'horizontal_y':(None, None,binning), 'vertical':(None, None,binning)})(self.reduced_volume)
+            ig = Binner(roi={'horizontal_x':(None, None,binning), 'horizontal_y':(None, None,binning), 'vertical':(None, None,binning)})(self.image_geometry)
         if calculate_ftol:
             loss_at_p0, _ = self.projection_reprojection(data, ig, ag, ag_ref, y_ref, p0_binned[0], p0_binned[1])
             ftol = self.ftol_from_bounds_and_xtol(loss_at_p0, 1, bounds_scaled)
@@ -254,9 +254,9 @@ class LaminographyGeometryCorrector(Processor):
             }
         data_binned = Binner(roi)(data)
 
-        if self.angle_binning is None:
-            self.angle_binning = np.ceil(data.get_dimension_size('angle')/(data.get_dimension_size('horizontal')*(np.pi/2)))
-        roi={'angle':(None, None, self.angle_binning*binning)}
+        if self.angle_subsampling is None:
+            self.angle_subsampling = np.ceil(data.get_dimension_size('angle')/(data.get_dimension_size('horizontal')*(np.pi/2)))
+        roi={'angle':(None, None, self.angle_subsampling*binning)}
         data_binned = Slicer(roi)(data_binned)
         
         coarse_tolerance = (self.parameter_tolerance[0], self.parameter_tolerance[1])
@@ -276,7 +276,7 @@ class LaminographyGeometryCorrector(Processor):
         roi = {
                 'horizontal': (None, None, binning),
                 'vertical': (None, None, binning),
-                'angle': (None, None, self.angle_binning)
+                'angle': (None, None, self.angle_subsampling)
             }
 
         data_binned = Binner(roi)(data)

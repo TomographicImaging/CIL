@@ -45,6 +45,7 @@ if has_numba:
 
 from scipy import constants
 from scipy.fft import ifftshift
+from scipy.spatial.transform import Rotation as R
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
 
@@ -3265,10 +3266,6 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
 
     def setUp(self):
         self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        # ag = AcquisitionGeometry.create_Parallel3D()\
-        #     .set_angles(numpy.linspace(0,360,360,endpoint=False))\
-        #     .set_panel([128,128],0.1)
-
         self.data_parallel.reorder('astra')
         
         # Additional test data
@@ -3283,7 +3280,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(
             source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set
         ).set_panel([32, 32])
-        arr = numpy.random.rand(3, 32, 32)
+        arr = numpy.random.rand(3, 32, 32).astype(numpy.float32)
         self.data_cone_flex = AcquisitionData(arr, geometry=cone_flex_ag)
 
     def error_message(self, processor, test_parameter):
@@ -3293,7 +3290,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         # test default values are initialised
         processor = LaminographyGeometryCorrector()
         test_parameter = ['parameter_bounds', 'parameter_tolerance', 
-                          'coarse_binning', 'final_binning', 'angle_binning', 'reduced_volume', 'evaluations']
+                          'coarse_binning', 'final_binning', 'angle_subsampling', 'image_geometry', 'evaluations']
         test_value = [[(-10, 10), (-20, 20)], (0.01, 0.01),
                       None, None, None, None, []]
 
@@ -3307,8 +3304,8 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
                                          parameter_tolerance=(0.1, 0.1),
                                          coarse_binning=2,
                                          final_binning=1,
-                                         angle_binning=2,
-                                         reduced_volume=None)
+                                         angle_subsampling=2,
+                                         image_geometry=None)
         test_value = [[(20, 35), (-5, 15)], (0.1, 0.1),
                       2, 1, 2, None]
 
@@ -3608,6 +3605,63 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         # Test with 180 degree tilt
         ag_updated_180 = processor.update_geometry(ag, 180.0, 0.0)
         self.assertEqual(ag_updated_180.config.panel.num_pixels[0], original_panel[0])
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_LaminographyGeometryCorrector_process(self):
+        # get volume
+        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        vol.reorder('astra')
+        ig = vol.geometry
+        
+        # forward project with tilt and cor offset
+        tilt = 37.7 # degrees
+        cor_offset = -2.4 # pixels
+        tilt_direction = numpy.array([1, 0, 0])
+        untilted_rotation_axis = numpy.array([0, 0, 1])
+
+        rotation_matrix = R.from_rotvec(numpy.deg2rad(tilt) * tilt_direction)
+        tilted_rotation_axis = rotation_matrix.apply(untilted_rotation_axis)
+        angles = numpy.arange(0,360,5)
+        ag = AcquisitionGeometry.create_Parallel3D(rotation_axis_direction=tilted_rotation_axis)\
+            .set_angles(angles)\
+            .set_panel(vol.shape[0:2], (vol.geometry.voxel_size_x, vol.geometry.voxel_size_y))
+        ag.set_centre_of_rotation(cor_offset, distance_units='pixels')
+        ag.set_labels(['vertical', 'angle','horizontal'])
+
+        A = AstraProjectionOperator(ig, ag)
+        proj = A.direct(vol)
+
+        # update geometry with guess values
+        tilt_guess = 35 # degrees
+        cor_guess = 0
+        rotation_matrix_guess = R.from_rotvec(numpy.deg2rad(tilt_guess) * tilt_direction)
+        tilted_rotation_axis_guess = rotation_matrix_guess.apply(untilted_rotation_axis)
+        proj.geometry.config.system.rotation_axis.direction = tilted_rotation_axis_guess
+        proj.geometry.set_centre_of_rotation(cor_guess, distance_units='pixels')
+
+        # run LaminographyGeometryCorrector
+        tolerance = 0.5 # choose high tolerance for quick convergence
+        processor = LaminographyGeometryCorrector(parameter_bounds=[(30,40),(-5,5)], 
+                                                parameter_tolerance=(tolerance, tolerance))
+        processor.set_input(proj)
+        
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
+        corrected_proj = processor.get_output()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+        # check the fitted values are within the tolerance of the true values
+        U = corrected_proj.geometry.config.system.rotation_axis.direction
+        V = corrected_proj.geometry.config.system.detector.direction_y
+        c = numpy.cross(U, V)
+        d = numpy.dot(U, V)
+        c_norm = numpy.linalg.norm(c)
+        tilt_fit = numpy.rad2deg(numpy.arctan2(c_norm, d))
+        cor_fit = corrected_proj.geometry.get_centre_of_rotation(distance_units='pixels')['offset'][0]
+
+        self.assertLessEqual(abs(tilt_fit - tilt), tolerance)
+        self.assertLessEqual(abs(cor_fit - cor_offset), tolerance)
 
 class TestFluxNormaliser(unittest.TestCase):
 

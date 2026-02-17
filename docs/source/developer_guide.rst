@@ -126,7 +126,7 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs_environment.yml``
-#. `Install Ruby version 3.2 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
+#. `Install Ruby version 3.4.8 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
 #. Install the web dependencies with ``make web-deps``
 #. Build the documentation with ``make dirhtml web``
 #. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
@@ -141,7 +141,7 @@ Example:
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
-  make web-deps  # install dependencies (requires ruby 3.2)
+  make web-deps  # install dependencies (requires ruby 3.4.8)
   make dirhtml web serve
 
 Notebooks gallery

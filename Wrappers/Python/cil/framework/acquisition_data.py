@@ -16,7 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
-import numpy
+import numpy as np
 import warnings
 
 from .labels import AcquisitionDimension, Backend, AcquisitionType
@@ -85,7 +85,7 @@ class AcquisitionData(DataContainer, Partitioner):
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype
-            xp = array_api_compat.numpy
+            xp = np
             array = xp.empty(geometry.shape, dtype=dtype)
     
         elif issubclass(type(array) , DataContainer):
@@ -120,11 +120,11 @@ class AcquisitionData(DataContainer, Partitioner):
         '''
         # FIXME: address this
         if isinstance(other, AcquisitionData):
-            if numpy.array_equal(self.as_array(), other.as_array()) \
+            if np.array_equal(self.as_array(), other.as_array()) \
                 and self.geometry == other.geometry \
                 and self.dtype == other.dtype:
                 return True 
-        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+        elif np.array_equal(self.as_array(), other) and self.dtype==other.dtype:
             return True
         else:
             return False
@@ -149,7 +149,7 @@ class AcquisitionData(DataContainer, Partitioner):
             dim = self.geometry.dimension_labels.index('vertical')
 
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-            ind0 = int(numpy.floor(centre_slice_pos))
+            ind0 = int(np.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
             kwargs['vertical'] = ind0
             out = DataContainer.get_slice(self, **kwargs)

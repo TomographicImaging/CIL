@@ -276,6 +276,7 @@ class DataContainer(object):
         will copy the data in new_data into the data container.
         '''
         from cil.framework.labels import FillType
+        import warnings
         dimension = {}
 
         try:

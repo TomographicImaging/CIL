@@ -355,6 +355,7 @@ class DataContainer(object):
                 else:
                     r = rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32).astype(self.dtype)
                 self.array[index] = r
+            return self
 
         # else:
         #     raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
@@ -550,11 +551,13 @@ class DataContainer(object):
             whatswrong = {}
             if not self.check_dimensions(out):
                 whatswrong['out shape'] = out.shape
+                whatswrong['expected shape'] = self.shape
             if not out.dtype == self.dtype:
                 whatswrong['out dtype'] = out.dtype
+                whatswrong['expected dtype'] = self.dtype
             if not whatswrong == {}:
                 # report to the user what's wrong
-                msg = "Wrong size for data memory:\n"
+                msg = "Wrong size or type for data memory:\n"
                 for k,v in whatswrong.items():
                     msg += f"{k} {v}\n"
                 raise ValueError(msg)
@@ -565,11 +568,13 @@ class DataContainer(object):
                 whatswrong = {}
                 if not self.check_dimensions(x2):
                     whatswrong['x2 shape'] = x2.shape
+                    whatswrong['expected shape'] = self.shape
                 if not out.dtype == self.dtype:
                     whatswrong['x2 dtype'] = x2.dtype
+                    whatswrong['expected dtype'] = self.dtype
                 if not whatswrong == {}:
                     # report to the user what's wrong
-                    msg = "Wrong size for data memory:\n"
+                    msg = "Wrong size or type for data memory:\n"
                     for k,v in whatswrong.items():
                         msg += f"{k} {v}\n"
                     raise ValueError(msg)

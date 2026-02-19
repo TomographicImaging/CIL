@@ -364,6 +364,10 @@ class DataContainer(object):
                 indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
                 if tuple(indexed_dimension_labels) != array.dimension_labels:
                     raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
+            # slice dimensions parameters have been stripped out of kwargs,
+            # Put them back for fill to use.
+            for k,v in dimension.items():
+                kwargs[k] = v
             return self.fill(array.as_array(), **kwargs)
 
 
@@ -383,26 +387,24 @@ class DataContainer(object):
                         slices[i] = slice(v,v+1,None)
                         where.append(i)
 
-            if self.array[index].shape == array.shape:
-                # numpy.copyto(self.array[index], array.array)
-                try:
-                 
+            try:
+                # if it's an array try to fill, otherwise catch the error and try to set the item directly (e.g. for numbers)
+                if self.array[index].shape == array.shape:
+                    # numpy.copyto(self.array[index], array.array)     
                     array = cil_expand_dims(array, axis=where)
                     self.array.__setitem__(tuple(slices), array)
                     array = cil_squeeze(array, axis=where)
-
-                except AttributeError as ae:
-                    self.array.__setitem__(tuple(slices), array)
-                    
-                except TypeError as ae:
-                    self.array.__setitem__(tuple(slices), array)
-                    
-            else:
-                raise ValueError('Cannot fill with the provided array.' + \
+                else:
+                    raise ValueError('Cannot fill with the provided array.' + \
                                     'Expecting shape {0} got {1}'.format(
-                                    self.array[index].shape, array.shape))
-            
+                                    self.array[index].shape, array.shape))   
         
+            except AttributeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+                    
+            except TypeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+            
         if kwargs:
             warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 

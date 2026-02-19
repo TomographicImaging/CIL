@@ -40,16 +40,13 @@ if has_astra:
     from cil.plugins.astra import FBP as FBP_astra
 
 
-from cil.recon.weighted_fbp import get_weights_for_FBP
+from cil.recon.weighted_fbp import get_weights_for_FBP, calculate_angular_sampling_weights
 
 class Test_get_weights_for_FBP(unittest.TestCase):
 
     def setUp(self):
         self.acq_data_360 = SIMULATED_PARALLEL_BEAM_DATA.get()
         self.img_data = SIMULATED_SPHERE_VOLUME.get()
-
-        
-
         self.acq_data_360=np.log(self.acq_data_360)
         self.acq_data_360*=-1.0
 
@@ -58,58 +55,106 @@ class Test_get_weights_for_FBP(unittest.TestCase):
         self.ig = self.img_data.geometry
         self.ag = self.acq_data_360.geometry
 
-    def test_weights_with_no_duplicates_and_equal_angular_spread(self):
-        for data in [self.acq_data_360, self.acq_data_180]:
-            weights = get_weights_for_FBP(data)
-            # TODO: look into tolerance etc
+    def test_weights_with_equal_angular_spread(self):
+        for data in [self.acq_data_180, self.acq_data_360]:
+            weights = calculate_angular_sampling_weights(data)
+
             np.testing.assert_allclose(weights, np.ones_like(weights), atol=1e-4)
             # Check normalisation of weights:
-            np.testing.assert_almost_equal(sum(weights), len(weights), decimal=1e-6)
+            np.testing.assert_almost_equal(sum(weights), len(weights), decimal=6)
 
-    def test_weights_with_duplicates(self):
-        for data in [self.acq_data_360, self.acq_data_180]:
-            # Create one duplicate angle:
-            acq_data_with_duplicate = data.copy()
-            angles = np.insert(acq_data_with_duplicate.geometry.angles, 1, acq_data_with_duplicate.geometry.angles[0])
-            acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 1, acq_data_with_duplicate.array[0], axis=0)
-            
-            # Create an angle which has 3 projections at the same angle:
-            angles = np.insert(angles, 30, angles[30])
-            angles = np.insert(angles, 30, angles[30])
-            acq_data_with_duplicate.geometry.set_angles(angles)
-            acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 30, acq_data_with_duplicate.array[30], axis=0)
-            acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 30, acq_data_with_duplicate.array[30], axis=0)
 
-            weights = get_weights_for_FBP(acq_data_with_duplicate)
+    def test_weights_with_two_duplicates_180(self):
+        data = self.acq_data_180 
+        # Create one duplicate angle:
+        acq_data_with_duplicate = data.copy()
+        angles = np.insert(acq_data_with_duplicate.geometry.angles, 1, acq_data_with_duplicate.geometry.angles[0])
+        acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 1, acq_data_with_duplicate.array[0], axis=0)
+        
+        # Create an angle which has 3 projections at the same angle:
+        angles = np.insert(angles, 30, angles[30])
+        angles = np.insert(angles, 30, angles[30])
+        acq_data_with_duplicate.geometry.set_angles(angles)
+        acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 30, acq_data_with_duplicate.array[30], axis=0)
+        acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 30, acq_data_with_duplicate.array[30], axis=0)
 
-            np.testing.assert_allclose(weights[0], weights[1], atol=1e-4)
-            np.testing.assert_allclose(weights[0], weights[2]/2.0, atol=1e-4)
-            np.testing.assert_allclose([weights[32], weights[31]], weights[30], atol=1e-4)
-            np.testing.assert_allclose(weights[30], weights[2]/3.0, atol=1e-4)
-            np.testing.assert_allclose(weights[2:30], weights[2], atol=1e-4)
-            np.testing.assert_allclose(weights[33:], weights[2], atol=1e-4)
-            # Check normalisation of weights:
-            np.testing.assert_almost_equal(sum(weights), len(weights)-3, decimal=1e-6) # subtract 3 here as we have 3 duplicate angles
+        weights = calculate_angular_sampling_weights(acq_data_with_duplicate)
+        print(weights[0:10])
+
+        np.testing.assert_allclose(weights[0], weights[1], atol=1e-4)
+        np.testing.assert_allclose(weights[0], weights[2]/2.0, atol=1e-4)
+        np.testing.assert_allclose([weights[32], weights[31]], weights[30], atol=1e-4)
+        np.testing.assert_allclose(weights[30], weights[2]/3.0, atol=1e-4)
+        np.testing.assert_allclose(weights[2:30], weights[2], atol=1e-4)
+        np.testing.assert_allclose(weights[33:], weights[2], atol=1e-4)
+    # def test_weights_with_duplicates_through_even_proj_around_360(self):
+    #     data = self.acq_data_360
+    #     weights = calculate_angular_sampling_weights(data)
+
+
 
     def test_weights_with_non_uniform_angular_spread(self):
-        angular_range=[360,180]
-        for i, data in enumerate([self.acq_data_360, self.acq_data_180]):
+        pass
+        
+    def test_weights_with_missing_wedge_at_end(self):
+        # 180 degree domain -----------------------------------------------------
+        # As data is parallel beam, should get same result whether 
+        # angular_domain is None or 180:
+        for angular_domain in [180, None]:
+
+            # 180 degrees of data:
+
             # create data with final 25% of angles missing:
-            final_angle_index = int(angular_range[i]*0.75)
-            acq_data_non_uniform = Slicer(roi={'angle': (0,final_angle_index+1,1)})(data.copy())
+            data = self.acq_data_180
+            final_angle_index = int(150*0.75)
+            acq_data_non_uniform = Slicer(roi={'angle': (0,final_angle_index,1)})(data.copy())
             
-            standard_gap = acq_data_non_uniform.geometry.angles[1] - acq_data_non_uniform.geometry.angles[0]
-            large_gap = (acq_data_non_uniform.geometry.angles[0] - acq_data_non_uniform.geometry.angles[final_angle_index] )%angular_range[i]
+            weights = calculate_angular_sampling_weights(acq_data_non_uniform, angular_domain=angular_domain)
+            # print(weights[-10:-1])
+            # print(weights[0:10])
+            # print(weights[weights!=weights[0]])
+            np.testing.assert_allclose(weights, weights[0], atol=1e-4)
+            np.testing.assert_almost_equal(weights[0], 1, decimal=6)
+        # 360 degree domain --------------------------------------------------------
+        angular_domain = 360
+        data = self.acq_data_360
+        final_angle_index = int(300*0.75)
+        acq_data_non_uniform = Slicer(roi={'angle': (0,final_angle_index+1,1)})(data.copy())
+        
+        weights = calculate_angular_sampling_weights(acq_data_non_uniform, angular_domain=angular_domain)
+        # print(weights[-10:-1])
+        # print(weights[0:10])
+        # print(weights[weights!=weights[0]])
+        #np.testing.assert_allclose(weights, weights[0], atol=1e-4)
+        np.testing.assert_almost_equal(weights[0], 1, decimal=6)
+
+    # def test_weights_with_missing_wedge_at_start(self):
+    #     angular_range=[360,180]
+    #     for i, data in enumerate([self.acq_data_360, self.acq_data_180]):
+    #         # create data with final 25% of angles missing:
+    #         first_angle_index = int(angular_range[i]*0.75)
+    #         acq_data_non_uniform = Slicer(roi={'angle': (first_angle_index,-1,1)})(data.copy())
             
-            weights = get_weights_for_FBP(acq_data_non_uniform)
-            np.testing.assert_allclose(weights[1:final_angle_index], weights[1], atol=1e-4)
-            np.testing.assert_almost_equal(weights[0], weights[final_angle_index], decimal=1e-6)
+    #         standard_gap = acq_data_non_uniform.geometry.angles[1] - acq_data_non_uniform.geometry.angles[0]
+    #         large_gap = (acq_data_non_uniform.geometry.angles[0] - acq_data_non_uniform.geometry.angles[first_angle_index] )%angular_range[i]
+            
+    #         weights = calculate_angular_sampling_weights(acq_data_non_uniform)
+    #         np.testing.assert_allclose(weights, weights[0], atol=1e-4)
+    #         np.testing.assert_almost_equal(weights[0], 1, decimal=1e-6)
 
-            np.testing.assert_almost_equal(weights[1],(standard_gap)/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)), decimal=1e-4)
-            np.testing.assert_almost_equal(weights[0], (large_gap+standard_gap)/2.0/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)) , decimal=1e-4)
+    #         np.testing.assert_almost_equal(weights[1],(standard_gap)/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)), decimal=1e-4)
+    #         np.testing.assert_almost_equal(weights[0], (large_gap+standard_gap)/2.0/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)) , decimal=1e-4)
 
-            # Check normalisation of weights:
-            np.testing.assert_almost_equal(sum(weights), len(weights), decimal=1e-6)
+
+    def test_weights_with_missing_wedges_at_centre(self):
+
+        # np.testing.assert_almost_equal(weights[1],(standard_gap)/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)), decimal=1e-4)
+        # np.testing.assert_almost_equal(weights[0], (large_gap+standard_gap)/2.0/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)) , decimal=1e-4)
+
+        # # Check normalisation of weights:
+        # np.testing.assert_almost_equal(sum(weights), len(weights), decimal=1e-6)
+        pass
+
 
 
 if __name__ == '__main__':

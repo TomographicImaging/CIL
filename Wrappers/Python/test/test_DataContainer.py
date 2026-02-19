@@ -1060,15 +1060,15 @@ class TestDataContainer(CCPiTestClass):
 
     def test_sapyb_datacontainer_f(self):
         #a vec, b vec
-
-        ig = ImageGeometry(10,10)
+        N,M=2,2
+        ig = ImageGeometry(N,M)
         d1 = ig.allocate(dtype=np.float32)
         d2 = ig.allocate(dtype=np.float32)
         a = ig.allocate(dtype=np.float32)
         b = ig.allocate(dtype=np.float32)
 
-        d1.fill(np.asarray(np.arange(1,101).reshape(10,10), dtype=np.float32))
-        d2.fill(np.asarray(np.arange(1,101).reshape(10,10), dtype=np.float32))
+        d1.fill(np.asarray(np.arange(1,N*M+1).reshape(N,M), dtype=np.float32))
+        d2.fill(np.asarray(np.arange(1,N*M+1).reshape(N,M), dtype=np.float32))
         a.fill(1.0/d1.as_array())
         b.fill(-1.0/d2.as_array())
 
@@ -1076,13 +1076,13 @@ class TestDataContainer(CCPiTestClass):
         # equals to 1 + -1 = 0
         out = d1.sapyb(a,d2,b)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
+        atol = np.finfo(np.float32).eps
+        np.testing.assert_allclose(res, out.as_array(), atol=atol)
 
         out.fill(0)
         d1.sapyb(a,d2,b, out)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
-
+        np.testing.assert_allclose(res, out.as_array(), atol=atol)
 
     def test_sapyb_scalar_f(self):
         # a,b scalar

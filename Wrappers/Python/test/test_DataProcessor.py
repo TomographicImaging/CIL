@@ -459,7 +459,7 @@ class TestBinner(unittest.TestCase):
 
         self.assertEqual(ig_gold, ig_out, msg="Binning image geometry with offset roi failed")
 
-
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_bin_array_consistency(self):
 
         ig = ImageGeometry(64,32,16,channels=8)
@@ -496,7 +496,8 @@ class TestBinner(unittest.TestCase):
 
         numpy.testing.assert_allclose(binned_by_hand,binned_arr_numpy,atol=1e-6)
         numpy.testing.assert_allclose(binned_by_hand,binned_arr_acc,atol=1e-6)
-
+    
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_bin_image_data(self):
         """
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
@@ -545,6 +546,7 @@ class TestBinner(unittest.TestCase):
 
 
 
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_bin_acquisition_data(self):
         """
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
@@ -590,7 +592,7 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(binned_data.geometry, binned_by_hand.geometry)
 
 
-
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_process_acquisition(self):
 
         arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
@@ -624,7 +626,7 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
-
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_process_image(self):
 
         arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
@@ -658,7 +660,7 @@ class TestBinner(unittest.TestCase):
         self.assertEqual(data_out.geometry, geometry_gold,
         msg="Binner failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
-
+    @unittest.skipUnless(has_ipp, "Requires IPP libraries")
     def test_process_data_container(self):
 
         arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)

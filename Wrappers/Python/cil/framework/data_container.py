@@ -298,10 +298,6 @@ class DataContainer(object):
         else:
             index = (slice(None),) * self.array.ndim
 
-        if dimension_labels is not None:
-            indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
-            if tuple(indexed_dimension_labels) != array.dimension_labels:
-                raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
 
         if id(array) == id(self.array):
             return
@@ -363,6 +359,10 @@ class DataContainer(object):
         # else:
         #     raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         if issubclass(array.__class__ , DataContainer):
+            if dimension_labels is not None:
+                indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
+                if tuple(indexed_dimension_labels) != array.dimension_labels:
+                    raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
             return self.fill(array.as_array(), **kwargs)
 
 
@@ -524,7 +524,7 @@ class DataContainer(object):
     ## binary operations
 
     def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):
-        out = kwargs.get('out', None)
+        out = kwargs.pop('out', None)
 
         if out is None:
             if isinstance(x2, Number):
@@ -543,6 +543,9 @@ class DataContainer(object):
                    geometry= None if self.geometry is None else self.geometry.copy(),
                    suppress_warning=True)
         else:
+            # assuming it is a CIL DataContainer we extract the actual data structure
+            outarr = out.as_array() 
+            kwargs['out'] = outarr
             # check the size and dimension of out
             whatswrong = {}
             if not self.check_dimensions(out):
@@ -557,7 +560,7 @@ class DataContainer(object):
                 raise ValueError(msg)
             
             if isinstance(x2, Number):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
+                pwop(self.as_array() , x2 , *args, **kwargs )
             else:
                 whatswrong = {}
                 if not self.check_dimensions(x2):
@@ -571,10 +574,12 @@ class DataContainer(object):
                         msg += f"{k} {v}\n"
                     raise ValueError(msg)
                 if issubclass(x2.__class__ , DataContainer):
-                    out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+                    pwop(self.as_array() , x2.as_array() , *args, **kwargs )
                 else:
-                    out = pwop(self.as_array() , x2 , *args, **kwargs )
-                return out
+                    pwop(self.as_array() , x2 , *args, **kwargs )
+
+            out.fill(outarr)
+            return out
 
     def add(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \

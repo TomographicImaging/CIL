@@ -552,48 +552,13 @@ class DataContainer(object):
             kwargs['out'] = outarr
                         
             if isinstance(x2, Number):
-                try:
                     pwop(self.as_array() , x2 , *args, **kwargs )
-                except Exception as bknerr:
-                    # check the size and dimension of out
-                    whatswrong = {}
-                    msg = ""
-                    if not self.check_dimensions(out):
-                        whatswrong['out shape'] = out.shape
-                        whatswrong['expected shape'] = self.shape
-                    if not out.dtype == self.dtype:
-                        whatswrong['out dtype'] = out.dtype
-                        whatswrong['expected dtype'] = self.dtype
-                    if not whatswrong == {}:
-                        # report to the user what's wrong
-                        msg = "Wrong size or type for data memory:\n"
-                        for k,v in whatswrong.items():
-                            msg += f"{k} {v}\n"
-                        print (msg)
-                    # report the error from the backend plus the error from the checks
-                    raise
             else:
-                try:
-                    if issubclass(x2.__class__ , DataContainer):
-                        pwop(self.as_array() , x2.as_array() , *args, **kwargs )
-                    else:
-                        pwop(self.as_array() , x2 , *args, **kwargs )
-                except Exception as bknerr:
-                    whatswrong = {}
-                    if not self.check_dimensions(x2):
-                        whatswrong['x2 shape'] = x2.shape
-                        whatswrong['expected shape'] = self.shape
-                    if not out.dtype == self.dtype:
-                        whatswrong['x2 dtype'] = x2.dtype
-                        whatswrong['expected dtype'] = self.dtype
-                    if not whatswrong == {}:
-                        # report to the user what's wrong
-                        msg = "Wrong size or type for data memory:\n"
-                        for k,v in whatswrong.items():
-                            msg += f"{k} {v}\n"
-                        print(msg)
-                    # report the error from the backend plus the error from the checks
-                    raise
+                if issubclass(x2.__class__ , DataContainer):
+                    pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+                else:
+                    pwop(self.as_array() , x2 , *args, **kwargs )
+                
             out.fill(outarr)
             return out
 

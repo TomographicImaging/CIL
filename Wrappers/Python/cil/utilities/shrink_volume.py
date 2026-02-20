@@ -1,90 +1,133 @@
+#  Copyright 2026 United Kingdom Research and Innovation
+#  Copyright 2026 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import label
-from skimage.filters import threshold_otsu, threshold_multiotsu
+from skimage.filters import threshold_multiotsu
+import importlib
+from cil.framework.labels import AcquisitionType
+
 
 from cil.processors import Binner, Slicer
-from cil.plugins.astra.processors import FBP
+
 
 import logging
 log = logging.getLogger(__name__)
 class VolumeShrinker(object):
     """
-    Shrinks the reconstruction volume based on a supplied volume size or 
-    automatic detection of the region of interest using Otsu thresholding and 
-    connected components.   
+    Shrinks the reconstruction volume from a dataset based on supplied volume 
+    limits, thresholding or automatic detection of the region of interest using 
+    Otsu thresholding.
+    
+    Parameters
+    ----------
+    data: AcquisitionData
+        The dataset to create a reduced reconstruction volume from.
+
+    recon_backend : {'tigre', 'astra'}
+        The backend to use for the reconstruction
+
     """
 
-    def run(self, data, auto=True, threshold='Otsu', buffer=None, mask_radius=None, manual_limits=None):
+    _supported_backends = ['astra', 'tigre']
+
+    def __init__(self, data, recon_backend='tigre'):
+         
+        self.data = data
+        self.recon_backend = recon_backend
+        self.recon_method = self._configure_recon(recon_backend)
+
+    def run(self, limits=None, preview=True, method='manual', **kwargs):
         """
         Parameters
         ----------
-        auto : bool, optional
-            If True, automatically detect and crop the reconstruction volume
-            If False, use manual_limits
+        limits : dict, optional
+            ImageGeometry limits {'axis_name1':(min, max), 'axis_name2':(min, max)}
+            The `key` being the ImageGeometry axis name and `value` a tuple containing 
+            the min and max limits.
+            Default None, uses the full extent of the data
 
-        threshold: string or float, optional
-            If automatically detecting the limits, specify the intensity threshold
-            between sample and background. By default use an Otsu filter. 
+        preview: bool, optional
+            If True, plots the maximum values from a binned reconstruction in each 
+            direction to check the ImageGeometry contains the full volume. 
+            Default is False.
+        
+        method : string, optional
+            If 'manual', use manual_limits
+            If 'threshold' crop the reconstruction volume based on a threshold
+            value between sample and background. Pass threshold as a kwarg.
+            If 'otsu', automatically detect and crop the reconstruction volume.
+            Default is 'manual'
+
+        **kwargs:
+        threshold: float, optional
+            If using 'threshold' method, specify the intensity threshold
+            between sample and background. Default is None.
 
         buffer: float, optional
-            Add a buffer around the automatically detected limits, expressed as 
-            a percentage of the axis size.
+            Buffer in pixels around the automatically detected limits. 
+            Default is None, no buffer added.
 
         mask_radius: float, optional
             Radius of circular mask to apply on the reconstructed volume, before
             automatically cropping the reconstruction volume. Default is None.
 
-        manual_limits : dict, optional
-            The limits {'axis_name1':(min, max), 'axis_name2':(min, max)}
-            The `key` being the axis name to apply the processor to, 
-            the `value` holding a tuple containing the min and max limits
-            or None, to specify no limit
-            Manual limits over-ride automatically detected limits
+        otsu_classes: int, optional
+            Number of material classes to use when automatically detecting the 
+            reconstruction volume using Otsu thresholding method. Default is 2.
+
+        min_component_size: int, optional
+            Minimum size in pixels of connected components to keep when automatically 
+            cropping the reconstruction volume. Default is None.
         """
 
-        binning = min(int(np.ceil(data.geometry.config.panel.num_pixels[0] / 128)),16)
-        angle_binning = np.ceil(data.get_dimension_size('angle')/(data.get_dimension_size('horizontal')*(np.pi/2)))
-        roi = {
-                'horizontal': (None, None, binning),
-                'vertical': (None, None, binning),
-                'angle' : (None, None, angle_binning)
-            }
-        data_binned = Binner(roi)(data)
-
-        ag = data_binned.geometry
-        ig = ag.get_ImageGeometry()
-
-        fbp = FBP(ig, ag)
-        recon = fbp(data_binned)
-        if mask_radius is not None:
-            recon.apply_circular_mask(mask_radius)
-            
-        if auto:
-            bounds = self.reduce_reconstruction_volume(recon, binning, threshold, buffer)
-        else:
+        ig = self.data.geometry.get_ImageGeometry()
+        if method.lower() == 'manual':
             bounds = {}
-            for dim in recon.dimension_labels:
-                bounds[dim] = (0, recon.get_dimension_size(dim)*binning)
-
-            if manual_limits is not None:    
-                for dim, v in manual_limits.items():
-                    if dim in recon.dimension_labels:
+            for dim in ig.dimension_labels:
+                bounds[dim] = (0, ig.shape[ig.dimension_labels.index(dim)])
+            if limits is not None:
+                for dim, v in limits.items():
+                    if dim in ig.dimension_labels:
                         if v is None:
-                            v = (0, recon.get_dimension_size(dim)*binning)
+                            v = (0, ig.shape[ig.dimension_labels.index(dim)])
                         elif v[0] is None:
                             v[0] = 0
                         elif v[1] is None:
-                            v[1] = recon.get_dimension_size(dim)*binning
+                            v[1] = ig.shape[ig.dimension_labels.index(dim)]
                         bounds[dim] = v
                     else:
-                        raise ValueError("dimension {} not recognised, must be one of {}".format(dim, recon.dimension_labels))
-            else:
-                bounds = None
+                        raise ValueError("dimension {} not recognised, must be one of {}".format(dim, ig.dimension_labels))
 
-        self.plot_with_bounds(recon, bounds, binning)
+        elif method.lower() in ['threshold', 'otsu']:
+            mask_radius = kwargs.pop('mask_radius', None)
+            recon, binning = self.get_recon(mask_radius=mask_radius)
+            bounds = self.reduce_reconstruction_volume(recon, binning, method, kwargs)
+
+        if preview:
+            if method.lower() == 'manual':
+                mask_radius = kwargs.pop('mask_radius', None)
+                recon, binning = self.get_recon(mask_radius=mask_radius)
+
+            self.plot_with_bounds(recon, bounds, binning)
         
-        return self.update_ig(data.geometry.get_ImageGeometry(), bounds)
+        return self.update_ig(self.data.geometry.get_ImageGeometry(), bounds)
 
     def update_ig(self, ig_unbinned, bounds):
         if bounds is None:
@@ -94,6 +137,27 @@ class VolumeShrinker(object):
                     'horizontal_y':(bounds['horizontal_y'][0], bounds['horizontal_y'][1], 1),
                     'vertical':(bounds['vertical'][0], bounds['vertical'][1], 1)})(ig_unbinned)
         return ig
+    
+    def get_recon(self, mask_radius):
+        binning = min(int(np.ceil(self.data.geometry.config.panel.num_pixels[0] / 128)),16)
+        angle_binning = np.ceil(self.data.get_dimension_size('angle')/(self.data.get_dimension_size('horizontal')*(np.pi/2)))
+        roi = {
+                'horizontal': (None, None, binning),
+                'vertical': (None, None, binning),
+                'angle' : (None, None, angle_binning)
+            }
+        data_binned = Binner(roi)(self.data)
+
+        ag = data_binned.geometry
+        ig = ag.get_ImageGeometry()
+
+        fbp = self.recon_method(ig, ag)
+        recon = fbp(data_binned)
+        
+        if mask_radius is not None:
+            recon.apply_circular_mask(mask_radius)
+
+        return recon, binning
 
     def plot_with_bounds(self, recon, bounds, binning):
         fig, axs = plt.subplots(nrows=1, ncols=recon.ndim, figsize=(14, 6))
@@ -123,32 +187,65 @@ class VolumeShrinker(object):
             ax.set_ylabel(y_dim)
             ax.set_title(f"Maximum values in direction: {dim}")
 
-    def reduce_reconstruction_volume(self, recon, binning, threshold, buffer):
-            
+    def reduce_reconstruction_volume(self, recon, binning, method, kwargs):
+        threshold = kwargs.pop('threshold', None)
+        buffer = kwargs.pop('buffer', None)
+        min_component_size = kwargs.pop('min_component_size', None)
+        otsu_classes = kwargs.pop('otsu_classes', 2)   
+
         dims = recon.dimension_labels
         all_bounds = {dim: [] for dim in dims}
 
         for dim in dims:
             arr = recon.max(axis=dim).array
             
-            mask, large_components_mask = self.threshold_large_components(arr, threshold)
+            if method.lower() == 'threshold':
+                mask = arr > threshold
+
+            elif method.lower() == 'otsu':
+                n_bins = 256
+                threshold = threshold_multiotsu(arr[arr>0], classes=otsu_classes, nbins=n_bins)
+                threshold = threshold[0]
+                mask = arr > threshold
+
+            if min_component_size is not None:
+                mask = self.threshold_large_components(mask, min_component_size)
 
             x_indices = np.where(np.any(mask, axis=0))[0]
             y_indices = np.where(np.any(mask, axis=1))[0]
             x_min, x_max = x_indices[0], x_indices[-1]
             y_min, y_max = y_indices[0], y_indices[-1]
 
+            if log.isEnabledFor(logging.DEBUG):
+                fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(8, 2.5))
+
+                axes[0].imshow(arr, cmap=plt.cm.gray)
+                axes[0].set_title('Original')
+
+                axes[1].hist(arr.ravel(), bins=100)
+                axes[1].set_title('Histogram')
+                axes[1].axvline(threshold, color='r')
+
+                axes[2].imshow(mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
+                axes[2].set_title('Thresholded')
+
+                axes[2].plot([x_min, x_max], [y_min, y_min], '--r')
+                axes[2].plot([x_min, x_max], [y_max, y_max], '--r')
+                axes[2].plot([x_min, x_min], [y_min, y_max], '--r')
+                axes[2].plot([x_max, x_max], [y_min, y_max], '--r')
+                plt.tight_layout()
+
             axis = recon.get_dimension_axis(dim)
             other_axes = [j for j in range(recon.ndim) if j != axis]
 
             if buffer is not None:
                 y_full = recon.get_dimension_size(dims[other_axes[0]])
-                y_min_buffer = np.max([0, (y_min-y_full//buffer)])
-                y_max_buffer = np.min([y_full, y_max+(y_full//buffer)])
+                y_min_buffer = np.max([0, y_min-(buffer//binning)])
+                y_max_buffer = np.min([y_full, y_max+(buffer//binning)])
 
                 x_full = recon.get_dimension_size(dims[other_axes[1]])
-                x_min_buffer = np.max([0, (x_min-x_full//buffer)])
-                x_max_buffer = np.min([x_full, x_max+(x_full//buffer)])
+                x_min_buffer = np.max([0, x_min-(buffer//binning)])
+                x_max_buffer = np.min([x_full, x_max+(buffer//binning)])
 
                 all_bounds[dims[other_axes[0]]].append((y_min_buffer, y_max_buffer))
                 all_bounds[dims[other_axes[1]]].append((x_min_buffer, x_max_buffer))
@@ -171,66 +268,24 @@ class VolumeShrinker(object):
             
         return bounds
         
-    def threshold_large_components(self, arr, threshold):
-        
-
-        if isinstance(threshold, (int, float)):
-            thresh = threshold
-        elif isinstance(threshold, str) and threshold.lower() == 'otsu':
-            # thresh = threshold_otsu(arr[arr > 0])
-            classes = 4
-            n_bins = 256
-            thresh = threshold_multiotsu(arr[arr>0], classes=classes, nbins=n_bins)
-            thresh = thresh[0]
-        else:
-            raise ValueError(f"Threshold {threshold} not recognised, must be a number or 'Otsu'")
-
-        mask = arr > thresh
-
-        labeled_mask, num_features = label(mask)
+    def threshold_large_components(self, mask, min_component_size):
+        labeled_mask, _ = label(mask)
         component_sizes = np.bincount(labeled_mask.ravel())
-        min_size = 10
+        min_component_size = 10
 
-        large_labels = np.where(component_sizes > min_size)[0]
+        large_labels = np.where(component_sizes > min_component_size)[0]
         large_labels = large_labels[large_labels != 0]  
         large_components_mask = np.isin(labeled_mask, large_labels)
 
-        if log.isEnabledFor(logging.DEBUG):
-            fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(8, 2.5))
+        return large_components_mask
+    
+    def _configure_recon(self, backend='tigre'):
+        """
+        Configures the recon for the right engine. Checks the geometry type and data order.
+        """
+        if backend not in self._supported_backends:
+            raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
 
-            axes[0].imshow(arr, cmap=plt.cm.gray)
-            axes[0].set_title('Original')
+        module = importlib.import_module(f'cil.plugins.{backend}')
 
-            axes[1].hist(arr.ravel(), bins=100)
-            axes[1].set_title('Histogram')
-            axes[1].axvline(thresh, color='r')
-
-            axes[2].imshow(mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
-            axes[2].set_title('Thresholded')
-
-            x_indices = np.where(np.any(mask, axis=0))[0]
-            y_indices = np.where(np.any(mask, axis=1))[0]
-            x_min, x_max = x_indices[0], x_indices[-1]
-            y_min, y_max = y_indices[0], y_indices[-1]
-
-            axes[2].plot([x_min, x_max], [y_min, y_min], '--r')
-            axes[2].plot([x_min, x_max], [y_max, y_max], '--r')
-            axes[2].plot([x_min, x_min], [y_min, y_max], '--r')
-            axes[2].plot([x_max, x_max], [y_min, y_max], '--r')
-
-            axes[3].imshow(large_components_mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
-            axes[3].set_title('Large components')
-
-            x_indices = np.where(np.any(large_components_mask, axis=0))[0]
-            y_indices = np.where(np.any(large_components_mask, axis=1))[0]
-            x_min, x_max = x_indices[0], x_indices[-1]
-            y_min, y_max = y_indices[0], y_indices[-1]
-
-            axes[3].plot([x_min, x_max], [y_min, y_min], '--r')
-            axes[3].plot([x_min, x_max], [y_max, y_max], '--r')
-            axes[3].plot([x_min, x_min], [y_min, y_max], '--r')
-            axes[3].plot([x_max, x_max], [y_min, y_max], '--r')
-
-            plt.tight_layout()
-
-        return mask, large_components_mask
+        return module.FBP

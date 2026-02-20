@@ -100,14 +100,14 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     sorted_indices = np.argsort(angles % angular_domain)
     ordered_mod_angles = angles[sorted_indices] % angular_domain
 
-    num_angles = len(ordered_mod_angles)
-    weights = np.zeros(num_angles)
+    num_proj = len(ordered_mod_angles)
+    weights = np.zeros(num_proj)
     
 
     # create tolerance for two angles being equal:
     gaps=[]
-    for i in range(num_angles):
-        prev_idx = (i - 1) % num_angles
+    for i in range(num_proj):
+        prev_idx = (i - 1) % num_proj
         gap = (ordered_mod_angles[i]-ordered_mod_angles[prev_idx]) % angular_domain
         gaps.append(gap)
 
@@ -119,7 +119,7 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     # If the user has not set the max_gap:
 
     if max_angular_span is None:
-        gaps_no_zeros = gaps[~np.isclose(gaps, 0)]
+        gaps_no_zeros = gaps[~np.isclose(gaps, 0, atol=1e-4)]
         # We need to identify whether there are any missing wedges in the data.
         # we identify any gap greater than mean_gap *2 to be a wedge
 
@@ -140,72 +140,54 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     # if np.allclose(gaps, mean_gap, atol=angular_tolerance):
     #     return np.ones_like(angles)   
 
-    num_proj_at_same_angle = 1
+    num_remaining_proj_at_current_angle = 1
+    total_num_proj_at_current_angle=1
     total_duplicates = 0
 
-    for i in range(num_angles):
-
-        # skips if current angle same as prev angle as has already been assigned a weight:
-        if num_proj_at_same_angle > 1:
-            num_proj_at_same_angle -= 1
-            continue
-
-        prev_idx = (i - 1) % num_angles
-        next_idx = (i + 1) % num_angles
-
+    for i in range(num_proj):
+        prev_idx = (i - 1 - (total_num_proj_at_current_angle-num_remaining_proj_at_current_angle)) % num_proj
+        next_idx = (i + num_remaining_proj_at_current_angle) % num_proj
+        current_angle = ordered_mod_angles[i]
         prev_angle = ordered_mod_angles[prev_idx]
         next_angle = ordered_mod_angles[next_idx]
-        current_angle = ordered_mod_angles[i]
-        # print("Current angle, ", current_angle)
 
-       
-        if np.isclose(next_angle, current_angle, atol=angular_tolerance):
-            print(next_angle, current_angle)
-            while np.isclose(next_angle, current_angle, atol=angular_tolerance):
-                next_idx = (next_idx + 1) % num_angles
-                next_angle = ordered_mod_angles[next_idx]
-                num_proj_at_same_angle += 1
-            print("Num proj at same angle: ", num_proj_at_same_angle)
-            for j in range(num_proj_at_same_angle):
-                current_angle = ordered_mod_angles[i + j]
-                print("Next angle: ", "prev angle: ")
-                angle_coverage = ((next_angle - prev_angle) % angular_domain) / 2.0
-                print("Angle coverage: ", angle_coverage)
-                if angle_coverage > max_angular_span:
-                    if wedge_behaviour == 'forward/back':
-                        forward = (next_angle - current_angle) % angular_domain
-                        backward = (current_angle - prev_angle) % angular_domain
-                        print("Forward: ", forward, "Backward: ", backward)
-                        if np.isclose(forward, backward, atol=angular_tolerance):
-                            angle_coverage = max_angular_span
-                        else:
-                            angle_coverage = min(forward, backward)
+        if total_num_proj_at_current_angle == 1: # This means we haven't checked if there are any projections at this same angle:
+            if np.isclose(next_angle, current_angle, atol=angular_tolerance):
+                while np.isclose(next_angle, current_angle, atol=angular_tolerance):
+                    next_idx = (next_idx + 1) % num_proj
+                    next_angle = ordered_mod_angles[next_idx]
+                    num_remaining_proj_at_current_angle += 1
+                total_num_proj_at_current_angle = num_remaining_proj_at_current_angle
+                total_duplicates+=total_num_proj_at_current_angle-1
+
+        angle_coverage = ((next_angle - prev_angle) % angular_domain) / 2.0
+        if angle_coverage > max_angular_span:
+            if wedge_behaviour == 'forward/back':
+                forward = (next_angle - current_angle) % angular_domain
+                backward = (current_angle - prev_angle) % angular_domain
+                if np.isclose(forward, backward, atol=angular_tolerance):
+                    angle_coverage = max_angular_span
                 else:
-                    angle_coverage = default_gap
-                print("Current angle ", ordered_mod_angles[i+j])
-                print("Weight: ", angle_coverage/ num_proj_at_same_angle)
-                weights[i+j] = angle_coverage/ num_proj_at_same_angle
-            total_duplicates+=num_proj_at_same_angle-1
-
-        else:
-            angle_coverage = ((next_angle - prev_angle) % angular_domain) / 2.0
-            print("Angle coverage: ", angle_coverage)
-            if angle_coverage > max_angular_span:
-                if wedge_behaviour == 'forward/back':
-                    forward = (next_angle - current_angle) % angular_domain
-                    backward = (current_angle - prev_angle) % angular_domain
-                    print("Forward: ", forward, "Backward: ", backward)
-                    if np.isclose(forward, backward, atol=angular_tolerance):
-                        angle_coverage = max_angular_span
-                    else:
-                        angle_coverage = min(forward, backward)
+                    angle_coverage = min(forward, backward)
             else:
                 angle_coverage = default_gap
-            # print("Weight: ", angle_coverage)
-            weights[i] = angle_coverage
+
+        weights[i] = angle_coverage/ total_num_proj_at_current_angle
+
+        if total_num_proj_at_current_angle > 1:
+            # if we have additional projections at the same angle that we already knew of,
+            # reduce the counter of remaining projections at this angle for next loop:
+            num_remaining_proj_at_current_angle-=1
+            if num_remaining_proj_at_current_angle == 0:
+                # This means we have processed all of the duplicates in this block. Reset counters for duplicates:
+                total_num_proj_at_current_angle = 1
+                num_remaining_proj_at_current_angle = 1
+
+
+
 
     # Reorder weights back to original projection order
-    original_order_weights = np.zeros(num_angles)
+    original_order_weights = np.zeros(num_proj)
     for i, idx in enumerate(sorted_indices):
         original_order_weights[idx] = weights[i]
 

@@ -550,42 +550,50 @@ class DataContainer(object):
             # assuming it is a CIL DataContainer we extract the actual data structure
             outarr = out.as_array() 
             kwargs['out'] = outarr
-            # check the size and dimension of out
-            whatswrong = {}
-            if not self.check_dimensions(out):
-                whatswrong['out shape'] = out.shape
-                whatswrong['expected shape'] = self.shape
-            if not out.dtype == self.dtype:
-                whatswrong['out dtype'] = out.dtype
-                whatswrong['expected dtype'] = self.dtype
-            if not whatswrong == {}:
-                # report to the user what's wrong
-                msg = "Wrong size or type for data memory:\n"
-                for k,v in whatswrong.items():
-                    msg += f"{k} {v}\n"
-                raise ValueError(msg)
-            
+                        
             if isinstance(x2, Number):
-                pwop(self.as_array() , x2 , *args, **kwargs )
-            else:
-                whatswrong = {}
-                if not self.check_dimensions(x2):
-                    whatswrong['x2 shape'] = x2.shape
-                    whatswrong['expected shape'] = self.shape
-                if not out.dtype == self.dtype:
-                    whatswrong['x2 dtype'] = x2.dtype
-                    whatswrong['expected dtype'] = self.dtype
-                if not whatswrong == {}:
-                    # report to the user what's wrong
-                    msg = "Wrong size or type for data memory:\n"
-                    for k,v in whatswrong.items():
-                        msg += f"{k} {v}\n"
-                    raise ValueError(msg)
-                if issubclass(x2.__class__ , DataContainer):
-                    pwop(self.as_array() , x2.as_array() , *args, **kwargs )
-                else:
+                try:
                     pwop(self.as_array() , x2 , *args, **kwargs )
-
+                except Exception as bknerr:
+                    # check the size and dimension of out
+                    whatswrong = {}
+                    msg = ""
+                    if not self.check_dimensions(out):
+                        whatswrong['out shape'] = out.shape
+                        whatswrong['expected shape'] = self.shape
+                    if not out.dtype == self.dtype:
+                        whatswrong['out dtype'] = out.dtype
+                        whatswrong['expected dtype'] = self.dtype
+                    if not whatswrong == {}:
+                        # report to the user what's wrong
+                        msg = "Wrong size or type for data memory:\n"
+                        for k,v in whatswrong.items():
+                            msg += f"{k} {v}\n"
+                        print (msg)
+                    # report the error from the backend plus the error from the checks
+                    raise
+            else:
+                try:
+                    if issubclass(x2.__class__ , DataContainer):
+                        pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+                    else:
+                        pwop(self.as_array() , x2 , *args, **kwargs )
+                except Exception as bknerr:
+                    whatswrong = {}
+                    if not self.check_dimensions(x2):
+                        whatswrong['x2 shape'] = x2.shape
+                        whatswrong['expected shape'] = self.shape
+                    if not out.dtype == self.dtype:
+                        whatswrong['x2 dtype'] = x2.dtype
+                        whatswrong['expected dtype'] = self.dtype
+                    if not whatswrong == {}:
+                        # report to the user what's wrong
+                        msg = "Wrong size or type for data memory:\n"
+                        for k,v in whatswrong.items():
+                            msg += f"{k} {v}\n"
+                        print(msg)
+                    # report the error from the backend plus the error from the checks
+                    raise
             out.fill(outarr)
             return out
 
@@ -670,9 +678,9 @@ class DataContainer(object):
                 self._axpby(a, b, y, out, out.dtype, num_threads)
                 return out
             except RuntimeError as rte:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+                warnings.warn("RuntimeError in sapyb, defaulting to Python due to: {}".format(rte))
             except TypeError as te:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+                warnings.warn("TypeError in sapyb, defaulting to Python due to: {}".format(te))
             finally:
                 pass
 

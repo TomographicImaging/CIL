@@ -525,6 +525,8 @@ class FBP(GenericFilteredBackProjection):
         ag = acquisition_geometry
         scaling = 0.25 * (2 * np.pi/ ag.num_projections) / ag.pixel_size_h
 
+        #scaling = 0.25 * (2 * np.pi/ 300) / ag.pixel_size_h
+
         if self.backend=='astra':
             scaling /=  ag.pixel_size_v
         self._weights = np.full((ag.pixel_num_v,ag.pixel_num_h),scaling,dtype=np.float32)

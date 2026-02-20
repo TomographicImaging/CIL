@@ -129,8 +129,6 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     else:
         default_gap = max_angular_span
 
-
-    print("Max angular span: ", max_angular_span)
     # TODO: decide what should be
     angular_tolerance = 0.01 * max_angular_span / 2
 
@@ -184,48 +182,25 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
                 num_remaining_proj_at_current_angle = 1
 
 
-
-
     # Reorder weights back to original projection order
     original_order_weights = np.zeros(num_proj)
     for i, idx in enumerate(sorted_indices):
         original_order_weights[idx] = weights[i]
-
-    print("Before normalization:")
-    print("Total of weights: ", np.sum(original_order_weights))
-    print(f"Weights shape: {original_order_weights.shape}")
-    print(f"Min weight: {original_order_weights.min():.4f}, Max weight: {original_order_weights.max():.4f}")
-    print(f"Mean weight: {original_order_weights.mean():.4f}")
 
     true_angular_range = np.sum(weights) # this may not be the same as the max angular range if we have gaps
     # Normalize weights:
     num_unique_angles = len(angles)-total_duplicates
     original_order_weights = original_order_weights  / (np.sum(weights)/len(weights))
     # / (true_angular_range/num_unique_angles) # used to do this
-    print("After normalization:")
-    print("Total of weights: ", np.sum(original_order_weights))
-    print(f"Weights shape: {original_order_weights.shape}")
-    print(f"Min weight: {original_order_weights.min():.4f}, Max weight: {original_order_weights.max():.4f}")
-    print(f"Mean weight: {original_order_weights.mean():.4f}")
-
-
-    print("Num unique angles: ", num_unique_angles)
-    print("Num projections: ", num_proj)
-    print("True angular range:", true_angular_range, np.radians(true_angular_range))
-
 
     return original_order_weights
 
-def get_angular_coverage(self):
-    gaps_no_zeros
 
 def normalise_weights_for_FBP(weights):
 
     normalised_weights = weights.copy()
     normalised_weights = normalised_weights / np.sum(normalised_weights) * len(normalised_weights)
     return normalised_weights
-
-
 
 
 

@@ -58,13 +58,13 @@ class Test_get_weights_for_FBP(unittest.TestCase):
     def test_weights_with_equal_angular_spread(self):
         for data in [self.acq_data_180, self.acq_data_360]:
             weights = calculate_angular_sampling_weights(data)
-
             np.testing.assert_allclose(weights, np.ones_like(weights), atol=1e-4)
+            
             # Check normalisation of weights:
             np.testing.assert_almost_equal(sum(weights), len(weights), decimal=6)
 
 
-    def test_weights_with_two_duplicates_180(self):
+    def test_weights_with_two_sets_of_duplicates_180(self):
         data = self.acq_data_180 
         # Create one duplicate angle:
         acq_data_with_duplicate = data.copy()
@@ -79,7 +79,6 @@ class Test_get_weights_for_FBP(unittest.TestCase):
         acq_data_with_duplicate.array = np.insert(acq_data_with_duplicate.array, 30, acq_data_with_duplicate.array[30], axis=0)
 
         weights = calculate_angular_sampling_weights(acq_data_with_duplicate)
-        print(weights[0:10])
 
         np.testing.assert_allclose(weights[0], weights[1], atol=1e-4)
         np.testing.assert_allclose(weights[0], weights[2]/2.0, atol=1e-4)
@@ -93,8 +92,14 @@ class Test_get_weights_for_FBP(unittest.TestCase):
 
 
 
-    def test_weights_with_non_uniform_angular_spread(self):
-        pass
+    # def test_weights_with_non_uniform_angular_spread(self):
+    #     for data in [self.acq_data_180, self.acq_data_360]:
+    #         data = Slicer(roi={'angle':(None, None, 3)})(data)
+    #         weights = calculate_angular_sampling_weights(data)
+            
+    #         # Check normalisation of weights:
+    #         np.testing.assert_almost_equal(sum(weights), len(weights), decimal=6)
+    #     pass
         
     def test_weights_with_missing_wedge_at_end(self):
         # 180 degree domain -----------------------------------------------------
@@ -128,33 +133,68 @@ class Test_get_weights_for_FBP(unittest.TestCase):
         #np.testing.assert_allclose(weights, weights[0], atol=1e-4)
         np.testing.assert_almost_equal(weights[0], 1, decimal=6)
 
-    # def test_weights_with_missing_wedge_at_start(self):
-    #     angular_range=[360,180]
-    #     for i, data in enumerate([self.acq_data_360, self.acq_data_180]):
-    #         # create data with final 25% of angles missing:
-    #         first_angle_index = int(angular_range[i]*0.75)
-    #         acq_data_non_uniform = Slicer(roi={'angle': (first_angle_index,-1,1)})(data.copy())
+    def test_weights_with_missing_wedge_at_start(self):
+        angular_range=[360,180]
+        for i, data in enumerate([self.acq_data_360, self.acq_data_180]):
+            # create data with final 25% of angles missing:
+            first_angle_index = int(len(data.geometry.angles)*0.75)
+            acq_data_non_uniform = Slicer(roi={'angle': (first_angle_index,-1,1)})(data.copy())
             
-    #         standard_gap = acq_data_non_uniform.geometry.angles[1] - acq_data_non_uniform.geometry.angles[0]
-    #         large_gap = (acq_data_non_uniform.geometry.angles[0] - acq_data_non_uniform.geometry.angles[first_angle_index] )%angular_range[i]
-            
-    #         weights = calculate_angular_sampling_weights(acq_data_non_uniform)
-    #         np.testing.assert_allclose(weights, weights[0], atol=1e-4)
-    #         np.testing.assert_almost_equal(weights[0], 1, decimal=1e-6)
-
-    #         np.testing.assert_almost_equal(weights[1],(standard_gap)/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)), decimal=1e-4)
-    #         np.testing.assert_almost_equal(weights[0], (large_gap+standard_gap)/2.0/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)) , decimal=1e-4)
-
+            weights = calculate_angular_sampling_weights(acq_data_non_uniform)
+            np.testing.assert_allclose(weights, weights[0], atol=1e-4)
+            np.testing.assert_almost_equal(weights[0], 1, decimal=1e-6)
 
     def test_weights_with_missing_wedges_at_centre(self):
+        angular_range = [360, 180]
+        for i, data in enumerate([self.acq_data_360, self.acq_data_180]):
+            # create data with middle sections removed (keep first 25% and last 25%):
+            total_angles = len(data.geometry.angles)
+            quarter_point = total_angles // 4
+            three_quarter_point = 3 * total_angles // 4
+            
+            # Keep first quarter and last quarter
+            indices_to_keep = list(range(quarter_point)) + list(range(three_quarter_point, total_angles))
+            
+            acq_data_non_uniform = data.copy()
+            acq_data_non_uniform.array = acq_data_non_uniform.array[indices_to_keep]
+            acq_data_non_uniform.geometry.set_angles(data.geometry.angles[indices_to_keep])
+            
+            weights = calculate_angular_sampling_weights(acq_data_non_uniform)
+            
+            # Check that weights are approximately equal (more lenient tolerance due to gap)
+            np.testing.assert_allclose(weights, weights[0], atol=1e-4)
+            
+            # Check normalization
+            np.testing.assert_almost_equal(sum(weights), len(weights))
 
         # np.testing.assert_almost_equal(weights[1],(standard_gap)/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)), decimal=1e-4)
         # np.testing.assert_almost_equal(weights[0], (large_gap+standard_gap)/2.0/(angular_range[i]/len(acq_data_non_uniform.geometry.angles)) , decimal=1e-4)
 
         # # Check normalisation of weights:
-        # np.testing.assert_almost_equal(sum(weights), len(weights), decimal=1e-6)
-        pass
 
+    def test_weights_with_non_uniform_angular_spread(self):
+        # Every fourth angle is missing
+        for i, data in enumerate([ self.acq_data_180]):
+            # create data with every fourth angle missing:
+            total_angles = len(data.geometry.angles)
+            indices_to_keep = [idx for idx in range(total_angles) if idx % 4 != 3]
+            
+            acq_data_non_uniform = data.copy()
+            acq_data_non_uniform.array = acq_data_non_uniform.array[indices_to_keep]
+            acq_data_non_uniform.geometry.set_angles(data.geometry.angles[indices_to_keep])
+            
+            weights = calculate_angular_sampling_weights(acq_data_non_uniform)
+
+            # expect weights to be in relative pattern:
+            # [x, 2,3,3,2,3,3,2,3,3], etc
+            # exclude end weights
+            # np.testing.assert_allclose(weights[3::3], weights[1]*3/2, atol=1e-4)
+            # # make copy of weights with all third indices removed:
+            # #weights_third_removed = 
+
+            np.testing.assert_allclose(weights[1::3], weights[2]*2/3, atol=1e-4)
+            np.testing.assert_allclose(weights[2::3], weights[1]*3/2, atol=1e-4)
+            np.testing.assert_allclose(weights[3::3], weights[1]*3/2, atol=1e-4)
 
 
 if __name__ == '__main__':

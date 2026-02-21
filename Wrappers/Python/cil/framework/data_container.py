@@ -180,10 +180,8 @@ class DataContainer(object):
                 dimension_labels_list.remove(key)
                 if new_array is None:
                     new_array = self.as_array()
-                xp = array_api_compat.get_array_module(new_array)
-                # new_array = new_array.take(indices=value, axis=axis)
-                new_array = xp.take(new_array, indices=value, axis=axis)
-
+                new_array = new_array.take(indices=value, axis=axis)
+                
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list)
         from .vector_data import VectorData

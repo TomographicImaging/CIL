@@ -180,7 +180,9 @@ class DataContainer(object):
                 dimension_labels_list.remove(key)
                 if new_array is None:
                     new_array = self.as_array()
-                new_array = new_array.take(indices=value, axis=axis)
+                xp = array_api_compat.get_array_module(new_array)
+                # new_array = new_array.take(indices=value, axis=axis)
+                new_array = xp.take(new_array, indices=value, axis=axis)
 
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list)
@@ -266,6 +268,11 @@ class DataContainer(object):
             required it should be passed directly as a kwarg.
             To fill random numbers using the earlier behaviour use `array='random_deprecated'` 
             or `array='random_int_deprecated'` 
+
+        dc.fill(some_data, vertical=1, horizontal_x=32)
+        will copy the data in `some_data` into the `dc` data container.
+        https://data-apis.org/array-api/latest/design_topics/copies_views_and_mutation.html
+        https://data-apis.org/array-api/latest/API_specification/generated/array_api.array.__setitem__.html#array_api.array.__setitem__
         
         Example
         -------
@@ -375,7 +382,6 @@ class DataContainer(object):
         if dimension == {}:
             import warnings
             warnings.filterwarnings('error')
-            xp = array_namespace(self.as_array())
             self.array.__setitem__(slice(None, None, None), array)
             warnings.resetwarnings()
         else:

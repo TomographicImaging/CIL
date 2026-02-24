@@ -21,7 +21,7 @@ NOTEBOOKS_geometry_links = [
 ]
 
 NOTEBOOKS_advanced_links = [
-    "https://github.com/TomographicImaging/CIL-Demos/raw/main/misc/callback_demonstration.ipynb"
+    "https://raw.githubusercontent.com/TomographicImaging/CIL-Demos/refs/heads/main/demos/4_Deep_Dives/01_callbacks.ipynb"
 ]
 
 NOTEBOOKS_usershowcase_links = [

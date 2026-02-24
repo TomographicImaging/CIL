@@ -18,6 +18,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.ndimage import label
 from skimage.filters import threshold_multiotsu
 import importlib
@@ -171,9 +172,12 @@ class VolumeShrinker(object):
             x_size = recon.get_dimension_size(x_dim)*binning
             y_size = recon.get_dimension_size(y_dim)*binning
 
-            ax.imshow(recon.max(axis=dim).array, origin='lower', cmap='gray',
+            im = ax.imshow(recon.max(axis=dim).array, origin='lower', cmap='gray',
                     extent=[0, x_size, 0, y_size])
-            
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes('right', size='5%', pad=0.05)
+            fig.colorbar(im, cax=cax, orientation='vertical')
+
             if bounds is not None:
                 x_min, x_max = bounds[x_dim]
                 y_min, y_max = bounds[y_dim]
@@ -186,6 +190,7 @@ class VolumeShrinker(object):
             ax.set_xlabel(x_dim)
             ax.set_ylabel(y_dim)
             ax.set_title(f"Maximum values in direction: {dim}")
+        plt.tight_layout()
 
     def reduce_reconstruction_volume(self, recon, binning, method, kwargs):
         threshold = kwargs.pop('threshold', None)

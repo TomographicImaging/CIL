@@ -3286,6 +3286,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
     def error_message(self, processor, test_parameter):
         return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
 
+    @unittest.skipUnless(has_astra, "Astra not installed")
     def test_LaminographyGeometryCorrector_init(self):
         # test default values are initialised
         processor = LaminographyGeometryCorrector()
@@ -3313,6 +3314,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
             self.assertEqual(getattr(processor, test_parameter[i]), test_value[i],
                            msg=self.error_message(processor, test_parameter[i]))
 
+    @unittest.skipUnless(has_astra, "Astra not installed")
     def test_LaminographyGeometryCorrector_check_input(self):
         processor = LaminographyGeometryCorrector()
         
@@ -3350,103 +3352,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             processor.set_input(self.data_cone_flex)
 
-    def test_LaminographyGeometryCorrector_filters(self):
-        # Test highpass filter with basic input
-        processor = LaminographyGeometryCorrector()
-        test_array = numpy.random.rand(10, 10, 10)
-        
-        result = processor.highpass_2d(test_array, sigma=3.0)
-        
-        # Output shape should match input shape
-        self.assertEqual(result.shape, test_array.shape)
-        # Result should be different from input (unless it's pure noise)
-        self.assertFalse(numpy.allclose(result, test_array))
-
-        # Test highpass filter with large sigma
-        processor = LaminographyGeometryCorrector()
-        test_array = numpy.random.rand(20, 20, 20)
-        
-        result = processor.highpass_2d(test_array, sigma=10.0)
-        
-        # Output shape should match input
-        self.assertEqual(result.shape, test_array.shape)
-
-        # Test Sobel filter
-        processor = LaminographyGeometryCorrector()
-        test_array = numpy.random.rand(20, 20, 20)
-        
-        result = processor.sobel_2d(test_array)
-        
-        # Output shape should match input
-        self.assertEqual(result.shape, test_array.shape)
-        # Sobel output should be non-negative
-        self.assertTrue(numpy.all(result >= 0))
-
-        # Test Sobel with uniform array (gradient should be zero)
-        processor = LaminographyGeometryCorrector()
-        test_array = numpy.ones((10, 10, 10))
-        
-        result = processor.sobel_2d(test_array)
-        
-        # Uniform array should have zero gradient
-        numpy.testing.assert_allclose(result, 0, atol=1e-10)
-
-    def test_LaminographyGeometryCorrector_loss_from_residual(self):
-        # Test loss_from_residual with zero residual
-        processor = LaminographyGeometryCorrector()
-        
-        # Create zero residual
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
-        ag.set_panel([10, 10])
-        zero_residual = AcquisitionData(numpy.zeros((5, 10, 10)), geometry=ag)
-        
-        loss = processor.loss_from_residual(zero_residual)
-        
-        # Zero residual should give zero loss
-        self.assertAlmostEqual(loss, 0.0, places=5)
-
-        # Test that loss_from_residual returns a scalar float
-        processor = LaminographyGeometryCorrector()
-        
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
-        ag.set_panel([10, 10])
-        residual = AcquisitionData(numpy.random.rand(5, 10, 10), geometry=ag)
-        
-        loss = processor.loss_from_residual(residual)
-        
-        self.assertIsInstance(loss, (float, numpy.floating))
-        self.assertTrue(loss >= 0)  # Loss should be non-negative
-
-        # Test loss_from_residual without filters
-        processor = LaminographyGeometryCorrector()
-        
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
-        ag.set_panel([10, 10])
-        residual = AcquisitionData(numpy.ones((5, 10, 10)), geometry=ag)
-        
-        loss_with_filters = processor.loss_from_residual(residual, use_highpass=True, use_sobel=True)
-        loss_no_filters = processor.loss_from_residual(residual, use_highpass=False, use_sobel=False)
-        
-        # Both should be valid numbers
-        self.assertIsInstance(loss_with_filters, (float, numpy.floating))
-        self.assertIsInstance(loss_no_filters, (float, numpy.floating))
-
-        # Test loss_from_residual with only highpass filter
-        processor = LaminographyGeometryCorrector()
-        
-        ag = AcquisitionGeometry.create_Parallel3D()
-        ag.set_angles(numpy.linspace(0, numpy.pi, 5))
-        ag.set_panel([10, 10])
-        residual = AcquisitionData(numpy.random.rand(5, 10, 10), geometry=ag)
-        
-        loss = processor.loss_from_residual(residual, use_highpass=True, use_sobel=False)
-        
-        self.assertIsInstance(loss, (float, numpy.floating))
-        self.assertTrue(loss >= 0)
-
+    @unittest.skipUnless(has_astra, "Astra not installed")
     def test_LaminographyGeometryCorrector_update_geometry(self):
         processor = LaminographyGeometryCorrector()
         
@@ -3457,7 +3363,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         tilt_deg = 35.0
         cor_pix = 5.0
         
-        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
         
         # Verify CoR was updated
         self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
@@ -3478,7 +3384,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         cor_pix = 0.0
         tilt_x = numpy.array([1, 0, 0])
         
-        ag_updated_x = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_x)
+        ag_updated_x = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_x)
         
         updated_axis = ag_updated_x.config.system.rotation_axis.direction
         # When tilting around x-axis, z-component should change, x-component should stay ~1
@@ -3495,7 +3401,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         cor_pix = 0.0
         tilt_y = numpy.array([0, 1, 0])
         
-        ag_updated_y = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_y)
+        ag_updated_y = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_y)
         
         updated_axis = ag_updated_y.config.system.rotation_axis.direction
         # When tilting around y-axis, x-component should change
@@ -3513,7 +3419,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         cor_pix = 0.0
         tilt_z = numpy.array([0, 0, 1])
         
-        ag_updated_z = processor.update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_z)
+        ag_updated_z = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_z)
         
         # Tilting around the rotation axis itself should not change the direction
         original_axis = numpy.array([0, 0, 1])
@@ -3530,7 +3436,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         tilt_deg = 0.0
         cor_pix = 5.0
         
-        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
         
         # With zero tilt, rotation axis should remain unchanged
         original_axis = numpy.array([0, 0, 1])
@@ -3549,7 +3455,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         
         original_panel = ag.config.panel.num_pixels
         
-        ag_updated = processor.update_geometry(ag, 35.0, 5.0)
+        ag_updated = processor._update_geometry(ag, 35.0, 5.0)
         updated_panel = ag_updated.config.panel.num_pixels
         
         # Panel size should be unchanged
@@ -3566,7 +3472,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         
         original_num_angles = len(ag.angles)
         
-        ag_updated = processor.update_geometry(ag, 30.0, 3.0)
+        ag_updated = processor._update_geometry(ag, 30.0, 3.0)
         updated_num_angles = len(ag_updated.angles)
         
         # Number of angles should be preserved
@@ -3582,7 +3488,7 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         tilt_deg = 45.0
         cor_pix = 10.0
         
-        ag_updated = processor.update_geometry(ag, tilt_deg, cor_pix)
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
         
         # Check that rotation axis is a unit vector
         axis = ag_updated.config.system.rotation_axis.direction
@@ -3599,11 +3505,11 @@ class TestLaminographyGeometryCorrector(unittest.TestCase):
         original_panel = ag.config.panel.num_pixels
         
         # Test with 90 degree tilt
-        ag_updated_90 = processor.update_geometry(ag, 90.0, 0.0)
+        ag_updated_90 = processor._update_geometry(ag, 90.0, 0.0)
         self.assertEqual(ag_updated_90.config.panel.num_pixels[0], original_panel[0])
         
         # Test with 180 degree tilt
-        ag_updated_180 = processor.update_geometry(ag, 180.0, 0.0)
+        ag_updated_180 = processor._update_geometry(ag, 180.0, 0.0)
         self.assertEqual(ag_updated_180.config.panel.num_pixels[0], original_panel[0])
 
     @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")

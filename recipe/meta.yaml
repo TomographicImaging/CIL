@@ -62,6 +62,7 @@ requirements:
     - cil-data >=22
     - tqdm
     - numba
+    - array-api-compat
 
   # version constraints of optional dependencies
   run_constrained:

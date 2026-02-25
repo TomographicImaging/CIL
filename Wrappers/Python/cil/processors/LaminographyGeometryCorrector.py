@@ -34,14 +34,9 @@ log = logging.getLogger(__name__)
 
 
 class LaminographyGeometryCorrector(Processor):
-
-    _supported_backends = ['astra']
-
-    def __init__(self, parameter_bounds=[(-10, 10),(-20, 20)], parameter_tolerance=(0.01, 0.01), 
-                 coarse_binning=None, final_binning = None, angle_subsampling = None, image_geometry = None, backend='astra'):
-        """
-        Initialise a LaminographyGeometryCorrector processor to fit a geometry 
-        and find tilt and center-of-rotation for parallel beam laminography data.
+    """
+        LaminographyGeometryCorrector processor to fit a the geometry of a 
+        parallel beam laminography dataset to find tilt and center-of-rotation.
         
         Parameters
         ----------
@@ -83,6 +78,12 @@ class LaminographyGeometryCorrector(Processor):
         >>> data_corrected = processor.get_output()
         
         """
+    
+    _supported_backends = ['astra']
+
+    def __init__(self, parameter_bounds=[(-10, 10),(-20, 20)], parameter_tolerance=(0.01, 0.01), 
+                 coarse_binning=None, final_binning = None, angle_subsampling = None, image_geometry = None, backend='astra'):
+        
 
         FBP, ProjectionOperator = self._configure_FBP(backend)
         kwargs = {
@@ -321,7 +322,7 @@ class LaminographyGeometryCorrector(Processor):
     def plot_evaluations(self):
         """
         Plot results from the minimisation. Plots the loss function value as a 
-        function of tilt and cenrte of rotation offset position.
+        function of tilt and centre of rotation offset position.
         """
         num_evals = len(self.evaluations)
         if num_evals > 0:

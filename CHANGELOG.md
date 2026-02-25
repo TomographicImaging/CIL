@@ -1,6 +1,8 @@
 * XX.X.X
   - New features:
     - LSQR algorithm added to the CIL algorithm class (#1975)
+    - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an
+    `AcquisitionData` (#2221)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)

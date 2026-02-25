@@ -136,9 +136,9 @@ We suggest creating a conda environment with all the dependencies for building C
 
 | OS | Command | Status |
 |----|----|----|
-| Linux | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml`| Tested |
-| Windows | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml`| Tested |
-| MacOS (ARM) | `conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development_osx.yml`| Experimental |
+| Linux | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml`| Tested |
+| Windows | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml`| Tested |
+| MacOS (ARM) | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development_osx.yml`| Experimental |
 
 > [!NOTE]
 > Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available/working, such as FFT filtering for FDK.
@@ -148,11 +148,8 @@ We suggest creating a conda environment with all the dependencies for building C
 
 A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
-
-| OS | Build Command |
-|----|----|
-| Linux | `pip install --no-deps . -Ccmake.define.IPP_ROOT=$CONDA_PREFIX`|
-| Windows | `pip install --no-deps . -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%`|
+```sh
+pip install -e .
 
 > [!NOTE]
 > You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.

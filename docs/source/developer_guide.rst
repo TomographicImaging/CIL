@@ -141,13 +141,13 @@ We suggest creating a conda environment with all the dependencies for building C
      - Command
      - Status
    * - Linux
-     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml``
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
      - Tested
    * - Windows
-     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development.yml``
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
      - Tested
    * - MacOS (ARM)
-     - ``conda env create -f https://tomographicimaging.github.io/scripts/env/cil_development_osx.yml``
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development_osx.yml``
      - Experimental
 
 .. note::
@@ -162,12 +162,9 @@ A C++ compiler is required to build the source code. Let's suppose that the user
    :header-rows: 1
    :widths: 20 80
 
-   * - OS
-     - Build Command
-   * - Linux
-     - ``pip install --no-deps . -Ccmake.define.IPP_ROOT=$CONDA_PREFIX``
-   * - Windows
-     - ``pip install --no-deps . -Ccmake.define.IPP_ROOT=%CONDA_PREFIX%``
+.. code::sh
+
+   pip install -e .
 
 .. note::
    You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
@@ -178,7 +175,7 @@ If not installing inside a conda environment, then the user might need to set th
 
 .. code:: sh
 
-   pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
+   pip install -e . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>" -Ccmake.define.CMAKE_BUILD_TYPE=RelWithDebInfo
 
 Notes for Windows users
 """"""""""""""""

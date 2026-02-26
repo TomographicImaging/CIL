@@ -40,4 +40,5 @@ from .SGFunction import SGFunction
 from .SVRGFunction import SVRGFunction, LSVRGFunction
 from .SAGFunction import SAGFunction, SAGAFunction
 from .AbsFunction import FunctionOfAbs
+from .BM3DFunction import BM3DFunction
 

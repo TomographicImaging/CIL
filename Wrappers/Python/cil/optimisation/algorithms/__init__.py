@@ -22,6 +22,7 @@ from .SIRT import SIRT
 from .GD import GD
 from .FISTA import FISTA
 from .FISTA import ISTA
+from .ProxSkip import ProxSkip
 from .FISTA import ISTA as PGD
 from .APGD import APGD 
 from .PDHG import PDHG

@@ -138,13 +138,11 @@ link_islicer - link islicer objects by index
 
 Shrink volume
 =============
-VolumeShrinker - Display 2D slices
+VolumeShrinker - create a cropped reconstruction volume from image data
 --------------------------
 
-.. autoclass:: cil.utilities.shink_volume.VolumeShrinker
+.. autoclass:: cil.utilities.shrink_volume.VolumeShrinker
    :members:
    :inherited-members:
-
-
 
 :ref:`Return Home <mastertoc>`

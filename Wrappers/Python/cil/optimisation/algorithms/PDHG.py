@@ -223,7 +223,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, 
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, adaptive = False, initial_alpha=0.95, eta=0.95, c=0.9, update_step_sizes_rules = [],
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
@@ -239,13 +239,9 @@ class PDHG(Algorithm):
         self._tau = None
         self._sigma = None
 
-        # check for gamma_g, gamma_fconj, strongly convex constants
-        self._gamma_g = None
-        self._gamma_fconj = None
-        self.set_gamma_g(gamma_g)
-        self.set_gamma_fconj(gamma_fconj)
+    
+        self.update_step_sizes_rules = update_step_sizes_rules
         
-        self.adaptive = adaptive
         self.alpha = initial_alpha
         self.eta = eta
         self.c = c
@@ -270,59 +266,6 @@ class PDHG(Algorithm):
         """The relaxation parameter for the over-relaxation of the primal variable """
         return self._theta
 
-    @property
-    def gamma_g(self):
-        """The strongly convex constant for the function g """
-        return self._gamma_g
-
-    @property
-    def gamma_fconj(self):
-        """The strongly convex constant for the convex conjugate of the function f """
-        return self._gamma_fconj
-
-    def set_gamma_g(self, value):
-        '''Set the value of the strongly convex constant for function `g`
-
-        Parameters
-        ----------
-            value : a positive number or None
-        '''
-        if self.gamma_fconj is not None and value is not None:
-            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +
-                             "Currently the strongly convex constant of the convex conjugate of the function f has been specified as ", self.gamma_fconj)
-
-        if isinstance(value, Number):
-            if value <= 0:
-                raise ValueError(
-                    "Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))
-            self._gamma_g = value
-        elif value is None:
-            pass
-        else:
-            raise ValueError(
-                "Positive float is expected for the strongly convex constant of function g, {} is passed".format(value))
-
-    def set_gamma_fconj(self, value):
-        '''Set the value of the strongly convex constant for the convex conjugate of function `f`
-
-        Parameters
-        ----------
-            value : a positive number or None
-        '''
-        if self.gamma_g is not None and value is not None:
-            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +
-                             "Currently the strongly convex constant of the function g has been specified as ", self.gamma_g)
-
-        if isinstance(value, Number):
-            if value <= 0:
-                raise ValueError(
-                    "Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))
-            self._gamma_fconj = value
-        elif value is None:
-            pass
-        else:
-            raise ValueError(
-                "Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))
 
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None):
         """Initialisation of the algorithm
@@ -378,19 +321,7 @@ class PDHG(Algorithm):
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
-        
-        if self.adaptive:
-            self.y_old = self.y.copy()
-            self.y_resid = self.y.copy() # Extra range data 2
-            self.x_resid = self.x.copy() # Extra image 1
-            self.x_store = self.x.copy() # Extra image 2 
-
-        if self.gamma_g is not None:
-            warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
-
-        if self.gamma_fconj is not None:
-            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
-
+    
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
@@ -403,10 +334,6 @@ class PDHG(Algorithm):
         self.x_old = self.x
         self.x = tmp
         
-        if self.adaptive:
-            tmp = self.y_old
-            self.y_old = self.y
-            self.y = tmp
         
 
     def get_output(self):
@@ -416,25 +343,15 @@ class PDHG(Algorithm):
     def _pdhg_update(self):
 
 
-        if self.adaptive:
-            tmp =self.x_store
-            self.x_store = self.x
-            self.x = tmp
-            # calculate x-bar and store in self.x_tmp
-            self.x_old.sapyb((self.theta + 1.0), self.x_store, -
-                            self.theta, out=self.x_tmp) # somewhere in line 4
-        else:
-            # calculate x-bar and store in self.x_tmp
-            self.x_old.sapyb((self.theta + 1.0), self.x, -
-                            self.theta, out=self.x_tmp) # somewhere in line 4
+
+        # calculate x-bar and store in self.x_tmp
+        self.x_old.sapyb((self.theta + 1.0), self.x, -
+                        self.theta, out=self.x_tmp) # somewhere in line 4
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
-        
-        if self.adaptive:
-            self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
-        else:
-            self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp) #line 4
+
+        self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp) #line 4
 
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
         
@@ -454,6 +371,7 @@ class PDHG(Algorithm):
 
     def update(self):
         """Performs a single iteration of the PDHG algorithm"""
+        print('Iteration number: {}'.format(self.iteration))
         self._pdhg_update()
 
         # update the step sizes for special cases
@@ -541,22 +459,7 @@ class PDHG(Algorithm):
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
             
-    def _calculate_backtracking_condition(self): #TODO: Not sure this backgracking is working
-        """Calculates the backtracking condition for adaptive step sizes update.
-        Returns
-        -------
-            Boolean
-                True if backtracking condition is satisfied, False otherwise.
-        """
-        self.x.sapyb(1.0, self.x_old, -1.0,  out=self.x_resid)
-        x_change_norm = self.x_resid.norm()
-        self.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
-        y_change_norm = self.y_resid.norm()
-        self.operator.direct(self.x_resid, out=self.y_tmp)
-        cross_term =np.abs(4*self.sigma*self.tau*self.y_resid.dot( self.y_tmp))
-        b = self.c*self.sigma*x_change_norm**2 + self.c*self.tau*y_change_norm**2 - cross_term
-        print( "Backtracking condition value:", b)
-        return b
+
   
         
 
@@ -566,49 +469,10 @@ class PDHG(Algorithm):
         Updates the step sizes, based on the rules passed
         """
         
-        for rule in update_step_sizes_rules:
-            self._theta, self_sigma, self._tau = rule(self)
+        for rule in self.update_step_sizes_rules:
+            self._theta, self._tau, self._sigma = rule.get_step_size(self)
                 
-            
-   
-            if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
-            #print('Before adaptive', self.tau, self.sigma)
-                b = self._calculate_backtracking_condition()
-                while b<0:
-                    self._tau /= 2
-                    self._sigma /= 2
-                    # Swap x and x_store
-                    tmp=self.x
-                    self.x= self.x_store
-                    self.x_store= tmp
-                    
-                    self._pdhg_update() 
-                    
-                    print('Step sizes reduced')
-                    b = self._calculate_backtracking_condition()
-                print('After possible reduction', self.tau, self.sigma)
-                self.operator.adjoint(self.y_resid, out=self.x_tmp)
-                self.operator.direct(self.x_resid, out=self.y_tmp)
-                self.x_resid.sapyb((1/self.tau), self.x_tmp, -1.0, out=self.x_resid)
-                self.y_resid.sapyb((1/self.sigma), self.y_tmp, -1.0, out=self.y_resid)
-                self.p_norm = self.x_resid.norm()
-                self.d_norm = self.operator.norm()*self.y_resid.norm()
-                if 2*self.p_norm < self.d_norm:
-                    print('2*self.p_norm < self.d_norm')
-                    self._tau *= (1- self.alpha)
-                    self._sigma /= (1 - self.alpha)
-                    self.alpha *= self.eta
-                elif 2*self.d_norm < self.p_norm:
-                    print('2*self.d_norm < self.p_norm')
-                    self._tau /= (1 - self.alpha)
-                    self._sigma *= (1 - self.alpha)
-                    self.alpha *=self.eta
-                else:
-                    print('No change')
-                    pass
-                print('After adaptive', self.tau, self.sigma, self.alpha)
-            else:
-                print('No adaptive step size update, below tolerance')
+
 
     def update_objective(self):
         """Evaluates the primal objective, the dual objective and the primal-dual gap."""
@@ -639,8 +503,6 @@ class PDHG(Algorithm):
         return [x[2] for x in self.loss]
 
 
-
-
 class PDHG_2013(Algorithm):
 
     r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
@@ -653,15 +515,31 @@ class PDHG_2013(Algorithm):
     g : Function
         A convex function with a "simple" proximal.
     operator : LinearOperator
-        A Linear Operator.    sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
+        A Linear Operator.
+    sigma : TODO: if adaptive, this needs to be big.  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
         Step size for the dual problem.
-    tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default (if 'adaptive' is False) is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided. If 'adaptive' is True, default is large value (1e5)
+    tau :  TODO: if adaptive, this needs to be big. positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
         Step size for the primal problem.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-    adaptive_step_sizes : list, optional, default=None
-        List of adaptive step size rules to be used (in the order given) in the PDHG algorithm. If None, no adaptive step size update is performed.
-        
+    gamma_g : positive :obj:`float`, optional, default=None
+        Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
+    gamma_fconj : positive :obj:`float`, optional, default=None
+        Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
+    adaptive : :obj:`boolean`, optional, default=False
+        If True, the step sizes are updated adaptively based on the method proposed in :cite:`Goldstein2015`.
+    initial_alpha : positive :obj:`float`, optional, default=0.95
+        Initial value of the parameter alpha used in the adaptive step size method.
+    beta : positive :obj:`float`, optional, default=0.95
+        Value of the parameter eta used in the adaptive step size method.
+    gamma : positive :obj:`float`, optional, default=0.75
+        Value of the parameter c used in the adaptive step size method.
+    delta : positive :obj:`float`,greater than one,  optional, default=1.5
+        Value of the parameter delta used in the adaptive step size method.
+    s : positive :obj:`float`, optional, default=255
+        Value of the parameter s used in the adaptive step size method.
+    eta : positive :obj:`float`, optional, default=0.95
+        Value of the parameter eta used in the adaptive step size method.
     
         
     
@@ -832,7 +710,7 @@ class PDHG_2013(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, update_step_sizes_rules=None, 
+    def __init__(self, f, g, operator, tau=None, sigma=None, initial=None, gamma_g=None, gamma_fconj=None, adaptive = False, initial_alpha=0.95, eta=0.95, beta=0.75, delta=1.5, s=None, gamma=0.9,
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
@@ -847,13 +725,28 @@ class PDHG_2013(Algorithm):
 
         self._tau = None
         self._sigma = None
-        self.update_step_sizes_rules = update_step_sizes_rules if update_step_sizes_rules is not None else []
-        # TODO: DeprecationWarning for strong convex constants
+
+        # check for gamma_g, gamma_fconj, strongly convex constants
+        self._gamma_g = None
+        self._gamma_fconj = None
+        self.set_gamma_g(gamma_g)
+        self.set_gamma_fconj(gamma_fconj)
         
-     
+        self.adaptive = adaptive
+        self.alpha = initial_alpha
+        self.eta = eta
+        self.beta = beta
+        self.delta = delta
+        self.s = s
+        self.gamma = gamma
+        self.tolerance = 1e-6
         self.set_up(f=f, g=g, operator=operator, tau=tau,
                     sigma=sigma, initial=initial)
-
+        self.p_norm = 100
+        self.d_norm = 100
+        
+        if self.s is None:
+            self.s = self.operator.norm()
 
     @property
     def tau(self):
@@ -873,11 +766,12 @@ class PDHG_2013(Algorithm):
     @property
     def gamma_g(self):
         """The strongly convex constant for the function g """
-       # TODO: DeprecationWarning
+        return self._gamma_g
+
     @property
     def gamma_fconj(self):
         """The strongly convex constant for the convex conjugate of the function f """
-        # TODO: DeprecationWarning
+        return self._gamma_fconj
 
     def set_gamma_g(self, value):
         '''Set the value of the strongly convex constant for function `g`
@@ -886,8 +780,21 @@ class PDHG_2013(Algorithm):
         ----------
             value : a positive number or None
         '''
-       # TODO: DeprecationWarning
-    
+        if self.gamma_fconj is not None and value is not None:
+            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +
+                             "Currently the strongly convex constant of the convex conjugate of the function f has been specified as ", self.gamma_fconj)
+
+        if isinstance(value, Number):
+            if value <= 0:
+                raise ValueError(
+                    "Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))
+            self._gamma_g = value
+        elif value is None:
+            pass
+        else:
+            raise ValueError(
+                "Positive float is expected for the strongly convex constant of function g, {} is passed".format(value))
+
     def set_gamma_fconj(self, value):
         '''Set the value of the strongly convex constant for the convex conjugate of function `f`
 
@@ -895,8 +802,21 @@ class PDHG_2013(Algorithm):
         ----------
             value : a positive number or None
         '''
-        # TODO: DeprecationWarning
-        
+        if self.gamma_g is not None and value is not None:
+            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +
+                             "Currently the strongly convex constant of the function g has been specified as ", self.gamma_g)
+
+        if isinstance(value, Number):
+            if value <= 0:
+                raise ValueError(
+                    "Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))
+            self._gamma_fconj = value
+        elif value is None:
+            pass
+        else:
+            raise ValueError(
+                "Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))
+
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None):
         """Initialisation of the algorithm
 
@@ -952,7 +872,14 @@ class PDHG_2013(Algorithm):
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
         
+        if self.adaptive:
+            self.y_old = self.y.copy()
 
+        if self.gamma_g is not None:
+            warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
+
+        if self.gamma_fconj is not None:
+            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
 
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
@@ -966,24 +893,31 @@ class PDHG_2013(Algorithm):
         self.x_old = self.x
         self.x = tmp
         
-            
+        if self.adaptive:
+            tmp = self.y_old
+            self.y_old = self.y
+            self.y = tmp
+        
 
     def get_output(self):
         " Returns the current solution. "
         return self.x_old
 
-    def _pdhg_update(self, x):
+    def update(self):
         """Performs a single iteration of the PDHG algorithm"""
-
-
+        print('Iteration number: {}'.format(self.iteration))
+       
+        # calculate x-bar and store in self.x_tmp
         self.x_old.sapyb((self.theta + 1.0), self.x, -
-                            self.theta, out=self.x_tmp) # somewhere in line 4
+                         self.theta, out=self.x_tmp) # somewhere in line 4
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
         
-
-        self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp) #line 4
+        if self.adaptive:
+            self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
+        else:
+            self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp) #line 4
 
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
         
@@ -994,16 +928,10 @@ class PDHG_2013(Algorithm):
         self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
         print('x_tmp norm = ',self.x_tmp.norm())
 
-
         self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
         print('x norm = ',(self.x -self.x_old).norm())
         # update_previous_solution() called after update by base class
         # i.e current solution is now in x_old, previous solution is now in x
-        
-
-    def update(self):
-        """Performs a single iteration of the PDHG algorithm"""
-        self._pdhg_update(self.x)
 
         # update the step sizes for special cases
         self.update_step_sizes()
@@ -1071,26 +999,105 @@ class PDHG_2013(Algorithm):
             self._sigma = sigma
             self._tau = tau
         elif sigma is None and isinstance(tau, Number):
-           
-            self._sigma = 1./(tau*self.operator.norm()**2)
+            if self.adaptive:
+                self._sigma = 1e5
+            else:
+                self._sigma = 1./(tau*self.operator.norm()**2)
             self._tau = tau
         elif tau is None and isinstance(sigma, Number):
             self._sigma = sigma
-            self._tau = 1./(self.sigma*self.operator.norm()**2)
+            if self.adaptive:
+                self._tau = 1e5
+            else:
+                self._tau = 1./(self.sigma*self.operator.norm()**2)
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
-            
-  
 
     def update_step_sizes(self):
         """
-        Updates the step sizes, based on the rules passed
+        Updates step sizes in the cases of primal or dual acceleration using the strongly convexity property.
+        The case where both functions are strongly convex is not available at the moment.
         """
-        
-        for rule in self.update_step_sizes_rules:
-            self._theta, self._sigma, self._tau = rule(self)
+        # Update sigma and tau based on the strong convexity of G
+        if self.gamma_g is not None:
+            self._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * self.tau)
+            self._tau *= self.theta
+            self._sigma /= self.theta
+
+        # Update sigma and tau based on the strong convexity of F
+        # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
+        if self.gamma_fconj is not None:
+            self._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
+            self._sigma *= self.theta
+            self._tau /= self.theta
             
+        if self.adaptive:
+            if self.p_norm > self.tolerance and self.d_norm > self.tolerance: # adaptive step sizes only when above tolerance 
+            #print('Before adaptive', self.tau, self.sigma)
+                x_resid = self.x-self.x_old # Extra image 1
+                x_change_norm = x_resid.norm() 
+                y_resid = self.y - self.y_old # Extra range data 1
+                y_change_norm = y_resid.norm()
+                y_temp2 = self.operator.direct(x_resid) # Extra range data 2
+                cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
+                b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
+                print('x_change_norm = {}, y_change_norm = {}, ((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2)= {}, cross_term = {}'.format(x_change_norm, y_change_norm, (self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 , cross_term))
+                print(b)
+
+                if b>1: 
+                    self._tau *= self.beta/b
+                    self._sigma *= self.beta/b
+                    print('Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
+   
+                    
+                    self.x_old.sapyb((self.theta + 1.0), self.x, -
+                         self.theta, out=self.x_tmp) # somewhere in line 4
+                    # Gradient ascent for the dual variable
+                    self.operator.direct(self.x_tmp, out=self.y_tmp) #line 4
+                    self.y_tmp.sapyb(self.sigma, self.y_old, 1.0, out=self.y_tmp) #line 4
+                    self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y) # line 5
+                    
+
+                    # Gradient descent for the primal variable
+                    self.operator.adjoint(self.y, out=self.x_tmp) #line 2 
+                    self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp) #line 2
+                    self.g.proximal(self.x_tmp, self.tau, out=self.x) #line 3
+                    print('Recomputing x and y after reducing step sizes')
+                    x_resid = self.x-self.x_old # Extra image 1 - Need to be more memory efficient 
+                    x_change_norm = x_resid.norm() 
+                    y_resid = self.y - self.y_old # Extra range data 1
+                    y_change_norm = y_resid.norm()
+                    y_temp2 = self.operator.direct(x_resid) # Extra range data 2
+                    cross_term = np.real(2*self.sigma*self.tau*y_resid.dot(y_temp2))
+                    b = cross_term/((self.gamma*self.sigma)*x_change_norm**2 + (self.gamma*self.tau)*y_change_norm**2 )
+
+                print('After possible reduction', self.tau, self.sigma)
+                p = (1/self.tau)*x_resid -self.operator.adjoint(y_resid) # Extra image 2
+                d = (1/self.sigma)*y_resid - self.operator.direct(x_resid) # Extra range data 3
+                self.p_norm = p.norm()
+                self.d_norm = d.norm()
+                print('p_norm = {}, d_norm = {}'.format(self.p_norm, self.d_norm))
+                print('self.s, self.delta = {}, {}'.format(self.s, self.delta))
+                if self.p_norm < (self.s/self.delta)*self.d_norm:
+                    print('2*self.p_norm < self.d_norm')
+                    self._tau *= (1- self.alpha)
+                    self._sigma /= (1 - self.alpha)
+                    self.alpha *= self.eta
+                elif (self.s*self.delta)*self.d_norm < self.p_norm:
+                    print('2*self.d_norm < self.p_norm')
+                    self._tau /= (1 - self.alpha)
+                    self._sigma *= (1 - self.alpha)
+                    self.alpha *=self.eta
+                else:
+                    print('No change')
+                    pass
+                print('After adaptive', self.tau, self.sigma, self.alpha)
+            else:
+                print('No adaptive step size update, below tolerance')
+
+                
+                
     def update_objective(self):
         """Evaluates the primal objective, the dual objective and the primal-dual gap."""
         self.operator.direct(self.x_old, out=self.y_tmp)
@@ -1118,6 +1125,3 @@ class PDHG_2013(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
-                
-            
-         

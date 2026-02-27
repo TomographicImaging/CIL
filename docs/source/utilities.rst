@@ -136,4 +136,15 @@ link_islicer - link islicer objects by index
    :inherited-members:
 
 
+Shrink volume
+=============
+VolumeShrinker - Display 2D slices
+--------------------------
+
+.. autoclass:: cil.utilities.shink_volume.VolumeShrinker
+   :members:
+   :inherited-members:
+
+
+
 :ref:`Return Home <mastertoc>`

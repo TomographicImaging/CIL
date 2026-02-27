@@ -39,8 +39,12 @@ class TestVolumeShrinker(unittest.TestCase):
         arr = np.zeros((10, 10, 10), dtype=np.float32)
         arr[2:8, 2:8, 2:8] = 0.2
         arr[3:7, 3:7, 3:7] = 1
-        
         self.test_recon = ImageData(arr, geometry=ImageGeometry(10,10,10))
+
+        arr = np.zeros((10, 10, 10), dtype=np.float32)
+        arr[2:8, 2:8, 3:7] = 0.2
+        arr[3:7, 3:7, 4:6] = 1
+        self.test_recon_asymmetrical = ImageData(arr, geometry=ImageGeometry(10,10,10))
         
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
@@ -80,12 +84,38 @@ class TestVolumeShrinker(unittest.TestCase):
         
         for data in [self.data_cone, self.data_parallel]:
             data.reorder('astra')
+            old_ig = data.geometry.get_ImageGeometry()
             vs = VolumeShrinker(data, recon_backend='astra')
             new_ig = vs.run(limits=limits, preview=False, method='manual')
-
-            # expected sizes are stop - start
+            # get the voxel size and centers that correspond to each dimension
+            voxel_sizes = {'horizontal_x': old_ig.voxel_size_x,'horizontal_y': old_ig.voxel_size_y,'vertical': old_ig.voxel_size_z}
+            centers = {'horizontal_x': new_ig.center_x, 'horizontal_y': new_ig.center_y, 'vertical': new_ig.center_z}
+            
             for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-                self.assertEqual(new_ig.shape[new_ig.dimension_labels.index(dim)], limits[dim][1] - limits[dim][0])
+                # expected sizes are stop - start
+                new_size = limits[dim][1] - limits[dim][0]
+                ind = new_ig.dimension_labels.index(dim)
+                self.assertEqual(new_ig.shape[ind], new_size)
+
+                old_size = old_ig.shape[ind]
+
+                # expected center is (new center-old center)*voxel size
+                center = ((limits[dim][0]+(new_size/2))-(old_size/2))*voxel_sizes[dim]
+                self.assertEqual(center, centers[dim])
+
+
+        # test some non-sensical limits
+        limits = {
+                'horizontal_x': (10, 5),
+                'horizontal_y': (20, 9),
+                'vertical': (12, 2)
+            }
+
+        for data in [self.data_cone, self.data_parallel]:
+            data.reorder('astra')
+            vs = VolumeShrinker(data, recon_backend='astra')
+            with self.assertRaises(ValueError):
+                new_ig = vs.run(limits=limits, preview=False, method='manual')
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_run_manual_tigre(self):
@@ -98,29 +128,81 @@ class TestVolumeShrinker(unittest.TestCase):
         
         for data in [self.data_cone, self.data_parallel]:
             data.reorder('tigre')
+            old_ig = data.geometry.get_ImageGeometry()
             vs = VolumeShrinker(data, recon_backend='tigre')
             new_ig = vs.run(limits=limits, preview=False, method='manual')
 
-            # expected sizes are stop - start
-            for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-                self.assertEqual(new_ig.shape[new_ig.dimension_labels.index(dim)], limits[dim][1] - limits[dim][0])
-
-    unittest.skipUnless(has_astra and has_nvidia, "Astra GPU not installed")
-    def test_reduce_reconstruction_volume_astra(self):
-        vs = VolumeShrinker(self.data_cone, recon_backend='astra')
-        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.5)
-        for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (3,6))
-
-        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', kwargs={'threshold':0.1})
-        for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (2,7))
+            # get the voxel size and centers that correspond to each dimension
+            voxel_sizes = {'horizontal_x': old_ig.voxel_size_x,'horizontal_y': old_ig.voxel_size_y,'vertical': old_ig.voxel_size_z}
+            centers = {'horizontal_x': new_ig.center_x, 'horizontal_y': new_ig.center_y, 'vertical': new_ig.center_z}
             
-        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu', kwargs={})
+            for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
+                # expected sizes are stop - start
+                new_size = limits[dim][1] - limits[dim][0]
+                ind = new_ig.dimension_labels.index(dim)
+                self.assertEqual(new_ig.shape[ind], new_size)
+
+                old_size = old_ig.shape[ind]
+
+                # expected center is (new center-old center)*voxel size
+                center = ((limits[dim][0]+(new_size/2))-(old_size/2))*voxel_sizes[dim]
+                self.assertEqual(center, centers[dim])
+
+        # test some non-sensical limits
+        limits = {
+                'horizontal_x': (10, 5),
+                'horizontal_y': (20, 9),
+                'vertical': (12, 2)
+            }
+        
+        for data in [self.data_cone, self.data_parallel]:
+            data.reorder('tigre')
+            vs = VolumeShrinker(data, recon_backend='tigre')
+            with self.assertRaises(ValueError):
+                new_ig = vs.run(limits=limits, preview=False, method='manual')
+
+    def test_reduce_reconstruction_volume(self):
+        vs = VolumeShrinker(self.data_cone, recon_backend='astra')
+
+        # test error with threshold higher than max value in volume
+        with self.assertRaises(ValueError):
+            bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=500)
+
+        # test expected boundaries are found
+        bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.5)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
             self.assertEqual(bounds[dim], (3,6))
 
-        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu', kwargs={'buffer':1})
+        bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.1)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
             self.assertEqual(bounds[dim], (2,7))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu')
+        for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
+            self.assertEqual(bounds[dim], (3,6))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu', buffer=1)
+        for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
+            self.assertEqual(bounds[dim], (2,7))
+
+        # test the asymmetrical volume
+        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='threshold', threshold=0.5)
+        self.assertEqual(bounds['horizontal_x'], (4,5))
+        self.assertEqual(bounds['horizontal_y'], (3,6))
+        self.assertEqual(bounds['vertical'], (3,6))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='threshold', threshold=0.1)
+        self.assertEqual(bounds['horizontal_x'], (3,6))
+        self.assertEqual(bounds['horizontal_y'], (2,7))
+        self.assertEqual(bounds['vertical'], (2,7))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='otsu')
+        self.assertEqual(bounds['horizontal_x'], (4,5))
+        self.assertEqual(bounds['horizontal_y'], (3,6))
+        self.assertEqual(bounds['vertical'], (3,6))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='otsu', buffer=1)
+        self.assertEqual(bounds['horizontal_x'], (3,6))
+        self.assertEqual(bounds['horizontal_y'], (2,7))
+        self.assertEqual(bounds['vertical'], (2,7))
 

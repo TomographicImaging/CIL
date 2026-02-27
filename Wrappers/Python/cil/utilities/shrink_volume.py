@@ -79,7 +79,7 @@ class VolumeShrinker(object):
         **kwargs:
         threshold: float, optional
             If using 'threshold' method, specify the intensity threshold
-            between sample and background. Default is None.
+            between sample and background in the reconstruction. Default is None.
 
         buffer: float, optional
             Buffer in pixels around the automatically detected limits. 
@@ -87,15 +87,46 @@ class VolumeShrinker(object):
 
         mask_radius: float, optional
             Radius of circular mask to apply on the reconstructed volume, before
-            automatically cropping the reconstruction volume. Default is None.
+            automatically cropping the reconstruction volume or displaying with 
+            preview. Default is None.
 
         otsu_classes: int, optional
             Number of material classes to use when automatically detecting the 
             reconstruction volume using Otsu thresholding method. Default is 2.
 
         min_component_size: int, optional
-            Minimum size in pixels of connected components to keep when automatically 
+            Minimum size in pixels of connected components to consider when automatically 
             cropping the reconstruction volume. Default is None.
+
+        Returns
+        -------
+        ig_reduced: ImageGeometry
+            The reduced size ImageGeometry
+
+        Example
+        -------
+        >>> vs = VolumeShrinker(data, recon_backend='astra')
+        >>> ig_reduced = vs.run(method='manual', limits={'horizontal_x':(10, 150)})
+        
+        Example
+        -------
+        >>> cil_log_level = logging.getLogger()
+        >>> cil_log_level.setLevel(logging.DEBUG)
+        >>> vs = VolumeShrinker(data, recon_backend='astra')
+        >>> ig_reduced = vs.run(method='threshold' threshold=0.9)
+
+        Example
+        -------
+        >>> cil_log_level = logging.getLogger()
+        >>> cil_log_level.setLevel(logging.DEBUG)
+        >>> vs = VolumeShrinker(data, recon_backend='astra')
+        >>> ig_reduced = vs.run(method='otsu', otsu_classes=3)
+
+        Note
+        ----
+        For the `otsu` and `threshold` methods, setting logging to 'debug' shows 
+        a plot of the threshold on a histogram of the data and the threshold mask 
+        on the reconstruction.
         """
 
         ig = self.data.geometry.get_ImageGeometry()
@@ -108,29 +139,42 @@ class VolumeShrinker(object):
                     if dim in ig.dimension_labels:
                         if v is None:
                             v = (0, ig.shape[ig.dimension_labels.index(dim)])
-                        elif v[0] is None:
-                            v[0] = 0
-                        elif v[1] is None:
-                            v[1] = ig.shape[ig.dimension_labels.index(dim)]
+                        else:
+                            if v[0] is None:
+                                v = list(v)
+                                v[0] = 0
+                                v = tuple(v)
+                            if v[1] is None:
+                                v = list(v)
+                                v[1] = ig.shape[ig.dimension_labels.index(dim)]
+                                v = tuple(v)
                         bounds[dim] = v
                     else:
                         raise ValueError("dimension {} not recognised, must be one of {}".format(dim, ig.dimension_labels))
 
         elif method.lower() in ['threshold', 'otsu']:
             mask_radius = kwargs.pop('mask_radius', None)
-            recon, binning = self.get_recon(mask_radius=mask_radius)
-            bounds = self.reduce_reconstruction_volume(recon, binning, method, kwargs)
+            recon, binning = self._get_recon(mask_radius=mask_radius)
+            threshold = kwargs.pop('threshold', None)
+            buffer = kwargs.pop('buffer', None)
+            min_component_size = kwargs.pop('min_component_size', None)
+            otsu_classes = kwargs.pop('otsu_classes', 2) 
+            bounds = self._reduce_reconstruction_volume(recon, binning, method, 
+                                                        threshold, buffer, min_component_size, otsu_classes)
 
         if preview:
             if method.lower() == 'manual':
                 mask_radius = kwargs.pop('mask_radius', None)
-                recon, binning = self.get_recon(mask_radius=mask_radius)
+                recon, binning = self._get_recon(mask_radius=mask_radius)
 
-            self.plot_with_bounds(recon, bounds, binning)
+            self._plot_with_bounds(recon, bounds, binning)
         
         return self.update_ig(self.data.geometry.get_ImageGeometry(), bounds)
 
     def update_ig(self, ig_unbinned, bounds):
+        """
+        Return a new unbinned ImageGeometry with the bounds applied
+        """
         if bounds is None:
             ig = ig_unbinned
         else:
@@ -139,7 +183,11 @@ class VolumeShrinker(object):
                     'vertical':(bounds['vertical'][0], bounds['vertical'][1], 1)})(ig_unbinned)
         return ig
     
-    def get_recon(self, mask_radius):
+    def _get_recon(self, mask_radius=None):
+        """
+        Gets a binned reconstruction from the dataset with an optional mask
+        Also returns the binning which has been used
+        """
         binning = min(int(np.ceil(self.data.geometry.config.panel.num_pixels[0] / 128)),16)
         angle_binning = np.ceil(self.data.get_dimension_size('angle')/(self.data.get_dimension_size('horizontal')*(np.pi/2)))
         roi = {
@@ -160,7 +208,12 @@ class VolumeShrinker(object):
 
         return recon, binning
 
-    def plot_with_bounds(self, recon, bounds, binning):
+    def _plot_with_bounds(self, recon, bounds, binning):
+        """
+        Plots the bounds on the maximum value in the reconstructed dataset along 
+        each direction.
+        """
+
         fig, axs = plt.subplots(nrows=1, ncols=recon.ndim, figsize=(14, 6))
 
         dims = recon.dimension_labels
@@ -192,11 +245,16 @@ class VolumeShrinker(object):
             ax.set_title(f"Maximum values in direction: {dim}")
         plt.tight_layout()
 
-    def reduce_reconstruction_volume(self, recon, binning, method, kwargs):
-        threshold = kwargs.pop('threshold', None)
-        buffer = kwargs.pop('buffer', None)
-        min_component_size = kwargs.pop('min_component_size', None)
-        otsu_classes = kwargs.pop('otsu_classes', 2)   
+    def _reduce_reconstruction_volume(self, recon, binning, method, 
+                                      threshold=None, buffer=None, min_component_size=None, otsu_classes=2):
+        """
+        Automatically finds the boundaries of the sample in a reconstructed
+        volume based on a threshold between sample and background. 
+        If method=`threshold`, the threshold must be provided.
+        If method=`otsu`, the threshold is calculated from an Otsu filter. The
+        number of `otsu_classes` can be passed. 
+        """
+          
 
         dims = recon.dimension_labels
         all_bounds = {dim: [] for dim in dims}
@@ -205,7 +263,12 @@ class VolumeShrinker(object):
             arr = recon.max(axis=dim).array
             
             if method.lower() == 'threshold':
-                mask = arr > threshold
+                if threshold is not None:
+                    if threshold >= arr.max():
+                        raise ValueError("Threshold is greater than maximum value in dimension: no limits can be found. Try specifying a lower threshold.")
+                    mask = arr > threshold
+                else:
+                    raise ValueError("You must supply a threshold argument if method='threshold'")
 
             elif method.lower() == 'otsu':
                 n_bins = 256
@@ -214,7 +277,7 @@ class VolumeShrinker(object):
                 mask = arr > threshold
 
             if min_component_size is not None:
-                mask = self.threshold_large_components(mask, min_component_size)
+                mask = self._threshold_large_components(mask, min_component_size)
 
             x_indices = np.where(np.any(mask, axis=0))[0]
             y_indices = np.where(np.any(mask, axis=1))[0]
@@ -225,19 +288,22 @@ class VolumeShrinker(object):
                 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(8, 2.5))
 
                 axes[0].imshow(arr, cmap=plt.cm.gray)
-                axes[0].set_title('Original')
+                axes[0].set_title('Maximum values')
 
                 axes[1].hist(arr.ravel(), bins=100)
-                axes[1].set_title('Histogram')
+                axes[1].set_title('Histogram of maximum values')
                 axes[1].axvline(threshold, color='r')
 
                 axes[2].imshow(mask, cmap=plt.cm.gray, extent=[axes[0].get_xlim()[0], axes[0].get_xlim()[1], axes[0].get_ylim()[0], axes[0].get_ylim()[1]])
-                axes[2].set_title('Thresholded')
+                axes[2].set_title('Calculated threshold mask')
 
                 axes[2].plot([x_min, x_max], [y_min, y_min], '--r')
                 axes[2].plot([x_min, x_max], [y_max, y_max], '--r')
                 axes[2].plot([x_min, x_min], [y_min, y_max], '--r')
                 axes[2].plot([x_max, x_max], [y_min, y_max], '--r')
+
+                plt.suptitle(dim)
+                
                 plt.tight_layout()
 
             axis = recon.get_dimension_axis(dim)
@@ -273,7 +339,13 @@ class VolumeShrinker(object):
             
         return bounds
         
-    def threshold_large_components(self, mask, min_component_size):
+    def _threshold_large_components(self, mask, min_component_size):
+        """
+        Modify a threshold mask to ignore clusters of pixel values above the threshold 
+        if the cluster is below a specified `min_component_size` in pixels. This 
+        can be useful for noisy datasets where a few noisy pixels above the threshold 
+        may appear in the background and erroneously increase the bounds.
+        """
         labeled_mask, _ = label(mask)
         component_sizes = np.bincount(labeled_mask.ravel())
         min_component_size = 10
@@ -286,7 +358,7 @@ class VolumeShrinker(object):
     
     def _configure_recon(self, backend='tigre'):
         """
-        Configures the recon for the right engine. Checks the geometry type and data order.
+        Configures the recon for the right engine.
         """
         if backend not in self._supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))

@@ -70,7 +70,7 @@ class VolumeShrinker(object):
             Default is False.
         
         method : string, optional
-            If 'manual', use manual_limits
+            If 'manual', use `limits`
             If 'threshold' crop the reconstruction volume based on a threshold
             value between sample and background. Pass threshold as a kwarg.
             If 'otsu', automatically detect and crop the reconstruction volume.

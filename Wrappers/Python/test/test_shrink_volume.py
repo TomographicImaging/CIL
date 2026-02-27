@@ -88,7 +88,7 @@ class TestVolumeShrinker(unittest.TestCase):
                 self.assertEqual(new_ig.shape[new_ig.dimension_labels.index(dim)], limits[dim][1] - limits[dim][0])
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
-    def test_run_manual_astra(self):
+    def test_run_manual_tigre(self):
 
         limits = {
                 'horizontal_x': (10, 50),
@@ -108,7 +108,7 @@ class TestVolumeShrinker(unittest.TestCase):
     unittest.skipUnless(has_astra and has_nvidia, "Astra GPU not installed")
     def test_reduce_reconstruction_volume_astra(self):
         vs = VolumeShrinker(self.data_cone, recon_backend='astra')
-        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', kwargs={'threshold':0.5})
+        bounds = vs.reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.5)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
             self.assertEqual(bounds[dim], (3,6))
 

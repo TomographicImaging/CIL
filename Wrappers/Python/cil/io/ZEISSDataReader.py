@@ -131,17 +131,20 @@ class ZEISSDataReader:
 
             # check roi labels and create tuple for slicing
             for key in roi.keys():
+                if key not in zeiss_data_order:
+                    raise ValueError('Invalid roi key: {}. Keys should be one of {}'.format(key, list(zeiss_data_order.keys())))
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
                         if x is None:
                             continue
-
                         if i != 2: #start and stop
-                            default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] - x
+                            adjusted_x = x if x >= 0 else default_roi[idx][1] + x
+                            if adjusted_x < 0 or adjusted_x > default_roi[idx][1]:
+                                raise ValueError('Invalid roi value: {} for key: {}. Values should be between -{} and {}'.format(x, key, default_roi[idx][1], default_roi[idx][1]))
+                            default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] + x
                         else: #step
                             default_roi[idx][i] =  x if x > 0 else 1
-
             self._roi = default_roi
             self._metadata = self.slice_metadata(metadata)
         else:

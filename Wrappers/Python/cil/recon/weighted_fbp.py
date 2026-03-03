@@ -3,99 +3,159 @@ import numpy as np
 from cil.plugins.astra import FBP as FBP_ASTRA
 import numba
 from cil.framework.labels import AngleUnit, AcquisitionType
+from cil.framework.acquisition_geometry import SystemConfiguration
+import warnings
+import logging
 
-
-
-def run_weighted_fbp(data, weights):
-    # Apply weights to the data
-    data_weighted = data.copy()
-    for angle_idx in range(data.geometry.angles.size):
-        try:
-            data_weighted.array[angle_idx, :, :] *= weights[angle_idx]
-        except:
-            data_weighted.array[angle_idx, :] *= weights[angle_idx]
-
-    # Reorder and reconstruct with weighted data
-    data_weighted.reorder('astra')
-    recon = FBP_ASTRA(data_weighted.geometry.get_ImageGeometry(), data_weighted.geometry)(data_weighted)
-    return recon
-
-
-def get_weights_for_FBP(data):
-    angles = data.geometry.angles.copy()
-
-    
-
-    if data.geometry.config.angles.angle_unit == AngleUnit.DEGREE:
-        half_angle = 180.0
-    else:
-        half_angle = np.pi
-
-    if data.geometry.geom_type == AcquisitionType.CONE:
-        angular_domain = half_angle*2.0
-    elif data.geometry.geom_type & AcquisitionType.CONE_FLEX:
-        raise NotImplementedError("get_weights_for_FBP does not currently support CONE_FLEX geometries")
-    elif data.geometry.geom_type == AcquisitionType.PARALLEL:
-        angular_domain = half_angle
-
-    num_proj = data.geometry.num_projections
-
-    return get_weights(angles, angular_domain, num_proj)
-  
-    
-def calculate_angular_sampling_weights(data, angular_domain=None, max_gap=None, wedge_behaviour='forward/back'):  #, wrap_angles=True
+def calculate_angular_sampling_weights_cone(data, scan_type = 'full', max_gap=None, wedge_behaviour='forward/back'):
     '''
-    angular_domain: The ideal minimum angular range needed for the scan.
-        default assumes 180 for parallel beam and 360 for cone beam
-        If you had a laminography parallel beam for example you would need 360
+    Calculates angular sampling weights for cone beam data, based on the spacing of the projection angles.
+    Wraps around the angular domain to calculate the spacing between the first and last projection angles, unless this is determined to be a wedge gap based on the max_gap parameter.
+
+    Parameters
+    ----------
+    scan_type: {'full', 'half'}, default: 'full'
+        This defines the ideal minimum angular range needed for the scan.
+        If 'full' this is 360 degrees.
+        If 'half' this is 180 degrees plus the cone angle. 
+        
         The spacing between the last and first projection angles is computed 
-        by wrapping around the angular domain. This may or may not be determined to be a wedge gap,
+        by wrapping around the angular domain, unless the spacing is determined to be a wedge gap,
         depending on the max_gap parameter.
     
     max_gap: This is used to find missing wedges in the data: max_gap is the maximum spacing between angles which 
         isn't classified as a wedge. If a gap between two angles is found to be greater than the max_gap, it is assigned 
-        a value based on the selected 'wedge_behaviour'.
+        a value based on the selected 'wedge_behaviour'. 
         Default behaviour:
             If max_gap is None:
+                This is set to double the mean of all gaps. 
+
+    wedge_behaviour: {'forward/back', 'max_gap'}
+        If 'forward/back', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge are the backward or forward 
+        gaps respectively.
+
+        If 'max_gap', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge is determined by max_gap.
+        If 'max_gap' has been set by the user then these are set to 'max_gap'/2
+
+    Returns
+    -------
+    weights: np.ndarray
+        An array of weights with the same length as the number of projections in the data, which can be used to weight the projections for FBP reconstruction.
+        These require normalisation before use in FBP, which can be done with the normalise_weights_for_FBP function.
+
+    
+    '''
+
+    if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
+        raise NotImplementedError("calculate_angular_sampling_weights_cone does not currently support CONE_FLEX geometries")
+    if not data.geometry.geom_type & AcquisitionType.CONE:
+        raise ValueError("calculate_angular_sampling_weights_cone only supports cone beam data")
+
+    if scan_type == 'full':
+        angular_domain = 360
+    elif scan_type == 'half':
+        # When implemented this will calculate 180 + cone angle
+        raise NotImplementedError("Half scan type is currently not implemented.")
+    else:
+        raise ValueError("Currently only 'full' scan_type is supported.")
+    
+
+
+    return _calculate_angular_sampling_weights(data, angular_domain, max_gap, wedge_behaviour)
+
+    
+
+def calculate_angular_sampling_weights_parallel(data, max_gap=None, wedge_behaviour='forward/back'):
+    '''
+    Calculates angular sampling weights for parallel beam data, based on the spacing of the projection angles.
+    Wraps around the angular domain to calculate the spacing between the first and last projection angles, unless this is determined to be a wedge gap based on the max_gap parameter.
+   
+    Parameters
+    ----------
+    max_gap: This is used to find missing wedges in the data: max_gap is the maximum spacing between angles which 
+        isn't classified as a wedge. If a gap between two angles is found to be greater than the max_gap, it is assigned 
+        a value based on the selected 'wedge_behaviour'.
+        Default behaviour:
+            If max_gap is None: 
+                This is set to double the mean of all gaps. 
+
+    wedge_behaviour: {'forward/back', 'max_gap'}
+        If 'forward/back', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge are the backward or forward 
+        gaps respectively.
+
+        If 'max_gap', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge is determined by max_gap.
+        If 'max_gap' has been set by the user then these are set to 'max_gap'/2
+    
+    Returns
+    -------
+    weights: np.ndarray
+        An array of weights with the same length as the number of projections in the data, which can be used to weight the projections for FBP reconstruction.
+        These require normalisation before use in FBP, which can be done with the normalise_weights_for_FBP function.
+    '''
+    
+    
+    if not data.geometry.geom_type & AcquisitionType.PARALLEL:
+        raise ValueError("calculate_angular_sampling_weights_parallel only supports parallel beam data")
+
+    if data.geometry.config.system.system_description == SystemConfiguration.SYSTEM_ADVANCED:
+        tilt = data.geometry.get_centre_of_rotation()['angle']
+        tilt_value = tilt[0]
+        tilt_unit = tilt[1]
+        #TODO: figure out what tolerance should be used here and make unit tests
+        percentage_tolerance = 0.05
+        if tilt_unit == AngleUnit.DEGREE:
+            max_tilt = 90 * percentage_tolerance
+        elif tilt_unit == AngleUnit.RADIAN:
+            max_tilt = np.pi/2 * percentage_tolerance
+        
+        max_tilt = max_tilt * (percentage_tolerance)
+        if tilt_value > max_tilt:
+            raise NotImplementedError("calculate_angular_sampling_weights_parallel does not currently support tilted geometries with tilt greater than {max_tilt:.2f} {tilt_unit}".format(max_tilt=max_tilt, tilt_unit=tilt_unit))
+    return _calculate_angular_sampling_weights(data, 180, max_gap, wedge_behaviour)
+  
+    
+def _calculate_angular_sampling_weights(data, angular_domain, max_gap=None, wedge_behaviour='forward/back'):  #, wrap_angles=True
+    '''
+    angular_domain: (180,360, or 180 plus cone angle)
+        The ideal minimum angular range needed for the scan. This is not the angular range covered, its the angular range the recon needs
+        default assumes 180 for parallel beam and 360 for cone beam
+        If you had a laminography parallel beam for example you would need angular_domain=360
+        The spacing between the last and first projection angles is computed 
+        by wrapping around the angular domain, unless the spacing is determined to be a wedge gap,
+        depending on the max_gap parameter.
+    
+    max_gap: This is used to find missing wedges in the data: max_gap is the maximum spacing between angles which 
+        isn't classified as a wedge. If a gap between two angles is found to be greater than the max_gap, it is assigned 
+        a value based on the selected 'wedge_behaviour'. 
+        Default behaviour:
+            If max_gap is None: # TODO: could be 1 degree - what does this mean for a 4k detector?
                 This is set to double the mean of all gaps.
 
     wedge_behaviour: {'forward/back', 'max_gap'}
-        If 'forward/back', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge are the doubled backward or forward 
+        If 'forward/back', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge are the backward or forward 
         gaps respectively.
+
         If 'max_gap', the angular spacing assigned to the final angle before a wedge and the first angle after a wedge is determined by max_gap.
-        If 'max_gap' has been set by the user then these are set to 'max_gap'
-        However, if 'max_gap' is None:
-            The replacement value is set to the mean of all gaps less than double the mean of all gaps.
-            e.g. if you had limited angle data which spanned 70 degrees, with 10 degree gaps in this range and angular_domain=180:
-            [0,10,20,30,40,50,60]
-            gaps=[120,10,10,10,10,10,10]
-            mean gap = 25.5
-            max_gap = 51
-            The replacement gap would be set to the mean of the gaps < 51, therefore 10
-            so the weight for 0 would be 10, and for 60 would be 10 instead of the weight for 0 being (0-60)%180=120 
+        If 'max_gap' has been set by the user then these are set to 'max_gap'/2
+
+    Returns
+    -------
+    weights: np.ndarray
+        An array of weights with the same length as the number of projections in the data, which can be used to weight the projections for FBP reconstruction.
+        These require normalisation before use in FBP, which can be done with the normalise_weights_for_FBP function.
     '''
     angles = data.geometry.angles.copy()
 
-    if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError("X does not currently support CONE_FLEX geometries")
+    if max_gap is None:
+        if wedge_behaviour == 'max_gap':
+            raise ValueError("If wedge_behaviour is set to 'max_gap', max_gap must be set.")
+    if wedge_behaviour not in ['forward/back', 'max_gap']:
+        raise ValueError("wedge_behaviour must be either 'forward/back' or 'max_gap'")
 
-    if angular_domain is None:
-        if data.geometry.config.angles.angle_unit == AngleUnit.DEGREE:
-            half_angle = 180.0
-        else:
-            half_angle = np.pi
 
-        angular_domain = half_angle
-
-        if data.geometry.geom_type == AcquisitionType.CONE:
-            angular_domain *=2.0
             
     num_proj = data.geometry.num_projections
 
-    return get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour)
-
-
-def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     # Create array of angle indices in order of angle values
     sorted_indices = np.argsort(angles % angular_domain)
     ordered_mod_angles = angles[sorted_indices] % angular_domain
@@ -104,7 +164,6 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
     weights = np.zeros(num_proj)
     
 
-    # create tolerance for two angles being equal:
     gaps=[]
     for i in range(num_proj):
         prev_idx = (i - 1) % num_proj
@@ -112,7 +171,10 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
         gaps.append(gap)
 
     gaps = np.asarray(gaps)
-    
+
+    mean_gap = np.mean(gaps)
+    if np.allclose(gaps, mean_gap):
+        return np.array([mean_gap]*num_proj)  
 
     max_angular_span = max_gap
 
@@ -125,22 +187,17 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
 
         max_angular_span = np.mean(gaps_no_zeros)*2 # duplicate angles shouldn't go into the mean
         # calculate mean of all gaps that aren't wedge gaps: 
-        default_gap = np.mean(gaps_no_zeros[gaps_no_zeros< max_angular_span])
+
+        warnings.warn("Because max_gap was None, it has been set to double the mean of all gaps between angles: " \
+        "{:.4f} {angular_unit}".format(max_angular_span, angular_unit=data.geometry.config.angles.angle_unit), UserWarning, stacklevel=2)      
+
     else:
         default_gap = max_angular_span
-
-    # TODO: decide what should be
-    angular_tolerance = 0.01 * max_angular_span / 2
-
-
-    # TODO: reinstate after testing:
-    # check if all gaps are equal, if so return weights of 1:
-    # if np.allclose(gaps, mean_gap, atol=angular_tolerance):
-    #     return np.ones_like(angles)   
 
     num_remaining_proj_at_current_angle = 1
     total_num_proj_at_current_angle=1
     total_duplicates = 0
+    num_wedges=0
 
     for i in range(num_proj):
         prev_idx = (i - 1 - (total_num_proj_at_current_angle-num_remaining_proj_at_current_angle)) % num_proj
@@ -150,8 +207,8 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
         next_angle = ordered_mod_angles[next_idx]
 
         if total_num_proj_at_current_angle == 1: # This means we haven't checked if there are any projections at this same angle:
-            if np.isclose(next_angle, current_angle, atol=angular_tolerance):
-                while np.isclose(next_angle, current_angle, atol=angular_tolerance):
+            if np.isclose(next_angle, current_angle):
+                while np.isclose(next_angle, current_angle):
                     next_idx = (next_idx + 1) % num_proj
                     next_angle = ordered_mod_angles[next_idx]
                     num_remaining_proj_at_current_angle += 1
@@ -160,10 +217,11 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
 
         angle_coverage = ((next_angle - prev_angle) % angular_domain) / 2.0
         if angle_coverage > max_angular_span:
+            num_wedges+=1
             if wedge_behaviour == 'forward/back':
                 forward = (next_angle - current_angle) % angular_domain
                 backward = (current_angle - prev_angle) % angular_domain
-                if np.isclose(forward, backward, atol=angular_tolerance):
+                if np.isclose(forward, backward):
                     angle_coverage = max_angular_span
                 else:
                     angle_coverage = min(forward, backward)
@@ -181,44 +239,44 @@ def get_weights(angles, angular_domain, num_proj, max_gap, wedge_behaviour):
                 total_num_proj_at_current_angle = 1
                 num_remaining_proj_at_current_angle = 1
 
+    if num_wedges > 0:
+        logging.info(f"{num_wedges} missing wedges were identified in the data based on the max_gap value of {max_angular_span:.4f} {data.geometry.config.angles.angle_unit}. If this is not expected, consider adjusting the max_gap value.")
 
     # Reorder weights back to original projection order
     original_order_weights = np.zeros(num_proj)
     for i, idx in enumerate(sorted_indices):
         original_order_weights[idx] = weights[i]
 
-    true_angular_range = np.sum(weights) # this may not be the same as the max angular range if we have gaps
-    # Normalize weights:
-    num_unique_angles = len(angles)-total_duplicates
-    original_order_weights = original_order_weights  / (np.sum(weights)/len(weights))
-    # / (true_angular_range/num_unique_angles) # used to do this
-
     return original_order_weights
 
 
 def normalise_weights_for_FBP(weights):
+    '''
+    Normalises weights for use in FBP or FDK reconstruction, by ensuring
+    the sum of the weights is equal to the number of projections in the data.
+
+    The weights are divided by sum of the weights and multiplied by the number of weights.
+
+    Parameters
+    ----------
+    weights: np.ndarray
+        An array of weights with the same length as the number of projections in the data, which
+        can be used to weight the projections for FBP reconstruction.
+        These are typically the output of the calculate_angular_sampling_weights_cone or calculate_angular_sampling_weights_parallel functions,
+        or can be custom weights defined by the user.
+
+    Returns
+    -------
+    normalised_weights: np.ndarray
+        An array of normalised weights with the same length as the number of projections in the data.
+        These can be used to weight the projections for FBP reconstruction.
+    '''
 
     normalised_weights = weights.copy()
     normalised_weights = normalised_weights / np.sum(normalised_weights) * len(normalised_weights)
     return normalised_weights
 
 
-
-
-
-# def run_weighted_fbp(data, weights):
-#     # Apply weights to the data
-#     data_weighted = data.copy()
-#     for angle_idx in range(data.geometry.angles.size):
-#         try:
-#             data_weighted.array[angle_idx, :, :] *= weights[angle_idx]
-#         except:
-#             data_weighted.array[angle_idx, :] *= weights[angle_idx]
-
-#     # Reorder and reconstruct with weighted data
-#     data_weighted.reorder('astra')
-#     recon = FBP_ASTRA(data_weighted.geometry.get_ImageGeometry(), data_weighted.geometry)(data_weighted)
-#     return recon
 
 
 def run_weighted_fbp(data, weights, accelerated=True):

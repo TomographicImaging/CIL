@@ -130,9 +130,11 @@ class VolumeShrinker(object):
         ig = self.data.geometry.get_ImageGeometry()
         if method.lower() == 'manual':
             bounds = {}
+            # sets default full range bounds for all dimensions
             for dim in ig.dimension_labels:
                 bounds[dim] = (0, ig.shape[ig.dimension_labels.index(dim)])
             if limits is not None:
+                # applies limits to dimension if specified
                 for dim, v in limits.items():
                     if dim in ig.dimension_labels:
                         if v is None:
@@ -149,7 +151,7 @@ class VolumeShrinker(object):
                         bounds[dim] = v
                     else:
                         raise ValueError("dimension {} not recognised, must be one of {}".format(dim, ig.dimension_labels))
-
+        # methods to find automatic limits
         elif method.lower() in ['threshold', 'otsu']:
             mask_radius = kwargs.pop('mask_radius', None)
             recon, binning = self._get_recon(mask_radius=mask_radius)
@@ -164,6 +166,7 @@ class VolumeShrinker(object):
             raise ValueError("Method {method} not recognised, must be one of 'manual', 'threshold' or 'otsu'")
 
         if preview:
+            # if we use manual limits but preview is True we need to calculate the recon
             if method.lower() == 'manual':
                 mask_radius = kwargs.pop('mask_radius', None)
                 recon, binning = self._get_recon(mask_radius=mask_radius)
@@ -260,6 +263,7 @@ class VolumeShrinker(object):
         dims = recon.dimension_labels
         all_bounds = {dim: [] for dim in dims}
 
+        # loops through the dimensions and finds the min and max pixel position with value above the threshold
         for dim in dims:
             arr = recon.max(axis=dim).array
             
@@ -322,6 +326,7 @@ class VolumeShrinker(object):
             all_bounds[dims[other_axes[1]]].append((x_min, x_max))
 
         bounds = {}
+        # loops over dimensions and finds the maximum bounds, then multiplies by binning and adds buffer
         for dim in dims:
 
             mins = [b[0] for b in all_bounds[dim]]

@@ -81,13 +81,12 @@ class VolumeShrinker(object):
 
         buffer: float, optional
             Buffer in pixels around the automatically detected limits. 
-            Default is None, no buffer added.
+            Default is 0, no buffer added.
 
         mask_radius: float, optional
             Radius of circular mask to apply on the reconstructed volume. This
             impacts the automatic cropping of the reconstruction volume when method
-            is 'threshold' or 'reconstruction' and displaying with preview. 
-            Default is None.
+            is 'threshold' or 'otsu' and displaying with preview. Default is None.
 
         otsu_classes: int, optional
             Number of material classes to use when automatically detecting the 
@@ -155,7 +154,7 @@ class VolumeShrinker(object):
             mask_radius = kwargs.pop('mask_radius', None)
             recon, binning = self._get_recon(mask_radius=mask_radius)
             threshold = kwargs.pop('threshold', None)
-            buffer = kwargs.pop('buffer', None)
+            buffer = kwargs.pop('buffer', 0)
             min_component_size = kwargs.pop('min_component_size', None)
             otsu_classes = kwargs.pop('otsu_classes', 2) 
             bounds = self._reduce_reconstruction_volume(recon, binning, method, 
@@ -242,13 +241,13 @@ class VolumeShrinker(object):
                 ax.plot([x_min, x_min], [y_min, y_max], '--r')
                 ax.plot([x_max, x_max], [y_min, y_max], '--r')
 
-            ax.set_xlabel(x_dim)
-            ax.set_ylabel(y_dim)
+            ax.set_xlabel(f"Downsampled  {x_dim}")
+            ax.set_ylabel(f"Downsampled  {y_dim}")
             ax.set_title(f"Maximum values in direction: {dim}")
         plt.tight_layout()
 
     def _reduce_reconstruction_volume(self, recon, binning, method, 
-                                      threshold=None, buffer=None, min_component_size=None, otsu_classes=2):
+                                      threshold=None, buffer=0, min_component_size=None, otsu_classes=2):
         """
         Automatically finds the boundaries of the sample in a reconstructed
         volume based on a threshold between sample and background. 
@@ -280,9 +279,13 @@ class VolumeShrinker(object):
                 threshold = threshold_multiotsu(arr[arr>0], classes=otsu_classes, nbins=n_bins)
                 threshold = threshold[0]
                 mask = arr > threshold
+                if not mask.any():
+                    raise ValueError("No pixels found within threshold, consider using a different number of otsu_classes or method='threshold' or 'manual'")
 
             if min_component_size is not None:
                 mask = self._threshold_large_components(mask, min_component_size)
+                if not mask.any():
+                    raise ValueError("No pixels found within threshold, consider reducing min_component_size")
 
             x_indices = np.where(np.any(mask, axis=0))[0]
             y_indices = np.where(np.any(mask, axis=1))[0]
@@ -314,20 +317,9 @@ class VolumeShrinker(object):
             axis = recon.get_dimension_axis(dim)
             other_axes = [j for j in range(recon.ndim) if j != axis]
 
-            if buffer is not None:
-                y_full = recon.get_dimension_size(dims[other_axes[0]])
-                y_min_buffer = np.max([0, y_min-(buffer//binning)])
-                y_max_buffer = np.min([y_full, y_max+(buffer//binning)])
 
-                x_full = recon.get_dimension_size(dims[other_axes[1]])
-                x_min_buffer = np.max([0, x_min-(buffer//binning)])
-                x_max_buffer = np.min([x_full, x_max+(buffer//binning)])
-
-                all_bounds[dims[other_axes[0]]].append((y_min_buffer, y_max_buffer))
-                all_bounds[dims[other_axes[1]]].append((x_min_buffer, x_max_buffer))
-            else:
-                all_bounds[dims[other_axes[0]]].append((y_min, y_max))
-                all_bounds[dims[other_axes[1]]].append((x_min, x_max))
+            all_bounds[dims[other_axes[0]]].append((y_min, y_max))
+            all_bounds[dims[other_axes[1]]].append((x_min, x_max))
 
         bounds = {}
         for dim in dims:
@@ -336,6 +328,11 @@ class VolumeShrinker(object):
             maxs = [b[1] for b in all_bounds[dim]]
             dim_min = np.min(mins)*binning
             dim_max = np.max(maxs)*binning
+
+            # add the buffer but limit to original ig size
+            dim_min = np.max([0, (dim_min - buffer)]) 
+            dim_full = recon.get_dimension_size(dim)*binning
+            dim_max = np.min([dim_full, (dim_max + buffer)])
             
             bounds[dim] = (dim_min, dim_max)
 
@@ -353,7 +350,6 @@ class VolumeShrinker(object):
         """
         labeled_mask, _ = label(mask)
         component_sizes = np.bincount(labeled_mask.ravel())
-        min_component_size = 10
 
         large_labels = np.where(component_sizes > min_component_size)[0]
         large_labels = large_labels[large_labels != 0]  

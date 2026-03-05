@@ -21,10 +21,11 @@ from unittest.mock import patch
 import numpy as np
 
 from cil.framework import ImageGeometry, ImageData
-from cil.framework.labels import AcquisitionType
 
 from cil.utilities.shrink_volume import VolumeShrinker
 from cil.utilities import dataexample
+
+from cil.processors import TransmissionAbsorptionConverter, CentreOfRotationCorrector
 
 from utils import has_astra, has_tigre, has_nvidia, initialise_tests
 
@@ -206,3 +207,88 @@ class TestVolumeShrinker(unittest.TestCase):
         self.assertEqual(bounds['horizontal_y'], (2,7))
         self.assertEqual(bounds['vertical'], (2,7))
 
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_run_otsu(self):
+        data = self.data_parallel
+        data = TransmissionAbsorptionConverter()(data)
+        data = CentreOfRotationCorrector.xcorrelation(slice_index='centre')(data) 
+
+        # test Otsu method
+
+        # without a mask, bright ring in the recon makes a large ig 
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='otsu', otsu_classes=2, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 78)
+        self.assertEqual(ig_reduced.voxel_num_y, 158)
+        self.assertEqual(ig_reduced.voxel_num_z, 106)
+
+        # with a mask, 2 otsu classes finds volume around the steel wire
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='otsu', otsu_classes=2, preview=False, mask_radius=0.9)
+        self.assertEqual(ig_reduced.voxel_num_x, 20)
+        self.assertEqual(ig_reduced.voxel_num_y, 22)
+        self.assertEqual(ig_reduced.voxel_num_z, 44)
+
+        # 3 otsu classes finds volume around the stand
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='otsu', otsu_classes=3, preview=False, mask_radius=0.9)
+        self.assertEqual(ig_reduced.voxel_num_x, 80)
+        self.assertEqual(ig_reduced.voxel_num_y, 80)
+        self.assertEqual(ig_reduced.voxel_num_z, 74)
+
+        # use min_component_size to exclude noisy outliers
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='otsu', min_component_size=100, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 20)
+        self.assertEqual(ig_reduced.voxel_num_y, 22)
+        self.assertEqual(ig_reduced.voxel_num_z, 44)
+
+        # test buffer adds expected number of pixels each side
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='otsu', buffer=5, min_component_size=100, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 30)
+        self.assertEqual(ig_reduced.voxel_num_y, 32)
+        self.assertEqual(ig_reduced.voxel_num_z, 54)
+
+    @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
+    def test_run_threshold(self):
+        data = self.data_parallel
+        data = TransmissionAbsorptionConverter()(data)
+        data = CentreOfRotationCorrector.xcorrelation(slice_index='centre')(data) 
+
+        # test Otsu method
+
+        # without a mask, bright ring in the recon makes a large ig 
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='threshold', threshold=0.02, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 78)
+        self.assertEqual(ig_reduced.voxel_num_y, 158)
+        self.assertEqual(ig_reduced.voxel_num_z, 108)
+
+        # with a mask, find volume around the steel wire
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='threshold', threshold=0.02, preview=False, mask_radius=0.9)
+        self.assertEqual(ig_reduced.voxel_num_x, 22)
+        self.assertEqual(ig_reduced.voxel_num_y, 24)
+        self.assertEqual(ig_reduced.voxel_num_z, 48)
+
+        # lower threshold finds volume around the stand
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='threshold', threshold=0.01, preview=False, mask_radius=0.9)
+        self.assertEqual(ig_reduced.voxel_num_x, 80)
+        self.assertEqual(ig_reduced.voxel_num_y, 80)
+        self.assertEqual(ig_reduced.voxel_num_z, 74)
+
+        # # use min_component_size to exclude noisy outliers
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 20)
+        self.assertEqual(ig_reduced.voxel_num_y, 22)
+        self.assertEqual(ig_reduced.voxel_num_z, 44)
+
+        # test buffer adds expected number of pixels each side
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, buffer=5, preview=False)
+        self.assertEqual(ig_reduced.voxel_num_x, 30)
+        self.assertEqual(ig_reduced.voxel_num_y, 32)
+        self.assertEqual(ig_reduced.voxel_num_z, 54)

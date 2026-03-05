@@ -22,8 +22,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.ndimage import label
 from skimage.filters import threshold_multiotsu
 import importlib
-from cil.framework.labels import AcquisitionType
-
 
 from cil.processors import Binner, Slicer
 
@@ -42,7 +40,7 @@ class VolumeShrinker(object):
         The dataset to create a reduced reconstruction volume from.
 
     recon_backend : {'tigre', 'astra'}
-        The backend to use for the reconstruction
+        The plugin backend to use for the reconstruction
 
     """
 
@@ -86,9 +84,10 @@ class VolumeShrinker(object):
             Default is None, no buffer added.
 
         mask_radius: float, optional
-            Radius of circular mask to apply on the reconstructed volume, before
-            automatically cropping the reconstruction volume or displaying with 
-            preview. Default is None.
+            Radius of circular mask to apply on the reconstructed volume. This
+            impacts the automatic cropping of the reconstruction volume when method
+            is 'threshold' or 'reconstruction' and displaying with preview. 
+            Default is None.
 
         otsu_classes: int, optional
             Number of material classes to use when automatically detecting the 
@@ -113,7 +112,7 @@ class VolumeShrinker(object):
         >>> cil_log_level = logging.getLogger()
         >>> cil_log_level.setLevel(logging.DEBUG)
         >>> vs = VolumeShrinker(data, recon_backend='astra')
-        >>> ig_reduced = vs.run(method='threshold' threshold=0.9)
+        >>> ig_reduced = vs.run(method='threshold', threshold=0.9)
 
         Example
         -------
@@ -161,6 +160,9 @@ class VolumeShrinker(object):
             otsu_classes = kwargs.pop('otsu_classes', 2) 
             bounds = self._reduce_reconstruction_volume(recon, binning, method, 
                                                         threshold, buffer, min_component_size, otsu_classes)
+            
+        else:
+            raise ValueError("Method {method} not recognised, must be one of 'manual', 'threshold' or 'otsu'")
 
         if preview:
             if method.lower() == 'manual':
@@ -265,8 +267,11 @@ class VolumeShrinker(object):
             if method.lower() == 'threshold':
                 if threshold is not None:
                     if threshold >= arr.max():
-                        raise ValueError("Threshold is greater than maximum value in dimension: no limits can be found. Try specifying a lower threshold.")
+                        raise ValueError(f"Threshold {threshold} is greater than maximum value in dimension: {arr.max()}. Try specifying a lower threshold.")
+                    elif threshold <= arr.min():
+                        raise ValueError(f"Threshold {threshold} is less than minimum value in dimension: {arr.min()}. Try specifying a higher threshold.")
                     mask = arr > threshold
+
                 else:
                     raise ValueError("You must supply a threshold argument if method='threshold'")
 

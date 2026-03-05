@@ -243,6 +243,10 @@ class TestVolumeShrinker(unittest.TestCase):
         self.assertEqual(ig_reduced.voxel_num_y, 22)
         self.assertEqual(ig_reduced.voxel_num_z, 44)
 
+        # check we get an error if the component size is too large to find any pixels
+        with self.assertRaises(ValueError):
+            ig_reduced = vs.run(method='otsu', min_component_size=900, preview=False)
+
         # test buffer adds expected number of pixels each side
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', buffer=5, min_component_size=100, preview=False)
@@ -257,6 +261,11 @@ class TestVolumeShrinker(unittest.TestCase):
         data = CentreOfRotationCorrector.xcorrelation(slice_index='centre')(data) 
 
         # test Otsu method
+
+        # check we get an error if the threshold is too high to find any pixels
+        vs = VolumeShrinker(data, recon_backend='tigre')
+        with self.assertRaises(ValueError):
+            ig_reduced = vs.run(method='threshold', threshold=1, preview=False)
 
         # without a mask, bright ring in the recon makes a large ig 
         vs = VolumeShrinker(data, recon_backend='tigre')
@@ -279,16 +288,22 @@ class TestVolumeShrinker(unittest.TestCase):
         self.assertEqual(ig_reduced.voxel_num_y, 80)
         self.assertEqual(ig_reduced.voxel_num_z, 74)
 
-        # # use min_component_size to exclude noisy outliers
+        # use min_component_size to exclude noisy outliers
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, preview=False)
         self.assertEqual(ig_reduced.voxel_num_x, 20)
         self.assertEqual(ig_reduced.voxel_num_y, 22)
         self.assertEqual(ig_reduced.voxel_num_z, 44)
 
+        # check we get an error if the component size is too large to find any pixels
+        with self.assertRaises(ValueError):
+            ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=900, preview=False)
+        
         # test buffer adds expected number of pixels each side
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, buffer=5, preview=False)
         self.assertEqual(ig_reduced.voxel_num_x, 30)
         self.assertEqual(ig_reduced.voxel_num_y, 32)
         self.assertEqual(ig_reduced.voxel_num_z, 54)
+
+        

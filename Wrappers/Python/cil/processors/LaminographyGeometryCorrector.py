@@ -150,31 +150,70 @@ class LaminographyGeometryCorrector(Processor):
 
         return ag
        
-    def _projection_reprojection(self, data, ig, ag, ag_ref, y_ref, tilt_deg, cor_pix):
+    def _projection_reprojection(self, data, recon, ig, ag, ag_downsampled, data_downsampled, residual, tilt_deg, cor_pix):
         """
         Reconstruct the data then re-project and calculate the residual. Then
         filter the residual and calculate the L2Norm loss.
+
+        Parameters
+        ----------
+        data: AcquisitionData
+            The full size dataset
+        recon: ImageData
+            Pre-allocated reconstruction volume
+        ig: ImageGeometry
+            Reconstruction volume geometry
+        ag: AcquisitionGeometry
+            Copy of full data geometry
+        ag_downsampled: AcquisitionGeometry
+            Geometry of the downsampled dataset used for reprojection
+        data_downsampled: AcquisitionData
+            Downsampled dataset used for reprojection
+        residual: AcqusitionData
+            Pre-allocated residual, difference between data and reprojection
+        tilt_deg: float
+            Latest tilt angle in degrees
+        cor_pix: floar
+            Latest centre of rotation offset in pixels
+
         """
         
+        # update the geometry with latest values and get reconstruction
         ag = self._update_geometry(ag, tilt_deg, cor_pix)
-        recon = self.FBP(ig, ag)(data)
+        FBP = self.FBP(ig, ag)
+        FBP.set_input(data)
+        FBP.get_output(out=recon)
         recon.apply_circular_mask(0.9)
 
-        ag_ref = self._update_geometry(ag_ref, tilt_deg, cor_pix)
-        A = self.ProjectionOperator(ig, ag_ref)
+        # update the downsampled data geometry and get forward projection
+        ag_downsampled = self._update_geometry(ag_downsampled, tilt_deg, cor_pix)
+        A = self.ProjectionOperator(ig, ag_downsampled)
+        A.direct(recon, out=residual)
+        # subtract the downsampled reference data
+        residual.subtract(data_downsampled, out=residual)
         
-        residual = A.direct(recon) - y_ref
-        
-        residual = residual.as_array() - gaussian_filter(residual.as_array(), sigma=3.0)
-        residual = np.sqrt((sobel(residual, axis=0))**2 + (sobel(residual, axis=2))**2)
+        # apply Gaussian and Sobel filter - note the axes are hard coded here for astra, this would need to be updated for tigre 
+        residual.subtract(gaussian_filter(residual.as_array(), sigma=3.0, axes=(0,2)), out=residual)
+        np.sqrt((sobel(residual.array, axis=0))**2 + (sobel(residual.array, axis=2))**2, out=residual.array)
         
         loss = float(np.sum(residual**2))
 
-        return loss, recon
+        return loss
     
     def _minimise_geometry(self, data, binning, p0, bounds):
         """
         Setup and run the scipy Powell minimize method
+
+        Parameters
+        ----------
+        data: AcquistionData
+            Full dataset
+        binning: int
+            Current detector binning value
+        p0: list or tuple
+            Initial start parameters for search (tilt_deg, cor_pix)
+        bounds: list of tuple of floats
+            Bounds for the parameters [(tilt_min_deg, tilt_max_deg), (CoR_min_pix, CoR_max_pix)]
         """
         
         current_run_evaluations = []
@@ -196,22 +235,30 @@ class LaminographyGeometryCorrector(Processor):
         # get y_ref: a subset of the real data to compare with the reprojections
         target = max(np.ceil(data.get_dimension_size('angle') / 10), 36)
         divider = np.floor(data.get_dimension_size('angle') / target)
-        y_ref = Slicer(roi={'angle':(None, None, divider)})(data)
+        data_downsampled = Slicer(roi={'angle':(None, None, divider)})(data)
 
         # also get a matching reference geometry
         ag = data.geometry.copy()
-        ag_ref = Slicer(roi={'angle':(None, None, divider)})(ag)
+        ag_downsampled = Slicer(roi={'angle':(None, None, divider)})(ag)
 
         if self.image_geometry is None:
             ig = ag.get_ImageGeometry()
         else:
             ig = Binner(roi={'horizontal_x':(None, None,binning), 'horizontal_y':(None, None,binning), 'vertical':(None, None,binning)})(self.image_geometry)
         
+        # pre-allocate reconstruction volume and residual array
+        recon = ig.allocate(0)
+        residual = ag_downsampled.allocate()
+
         def loss_function_wrapper(p):
+            """
+            Function wrapper for the loss function, self._projection_reprojection
+            to be called by scipy.minimize. Rescales tilt and cor by xtol so a 
+            single tolerance can be used for each parameter.
+            """
             tilt = p[0] * xtol[0]
             cor  = p[1] * xtol[1]
-
-            loss, recon = self._projection_reprojection(data, ig, ag, ag_ref, y_ref, tilt, cor)
+            loss = self._projection_reprojection(data, recon, ig, ag, ag_downsampled, data_downsampled, residual, tilt, cor)
             
             current_run_evaluations.append((tilt, cor * binning, loss))
 

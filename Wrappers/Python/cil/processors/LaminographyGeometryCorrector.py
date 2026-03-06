@@ -395,7 +395,7 @@ class LaminographyGeometryCorrector(Processor):
 
     def _configure_FBP(self, backend='astra'):
         """
-        Configures the recon and projection operator for the right engine. Checks the geometry type and data order.
+        Configures the recon and projection operator for the right engine.
         """
         if backend not in self._supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))

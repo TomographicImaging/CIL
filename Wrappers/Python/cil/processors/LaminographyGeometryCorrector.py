@@ -119,7 +119,7 @@ class LaminographyGeometryCorrector(Processor):
 
         return True
 
-    def _get_initial_parameters(self):
+    def _calculate_initial_parameters(self):
         """
         Get the current tilt and centre of rotation from the geometry
         """
@@ -261,8 +261,8 @@ class LaminographyGeometryCorrector(Processor):
             loss = self._projection_reprojection(data, recon, ig, ag, ag_downsampled, data_downsampled, residual, tilt, cor)
             
             current_run_evaluations.append((tilt, cor * binning, loss))
-
-            print(f"tilt: {tilt:.3f}, CoR: {cor*binning:.3f}, loss: {loss:.3e}")
+            if log.isEnabledFor(logging.DEBUG):
+                print(f"tilt: {tilt:.3f}, CoR: {cor*binning:.3f}, loss: {loss:.3e}")
 
             return loss
         
@@ -270,7 +270,7 @@ class LaminographyGeometryCorrector(Processor):
         res_scaled = minimize(loss_function_wrapper, p0_scaled,
                     method='Powell',
                     bounds=bounds_scaled,
-                    options={'maxiter': 5, 'disp': True, 'xtol': 1.0, 'direc': direc}) 
+                    options={'maxiter': 5, 'disp': False, 'xtol': 1.0, 'direc': direc}) 
         
         # re-scale the results
         res_real = res_scaled
@@ -292,7 +292,7 @@ class LaminographyGeometryCorrector(Processor):
     def process(self, out=None):
 
         data = self.get_input()
-        self._get_initial_parameters()
+        self._calculate_initial_parameters()
 
         # apply coarse binning to the data
         if self.coarse_binning is None:
@@ -320,7 +320,8 @@ class LaminographyGeometryCorrector(Processor):
         
         tilt_min = res.x[0]
         cor_min = res.x[1]
-        print(f"Coarse scan optimised tilt = {tilt_min:.3f}, CoR = {cor_min:.3f}")
+        if log.isEnabledFor(logging.DEBUG):
+            print(f"Coarse scan optimised tilt = {tilt_min:.3f}, CoR = {cor_min:.3f}")
 
         # apply final binning
         if self.final_binning is None:
@@ -341,10 +342,12 @@ class LaminographyGeometryCorrector(Processor):
         min_search_range_cor  = 1.0
 
         half_width_tilt = max(search_factor * coarse_tolerance[0], min_search_range_tilt/2)
-        fine_bounds_tilt = (tilt_min - half_width_tilt, tilt_min + half_width_tilt)
+        fine_bounds_tilt = (max((tilt_min - half_width_tilt), self.parameter_bounds[0][0]), # whichever is higher out of the calculated fine lower bound and coarse bound
+                            min((tilt_min + half_width_tilt), self.parameter_bounds[0][1])) # whichever is lower out of the calculated fine upper bound and coarse bound
 
         half_width_cor = max(search_factor * coarse_tolerance[1], min_search_range_cor/2)
-        fine_bounds_cor = (cor_min - half_width_cor, cor_min + half_width_cor)
+        fine_bounds_cor = (max((cor_min - half_width_cor), self.parameter_bounds[1][0]), # whichever is higher out of the calculated fine lower bound and coarse bound
+                           min((cor_min + half_width_cor), self.parameter_bounds[1][1])) # whichever is lower out of the calculated fine upper bound and coarse bound
 
         # run fine minimisation
         res = self._minimise_geometry(data_binned, binning=binning,

@@ -173,9 +173,9 @@ class VolumeShrinker(object):
 
             self._plot_with_bounds(recon, bounds, binning)
         
-        return self.update_ig(self.data.geometry.get_ImageGeometry(), bounds)
+        return self._update_ig(self.data.geometry.get_ImageGeometry(), bounds)
 
-    def update_ig(self, ig_unbinned, bounds):
+    def _update_ig(self, ig_unbinned, bounds):
         """
         Return a new unbinned ImageGeometry with the bounds applied
         """

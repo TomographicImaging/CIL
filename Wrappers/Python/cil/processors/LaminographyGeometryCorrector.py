@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 
 class LaminographyGeometryCorrector(Processor):
     """
-        LaminographyGeometryCorrector processor to fit a the geometry of a 
+        LaminographyGeometryCorrector processor to fit the geometry of a 
         parallel beam laminography dataset to find tilt and center-of-rotation.
         
         Parameters
@@ -169,11 +169,11 @@ class LaminographyGeometryCorrector(Processor):
             Geometry of the downsampled dataset used for reprojection
         data_downsampled: AcquisitionData
             Downsampled dataset used for reprojection
-        residual: AcqusitionData
+        residual: AcquisitionData
             Pre-allocated residual, difference between data and reprojection
         tilt_deg: float
             Latest tilt angle in degrees
-        cor_pix: floar
+        cor_pix: float
             Latest centre of rotation offset in pixels
 
         """

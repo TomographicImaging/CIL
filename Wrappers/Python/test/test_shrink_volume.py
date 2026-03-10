@@ -172,40 +172,40 @@ class TestVolumeShrinker(unittest.TestCase):
         # test expected boundaries are found
         bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.5)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (3,6))
+            self.assertEqual(bounds[dim], (2,7))
 
         bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='threshold', threshold=0.1)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (2,7))
+            self.assertEqual(bounds[dim], (1,8))
 
         bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu')
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (3,6))
+            self.assertEqual(bounds[dim], (2,7))
 
         bounds = vs._reduce_reconstruction_volume(self.test_recon, binning=1, method='otsu', buffer=1)
         for dim in ['horizontal_x', 'horizontal_y', 'vertical']:
-            self.assertEqual(bounds[dim], (2,7))
+            self.assertEqual(bounds[dim], (1,8))
 
         # test the asymmetrical volume
         bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='threshold', threshold=0.5)
-        self.assertEqual(bounds['horizontal_x'], (4,5))
-        self.assertEqual(bounds['horizontal_y'], (3,6))
-        self.assertEqual(bounds['vertical'], (3,6))
+        self.assertEqual(bounds['horizontal_x'], (3,6))
+        self.assertEqual(bounds['horizontal_y'], (2,7))
+        self.assertEqual(bounds['vertical'], (2,7))
 
         bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='threshold', threshold=0.1)
-        self.assertEqual(bounds['horizontal_x'], (3,6))
-        self.assertEqual(bounds['horizontal_y'], (2,7))
-        self.assertEqual(bounds['vertical'], (2,7))
+        self.assertEqual(bounds['horizontal_x'], (2,7))
+        self.assertEqual(bounds['horizontal_y'], (1,8))
+        self.assertEqual(bounds['vertical'], (1,8))
 
         bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='otsu')
-        self.assertEqual(bounds['horizontal_x'], (4,5))
-        self.assertEqual(bounds['horizontal_y'], (3,6))
-        self.assertEqual(bounds['vertical'], (3,6))
-
-        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='otsu', buffer=1)
         self.assertEqual(bounds['horizontal_x'], (3,6))
         self.assertEqual(bounds['horizontal_y'], (2,7))
         self.assertEqual(bounds['vertical'], (2,7))
+
+        bounds = vs._reduce_reconstruction_volume(self.test_recon_asymmetrical, binning=1, method='otsu', buffer=1)
+        self.assertEqual(bounds['horizontal_x'], (2,7))
+        self.assertEqual(bounds['horizontal_y'], (1,8))
+        self.assertEqual(bounds['vertical'], (1,8))
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_run_otsu(self):
@@ -218,30 +218,30 @@ class TestVolumeShrinker(unittest.TestCase):
         # without a mask, bright ring in the recon makes a large ig 
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', otsu_classes=2, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 78)
-        self.assertEqual(ig_reduced.voxel_num_y, 158)
-        self.assertEqual(ig_reduced.voxel_num_z, 106)
+        self.assertEqual(ig_reduced.voxel_num_x, 80)
+        self.assertEqual(ig_reduced.voxel_num_y, 160)
+        self.assertEqual(ig_reduced.voxel_num_z, 108)
 
         # with a mask, 2 otsu classes finds volume around the steel wire
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', otsu_classes=2, preview=False, mask_radius=0.9)
-        self.assertEqual(ig_reduced.voxel_num_x, 20)
-        self.assertEqual(ig_reduced.voxel_num_y, 22)
-        self.assertEqual(ig_reduced.voxel_num_z, 44)
+        self.assertEqual(ig_reduced.voxel_num_x, 24)
+        self.assertEqual(ig_reduced.voxel_num_y, 26)
+        self.assertEqual(ig_reduced.voxel_num_z, 48)
 
         # 3 otsu classes finds volume around the stand
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', otsu_classes=3, preview=False, mask_radius=0.9)
-        self.assertEqual(ig_reduced.voxel_num_x, 80)
-        self.assertEqual(ig_reduced.voxel_num_y, 80)
-        self.assertEqual(ig_reduced.voxel_num_z, 74)
+        self.assertEqual(ig_reduced.voxel_num_x, 84)
+        self.assertEqual(ig_reduced.voxel_num_y, 84)
+        self.assertEqual(ig_reduced.voxel_num_z, 78)
 
         # use min_component_size to exclude noisy outliers
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', min_component_size=100, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 20)
-        self.assertEqual(ig_reduced.voxel_num_y, 22)
-        self.assertEqual(ig_reduced.voxel_num_z, 44)
+        self.assertEqual(ig_reduced.voxel_num_x, 24)
+        self.assertEqual(ig_reduced.voxel_num_y, 26)
+        self.assertEqual(ig_reduced.voxel_num_z, 48)
 
         # check we get an error if the component size is too large to find any pixels
         with self.assertRaises(ValueError):
@@ -250,9 +250,9 @@ class TestVolumeShrinker(unittest.TestCase):
         # test buffer adds expected number of pixels each side
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='otsu', buffer=5, min_component_size=100, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 30)
-        self.assertEqual(ig_reduced.voxel_num_y, 32)
-        self.assertEqual(ig_reduced.voxel_num_z, 54)
+        self.assertEqual(ig_reduced.voxel_num_x, 34)
+        self.assertEqual(ig_reduced.voxel_num_y, 36)
+        self.assertEqual(ig_reduced.voxel_num_z, 58)
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
     def test_run_threshold(self):
@@ -270,30 +270,30 @@ class TestVolumeShrinker(unittest.TestCase):
         # without a mask, bright ring in the recon makes a large ig 
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.02, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 78)
-        self.assertEqual(ig_reduced.voxel_num_y, 158)
-        self.assertEqual(ig_reduced.voxel_num_z, 108)
+        self.assertEqual(ig_reduced.voxel_num_x, 80)
+        self.assertEqual(ig_reduced.voxel_num_y, 160)
+        self.assertEqual(ig_reduced.voxel_num_z, 110)
 
         # with a mask, find volume around the steel wire
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.02, preview=False, mask_radius=0.9)
-        self.assertEqual(ig_reduced.voxel_num_x, 22)
-        self.assertEqual(ig_reduced.voxel_num_y, 24)
-        self.assertEqual(ig_reduced.voxel_num_z, 48)
+        self.assertEqual(ig_reduced.voxel_num_x, 26)
+        self.assertEqual(ig_reduced.voxel_num_y, 28)
+        self.assertEqual(ig_reduced.voxel_num_z, 52)
 
         # lower threshold finds volume around the stand
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.01, preview=False, mask_radius=0.9)
-        self.assertEqual(ig_reduced.voxel_num_x, 80)
-        self.assertEqual(ig_reduced.voxel_num_y, 80)
-        self.assertEqual(ig_reduced.voxel_num_z, 74)
+        self.assertEqual(ig_reduced.voxel_num_x, 84)
+        self.assertEqual(ig_reduced.voxel_num_y, 84)
+        self.assertEqual(ig_reduced.voxel_num_z, 78)
 
         # use min_component_size to exclude noisy outliers
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 20)
-        self.assertEqual(ig_reduced.voxel_num_y, 22)
-        self.assertEqual(ig_reduced.voxel_num_z, 44)
+        self.assertEqual(ig_reduced.voxel_num_x, 24)
+        self.assertEqual(ig_reduced.voxel_num_y, 26)
+        self.assertEqual(ig_reduced.voxel_num_z, 48)
 
         # check we get an error if the component size is too large to find any pixels
         with self.assertRaises(ValueError):
@@ -302,8 +302,8 @@ class TestVolumeShrinker(unittest.TestCase):
         # test buffer adds expected number of pixels each side
         vs = VolumeShrinker(data, recon_backend='tigre')
         ig_reduced = vs.run(method='threshold', threshold=0.05, min_component_size=90, buffer=5, preview=False)
-        self.assertEqual(ig_reduced.voxel_num_x, 30)
-        self.assertEqual(ig_reduced.voxel_num_y, 32)
-        self.assertEqual(ig_reduced.voxel_num_z, 54)
+        self.assertEqual(ig_reduced.voxel_num_x, 34)
+        self.assertEqual(ig_reduced.voxel_num_y, 36)
+        self.assertEqual(ig_reduced.voxel_num_z, 58)
 
         

@@ -331,8 +331,11 @@ class VolumeShrinker(object):
 
             mins = [b[0] for b in all_bounds[dim]]
             maxs = [b[1] for b in all_bounds[dim]]
-            dim_min = np.min(mins)*binning
-            dim_max = np.max(maxs)*binning
+
+            # get the lowest and highest boundary
+            # bounds can only be found with the precision of binning so add a full bin each side
+            dim_min = (np.min(mins)*binning) - binning
+            dim_max = (np.max(maxs)*binning) + binning
 
             # add the buffer but limit to original ig size
             dim_min = np.max([0, (dim_min - buffer)]) 

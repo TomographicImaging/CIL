@@ -160,7 +160,7 @@ class LaminographyGeometryCorrector(Processor):
         data: AcquisitionData
             The full size dataset
         recon: ImageData
-            Pre-allocated reconstruction volume
+            Pre-allocated buffer for the reconstruction volume
         ig: ImageGeometry
             Reconstruction volume geometry
         ag: AcquisitionGeometry
@@ -170,7 +170,7 @@ class LaminographyGeometryCorrector(Processor):
         data_downsampled: AcquisitionData
             Downsampled dataset used for reprojection
         residual: AcquisitionData
-            Pre-allocated residual, difference between data and reprojection
+            Pre-allocated buffer, size of the downsampled data
         tilt_deg: float
             Latest tilt angle in degrees
         cor_pix: float

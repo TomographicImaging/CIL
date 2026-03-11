@@ -150,7 +150,7 @@ class LaminographyGeometryCorrector(Processor):
 
         return ag
        
-    def _projection_reprojection(self, data, recon, ig, ag, ag_downsampled, data_downsampled, residual, tilt_deg, cor_pix):
+    def _projection_reprojection(self, data, recon_buffer, ig, ag, ag_downsampled, data_downsampled, residual_buffer, tilt_deg, cor_pix):
         """
         Reconstruct the data then re-project and calculate the residual. Then
         filter the residual and calculate the L2Norm loss.
@@ -159,7 +159,7 @@ class LaminographyGeometryCorrector(Processor):
         ----------
         data: AcquisitionData
             The full size dataset
-        recon: ImageData
+        recon_buffer: ImageData
             Pre-allocated buffer for the reconstruction volume
         ig: ImageGeometry
             Reconstruction volume geometry
@@ -169,7 +169,7 @@ class LaminographyGeometryCorrector(Processor):
             Geometry of the downsampled dataset used for reprojection
         data_downsampled: AcquisitionData
             Downsampled dataset used for reprojection
-        residual: AcquisitionData
+        residual_buffer: AcquisitionData
             Pre-allocated buffer, size of the downsampled data
         tilt_deg: float
             Latest tilt angle in degrees
@@ -182,21 +182,21 @@ class LaminographyGeometryCorrector(Processor):
         ag = self._update_geometry(ag, tilt_deg, cor_pix)
         FBP = self.FBP(ig, ag)
         FBP.set_input(data)
-        FBP.get_output(out=recon)
-        recon.apply_circular_mask(0.9)
+        FBP.get_output(out=recon_buffer)
+        recon_buffer.apply_circular_mask(0.9)
 
         # update the downsampled data geometry and get forward projection
         ag_downsampled = self._update_geometry(ag_downsampled, tilt_deg, cor_pix)
         A = self.ProjectionOperator(ig, ag_downsampled)
-        A.direct(recon, out=residual)
+        A.direct(recon_buffer, out=residual_buffer)
         # subtract the downsampled reference data
-        residual.subtract(data_downsampled, out=residual)
+        residual_buffer.subtract(data_downsampled, out=residual_buffer)
         
         # apply Gaussian and Sobel filter - note the axes are hard coded here for astra, this would need to be updated for tigre 
-        residual.subtract(gaussian_filter(residual.as_array(), sigma=3.0, axes=(0,2)), out=residual)
-        np.sqrt((sobel(residual.array, axis=0))**2 + (sobel(residual.array, axis=2))**2, out=residual.array)
+        residual_buffer.subtract(gaussian_filter(residual_buffer.as_array(), sigma=3.0, axes=(0,2)), out=residual_buffer)
+        np.sqrt((sobel(residual_buffer.array, axis=0))**2 + (sobel(residual_buffer.array, axis=2))**2, out=residual_buffer.array)
         
-        loss = float(np.sum(residual**2))
+        loss = float(np.sum(residual_buffer**2))
 
         return loss
     

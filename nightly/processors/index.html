@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 25.0.1.dev24+g3065ebd75 documentation</title>
+    <title>Processors &#8212; CIL 25.0.1.dev25+g090bb98c9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=4bd1a2b0678c3970e5a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=4bd1a2b0678c3970e5a9" />
 
-    <script src="../_static/documentation_options.js?v=e4421471"></script>
+    <script src="../_static/documentation_options.js?v=4dbdea7b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev24+g3065ebd75';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev25+g090bb98c9';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev24+g3065ebd75" />
+  <meta name="docsearch:version" content="25.0.1.dev25+g090bb98c9" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -445,6 +445,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ring-remover">Ring Remover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#paganin-processor">Paganin Processor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#laminography-geometry-corrector">Laminography Geometry Corrector</a></li>
 </ul>
 </li>
 </ul>
@@ -2010,6 +2011,96 @@ alpha when also using <code class="code docutils literal notranslate"><span clas
 re-scaling the result by <span class="math notranslate nohighlight">\(\mu\)</span> e.g.
 <code class="code docutils literal notranslate"><span class="pre">thickness*processor.mu</span></code> If <code class="code docutils literal notranslate"><span class="pre">alpha</span></code> is not specified,
 it will be calculated <span class="math notranslate nohighlight">\(\frac{\Delta\delta\lambda}{4\pi\beta}\)</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="laminography-geometry-corrector">
+<h3>Laminography Geometry Corrector<a class="headerlink" href="#laminography-geometry-corrector" title="Link to this heading">#</a></h3>
+<p>Laminography is a technique similar to tomography in which the rotation axis
+is tilted relative to the beam. This can be setup as below, by tilting the
+sample and rotation axis by an angle <span class="math notranslate nohighlight">\(\phi\)</span>:</p>
+<figure class="align-center" id="id5">
+<img alt="laminography geometry showing tilted rotation axis" src="../_images/lamino_tilt1.png" />
+<figcaption>
+<p><span class="caption-text">Laminography geometry from tilted rotation axis</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>or equivalently by offsetting the source and detector:</p>
+<figure class="align-center" id="id6">
+<img alt="laminography geometry showing tilted rotation axis" src="../_images/lamino_tilt2.png" />
+<figcaption>
+<p><span class="caption-text">Laminography geometry from offset source and detector</span><a class="headerlink" href="#id6" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>This processor fits the tilt angle <span class="math notranslate nohighlight">\(\phi\)</span> as well as the centre of
+rotation offset (defined above) for parallel beam laminography data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.processors.LaminographyGeometryCorrector">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.processors.</span></span><span class="sig-name descname"><span class="pre">LaminographyGeometryCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[(-10,</span> <span class="pre">10),</span> <span class="pre">(-20,</span> <span class="pre">20)]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.01,</span> <span class="pre">0.01)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_subsampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'astra'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/LaminographyGeometryCorrector/#LaminographyGeometryCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.LaminographyGeometryCorrector" title="Link to this definition">#</a></dt>
+<dd><p>LaminographyGeometryCorrector processor to fit the geometry of a
+parallel beam laminography dataset to find tilt and center-of-rotation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter_bounds</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Bounds for the parameters [(tilt_min_deg, tilt_max_deg), (CoR_min_pix, CoR_max_pix)].
+Defaults to [(-10, 10), (-20, 20)].</p></li>
+<li><p><strong>parameter_tolerance</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Convergence tolerance for optimisation of parameters, (tilt_tol_deg, CoR_tol_pix).
+Defaults to (0.01, 0.01).</p></li>
+<li><p><strong>coarse_binning</strong> (<em>int</em><em>, </em><em>optional</em>) – Initial binning factor applied to the input dataset for coarse optimisation.
+If None, a value based on dataset size is used.</p></li>
+<li><p><strong>final_binning</strong> (<em>int</em><em>, </em><em>optional</em>) – Final binning factor applied for fine optimisation.
+If None, no binning is applied in the fine optimisation step.</p></li>
+<li><p><strong>angle_subsampling</strong> (<em>float</em><em>, </em><em>optional</em>) – Subsampling factor for the angle dimension during optimisation.
+If None, automatically determined based on input dataset.</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>optional</em>) – Pass a reduced volume ImageGeometry to be used for fitting.
+If None, the full dataset is used.</p></li>
+<li><p><strong>backend</strong> (<em>{'astra'}</em><em>, </em><em>optional</em>) – The backend to use for the reconstruction. Currently only ‘astra’
+is supported.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span> <span class="o">=</span> <span class="n">LaminographyGeometryCorrector</span><span class="p">(</span><span class="n">parameter_bounds</span><span class="o">=</span><span class="p">(</span><span class="n">tilt_bounds</span><span class="p">,</span> <span class="n">CoR_bounds</span><span class="p">),</span>
+<span class="go">    parameter_tolerance=(tilt_tol, CoR_tol))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_corrected</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.LaminographyGeometryCorrector.plot_evaluations">
+<span class="sig-name descname"><span class="pre">plot_evaluations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/LaminographyGeometryCorrector/#LaminographyGeometryCorrector.plot_evaluations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.LaminographyGeometryCorrector.plot_evaluations" title="Link to this definition">#</a></dt>
+<dd><p>Plot results from the minimisation. Plots the loss function value as a
+function of tilt and centre of rotation offset position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.LaminographyGeometryCorrector.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.LaminographyGeometryCorrector.get_output" title="Link to this definition">#</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The processed data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.processors.LaminographyGeometryCorrector.set_input">
+<span class="sig-name descname"><span class="pre">set_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.LaminographyGeometryCorrector.set_input" title="Link to this definition">#</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

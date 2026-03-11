@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utilities &#8212; CIL 25.0.1.dev25+g090bb98c9 documentation</title>
+    <title>Utilities &#8212; CIL 25.0.1.dev26+g7c0dcdda9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=4bd1a2b0678c3970e5a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=4bd1a2b0678c3970e5a9" />
 
-    <script src="../_static/documentation_options.js?v=4dbdea7b"></script>
+    <script src="../_static/documentation_options.js?v=e4ee4d99"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev25+g090bb98c9';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev26+g7c0dcdda9';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Recon" href="../recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev25+g090bb98c9" />
+  <meta name="docsearch:version" content="25.0.1.dev26+g7c0dcdda9" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -452,6 +452,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#show-geometry-display-system-geometry">show_geometry - Display system geometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#islicer-interactive-display-of-2d-slices">islicer - interactive display of 2D slices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#link-islicer-link-islicer-objects-by-index">link_islicer - link islicer objects by index</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#shrink-volume">Shrink volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#volumeshrinker-create-a-cropped-reconstruction-volume-from-image-data">VolumeShrinker - create a cropped reconstruction volume from image data</a></li>
 </ul>
 </li>
 </ul>
@@ -1260,6 +1264,94 @@ through a set of them</p></li>
 selection sliders will be extracted and linked.</p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="shrink-volume">
+<h2>Shrink volume<a class="headerlink" href="#shrink-volume" title="Link to this heading">#</a></h2>
+<section id="volumeshrinker-create-a-cropped-reconstruction-volume-from-image-data">
+<h3>VolumeShrinker - create a cropped reconstruction volume from image data<a class="headerlink" href="#volumeshrinker-create-a-cropped-reconstruction-volume-from-image-data" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.utilities.shrink_volume.VolumeShrinker">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cil.utilities.shrink_volume.</span></span><span class="sig-name descname"><span class="pre">VolumeShrinker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recon_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/shrink_volume/#VolumeShrinker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.shrink_volume.VolumeShrinker" title="Link to this definition">#</a></dt>
+<dd><p>Shrinks the reconstruction volume from a dataset based on supplied volume
+limits, thresholding or automatic detection of the region of interest using
+Otsu thresholding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The dataset to create a reduced reconstruction volume from.</p></li>
+<li><p><strong>recon_backend</strong> (<em>{'tigre'</em><em>, </em><em>'astra'}</em>) – The plugin backend to use for the reconstruction</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.utilities.shrink_volume.VolumeShrinker.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preview</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'manual'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/shrink_volume/#VolumeShrinker.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.shrink_volume.VolumeShrinker.run" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limits</strong> (<em>dict</em><em>, </em><em>optional</em>) – ImageGeometry limits {‘axis_name1’:(min, max), ‘axis_name2’:(min, max)}
+The <cite>key</cite> being the ImageGeometry axis name and <cite>value</cite> a tuple containing
+the min and max limits.
+Default None, uses the full extent of the data</p></li>
+<li><p><strong>preview</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, plots the maximum values from a binned reconstruction in each
+direction to check the ImageGeometry contains the full volume.
+Default is False.</p></li>
+<li><p><strong>method</strong> (<em>string</em><em>, </em><em>optional</em>) – If ‘manual’, use <cite>limits</cite>
+If ‘threshold’ crop the reconstruction volume based on a threshold
+value between sample and background. Pass threshold as a kwarg.
+If ‘otsu’, automatically detect and crop the reconstruction volume.
+Default is ‘manual’</p></li>
+<li><p><strong>**kwargs</strong></p></li>
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – If using ‘threshold’ method, specify the intensity threshold
+between sample and background in the reconstruction. Default is None.</p></li>
+<li><p><strong>buffer</strong> (<em>float</em><em>, </em><em>optional</em>) – Buffer in pixels around the automatically detected limits.
+Default is 0, no buffer added.</p></li>
+<li><p><strong>mask_radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of circular mask to apply on the reconstructed volume. This
+impacts the automatic cropping of the reconstruction volume when method
+is ‘threshold’ or ‘otsu’ and displaying with preview. Default is None.</p></li>
+<li><p><strong>otsu_classes</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of material classes to use when automatically detecting the
+reconstruction volume using Otsu thresholding method. Default is 2.</p></li>
+<li><p><strong>min_component_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum size in pixels of connected components to consider when automatically
+cropping the reconstruction volume. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ig_reduced</strong> – The reduced size ImageGeometry</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../framework/#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry">ImageGeometry</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;manual&#39;</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">150</span><span class="p">)})</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;otsu&#39;</span><span class="p">,</span> <span class="n">otsu_classes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <cite>otsu</cite> and <cite>threshold</cite> methods, setting logging to ‘debug’ shows
+a plot of the threshold on a histogram of the data and the threshold mask
+on the reconstruction.</p>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <p><a class="reference internal" href="../#mastertoc"><span class="std std-ref">Return Home</span></a></p>

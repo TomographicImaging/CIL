@@ -1,0 +1,926 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.utilities.shrink_volume &#8212; CIL 25.0.1.dev26+g7c0dcdda9 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=4bd1a2b0678c3970e5a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=4bd1a2b0678c3970e5a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=4bd1a2b0678c3970e5a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=4bd1a2b0678c3970e5a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=4bd1a2b0678c3970e5a9" />
+
+    <script src="../../../../_static/documentation_options.js?v=e4ee4d99"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/utilities/shrink_volume';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.2dev0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev26+g7c0dcdda9';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.0.1.dev26+g7c0dcdda9" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+     
+  
+
+<a class="navbar-brand logo" href="https://tomographicimaging.github.io/CIL">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB.svg" class="logo__image only-light" alt="CIL - Home"/>
+    <img src="https://ccpi.ac.uk/wp-content/uploads/2022/11/CIL-logo-RGB-reversed.svg" class="logo__image only-dark pst-js-only" alt="CIL - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../introduction/">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../framework/">
+    Framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../io/">
+    Read/ write AcquisitionData and ImageData
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../optimisation/">
+    Optimisation framework
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../processors/">
+    Processors
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../recon/">
+    Recon
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../utilities/">
+    Utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../plugins/">
+    CIL Plugins
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide/">
+    Developers’ Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../demos/">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../usershowcase/">
+    User showcase
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction/">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../framework/">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io/">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation/#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../processors/">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../recon/">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utilities/">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plugins/">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide/">Developers’ Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos/">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usershowcase/">User showcase</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">cil.utilities.shrink_volume</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for cil.utilities.shrink_volume</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  Copyright 2026 United Kingdom Research and Innovation</span>
+<span class="c1">#  Copyright 2026 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  you may not use this file except in compliance with the License.</span>
+<span class="c1">#  You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#  See the License for the specific language governing permissions and</span>
+<span class="c1">#  limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Authors:</span>
+<span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.axes_grid1</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">label</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">skimage.filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">threshold_multiotsu</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.processors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binner</span><span class="p">,</span> <span class="n">Slicer</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<div class="viewcode-block" id="VolumeShrinker">
+<a class="viewcode-back" href="../../../../utilities/#cil.utilities.shrink_volume.VolumeShrinker">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VolumeShrinker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shrinks the reconstruction volume from a dataset based on supplied volume </span>
+<span class="sd">    limits, thresholding or automatic detection of the region of interest using </span>
+<span class="sd">    Otsu thresholding.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: AcquisitionData</span>
+<span class="sd">        The dataset to create a reduced reconstruction volume from.</span>
+
+<span class="sd">    recon_backend : {&#39;tigre&#39;, &#39;astra&#39;}</span>
+<span class="sd">        The plugin backend to use for the reconstruction</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="s1">&#39;tigre&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+         
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_backend</span> <span class="o">=</span> <span class="n">recon_backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recon_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configure_recon</span><span class="p">(</span><span class="n">recon_backend</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VolumeShrinker.run">
+<a class="viewcode-back" href="../../../../utilities/#cil.utilities.shrink_volume.VolumeShrinker.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;manual&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        limits : dict, optional</span>
+<span class="sd">            ImageGeometry limits {&#39;axis_name1&#39;:(min, max), &#39;axis_name2&#39;:(min, max)}</span>
+<span class="sd">            The `key` being the ImageGeometry axis name and `value` a tuple containing </span>
+<span class="sd">            the min and max limits.</span>
+<span class="sd">            Default None, uses the full extent of the data</span>
+
+<span class="sd">        preview: bool, optional</span>
+<span class="sd">            If True, plots the maximum values from a binned reconstruction in each </span>
+<span class="sd">            direction to check the ImageGeometry contains the full volume. </span>
+<span class="sd">            Default is False.</span>
+<span class="sd">        </span>
+<span class="sd">        method : string, optional</span>
+<span class="sd">            If &#39;manual&#39;, use `limits`</span>
+<span class="sd">            If &#39;threshold&#39; crop the reconstruction volume based on a threshold</span>
+<span class="sd">            value between sample and background. Pass threshold as a kwarg.</span>
+<span class="sd">            If &#39;otsu&#39;, automatically detect and crop the reconstruction volume.</span>
+<span class="sd">            Default is &#39;manual&#39;</span>
+
+<span class="sd">        **kwargs:</span>
+<span class="sd">        threshold: float, optional</span>
+<span class="sd">            If using &#39;threshold&#39; method, specify the intensity threshold</span>
+<span class="sd">            between sample and background in the reconstruction. Default is None.</span>
+
+<span class="sd">        buffer: float, optional</span>
+<span class="sd">            Buffer in pixels around the automatically detected limits. </span>
+<span class="sd">            Default is 0, no buffer added.</span>
+
+<span class="sd">        mask_radius: float, optional</span>
+<span class="sd">            Radius of circular mask to apply on the reconstructed volume. This</span>
+<span class="sd">            impacts the automatic cropping of the reconstruction volume when method</span>
+<span class="sd">            is &#39;threshold&#39; or &#39;otsu&#39; and displaying with preview. Default is None.</span>
+
+<span class="sd">        otsu_classes: int, optional</span>
+<span class="sd">            Number of material classes to use when automatically detecting the </span>
+<span class="sd">            reconstruction volume using Otsu thresholding method. Default is 2.</span>
+
+<span class="sd">        min_component_size: int, optional</span>
+<span class="sd">            Minimum size in pixels of connected components to consider when automatically </span>
+<span class="sd">            cropping the reconstruction volume. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ig_reduced: ImageGeometry</span>
+<span class="sd">            The reduced size ImageGeometry</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; vs = VolumeShrinker(data, recon_backend=&#39;astra&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ig_reduced = vs.run(method=&#39;manual&#39;, limits={&#39;horizontal_x&#39;:(10, 150)})</span>
+<span class="sd">        </span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level = logging.getLogger()</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level.setLevel(logging.DEBUG)</span>
+<span class="sd">        &gt;&gt;&gt; vs = VolumeShrinker(data, recon_backend=&#39;astra&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ig_reduced = vs.run(method=&#39;threshold&#39;, threshold=0.9)</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level = logging.getLogger()</span>
+<span class="sd">        &gt;&gt;&gt; cil_log_level.setLevel(logging.DEBUG)</span>
+<span class="sd">        &gt;&gt;&gt; vs = VolumeShrinker(data, recon_backend=&#39;astra&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ig_reduced = vs.run(method=&#39;otsu&#39;, otsu_classes=3)</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For the `otsu` and `threshold` methods, setting logging to &#39;debug&#39; shows </span>
+<span class="sd">        a plot of the threshold on a histogram of the data and the threshold mask </span>
+<span class="sd">        on the reconstruction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;manual&#39;</span><span class="p">:</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># sets default full range bounds for all dimensions</span>
+            <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                <span class="n">bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="n">limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># applies limits to dimension if specified</span>
+                <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">limits</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                                <span class="n">v</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)]</span>
+                                <span class="n">v</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dimension </span><span class="si">{}</span><span class="s2"> not recognised, must be one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">))</span>
+        <span class="c1"># methods to find automatic limits</span>
+        <span class="k">elif</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;otsu&#39;</span><span class="p">]:</span>
+            <span class="n">mask_radius</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;mask_radius&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">recon</span><span class="p">,</span> <span class="n">binning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recon</span><span class="p">(</span><span class="n">mask_radius</span><span class="o">=</span><span class="n">mask_radius</span><span class="p">)</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">buffer</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;buffer&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">min_component_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;min_component_size&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">otsu_classes</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;otsu_classes&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> 
+            <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_reconstruction_volume</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">binning</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> 
+                                                        <span class="n">threshold</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">min_component_size</span><span class="p">,</span> <span class="n">otsu_classes</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Method </span><span class="si">{method}</span><span class="s2"> not recognised, must be one of &#39;manual&#39;, &#39;threshold&#39; or &#39;otsu&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">preview</span><span class="p">:</span>
+            <span class="c1"># if we use manual limits but preview is True we need to calculate the recon</span>
+            <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;manual&#39;</span><span class="p">:</span>
+                <span class="n">mask_radius</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;mask_radius&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">recon</span><span class="p">,</span> <span class="n">binning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recon</span><span class="p">(</span><span class="n">mask_radius</span><span class="o">=</span><span class="n">mask_radius</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_with_bounds</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">binning</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_ig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">(),</span> <span class="n">bounds</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_ig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ig_unbinned</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a new unbinned ImageGeometry with the bounds applied</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ig</span> <span class="o">=</span> <span class="n">ig_unbinned</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ig</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">:(</span><span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;horizontal_y&#39;</span><span class="p">:(</span><span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;vertical&#39;</span><span class="p">:(</span><span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)})(</span><span class="n">ig_unbinned</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ig</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_radius</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a binned reconstruction from the dataset with an optional mask</span>
+<span class="sd">        Also returns the binning which has been used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">binning</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">128</span><span class="p">)),</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">angle_binning</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">binning</span><span class="p">),</span>
+                <span class="s1">&#39;vertical&#39;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">binning</span><span class="p">),</span>
+                <span class="s1">&#39;angle&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">angle_binning</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="n">data_binned</span> <span class="o">=</span> <span class="n">Binner</span><span class="p">(</span><span class="n">roi</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">ag</span> <span class="o">=</span> <span class="n">data_binned</span><span class="o">.</span><span class="n">geometry</span>
+        <span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+
+        <span class="n">fbp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recon_method</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">)</span>
+        <span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_binned</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">mask_radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">recon</span><span class="o">.</span><span class="n">apply_circular_mask</span><span class="p">(</span><span class="n">mask_radius</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recon</span><span class="p">,</span> <span class="n">binning</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_with_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">binning</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the bounds on the maximum value in the reconstructed dataset along </span>
+<span class="sd">        each direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">recon</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">dimension_labels</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dims</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="n">other_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">]</span>
+            <span class="n">y_dim</span><span class="p">,</span> <span class="n">x_dim</span> <span class="o">=</span> <span class="n">other_dims</span>
+            <span class="n">x_size</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">x_dim</span><span class="p">)</span><span class="o">*</span><span class="n">binning</span>
+            <span class="n">y_size</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">y_dim</span><span class="p">)</span><span class="o">*</span><span class="n">binning</span>
+
+            <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+                    <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y_size</span><span class="p">])</span>
+            <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+            <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;5%&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="n">x_dim</span><span class="p">]</span>
+                <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="n">y_dim</span><span class="p">]</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downsampled  </span><span class="si">{</span><span class="n">x_dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downsampled  </span><span class="si">{</span><span class="n">y_dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum values in direction: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_reconstruction_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">binning</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> 
+                                      <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">min_component_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">otsu_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automatically finds the boundaries of the sample in a reconstructed</span>
+<span class="sd">        volume based on a threshold between sample and background. </span>
+<span class="sd">        If method=`threshold`, the threshold must be provided.</span>
+<span class="sd">        If method=`otsu`, the threshold is calculated from an Otsu filter. The</span>
+<span class="sd">        number of `otsu_classes` can be passed. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+          
+
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">dimension_labels</span>
+        <span class="n">all_bounds</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">}</span>
+
+        <span class="c1"># loops through the dimensions and finds the min and max pixel position with value above the threshold</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">array</span>
+            
+            <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;threshold&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">threshold</span> <span class="o">&gt;=</span> <span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> is greater than maximum value in dimension: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">. Try specifying a lower threshold.&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">threshold</span> <span class="o">&lt;=</span> <span class="n">arr</span><span class="o">.</span><span class="n">min</span><span class="p">():</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> is less than minimum value in dimension: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2">. Try specifying a higher threshold.&quot;</span><span class="p">)</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">&gt;</span> <span class="n">threshold</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must supply a threshold argument if method=&#39;threshold&#39;&quot;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;otsu&#39;</span><span class="p">:</span>
+                <span class="n">n_bins</span> <span class="o">=</span> <span class="mi">256</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold_multiotsu</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">arr</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="n">otsu_classes</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">&gt;</span> <span class="n">threshold</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No pixels found within threshold, consider using a different number of otsu_classes or method=&#39;threshold&#39; or &#39;manual&#39;&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">min_component_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_large_components</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">min_component_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No pixels found within threshold, consider reducing min_component_size&quot;</span><span class="p">)</span>
+
+            <span class="n">x_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">y_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">x_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">y_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">log</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+
+                <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Maximum values&#39;</span><span class="p">)</span>
+
+                <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Histogram of maximum values&#39;</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]])</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Calculated threshold mask&#39;</span><span class="p">)</span>
+
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_min</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+                <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x_max</span><span class="p">,</span> <span class="n">x_max</span><span class="p">],</span> <span class="p">[</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">],</span> <span class="s1">&#39;--r&#39;</span><span class="p">)</span>
+
+                <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+                
+                <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+            <span class="n">other_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">axis</span><span class="p">]</span>
+
+
+            <span class="n">all_bounds</span><span class="p">[</span><span class="n">dims</span><span class="p">[</span><span class="n">other_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">))</span>
+            <span class="n">all_bounds</span><span class="p">[</span><span class="n">dims</span><span class="p">[</span><span class="n">other_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">))</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># loops over dimensions and finds the maximum bounds, then multiplies by binning and adds buffer</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+
+            <span class="n">mins</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">all_bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">]]</span>
+            <span class="n">maxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">all_bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">]]</span>
+
+            <span class="c1"># get the lowest and highest boundary</span>
+            <span class="c1"># bounds can only be found with the precision of binning so add a full bin each side</span>
+            <span class="n">dim_min</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">mins</span><span class="p">)</span><span class="o">*</span><span class="n">binning</span><span class="p">)</span> <span class="o">-</span> <span class="n">binning</span>
+            <span class="n">dim_max</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">maxs</span><span class="p">)</span><span class="o">*</span><span class="n">binning</span><span class="p">)</span> <span class="o">+</span> <span class="n">binning</span>
+
+            <span class="c1"># add the buffer but limit to original ig size</span>
+            <span class="n">dim_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_min</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">)])</span> 
+            <span class="n">dim_full</span> <span class="o">=</span> <span class="n">recon</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span><span class="o">*</span><span class="n">binning</span>
+            <span class="n">dim_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">dim_full</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_max</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">)])</span>
+            
+            <span class="n">bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_min</span><span class="p">,</span> <span class="n">dim_max</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">log</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">bounds</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_threshold_large_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">min_component_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Modify a threshold mask to ignore clusters of pixel values above the threshold </span>
+<span class="sd">        if the cluster is below a specified `min_component_size` in pixels. This </span>
+<span class="sd">        can be useful for noisy datasets where a few noisy pixels above the threshold </span>
+<span class="sd">        may appear in the background and erroneously increase the bounds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labeled_mask</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">label</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">component_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labeled_mask</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+        <span class="n">large_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">component_sizes</span> <span class="o">&gt;</span> <span class="n">min_component_size</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">large_labels</span> <span class="o">=</span> <span class="n">large_labels</span><span class="p">[</span><span class="n">large_labels</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>  
+        <span class="n">large_components_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">labeled_mask</span><span class="p">,</span> <span class="n">large_labels</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">large_components_mask</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_configure_recon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configures the recon for the right engine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported_backends</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Backend unsupported. Supported backends: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_supported_backends</span><span class="p">))</span>
+
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cil.plugins.</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="n">FBP</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=4bd1a2b0678c3970e5a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=4bd1a2b0678c3970e5a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2024.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

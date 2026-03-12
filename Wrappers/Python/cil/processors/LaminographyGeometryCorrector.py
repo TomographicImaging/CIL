@@ -135,7 +135,7 @@ class LaminographyGeometryCorrector(Processor):
         self.initial_parameters = (tilt_deg, CoR_pix)
 
     def _update_geometry(self, ag, tilt_deg, cor_pix, 
-                        tilt_direction_vector = np.array([1, 0, 0]), 
+                        tilt_direction_vector = np.array([1, 0, 0]),
                         original_rotation_axis=np.array([0, 0, 1])):
         """
         Update the rotation matrix direction and centre of rotation from a tilt

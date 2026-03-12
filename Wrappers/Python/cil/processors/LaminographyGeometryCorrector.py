@@ -135,7 +135,7 @@ class LaminographyGeometryCorrector(Processor):
         self.initial_parameters = (tilt_deg, CoR_pix)
 
     def _update_geometry(self, ag, tilt_deg, cor_pix, 
-                        tilt_direction_vector = np.array([1, 0, 0]), 
+                        tilt_direction_vector = np.array([1, 0, 0]),
                         original_rotation_axis=np.array([0, 0, 1])):
         """
         Update the rotation matrix direction and centre of rotation from a tilt
@@ -144,7 +144,8 @@ class LaminographyGeometryCorrector(Processor):
         tilt_rad = np.deg2rad(tilt_deg)
         rotation_matrix = R.from_rotvec(tilt_rad * tilt_direction_vector)
         tilted_rotation_axis = rotation_matrix.apply(original_rotation_axis)
-
+        
+        ag.config.system.rotation_axis.direction = original_rotation_axis
         ag.set_centre_of_rotation(offset=cor_pix, distance_units='pixels')
         ag.config.system.rotation_axis.direction = tilted_rotation_axis
 

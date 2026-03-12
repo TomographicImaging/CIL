@@ -144,7 +144,8 @@ class LaminographyGeometryCorrector(Processor):
         tilt_rad = np.deg2rad(tilt_deg)
         rotation_matrix = R.from_rotvec(tilt_rad * tilt_direction_vector)
         tilted_rotation_axis = rotation_matrix.apply(original_rotation_axis)
-
+        
+        ag.config.system.rotation_axis.direction = original_rotation_axis
         ag.set_centre_of_rotation(offset=cor_pix, distance_units='pixels')
         ag.config.system.rotation_axis.direction = tilted_rotation_axis
 

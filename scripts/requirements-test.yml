@@ -19,11 +19,11 @@ channels:
 dependencies:
   - python >=3.10
   - numpy >=1.23,<2
-  - libgomp      # [linux]
+  - llvm-openmp
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6
   - ccpi::ccpi-regulariser 24.0.1
-  - ccpi::tomophantom 2.0.0
+  - httomo::tomophantom
   - astra-toolbox 2.1 cuda*
   - cvxpy
   - python-wget

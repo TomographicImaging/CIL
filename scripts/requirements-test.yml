@@ -48,3 +48,4 @@ dependencies:
   - pip
   - pip:
     - unittest-parametrize
+    - bm3d

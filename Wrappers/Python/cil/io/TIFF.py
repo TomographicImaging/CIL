@@ -49,7 +49,7 @@ def save_scale_offset(fname, scale, offset):
     '''
     dirname = os.path.dirname(fname)
     txt = os.path.join(dirname, 'scaleoffset.json')
-    d = {'scale': scale, 'offset': offset}
+    d = {'scale': str(scale), 'offset': str(offset)}
     utilities.save_dict_to_file(txt, d)
 
 class TIFFWriter(object):
